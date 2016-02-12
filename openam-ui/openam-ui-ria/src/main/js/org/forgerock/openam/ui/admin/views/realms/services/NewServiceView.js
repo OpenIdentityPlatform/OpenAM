@@ -22,12 +22,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
     "org/forgerock/openam/ui/admin/views/realms/services/renderForm",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, SMSRealmService, renderForm) {
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, renderForm) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceTemplate.html",
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
 
             this.data.realmPath = args[0];
 
-            SMSRealmService.services.type.getCreatables(this.data.realmPath).then(function (creatableTypes) {
+            ServicesService.type.getCreatables(this.data.realmPath).then(function (creatableTypes) {
                 self.data.creatableTypes = creatableTypes;
 
                 self.parentRender(function () {
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
             if (service && service !== this.data.type) {
                 this.data.type = service;
 
-                SMSRealmService.services.instance.getInitialState(this.data.realmPath, this.data.type)
+                ServicesService.instance.getInitialState(this.data.realmPath, this.data.type)
                     .then(function (initialState) {
                         renderForm(self.$el, {
                             schema: initialState.schema,
@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         onSave: function () {
             var self = this;
 
-            SMSRealmService.services.instance.create(this.data.realmPath, this.data.type, this.form.data())
+            ServicesService.instance.create(this.data.realmPath, this.data.type, this.form.data())
                 .then(function () {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 

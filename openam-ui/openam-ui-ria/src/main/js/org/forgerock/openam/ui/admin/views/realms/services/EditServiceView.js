@@ -22,18 +22,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, SMSRealmService, FormHelper, Form,
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper,
              SubschemaListView) {
 
     function deleteService () {
-        SMSRealmService.services.instance.remove(this.data.realmPath, this.data.type).then(_.bind(function () {
+        ServicesService.instance.remove(this.data.realmPath, this.data.type).then(_.bind(function () {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
             Router.routeTo(Router.configuration.routes.realmsServices, {
@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
 
             var self = this;
 
-            SMSRealmService.services.instance.get(this.data.realmPath, this.data.type).then(function (data) {
+            ServicesService.instance.get(this.data.realmPath, this.data.type).then(function (data) {
                 self.data.schema = data.schema;
                 self.data.values = data.values;
                 self.data.name = data.name;
@@ -92,7 +92,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
 
         onSave: function () {
             var self = this;
-            SMSRealmService.services.instance.update(this.data.realmPath, this.data.type, this.form.data())
+            ServicesService.instance.update(this.data.realmPath, this.data.type, this.form.data())
                 .then(function (data) {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     self.data.values = data;

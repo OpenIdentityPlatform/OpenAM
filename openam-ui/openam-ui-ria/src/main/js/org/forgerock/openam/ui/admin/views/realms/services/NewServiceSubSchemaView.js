@@ -22,12 +22,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
     "org/forgerock/openam/ui/admin/views/realms/services/renderForm",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, SMSRealmService, renderForm) {
+], function ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, renderForm) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
@@ -53,7 +53,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
             this.parentRender(function () {
                 var self = this;
 
-                SMSRealmService.services.type.subSchema.instance.getInitialState(
+                ServicesService.type.subSchema.instance.getInitialState(
                     this.data.realmPath, this.data.serviceInstance, this.data.subSchemaType
                 ).then(function (initialState) {
                     renderForm(self.$el, {
@@ -70,7 +70,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
         onSave: function () {
             var self = this;
 
-            SMSRealmService.services.type.subSchema.instance.create(
+            ServicesService.type.subSchema.instance.create(
                 this.data.realmPath,
                 this.data.serviceInstance,
                 this.data.subSchemaType,

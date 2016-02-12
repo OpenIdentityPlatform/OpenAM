@@ -19,14 +19,14 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function ($, _, Messages, AbstractView, SMSRealmService, FormHelper) {
+], function ($, _, Messages, AbstractView, ServicesService, FormHelper) {
     function getServiceIdFromElement (element) {
         return $(element).closest("tr").data("serviceId");
     }
     function loadServicesFromServer (realmPath) {
-        return SMSRealmService.services.instance.getAll(realmPath);
+        return ServicesService.instance.getAll(realmPath);
     }
     function deleteServices (ids) {
         var self = this;
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         FormHelper.showConfirmationBeforeDeleting({
             message: $.t("console.services.list.confirmDeleteSelected", { count: ids.length })
         }, function () {
-            SMSRealmService.services.instance.remove(self.data.realmPath, ids).then(function () {
+            ServicesService.instance.remove(self.data.realmPath, ids).then(function () {
                 self.rerender();
             }, function (reason) {
                 Messages.addMessage({
