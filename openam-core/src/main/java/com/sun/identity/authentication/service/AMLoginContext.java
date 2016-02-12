@@ -24,7 +24,7 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.service;
@@ -1863,13 +1863,13 @@ public class AMLoginContext {
             debug.message("indexType is module");
             boolean instanceExists = loginState.getDomainAuthenticators().contains(indexName);
             if (!indexName.equals(ISAuthConstants.APPLICATION_MODULE) && !instanceExists) {
-                debug.message("Module denied!!");
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
-                loginState.logFailed(bundle.getString("moduleDenied"), "MODULEDENIED");
-                auditor.auditLoginFailure(loginState, MODULE_DENIED);
+                debug.message("Module {} Not Found!!", indexName);
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_NOT_FOUND);
+                loginState.logFailed(bundle.getString("moduleNotFound"), "MODULENOTFOUND");
+                auditor.auditLoginFailure(loginState, MODULE_NOT_FOUND);
                 setErrorMsgAndTemplate();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_MODULE_DENIED, null);
+                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_MODULE_NOT_FOUND, null);
             } else {
                 return false;
             }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -68,6 +68,7 @@ public class AMAuthErrorCodeResponseStatusMapping {
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_ORG_INACTIVE, Response.Status.BAD_REQUEST);
 //        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TIMEOUT, ???); 408
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_MODULE_DENIED, Response.Status.BAD_REQUEST);
+        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_MODULE_NOT_FOUND, Response.Status.NOT_FOUND);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_USER_LOCKED, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_USER_NOT_FOUND, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TYPE_DENIED, Response.Status.BAD_REQUEST);

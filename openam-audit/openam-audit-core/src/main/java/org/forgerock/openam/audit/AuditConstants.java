@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -224,6 +224,8 @@ public final class AuditConstants {
         LOGIN_TIMEOUT,
         /** Authentication module is denied. */
         MODULE_DENIED,
+        /** Authentication module not found. */
+        MODULE_NOT_FOUND,
         /** Limit for maximum number of allowed session has been reached. */
         MAX_SESSION_REACHED,
         /** Org/Realm does not exists. */

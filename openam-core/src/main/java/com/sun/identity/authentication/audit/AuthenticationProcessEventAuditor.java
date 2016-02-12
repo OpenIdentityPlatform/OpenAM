@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.audit;
 
@@ -260,6 +260,8 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                 return LOGIN_TIMEOUT;
             case AMAuthErrorCode.AUTH_MODULE_DENIED:
                 return MODULE_DENIED;
+            case AMAuthErrorCode.AUTH_MODULE_NOT_FOUND:
+                return MODULE_NOT_FOUND;
             case AMAuthErrorCode.AUTH_USER_LOCKED:
                 return LOCKED_OUT;
             case AMAuthErrorCode.AUTH_USER_NOT_FOUND:
