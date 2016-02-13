@@ -88,6 +88,7 @@ public class AMSignatureProvider implements SignatureProvider {
     private boolean isJKSKeyStore= false;
     private String wsfVersion = null;
     private String defaultSigAlg = null;
+    private String digestAlg = null;
 
     /**
      * Default Constructor
@@ -117,6 +118,10 @@ public class AMSignatureProvider implements SignatureProvider {
         
         defaultSigAlg = SystemConfigurationUtil.getProperty(
             SAMLConstants.XMLSIG_ALGORITHM);
+
+        digestAlg = SystemConfigurationUtil.getProperty(
+            SAMLConstants.DIGEST_ALGORITHM,
+            Constants.ALGO_ID_DIGEST_SHA1);
 
         try {
             String valCert = SystemConfigurationUtil.getProperty(
@@ -246,7 +251,7 @@ public class AMSignatureProvider implements SignatureProvider {
             	transforms.addTransform(transformAlg);
             }
             
-            sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+            sig.addDocument("", transforms, digestAlg);
         
             // add certificate 
             X509Certificate cert =
@@ -536,7 +541,7 @@ public class AMSignatureProvider implements SignatureProvider {
             transforms.addTransform(
 				Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
             String ref = "#" + id;  
-            sig.addDocument(ref, transforms, Constants.ALGO_ID_DIGEST_SHA1);
+            sig.addDocument(ref, transforms, digestAlg);
             if (includeCert) {
                 X509Certificate cert =
                     (X509Certificate) keystore.getX509Certificate(certAlias);
@@ -675,8 +680,7 @@ public class AMSignatureProvider implements SignatureProvider {
 		if (SAMLUtilsCommon.debug.messageEnabled()) {
 		    SAMLUtilsCommon.debug.message("id = " +id);
 		}
-		signature.addDocument("#"+id, transforms,
-			Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("#"+id, transforms, digestAlg);
 	    }
 
 	    X509Certificate cert =
@@ -843,8 +847,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 if (SAMLUtilsCommon.debug.messageEnabled()) {
                     SAMLUtilsCommon.debug.message("id = " +id);
                 }
-                signature.addDocument("#"+id, transforms,
-                        Constants.ALGO_ID_DIGEST_SHA1);
+                signature.addDocument("#"+id, transforms, digestAlg);
             }
             KeyInfo keyInfo = signature.getKeyInfo();
             Element securityTokenRef = doc.createElementNS(wsseNS,
@@ -987,8 +990,7 @@ public class AMSignatureProvider implements SignatureProvider {
 		if (SAMLUtilsCommon.debug.messageEnabled()) {
 		    SAMLUtilsCommon.debug.message("id = " +id);
 		}
-		signature.addDocument("#"+id, transforms,
-			Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("#"+id, transforms, digestAlg);
 	    }
 
 	    KeyInfo keyInfo = signature.getKeyInfo();

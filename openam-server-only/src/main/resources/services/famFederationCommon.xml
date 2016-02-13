@@ -26,7 +26,7 @@
                                                                                 
    $Id: famFederationCommon.xml,v 1.4 2010/01/08 22:41:43 exu Exp $
                                                                                 
-    Portions Copyrighted 2015 ForgeRock AS.
+   Portions Copyrighted 2015-2016 ForgeRock AS.
 
 -->
 
@@ -167,6 +167,20 @@
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>http://www.w3.org/2000/09/xmldsig#rsa-sha1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="DigestAlgorithm"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1150">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#sha1">http://www.w3.org/2000/09/xmldsig#sha1</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmlenc#sha256">http://www.w3.org/2001/04/xmlenc#sha256</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmlenc#sha512">http://www.w3.org/2001/04/xmlenc#sha512</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#sha384">http://www.w3.org/2001/04/xmldsig-more#sha384</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2000/09/xmldsig#sha1</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="QuerySignatureAlgorithmRSA"

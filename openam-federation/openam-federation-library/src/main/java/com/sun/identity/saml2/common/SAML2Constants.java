@@ -951,6 +951,8 @@ public interface SAML2Constants {
          "com.sun.identity.saml.xmlsig.transformAlg";
     public String XMLSIG_ALGORITHM =
          "com.sun.identity.saml.xmlsig.xmlSigAlgorithm";
+    public String DIGEST_ALGORITHM =
+         "com.sun.identity.saml.xmlsig.digestAlgorithm";
     /**
      * Property name for the global default query signature algorithm for RSA keys.
      */

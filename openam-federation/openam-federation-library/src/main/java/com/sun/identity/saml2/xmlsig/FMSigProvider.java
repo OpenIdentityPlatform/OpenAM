@@ -72,6 +72,7 @@ public final class FMSigProvider implements SigProvider {
     private static String c14nMethod = null;
     private static String transformAlg = null;
     private static String sigAlg = null;
+    private static String digestAlg = null;
     // flag to check if the partner's signing cert included in
     // the XML doc is the same as the one in its meta data
     private static boolean checkCert = true;
@@ -87,6 +88,9 @@ public final class FMSigProvider implements SigProvider {
 	    Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS); 
 	sigAlg = SystemPropertiesManager.get(
 	    SAML2Constants.XMLSIG_ALGORITHM); 
+	digestAlg = SystemPropertiesManager.get(
+	    SAML2Constants.DIGEST_ALGORITHM,
+            Constants.ALGO_ID_DIGEST_SHA1);
 	
 	String valCert = 
 	    SystemPropertiesManager.get(
@@ -201,7 +205,7 @@ public final class FMSigProvider implements SigProvider {
 	    sig.addDocument(
 		ref,
 		transforms,
-		Constants.ALGO_ID_DIGEST_SHA1);
+		digestAlg);
 	} catch (XMLSignatureException sige1) {
 	    throw new SAML2Exception(sige1);
 	}	    
