@@ -118,7 +118,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 element = this.$el.find("#tabpanel").empty().get(0);
 
             if (tabId === "subschema") {
-                SubschemaListView.render(this.data.subschema);
+                SubschemaListView.render(this.data);
             } else {
                 this.form = new Form(element, schema, this.data.values);
             }

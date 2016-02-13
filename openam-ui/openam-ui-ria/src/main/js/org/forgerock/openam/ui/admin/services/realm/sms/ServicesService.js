@@ -109,14 +109,31 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 ]);
             }
 
+            function getCreatableTypes () {
+                // return obj.serviceCall({
+                //     url: scopedByRealm(realm, "services/" + type + "?_action=getCreatableTypes"),
+                //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                //     type: "POST"
+                // });
+
+                return $.Deferred().resolve([
+                    { "_id":"CSV", "description":"CSV" },
+                    { "_id":"JDBC", "description":"JDBC" },
+                    { "_id":"Syslog", "description":"Syslog" }
+                ]);
+            }
+
             function getSubSchema () {
                 return getSubSchemaTypes(realm, type).then(function (types) {
                     if (types.length > 0) {
-                        return getSubSchemaInstances(type).then(function (instances) {
-                            return instances;
+                        return Promise.all([getSubSchemaInstances(), getCreatableTypes()]).then(function (result) {
+                            return {
+                                instances: result[0],
+                                creatables: result[1]
+                            };
                         });
                     } else {
-                        return [];
+                        return null;
                     }
                 });
             }
@@ -264,16 +281,6 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST",
                         data: JSON.stringify(data)
-                    });
-                }
-            },
-
-            type: {
-                getCreatables: function (realm, serviceType) {
-                    return obj.serviceCall({
-                        url: scopedByRealm(realm, "services/" + serviceType + "?_action=getCreatableTypes"),
-                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                        type: "POST"
                     });
                 }
             }

@@ -8,7 +8,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#each subschema}}
+            {{#each subschema.instances}}
                 <tr data-service-id="{{_id}}">
                     <td class="wordwrap">
                         <a href="#AME-9651-TODO-Routing/{{_id}}" title="{{t 'common.form.edit'}}">{{typeDescription}}</a>
@@ -28,8 +28,17 @@
             {{/each}}
         </tbody>
     </table>
+</div>
 
-    <a href="#TODO" class="btn btn-default pull-right">
-        <i class="fa fa-plus"></i> {{t 'common.form.add'}}
-    </a>
+<div class="btn-group pull-right">
+    <button type="button" class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{t "console.services.subSchema.add"}} <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu">
+        {{#each subschema.creatables}}
+        <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{description}}</a></li>
+        {{/each}}
+    </ul>
 </div>

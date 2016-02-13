@@ -16,9 +16,10 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView"
-], function ($, Messages, AbstractView) {
+], function ($, _, Messages, AbstractView) {
 
     var SubschemaListView = AbstractView.extend({
         template: "templates/admin/views/realms/services/SubSchemaListTemplate.html",
@@ -28,7 +29,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
 
         render: function (data) {
             var self = this;
-            this.data.subschema = data;
+
+            _.extend(this.data, data);
+
             self.parentRender(function () {
                 // TODO
             });
