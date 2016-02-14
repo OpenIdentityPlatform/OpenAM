@@ -24,7 +24,7 @@
 
    $Id: idpSSOFederate.jsp,v 1.6 2009/10/15 00:00:41 exu Exp $
 
-   Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2013-2016 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
@@ -45,7 +45,6 @@
     SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
 
     saml2Auditor.setMethod("idpSSOFederate");
-    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
     saml2Auditor.setSessionTrackingId(session.getId());
     saml2Auditor.auditAccessAttempt();
 

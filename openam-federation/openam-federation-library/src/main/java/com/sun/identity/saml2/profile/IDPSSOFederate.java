@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -218,8 +218,11 @@ public class IDPSSOFederate {
         String idpEntityID = validator.getIDPEntity(idpMetaAlias, realm);
         SAML2IdentityProviderAdapter idpAdapter = validator.getIDPAdapter(realm, idpEntityID);
         String reqID = request.getParameter(REQ_ID);
-        if (null != auditor && StringUtils.isNotEmpty(reqID)) {
-            auditor.setRequestId(reqID);
+        if (null != auditor) {
+            if (StringUtils.isNotEmpty(reqID)) {
+                auditor.setRequestId(reqID);
+            }
+            auditor.setRealm(realm);
         }
         IDPSSOFederateRequest reqData = new IDPSSOFederateRequest(reqID, realm, idpAdapter, idpMetaAlias, idpEntityID);
         reqData.setEventAuditor(auditor);
