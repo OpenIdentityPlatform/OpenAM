@@ -816,9 +816,9 @@
             "list": {
                 "service": "Service",
                 "title": "Services",
-                "description": "(TODO: AME-9642 `console.services.description`) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed purus convallis purus venenatis eleifend ultricies eget ex. Integer vel pulvinar risus. Donec efficitur risus et ligula pulvinar porta. Aliquam erat volutpat. Vivamus sagittis lacus eu consectetur pellentesque. Nulla rutrum nibh commodo magna vestibulum, vel interdum elit iaculis.",
+                "description": "Configure realm-specific properties for OpenAM functionality.",
                 "addService": "Add Service",
-                "addServicePrompt": "(TODO: AME-9642 `console.services.addServicePrompt`) You have no services. Add a service here",
+                "addServicePrompt": "Add your first service.",
                 "grid": {
                     "header": ["Name"]
                 },
