@@ -1348,28 +1348,17 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Returns the realm.
-     *
-     * @param paramsMap a map of parameters
-     * @return realm if the input map contains the realm, otherwise
-     * return the default realm from AMConfig.properties
-     */
-    public static String getRealm(final Map paramsMap) {
-        return getRealm(getParameter(paramsMap, SAML2Constants.REALM));
-    }
-
-    /**
      * Returns the query parameter value for the param specified from the given Map.
      *
      * @param paramsMap     a map of parameters
      * @param attributeName name of the parameter
      * @return the value of this parameter or null if the parameter was not found in the params map
      */
-    public static String getParameter(final Map paramsMap, final String attributeName) {
+    public static String getParameter(final Map<String, String> paramsMap, final String attributeName) {
         if (null == paramsMap || paramsMap.isEmpty()) {
             return null;
         }
-        return (String) paramsMap.get(attributeName);
+        return paramsMap.get(attributeName);
     }
 
     /**

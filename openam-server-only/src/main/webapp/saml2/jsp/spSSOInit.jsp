@@ -24,12 +24,13 @@
 
    $Id: spSSOInit.jsp,v 1.11 2009/06/24 23:05:30 mrudulahg Exp $
 
-   Portions Copyright 2013-2015 ForgeRock AS.
+   Portions Copyright 2013-2016 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.SPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.SPSSOFederate" %>
 <%@ page import="java.util.Map" %>
@@ -164,7 +165,6 @@
     SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
 
     saml2Auditor.setMethod("spSSOInit");
-    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
     saml2Auditor.setSessionTrackingId(session.getId());
     saml2Auditor.auditAccessAttempt();
 
@@ -183,6 +183,7 @@
     	   idpEntityID = SAML2Utils.getPreferredIDP(request);
     	   paramsMap = (Map)SPCache.reqParamHash.get(reqID);
     	   metaAlias = (String) paramsMap.get("metaAlias");
+           saml2Auditor.setRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
     	   SPCache.reqParamHash.remove(reqID);
     	} else {
     	    // this is an original request check
@@ -190,6 +191,7 @@
     	    // if idpEntityID is null redirect to IDP Discovery
     	    // Service to retrieve.
     	    metaAlias = request.getParameter("metaAlias");
+            saml2Auditor.setRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
             if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
                 SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "nullSPEntityID",
     		    SAML2Utils.bundle.getString("nullSPEntityID"));
