@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- */
-
-/**
- * "Portions Copyrighted 2011-2014 ForgeRock Inc"
  */
 
 /*global document, $, define, _, window */
@@ -111,9 +107,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
         } else if (requirements.hasOwnProperty("tokenId")) {
-            _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
-                cookieHelper.setCookie(configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, configuration.globalData.secureCookie);
-            });
+            cookieHelper.setCookie(configuration.globalData.auth.cookieName, requirements.tokenId, "", "/",
+                configuration.globalData.auth.cookieDomains, configuration.globalData.secureCookie);
         }
     };
 
