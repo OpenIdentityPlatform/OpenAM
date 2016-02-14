@@ -35,24 +35,6 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             }
 
             return encodedRealm + "/realm-config/" + path;
-        },
-        getServiceSchema = function (realm, type) {
-            return obj.serviceCall({
-                url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            }).then(function (data) {
-                return SMSServiceUtils.sanitizeSchema(data);
-            });
-        },
-        getServiceSubSchema = function (realm, serviceType, subSchemaType) {
-            return obj.serviceCall({
-                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            }).then(function (data) {
-                return SMSServiceUtils.sanitizeSchema(data);
-            });
         };
 
     obj.authentication = {
