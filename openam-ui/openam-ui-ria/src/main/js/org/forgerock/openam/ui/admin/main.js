@@ -30,6 +30,7 @@ define([
     "./views/realms/agents/AgentsView",
 
     "./views/realms/authentication/chains/CriteriaView",
+    "./views/realms/authentication/chains/AddChainView",
     "./views/realms/authentication/chains/EditChainView",
     "./views/realms/authentication/chains/EditLinkView",
     "./views/realms/authentication/chains/LinkView",

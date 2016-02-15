@@ -40,16 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             "change input[data-chain-name]" : "chainSelected",
             "click  button.delete-chain-btn": "onDeleteSingle",
             "click  #deleteChains"          : "onDeleteMultiple",
-            "click  #selectAll"             : "selectAll",
-            "click  #addChain"              : "addChain"
-        },
-        partials: [
-            "partials/alerts/_Alert.html" // AddChainDialog
-        ],
-        addChain: function (event) {
-            event.preventDefault();
-
-            AddChainDialog(this.data.realmPath, this.data.sortedChains);
+            "click  #selectAll"             : "selectAll"
         },
         chainSelected: function (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),

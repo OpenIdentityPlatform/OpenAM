@@ -50,8 +50,17 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationChains": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView",
-                url: scopedByRealm("authentication\/chains\/?"),
-                pattern: "realms/?/authentication/chains",
+                url: scopedByRealm("authentication\/chains\/list"),
+                pattern: "realms/?/authentication/chains/list",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmsAuthenticationChainNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChainView",
+                url: scopedByRealm("authentication\/chains\/new"),
+                pattern: "realms/?/authentication/chains/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
@@ -59,8 +68,8 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationChainEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView",
-                url: scopedByRealm("authentication\/chains\/([^\/]+)"),
-                pattern: "realms/?/authentication/chains/?",
+                url: scopedByRealm("authentication\/chains\/edit\/([^\/]+)"),
+                pattern: "realms/?/authentication/chains/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin"
             },

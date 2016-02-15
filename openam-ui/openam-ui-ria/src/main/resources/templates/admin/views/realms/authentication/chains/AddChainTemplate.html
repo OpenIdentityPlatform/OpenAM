@@ -1,5 +1,23 @@
-<div class="form-group">
-    <label for="name">{{t "console.authentication.chains.chainName"}}</label>
-    <input autofocus type="text" id="name" class="form-control">
+{{> headers/_Title title="console.authentication.chains.newChain"}}
+<div class="panel panel-default fr-panel-with-border">
+    <div class="panel-body tab-content">
+        <div class="block clearfix form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="name">{{t "common.form.name"}}</label>
+                <div class="col-sm-9">
+                    <input autofocus type="text" id="name" data-chain-name class="form-control" placeholder="{{t 'common.form.validation.required'}}" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsAuthenticationChains' realmPath}}">
+                {{t "common.form.cancel"}}
+            </a>
+            <button type="button" class="btn btn-primary" data-save disabled>
+                <span>{{t "common.form.create"}}</span>
+            </button>
+        </div>
+    </div>
 </div>
-<div id="alertContainer"></div>
