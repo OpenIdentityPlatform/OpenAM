@@ -41,8 +41,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
         validationFields: ["name", "resourceTypeUuids"],
         events: {
-            "click #saveChanges": "submitForm",
-            "click #delete": "onDeleteClick"
+            "click [data-save]": "submitForm",
+            "click [data-delete]": "onDeleteClick"
         },
 
         initialize: function () {
@@ -103,7 +103,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                             policySetModel: self.model
                         }, function () {
                             self.$el.find(".tab-menu .nav-tabs").tabdrop();
-
                             UIUtils.fillTemplateWithData(
                                 "templates/admin/views/realms/authorization/policySets/PolicySetSettingsTemplate.html",
                                 self.data,
@@ -205,9 +204,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                                 args: _.map([self.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
                             });
+                        } else {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
 
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);

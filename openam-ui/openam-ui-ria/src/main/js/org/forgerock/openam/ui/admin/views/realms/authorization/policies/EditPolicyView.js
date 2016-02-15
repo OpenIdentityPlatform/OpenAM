@@ -47,9 +47,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         ],
         validationFields: ["name", "resources"],
         events: {
-            "click input[name=submitForm]": "submitForm",
+            "click [data-save]": "submitForm",
             "change #availableResTypes": "changeResourceType",
-            "click #delete": "onDeleteClick"
+            "click [data-delete]": "onDeleteClick"
         },
 
         getAllResponseAttributes: function () {
@@ -287,14 +287,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             if (savePromise) {
                 savePromise
                     .done(function () {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-
                         if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetName, self.model.id],
                                     encodeURIComponent),
                                 trigger: true
                             });
+                        } else {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
                     });
             } else {

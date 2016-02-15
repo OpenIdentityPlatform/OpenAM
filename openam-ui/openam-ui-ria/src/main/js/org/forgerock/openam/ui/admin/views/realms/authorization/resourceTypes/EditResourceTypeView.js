@@ -170,9 +170,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                                 args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
                             });
+                        } else {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
-
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);

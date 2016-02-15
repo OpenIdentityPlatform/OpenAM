@@ -245,8 +245,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                             args: [encodeURIComponent(self.data.realmPath), self.model.id],
                             trigger: true
                         });
+                    } else {
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     }
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
