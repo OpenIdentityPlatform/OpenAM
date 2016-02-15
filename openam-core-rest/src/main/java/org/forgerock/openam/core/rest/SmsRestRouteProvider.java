@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -55,7 +55,6 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
 
         rootRouter.route("global-config")
                 .auditAs(CONFIG)
-                .through(RealmContextFilter.class)
                 .toRequestHandler(STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
         rootRouter.route("global-config/servers/{serverName}/properties/{tab}")
