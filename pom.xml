@@ -178,7 +178,7 @@
         <publicsuffix.version>1.0.1</publicsuffix.version>
         <webservices-extra.version>2008-03-12</webservices-extra.version>
         <webservices-extra-api.version>2003-09-04</webservices-extra-api.version>
-        <webservices-rt.version>2009-29-07</webservices-rt.version>
+        <webservices-rt.version>2016-17-02</webservices-rt.version>
         <webservices-api.version>2009-14-01</webservices-api.version>
         <jackson-asl.version>1.9.7</jackson-asl.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
