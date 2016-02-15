@@ -91,7 +91,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>with-oem</id>
             <build>
                 <plugins>
                     <plugin>

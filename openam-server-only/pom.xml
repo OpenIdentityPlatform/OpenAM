@@ -40,10 +40,14 @@
     <packaging>war</packaging>
 
     <properties>
-        <!-- default settings for standard embedded dj -->
+        <!-- Default settings for standard embedded dj. -->
         <dj.backend.type>je</dj.backend.type>
-        <!-- By default this property is empty so as not to include the SecurID auth module -->
+        <!-- By default this property is empty so as not to include the SecurID auth module. -->
         <auth.securID.xml />
+        <!-- Default settings for the exclusion list to use for creating the opendj zip file. -->
+        <exclusion.list.filename>opendj_exclusion_list</exclusion.list.filename>
+        <!-- Default folder to use for pulling in third party distribution legal notices. -->
+        <third.party.legal.directory>legal</third.party.legal.directory>
     </properties>
 
     <!-- Build -->
@@ -164,6 +168,8 @@
 
                                 <property name="federation.xml.dir" value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
 
+                                <property name="exclusion.list" value="${exclusion.list.filename}" />
+
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
                                     <target name="openam-server-prepare-war" />
                                 </ant>
@@ -199,6 +205,7 @@
                         WEB-INF/lib/jaxb-libs-1.0.6.jar,
                         WEB-INF/lib/jaxb-xjc-1.0.6.jar,
                         WEB-INF/lib/jaxp-api-1.4.2.jar,
+
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -294,7 +301,7 @@
                         </webResource>
                         <webResource>
                             <!-- Copy all third-party licences too. -->
-                            <directory>${project.parent.basedir}/legal</directory>
+                            <directory>${project.parent.basedir}/${third.party.legal.directory}</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -447,6 +454,13 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>with-oem</id>
+            <properties>
+                <exclusion.list.filename>opendj_oem_exclusion_list</exclusion.list.filename>
+                <third.party.legal.directory>legal-oem</third.party.legal.directory>
+            </properties>
+        </profile>
         <profile>
             <id>release</id>
             <dependencies>
