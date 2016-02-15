@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 ]);
             }
 
-            function getCreatableTypes () {
+            function getSubSchemaCreatables () {
                 // return obj.serviceCall({
                 //     url: scopedByRealm(realm, "services/" + type + "?_action=getCreatableTypes"),
                 //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -126,12 +126,13 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             function getSubSchema () {
                 return getSubSchemaTypes(realm, type).then(function (types) {
                     if (types.length > 0) {
-                        return Promise.all([getSubSchemaInstances(), getCreatableTypes()]).then(function (result) {
-                            return {
-                                instances: result[0],
-                                creatables: result[1]
-                            };
-                        });
+                        return Promise.all([getSubSchemaInstances(), getSubSchemaCreatables()])
+                            .then(function (result) {
+                                return {
+                                    instances: result[0],
+                                    creatables: result[1]
+                                };
+                            });
                     } else {
                         return null;
                     }

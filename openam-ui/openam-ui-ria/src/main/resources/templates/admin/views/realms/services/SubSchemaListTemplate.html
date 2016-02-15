@@ -11,12 +11,14 @@
             {{#each subschema.instances}}
                 <tr data-service-id="{{_id}}">
                     <td class="wordwrap">
-                        <a href="#AME-9651-TODO-Routing/{{_id}}" title="{{t 'common.form.edit'}}">{{typeDescription}}</a>
+                        <a href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type type _id}}"
+                            title="{{t 'common.form.edit'}}">{{_id}}</a>
                     </td>
                     <td class="wordwrap">{{type}}</td>
                     <td class="fr-col-btn-2">
                         <div class="btn-group">
-                            <a class="btn btn-link" href="#AME-9651-TODO-Routing/{{_id}}" title="{{t 'common.form.edit'}}">
+                            <a class="btn btn-link" href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type type _id}}"
+                                title="{{t 'common.form.edit'}}">
                                 <i class="fa fa-pencil"/>
                             </a>
                             <button type="button" data-delete class="btn btn-link">
@@ -30,15 +32,22 @@
     </table>
 </div>
 
-<div class="btn-group pull-right">
-    <button type="button" class="btn btn-default dropdown-toggle"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{t "console.services.subSchema.add"}} <span class="caret"></span>
-    </button>
+{{#if subschema.creatables.[1]}}
+    <div class="btn-group pull-right">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{t "console.services.subSchema.add"}} <span class="caret"></span>
+        </button>
 
-    <ul class="dropdown-menu">
-        {{#each subschema.creatables}}
-        <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{description}}</a></li>
-        {{/each}}
-    </ul>
-</div>
+        <ul class="dropdown-menu">
+            {{#each subschema.creatables}}
+            <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{description}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
+{{else}}
+    <a class="btn btn-default pull-right" href="{{routeTo 'realmsServiceSubSchemaNew' realmPath type subschema.creatables.[0]._id}}"
+        title="{{t 'common.form.edit'}}">
+        <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
+    </a>
+{{/if}}

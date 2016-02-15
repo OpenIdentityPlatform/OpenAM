@@ -826,7 +826,7 @@
                 "confirmDeleteSelected_plural": "Are you sure you want to delete the selected services?"
             },
             "subSchema": {
-                "add": "Add new instance...",
+                "add": "Add new instance",
                 "new": {
                     "title": "New __subSchema__ instance"
                 }
