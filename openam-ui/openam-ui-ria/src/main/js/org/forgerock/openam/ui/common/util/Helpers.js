@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/common/util/Helpers", [
         console.warn(this);
     });
 
-    // TODO: Commons Candidate
+    // TODO: should be removed once we upgrade to the newer version of handlebars
     /**
      * Handlebars parameterized translation helper
      * @example

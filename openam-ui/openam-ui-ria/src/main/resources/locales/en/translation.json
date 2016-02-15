@@ -827,6 +827,7 @@
             },
             "subSchema": {
                 "add": "Add new instance",
+                "title": "__subSchema__ instance",
                 "new": {
                     "title": "New __subSchema__ instance"
                 }

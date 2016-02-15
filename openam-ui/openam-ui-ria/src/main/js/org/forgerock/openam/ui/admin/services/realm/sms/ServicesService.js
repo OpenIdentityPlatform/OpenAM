@@ -229,8 +229,8 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     return $.when(getServiceSubSchema(realm, serviceType, subSchemaType), getInstance())
                         .then(function (subSchema, values) {
                             return {
-                                subSchema: subSchema,
-                                values: values
+                                schema: subSchema,
+                                values: values[0]
                             };
                         });
                 },
