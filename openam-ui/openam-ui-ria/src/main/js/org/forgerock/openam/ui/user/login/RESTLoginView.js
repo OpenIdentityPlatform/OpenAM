@@ -215,7 +215,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                             Configuration.setProperty("loggedUser", user);
                             delete auth.passedInRealm;
 
-                            RESTLoginHelper.setSuccessURL(reqs.tokenId).then(function () {
+                            RESTLoginHelper.setSuccessURL(reqs.tokenId, reqs.successUrl).then(function () {
 
                                 if (auth.urlParams && auth.urlParams.goto) {
                                     window.location.href = auth.urlParams.goto;
