@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 if (result.hasOwnProperty("tokenId")) {
                     obj.getLoggedUser(function (user) {
                         Configuration.setProperty("loggedUser", user);
-                        self.setSuccessURL(result.tokenId).then(function () {
+                        self.setSuccessURL(result.tokenId, result.successUrl).then(function () {
                             successCallback(user);
                             AuthNService.resetProcess();
                         });
@@ -105,10 +105,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         return URIUtils.parseQueryString(successfulLoginURLParams);
     };
 
-    obj.setSuccessURL = function (tokenId) {
+    obj.setSuccessURL = function (tokenId, newSuccessUrl) {
         var promise = $.Deferred(),
             urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
-            url = Configuration.globalData.auth.successURL,
+            url = newSuccessUrl ? newSuccessUrl : Configuration.globalData.auth.successURL,
             context = "";
         if (urlParams && urlParams.goto) {
             AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
