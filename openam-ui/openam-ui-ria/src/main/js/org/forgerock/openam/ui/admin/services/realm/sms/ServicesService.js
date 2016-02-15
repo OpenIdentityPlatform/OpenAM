@@ -275,10 +275,9 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     });
                 },
 
-                create: function (realm, serviceType, subSchemaType, subSchemaInstance, data) {
+                create: function (realm, serviceType, subSchemaType, data) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType +
-                            "/" + subSchemaInstance + "?_action=create"),
+                        url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=create"),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST",
                         data: JSON.stringify(data)

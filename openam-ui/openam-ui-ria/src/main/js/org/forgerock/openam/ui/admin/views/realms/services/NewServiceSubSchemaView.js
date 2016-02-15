@@ -68,20 +68,23 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
         },
 
         onSave: function () {
-            var self = this;
+            var self = this,
+                formData = this.form.data(),
+                subSchemaInstanceId = this.$el.find("[data-name]").val();
+
+            formData["_id"] = subSchemaInstanceId;
 
             ServicesService.type.subSchema.instance.create(
                 this.data.realmPath,
                 this.data.serviceInstance,
                 this.data.subSchemaType,
-                "", // TODO pass an ID here
-                this.form.data()
+                formData
             ).then(function () {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
-                Router.routeTo(Router.configuration.routes.realmsServiceSubSchemaInstanceEdit, {
+                Router.routeTo(Router.configuration.routes.realmsServiceSubSchemaEdit, {
                     args: _.map([
-                        self.data.realmPath, self.data.serviceInstance, self.data.subSchemaType, self.data.name
+                        self.data.realmPath, self.data.serviceInstance, self.data.subSchemaType, subSchemaInstanceId
                     ], encodeURIComponent),
                     trigger: true
                 });
