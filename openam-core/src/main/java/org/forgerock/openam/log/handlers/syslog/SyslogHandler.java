@@ -45,7 +45,7 @@ public class SyslogHandler extends Handler {
     private final SyslogPublisher publisher;
     private final int bufferSize;
     private final Object LOG_FLUSH_LOCK = new Object();
-    private List<String> logRecords = new ArrayList<String>();
+    private final List<String> logRecords = new ArrayList<String>();
     private TimeBufferingTask bufferingTask;
 
     /**
@@ -100,17 +100,22 @@ public class SyslogHandler extends Handler {
      * Flushes the buffered logrecords.
      */
     @Override
-    public synchronized void flush() {
-        new FlushTask(logRecords).run();
-        logRecords = new ArrayList<String>();
+    public void flush() {
+        FlushTask task;
+        synchronized (logRecords) {
+            task = new FlushTask(new ArrayList<String>(logRecords));
+            logRecords.clear();
+        }
+        task.run();
     }
 
     /**
      * Flushes the buffered logrecords in a separate thread to prevent blocking.
+     * Access to logRecords is guarded by the publish method's synchronized block.
      */
-    private synchronized void nonBlockingFlush() {
-        FlushTask task = new FlushTask(logRecords);
-        logRecords = new ArrayList<String>();
+    private void nonBlockingFlush() {
+        FlushTask task = new FlushTask(new ArrayList<String>(logRecords));
+        logRecords.clear();
         try {
             LoggingThread.getInstance().run(task);
         } catch (ThreadPoolException ex) {
@@ -141,14 +146,17 @@ public class SyslogHandler extends Handler {
      * to an outputstream managed by this handler.
      */
     @Override
-    public synchronized void publish(final LogRecord logRecord) {
+    public void publish(final LogRecord logRecord) {
         if (!isLoggable(logRecord)) {
             return;
         }
 
-        logRecords.add(getFormatter().format(logRecord));
-        if (logRecords.size() >= bufferSize) {
-            nonBlockingFlush();
+        String formatted = getFormatter().format(logRecord);
+        synchronized (logRecords) {
+            logRecords.add(formatted);
+            if (logRecords.size() >= bufferSize) {
+                nonBlockingFlush();
+            }
         }
     }
 
