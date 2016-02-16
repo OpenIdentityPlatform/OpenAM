@@ -654,15 +654,14 @@ public class AMLoginContext {
                 }
             }
         } catch (InvalidPasswordException ipe) {
-            debug.message("Invalid Password : ");
-            if (debug.messageEnabled()) {
-                debug.message("Exception ", ipe);
+            String failedUserId = ipe.getTokenId();
+            if (failedUserId == null) {
+                failedUserId = loginState.getFailureTokenId();
             }
 
-            String failedUserId = ipe.getTokenId();
-
             if (debug.messageEnabled()) {
-                debug.message("Invalid Password Exception " + failedUserId);
+                debug.message("Invalid Password : failedUserId " + failedUserId);
+                debug.message("Invalid Password : Exception ", ipe);
             }
 
             if (failedUserId != null) {
