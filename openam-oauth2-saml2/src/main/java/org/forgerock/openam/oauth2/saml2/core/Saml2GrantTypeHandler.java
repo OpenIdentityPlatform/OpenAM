@@ -139,7 +139,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.put(SCOPE, joinScope(validatedScope));
+            accessToken.addExtraData(SCOPE, joinScope(validatedScope));
         }
 
         tokenStore.updateAccessToken(accessToken);
