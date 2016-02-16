@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -22,6 +22,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -39,20 +40,23 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
 import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
 import org.forgerock.jaspi.modules.openid.helpers.JWKSetParser;
+import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.json.jose.jwk.JWKSet;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -609,21 +613,45 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     }
 
     @Override
-    public boolean verifyJwtIdentity(OAuth2Jwt jwt) {
+    public boolean verifyJwtIdentity(final OAuth2Jwt jwt) {
+        final JwsAlgorithm signatureAlgorithm = JwsAlgorithm.valueOf(getIDTokenSignedResponseAlgorithm());
+        if (signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.HMAC) {
+            return verifyJwtBySharedSecret(jwt);
+        } else {
+            try {
+                switch (getClientPublicKeySelector()) {
+                    case JWKS:
+                        return byJWKs(jwt);
+                    case JWKS_URI:
+                        return byJWKsURI(jwt);
+                    default:
+                        return byX509Key(jwt);
+                }
+            } catch (Exception e) {
+                logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                        "Unable to get Client Bearer Jwt Public key from repository");
+            }
+        }
+    }
+
+    private boolean verifyJwtBySharedSecret(final OAuth2Jwt jwt) {
+        final String issuer = jwt.getSignedJwt().getClaimsSet().getIssuer();
+        OpenIdResolver resolver = resolverService.getResolverForIssuer(issuer);
+        if (resolver == null) {
+            final String secret = getClientSecret();
+            if (!resolverService.configureResolverWithSecret(issuer, secret)) {
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                        "Unable to configure internal shared secret resolver service.");
+            }
+            resolver = resolverService.getResolverForIssuer(issuer);
+        }
 
         try {
-            switch (getClientPublicKeySelector()) {
-                case JWKS:
-                    return byJWKs(jwt);
-                case JWKS_URI:
-                    return byJWKsURI(jwt);
-                default:
-                    return byX509Key(jwt);
-            }
-        } catch (Exception e) {
-            logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get Client Bearer Jwt Public key from repository");
+            resolver.validateIdentity(jwt.getSignedJwt());
+            return jwt.isContentValid() && jwt.isIntendedForAudience(getClientId());
+        } catch (OpenIdConnectVerificationException e) {
+            return false;
         }
     }
 
