@@ -24,7 +24,7 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.service;
@@ -641,15 +641,14 @@ public class AMLoginContext {
                 }
             }
         } catch (InvalidPasswordException ipe) {
-            debug.message("Invalid Password : ");
-            if (debug.messageEnabled()) {
-                debug.message("Exception ", ipe);
+            String failedUserId = ipe.getTokenId();
+            if (failedUserId == null) {
+                failedUserId = loginState.getFailureTokenId();
             }
 
-            String failedUserId = ipe.getTokenId();
-
             if (debug.messageEnabled()) {
-                debug.message("Invalid Password Exception " + failedUserId);
+                debug.message("Invalid Password : failedUserId " + failedUserId);
+                debug.message("Invalid Password : Exception ", ipe);
             }
 
             if (failedUserId != null) {

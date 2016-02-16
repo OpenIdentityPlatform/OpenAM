@@ -24,7 +24,7 @@
  *
  * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -6663,7 +6663,13 @@ public class LoginState {
             setSession(oldSession);
         }
     }
-    
+
+    /**
+     * <code>SSOToken</code> ID for login failed
+     */
+    public String getFailureTokenId() {
+        return failureTokenId;
+    }
     /**
      * Sets a shared state map from the {@link AMLoginModule}.
      * 
