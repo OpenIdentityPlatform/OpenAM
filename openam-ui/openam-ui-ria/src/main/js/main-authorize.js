@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2016 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -61,15 +61,10 @@ require([
     "handlebars",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
-    "text!templates/user/AuthorizeTemplate.html",
-    "text!templates/common/LoginBaseTemplate.html",
-    "text!templates/common/FooterTemplate.html",
-    "text!templates/common/LoginHeaderTemplate.html",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager",
     "Router"
-], function ($, _, HandleBars, Configuration, Constants, AuthorizeTemplate,
-            LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate, i18nManager, ThemeManager, Router) {
+], function ($, _, HandleBars, Configuration, Constants, i18nManager, ThemeManager, Router) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -79,6 +74,12 @@ require([
         baseTemplate,
         footerTemplate,
         loginHeaderTemplate,
+        templatePaths = [
+            "templates/user/AuthorizeTemplate.html",
+            "templates/common/LoginBaseTemplate.html",
+            "templates/common/FooterTemplate.html",
+            "templates/common/LoginHeaderTemplate.html"
+        ],
         data = window.pageData || {},
         KEY_CODE_ENTER = 13,
         KEY_CODE_SPACE = 32;
@@ -121,24 +122,31 @@ require([
     };
 
     ThemeManager.getTheme().always(function (theme) {
-        data.theme = theme;
-        baseTemplate = HandleBars.compile(LoginBaseTemplate);
-        formTemplate = HandleBars.compile(AuthorizeTemplate);
-        footerTemplate = HandleBars.compile(FooterTemplate);
-        loginHeaderTemplate = HandleBars.compile(LoginHeaderTemplate);
 
-        $("#wrapper").html(baseTemplate(data));
-        $("#footer").html(footerTemplate(data));
-        $("#loginBaseLogo").html(loginHeaderTemplate(data));
-        $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
-            // keyup is required so that the collasped panel can be opened with the keyboard alone,
-            // and without relying on a mouse click event.
-            if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
-                return;
-            }
-            $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
+        // add prefix to templates for custom theme when path is defined
+        var themePath = Configuration.globalData.theme.path;
+        templatePaths = _.map(templatePaths, function (templatePath) {
+            return "text!" + themePath + templatePath;
         });
 
-    });
+        require(templatePaths, function (AuthorizeTemplate, LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate) {
+            data.theme = theme;
+            baseTemplate = HandleBars.compile(LoginBaseTemplate);
+            formTemplate = HandleBars.compile(AuthorizeTemplate);
+            footerTemplate = HandleBars.compile(FooterTemplate);
+            loginHeaderTemplate = HandleBars.compile(LoginHeaderTemplate);
 
+            $("#wrapper").html(baseTemplate(data));
+            $("#footer").html(footerTemplate(data));
+            $("#loginBaseLogo").html(loginHeaderTemplate(data));
+            $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
+                // keyup is required so that the collapsed panel can be opened with the keyboard alone,
+                // and without relying on a mouse click event.
+                if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
+                    return;
+                }
+                $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
+            });
+        });
+    });
 });
