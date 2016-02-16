@@ -68,6 +68,8 @@ import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.sm.DNMapper;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -526,6 +528,16 @@ public class LoginViewBean extends AuthViewBeanBase {
             // is the federation post login servlet, use forward instead
             boolean doForward = AuthUtils.isForwardSuccess(ac,request);
 
+            // Override the doForward if the redirect_url is an absolute URL, for example: http://test.example.com
+            // This can occur as a result of a failed login during a Federation login and the Failure Login URL has
+            // been set to an absolute URL
+            try {
+                if (doForward && new URI(redirect_url).isAbsolute()) {
+                    doForward = false;
+                }
+            } catch (URISyntaxException e) {
+                loginDebug.warning("LoginViewBean.forwardTo(): redirect_url {} was not valid", redirect_url, e);
+            }
             if (AuthUtils.isGenericHTMLClient(client_type) || doForward) {
                 try {
                     if (loginDebug.messageEnabled()) {
@@ -593,24 +605,21 @@ public class LoginViewBean extends AuthViewBeanBase {
                         //would not have any knowledge about the freshly created session ID - this can be especially
                         //a problem, when upgrading session: old session ID cookie is still present in the request
                         //but the new isn't.
-                        if(redirect_url.indexOf("?") == -1){
-                            redirect_url = redirect_url + "?" + 
-                            appendCookie.getName() + "=" + 
-                            URLEncDec.encode(appendCookie.getValue());
-                        }else{
-                            redirect_url = redirect_url + "&" + 
-                            appendCookie.getName() + "=" + 
-                            URLEncDec.encode(appendCookie.getValue());
+                        if (redirect_url.contains("?")) {
+                            redirect_url += "&" + appendCookie.getName() + "=";
+                        } else {
+                            redirect_url += "?" + appendCookie.getName() + "=";
+                        }
+                        String cookieValue = appendCookie.getValue();
+                        if (cookieValue != null) {
+                            redirect_url += URLEncDec.encode(cookieValue);
                         }
                         if(loginDebug.messageEnabled()){
-                            loginDebug.message("LoginViewBean.forwardTo():" +
-                            "Final Forward URL is " + redirect_url); 
+                            loginDebug.message("LoginViewBean.forwardTo(): Final Forward URL is " + redirect_url);
                         }
 
-                        RequestDispatcher dispatcher =
-                        request.getRequestDispatcher(redirect_url);
-                        request.setAttribute(Constants.FORWARD_PARAM,
-                            Constants.FORWARD_YES_VALUE);
+                        RequestDispatcher dispatcher = request.getRequestDispatcher(redirect_url);
+                        request.setAttribute(Constants.FORWARD_PARAM, Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {
                         response.sendRedirect(redirect_url);
