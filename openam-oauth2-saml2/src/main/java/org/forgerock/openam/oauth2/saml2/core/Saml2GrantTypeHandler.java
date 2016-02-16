@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -134,7 +134,7 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add(SCOPE, joinScope(validatedScope));
+            accessToken.addExtraData(SCOPE, joinScope(validatedScope));
         }
 
         return accessToken;
