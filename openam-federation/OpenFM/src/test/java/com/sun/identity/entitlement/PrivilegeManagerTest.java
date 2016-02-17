@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeManagerTest.java,v 1.3 2010/01/26 20:10:16 dillidorai Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -77,8 +77,7 @@ public class PrivilegeManagerTest {
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
     private UserSubject ua1;
     private UserSubject ua2;
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup()

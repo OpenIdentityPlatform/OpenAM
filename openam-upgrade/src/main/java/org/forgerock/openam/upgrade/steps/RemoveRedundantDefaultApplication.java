@@ -21,7 +21,8 @@ import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -58,7 +59,7 @@ public final class RemoveRedundantDefaultApplication extends AbstractEntitlement
     private final static String DEFAULT_REALM = "/";
 
     private final Set<String> removedDefaultApplications;
-    private final ApplicationManagerWrapper applicationService;
+    private final ApplicationServiceFactory applicationServiceFactory;
 
     private final Set<String> defaultApplicationsToBeRemoved;
     private final Set<String> successfulApplicationRemovals;
@@ -66,14 +67,18 @@ public final class RemoveRedundantDefaultApplication extends AbstractEntitlement
 
     @Inject
     public RemoveRedundantDefaultApplication(@Named("removedDefaultApplications") Set<String> removedDefaultApplications,
-            ApplicationManagerWrapper applicationService, PrivilegedAction<SSOToken> adminTokenAction,
+            ApplicationServiceFactory applicationServiceFactory, PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.removedDefaultApplications = removedDefaultApplications;
-        this.applicationService = applicationService;
+        this.applicationServiceFactory = applicationServiceFactory;
         defaultApplicationsToBeRemoved = new HashSet<>();
         successfulApplicationRemovals = new HashSet<>();
         failedApplicationRemovals = new HashSet<>();
+    }
+
+    private ApplicationService appService() {
+        return applicationServiceFactory.create(getAdminSubject(), DEFAULT_REALM);
     }
 
     @Override
@@ -89,7 +94,7 @@ public final class RemoveRedundantDefaultApplication extends AbstractEntitlement
 
     private void identifyApplicationsToBeRemoved() throws EntitlementException {
         // Default applications are only in the root realm.
-        defaultApplicationsToBeRemoved.addAll(applicationService.getApplicationNames(getAdminSubject(), DEFAULT_REALM));
+        defaultApplicationsToBeRemoved.addAll(appService().getApplicationNames());
         defaultApplicationsToBeRemoved.retainAll(removedDefaultApplications);
     }
 
@@ -103,7 +108,7 @@ public final class RemoveRedundantDefaultApplication extends AbstractEntitlement
         for (String applicationName : defaultApplicationsToBeRemoved) {
             try {
                 UpgradeProgress.reportStart(AUDIT_REMOVING_APPLICATION, applicationName);
-                applicationService.deleteApplication(getAdminSubject(), DEFAULT_REALM, applicationName);
+                appService().deleteApplication(applicationName);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
                 successfulApplicationRemovals.add(applicationName);
 

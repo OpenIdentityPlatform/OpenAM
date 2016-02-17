@@ -15,8 +15,7 @@
 */
 package org.forgerock.openam.entitlement.rest;
 
-import static com.sun.identity.entitlement.Application.NAME_SEARCH_ATTRIBUTE;
-import static java.util.Collections.singleton;
+import static com.sun.identity.entitlement.Application.NAME_ATTRIBUTE;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils.getPrincipalNameFromSubject;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
@@ -25,9 +24,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -49,14 +46,14 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
-import org.forgerock.openam.entitlement.rest.query.QueryFilterVisitorAdapter;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.query.QueryByStringFilterConverter;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
@@ -68,7 +65,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -83,39 +79,35 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class ApplicationsResource extends RealmAwareResource {
 
-    public static final String APPLICATION_QUERY_ATTRIBUTES = "ApplicationQueryAttributes";
-
     private static final ObjectMapper mapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    private final ApplicationManagerWrapper appManager;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final ApplicationTypeManagerWrapper appTypeManagerWrapper;
-    private final Map<String, QueryAttribute> queryAttributes;
     private final Debug debug;
 
     private final ExceptionMappingHandler<EntitlementException, ResourceException> exceptionMappingHandler;
 
     /**
      * @param debug Debug instance.
-     * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
+     * @param applicationServiceFactory Application service factory responsible for creating the application service.
      * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
-     * @param queryAttributes Definition of Application fields that can be queried
      * @param exceptionMappingHandler Error handler to convert EntitlementExceptions to ResourceExceptions.
      */
     @Inject
-    public ApplicationsResource(@Named("frRest") Debug debug, ApplicationManagerWrapper appManager,
-                                ApplicationTypeManagerWrapper appTypeManagerWrapper,
-                                @Named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES)
-                                Map<String, QueryAttribute> queryAttributes,
-                                ExceptionMappingHandler<EntitlementException, ResourceException> exceptionMappingHandler) {
+    public ApplicationsResource(@Named("frRest") Debug debug, ApplicationServiceFactory applicationServiceFactory,
+            ApplicationTypeManagerWrapper appTypeManagerWrapper,
+            ExceptionMappingHandler<EntitlementException, ResourceException> exceptionMappingHandler) {
 
-        Reject.ifNull(appManager);
         Reject.ifNull(appTypeManagerWrapper);
 
         this.debug = debug;
-        this.appManager = appManager;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.appTypeManagerWrapper = appTypeManagerWrapper;
-        this.queryAttributes = queryAttributes;
         this.exceptionMappingHandler = exceptionMappingHandler;
+    }
+
+    private ApplicationService appService(Subject subject, String realm) {
+        return applicationServiceFactory.create(subject, realm);
     }
 
     /**
@@ -166,7 +158,7 @@ public class ApplicationsResource extends RealmAwareResource {
             if (applicationExists(applicationId, realm, subject)) {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
-            Application application = appManager.saveApplication(subject, realm, applicationWrapper.getApplication());
+            Application application = appService(subject, realm).saveApplication(applicationWrapper.getApplication());
             return newResultPromise(newResourceResponse(application.getName(),
                     Long.toString(application.getLastModifiedDate()), applicationToJson(application)));
         } catch (EntitlementException e) {
@@ -255,7 +247,7 @@ public class ApplicationsResource extends RealmAwareResource {
             if (!applicationExists(resourceId, realm, subject)) {
                 throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION, resourceId);
             }
-            appManager.deleteApplication(subject, realm, resourceId);
+            appService(subject, realm).deleteApplication(resourceId);
             return newResultPromise(newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object())));
         } catch (EntitlementException e) {
             debug.error("ApplicationsResource :: DELETE by {}: Application failed to delete the resource specified. ",
@@ -295,17 +287,17 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         final String realm = getRealm(context);
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
+        if (queryFilter == null) {
+            // Return everything
+            queryFilter = QueryFilter.alwaysTrue();
+        }
+        QueryFilter<String> stringQueryFilter = queryFilter.accept(new QueryByStringFilterConverter(), null);
         try {
+            Set<Application> applications = appService(subject, realm).search(stringQueryFilter);
             List<ResourceResponse> results = new ArrayList<>();
-            final Set<String> applicationIds = query(request, subject, realm);
-            for (String applicationId : applicationIds) {
-                final Application application = appManager.getApplication(subject, realm, applicationId);
-                if (application == null) {
-                    debug.warning("Unable to find application {}", applicationId);
-                    continue;
-                }
-                ApplicationWrapper wrapper = createApplicationWrapper(application, appTypeManagerWrapper);
-                results.add(newResourceResponse(wrapper.getName(), null, wrapper.toJsonValue()));
+            for (Application application : applications) {
+                results.add(newResourceResponse(application.getName(), null, applicationToJson(application)));
             }
             QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
             return QueryResponsePresentation.perform(handler, request, results);
@@ -335,7 +327,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         final String realm = getRealm(context);
         try {
-            final Application application = appManager.getApplication(subject, realm, resourceId);
+            final Application application = appService(subject, realm).getApplication(resourceId);
             if (application == null) {
                 throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, realm);
             }
@@ -376,7 +368,7 @@ public class ApplicationsResource extends RealmAwareResource {
             if (!applicationExists(resourceId, realm, subject)) {
                 throw new EntitlementException(EntitlementException.NOT_FOUND, resourceId);
             }
-            Application application = appManager.saveApplication(subject, realm, applicationWrapper.getApplication());
+            Application application = appService(subject, realm).saveApplication(applicationWrapper.getApplication());
             return newResultPromise(newResourceResponse(application.getName(),
                     Long.toString(application.getLastModifiedDate()), applicationToJson(application)));
         } catch (EntitlementException e) {
@@ -386,40 +378,8 @@ public class ApplicationsResource extends RealmAwareResource {
         }
     }
 
-    /**
-     * Query-based wrapper for the method {@link ApplicationManagerWrapper#search(Subject, String, Set)}.
-     *
-     * @param request the query request.
-     * @param subject The subject authorizing the update - will be validated for permission.
-     * @param realm The realm from which to gather the {@link Application} names.
-     * @return the names of those Applications that match the query.
-     * @throws EntitlementException if an error occurs or the query is invalid.
-     * @since 12.0.0
-     */
-    Set<String> query(QueryRequest request, Subject subject, String realm) throws EntitlementException {
-
-        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
-        if (queryFilter == null) {
-            // Return everything
-            queryFilter = QueryFilter.alwaysTrue();
-        }
-
-        try {
-            Set<SearchFilter> searchFilters = queryFilter.accept(
-                    new ApplicationQueryBuilder(queryAttributes), new HashSet<SearchFilter>());
-            return appManager.search(subject, realm, searchFilters);
-
-        } catch (UnsupportedOperationException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER, ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_VALUE, ex.getMessage());
-        }
-    }
-
     private boolean applicationExists(String applicationId, String realm, Subject subject) throws EntitlementException {
-        SearchFilter searchFilter = new SearchFilter(NAME_SEARCH_ATTRIBUTE, applicationId);
-        Set<String> applicationIds = appManager.search(subject, realm, singleton(searchFilter));
-        return isNotEmpty(applicationIds);
+        return isNotEmpty(appService(subject, realm).search(QueryFilter.equalTo(NAME_ATTRIBUTE, applicationId)));
     }
 
     private void ensureApplicationIdMatch(ApplicationWrapper applicationWrapper, String resourceId)
@@ -454,52 +414,5 @@ public class ApplicationsResource extends RealmAwareResource {
 
     private JsonValue applicationToJson(Application application) throws EntitlementException {
         return createApplicationWrapper(application, appTypeManagerWrapper).toJsonValue();
-    }
-
-    /**
-     * Converts a set of CREST {@link QueryFilter} into a set of entitlement {@link SearchFilter}.
-     *
-     * @since 12.0.0
-     */
-    private static final class ApplicationQueryBuilder extends QueryFilterVisitorAdapter {
-
-        ApplicationQueryBuilder(Map<String, QueryAttribute> queryAttributes) {
-            super("application", queryAttributes);
-        }
-
-        @Override
-        public Set<SearchFilter> visitEqualsFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                   Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.EQUALS_OPERATOR, valueAssertion));
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitGreaterThanFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                        Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.GREATER_THAN_OPERATOR, valueAssertion));
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitGreaterThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                                 Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.GREATER_THAN_OR_EQUAL_OPERATOR, valueAssertion));
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitLessThanFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                     Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESS_THAN_OPERATOR, valueAssertion));
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitLessThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                              Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESS_THAN_OR_EQUAL_OPERATOR, valueAssertion));
-            return filters;
-        }
     }
 }

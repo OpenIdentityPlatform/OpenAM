@@ -24,12 +24,13 @@
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.interfaces.IThreadPool;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,12 +41,16 @@ import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
+
+import com.sun.identity.entitlement.interfaces.IThreadPool;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class evaluates entitlements of a subject for a given resource
@@ -79,8 +84,7 @@ class PrivilegeEvaluator {
     private static final boolean isMultiThreaded;
 
     static {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(SUPER_ADMIN_SUBJECT, "/");
         Set<String> setPolicyEvalThread = ec.getConfiguration(
             EntitlementConfiguration.POLICY_EVAL_THREAD_SIZE);
 

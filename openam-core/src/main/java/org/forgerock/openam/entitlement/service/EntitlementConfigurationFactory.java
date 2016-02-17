@@ -11,32 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.service;
 
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
+import javax.security.auth.Subject;
+
+import com.sun.identity.entitlement.EntitlementConfiguration;
 
 /**
- * Application service to handle all things relating to applications.
- *
- * @see ApplicationServiceFactory
- * @since 13.0.0
+ * A factory for providing new {@link EntitlementConfiguration} instances.
  */
-public interface ApplicationService {
+public interface EntitlementConfigurationFactory {
 
     /**
-     * Retrieves an application instance for the passed name.
+     * Creates a new {@link EntitlementConfiguration} instance based on the calling subject for the passed realm.
      *
-     * @param applicationName
-     *         the application name
-     *
-     * @return an application instance, null if the application doesn't exist
-     *
-     * @throws EntitlementException
-     *         should some error occur during the application retrieval
+     * @param subject the calling subject
+     * @param realm the realm
+     * @return an {@link EntitlementConfiguration} instance
      */
-    Application getApplication(String applicationName) throws EntitlementException;
+    EntitlementConfiguration create(Subject subject, String realm);
 
 }

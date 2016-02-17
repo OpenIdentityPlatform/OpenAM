@@ -16,25 +16,19 @@
 
 package org.forgerock.openam.entitlement.guice;
 
-import static org.forgerock.openam.entitlement.rest.query.AttributeType.STRING;
-import static org.forgerock.openam.entitlement.rest.query.AttributeType.TIMESTAMP;
+import static org.forgerock.openam.entitlement.rest.query.AttributeType.*;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
-import com.sun.identity.shared.debug.Debug;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.entitlement.rest.ApplicationsResource;
 import org.forgerock.openam.entitlement.rest.EntitlementEvaluatorFactory;
 import org.forgerock.openam.entitlement.rest.EntitlementsExceptionMappingHandler;
 import org.forgerock.openam.entitlement.rest.JsonPolicyParser;
@@ -50,11 +44,16 @@ import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.restlet.routing.Router;
 
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.AbstractModule;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for binding entitlement REST endpoints.
@@ -102,11 +101,6 @@ public class EntitlementRestGuiceModule extends AbstractModule {
                 .toProvider(PolicyQueryAttributesMapProvider.class)
                 .asEagerSingleton();
         bind(PolicyEvaluatorFactory.class).to(EntitlementEvaluatorFactory.class).in(Singleton.class);
-
-        bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
-                .annotatedWith(Names.named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES))
-                .toProvider(ApplicationQueryAttributesMapProvider.class)
-                .asEagerSingleton();
 
         bind(CollectionResourceProvider.class).annotatedWith(Names.named("PolicyResource")).to(PolicyResource.class);
     }
@@ -176,6 +170,7 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.RESOURCE_TYPE_ID_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.NO_RESOURCE_TYPE_EXPECTED, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.MISSING_APPLICATION_NAME, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_QUERY_FILTER, ResourceException.BAD_REQUEST);
 
             return handlers;
         }
@@ -211,25 +206,6 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_SEARCH_ATTRIBUTE));
             attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE));
             attributes.put("resourceTypeUuid", new QueryAttribute(STRING, Privilege.RESOURCE_TYPE_UUID_SEARCH_ATTRIBUTE));
-
-            return attributes;
-        }
-    }
-
-    /**
-     * Defines all allowed query attributes in queries against the application endpoint.
-     */
-    private static class ApplicationQueryAttributesMapProvider implements Provider<Map<String, QueryAttribute>> {
-        @Override
-        public Map<String, QueryAttribute> get() {
-            final Map<String, QueryAttribute> attributes = new HashMap<String, QueryAttribute>();
-
-            attributes.put("name", new QueryAttribute(STRING, Application.NAME_SEARCH_ATTRIBUTE));
-            attributes.put("description", new QueryAttribute(STRING, Application.DESCRIPTION_SEARCH_ATTRIBUTE));
-            attributes.put("createdBy", new QueryAttribute(STRING, Application.CREATED_BY_SEARCH_ATTRIBUTE));
-            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Application.CREATION_DATE_SEARCH_ATTRIBUTE));
-            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Application.LAST_MODIFIED_BY_SEARCH_ATTRIBUTE));
-            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE));
 
             return attributes;
         }

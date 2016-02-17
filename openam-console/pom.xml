@@ -178,6 +178,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-entitlements</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>

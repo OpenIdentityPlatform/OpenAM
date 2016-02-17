@@ -24,26 +24,12 @@
  *
  * $Id: DeleteXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
 
-import com.iplanet.sso.SSOToken;
-
-import com.sun.identity.cli.AttributeValues;
-import com.sun.identity.cli.AuthenticatedCommand;
-import com.sun.identity.cli.CLIException;
-import com.sun.identity.cli.ExitCodes;
-import com.sun.identity.cli.IArgument;
-import com.sun.identity.cli.IOutput;
-import com.sun.identity.cli.LogWriter;
-import com.sun.identity.cli.RequestContext;
-
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,6 +38,20 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.security.auth.Subject;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.cli.AttributeValues;
+import com.sun.identity.cli.AuthenticatedCommand;
+import com.sun.identity.cli.CLIException;
+import com.sun.identity.cli.ExitCodes;
+import com.sun.identity.cli.IArgument;
+import com.sun.identity.cli.IOutput;
+import com.sun.identity.cli.LogWriter;
+import com.sun.identity.cli.RequestContext;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 
 /**
  * Deletes policies in a realm.
@@ -74,8 +74,7 @@ public class DeleteXACML extends AuthenticatedCommand {
         String realm = getStringOptionValue(IArgument.REALM_NAME);
 
         // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         if(!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY", 
                     "list-xacml not supported in  legacy policy mode"};

@@ -24,13 +24,14 @@
  *
  * $Id: PrivilegeChangeNotifier.java,v 1.5 2010/01/07 00:19:11 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.entitlement.interfaces.ResourceName;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -40,11 +41,15 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.entitlement.interfaces.ResourceName;
 
 public class PrivilegeChangeNotifier {
     private static PrivilegeChangeNotifier instance = new
@@ -55,8 +60,7 @@ public class PrivilegeChangeNotifier {
     private static int RETRY_INTERVAL = 3000;
 
     static {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(SUPER_ADMIN_SUBJECT, "/");
         POOL_SIZE = getConfiguration(ec,
             "privilege-notifier-threadpool-size", 5);
         HTTP_TIMEOUT = getConfiguration(ec,
@@ -146,8 +150,7 @@ public class PrivilegeChangeNotifier {
                     return true;
                 }
 
-                Application app = ApplicationManager.getApplication(
-                        PolicyConstants.SUPER_ADMIN_SUBJECT, realm, appName);
+                Application app = ApplicationManager.getApplication(SUPER_ADMIN_SUBJECT, realm, appName);
                 ResourceName resourceComp = app.getResourceComparator();
 
                 for (String r : res) {

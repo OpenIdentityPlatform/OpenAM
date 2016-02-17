@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementServiceTest.java,v 1.1 2009/08/19 05:41:01 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -40,8 +42,7 @@ public class EntitlementServiceTest {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            SubjectUtils.createSubject(adminToken), "/");
+        EntitlementConfiguration ec = new EntitlementService(SubjectUtils.createSubject(adminToken), "/");
         boolean result = ec.hasEntitlementDITs();
         UnittestLog.logMessage(
             "EntitlementServiceTest.hasEntitlementDITs: returns " + result);
@@ -52,8 +53,7 @@ public class EntitlementServiceTest {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            SubjectUtils.createSubject(adminToken), "/");
+        EntitlementConfiguration ec = new EntitlementService(SubjectUtils.createSubject(adminToken), "/");
         boolean result = ec.migratedToEntitlementService();
         UnittestLog.logMessage(
             "EntitlementServiceTest.migratedToEntitlementService: returns " +

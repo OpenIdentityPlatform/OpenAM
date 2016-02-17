@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationCacheAfterRealmChangeTest.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -61,8 +61,7 @@ public class ApplicationCacheAfterRealmChangeTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup()

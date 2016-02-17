@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPTest.java,v 1.2 2009/11/12 18:37:39 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -63,8 +65,7 @@ public class IDPPTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     private AMIdentity user1;
     private AMIdentity group1;

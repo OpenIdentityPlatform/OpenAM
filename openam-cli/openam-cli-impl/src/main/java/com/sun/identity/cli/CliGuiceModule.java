@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -23,12 +23,15 @@ import org.forgerock.openam.entitlement.constraints.ConstraintValidatorImpl;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ApplicationServiceImpl;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 import org.forgerock.openam.session.SessionCache;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.EntitlementService;
 
 /**
  * Guice module for bindings that are required for the command line tools to work but are declared
@@ -47,6 +50,10 @@ public class CliGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(ApplicationService.class, ApplicationServiceImpl.class)
                 .build(ApplicationServiceFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(EntitlementConfiguration.class, EntitlementService.class)
+                .build(EntitlementConfigurationFactory.class));
 
         bind(SessionCache.class).toInstance(SessionCache.getInstance());
     }

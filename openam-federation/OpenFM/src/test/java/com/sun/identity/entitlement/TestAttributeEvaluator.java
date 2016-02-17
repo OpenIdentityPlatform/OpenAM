@@ -24,7 +24,7 @@
  *
  * $Id: TestAttributeEvaluator.java,v 1.2 2009/11/12 18:37:40 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -61,8 +61,7 @@ public class TestAttributeEvaluator {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     private AMIdentity user1;
     private String attrName = "mail";

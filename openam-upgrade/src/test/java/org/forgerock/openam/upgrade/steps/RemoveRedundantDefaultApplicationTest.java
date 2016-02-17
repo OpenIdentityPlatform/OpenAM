@@ -18,8 +18,7 @@ package org.forgerock.openam.upgrade.steps;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -28,7 +27,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
@@ -45,7 +45,9 @@ import java.security.PrivilegedAction;
 public final class RemoveRedundantDefaultApplicationTest {
 
     @Mock
-    private ApplicationManagerWrapper applicationService;
+    private ApplicationServiceFactory applicationServiceFactory;
+    @Mock
+    private ApplicationService applicationService;
     @Mock
     private PrivilegedAction<SSOToken> ssoTokenAction;
     @Mock
@@ -61,15 +63,16 @@ public final class RemoveRedundantDefaultApplicationTest {
         SSOToken token = mock(SSOToken.class);
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("abc");
         given(ssoTokenAction.run()).willReturn(token);
+        given(applicationServiceFactory.create(isA(Subject.class), eq("/"))).willReturn(applicationService);
 
         upgradeStep = new RemoveRedundantDefaultApplication(asSet("app1", "app2"),
-                applicationService, ssoTokenAction, connectionFactory);
+                applicationServiceFactory, ssoTokenAction, connectionFactory);
     }
 
     @Test
     public void successfullyRemovesRedundantApplications() throws Exception {
         // Given
-        given(applicationService.getApplicationNames(isA(Subject.class), eq("/"))).willReturn(asSet("app2", "someOtherApp"));
+        given(applicationService.getApplicationNames()).willReturn(asSet("app2", "someOtherApp"));
 
         // When
         upgradeStep.initialize();
@@ -79,14 +82,14 @@ public final class RemoveRedundantDefaultApplicationTest {
         // Then
         assertThat(isApplicable).isTrue();
         // Intersection of the two sets is app2.
-        verify(applicationService).deleteApplication(isA(Subject.class), eq("/"), eq("app2"));
+        verify(applicationService).deleteApplication(eq("app2"));
     }
 
     @Test
     public void checkReportForSuccessAndFailureApplications() throws Exception {
         // Given
-        given(applicationService.getApplicationNames(isA(Subject.class), eq("/"))).willReturn(asSet("app1", "app2", "someOtherApp"));
-        doThrow(EntitlementException.class).when(applicationService).deleteApplication(isA(Subject.class), eq("/"), eq("app2"));
+        given(applicationService.getApplicationNames()).willReturn(asSet("app1", "app2", "someOtherApp"));
+        doThrow(EntitlementException.class).when(applicationService).deleteApplication(eq("app2"));
 
         // When
         upgradeStep.initialize();
@@ -96,8 +99,8 @@ public final class RemoveRedundantDefaultApplicationTest {
 
         // Then
         assertThat(isApplicable).isTrue();
-        verify(applicationService).deleteApplication(isA(Subject.class), eq("/"), eq("app1"));
-        verify(applicationService).deleteApplication(isA(Subject.class), eq("/"), eq("app2"));
+        verify(applicationService).deleteApplication(eq("app1"));
+        verify(applicationService).deleteApplication(eq("app2"));
         assertThat(report).containsSequence("successfully removed", "app1", "failed to be removed", "app2");
     }
 

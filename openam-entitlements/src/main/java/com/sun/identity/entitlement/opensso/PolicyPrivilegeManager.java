@@ -29,6 +29,22 @@
 package com.sun.identity.entitlement.opensso;
 
 import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -51,19 +67,6 @@ import com.sun.identity.policy.PolicyEvent;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
-import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
-
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.security.auth.Subject;
 
 /**
  * Implementation of <code>PrivilegeManager</code> that saves privileges as <code>com.sun.identity.policy</code> objects
@@ -80,7 +83,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     static {
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         dsameUserSubject = SubjectUtils.createSubject(adminToken);
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(dsameUserSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(dsameUserSubject, "/");
         migratedToEntitlementSvc = ec.migratedToEntitlementService();
         xacmlEnabled = ec.xacmlPrivilegeEnabled();
         try {

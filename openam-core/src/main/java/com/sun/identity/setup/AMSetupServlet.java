@@ -30,21 +30,11 @@
 package com.sun.identity.setup;
 
 import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
 import static org.forgerock.openam.utils.Time.*;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -81,6 +71,32 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseLocator;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.license.ServletContextLicenseLocator;
+import org.forgerock.openam.upgrade.OpenDJUpgrader;
+import org.forgerock.openam.upgrade.UpgradeDirectoryUtils;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.config.ConfigurationFramework;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -135,19 +151,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.license.License;
-import org.forgerock.openam.license.LicenseLocator;
-import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.license.ServletContextLicenseLocator;
-import org.forgerock.openam.upgrade.UpgradeDirectoryUtils;
-import org.forgerock.openam.upgrade.OpenDJUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.VersionUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.config.ConfigurationFramework;
 
 /**
  * This class is the first class to get loaded by the Servlet container.
@@ -674,8 +677,7 @@ public class AMSetupServlet extends HttpServlet {
                     // Setup Replication port in SMS for each server
                     updateReplPortInfo(map);
                 }
-                EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                        SubjectUtils.createSuperAdminSubject(), "/");
+                EntitlementConfiguration ec = getEntitlementConfiguration(SubjectUtils.createSuperAdminSubject(), "/");
                 ec.reindexApplications();
             }
         } catch (Exception e) {

@@ -120,6 +120,8 @@ public class EntitlementException extends Exception {
     public static final int AUTHENTICATION_ERROR = 434;
     public static final int CLIENT_IP_EMPTY = 437;
     public static final int RESOURCE_ENV_NOT_KNOWN = 438;
+    public static final int APPLICATION_SEARCH_FAILED = 450;
+    public static final int INVALID_QUERY_FILTER = 452;
 
     public static final int CONDITION_EVALUATION_FAILED = 510;
 

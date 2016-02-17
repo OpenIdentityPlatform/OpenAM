@@ -24,15 +24,13 @@
  *
  * $Id: SubjectAttributesManager.java,v 1.3 2009/09/24 22:37:43 hengming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.entitlement.PolicyConstants;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
-import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +38,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Manages multiple instances of <class>SubjectAttributesCollector</class>,
@@ -66,8 +70,7 @@ public class SubjectAttributesManager {
         this.realmName = realmName;
         this.adminSubject = adminSubject;
         
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, realmName);
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, realmName);
 
         Map<String, Set<String>> configMap = null;
         try {
@@ -299,8 +302,7 @@ public class SubjectAttributesManager {
         String realm,
         String applicationName
     ) throws EntitlementException {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, realm);
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, realm);
         return ec.getSubjectAttributeNames(applicationName);
     }
 

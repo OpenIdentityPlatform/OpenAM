@@ -24,7 +24,7 @@
  *
  * $Id: RealmRemovedTest.java,v 1.1 2010/01/11 20:15:45 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -33,7 +33,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
-import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.security.AdminTokenAction;
@@ -65,8 +64,7 @@ public class RealmRemovedTest {
         AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup() throws Exception {

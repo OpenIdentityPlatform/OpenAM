@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -43,8 +43,9 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.RealmContext;
@@ -90,7 +91,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final Debug logger = Debug.getInstance("UmaProvider");
 
     private final AMIdentityRepositoryFactory idRepoFactory;
-    private final ApplicationManagerWrapper applicationManager;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final RequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
@@ -99,7 +100,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     /**
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
      * @param idRepoFactory An instance of the {@code AMIdentityRepositoryFactory}.
-     * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
+     * @param applicationServiceFactory An instance of the {@code ApplicationServiceFactory}.
      * @param applicationTypeManagerWrapper An instance of the {@code ApplicationTypeManagerWrapper}.
      * @param policyResource An instance of the policy backend {@code PromisedRequestHandler}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
@@ -107,12 +108,12 @@ public class UmaPolicyApplicationListener implements IdEventListener {
      */
     @Inject
     public UmaPolicyApplicationListener(final AMIdentityRepositoryFactory idRepoFactory,
-            ApplicationManagerWrapper applicationManager,
+            ApplicationServiceFactory applicationServiceFactory,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) RequestHandler policyResource,
             ResourceSetStoreFactory resourceSetStoreFactory, SessionCache sessionCache) {
         this.idRepoFactory = idRepoFactory;
-        this.applicationManager = applicationManager;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
@@ -235,13 +236,14 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void createApplication(String realm, String resourceServerId) {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm, resourceServerId);
+            ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+            Application application = appService.getApplication(resourceServerId);
             if (application == null) {
                 ApplicationType applicationType = applicationTypeManagerWrapper.getApplicationType(adminSubject,
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
-                applicationManager.saveApplication(adminSubject, realm, application);
+                appService.saveApplication(application);
             }
         } catch (EntitlementException e) {
             logger.error("Failed to create policy application", e);
@@ -254,8 +256,9 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             deletePolicies(realm, resourceServerId);
             try {
                 Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-                if (applicationManager.getApplication(adminSubject, realm, resourceServerId) != null) {
-                    applicationManager.deleteApplication(adminSubject, realm, resourceServerId);
+                ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+                if (appService.getApplication(resourceServerId) != null) {
+                    appService.deleteApplication(resourceServerId);
                 }
             } catch (EntitlementException e) {
                 logger.error("Failed to remove policy application", e);

@@ -24,9 +24,27 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.cli.entitlement;
+
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -50,20 +68,6 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.cli.entitlement.XACMLUtils;
-
-import javax.security.auth.Subject;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * Gets policies in a realm.
@@ -92,8 +96,7 @@ public class ListXACML extends AuthenticatedCommand {
         ldapLogin();
 
         // FIXME: change to use entitlementService.xacmlPrivilegeEnabled()
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         if(!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY",
                     "list-xacml not supported in  legacy policy mode"};

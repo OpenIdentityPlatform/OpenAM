@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
                     columns = [
                         {
-                            name: "name",
+                            name: "displayName",
                             label: $.t("console.authorization.policySets.list.grid.0"),
                             cell: BackgridUtils.TemplateCell.extend({
                                 iconClass: "fa-folder",

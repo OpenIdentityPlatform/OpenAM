@@ -24,7 +24,7 @@
  *
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -1108,7 +1108,7 @@ public class DataStore {
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
             return adminToken;
         }
         return SubjectUtils.getSSOToken(subject);

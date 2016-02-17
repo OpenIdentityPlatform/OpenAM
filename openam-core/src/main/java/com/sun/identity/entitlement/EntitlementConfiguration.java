@@ -24,96 +24,41 @@
  *
  * $Id: EntitlementConfiguration.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import org.forgerock.openam.entitlement.PolicyConstants;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
+
 import javax.security.auth.Subject;
+
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Entitlement Configuration
  */
-public abstract class EntitlementConfiguration {
-    public static final String POLICY_EVAL_THREAD_SIZE = "evalThreadSize";
-    public static final String POLICY_SEARCH_THREAD_SIZE = "searchThreadSize";
-    public static final String POLICY_CACHE_SIZE = "policyCacheSize";
-    public static final String INDEX_CACHE_SIZE = "indexCacheSize";
-    public static final String RESOURCE_COMPARATOR = "resourceComparator";
-    
-    private Subject adminSubject;
+public interface EntitlementConfiguration {
 
-    /**
-     * Returns an instance of entitlement configuration.
-     *
-     * @param adminSubject Admin Subject who has rights to query and modify
-     *        configuration datastore.
-     * @param realm Realm name.
-     * @return an instance of entitlement configuration.
-     */
-    public static EntitlementConfiguration getInstance(
-        Subject adminSubject, String realm) {
-
-        final Class clazz;
-        try {
-            //RFE: load different configuration plugin
-            clazz = Class.forName(
-                    "com.sun.identity.entitlement.opensso.EntitlementService");
-        } catch (ClassNotFoundException e) {
-            PolicyConstants.DEBUG.error("EntitlementConfiguration.<init>", e);
-            return null;
-        }
-
-        Class[] parameterTypes = {String.class};
-        try {
-            Constructor constructor = clazz.getConstructor(parameterTypes);
-            Object[] args = {realm};
-            EntitlementConfiguration impl = (EntitlementConfiguration)
-                constructor.newInstance(args);
-            impl.adminSubject = adminSubject;
-            return impl;
-        } catch (InstantiationException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        } catch (IllegalAccessException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        } catch (IllegalArgumentException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        } catch (InvocationTargetException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        } catch (NoSuchMethodException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        } catch (SecurityException ex) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                ex);
-        }
-        return null;
-    }
+    String POLICY_EVAL_THREAD_SIZE = "evalThreadSize";
+    String POLICY_SEARCH_THREAD_SIZE = "searchThreadSize";
+    String POLICY_CACHE_SIZE = "policyCacheSize";
+    String INDEX_CACHE_SIZE = "indexCacheSize";
 
     /**
      * Returns the application with the specified name.
      *
      * @return The application or null if the application could not be found.
      */
-    public abstract Application getApplication(String name);
+    Application getApplication(String name);
 
     /**
      * Returns a set of registered applications.
      *
      * @return a set of registered applications.
      */
-    public abstract Set<Application> getApplications();
+    Set<Application> getApplications();
 
     /**
      * Removes application.
@@ -121,8 +66,7 @@ public abstract class EntitlementConfiguration {
      * @param name name of application to be removed.
      * @throws EntitlementException if application cannot be removed.
      */
-    public abstract void removeApplication(String name)
-        throws EntitlementException;
+    void removeApplication(String name) throws EntitlementException;
 
     /**
      * Stores the application to data store.
@@ -130,15 +74,14 @@ public abstract class EntitlementConfiguration {
      * @param application Application object.
      * @throws EntitlementException if application cannot be stored.
      */
-    public abstract void storeApplication(Application application)
-        throws EntitlementException;
+    void storeApplication(Application application) throws EntitlementException;
 
     /**
      * Returns a set of registered application type.
      *
      * @return A set of registered application type.
      */
-    public abstract Set<ApplicationType> getApplicationTypes();
+    Set<ApplicationType> getApplicationTypes();
 
     /**
      * Removes application type.
@@ -146,8 +89,7 @@ public abstract class EntitlementConfiguration {
      * @param name name of application type to be removed.
      * @throws EntitlementException  if application type cannot be removed.
      */
-    public abstract void removeApplicationType(String name)
-        throws EntitlementException;
+    void removeApplicationType(String name) throws EntitlementException;
 
     /**
      * Stores the application type to data store.
@@ -155,8 +97,7 @@ public abstract class EntitlementConfiguration {
      * @param applicationType Application type  object.
      * @throws EntitlementException if application type cannot be stored.
      */
-    public abstract void storeApplicationType(ApplicationType applicationType)
-        throws EntitlementException;
+    void storeApplicationType(ApplicationType applicationType) throws EntitlementException;
 
     /**
      * Returns set of attribute values of a given attribute name,
@@ -164,7 +105,7 @@ public abstract class EntitlementConfiguration {
      * @param attributeName attribute name.
      * @return set of attribute values of a given attribute name,
      */
-    public abstract Set<String> getConfiguration(String attributeName);
+    Set<String> getConfiguration(String attributeName);
 
     /**
      * Returns subject attribute names.
@@ -174,8 +115,7 @@ public abstract class EntitlementConfiguration {
      * @throws EntitlementException if subject attribute names cannot be
      * returned.
      */
-    public abstract Set<String> getSubjectAttributeNames(String application)
-        throws EntitlementException;
+    Set<String> getSubjectAttributeNames(String application) throws EntitlementException;
 
     /**
      * Adds subject attribute names.
@@ -185,32 +125,7 @@ public abstract class EntitlementConfiguration {
      * @throws EntitlementException if subject attribute names cannot be
      *         added.
      */
-    public abstract void addSubjectAttributeNames(String application,
-        Set<String> names) throws EntitlementException;
-
-    /**
-     * Adds a new action.
-     *
-     * @param appName Application name,
-     * @param name Action name.
-     * @param defVal Default value.
-     * @throws EntitlementException if action cannot be added.
-     */
-    public abstract void addApplicationAction(
-        String appName,
-        String name,
-        Boolean defVal
-    ) throws EntitlementException;
-
-    /**
-     * Returns subject attributes collector names.
-     *
-     * @return subject attributes collector names.
-     * @throws EntitlementException if subject attributes collector names
-     * cannot be returned.
-     */
-    public abstract Set<String> getSubjectAttributesCollectorNames()
-        throws EntitlementException;
+    void addSubjectAttributeNames(String application, Set<String> names) throws EntitlementException;
 
     /**
      * Returns subject attributes collector configuration.
@@ -220,9 +135,7 @@ public abstract class EntitlementConfiguration {
      * @throws EntitlementException if subject attributes collector
      * configuration cannot be returned.
      */
-    public abstract Map<String, Set<String>>
-        getSubjectAttributesCollectorConfiguration(String name)
-        throws EntitlementException;
+    Map<String, Set<String>> getSubjectAttributesCollectorConfiguration(String name) throws EntitlementException;
 
     /**
      * Sets subject attributes collector configuration.
@@ -232,9 +145,8 @@ public abstract class EntitlementConfiguration {
      * @throws EntitlementException if subject attributes collector
      * configuration cannot be set.
      */
-    public abstract void setSubjectAttributesCollectorConfiguration(
-        String name, Map<String, Set<String>> attrMap)
-        throws EntitlementException;
+    void setSubjectAttributesCollectorConfiguration(String name, Map<String, Set<String>> attrMap)
+            throws EntitlementException;
 
     /**
      * Returns <code>true</code> if OpenAM policy data is migrated to a
@@ -243,7 +155,7 @@ public abstract class EntitlementConfiguration {
      * @return <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      */
-    public abstract boolean hasEntitlementDITs();
+    boolean hasEntitlementDITs();
 
     /**
      * Returns <code>true</code> if the system is migrated to support
@@ -252,7 +164,7 @@ public abstract class EntitlementConfiguration {
      * @return <code>true</code> if the system is migrated to support
      * entitlement services.
      */
-    public abstract boolean migratedToEntitlementService();
+    boolean migratedToEntitlementService();
     
     /**
      * Returns <code>true</code> if the network monitoring for entitlements
@@ -261,18 +173,14 @@ public abstract class EntitlementConfiguration {
      * @return <code>true</code> if the network monitoring for entitlements
      * is enabled.
      */
-    public abstract boolean networkMonitorEnabled();
+    boolean networkMonitorEnabled();
     
     /**
      * Allows the network monitoring to be enabled/disabled
      * 
      * @param enabled Is the network monitoring enabled
      */
-    public abstract void setNetworkMonitorEnabled(boolean enabled);
-
-    protected Subject getAdminSubject() {
-        return adminSubject;
-    }
+    void setNetworkMonitorEnabled(boolean enabled);
 
     /**
      * Returns <code>true</code> if the system stores privileges in
@@ -282,59 +190,34 @@ public abstract class EntitlementConfiguration {
      * @return <code>true</code> if the system stores privileges in
      * XACML format and supports exporting privileges in XACML format
      */
-    public abstract boolean xacmlPrivilegeEnabled();
+    boolean xacmlPrivilegeEnabled();
 
     /**
-     * Returns a set of application names for a given search criteria.
+     * Returns a set of applications for the given search criteria.
      *
-     * @param adminSubject Admin Subject
-     * @param filters Set of search filter.
-     * @return a set of application names for a given search criteria.
+     * @param subject Admin Subject
+     * @param queryFilter Query filter.
+     * @return a set of applications for the given search criteria.
      * @throws EntitlementException if search failed.
      */
-    public abstract Set<String> searchApplicationNames(
-        Subject adminSubject,
-        Set<SearchFilter> filters) throws EntitlementException;
+    Set<Application> searchApplications(Subject subject, QueryFilter<String> queryFilter) throws EntitlementException;
 
-    public abstract void reindexApplications();
-
-    public abstract Set<String> getParentAndPeerRealmNames()
-        throws EntitlementException;
-
-    public abstract String getRealmName(String realm);
-
-    public abstract boolean doesRealmExist();
-    
     /**
-     * For the passed in Entitlement environment, update the value associated with the key "am.policy.realmDN".
-     *
-     * @param environment The Entitlement environment to update with new realm DN value.
-     * @param subRealm The Sub Realm whose DN value should be stored in the environment map.
-     * @return The existing realm DN value stored in the environment map to enable it to be restored.
-     * @see #restoreEnvironmentRealmDn
+     * Reindex Applications.
      */
-    public abstract Set<String> updateEnvironmentRealmDn(Map<String, Set<String>> environment, String subRealm);
-    
-    /**
-     * For the passed in Entitlement environment, replace the existing realm DN with the previous value savedRealmDn.
-     *
-     * @param environment The Entitlement environment to update with the saved realm DN value.
-     * @param savedRealmDn The value to assign to the "am.policy.realmDN" key in the environment map.
-     * @see #updateEnvironmentRealmDn
-     */
-    public abstract void restoreEnvironmentRealmDn(Map<String, Set<String>> environment, Set<String> savedRealmDn);
+    void reindexApplications();
 
     /**
      * For letting us know whether or not the Agent monitoring is enabled in core.
      *
      * @return true if monitoring is enabled, false otherwise
      */
-    public abstract boolean isMonitoringRunning();
+    boolean isMonitoringRunning();
 
     /**
      * Informs us of the size of the policy window set in the configurable options.
      *
      * @return the value of the window size as configured.
      */
-    public abstract int getPolicyWindowSize();
+    int getPolicyWindowSize();
 }

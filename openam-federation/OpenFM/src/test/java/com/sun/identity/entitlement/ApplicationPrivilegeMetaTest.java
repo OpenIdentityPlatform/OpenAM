@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationPrivilegeMetaTest.java,v 1.1 2009/11/19 00:08:52 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -64,8 +64,7 @@ public class ApplicationPrivilegeMetaTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
     private AMIdentity user1;
 
     @BeforeClass

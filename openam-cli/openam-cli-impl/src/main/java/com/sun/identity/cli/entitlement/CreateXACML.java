@@ -24,13 +24,28 @@
  *
  * $Id: ImportXACML.java,v 1.3 2010/01/11 01:21:01 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
 
 import static com.sun.identity.cli.LogWriter.*;
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.INFO;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.util.List;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
+import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -51,18 +66,6 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.cli.entitlement.XACMLUtils;
-import org.forgerock.openam.utils.IOUtils;
-
-import javax.security.auth.Subject;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * Converts access policies read from XACML XML into Entitlement Framework Privileges
@@ -179,7 +182,7 @@ public class CreateXACML extends AuthenticatedCommand {
 
     private void ensureEntitlementServiceActive(Subject adminSubject, String realm) throws CLIException {
         // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         if (!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY", "create-xacml not supported in  legacy policy mode"};
             debugError("CreateXACML.handleRequest(): create-xacml not supported in  legacy policy mode");

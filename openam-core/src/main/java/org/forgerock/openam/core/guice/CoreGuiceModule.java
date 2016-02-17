@@ -57,6 +57,7 @@ import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.session.SessionCache;
@@ -121,6 +122,8 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.delegation.DelegationManager;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.security.AdminTokenAction;
@@ -302,6 +305,11 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
 
         bind(ConsoleConfigHandler.class).to(ConsoleConfigHandlerImpl.class);
+
+        /* Entitlement bindings */
+        install(new FactoryModuleBuilder()
+                .implement(EntitlementConfiguration.class, EntitlementService.class)
+                .build(EntitlementConfigurationFactory.class));
     }
 
     @Provides

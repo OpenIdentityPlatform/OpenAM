@@ -29,23 +29,30 @@
 
 package com.sun.identity.entitlement.opensso;
 
-import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
+import static com.sun.identity.entitlement.ApplicationTypeManager.getAppplicationType;
+import static com.sun.identity.entitlement.EntitlementException.*;
+import static org.forgerock.openam.entitlement.PolicyConstants.DEBUG;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.service.ApplicationQueryFilterVisitor;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.util.query.QueryFilter;
 
+import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -57,11 +64,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
-import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.monitoring.MonitoringUtil;
-import com.sun.identity.policy.PolicyConfig;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.PolicyException;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -74,7 +77,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 /**
  *
  */
-public class EntitlementService extends EntitlementConfiguration {
+public class EntitlementService implements EntitlementConfiguration {
     /**
      * Entitlement Service name.
      */
@@ -99,12 +102,18 @@ public class EntitlementService extends EntitlementConfiguration {
     private static final String REALM_DN_TEMPLATE = "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou="
             + SERVICE_NAME + ",ou=services,{1}";
 
-    private String realm;
+    private final Subject subject;
+    private final String realm;
 
     /**
-     * Constructor.
+     * Construct a new instance of {@link EntitlementService}.
+     *
+     * @param subject the calling subject
+     * @param realm the realm
      */
-    public EntitlementService(String realm) {
+    @Inject
+    public EntitlementService(@Assisted Subject subject, @Assisted String realm) {
+        this.subject = subject;
         this.realm = realm;
     }
 
@@ -114,6 +123,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @param attrName attribute name.
      * @return set of attribute values of a given attribute name,
      */
+    @Override
     public Set<String> getConfiguration(String attrName) {
         return getConfiguration(EntitlementUtils.getAdminToken(), attrName);
     }
@@ -192,6 +202,7 @@ public class EntitlementService extends EntitlementConfiguration {
      *
      * @return A set of registered application type.
      */
+    @Override
     public Set<ApplicationType> getApplicationTypes() {
         Set<ApplicationType> results = new HashSet<ApplicationType>();
         try {
@@ -247,73 +258,47 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private SSOToken getSSOToken() {
-        return (getAdminSubject() == PolicyConstants.SUPER_ADMIN_SUBJECT) ?
+        return (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) ?
             EntitlementUtils.getAdminToken() :
-            SubjectUtils.getSSOToken(getAdminSubject());
+            SubjectUtils.getSSOToken(subject);
     }
 
-    /**
-     * Returns a set of application names for a given search criteria.
-     *
-     * @param adminSubject Admin Subject
-     * @param filters Set of search filter.
-     * @return a set of application names for a given search criteria.
-     * @throws EntitlementException if search failed.
-     */
-    public Set<String> searchApplicationNames(
-        Subject adminSubject,
-        Set<SearchFilter> filters
-    ) throws EntitlementException {
-        SSOToken token = getSSOToken(adminSubject);
+    @Override
+    public Set<Application> searchApplications(Subject subject, QueryFilter<String> queryFilter)
+            throws EntitlementException {
 
-        if (token == null) {
-            throw new EntitlementException(451);
-        }
-        
-        String baseDN = getApplicationSearchBaseDN(realm);
-        if (!SMSEntry.checkIfEntryExists(baseDN, token)) {
-            return Collections.EMPTY_SET;
+        Set<Application> applications = new LinkedHashSet<>();
+        ServiceConfig config = getApplicationConfiguration(getSSOToken(subject), realm);
+        if (config == null) {
+            return applications;
         }
 
         try {
-            Set<String> dns = SMSEntry.search(token, baseDN,
-                getApplicationSearchFilter(filters), 0, 0, false, false);
-            Set<String> results = new HashSet<String>();
-
-            for (String dn : dns) {
-                if (!LDAPUtils.dnEquals(baseDN, dn)) {
-                    results.add(LDAPUtils.rdnValueFromDn(dn));
+            Set<String> appNames = config.getSubConfigNames();
+            for (String appName : appNames) {
+                ServiceConfig appConfig = config.getSubConfig(appName);
+                @SuppressWarnings("unchecked")
+                Map<String, Set<String>> appData = appConfig.getAttributes();
+                if (queryFilter.accept(new ApplicationQueryFilterVisitor(appName), appConfig)) {
+                    ApplicationType appType = getAppplicationType(subject, getAttribute(appData, APPLICATION_TYPE));
+                    applications.add(EntitlementUtils.createApplication(appType, appName, appData));
                 }
             }
-            return results;
-        } catch (SMSException e) {
-            throw new EntitlementException(450, e);
+        } catch (SMSException | SSOException | InstantiationException | IllegalAccessException e) {
+            DEBUG.error("EntitlementService.searchApplications", e);
+            throw new EntitlementException(APPLICATION_SEARCH_FAILED, e);
+        } catch (UnsupportedOperationException e) {
+            DEBUG.error("EntitlementService.searchApplications", e);
+            throw new EntitlementException(INVALID_QUERY_FILTER, e);
         }
+        return applications;
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
             return EntitlementUtils.getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
-    }
-
-    private String getApplicationSearchFilter(Set<SearchFilter> filters) {
-        StringBuilder strFilter = new StringBuilder();
-        if ((filters == null) || filters.isEmpty()) {
-            strFilter.append("(ou=*)");
-        } else {
-            if (filters.size() == 1) {
-                strFilter.append(filters.iterator().next().getFilter());
-            } else {
-                strFilter.append("(&");
-                for (SearchFilter psf : filters) {
-                    strFilter.append(psf.getFilter());
-                }
-                strFilter.append(")");
-            }
-        }
-        return strFilter.toString();
     }
 
     private static String getApplicationSearchBaseDN(String realm) {
@@ -321,9 +306,7 @@ public class EntitlementService extends EntitlementConfiguration {
         return MessageFormat.format(REALM_DN_TEMPLATE, args);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Application getApplication(String name) {
         try {
             final ServiceConfig appConfig = getApplicationConfiguration(getSSOToken(), realm);
@@ -352,6 +335,7 @@ public class EntitlementService extends EntitlementConfiguration {
      *
      * @return a set of registered applications.
      */
+    @Override
     public Set<Application> getApplications() {
         final Set<Application> results = new HashSet<Application>();
         try {
@@ -419,7 +403,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
         final Map<String, Set<String>> data = conf.getSubConfig(appName).getAttributes();
         final ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
-                getAdminSubject(), EntitlementUtils.getAttribute(data, EntitlementUtils.APPLICATION_TYPE));
+                subject, EntitlementUtils.getAttribute(data, EntitlementUtils.APPLICATION_TYPE));
         return EntitlementUtils.createApplication(applicationType, appName, data);
     }
 
@@ -431,6 +415,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @throws EntitlementException if subject attribute names cannot be
      * returned.
      */
+    @Override
     public void addSubjectAttributeNames(
         String applicationName,
         Set<String> names
@@ -483,45 +468,6 @@ public class EntitlementService extends EntitlementConfiguration {
         }
     }
 
-    /**
-     * Adds a new action.
-     *
-     * @param appName application name.
-     * @param name Action name.
-     * @param defVal Default value.
-     * @throws EntitlementException if action cannot be added.
-     */
-    public void addApplicationAction(
-        String appName,
-        String name,
-        Boolean defVal
-    ) throws EntitlementException {
-        try {
-            SSOToken token = SubjectUtils.getSSOToken(getAdminSubject());
-
-            if (token == null) {
-                throw new EntitlementException(226);
-            }
-
-            ServiceConfig applConf = getApplicationSubConfig(
-                token, realm, appName);
-
-            if (applConf != null) {
-                Map<String, Set<String>> data =
-                    applConf.getAttributes();
-                Map<String, Set<String>> result =
-                    addAction(data, name, defVal);
-                if (result != null) {
-                    applConf.setAttributes(result);
-                }
-            }
-        } catch (SMSException ex) {
-            throw new EntitlementException(221, ex);
-        } catch (SSOException ex) {
-            throw new EntitlementException(221, ex);
-        }
-    }
-
     private ServiceConfig getApplicationSubConfig(
         SSOToken token,
         String realm,
@@ -540,35 +486,13 @@ public class EntitlementService extends EntitlementConfiguration {
         return applConf;
     }
 
-    private Map<String, Set<String>> addAction(
-        Map<String, Set<String>> data,
-        String name,
-        Boolean defVal
-    ) throws EntitlementException {
-        Map<String, Set<String>> results = null;
-
-        Map<String, Boolean> actionMap = EntitlementUtils.getActions(data);
-        if (!actionMap.keySet().contains(name)) {
-            Set<String> actions = data.get(EntitlementUtils.CONFIG_ACTIONS);
-            Set<String> cloned = new HashSet<String>();
-            cloned.addAll(actions);
-            cloned.add(name + "=" + defVal.toString());
-            results = new HashMap<String, Set<String>>();
-            results.put(EntitlementUtils.CONFIG_ACTIONS, cloned);
-        } else {
-            Object[] args = {name};
-            throw new EntitlementException(222, args);
-        }
-
-        return results;
-    }
-
     /**
      * Removes application.
      *
      * @param name name of application to be removed.
      * @throws EntitlementException if application cannot be removed.
      */
+    @Override
     public void removeApplication(String name)
         throws EntitlementException
     {
@@ -577,27 +501,27 @@ public class EntitlementService extends EntitlementConfiguration {
             if (conf != null) {
                 String[] logParams = {realm, name};
                 OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                    "ATTEMPT_REMOVE_APPLICATION", logParams, getAdminSubject());
+                    "ATTEMPT_REMOVE_APPLICATION", logParams, subject);
                 conf.removeSubConfig(name);
                 OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                     "SUCCEEDED_REMOVE_APPLICATION", logParams,
-                    getAdminSubject());
+                        subject);
 
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-                Notifier.submit(NotificationServlet.APPLICATIONS_CHANGED,
-                    params);
+                Notifier.submit(
+                        NotificationServlet.APPLICATIONS_CHANGED, params);
             }
         } catch (SMSException ex) {
             String[] logParams = {realm, name, ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                "FAILED_REMOVE_APPLICATION", logParams, getAdminSubject());
+                "FAILED_REMOVE_APPLICATION", logParams, subject);
             Object[] args = {name};
             throw new EntitlementException(EntitlementException.REMOVE_APPLICATION_FAIL, args);
         } catch (SSOException ex) {
             String[] logParams = {realm, name, ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                "FAILED_REMOVE_APPLICATION", logParams, getAdminSubject());
+                "FAILED_REMOVE_APPLICATION", logParams, subject);
             Object[] args = {name};
             throw new EntitlementException(EntitlementException.REMOVE_APPLICATION_FAIL, args);
         }
@@ -609,10 +533,11 @@ public class EntitlementService extends EntitlementConfiguration {
      * @param name name of application type to be removed.
      * @throws EntitlementException  if application type cannot be removed.
      */
+    @Override
     public void removeApplicationType(String name)
         throws EntitlementException{
         try {
-            SSOToken token = SubjectUtils.getSSOToken(getAdminSubject());
+            SSOToken token = SubjectUtils.getSSOToken(subject);
 
             if (token == null) {
                 Object[] arg = {name};
@@ -646,7 +571,7 @@ public class EntitlementService extends EntitlementConfiguration {
     private ServiceConfig createApplicationCollectionConfig(String realm)
         throws SMSException, SSOException {
         ServiceConfig sc = null;
-        SSOToken token = SubjectUtils.getSSOToken(getAdminSubject());
+        SSOToken token = SubjectUtils.getSSOToken(subject);
         ServiceConfigManager mgr = new ServiceConfigManager(SERVICE_NAME,
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
@@ -655,8 +580,8 @@ public class EntitlementService extends EntitlementConfiguration {
         }
 
         if (sc == null) {
-            orgConfig.addSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS, SCHEMA_APPLICATIONS, 0,
-                Collections.EMPTY_MAP);
+            orgConfig.addSubConfig(
+                    EntitlementUtils.REGISTERED_APPLICATIONS, SCHEMA_APPLICATIONS, 0, Collections.EMPTY_MAP);
             sc = orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
         }
         return sc;
@@ -668,9 +593,10 @@ public class EntitlementService extends EntitlementConfiguration {
      * @param appl Application object.
      * @throws EntitlementException if application cannot be stored.
      */
+    @Override
     public void storeApplication(Application appl)
         throws EntitlementException {
-        SSOToken token = SubjectUtils.getSSOToken(getAdminSubject());
+        SSOToken token = SubjectUtils.getSSOToken(subject);
         try {
             createApplicationCollectionConfig(realm);
             String dn = getApplicationDN(appl.getName(), realm);
@@ -679,10 +605,10 @@ public class EntitlementService extends EntitlementConfiguration {
 
             String[] logParams = {realm, appl.getName()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                "ATTEMPT_SAVE_APPLICATION", logParams, getAdminSubject());
+                "ATTEMPT_SAVE_APPLICATION", logParams, subject);
             s.save();
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                "SUCCEEDED_SAVE_APPLICATION", logParams, getAdminSubject());
+                "SUCCEEDED_SAVE_APPLICATION", logParams, subject);
             
             Map<String, String> params = new HashMap<String, String>();
             params.put(NotificationServlet.ATTR_REALM_NAME, realm);
@@ -691,13 +617,13 @@ public class EntitlementService extends EntitlementConfiguration {
         } catch (SMSException ex) {
             String[] logParams = {realm, appl.getName(), ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_SAVE_APPLICATION", logParams, getAdminSubject());
+                "FAILED_SAVE_APPLICATION", logParams, subject);
             Object[] arg = {appl.getName()};
             throw new EntitlementException(EntitlementException.MODIFY_APPLICATION_FAIL, arg, ex);
         } catch (SSOException ex) {
             String[] logParams = {realm, appl.getName(), ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_SAVE_APPLICATION", logParams, getAdminSubject());
+                "FAILED_SAVE_APPLICATION", logParams, subject);
             Object[] arg = {appl.getName()};
             throw new EntitlementException(EntitlementException.MODIFY_APPLICATION_FAIL, arg, ex);
         }
@@ -713,10 +639,11 @@ public class EntitlementService extends EntitlementConfiguration {
      * @param applicationType Application type  object.
      * @throws EntitlementException if application type cannot be stored.
      */
+    @Override
     public void storeApplicationType(ApplicationType applicationType)
         throws EntitlementException {
         try {
-            SSOToken token = SubjectUtils.getSSOToken(getAdminSubject());
+            SSOToken token = SubjectUtils.getSSOToken(subject);
 
             if (token == null) {
                 Object[] arg = {applicationType.getName()};
@@ -852,48 +779,7 @@ public class EntitlementService extends EntitlementConfiguration {
             map.put(SMSEntry.ATTR_XML_KEYVAL, searchableAttributes);
         }
 
-        map.put("ou", getApplicationIndices(appl));
         return map;
-    }
-
-    private Set<String> getApplicationIndices(Application appl) {
-        Set<String> info = new HashSet<String>();
-        info.add(appl.getName());
-        info.add(Application.NAME_ATTRIBUTE + "=" + appl.getName());
-
-        String desc = appl.getDescription();
-        if (desc == null) {
-            desc = "";
-        }
-        info.add(Application.DESCRIPTION_ATTRIBUTE + "=" + desc);
-
-        String createdBy = appl.getCreatedBy();
-        if (createdBy != null) {
-            info.add(Application.CREATED_BY_ATTRIBUTE + createdBy);
-        }
-
-        String lastModifiedBy = appl.getLastModifiedBy();
-        if (lastModifiedBy != null) {
-            info.add(Application.LAST_MODIFIED_BY_ATTRIBUTE + "=" +
-                lastModifiedBy);
-        }
-
-        long creationDate = appl.getCreationDate();
-        if (creationDate > 0) {
-            String data = Long.toString(creationDate) + "=" +
-                Application.CREATION_DATE_ATTRIBUTE;
-            info.add(data);
-            info.add("|" + data);
-        }
-
-        long lastModifiedDate = appl.getLastModifiedDate();
-        if (lastModifiedDate > 0) {
-            String data = Long.toString(lastModifiedDate) + "=" +
-                Application.LAST_MODIFIED_DATE_ATTRIBUTE;
-            info.add(data);
-            info.add("|" + data);
-        }
-        return info;
     }
 
     /**
@@ -902,6 +788,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @param application Application name.
      * @return subject attribute names.
      */
+    @Override
     public Set<String> getSubjectAttributeNames(String application) {
         try {
             Application app = ApplicationManager.getApplication(
@@ -917,46 +804,6 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     /**
-     * Returns subject attributes collector names.
-     *
-     * @return subject attributes collector names.
-     * @throws EntitlementException if subject attributes collector names
-     * cannot be returned.
-     */
-    public Set<String> getSubjectAttributesCollectorNames()
-        throws EntitlementException {
-        try {
-            SSOToken token = getSSOToken();
-
-            if (token != null) {
-                ServiceConfigManager mgr = new ServiceConfigManager(
-                    SERVICE_NAME, token);
-                ServiceConfig orgConfig = mgr.getOrganizationConfig(
-                    realm, null);
-                if (orgConfig != null) {
-                    ServiceConfig conf = orgConfig.getSubConfig(
-                        CONFIG_SUBJECT_ATTRIBUTES_COLLECTORS);
-                    return conf.getSubConfigNames();
-                }
-            } else {
-                PolicyConstants.DEBUG.error(
-                    "EntitlementService.getSubjectAttributesCollectorNames: " +
-                    "admin sso token is absent");
-                throw new EntitlementException(285);
-            }
-        } catch (SMSException ex) {
-            PolicyConstants.DEBUG.error(
-                "EntitlementService.getSubjectAttributesCollectorNames", ex);
-            throw new EntitlementException(286, ex);
-        } catch (SSOException ex) {
-            PolicyConstants.DEBUG.error(
-                "EntitlementService.getSubjectAttributesCollectorNames", ex);
-            throw new EntitlementException(286, ex);
-        }
-        return null;
-    }
-
-    /**
      * Returns subject attributes collector configuration.
      *
      * @param name subject attributes collector name
@@ -964,6 +811,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @throws EntitlementException if subject attributes collector
      * configuration cannot be returned.
      */
+    @Override
     public Map<String, Set<String>>
         getSubjectAttributesCollectorConfiguration(String name)
         throws EntitlementException {
@@ -1046,6 +894,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @throws EntitlementException if subject attributes collector
      * configuration cannot be set.
      */
+    @Override
     public void setSubjectAttributesCollectorConfiguration(
         String name, Map<String, Set<String>> attrMap)
         throws EntitlementException {
@@ -1108,6 +957,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      */
+    @Override
     public boolean hasEntitlementDITs() {
         try {
             new ServiceSchemaManager(SERVICE_NAME, EntitlementUtils.getAdminToken());
@@ -1126,6 +976,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return <code>true</code> if the system is migrated to support
      * entitlement services.
      */
+    @Override
     public boolean migratedToEntitlementService() {
         if (!hasEntitlementDITs()) {
             return false;
@@ -1146,6 +997,7 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return <code>true</code> if the system stores privileges in
      * XACML format and supports exporting privileges in XACML format
      */
+    @Override
     public boolean xacmlPrivilegeEnabled() {
         if (!hasEntitlementDITs()) {
             return false;
@@ -1159,6 +1011,7 @@ public class EntitlementService extends EntitlementConfiguration {
                 : false;
     }
 
+    @Override
     public boolean networkMonitorEnabled() {
         if (!hasEntitlementDITs()) {
             return false;
@@ -1170,56 +1023,24 @@ public class EntitlementService extends EntitlementConfiguration {
         
         return (migrated != null) ? Boolean.parseBoolean(migrated) : false;     
     }
-    
+
+    @Override
     public void setNetworkMonitorEnabled(boolean enabled) {
         Set<String> values = new HashSet<String>();
         values.add(Boolean.toString(enabled));
         setConfiguration(EntitlementUtils.getAdminToken(), NETWORK_MONITOR_ENABLED, values);
     }
 
+    @Override
     public void reindexApplications() {
         Set<Application> appls = getApplications();
         for (Application a : appls) {
             try {
-                ApplicationManager.saveApplication(getAdminSubject(), realm, a);
+                ApplicationManager.saveApplication(subject, realm, a);
             } catch (EntitlementException ex) {
                 //ignore
             }
         }
-    }
-
-    public boolean doesRealmExist() {
-        try {
-            OrganizationConfigManager mgr = new OrganizationConfigManager(
-                EntitlementUtils.getAdminToken(), realm);
-            return true;
-        } catch (SMSException ex) {
-            return false;
-        }
-    }
-
-    public Set<String> getParentAndPeerRealmNames()
-        throws EntitlementException {
-        Set<String> results = new HashSet<String>();
-
-        try {
-            OrganizationConfigManager mgr = new OrganizationConfigManager(
-                EntitlementUtils.getAdminToken(), realm);
-            mgr = mgr.getParentOrgConfigManager();
-            String parentRealm = DNMapper.orgNameToRealmName(
-                mgr.getOrganizationName());
-            results.add(parentRealm);
-            Set<String> orgNames = mgr.getSubOrganizationNames();
-
-            for (String o : orgNames) {
-                results.add(DNMapper.orgNameToRealmName(o));
-            }
-        } catch (SMSException ex) {
-            PolicyConstants.DEBUG.error("EntitlementService.getSubRealmNames",
-                ex);
-            // realm no longer exist
-        }
-        return results;
     }
 
     private String getParentRealm(String realm) {
@@ -1235,54 +1056,12 @@ public class EntitlementService extends EntitlementConfiguration {
         return (idx == 0) ? "/" : realm.substring(0, idx);
     }
 
-    public String getRealmName(String realm) {
-        return DNMapper.orgNameToRealmName(realm);
-    }
-
-    /**
-     * For the passed in Entitlement environment, update the value associated with the key "am.policy.realmDN".
-     *
-     * @param environment The Entitlement environment to update with new realm DN value.
-     * @param subRealm The Sub Realm whose DN value should be stored in the environment map.
-     * @return The existing realm DN value stored in the environment map to enable it to be restored, may be
-     *         null if the Policy Configuration for the Sub Realm could not be loaded.
-     * @see #restoreEnvironmentRealmDn
-     */
-    public Set<String> updateEnvironmentRealmDn(Map<String, Set<String>> environment, String subRealm) {
-
-        String orgDN = DNMapper.orgNameToDN(subRealm);
-        Map orgConfig = null;
-        Set<String> savedRealmDn = null;
-        try {
-            orgConfig = PolicyConfig.getPolicyConfig(orgDN);
-        } catch (PolicyException ex) {
-            PolicyConstants.DEBUG.error("EntitlementService.updateEnvironmentRealmDn: "
-                    + "can not get policy config for sub-realm : " + subRealm + " org : " + orgDN, ex);
-        }
-        if (orgConfig != null) {
-            /**
-             * Save the realm name for the current policy config before passing control down to sub-realm
-             */
-            savedRealmDn = environment.get(PolicyEvaluator.REALM_DN);
-            // Update env to point to the realm policy config data.
-            environment.put(PolicyEvaluator.REALM_DN, CollectionUtils.asSet(orgDN));
-        }
-        
-        return savedRealmDn;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void restoreEnvironmentRealmDn(Map<String, Set<String>> environment, Set<String> savedRealmDn) {
-        environment.put(REALM_DN, savedRealmDn);
-    }
-
     /**
      * Whether the overall monitoring framework is enabled and running.
      *
      * @return true if monitoring is enabled, false otherwise.
      */
+    @Override
     public boolean isMonitoringRunning() {
         return MonitoringUtil.isRunning();
     }

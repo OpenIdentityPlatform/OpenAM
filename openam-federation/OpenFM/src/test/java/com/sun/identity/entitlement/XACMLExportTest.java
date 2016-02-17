@@ -24,11 +24,7 @@
  *
  * $Id: XACMLExportTest.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
- */
-
-/**
- * Portions copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -80,8 +76,7 @@ public class XACMLExportTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
     private UserSubject ua;
-    private boolean migrated = EntitlementConfiguration.getInstance(adminSubject, "/")
-            .migratedToEntitlementService();
+    private boolean migrated = true;
 
     private PrivilegeManager pm;
     private Privilege privilege1;

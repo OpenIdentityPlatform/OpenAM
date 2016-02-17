@@ -24,10 +24,12 @@
  *
  * $Id: ApplicationFilterTest.java,v 1.2 2009/12/07 19:46:50 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
+
+import static com.sun.identity.entitlement.Application.NAME_ATTRIBUTE;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -35,7 +37,6 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.AuthUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
-import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
@@ -46,6 +47,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.util.query.QueryFilter;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -68,8 +71,7 @@ public class ApplicationFilterTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
     private AMIdentity user1;
 
     @BeforeClass
@@ -139,21 +141,15 @@ public class ApplicationFilterTest {
         SSOToken userToken = AuthUtils.authenticate("/", USER1, USER1);
         Subject userSubject = SubjectUtils.createSubject(userToken);
 
-        Set<SearchFilter> filters = new HashSet<SearchFilter>();
-        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE,
-            "ApplicationFilterTes*"));
-        Set<String> names = ApplicationManager.search(userSubject, "/",
-            filters);
-        if (names.isEmpty()) {
+        Set<Application> apps = ApplicationManager.search(userSubject, "/",
+                QueryFilter.equalTo(NAME_ATTRIBUTE, "ApplicationFilterTes*"));
+        if (apps.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return one entry");
         }
 
-        filters.clear();
-        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE, "4rwrwr*"));
-        
-        names = ApplicationManager.search(userSubject, "/", filters);
-        if (!names.isEmpty()) {
+        apps = ApplicationManager.search(userSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, "4rwrwr*"));
+        if (!apps.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return no entries");
         }

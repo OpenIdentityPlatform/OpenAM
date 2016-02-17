@@ -22,18 +22,34 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  *
  * $Id: OpenSSOPolicyDataStore.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.io.ByteArrayInputStream;
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.security.auth.Subject;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
-import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.PolicyDataStore;
@@ -51,18 +67,6 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.io.ByteArrayInputStream;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import javax.security.auth.Subject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  */
@@ -318,9 +322,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
 
         Document doc = XMLUtils.getXMLDocument(
             new ByteArrayInputStream(xml.getBytes("UTF8")));
-        if (EntitlementConfiguration.getInstance(
-                SubjectUtils.createSubject(adminToken),
-                "/").xacmlPrivilegeEnabled()) {
+        if (getEntitlementConfiguration(SubjectUtils.createSubject(adminToken), "/").xacmlPrivilegeEnabled()) {
             //TODO: create xacml policy from xml document
         } else {
             PolicyManager pm = new PolicyManager(adminToken, realm);

@@ -24,13 +24,22 @@
  *
  * $Id: ReferralPrivilege.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
+import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
+
 import com.sun.identity.entitlement.interfaces.ResourceName;
+import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
 import com.sun.identity.shared.JSONUtils;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +51,9 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -450,9 +461,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         entitlementCombiner.init("/", applicationName, normalisedResourceName, requestedResourceName, actionNames,
                 recursive);
         for (String rlm : realms) {
-            EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, rlm);
-            if (ec.doesRealmExist()) {
+            if (doesRealmExist(rlm)) {
                 for (String app : mapApplNameToResources.keySet()) {
                     if (app.equals(applicationName)) {
                         Set<String> resourceNames = mapApplNameToResources.get(
@@ -496,7 +505,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                             // Fix for OPENAM-790
                             // Ensure that the Entitlement environment contains the correct 
                             // Policy Configuration for the realm being evaluated.
-                            Set<String> savedRealmDn = ec.updateEnvironmentRealmDn(environment, rlm);
+                            Set<String> savedRealmDn = updateEnvironmentRealmDn(environment, rlm);
                             
                             List<Entitlement> entitlements = evaluator.evaluate(
                                 rlm,
@@ -504,7 +513,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                                 normalisedResourceName, requestedResourceName, environment, recursive);
                             
                             if (savedRealmDn != null) {
-                                ec.restoreEnvironmentRealmDn(environment, savedRealmDn);
+                                restoreEnvironmentRealmDn(environment, savedRealmDn);
                             }
                             
                             if (entitlements != null) {
@@ -584,5 +593,59 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * For the passed in Entitlement environment, update the value associated with the key "am.policy.realmDN".
+     *
+     * @param environment The Entitlement environment to update with new realm DN value.
+     * @param subRealm The Sub Realm whose DN value should be stored in the environment map.
+     * @return The existing realm DN value stored in the environment map to enable it to be restored, may be
+     *         null if the Policy Configuration for the Sub Realm could not be loaded.
+     * @see #restoreEnvironmentRealmDn
+     */
+    private Set<String> updateEnvironmentRealmDn(Map<String, Set<String>> environment, String subRealm) {
+
+        String orgDN = DNMapper.orgNameToDN(subRealm);
+        Map orgConfig = null;
+        Set<String> savedRealmDn = null;
+        try {
+            orgConfig = PolicyConfig.getPolicyConfig(orgDN);
+        } catch (PolicyException ex) {
+            PolicyConstants.DEBUG.error(
+                    "ReferralPrivilege.updateEnvironmentRealmDn: can not get policy config for sub-realm : "
+                            + subRealm + " org : " + orgDN, ex);
+        }
+        if (orgConfig != null) {
+            /**
+             * Save the realm name for the current policy config before passing control down to sub-realm
+             */
+            savedRealmDn = environment.get(PolicyEvaluator.REALM_DN);
+            // Update env to point to the realm policy config data.
+            environment.put(PolicyEvaluator.REALM_DN, CollectionUtils.asSet(orgDN));
+        }
+
+        return savedRealmDn;
+    }
+
+    /**
+     * For the passed in Entitlement environment, replace the existing realm DN with the previous value savedRealmDn.
+     *
+     * @param environment The Entitlement environment to update with the saved realm DN value.
+     * @param savedRealmDn The value to assign to the "am.policy.realmDN" key in the environment map.
+     * @see #updateEnvironmentRealmDn
+     */
+    private void restoreEnvironmentRealmDn(Map<String, Set<String>> environment, Set<String> savedRealmDn) {
+        environment.put(REALM_DN, savedRealmDn);
+    }
+
+
+    private boolean doesRealmExist(String realm) {
+        try {
+            new OrganizationConfigManager(EntitlementUtils.getAdminToken(), realm);
+            return true;
+        } catch (SMSException ex) {
+            return false;
+        }
     }
 }

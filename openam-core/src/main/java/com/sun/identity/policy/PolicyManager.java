@@ -29,6 +29,8 @@
 
 package com.sun.identity.policy;
 
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,7 +44,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
-import com.iplanet.am.sdk.AMCommonUtils;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.forgerock.openam.utils.Time;
+import org.forgerock.opendj.ldap.DN;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -73,13 +82,6 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.shared.concurrency.LockFactory;
-import org.forgerock.openam.utils.Time;
-import org.forgerock.opendj.ldap.DN;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * The <code>PolicyManager</code> class manages policies
@@ -1779,8 +1781,7 @@ public final class PolicyManager {
         // Do this outside of a static block to avoid issues on container shutdown/restart
         adminSubject = SubjectUtils.createSubject(
                 (SSOToken)AccessController.doPrivileged(AdminTokenAction.getInstance()));
-        EntitlementConfiguration ec =
-                EntitlementConfiguration.getInstance(adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         migratedToEntitlementService = ec.migratedToEntitlementService();
     }
 

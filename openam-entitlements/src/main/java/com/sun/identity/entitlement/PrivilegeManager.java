@@ -28,11 +28,20 @@
  */
 package com.sun.identity.entitlement;
 
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.Time.*;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -43,14 +52,8 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
@@ -78,7 +81,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      * @return instance of configured <code>PrivilegeManager</code>
      */
     static public PrivilegeManager getInstance(String realm, Subject subject) {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(subject, realm);
+        EntitlementConfiguration ec = getEntitlementConfiguration(subject, realm);
         if (!ec.migratedToEntitlementService()) {
             throw new UnsupportedOperationException(
                 "Updating of DITs is required before using the entitlement service");

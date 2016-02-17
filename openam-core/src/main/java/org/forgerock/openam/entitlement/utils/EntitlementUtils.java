@@ -15,9 +15,12 @@
  */
 package org.forgerock.openam.entitlement.utils;
 
+import static com.sun.identity.entitlement.EntitlementException.INVALID_APPLICATION_CLASS;
 import static com.sun.identity.entitlement.opensso.EntitlementService.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,18 +30,20 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.util.Reject;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -117,7 +122,7 @@ public final class EntitlementUtils {
      */
     public static Application createApplication(ApplicationType applicationType, String name,
             Map<String, Set<String>> data) throws InstantiationException, IllegalAccessException, EntitlementException {
-        Application app = ApplicationManager.newApplication(name, applicationType);
+        Application app = newApplication(name, applicationType);
 
         final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
         if (resourceTypeUuids != null) {
@@ -177,6 +182,27 @@ public final class EntitlementUtils {
         }
 
         return app;
+    }
+
+    /**
+     * Creates an application.
+     *
+     * @param name Name of application.
+     * @param applicationType application type.
+     * @throws EntitlementException if application class is not found.
+     */
+    public static Application newApplication(String name, ApplicationType applicationType) throws EntitlementException {
+        Class clazz = applicationType.getApplicationClass();
+        Class[] parameterTypes = {String.class, ApplicationType.class};
+        Constructor constructor;
+        try {
+            constructor = clazz.getConstructor(parameterTypes);
+            Object[] parameters = {name, applicationType};
+            return (Application) constructor.newInstance(parameters);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InstantiationException |
+                IllegalArgumentException | InvocationTargetException ex) {
+            throw new EntitlementException(INVALID_APPLICATION_CLASS, ex);
+        }
     }
 
     /**
@@ -375,7 +401,7 @@ public final class EntitlementUtils {
      * @return An SSO token.
      */
     public static SSOToken getSSOToken(Subject subject) {
-        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
             return getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
@@ -429,5 +455,16 @@ public final class EntitlementUtils {
                 .setLastModifiedBy(getAttribute(data, CONFIG_LAST_MODIFIED_BY, EMPTY))
                 .setLastModifiedDate(getDateAttributeAsLong(data, CONFIG_LAST_MODIFIED_DATE))
                 .build();
+    }
+
+    /**
+     * Get a new instance of the {@link EntitlementConfiguration}.
+     *
+     * @param subject The requesting Subject.
+     * @param realm The realm for which the configuration is required.
+     * @return The {@link EntitlementConfiguration} for the given realm.
+     */
+    public static EntitlementConfiguration getEntitlementConfiguration(Subject subject, String realm) {
+        return InjectorHolder.getInstance(EntitlementConfigurationFactory.class).create(subject, realm);
     }
 }

@@ -24,10 +24,16 @@
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.security.AccessController;
+
+import javax.security.auth.Subject;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -42,9 +48,6 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
 
 /**
  * This observer will remove all referral and application privileges
@@ -64,8 +67,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
             (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            SubjectUtils.createSubject(adminToken), "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(SubjectUtils.createSubject(adminToken), "/");
         if (ec.migratedToEntitlementService()) {
             try {
                 ServiceConfigManager scm = new ServiceConfigManager(

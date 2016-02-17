@@ -30,19 +30,21 @@
 package com.sun.identity.entitlement.util;
 
 import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import org.forgerock.openam.entitlement.PolicyConstants;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.sun.identity.entitlement.EntitlementConfiguration;
 
 /**
  * Utility to collect response time and throughput on a per second basis.
@@ -52,8 +54,7 @@ public class NetworkMonitor extends HttpServlet {
 
     // Static variables
     private static HashMap<String, NetworkMonitor> stats = new HashMap();
-    private static EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
+    private static EntitlementConfiguration ec = getEntitlementConfiguration(SUPER_ADMIN_SUBJECT, "/");
     private static boolean collectStats = ec.networkMonitorEnabled();
 
     // Instance variables

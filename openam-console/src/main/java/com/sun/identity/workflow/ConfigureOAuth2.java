@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,14 +24,13 @@
 package com.sun.identity.workflow;
 
 import static java.text.MessageFormat.format;
-import static java.util.Collections.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
+import static java.util.Collections.singleton;
 import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import java.security.AccessController;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +57,7 @@ import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
 import org.forgerock.util.query.QueryFilter;
@@ -74,7 +74,6 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -298,7 +297,7 @@ public class ConfigureOAuth2 extends Task {
         if (application == null) {
             ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(adminSubject,
                     ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
-            application = ApplicationManager.newApplication(POLICY_APPLICATION_NAME, applicationType);
+            application = EntitlementUtils.newApplication(POLICY_APPLICATION_NAME, applicationType);
         }
 
         Set<String> resourceTypeIds = application.getResourceTypeUuids();

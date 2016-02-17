@@ -24,7 +24,7 @@
  *
  * $Id: ReferredResourcesTest.java,v 1.2 2009/11/05 21:13:46 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -59,8 +59,7 @@ public class ReferredResourcesTest {
         AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-            adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup() throws Exception {

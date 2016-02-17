@@ -11,25 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.guice;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.entitlement.xacml3.XACMLConstants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.EntitlementIndexConfigFilter;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
@@ -47,16 +39,26 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ApplicationServiceImpl;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.xacml3.XACMLConstants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.EntitlementIndexConfigFilter;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * Guice model for defining object bindings for all things related
@@ -74,15 +76,6 @@ public class EntitlementGuiceModule extends AbstractModule {
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
-
-        bind(EntitlementConfiguration.class).toProvider(new Provider<EntitlementConfiguration>() {
-
-            @Override
-            public EntitlementConfiguration get() {
-                return EntitlementConfiguration.getInstance(SubjectUtils.createSuperAdminSubject(), "/");
-            }
-
-        }).in(Singleton.class);
 
         bind(Debug.class).annotatedWith(Names.named(XACMLConstants.DEBUG))
                 .toInstance(Debug.getInstance(XACMLConstants.DEBUG));
@@ -114,6 +107,11 @@ public class EntitlementGuiceModule extends AbstractModule {
         }
     }
 
-
+    @Provides
+    @Inject
+    @Named("RootRealmEntitlementConfiguration")
+    EntitlementConfiguration getEntitlementConfiguration(EntitlementConfigurationFactory configurationFactory) {
+        return configurationFactory.create(SubjectUtils.createSuperAdminSubject(), "/");
+    }
 
 }

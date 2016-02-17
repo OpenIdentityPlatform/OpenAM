@@ -24,10 +24,26 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -61,18 +77,6 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.ldap.LDAPUtils;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class OpenSSOIndexStore extends PrivilegeIndexStore {
     private static final int DEFAULT_CACHE_SIZE = 100000;
@@ -92,8 +96,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     // Initialize the caches
     static {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
 
         policyCacheSize = getInteger(ec,
             EntitlementConfiguration.POLICY_CACHE_SIZE, DEFAULT_CACHE_SIZE);
@@ -161,8 +164,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         super(adminSubject, realm);
         superAdminSubject = SubjectUtils.createSuperAdminSubject();
         realmDN = DNMapper.orgNameToDN(realm);
-        entitlementConfig = EntitlementConfiguration.getInstance(
-            adminSubject, realm);
+        entitlementConfig = getEntitlementConfiguration(adminSubject, realm);
 
         // Get Index caches based on realm
         if (indexCacheSize > 0) {

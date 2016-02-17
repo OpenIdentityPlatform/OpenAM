@@ -24,7 +24,7 @@
  *
  * $Id: ReferralPrivilegeTest.java,v 1.1 2009/12/07 19:46:50 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -67,8 +67,7 @@ public class ReferralPrivilegeTest {
         AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-            adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
     private AMIdentity user;
 
     @BeforeClass
