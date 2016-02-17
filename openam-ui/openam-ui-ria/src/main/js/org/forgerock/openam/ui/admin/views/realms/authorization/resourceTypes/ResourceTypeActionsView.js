@@ -29,10 +29,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesActionsTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click .radio-inline": "toggleRadio",
-            "keyup .radio-inline": "toggleRadio",
-            "click .editing button": "addItem",
-            "keyup .editing button": "addItem",
+            "click [data-toggle-item]": "toggleRadio",
+            "keyup [data-toggle-item]": "toggleRadio",
+            "click [data-add-item]": "addItem",
+            "keyup [data-add-item]": "addItem",
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },

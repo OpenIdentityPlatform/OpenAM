@@ -36,12 +36,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         template: "templates/admin/views/realms/authorization/policies/conditions/ManageRulesTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click  #addCondition:not(.disabled)": "addCondition",
-            "keyup  #addCondition:not(.disabled)": "addCondition",
-            "click  #addOperator:not(.disabled)": "addOperator",
-            "keyup  #addOperator:not(.disabled)": "addOperator",
-            "click  .operator > .item-button-panel > .fa-times": "onDelete",
-            "keyup  .operator > .item-button-panel > .fa-times": "onDelete"
+            "click  [data-add-condition]:not(.disabled)": "addCondition",
+            "keyup  [data-add-condition]:not(.disabled)": "addCondition",
+            "click  [data-add-operator]:not(.disabled)": "addOperator",
+            "keyup  [data-add-operator]:not(.disabled)": "addOperator",
+            "click  [data-delete-operator]": "onDelete",
+            "keyup  [data-delete-operator]": "onDelete"
         },
         types: {
             ENVIRONMENT: "environmentType",

@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         render: function (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
-            this.events["click .fa-clock-o"] = _.bind(this.clickClockPicker, this);
+            this.events["click [data-clock]"] = _.bind(this.clickClockPicker, this);
 
             this.parentRender(function () {
                 this.initClockPickers();

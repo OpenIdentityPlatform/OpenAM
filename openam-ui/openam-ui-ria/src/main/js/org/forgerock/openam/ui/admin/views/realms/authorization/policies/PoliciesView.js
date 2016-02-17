@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policies/PoliciesToolbarTemplate.html",
         events: {
-            "click #addNewPolicy": "addNewPolicy"
+            "click [data-add-entity]": "addNewPolicy"
         },
         render: function (data, callback) {
             var self = this,
@@ -117,8 +117,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                         className: "fr-col-btn-2",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
-                            "click .edit-row-item": "editItem",
-                            "click .delete-row-item": "deleteItem"
+                            "click [data-edit-item]": "editItem",
+                            "click [data-delete-item]": "deleteItem"
                         },
                         editItem: function () {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {

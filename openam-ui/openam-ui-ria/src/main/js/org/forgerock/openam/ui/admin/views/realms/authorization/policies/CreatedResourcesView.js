@@ -30,13 +30,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
         template: "templates/admin/views/realms/authorization/policies/CreatedResourcesTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click #addResource": "addResource",
-            "keyup #addResource": "addResource",
+            "click [data-add-resource]": "addResource",
+            "keyup [data-add-resource]": "addResource",
             "keyup #resourceBuilder input": "addResource",
             "click span[data-delete]": "deleteResource",
             "keyup span[data-delete]": "deleteResource",
-            "click #removePendingResource": "removePendingResource",
-            "click #addResourceEditBtn" : "showEditingResources"
+            "click [data-remove-pending]": "removePendingResource",
+            "click [data-show-editing]" : "showEditingResources"
         },
 
         render: function (args, callback) {

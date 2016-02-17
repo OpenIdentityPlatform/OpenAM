@@ -25,13 +25,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
 ], function ($, _, AbstractView, EventManager, Constants) {
     return AbstractView.extend({
         noBaseTemplate: true,
-
         events: {
-            "click .fa-plus": "addItem",
-            "keyup .fa-plus": "addItem",
-            "keyup .editing input": "addItem",
-            "click .editing button": "addItem",
-            "keyup .editing button": "addItem",
+            "click [data-add-item]": "addItem",
+            "keyup [data-add-item]": "addItem",
+            "keyup [data-editing-input]": "addItem",
             "click span[data-delete]": "deleteItem",
             "keyup span[data-delete]": "deleteItem"
         },
@@ -76,7 +73,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             }
 
             _.each(this.data.items, function (item) {
-
                 if (self.isExistingItem(pending, item)) { // provide child implementation
                     duplicateIndex = counter;
                     return;

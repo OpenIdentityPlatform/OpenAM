@@ -42,7 +42,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             "partials/util/_HelpLink.html"
         ],
         events: {
-            "click #addNewRes": "addNewResourceType"
+            "click [data-add-entity]": "addNewResourceType"
         },
         render: function (args, callback) {
             var self = this,
@@ -109,8 +109,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                         className: "fr-col-btn-2",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
-                            "click .edit-row-item": "editItem",
-                            "click .delete-row-item": "deleteItem"
+                            "click [data-edit-item]": "editItem",
+                            "click [data-delete-item]": "deleteItem"
                         },
                         editItem: function (e) {
                             self.editRecord(e, this.model.id, Router.configuration.routes.realmsResourceTypeEdit);

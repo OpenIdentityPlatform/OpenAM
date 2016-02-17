@@ -25,10 +25,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
         noBaseTemplate: true,
         template: "templates/admin/views/realms/authorization/common/StripedListWrapperTemplate.html",
         events: {
-            "click .list-group-item": "clickItem",
-            "keyup .list-group-item": "clickItem",
-            "click .striped-list-filter": "filterItems",
-            "keyup .striped-list-filter": "filterItems"
+            "click [data-list-item]":   "clickItem",
+            "keyup [data-list-item]":   "clickItem",
+            "click [data-list-filter]": "filterItems",
+            "keyup [data-list-filter]": "filterItems"
         },
 
         render: function (data, el, callback) {
@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
         emptyFilter: function () {
             this.setFilter("");
 
-            this.$el.find(".striped-list-filter").val("");
+            this.$el.find("[data-list-filter]").val("");
         },
 
         setFilter: function (filter) {

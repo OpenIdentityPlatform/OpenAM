@@ -48,7 +48,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         validationFields: ["name", "resources"],
         events: {
             "click [data-save]": "submitForm",
-            "change #availableResTypes": "changeResourceType",
             "click [data-delete]": "onDeleteClick"
         },
 

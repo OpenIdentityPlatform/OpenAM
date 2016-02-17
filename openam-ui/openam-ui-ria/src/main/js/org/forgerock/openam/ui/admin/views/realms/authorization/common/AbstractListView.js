@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
 ], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, FormHelper, BackgridUtils) {
 
     return AbstractView.extend({
-        toolbarTemplateID: "#gridToolbar",
+        toolbarTemplateID: "[data-grid-toolbar]",
 
         initialize: function () {
             AbstractView.prototype.initialize.call(this);

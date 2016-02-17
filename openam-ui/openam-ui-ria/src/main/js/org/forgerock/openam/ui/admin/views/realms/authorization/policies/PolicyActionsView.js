@@ -26,9 +26,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
         template: "templates/admin/views/realms/authorization/policies/PolicyActionsTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click .radio-inline": "changePermission",
-            "change .editing select": "selectAction",
-            "click .add-item": "addAction",
+            "click [data-toggle-item]": "changePermission",
+            "change [data-select-item]": "selectAction",
+            "click [data-add-item]": "addAction",
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },
@@ -86,7 +86,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
                 { "items": this.data.selectedActions },
                 function (tpl) {
                     self.$el.find("#selectedActions").html(tpl);
-                    self.$el.find("button.add-item").prop("disabled", true);
+                    self.$el.find("button[data-add-item]").prop("disabled", true);
                     if (callback) {
                         callback();
                     }
@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
         },
 
         selectAction: function () {
-            this.$el.find("button.add-item").prop("disabled", false);
+            this.$el.find("button[data-add-item]").prop("disabled", false);
         },
 
         addAction: function (e) {

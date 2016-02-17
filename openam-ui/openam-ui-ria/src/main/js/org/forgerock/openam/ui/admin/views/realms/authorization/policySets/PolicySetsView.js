@@ -44,11 +44,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
             "partials/util/_HelpLink.html"
         ],
         events: {
-            "click #addNewPolicySet": "addNewPolicySet",
-            "click #importPolicies": "startImportPolicies",
-            "click #exportPolicies": "exportPolicies",
-            "click [data-add-resource]" : "addResource",
-            "change [name=upload]": "readImportFile"
+            "click [data-add-entity]":      "addNewPolicySet",
+            "click [data-import-policies]": "startImportPolicies",
+            "click [data-export-policies]": "exportPolicies",
+            "click [data-add-resource]":    "addResource",
+            "change [name=upload]":         "readImportFile"
         },
         render: function (args, callback) {
             this.realmPath = args[0];
@@ -120,8 +120,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                                 className: "fr-col-btn-2",
                                 template: "templates/admin/backgrid/cell/RowActionsCell.html",
                                 events: {
-                                    "click .edit-row-item": "editItem",
-                                    "click .delete-row-item": "deleteItem"
+                                    "click [data-edit-item]": "editItem",
+                                    "click [data-delete-item]": "deleteItem"
                                 },
                                 editItem: function (e) {
                                     self.editRecord(e, this.model.id, Router.configuration.routes.realmsPolicySetEdit);
@@ -213,7 +213,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
 
         exportPolicies: function () {
             var realm = this.realmPath === "/" ? "" : RealmHelper.encodeRealm(this.realmPath);
-            this.$el.find("#exportPolicies").attr("href",
+            this.$el.find("[data-export-policies]").attr("href",
                 Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
         },
 

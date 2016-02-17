@@ -34,10 +34,10 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
         template: "templates/admin/views/realms/RealmsListTemplate.html",
         editDetailsDialogTemplate: "templates/admin/views/realms/RealmPropertiesDialogTemplate.html",
         events: {
-            "click [data-delete-realm]"  : "deleteRealm",
-            "click [data-add-realm]"     : "addRealm",
-            "click [data-edit-realm]"    : "editRealm",
-            "click [data-toogle-realm ]" : "toggleRealmActive"
+            "click [data-delete-realm]" : "deleteRealm",
+            "click [data-add-realm]"    : "addRealm",
+            "click [data-edit-realm]"   : "editRealm",
+            "click [data-toogle-realm]" : "toggleRealmActive"
         },
         partials: [
             "partials/alerts/_Alert.html" // needed in CreateUpdateRealmDialog

@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditEnvironmentTemplate.html",
         events: {
-            "change select.type-selection": "changeType"
+            "change [data-type-selection]": "changeType"
         },
         data: {},
         i18n: {

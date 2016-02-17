@@ -221,7 +221,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             var self = this;
 
             UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
-                self.$el.find("#gridToolbar").html(tpl);
+                self.$el.find("[data-grid-toolbar]").html(tpl);
             });
         },
 
