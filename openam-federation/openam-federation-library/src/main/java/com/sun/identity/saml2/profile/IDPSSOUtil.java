@@ -441,29 +441,29 @@ public class IDPSSOUtil {
                 redirectUrl = remoteRequestData.get(SAML2Constants.AM_REDIRECT_URL);
                 outputData = remoteRequestData.get(SAML2Constants.OUTPUT_DATA);
                 responseCode = remoteRequestData.get(SAML2Constants.RESPONSE_CODE);
-            }
 
-            try {
-                if (redirectUrl != null && !redirectUrl.isEmpty()) {
-                    response.sendRedirect(redirectUrl);
-                } else {
-                    if (responseCode != null) {
-                        response.setStatus(Integer.valueOf(responseCode));
+                try {
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        response.sendRedirect(redirectUrl);
+                    } else {
+                        if (responseCode != null) {
+                            response.setStatus(Integer.valueOf(responseCode));
+                        }
+                        // no redirect, perhaps an error page, return the content
+                        if (outputData != null && !outputData.isEmpty()) {
+                            SAML2Utils.debug.message("Printing the forwarded response");
+                            response.setContentType("text/html; charset=UTF-8");
+                            out.println(outputData);
+                            return;
+                        }
                     }
-                    // no redirect, perhaps an error page, return the content
-                    if (outputData != null && !outputData.isEmpty()) {
-                        SAML2Utils.debug.message("Printing the forwarded response");
-                        response.setContentType("text/html; charset=UTF-8");
-                        out.println(outputData);
-                        return;
+                } catch (IOException ioe) {
+                    if (SAML2Utils.debug.messageEnabled()) {
+                        SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS() error in Request Routing", ioe);
                     }
                 }
-            } catch (IOException ioe) {
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS() error in Request Routing", ioe);
-                }
+                return;
             }
-            return;
         }
         //end of request proxy
 
