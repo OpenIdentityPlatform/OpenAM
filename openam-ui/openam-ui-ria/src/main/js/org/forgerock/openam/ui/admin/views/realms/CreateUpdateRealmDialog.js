@@ -23,8 +23,9 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/common/util/Promise",
     "popoverclickaway" // depends on jquery and bootstrap
-], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalService, Form) {
+], function ($, _, Handlebars, BootstrapDialog, Messages, AbstractView, SMSGlobalService, Form, Promise) {
     function validateRealmName (dialog) {
         var valid = true,
             alert = "",
@@ -96,14 +97,15 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                 promise = SMSGlobalService.realms.get(options.realmPath);
             }
 
-            $.when(promise, allRealmsPromise).then(function (data, allRealmsData) {
+            Promise.all([promise, allRealmsPromise]).then(function (results) {
                 var i18nTitleKey = newRealm ? "createTitle" : "updateTitle",
                     i18nButtonKey = newRealm ? "create" : "save",
+                    data = results[0],
                     realmName = data.values.name === "/" ? $.t("console.common.topLevelRealm") : data.values.name;
 
                 if (!options.allRealmPaths) {
                     options.allRealmPaths = [];
-                    _.each(allRealmsData[0].result, function (realm) {
+                    _.each(results[1][0].result, function (realm) {
                         if (realm.parentPath) {
                             options.allRealmPaths.push(realm.parentPath);
                         }

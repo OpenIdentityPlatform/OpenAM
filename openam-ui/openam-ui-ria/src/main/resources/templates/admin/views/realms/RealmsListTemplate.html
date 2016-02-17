@@ -2,7 +2,7 @@
     {{> headers/_Title title="console.realms.title" }}
     <p class="page-description">{{t "console.realms.description"}}</p>
     <div class="btn-toolbar page-toolbar"  role="toolbar" aria-label="toolbar">
-        <a class="btn btn-primary" id="addRealm" href="#"><i class="fa fa-plus"></i> {{t "console.realms.newRealm"}}</a>
+        <a class="btn btn-primary" data-add-realm id="addRealm" href="#"><i class="fa fa-plus"></i> {{t "console.realms.newRealm"}}</a>
         <ul class="btn-group pull-right" role="group">
             <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#grid"><i class="fa fa-th"></i></a></li>
             <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#list"><i class="fa fa-list"></i></a></li>
@@ -20,14 +20,14 @@
                                 <i class="fa fa-ellipsis-v fa-lg"></i>
                             </button>
                             <ul class="dropdown-menu pull-left" role="menu">
-                                <li><a href="#" class="edit-realm"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
+                                <li><a href="#" data-edit-realm class="edit-realm"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                                 {{#if active}}
-                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
+                                    <li><a href="#" data-toogle-realm class="toggle-realm-active"><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
                                 {{else}}
-                                    <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
+                                    <li><a href="#" data-toogle-realm class="toggle-realm-active"><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
                                 {{/if}}
                                 <li class="divider"></li>
-                                <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+                                <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" data-delete-realm class="delete-realm"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
                             </ul>
                         </div>
                         <a href="{{routeTo 'realmDefault' path}}">
@@ -96,8 +96,8 @@
                                 </td>
                                 <td class="fr-col-btn-2">
                                     <div class="btn-group realm-name" data-realm-path="{{path}}">
-                                        <button type="button" class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
-                                        <button type="button" class="btn btn-link delete-realm {{#unless canDelete}} disabled {{/unless}}"><i class="fa fa-close"></i></button>
+                                        <button type="button" data-edit-realm class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
+                                        <button type="button" data-delete-realm class="btn btn-link delete-realm {{#unless canDelete}} disabled {{/unless}}"><i class="fa fa-close"></i></button>
                                     </div>
                                 </td>
                             </tr>

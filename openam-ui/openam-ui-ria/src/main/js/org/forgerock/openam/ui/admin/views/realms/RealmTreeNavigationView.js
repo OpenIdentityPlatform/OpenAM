@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
@@ -42,9 +42,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm")
                 : this.data.realmPath;
 
-            this.realmExists(this.data.realmPath).done(function () {
+            this.realmExists(this.data.realmPath).then(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);
-            }).fail(function (xhr) {
+            }, function (xhr) {
                 /**
                  * If a non-existant realm was specified, return to realms list
                  */
