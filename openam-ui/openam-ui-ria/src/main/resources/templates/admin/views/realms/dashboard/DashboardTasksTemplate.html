@@ -1,7 +1,7 @@
 <div class="panel-heading">
     <h4 class="panel-title">
         {{#if taskGroup.name}}
-            <span id="commonTasksBtn">{{t 'console.dashboard.quickStart'}}</span>  <i class="fa fa-angle-right"></i> {{taskGroup.name}}
+            <span data-common-tasks id="commonTasksBtn">{{t 'console.dashboard.quickStart'}}</span>  <i class="fa fa-angle-right"></i> {{taskGroup.name}}
         {{else}}
             {{t 'console.dashboard.quickStart'}}
         {{/if}}
@@ -14,7 +14,7 @@
     <div class="grid-list">
     {{#each taskGroup.tasks}}
         <div class="col-sm-6 col-md-3">
-            <div class="panel-default panel am-panel-card">
+            <div data-panel-card class="panel-default panel am-panel-card">
                 <a href="{{#if link}}{{link}}{{else}}#{{_id}}{{/if}}" data-task-{{#if link}}link="{{link}}"{{else}}group="{{_id}}"{{/if}}>
                     <div class="card-body">
                         <div class="card-icon-circle card-icon-circle-sm bg-primary">

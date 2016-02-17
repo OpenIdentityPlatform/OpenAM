@@ -24,10 +24,10 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
     var DashboardTasksView = AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTasksTemplate.html",
         data: {},
-        element: "#commonTasks",
-        events:{
-            "click .am-panel-card a" : "cardClick",
-            "click span#commonTasksBtn" : "commonTasksBtnClick"
+        element: "[data-common-tasks-container]",
+        events: {
+            "click [data-panel-card] a" : "cardClick",
+            "click [data-common-tasks]" : "commonTasksBtnClick"
         },
         render: function (args, callback) {
             this.realmPath = args[0];

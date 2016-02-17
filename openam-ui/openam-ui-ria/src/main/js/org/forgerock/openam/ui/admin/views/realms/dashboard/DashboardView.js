@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
     var DashboardView = AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTemplate.html",
         events: {
-            "click #editProperties"        : "editProperties"
+            "click [data-edit-properties]" : "editProperties"
         },
         editProperties: function (event) {
             event.preventDefault();
