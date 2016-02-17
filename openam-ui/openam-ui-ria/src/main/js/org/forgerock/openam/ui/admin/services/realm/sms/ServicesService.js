@@ -153,7 +153,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 });
         },
         getInitialState: function (realm, type) {
-            function getTemplate (type) {
+            function getTemplate () {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "services/" + type + "?_action=template"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -161,7 +161,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 });
             }
 
-            return $.when(getServiceSchema(realm, type), getTemplate(type)).then(function (schema, values) {
+            return $.when(getServiceSchema(realm, type), getTemplate()).then(function (schema, values) {
                 return {
                     schema: schema,
                     values: values[0]

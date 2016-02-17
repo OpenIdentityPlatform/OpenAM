@@ -94,5 +94,9 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.editor.setValue(_.pick(this.values, _.keys(this.schema.properties)));
     };
 
+    obj.prototype.destroy = function () {
+        this.editor.destroy();
+    };
+
     return obj;
 });
