@@ -24,9 +24,8 @@
  *
  * $Id: AMSendMail.java,v 1.6 2009/12/22 19:57:19 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
-
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
@@ -195,8 +194,7 @@ public class AMSendMail {
         moduleProps.put("mail.smtp.port", port);
         moduleProps.put("mail.smtp.socketFactory.port", port);
         if (ssl) {
-            moduleProps.put("mail.smtp.socketFactory.class",
-                    "javax.net.ssl.SSLSocketFactory");
+            moduleProps.put("mail.smtp.ssl.enable", "true");
         }
         moduleProps.put("mail.smtp.socketFactory.fallback", "false");
 
