@@ -30,18 +30,10 @@ package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.newDate;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import javax.security.auth.Subject;
-
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -52,8 +44,14 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
+import javax.security.auth.Subject;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
@@ -345,6 +343,19 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      *         should some error occur
      */
     public abstract List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException;
+
+    /**
+     * Finds all policies based on the identity uid, whether user or group uid.
+     *
+     * @param uid
+     *         identity uid
+     *
+     * @return list of matching policies else an empty list
+     *
+     * @throws EntitlementException
+     *         should some query error occur
+     */
+    public abstract List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException;
 
     /**
      * Returns realm name.

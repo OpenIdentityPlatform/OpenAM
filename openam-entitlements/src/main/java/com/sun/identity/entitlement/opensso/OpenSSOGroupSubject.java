@@ -24,10 +24,11 @@
  *
  * $Id: OpenSSOGroupSubject.java,v 1.2 2009/08/21 21:52:01 hengming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -42,6 +43,8 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Collections;
@@ -49,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * This class represents group identity for membership check
@@ -117,7 +119,7 @@ public class OpenSSOGroupSubject extends GroupSubject {
                 Map<String, Set<String>> attributes = (Map<String, Set<String>>)
                     publicCreds.iterator().next();
                 Set<String> values = attributes.get(
-                    SubjectAttributesCollector.NAMESPACE_MEMBERSHIP +
+                    SubjectAttributesCollector.NAMESPACE_IDENTITY +
                     IdType.GROUP.getName());
                 String grpID = getID();
                 if (values != null) {
@@ -178,22 +180,8 @@ public class OpenSSOGroupSubject extends GroupSubject {
                 new HashMap<String, Set<String>>(4);
             if (sam.isGroupMembershipSearchIndexEnabled()) {
                 Set<String> set = new HashSet<String>();
-                String uuid = getID();
-                SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
-                try {
-                    AMIdentity amid = IdUtils.getIdentity(adminToken, uuid);
-                    set.add(OpenSSOSubjectAttributesCollector.
-                        getIDWithoutOrgName(amid));
-                } catch (IdRepoException ex) {
-                    if (PrivilegeManager.debug.messageEnabled()) {
-                        PrivilegeManager.debug.message(
-                            "OpenSSOGroupSubject.getSearchIndexAttributes", ex);
-                    }
-                    set.add(uuid);
-                }
-                map.put(SubjectAttributesCollector.NAMESPACE_MEMBERSHIP +
-                    IdType.GROUP.getName(), set);
+                set.add(getID());
+                map.put(SubjectAttributesCollector.NAMESPACE_IDENTITY, set);
             } else {
                 Set<String> set = new HashSet<String>();
                 set.add(SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
@@ -216,7 +204,7 @@ public class OpenSSOGroupSubject extends GroupSubject {
         if (sam != null) {
             if (sam.isGroupMembershipSearchIndexEnabled()) {
                 Set<String> set = new HashSet<String>(2);
-                set.add(SubjectAttributesCollector.NAMESPACE_MEMBERSHIP +
+                set.add(SubjectAttributesCollector.NAMESPACE_IDENTITY +
                     IdType.GROUP.getName());
                 return set;
             } else {

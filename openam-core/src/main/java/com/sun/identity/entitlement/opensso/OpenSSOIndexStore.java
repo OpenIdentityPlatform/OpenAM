@@ -29,23 +29,10 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import static java.util.Collections.singleton;
 import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
-
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -62,6 +49,7 @@ import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SequentialThreadPool;
+import com.sun.identity.entitlement.SubjectAttributesCollector;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.SearchFilter;
@@ -78,6 +66,19 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.util.Reject;
+
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OpenSSOIndexStore extends PrivilegeIndexStore {
     private static final int DEFAULT_CACHE_SIZE = 100000;
@@ -817,6 +818,13 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     @Override
     public List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException {
         return dataStore.findPoliciesByRealmAndApplication(getRealm(), application);
+    }
+
+    @Override
+    public List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException {
+        Reject.ifNull(uid);
+        Set<String> subjectIndexes = singleton(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" + uid);
+        return dataStore.findAllPoliciesByRealmAndSubjectIndex(getRealm(), subjectIndexes);
     }
 
     private Set<String> getParentRealms(String realm) throws SMSException {

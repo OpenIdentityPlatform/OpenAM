@@ -29,8 +29,14 @@
 
 package com.sun.identity.entitlement;
 
+import static java.util.Collections.singleton;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.PolicyConstants;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Manages multiple instances of <class>SubjectAttributesCollector</class>,
@@ -181,24 +181,29 @@ public class SubjectAttributesManager {
      * @throws com.sun.identity.entitlement.EntitlementException if indexes
      * cannot be obtained.
      */
-    public static Set<String> getSubjectSearchIndexes(Privilege privilege)
-        throws EntitlementException {
-        Set searchIndexes = new HashSet();
+    public static Set<String> getSubjectSearchIndexes(Privilege privilege) throws EntitlementException {
         EntitlementSubject es = privilege.getSubject();
-        if (es != null) {
-            Map<String, Set<String>> sis = es.getSearchIndexAttributes();
-            for (String attrName : sis.keySet()) {
-                Set<String> attrValues = sis.get(attrName);
-                for (String v : attrValues) {
-                    searchIndexes.add(attrName + "=" + v);
-                }
-            }
-        } else {
-            searchIndexes.add(
-                SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" +
-                SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
+
+        if (es == null) {
+            return singleton(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" +
+                    SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
         }
-        return (searchIndexes);
+
+        Map<String, Set<String>> indexAttributes = es.getSearchIndexAttributes();
+
+        if (isEmpty(indexAttributes)) {
+            return singleton(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" +
+                    SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
+        }
+
+        Set<String> searchIndexes = new HashSet<>();
+        for (Map.Entry<String, Set<String>> indexAttribute : indexAttributes.entrySet()) {
+            for (String value : indexAttribute.getValue()) {
+                searchIndexes.add(indexAttribute.getKey() + "=" + value);
+            }
+        }
+
+        return searchIndexes;
     }
 
     /**
@@ -222,36 +227,45 @@ public class SubjectAttributesManager {
      * @throws com.sun.identity.entitlement.EntitlementException if search
      * filter cannot be obtained.
      */
-    public Set<String> getSubjectSearchFilter(
-        Subject subject,
-        String applicationName)
-        throws EntitlementException {
-        Set<String> results = new HashSet<String>();
-        results.add(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" +
-            SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
-        if (subject != null) {
-            Set<String> names = getApplicationAttributeNames(
-                realmName, applicationName);
-            SubjectAttributesManager sam = SubjectAttributesManager.getInstance(
-                adminSubject, realmName);
-            try {
-                Map<String, Set<String>> values = sam.getAttributes(subject, names);
+    public Set<String> getSubjectSearchFilter(Subject subject, String applicationName) throws EntitlementException {
+        if (subject == null) {
+            return Collections.emptySet();
+        }
 
-                if (values != null) {
-                    for (String k : values.keySet()) {
-                        Set<String> set = values.get(k);
-                        for (String v : set) {
-                            results.add(k + "=" + v);
-                        }
-                    }
-                }
-            } catch (EntitlementException ex) {
-                if (DEBUG.warningEnabled()) {
-                    DEBUG.warning("Unable to read subject attributes", ex);
-                }
+        Set<String> attributeNames = getApplicationAttributeNames(realmName, applicationName);
+
+        if (isEmpty(attributeNames)) {
+            // Application does not define any index-able subject attributes.
+            return Collections.emptySet();
+        }
+
+        Map<String, Set<String>> attributeValues;
+
+        try {
+            attributeValues = getAttributes(subject, attributeNames);
+        } catch (EntitlementException ex) {
+            DEBUG.warning("Unable to read subject attributes", ex);
+            return Collections.emptySet();
+        }
+
+        if (isEmpty(attributeValues)) {
+            return Collections.emptySet();
+        }
+
+        Set<String> subjectFilterIndexes = new HashSet<>();
+        // Add the general "all" index to capture generic policies.
+        subjectFilterIndexes.add(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" +
+                SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES);
+
+        for (Map.Entry<String, Set<String>> keyValuePair : attributeValues.entrySet()) {
+            String attributeName = keyValuePair.getKey();
+
+            for (String value : keyValuePair.getValue()) {
+                subjectFilterIndexes.add(attributeName + "=" + value);
             }
         }
-        return results;
+
+        return subjectFilterIndexes;
     }
 
     /**
@@ -268,25 +282,6 @@ public class SubjectAttributesManager {
         Set<String> attrNames
     ) throws EntitlementException {
         return attrCollector.getAttributes(subject, attrNames);
-    }
-
-    /**
-     * Returns <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     *
-     * @param subject identity of the user
-     * @param attrName attribute name to check
-     * @param attrValue attribute value to check
-     * @return <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     * @throws com.sun.identity.entitlement.EntitlementException
-     */
-    public boolean hasAttribute(
-        Subject subject,
-        String attrName,
-        String attrValue
-    ) throws EntitlementException {
-        return attrCollector.hasAttribute(subject, attrName, attrValue);
     }
 
     /**

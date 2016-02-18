@@ -171,6 +171,12 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.NO_RESOURCE_TYPE_EXPECTED, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.MISSING_APPLICATION_NAME, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_QUERY_FILTER, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.UNSUPPORTED_SUBJECT_INDEX, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.UNABLE_TO_CREATE_SUBJECT_INDEX, ResourceException.INTERNAL_ERROR);
+            handlers.put(EntitlementException.UNKNOWN_IDENTITY, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_QUERY_ID, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.QUERY_ID_MISSING_UID, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.UNABLE_TO_QUERY_POLICY_INVALID_UID, ResourceException.INTERNAL_ERROR);
 
             return handlers;
         }

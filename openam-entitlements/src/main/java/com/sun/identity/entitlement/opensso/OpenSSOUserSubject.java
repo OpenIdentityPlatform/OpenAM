@@ -24,19 +24,11 @@
  *
  * $Id: OpenSSOUserSubject.java,v 1.2 2009/08/21 21:52:01 hengming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
-
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -45,6 +37,14 @@ import com.sun.identity.entitlement.UserSubject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
+
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * OpenSSOUserSubject to represent user identity for membership check
@@ -93,8 +93,7 @@ public class OpenSSOUserSubject extends UserSubject {
         String uuid = getID();
         try {
             AMIdentity amid = new AMIdentity(adminToken, uuid);
-            set.add(OpenSSOSubjectAttributesCollector.getIDWithoutOrgName(
-                amid));
+            set.add(amid.getUniversalId());
         } catch (IdRepoException ex) {
             if (PrivilegeManager.debug.messageEnabled()) {
                 PrivilegeManager.debug.message(

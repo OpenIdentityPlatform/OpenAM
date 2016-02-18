@@ -24,10 +24,13 @@
  *
  * $Id: OpenSSOSubjectAttributesCollector.java,v 1.3 2009/09/24 22:38:21 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import static java.util.Collections.singletonMap;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,18 +44,17 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.ldap.LDAPUtils;
 
+import javax.security.auth.Subject;
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  *
@@ -102,146 +104,116 @@ public class OpenSSOSubjectAttributesCollector
         }
     }
 
-    /**
-     * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
-     *
-     * @param subject identity of the user
-     * @param attrNames requested attribute names
-     * @return a map of attribute names and their values
-     * @throws com.sun.identity.entitlement.EntitlementException if this
-     * operation failed.
-     */
-    public Map<String, Set<String>> getAttributes(
-        Subject subject,
-        Set<String> attrNames
-    ) throws EntitlementException {
+    @Override
+    public Map<String, Set<String>> getAttributes(Subject subject, Set<String> attributeNames)
+            throws EntitlementException {
         String uuid = SubjectUtils.getPrincipalId(subject);
+
         try {
-            Map<String, Set<String>> results = new
-                HashMap<String, Set<String>>();
-            Map<String, Set<String>> pubCreds = new
-                HashMap<String, Set<String>>();
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            AMIdentity identity = new AMIdentity(adminToken, uuid);
 
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            AMIdentity amid = new AMIdentity(adminToken, uuid);
+            Map<String, Set<String>> attributeKeyValues = new HashMap<>();
+            attributeKeyValues.putAll(getIdentityUniversalIds(attributeNames, identity));
+            attributeKeyValues.putAll(getIdentityAttributes(attributeNames, identity));
 
-            Set<String> set = new HashSet<String>(2);
-            set.add(getIDWithoutOrgName(amid));
-            results.put(NAMESPACE_IDENTITY, set);
-            set = new HashSet<String>(2);
-            set.add(uuid);
-            pubCreds.put(NAMESPACE_IDENTITY, set);
-
-            Set<String> primitiveAttrNames = getAttributeNames(attrNames,
-                NAMESPACE_ATTR);
-            if (!primitiveAttrNames.isEmpty()) {
-                Map<String, Set<String>> primitiveAttrValues =
-                    amid.getAttributes(primitiveAttrNames);
-                for (String name : primitiveAttrValues.keySet()) {
-                    Set<String> values = primitiveAttrValues.get(name);
-                    if (values != null) {
-                        results.put(NAMESPACE_ATTR + name, values);
-                        pubCreds.put(NAMESPACE_ATTR + name, values);
-                    }
-                }
-            }
-
-            Set<String> membershipAttrNames = getAttributeNames(attrNames,
-                NAMESPACE_MEMBERSHIP);
-            if (!membershipAttrNames.isEmpty()) {
-                for (String m : membershipAttrNames) {
-                    IdType type = IdUtils.getType(m);
-
-                    if (type != null) {
-                        Set<AMIdentity> memberships = amid.getMemberships(type);
-
-                        if (memberships != null) {
-                            Set<String> setMemberships = new HashSet<String>();
-                            Set<String> membershipsCred = new HashSet<String>();
-                            for (AMIdentity a : memberships) {
-                                setMemberships.add(getIDWithoutOrgName(a));
-                                membershipsCred.add(a.getUniversalId());
-                            }
-                            results.put(NAMESPACE_MEMBERSHIP + m,
-                                setMemberships);
-                            pubCreds.put(NAMESPACE_MEMBERSHIP + m,
-                                membershipsCred);
-                        }
-                    }
-                }
-            }
-
-            Set<Object> publicCreds = subject.getPublicCredentials();
-            publicCreds.add(pubCreds);
-            return results;
-        } catch (SSOException e) {
-            Object[] params = {uuid};
-            throw new EntitlementException(600, params, e);
-        } catch (IdRepoException e) {
-            Object[] params = {uuid};
-            throw new EntitlementException(600, params, e);
+            return attributeKeyValues;
+        } catch (SSOException | IdRepoException e) {
+            throw new EntitlementException(EntitlementException.UNABLE_TO_RETRIEVE_SUBJECT_ATTRIBUTE, e, uuid);
         }
     }
 
-    private Set<String> getAttributeNames(Set<String> attrNames, String ns) {
-        Set<String> results = new HashSet<String>();
-        int len = ns.length();
-        for (String s : attrNames) {
-            if (s.startsWith(ns)) {
-                results.add(s.substring(len));
-            }
+    private Map<String, Set<String>> getIdentityUniversalIds(Set<String> attributeNames,
+            AMIdentity identity) throws IdRepoException, SSOException {
+
+        Set<String> identityTypes = filterSet(attributeNames, NAMESPACE_IDENTITY);
+
+        if (isEmpty(identityTypes)) {
+            return Collections.emptyMap();
         }
-        return results;
+
+        Set<String> values = new HashSet<>();
+
+        for (String identityType : identityTypes) {
+            values.addAll(getUniversalIdForIdentityType(identityType, identity));
+        }
+
+        if (isEmpty(values)) {
+            return Collections.emptyMap();
+        }
+
+        return singletonMap(NAMESPACE_IDENTITY, values);
     }
 
-    /**
-     * Returns <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     *
-     * @param subject identity of the user
-     * @param attrName attribute name to check
-     * @param attrValue attribute value to check
-     * @return <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     * @throws com.sun.identity.entitlement.EntitlementException if this
-     * operation failed.
-     */
-    public boolean hasAttribute(
-        Subject subject,
-        String attrName,
-        String attrValue
-    ) throws EntitlementException {
-        String uuid = SubjectUtils.getPrincipalId(subject);
-        try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            AMIdentity amid = new AMIdentity(adminToken, uuid);
-            if (attrName.startsWith(NAMESPACE_ATTR)) {
-                Set<String> values = amid.getAttribute(attrName.substring(
-                    NAMESPACE_ATTR.length()));
-                return (values != null) ? values.contains(attrValue) : false;
-            } else if (attrName.startsWith(NAMESPACE_MEMBERSHIP)) {
-                IdType type = IdUtils.getType(attrName.substring(
-                    NAMESPACE_MEMBERSHIP.length()));
-                if (type != null) {
-                    AMIdentity parent = new AMIdentity(adminToken,
-                        attrValue);
-                    if (parent.getType().equals(type)) {
-                        Set<String> members = parent.getMembers(IdType.USER);
-                        return members.contains(amid.getUniversalId());
-                    }
-                }
-            }
-            return false;
-        } catch (IdRepoException e) {
-            Object[] params = {uuid};
-            throw new EntitlementException(601, params, e);
-        } catch (SSOException e) {
-            Object[] params = {uuid};
-            throw new EntitlementException(601, params, e);
+    private Set<String> getUniversalIdForIdentityType(String identityType,
+            AMIdentity identity) throws IdRepoException, SSOException {
+
+        if (identityType.equalsIgnoreCase(IdType.USER.getName())) {
+            return Collections.singleton(identity.getUniversalId());
         }
+
+        return checkTypeForMembership(identityType, identity);
+    }
+
+    private Set<String> checkTypeForMembership(String identityType,
+            AMIdentity identity) throws IdRepoException, SSOException {
+
+        IdType membershipType = IdUtils.getType(identityType);
+
+        if (membershipType == null) {
+            return Collections.emptySet();
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<AMIdentity> membershipIdentities = identity.getMemberships(membershipType);
+
+        if (isEmpty(membershipIdentities)) {
+            return Collections.emptySet();
+        }
+
+        Set<String> membershipUniversalIds = new HashSet<>();
+
+        for (AMIdentity membership : membershipIdentities) {
+            membershipUniversalIds.add(membership.getUniversalId());
+        }
+
+        return membershipUniversalIds;
+    }
+
+    private Map<String, Set<String>> getIdentityAttributes(Set<String> attributeNames,
+            AMIdentity identity) throws IdRepoException, SSOException {
+
+        Set<String> identityAttributes = filterSet(attributeNames, NAMESPACE_ATTR);
+
+        if (isEmpty(identityAttributes)) {
+            return Collections.emptyMap();
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Set<String>> attributeKeyValues = identity.getAttributes(identityAttributes);
+        Map<String, Set<String>> attributePrefixKeyValues = new HashMap<>();
+
+        for (Map.Entry<String, Set<String>> attributeKeyValue : attributeKeyValues.entrySet()) {
+            String prefixKey = NAMESPACE_ATTR + attributeKeyValue.getKey();
+            attributePrefixKeyValues.put(prefixKey, attributeKeyValue.getValue());
+        }
+
+        return attributePrefixKeyValues;
+    }
+
+    private Set<String> filterSet(Set<String> set, String prefix) {
+        Set<String> filteredSet = new HashSet<>();
+        int prefixLength = prefix.length();
+
+        for (String value : set) {
+            if (!value.startsWith(prefix)) {
+                continue;
+            }
+
+            filteredSet.add(value.substring(prefixLength));
+        }
+
+        return filteredSet;
     }
 
     public Set<String> getAvailableSubjectAttributeNames() throws EntitlementException {
@@ -309,15 +281,4 @@ public class OpenSSOSubjectAttributesCollector
         }
     }
 
-    /**
-     * Returns the universal identifier of this object without organization
-     * name.
-     *
-     * @return String representing the universal identifier of this object
-     *     without organization name.
-     */
-    protected static String getIDWithoutOrgName(AMIdentity amidentity) {
-        return ("id=" + LDAPUtils.escapeValue(amidentity.getName()) + ",ou=" +
-            amidentity.getType().getName());
-    }
 }

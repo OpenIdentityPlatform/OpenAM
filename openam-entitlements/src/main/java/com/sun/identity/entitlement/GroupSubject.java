@@ -24,7 +24,7 @@
  *
  * $Id: GroupSubject.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -102,7 +102,7 @@ public class GroupSubject extends EntitlementSubjectImpl {
             Map<String, Set<String>> attributes = (Map<String, Set<String>>)
                 publicCreds.iterator().next();
             Set<String> values = attributes.get(
-                SubjectAttributesCollector.NAMESPACE_MEMBERSHIP + GROUP_NAME);
+                SubjectAttributesCollector.NAMESPACE_IDENTITY + GROUP_NAME);
             satified = (values != null) ? values.contains(getID()) : false;
         }
         satified = satified ^ isExclusive();
@@ -119,8 +119,7 @@ public class GroupSubject extends EntitlementSubjectImpl {
         {
             Set<String> set = new HashSet<String>();
             set.add(getID());
-            map.put(SubjectAttributesCollector.NAMESPACE_MEMBERSHIP +
-                GROUP_NAME, set);
+            map.put(SubjectAttributesCollector.NAMESPACE_IDENTITY, set);
         }
         {
             Set<String> set = new HashSet<String>();
@@ -138,7 +137,7 @@ public class GroupSubject extends EntitlementSubjectImpl {
      */
     public Set<String> getRequiredAttributeNames() {
         Set<String> set = new HashSet<String>(2);
-        set.add(SubjectAttributesCollector.NAMESPACE_MEMBERSHIP + GROUP_NAME);
+        set.add(SubjectAttributesCollector.NAMESPACE_IDENTITY + GROUP_NAME);
         return set;
     }
 

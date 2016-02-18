@@ -54,6 +54,7 @@ import com.sun.identity.entitlement.PrivilegeChangeNotifier;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.util.Reject;
 
 /**
  * Implementation of <code>PrivilegeManager</code> that saves privileges as <code>com.sun.identity.policy</code> objects
@@ -160,6 +161,14 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         }
 
         return indexStore.findAllPoliciesByApplication(application);
+    }
+
+    @Override
+    public List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException {
+        Reject.ifNull(uid);
+        PrivilegeIndexStore indexStore = PrivilegeIndexStore.getInstance(getAdminSubject(), getRealm());
+        Reject.ifNull(indexStore, "Policy index store not initialised");
+        return indexStore.findAllPoliciesByIdentityUid(uid);
     }
 
     /**

@@ -61,6 +61,11 @@ public class EntitlementException extends Exception {
     public static final int RESOURCE_LIST_EMPTY = 14;
     public static final int RESOURCE_TYPE_ID_MISMATCH = 15;
 
+    public static final int UNSUPPORTED_SUBJECT_INDEX = 57;
+    public static final int UNABLE_TO_CREATE_SUBJECT_INDEX = 58;
+    public static final int UNKNOWN_IDENTITY = 59;
+    public static final int UNABLE_TO_QUERY_POLICY_INVALID_UID = 60;
+
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;
     public static final int UNABLE_SEARCH_PRIVILEGES = 215;
@@ -124,8 +129,12 @@ public class EntitlementException extends Exception {
     public static final int RESOURCE_ENV_NOT_KNOWN = 438;
     public static final int APPLICATION_SEARCH_FAILED = 450;
     public static final int INVALID_QUERY_FILTER = 452;
+    public static final int INVALID_QUERY_ID = 454;
+    public static final int QUERY_ID_MISSING_UID = 456;
 
     public static final int CONDITION_EVALUATION_FAILED = 510;
+
+    public static final int UNABLE_TO_RETRIEVE_SUBJECT_ATTRIBUTE = 600;
 
     public static final int INVALID_OAUTH2_SCOPE = 700;
     public static final int AUTH_LEVEL_NOT_INTEGER = 710;
