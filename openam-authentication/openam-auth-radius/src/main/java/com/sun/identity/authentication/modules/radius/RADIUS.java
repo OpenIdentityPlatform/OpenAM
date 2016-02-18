@@ -24,10 +24,7 @@
  *
  * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
  */
 package com.sun.identity.authentication.modules.radius;
@@ -183,6 +180,9 @@ public class RADIUS extends AMLoginModule {
     }
 
     private void setDynamicText(int state) throws AuthLoginException {
+        // Callbacks may not be initialized or may contain stale data, we need to re-read them.
+        setForceCallbacksRead(true);
+        forceCallbacksInit();
         Callback[] callbacks = getCallback(state);
         String prompt = ((PasswordCallback) callbacks[0]).getPrompt();
         boolean echo = ((PasswordCallback) callbacks[0]).isEchoOn();
