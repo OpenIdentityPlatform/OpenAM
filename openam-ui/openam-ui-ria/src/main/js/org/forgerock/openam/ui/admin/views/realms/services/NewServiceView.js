@@ -33,8 +33,36 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         el.find("[data-create]").prop("disabled", !enable);
     }
 
-    function toggleFormDisplay (el, show) {
-        el.find("[data-service-form-holder]").toggle(!!show);
+    function shouldHideProperty (obj, key, value) {
+        return (obj.required === true &&
+                (obj.type === "boolean" ||
+                 obj.type === "object" ||  // Remove once AME-9762 is completed
+                (obj.type === "string" && value !== "") ||
+                (obj.type === "array" && value.length > 0) ||
+                (obj.type === "number" && value !== "")));
+    }
+
+
+    function toggleHideSchemaGroup (schema, hide) {
+        _.set(schema, "options.hidden", hide);
+    }
+
+    function hideProperty (schema, key) {
+        _.set(schema, "properties[" + key + "].options.hidden", true);
+    }
+
+    function hideProps (schema, values) {
+
+        toggleHideSchemaGroup(schema, true);
+        _.each(schema.properties, (obj, key) => {
+            if (shouldHideProperty(obj, key, values[key])) {
+                hideProperty(schema, key);
+            } else {
+                toggleHideSchemaGroup(schema, false);
+            }
+        });
+
+        return schema;
     }
 
     return AbstractView.extend({
@@ -53,7 +81,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 this.parentRender(() => {
                     if (this.data.creatableTypes.length > 1) {
                         this.$el.find("#serviceSelection").selectize();
-                        toggleFormDisplay(this.$el, false);
                     } else if (this.data.creatableTypes[0] && this.data.creatableTypes[0]._id) {
                         this.selectService(this.data.creatableTypes[0]._id);
                     }
@@ -68,7 +95,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
 
         selectService: function (service) {
             toggleCreate(this.$el, service);
-            toggleFormDisplay(this.$el, service);
 
             if (service && service !== this.data.type) {
                 this.data.type = service;
@@ -78,15 +104,24 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 }
 
                 ServicesService.instance.getInitialState(this.data.realmPath, this.data.type)
-                    .then((initialState) => {
+                    .then((data) => {
+                        let schemaWithHiddenProperties = _.clone(data.schema, true);
+                        data.schema.grouped = false; // FIXME: Remove once AME-9670 is fixed
+                        if (data.schema.grouped) {
+                            _.each(data.schema.properties, (groupedSchema, key) => {
+                                schemaWithHiddenProperties.properties[key] = hideProps(groupedSchema, data.values[key]);
+                            });
+                        } else {
+                            schemaWithHiddenProperties = hideProps(data.schema, data.values);
+                        }
+
                         this.form = new Form(
                             this.$el.find("[data-service-form]")[0],
-                            initialState.schema,
-                            initialState.values
+                            schemaWithHiddenProperties,
+                            data.values
                         );
                     }, () => {
                         toggleCreate(this.$el, false);
-                        toggleFormDisplay(this.$el, false);
                     });
             }
         },
@@ -94,7 +129,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         onCreateClick: function () {
             ServicesService.instance.create(this.data.realmPath, this.data.type, this.form.data()).then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-
                 Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
                     args: _.map([this.data.realmPath, this.data.type], encodeURIComponent),
                     trigger: true
