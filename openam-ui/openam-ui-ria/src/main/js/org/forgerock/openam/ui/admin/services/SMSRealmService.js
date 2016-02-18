@@ -219,8 +219,9 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
             types: {
                 all: function (realm) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true"),
-                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                        url: scopedByRealm(realm, "authentication/modules?_action=getAllTypes"),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                        type: "POST"
                     }).done(SMSServiceUtils.sortResultBy("name"));
                 },
                 get: function (realm, type) {
