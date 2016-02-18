@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function ($, _, Messages, AbstractView, ServicesService, FormHelper) {
+], ($, _, Messages, AbstractView, ServicesService, FormHelper) => {
     function getServiceIdFromElement (element) {
         return $(element).closest("tr").data("serviceId");
     }
@@ -29,24 +29,22 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         return ServicesService.instance.getAll(realmPath);
     }
     function deleteServices (ids) {
-        var self = this;
-
         FormHelper.showConfirmationBeforeDeleting({
             message: $.t("console.services.list.confirmDeleteSelected", { count: ids.length })
-        }, function () {
-            ServicesService.instance.remove(self.data.realmPath, ids).then(function () {
-                self.rerender();
-            }, function (reason) {
+        }, () => {
+            ServicesService.instance.remove(this.data.realmPath, ids).then(() => {
+                this.rerender();
+            }, (reason) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response: reason
                 });
-                self.rerender();
+                this.rerender();
             });
         });
     }
 
-    var ServicesView = AbstractView.extend({
+    const ServicesView = AbstractView.extend({
         template: "templates/admin/views/realms/services/ServicesTemplate.html",
         partials: [
             "partials/util/_HelpLink.html"
@@ -57,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             "click [data-delete-services]": "onDeleteMultiple"
         },
         serviceSelected: function (event) {
-            var anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked"),
+            const anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked"),
                 row = $(event.currentTarget).closest("tr");
 
             row.toggleClass("selected");
@@ -66,27 +64,25 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         onDeleteSingle: function (event) {
             event.preventDefault();
 
-            var id = getServiceIdFromElement(event.currentTarget);
+            const id = getServiceIdFromElement(event.currentTarget);
 
             _.bind(deleteServices, this)([id]);
         },
         onDeleteMultiple: function (event) {
             event.preventDefault();
 
-            var ids = _(this.$el.find("input[type=checkbox]:checked")).toArray().map(getServiceIdFromElement).value();
+            const ids = _(this.$el.find("input[type=checkbox]:checked")).toArray().map(getServiceIdFromElement).value();
 
             _.bind(deleteServices, this)(ids);
         },
         render: function (args, callback) {
-            var self = this;
-
             this.data.args = args;
             this.data.realmPath = args[0];
 
-            loadServicesFromServer(this.data.realmPath).then(function (services) {
-                self.data.services = services.result;
+            loadServicesFromServer(this.data.realmPath).then((services) => {
+                this.data.services = services;
 
-                self.parentRender(function () {
+                this.parentRender(() => {
                     if (callback) {
                         callback();
                     }

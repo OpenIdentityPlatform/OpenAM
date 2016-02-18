@@ -29,18 +29,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper,
-             SubschemaListView) {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper,
+    SubschemaListView) => {
 
     function deleteService () {
-        ServicesService.instance.remove(this.data.realmPath, this.data.type).then(_.bind(function () {
+        ServicesService.instance.remove(this.data.realmPath, this.data.type).then(() => {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
             Router.routeTo(Router.configuration.routes.realmsServices, {
                 args: [encodeURIComponent(this.data.realmPath)],
                 trigger: true
             });
-        }, this), function (model, response) {
+        }, (model, response) => {
             Messages.addMessage({
                 response: response,
                 type: Messages.TYPE_DANGER
@@ -63,26 +63,26 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             this.data.realmPath = args[0];
             this.data.type = args[1];
 
-            var self = this;
+            ServicesService.instance.get(this.data.realmPath, this.data.type).then((data) => {
+                this.data.schema = data.schema;
+                this.data.values = data.values;
+                this.data.name = data.name;
+                this.data.subSchemaPresent = data.subSchemaTypes.length;
+                this.data.tabbed = this.data.schema.grouped || this.data.subSchemaPresent;
 
-            ServicesService.instance.get(this.data.realmPath, this.data.type).then(function (data) {
-                self.data.schema = data.schema;
-                self.data.values = data.values;
-                self.data.name = data.name;
-                self.data.subschema = data.subschema;
-                self.data.tabbed = self.data.schema.grouped || self.data.subschema;
+                this.parentRender(function () {
+                    if (this.data.tabbed) {
+                        this.$el.find("ul.nav a:first").tab("show");
+                        this.$el.find(".tab-menu .nav-tabs").tabdrop();
 
-                self.parentRender(function () {
-
-                    if (self.data.tabbed) {
-                        self.$el.find("ul.nav a:first").tab("show");
-                        self.$el.find(".tab-menu .nav-tabs").tabdrop();
-                        SubschemaListView.element = this.$el.find("#tabpanel");
+                        if (this.data.subSchemaPresent) {
+                            SubschemaListView.element = this.$el.find("#tabpanel");
+                        }
                     } else {
-                        self.form = new Form(
-                            self.$el.find("#tabpanel")[0],
-                            self.data.schema,
-                            self.data.values
+                        this.form = new Form(
+                            this.$el.find("#tabpanel")[0],
+                            this.data.schema,
+                            this.data.values
                         );
                     }
                     if (callback) { callback(); }
@@ -91,12 +91,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         onSave: function () {
-            var self = this;
             ServicesService.instance.update(this.data.realmPath, this.data.type, this.form.data())
-                .then(function (data) {
+                .then((data) => {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                    self.data.values = data;
-                }, function (response) {
+                    this.data.values = data;
+                }, (response) => {
                     Messages.addMessage({
                         response: response,
                         type: Messages.TYPE_DANGER
@@ -113,7 +112,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         renderTab: function (event) {
-            var tabId = $(event.target).data("tabId"),
+            const tabId = $(event.target).data("tabId"),
                 schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema,
                 element = this.$el.find("#tabpanel").empty().get(0);
 

@@ -22,13 +22,13 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) {
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
     /**
      * @exports org/forgerock/openam/ui/admin/services/realm/sms/ServicesService
      */
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
+    const obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
         scopedByRealm = function (realm, path) {
-            var encodedRealm = "";
+            let encodedRealm = "";
 
             if (realm !== "/") {
                 encodedRealm = RealmHelper.encodeRealm(realm);
@@ -41,18 +41,14 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then(function (data) {
-                return SMSServiceUtils.sanitizeSchema(data);
-            });
+            }).then((data) => SMSServiceUtils.sanitizeSchema(data));
         },
         getServiceSubSchema = function (realm, serviceType, subSchemaType) {
             return obj.serviceCall({
                 url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then(function (data) {
-                return SMSServiceUtils.sanitizeSchema(data);
-            });
+            }).then((data) => SMSServiceUtils.sanitizeSchema(data));
         };
 
     obj.instance = {
@@ -60,15 +56,13 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             return obj.serviceCall({
                 url: scopedByRealm(realm, "services?_queryFilter=true"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            });
+            }).then((response) => response.result);
         },
         get: function (realm, type) {
             function getInstance () {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "services/" + type),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                }).then(function (response) {
-                    return response;
                 });
             }
 
@@ -77,10 +71,9 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     url: scopedByRealm(realm, "services?_action=getAllTypes"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
-                }).then(function (all) {
-                    return _.findWhere(all.result, { "_id": type }).name;
-                });
+                }).then((all) => _.findWhere(all.result, { "_id": type }).name);
             }
+
 
             function getSubSchemaTypes () {
                 // return obj.serviceCall({
@@ -96,59 +89,16 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 ]);
             }
 
-            function getSubSchemaInstances () {
-                // return obj.serviceCall({
-                //     url: scopedByRealm(realm, "services/" + type + "?_queryFilter=true"),
-                //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                // });
-
-                return $.Deferred().resolve([
-                    { "_id":"csv1", "type":"CSV", "typeDescription":"CSV" },
-                    { "_id":"csv2", "type":"CSV", "typeDescription":"CSV" },
-                    { "_id":"jdbc", "type":"JDBC", "typeDescription":"JDBC" }
-                ]);
-            }
-
-            function getSubSchemaCreatables () {
-                // return obj.serviceCall({
-                //     url: scopedByRealm(realm, "services/" + type + "?_action=getCreatableTypes"),
-                //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                //     type: "POST"
-                // });
-
-                return $.Deferred().resolve([
-                    { "_id":"CSV", "description":"CSV" },
-                    { "_id":"JDBC", "description":"JDBC" },
-                    { "_id":"Syslog", "description":"Syslog" }
-                ]);
-            }
-
-            function getSubSchema () {
-                return getSubSchemaTypes(realm, type).then(function (types) {
-                    if (types.length > 0) {
-                        return Promise.all([getSubSchemaInstances(), getSubSchemaCreatables()])
-                            .then(function (result) {
-                                return {
-                                    instances: result[0],
-                                    creatables: result[1]
-                                };
-                            });
-                    } else {
-                        return null;
-                    }
-                });
-            }
-
-            return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchema()])
-                .then(function (data) {
-                    var schema = data[0],
-                        subSchema = data[3];
+            return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
+                .then((data) => {
+                    const schema = data[0],
+                        subSchemaTypes = data[3];
 
                     return {
                         schema: schema,
                         values: data[1],
                         name: data[2],
-                        subschema: subSchema
+                        subSchemaTypes: subSchemaTypes
                     };
                 });
         },
@@ -161,20 +111,16 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 });
             }
 
-            return $.when(getServiceSchema(realm, type), getTemplate()).then(function (schema, values) {
-                return {
-                    schema: schema,
-                    values: values[0]
-                };
-            });
+            return $.when(getServiceSchema(realm, type), getTemplate())
+                .then((schema, values) => ({ schema: schema, values: values[0] }));
         },
         remove: function (realm, types) {
             if (!_.isArray(types)) {
                 types = [types];
             }
 
-            var promises = _.map(types, function (type) {
-                return obj.serviceCall({
+            const promises = _.map(types, (type) => {
+                obj.serviceCall({
                     url: scopedByRealm(realm, "services/" + type),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
@@ -203,20 +149,43 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
 
     obj.type = {
         getCreatables: function (realm) {
-            function sortByName (response) {
-                return _.sortBy(response.result, "name");
-            }
-
-            var promise = obj.serviceCall({
+            const creatableTypes = obj.serviceCall({
                 url: scopedByRealm(realm, "services?_action=getCreatableTypes"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
 
-            return promise.then(sortByName);
+            return creatableTypes.then((response) => _.sortBy(response.result, "name"));
         },
         subSchema: {
+            type: {
+                getCreatables: function () {
+                    // return obj.serviceCall({
+                    //     url: scopedByRealm(realm, "services/" + serviceType + "?_action=getCreatableTypes"),
+                    //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    //     type: "POST"
+                    // });
+
+                    return $.Deferred().resolve([
+                        { "_id":"CSV", "description":"CSV" },
+                        { "_id":"JDBC", "description":"JDBC" },
+                        { "_id":"Syslog", "description":"Syslog" }
+                    ]);
+                }
+            },
             instance: {
+                getAll: function () {
+                    // return obj.serviceCall({
+                    //     url: scopedByRealm(realm, "services/" + serviceType + "?_queryFilter=true"),
+                    //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                    // });
+
+                    return $.Deferred().resolve([
+                        { "_id":"csv1", "type":"CSV", "typeDescription":"CSV" },
+                        { "_id":"csv2", "type":"CSV", "typeDescription":"CSV" },
+                        { "_id":"jdbc", "type":"JDBC", "typeDescription":"JDBC" }
+                    ]);
+                },
                 get: function (realm, serviceType, subSchemaType, subSchemaInstance) {
                     function getInstance () {
                         return obj.serviceCall({
@@ -227,12 +196,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     }
 
                     return $.when(getServiceSubSchema(realm, serviceType, subSchemaType), getInstance())
-                        .then(function (subSchema, values) {
-                            return {
-                                schema: subSchema,
-                                values: values[0]
-                            };
-                        });
+                        .then((subSchema, values) => ({ schema: subSchema, values: values[0] }));
                 },
 
                 getInitialState: function (realm, serviceType, subSchemaType) {
@@ -248,12 +212,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     return $.when(
                         getServiceSubSchema(realm, serviceType, subSchemaType),
                         getTemplate(serviceType, subSchemaType)
-                    ).then(function (subSchema, values) {
-                        return {
-                            subSchema: subSchema,
-                            values: values[0]
-                        };
-                    });
+                    ).then((subSchema, values) => ({ subSchema: subSchema, values: values[0] }));
                 },
 
                 remove: function (realm, serviceType, subSchemaType, subSchemaInstance) {

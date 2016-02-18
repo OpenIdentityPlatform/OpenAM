@@ -18,28 +18,64 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function ($, _, Messages, AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/admin/utils/FormHelper"
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FormHelper) => {
 
-    var SubschemaListView = AbstractView.extend({
+    function renderView () {
+        return Promise.all([
+            ServicesService.type.subSchema.instance.getAll(this.data.realmPath, this.data.type),
+            ServicesService.type.subSchema.type.getCreatables(this.data.realmPath, this.data.type)
+        ]).then((data) => {
+            this.data.instances = data[0];
+            this.data.creatables = data[1];
+
+            this.parentRender();
+        });
+    }
+
+    function deleteSubSchema (subSchemaType, subSchemaInstance) {
+        ServicesService.type.subSchema.instance.remove(
+            this.data.realmPath,
+            this.data.type,
+            subSchemaType,
+            subSchemaInstance
+        ).then(() => {
+            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            renderView.call(this);
+        }, (response) => {
+            Messages.addMessage({
+                response: response,
+                type: Messages.TYPE_DANGER
+            });
+        });
+    }
+
+    const SubschemaListView = AbstractView.extend({
         template: "templates/admin/views/realms/services/SubSchemaListTemplate.html",
         events: {
-            "click [data-delete]" : "onDelete"
+            "click [data-subschema-delete]" : "onDelete"
         },
 
         render: function (data) {
-            var self = this;
-
             _.extend(this.data, data);
-
-            self.parentRender(function () {
-                // TODO
-            });
+            renderView.call(this);
         },
 
         onDelete: function (e) {
             e.preventDefault();
-            // TODO: Delete instance and re-render or throw error.
+
+            const target = $(e.currentTarget),
+                subSchemaInstance = target.closest("tr").data("subschemaId"),
+                subSchemaType = target.closest("tr").data("subschemaType");
+
+            FormHelper.showConfirmationBeforeDeleting({
+                message: $.t("console.services.list.confirmDeleteSelected")
+            }, _.bind(deleteSubSchema, this, subSchemaType, subSchemaInstance));
         }
     });
 
