@@ -33,6 +33,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,6 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.crypto.SecretKey;
 
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.http.util.MultiValueMap;
@@ -58,6 +61,7 @@ import org.forgerock.json.jose.jwk.JWKSet;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
@@ -660,21 +664,42 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             MalformedURLException, FailedToLoadJWKException {
         Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.JWKS);
 
-        if (set == null || set.isEmpty()) {
+        final String jwkSetStr = CollectionUtils.getFirstItem(set);
+        if (jwkSetStr == null) {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "No Client Bearer JWKs_URI set.");
+                    "No Client Bearer JWK set.");
         }
 
-        final String jwkSetStr = set.iterator().next();
-        final JWKSet jwkSet = new JWKSet(JsonValueBuilder.toJsonValue(jwkSetStr));
+        final JWKSet jwkSet = new JWKSet(JsonValueBuilder.toJsonValue(jwkSetStr)
+                .get(OAuth2Constants.JWTTokenParams.KEYS));
         final JWKSetParser setParser = new JWKSetParser(0, 0); //0 values as not using for inet comms
 
         final Map<String, Key> jwkMap = setParser.jwkSetToMap(jwkSet);
 
         final Key key = jwkMap.get(jwt.getSignedJwt().getHeader().getKeyId());
 
-        return key != null && jwt.isValid(signingManager.newRsaSigningHandler(key));
+        return key != null && jwt.isValid(getSigningHandlerForKey(key));
     }
+
+    /**
+     * Get an appropriate signing handler for the given key.
+     *
+     * @param key the signature verification key.
+     * @return the appropriate signing handler for the key.
+     */
+    private SigningHandler getSigningHandlerForKey(final Key key) {
+        if (key instanceof RSAPublicKey) {
+            return signingManager.newRsaSigningHandler(key);
+        } else if (key instanceof ECPublicKey) {
+            return signingManager.newEcdsaVerificationHandler((ECPublicKey) key);
+        } else if (key instanceof SecretKey) {
+            return signingManager.newHmacSigningHandler(key.getEncoded());
+        } else {
+            throw new IllegalArgumentException("Unsupported verification key type");
+        }
+    }
+
+
 
     private boolean byJWKsURI(OAuth2Jwt jwt) throws IdRepoException, SSOException, MalformedURLException {
         final Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.JWKS_URI);

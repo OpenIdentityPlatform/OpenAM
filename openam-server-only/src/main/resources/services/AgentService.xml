@@ -478,6 +478,16 @@
                     </AttributeSchema>
 
                     <AttributeSchema
+                        name="com.forgerock.openam.oauth2provider.jwks"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a722b">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.clientJwtPublicKey"
                             type="single"
                             syntax="paragraph"
