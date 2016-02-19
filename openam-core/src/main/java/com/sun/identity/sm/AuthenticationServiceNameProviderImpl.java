@@ -30,6 +30,7 @@ package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -78,7 +79,7 @@ public class AuthenticationServiceNameProviderImpl implements
                 if (index != -1) {
                     module = module.substring(index + 1);
                 }
-                String serviceName = "iPlanetAMAuth" + module + "Service";
+                String serviceName = AMAuthConfigUtils.getModuleServiceName(module);
                 // Check if the service name exisits with organization schema
                 try {
                     ServiceSchemaManager ssm = new ServiceSchemaManager(
