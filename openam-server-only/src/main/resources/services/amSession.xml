@@ -200,6 +200,9 @@
                         <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS512">HS512</ChoiceValue>
                         <ChoiceValue i18nKey="choiceRS256">RS256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES256">ES256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES384">ES384</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES512">ES512</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>HS256</Value>

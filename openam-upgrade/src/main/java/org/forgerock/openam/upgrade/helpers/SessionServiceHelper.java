@@ -24,16 +24,20 @@
  */
 package org.forgerock.openam.upgrade.helpers;
 
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
-
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * This class is used by the upgrade mechanism (pre-upgrade) to set the value of
@@ -71,6 +75,8 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     private static final String SFO_PWD_ATTR = "iplanet-am-session-store-password";
     private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
     private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
+    private static final String STATELESS_SIGNING_ALGORITHM = "openam-session-stateless-signing-type";
+    private static final List<String> ECDSA_SIGNING_ALGORITHMS = Arrays.asList("ES256", "ES384", "ES512");
 
     private final static String REDUCED_CROSSTALK_ENABLED = CoreTokenConstants.IS_REDUCED_CROSSTALK_ENABLED;
 
@@ -79,6 +85,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
         attributes.add(SFO_PWD_ATTR);
         attributes.add(SFO_CPL_MAX_WAIT_TIME_ATTR);
         attributes.add(SFO_JDBC_URL_ATTR);
+        attributes.add(STATELESS_SIGNING_ALGORITHM);
     }
 
     @Override
@@ -117,6 +124,17 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
             //Since at the moment all the upgradable attributes should have empty i18nKey, it's safe to return null.
             //This way these attributes won't show up on the upgrade report.
             return null;
+        }
+
+        if (STATELESS_SIGNING_ALGORITHM.equals(existingAttr.getName())) {
+            List<String> existingChoices = Arrays.asList(existingAttr.getChoiceValues());
+            if (existingChoices.containsAll(ECDSA_SIGNING_ALGORITHMS)) {
+                return null;
+            } else {
+                final List<String> newChoices = new ArrayList<>(existingChoices);
+                newChoices.addAll(ECDSA_SIGNING_ALGORITHMS);
+                updateChoiceValues(newAttr, newChoices);
+            }
         }
         return newAttr;
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sso.providers.stateless;
 
@@ -31,7 +31,7 @@ public class JwtSessionMapperConfig {
 
     public static final String SIGNING_ALGORITHM = "openam-session-stateless-signing-type";
     public static final String SIGNING_HMAC_SHARED_SECRET = "openam-session-stateless-signing-hmac-shared-secret";
-    public static final String SIGNING_RSA_KEY_ALIAS = "openam-session-stateless-signing-rsa-certificate-alias";
+    public static final String ASYMMETRIC_SIGNING_KEY_ALIAS = "openam-session-stateless-signing-rsa-certificate-alias";
     public static final String ENCRYPTION_ALGORITHM = "openam-session-stateless-encryption-type";
     public static final String ENCRYPTION_RSA_KEY_ALIAS = "openam-session-stateless-encryption-rsa-certificate-alias";
 
@@ -65,7 +65,7 @@ public class JwtSessionMapperConfig {
         switch (signingAlgorithm) {
 
             case RS256:
-                builder.signedUsingRS256(getKeyPair(attrs, SIGNING_RSA_KEY_ALIAS));
+                builder.signedUsingRS256(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
                 break;
 
             case HS256:
@@ -78,6 +78,18 @@ public class JwtSessionMapperConfig {
 
             case HS512:
                 builder.signedUsingHS512(CollectionHelper.getMapAttr(attrs, SIGNING_HMAC_SHARED_SECRET));
+                break;
+
+            case ES256:
+                builder.signedUsingES256(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
+                break;
+
+            case ES384:
+                builder.signedUsingES384(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
+                break;
+
+            case ES512:
+                builder.signedUsingES512(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
                 break;
 
             case NONE:

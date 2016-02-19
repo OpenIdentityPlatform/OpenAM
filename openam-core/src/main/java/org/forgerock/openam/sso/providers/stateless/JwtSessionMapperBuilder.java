@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sso.providers.stateless;
 
@@ -20,12 +20,14 @@ import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.nio.charset.Charset;
 import java.security.KeyPair;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 
 /**
  * Responsible for creating instances of {@link JwtSessionMapper}.
@@ -37,10 +39,24 @@ import java.security.KeyPair;
 @NotThreadSafe
 class JwtSessionMapperBuilder {
 
+    private final SigningManager signingManager;
+
     private JwsAlgorithm jwsAlgorithm = JwsAlgorithm.NONE;
     private SigningHandler signingHandler = new SigningManager().newNopSigningHandler();
     private SigningHandler verificationHandler = new SigningManager().newNopSigningHandler();
     private KeyPair encryptionKeyPair = null;
+
+    @VisibleForTesting
+    JwtSessionMapperBuilder(final SigningManager signingManager) {
+        this.signingManager = signingManager;
+    }
+
+    /**
+     * Creates a blank session mapping builder with no signing or encryption modes configured.
+     */
+    public JwtSessionMapperBuilder() {
+        this(new SigningManager());
+    }
 
     /**
      * Instructs the builder to create instances of {@link JwtSessionMapper} that can sign and verify
@@ -57,8 +73,8 @@ class JwtSessionMapperBuilder {
         Reject.ifNull(signingKeyPair, "signingKeyPair must not be null.");
 
         jwsAlgorithm = JwsAlgorithm.RS256;
-        signingHandler = new SigningManager().newRsaSigningHandler(signingKeyPair.getPrivate());
-        verificationHandler = new SigningManager().newRsaSigningHandler(signingKeyPair.getPublic());
+        signingHandler = signingManager.newRsaSigningHandler(signingKeyPair.getPrivate());
+        verificationHandler = signingManager.newRsaSigningHandler(signingKeyPair.getPublic());
         return this;
     }
 
@@ -118,9 +134,63 @@ class JwtSessionMapperBuilder {
         final byte[] sharedSecretBytes = sharedSecret.getBytes(Charset.forName("UTF-8"));
 
         this.jwsAlgorithm = jwsAlgorithm;
-        this.signingHandler = new SigningManager().newHmacSigningHandler(sharedSecretBytes);
-        this.verificationHandler = new SigningManager().newHmacSigningHandler(sharedSecretBytes);
+        this.signingHandler = signingManager.newHmacSigningHandler(sharedSecretBytes);
+        this.verificationHandler = signingManager.newHmacSigningHandler(sharedSecretBytes);
 
+    }
+
+    /**
+     * Instructs the builder to create instances of {@link JwtSessionMapper} that can sign and verify the JWT using
+     * the ES256 signature algorithm (ECDSA using P-256 curve over SHA-256 hashes).
+     *
+     * @param signingKeyPair the signing key pair, not null.
+     * @return this {@link JwtSessionMapperBuilder}
+     *
+     * @see JwsAlgorithm
+     */
+    public JwtSessionMapperBuilder signedUsingES256(@Nonnull final KeyPair signingKeyPair) {
+        signedUsingESxxx(JwsAlgorithm.ES256, signingKeyPair);
+        return this;
+    }
+
+    /**
+     * Instructs the builder to create instances of {@link JwtSessionMapper} that can sign and verify the JWT using
+     * the ES384 signature algorithm (ECDSA using P-384 curve over SHA-384 hashes).
+     *
+     * @param signingKeyPair the signing key pair, not null.
+     * @return this {@link JwtSessionMapperBuilder}
+     *
+     * @see JwsAlgorithm
+     */
+    public JwtSessionMapperBuilder signedUsingES384(@Nonnull final KeyPair signingKeyPair) {
+        signedUsingESxxx(JwsAlgorithm.ES384, signingKeyPair);
+        return this;
+    }
+
+    /**
+     * Instructs the builder to create instances of {@link JwtSessionMapper} that can sign and verify the JWT using
+     * the ES512 signature algorithm (ECDSA using P-521 (not a typo!) curve over SHA-512 hashes).
+     *
+     * @param signingKeyPair the signing key pair, not null.
+     * @return this {@link JwtSessionMapperBuilder}
+     *
+     * @see JwsAlgorithm
+     */
+    public JwtSessionMapperBuilder signedUsingES512(@Nonnull final KeyPair signingKeyPair) {
+        signedUsingESxxx(JwsAlgorithm.ES512, signingKeyPair);
+        return this;
+    }
+
+    private void signedUsingESxxx(@Nonnull final JwsAlgorithm jwsAlgorithm, @Nonnull final KeyPair signingKeyPair) {
+        Reject.ifNull(signingKeyPair, "signingKeyPair must not be null.");
+        Reject.ifFalse(signingKeyPair.getPrivate() instanceof ECPrivateKey, "private key is not suitable for " +
+                jwsAlgorithm);
+        Reject.ifFalse(signingKeyPair.getPublic() instanceof ECPublicKey, "public key is not suitable for " +
+                jwsAlgorithm);
+
+        this.jwsAlgorithm = jwsAlgorithm;
+        this.signingHandler = signingManager.newEcdsaSigningHandler((ECPrivateKey) signingKeyPair.getPrivate());
+        this.verificationHandler = signingManager.newEcdsaVerificationHandler((ECPublicKey) signingKeyPair.getPublic());
     }
 
     /**
@@ -151,4 +221,8 @@ class JwtSessionMapperBuilder {
         return new JwtSessionMapper(jwsAlgorithm, signingHandler, verificationHandler, encryptionKeyPair);
     }
 
+    @VisibleForTesting
+    JwsAlgorithm getJwsAlgorithm() {
+        return jwsAlgorithm;
+    }
 }

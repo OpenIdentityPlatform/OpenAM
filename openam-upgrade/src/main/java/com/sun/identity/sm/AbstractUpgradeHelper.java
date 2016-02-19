@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,11 +26,16 @@
 package com.sun.identity.sm;
 
 import com.sun.identity.shared.xml.XMLUtils;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeHelper;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -65,6 +70,28 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
         Node attributeNode = updateNode(doc, SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT, attribute.getAttributeSchemaNode());        
         attribute.update(attributeNode);
         
+        return attribute;
+    }
+
+    protected AttributeSchemaImpl updateChoiceValues(AttributeSchemaImpl attribute, Collection<String> choiceValues)
+            throws UpgradeException {
+        try {
+            final Document choiceValuesDoc = XMLUtils.newDocument();
+            final Element choiceValuesElement = choiceValuesDoc.createElement(SMSUtils.ATTRIBUTE_CHOICE_VALUES_ELEMENT);
+            choiceValuesDoc.appendChild(choiceValuesElement);
+            for (String choiceValue : choiceValues) {
+                final Element choiceValueElement = choiceValuesDoc.createElement(SMSUtils
+                        .ATTRIBUTE_CHOICE_VALUE_ELEMENT);
+                choiceValueElement.appendChild(choiceValuesDoc.createTextNode(choiceValue));
+                choiceValuesElement.appendChild(choiceValueElement);
+            }
+
+            final Node attributeNode = updateNode(choiceValuesDoc, SMSUtils.ATTRIBUTE_CHOICE_VALUES_ELEMENT,
+                    attribute.getAttributeSchemaNode());
+            attribute.update(attributeNode);
+        } catch (ParserConfigurationException e) {
+            throw new UpgradeException(e);
+        }
         return attribute;
     }
 

@@ -110,7 +110,8 @@ public class ConfigureOAuth2 extends Task {
     private static final Map<String, Set<String>> COMMON_OIDC_UMA_ATTRIBUTES =
             new ImmutableMap.Builder<String, Set<String>>()
                     .put(SUBJECT_TYPES_SUPPORTED, singleton("public"))
-                    .put(ID_TOKEN_SIGNING_ALGORITHMS, asSet("HS256", "HS384", "HS512", "RS256"))
+                    .put(ID_TOKEN_SIGNING_ALGORITHMS, asSet("HS256", "HS384", "HS512", "RS256", "ES256", "ES384",
+                            "ES512"))
                     .put(RESPONSE_TYPE_LIST, asSet(
                             TOKEN + "|" + TokenResponseTypeHandler.class.getName(),
                             CODE + "|" + AuthorizationCodeResponseTypeHandler.class.getName(),

@@ -357,7 +357,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private String generateKid(JsonValue jwkSet, String algorithm) {
 
         final JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
-        if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+        if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType()) ||
+                JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
             JsonValue jwks = jwkSet.get(OAuth2Constants.JWTTokenParams.KEYS);
             if (!jwks.isNull() && !jwks.asList().isEmpty()) {
                 return jwks.get(0).get(OAuth2Constants.JWTTokenParams.KEY_ID).asString();

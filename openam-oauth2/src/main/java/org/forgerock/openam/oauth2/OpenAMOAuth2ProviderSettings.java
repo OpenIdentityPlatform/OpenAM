@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -20,24 +20,6 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.security.AccessController;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -54,10 +36,32 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.math.BigInteger;
+import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SupportedEllipticCurve;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
@@ -88,6 +92,7 @@ import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -807,13 +812,40 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         synchronized (jwks) {
             if (jwks.isEmpty()) {
                 PublicKey key = getServerKeyPair().getPublic();
-                jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.SIG, JwsAlgorithm.RS256.name()));
+                if (key instanceof RSAPublicKey) {
+                    jwks.add(createRSAJWK(getKeyAlias(), (RSAPublicKey) key, KeyUse.SIG, JwsAlgorithm.RS256.name()));
+                } else if (key instanceof ECPublicKey) {
+                    jwks.add(createECJWK(getKeyAlias(), (ECPublicKey) key, KeyUse.SIG));
+                }
             }
         }
         return new JsonValue(Collections.singletonMap("keys", jwks));
     }
 
-    private Map<String, Object> createRSAJWK(RSAPublicKey key, KeyUse use, String alg) throws ServerException {
+    @VisibleForTesting
+    static Map<String, Object> createRSAJWK(String alias, RSAPublicKey key, KeyUse use, String alg)
+            throws ServerException {
+        String kid = Hash.hash(alias + key.getModulus().toString() + key.getPublicExponent().toString());
+        return json(object(field("kty", "RSA"), field(OAuth2Constants.JWTTokenParams.KEY_ID, kid),
+                field("use", use.toString()), field("alg", alg),
+                field("n", Base64url.encode(key.getModulus().toByteArray())),
+                field("e", Base64url.encode(key.getPublicExponent().toByteArray())))).asMap();
+    }
+
+    @VisibleForTesting
+    static Map<String, Object> createECJWK(String alias, ECPublicKey key, KeyUse use) throws ServerException {
+        BigInteger x = key.getW().getAffineX();
+        BigInteger y = key.getW().getAffineY();
+        SupportedEllipticCurve curve = SupportedEllipticCurve.forKey(key);
+        String kid = Hash.hash(alias + ':' + curve.getStandardName() + ':' + x.toString() + ':' + y.toString());
+        return json(object(field("kty", "EC"), field(OAuth2Constants.JWTTokenParams.KEY_ID, kid),
+                field("use", use.toString()), field("alg", curve.getJwsAlgorithm().name()),
+                field("x", Base64url.encode(x.toByteArray())),
+                field("y", Base64url.encode(y.toByteArray())),
+                field("crv", curve.getStandardName()))).asMap();
+    }
+
+    private String getKeyAlias() throws ServerException {
         String alias = null;
         try {
             alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
@@ -827,11 +859,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         } else if ("test".equals(alias)) {
             logger.warning("Alias of ID Token Signing Key should be changed from default, 'test'.");
         }
-        String kid = Hash.hash(alias + key.getModulus().toString() + key.getPublicExponent().toString());
-        return json(object(field("kty", "RSA"), field(OAuth2Constants.JWTTokenParams.KEY_ID, kid),
-                field("use", use.toString()), field("alg", alg),
-                field("n", Base64url.encode(key.getModulus().toByteArray())),
-                field("e", Base64url.encode(key.getPublicExponent().toByteArray())))).asMap();
+        return alias;
     }
 
     public String getCreatedTimestampAttributeName() throws ServerException {

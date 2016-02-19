@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -20,6 +20,7 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 import java.security.KeyPair;
 import java.security.SignatureException;
+import java.security.interfaces.ECPrivateKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -304,6 +305,8 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         final SigningHandler signingHandler;
         if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
             signingHandler = new SigningManager().newRsaSigningHandler(keyPair.getPrivate());
+        } else if (JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
+            signingHandler = new SigningManager().newEcdsaSigningHandler((ECPrivateKey) keyPair.getPrivate());
         } else {
             signingHandler = new SigningManager().newHmacSigningHandler(clientSecret);
         }
