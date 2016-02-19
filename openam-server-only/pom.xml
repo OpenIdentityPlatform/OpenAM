@@ -48,6 +48,8 @@
         <exclusion.list.filename>opendj_exclusion_list</exclusion.list.filename>
         <!-- Default folder to use for pulling in third party distribution legal notices. -->
         <third.party.legal.directory>legal</third.party.legal.directory>
+        <!-- Default value for whether the build is running in oem mode -->
+        <is.oem.build>false</is.oem.build>
     </properties>
 
     <!-- Build -->
@@ -169,6 +171,8 @@
                                 <property name="federation.xml.dir" value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
 
                                 <property name="exclusion.list" value="${exclusion.list.filename}" />
+
+                                <property name="is.oem" value="${is.oem.build}" />
 
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
                                     <target name="openam-server-prepare-war" />
@@ -459,6 +463,7 @@
             <properties>
                 <exclusion.list.filename>opendj_oem_exclusion_list</exclusion.list.filename>
                 <third.party.legal.directory>legal-oem</third.party.legal.directory>
+                <is.oem.build>true</is.oem.build>
             </properties>
         </profile>
         <profile>
