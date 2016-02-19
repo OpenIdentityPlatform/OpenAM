@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2016 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,7 +28,6 @@
 package org.forgerock.openam.upgrade;
 
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.AMEncryption;
@@ -89,7 +88,7 @@ public class UpgradeServices {
 
     private UpgradeServices() throws UpgradeException {
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        createdDate = dateFormat.format(newDate());
+        createdDate = dateFormat.format(new Date());
         for (String className : UpgradeUtils.getPropertyValues("upgradesteps", "upgrade.step.order")) {
             try {
                 UpgradeStep step = getUpgradeStep(className);

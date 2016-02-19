@@ -24,12 +24,10 @@
  *
  * $Id: NetworkMonitor.java,v 1.2 2009/12/17 18:03:51 veiming Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import org.forgerock.openam.entitlement.PolicyConstants;
@@ -97,7 +95,7 @@ public class NetworkMonitor extends HttpServlet {
         if (!isCollectStats()) {
             return 0;
         }
-        return (currentTimeMillis());
+        return (System.currentTimeMillis());
     }
 
     public synchronized void end(long start) {
@@ -105,7 +103,7 @@ public class NetworkMonitor extends HttpServlet {
             long rs = 0;
             throughput++;
             if (start != 0) {
-                rs = currentTimeMillis() - start;
+                rs = System.currentTimeMillis() - start;
                 totalResponseTime += rs;
             }
             StatsData sd = getNewStats(rs);
@@ -138,7 +136,7 @@ public class NetworkMonitor extends HttpServlet {
     }
 
     private StatsData getNewStats(long responsetime) {
-        long currentTime = currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
         // nearest second
         long seconds = (long) (currentTime/1000);
         StatsData sd = new StatsData(seconds);

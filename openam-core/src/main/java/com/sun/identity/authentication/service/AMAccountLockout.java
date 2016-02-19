@@ -24,7 +24,7 @@
  *
  * $Id: AMAccountLockout.java,v 1.10 2009/03/06 22:09:20 hengming Exp $
  *
- * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.Map;
 
 import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 
@@ -155,7 +154,7 @@ class AMAccountLockout {
             DEBUG.message("exprDate = " + exprDate);
         }
         if (exprDate != null) {
-            return exprDate.before(newDate());
+            return exprDate.before(new Date());
         }
         return false;
     }

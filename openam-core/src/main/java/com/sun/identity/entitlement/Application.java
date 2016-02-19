@@ -28,8 +28,6 @@
  */
 package com.sun.identity.entitlement;
 
-import static org.forgerock.openam.utils.Time.*;
-
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -677,7 +675,7 @@ public class Application implements Cloneable {
                     creationDate = Long.parseLong(s);
                 } catch (NumberFormatException e) {
                     PolicyConstants.DEBUG.error("Application.setMetaData", e);
-                    Date date = newDate();
+                    Date date = new Date();
                     creationDate = date.getTime();
                 }
             } else if (m.startsWith(LAST_MODIFIED_BY_ATTRIBUTE + "=")) {
@@ -688,7 +686,7 @@ public class Application implements Cloneable {
                     lastModifiedDate = Long.parseLong(s);
                 } catch (NumberFormatException e) {
                     PolicyConstants.DEBUG.error("Application.setMetaData", e);
-                    Date date = newDate();
+                    Date date = new Date();
                     lastModifiedDate = date.getTime();
                 }
             }

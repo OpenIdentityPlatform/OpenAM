@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: StartTimeTableCell.java,v 1.2 2009/07/24 22:08:08 ak138937 Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.diagnostic.base.core.ui.gui.table;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -43,6 +40,6 @@ public class StartTimeTableCell extends LabelTableCell {
     }
     
     public void start() {
-        setText(newDate().toString());
+        setText(new Date().toString());
     }
 }

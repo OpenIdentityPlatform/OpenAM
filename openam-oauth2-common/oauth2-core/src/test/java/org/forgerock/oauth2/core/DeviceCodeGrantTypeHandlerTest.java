@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -24,7 +24,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
@@ -253,7 +252,7 @@ public class DeviceCodeGrantTypeHandlerTest {
         Set<String> scope = new HashSet<>();
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
-        mockDeviceCodeRead(deviceCode(field("expireTime", asSet(String.valueOf(currentTimeMillis() + 5000)))));
+        mockDeviceCodeRead(deviceCode(field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000)))));
 
         // When
         try {
@@ -273,8 +272,8 @@ public class DeviceCodeGrantTypeHandlerTest {
         mockRequestRealmClientIdClientSecretAndCode("REALM", "CLIENT_ID", "SECRET", "CODE", scope);
         mockClientRegistration();
         mockDeviceCodeRead(deviceCode(
-                field("expireTime", asSet(String.valueOf(currentTimeMillis() + 5000))),
-                field("lastQueried", asSet(String.valueOf(currentTimeMillis())))
+                field("expireTime", asSet(String.valueOf(System.currentTimeMillis() + 5000))),
+                field("lastQueried", asSet(String.valueOf(System.currentTimeMillis())))
                 ));
 
         // When

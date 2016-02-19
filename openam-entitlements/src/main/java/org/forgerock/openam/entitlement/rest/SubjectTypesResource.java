@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -212,7 +211,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                 LogicalSubject.class.isAssignableFrom(subjectClass));
 
         final ResourceResponse resource = newResourceResponse(resourceId,
-                String.valueOf(currentTimeMillis()), json);
+                String.valueOf(System.currentTimeMillis()), json);
 
         return newResultPromise(resource);
     }

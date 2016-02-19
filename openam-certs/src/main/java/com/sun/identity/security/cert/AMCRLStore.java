@@ -28,8 +28,6 @@
  */
 package com.sun.identity.security.cert;
 
-import static org.forgerock.openam.utils.Time.*;
-
 import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import com.iplanet.security.x509.CertUtils;
 import com.iplanet.security.x509.IssuingDistributionPointExtension;
@@ -685,7 +683,7 @@ public class AMCRLStore extends AMCertStore {
                     nextCRLUpdate);
         }
 
-        return ((nextCRLUpdate != null) && nextCRLUpdate.before(newDate()));
+        return ((nextCRLUpdate != null) && nextCRLUpdate.before(new Date()));
     }
 
     /**

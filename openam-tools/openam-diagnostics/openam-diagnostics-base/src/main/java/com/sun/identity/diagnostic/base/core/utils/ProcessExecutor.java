@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: ProcessExecutor.java,v 1.1 2008/11/22 02:19:58 ak138937 Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.diagnostic.base.core.utils;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -193,7 +190,7 @@ public class ProcessExecutor {
                 inputStream = subProcess.getErrorStream();
             } 
             redirectProcessOutput(subProcess);
-            long timeBefore = currentTimeMillis();
+            long timeBefore = System.currentTimeMillis();
             boolean timeoutReached = false;
             boolean isSubProcessFinished = false;
             boolean shouldBeDone = false;
@@ -211,7 +208,7 @@ public class ProcessExecutor {
                     sleep(kSleepTime);
                     //ignore exception
                 }
-                long timeAfter = currentTimeMillis();
+                long timeAfter = System.currentTimeMillis();
                 timeoutReached =
                     (timeAfter - timeBefore) >= mTimeoutMilliseconds;
                 shouldBeDone = timeoutReached || isSubProcessFinished;
@@ -267,7 +264,7 @@ public class ProcessExecutor {
                 inputStream = subProcess.getInputStream();
             }
             redirectProcessError(subProcess);
-            long timeBefore = currentTimeMillis();
+            long timeBefore = System.currentTimeMillis();
             boolean timeoutReached = false;
             boolean isSubProcessFinished = false;
             boolean shouldBeDone = false;
@@ -285,7 +282,7 @@ public class ProcessExecutor {
                     sleep(kSleepTime);
                     //ignore exception
                 }
-                long timeAfter = currentTimeMillis();
+                long timeAfter = System.currentTimeMillis();
                 timeoutReached = 
                     (timeAfter - timeBefore) >= mTimeoutMilliseconds;
                 shouldBeDone = timeoutReached || isSubProcessFinished;

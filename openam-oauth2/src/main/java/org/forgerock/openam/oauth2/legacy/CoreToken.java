@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2016 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import static org.forgerock.oauth2.core.Utils.stringToSet;
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Models legacy OAuth2 core token.
@@ -76,7 +75,7 @@ public class CoreToken extends JsonValue implements Token {
     public Map<String, Object> convertToMap(){
         Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE));
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (currentTimeMillis() - getExpireTime())/1000);
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (System.currentTimeMillis() - getExpireTime())/1000);
         return tokenMap;
     }
 
@@ -86,7 +85,7 @@ public class CoreToken extends JsonValue implements Token {
     public Map<String, Object> getTokenInfo() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (currentTimeMillis() - getExpireTime())/1000);
+        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (System.currentTimeMillis() - getExpireTime())/1000);
         tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
         tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenMap;
@@ -110,7 +109,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     protected void setExpireTime(long expireTime) {
-        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf((expireTime * 1000) + currentTimeMillis())));
+        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf((expireTime * 1000) + System.currentTimeMillis())));
     }
 
     protected void setNonce(String nonce){
@@ -237,7 +236,7 @@ public class CoreToken extends JsonValue implements Token {
      * {@inheritDoc}
      */
     public boolean isExpired() {
-        return (currentTimeMillis() > getExpireTime());
+        return (System.currentTimeMillis() > getExpireTime());
     }
 
     /**

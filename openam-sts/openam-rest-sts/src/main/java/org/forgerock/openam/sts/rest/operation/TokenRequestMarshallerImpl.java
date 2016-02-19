@@ -11,14 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.operation;
 
 import static org.forgerock.guava.common.collect.Iterables.filter;
 import static org.forgerock.guava.common.collect.Iterables.toArray;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.encode.Base64;
 
@@ -506,7 +505,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                     "indicate access to the caller's identity with a field of allow_access:true.");
         }
         final OpenIdConnectTokenCreationState openIdConnectTokenCreationState =
-                new OpenIdConnectTokenCreationState(userSpecifiedTokenCreationState.getNonce(), currentTimeMillis() / 1000);
+                new OpenIdConnectTokenCreationState(userSpecifiedTokenCreationState.getNonce(), System.currentTimeMillis() / 1000);
         return new OpenIdConnectRestTokenProviderParameters(openIdConnectTokenCreationState, inputTokenType, inputToken);
     }
 

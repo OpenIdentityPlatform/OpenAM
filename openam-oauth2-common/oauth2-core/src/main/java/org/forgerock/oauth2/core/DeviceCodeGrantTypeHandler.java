@@ -11,14 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
-import static org.forgerock.openam.utils.Time.*;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -106,7 +105,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                         validatedClaims, request);
             }
 
-            if (deviceCode.getExpiryTime() < currentTimeMillis()) {
+            if (deviceCode.getExpiryTime() < System.currentTimeMillis()) {
                 throw new ExpiredTokenException();
             }
         } finally {
@@ -119,7 +118,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
 
         try {
             final long lastPollTime = deviceCode.getLastPollTime();
-            if (lastPollTime + (providerSettings.getDeviceCodePollInterval() * 1000) > currentTimeMillis()) {
+            if (lastPollTime + (providerSettings.getDeviceCodePollInterval() * 1000) > System.currentTimeMillis()) {
                 throw new BadRequestException("slow_down", "The polling interval has not elapsed since the last request");
             }
 

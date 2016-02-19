@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: FSAssertionManager.java,v 1.12 2009/08/03 18:18:36 bigfatrat Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.services;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.PeriodicGroupRunnable;
 import com.sun.identity.common.ScheduleableGroupAction;
@@ -253,9 +250,9 @@ public final class FSAssertionManager {
             cleanupInterval, artifactTimeout, true);
         TimerPool pool = SystemTimerPool.getTimerPool();
         pool.schedule(assertionTimeoutRunnable, new Date(((
-                currentTimeMillis() + cleanupInterval) / 1000) * 1000));
+            System.currentTimeMillis() + cleanupInterval) / 1000) * 1000));
         pool.schedule(artifactTimeoutRunnable, new Date(((
-                currentTimeMillis() + cleanupInterval) / 1000) * 1000));
+            System.currentTimeMillis() + cleanupInterval) / 1000) * 1000));
         
         if (assrtStats.isEnabled()) {
             assrtIdStats = new FSAssertionStats(idEntryMap, realm,hostEntityId);
@@ -533,7 +530,7 @@ public final class FSAssertionManager {
                     }
                 }
             } else {
-                authInstant = newDate();
+                authInstant = new java.util.Date();
             }
 
             if (FSUtils.debug.messageEnabled()) {
@@ -689,7 +686,7 @@ public final class FSAssertionManager {
         statement.setSessionIndex(sessionIndex);
         
         //setReauthenticateOnOrAfter date
-        Date issueInstant = newDate();
+        Date issueInstant = new Date();
         // get this period from the config
         
         FSUtils.debug.message("here before date");
@@ -1140,7 +1137,7 @@ public final class FSAssertionManager {
         }
         
         String artString = aa.getAssertionArtifact();
-        Assertion assertion = new ErrorAssertion(newDate(), s);
+        Assertion assertion = new ErrorAssertion( new java.util.Date(), s );
         Entry e = new Entry( assertion, null, artString, null );
         Object oldEntry = null;
         synchronized (idEntryMap) {

@@ -18,7 +18,6 @@ package org.forgerock.openam.oauth2;
 
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 import static org.forgerock.json.JsonValue.*;
 
@@ -69,7 +68,7 @@ public class AccessTokenProtectionFilterTest {
 
         AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a", REQUIRED_SCOPE)),
-                field("expireTime", currentTimeMillis() + 5000))));
+                field("expireTime", System.currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);
 
         //When
@@ -93,7 +92,7 @@ public class AccessTokenProtectionFilterTest {
 
         AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a")),
-                field("expireTime", currentTimeMillis() + 5000))));
+                field("expireTime", System.currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);
 
         //When
@@ -122,7 +121,7 @@ public class AccessTokenProtectionFilterTest {
 
         AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a")),
-                field("expireTime", currentTimeMillis() + 5000))));
+                field("expireTime", System.currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);
 
         //When

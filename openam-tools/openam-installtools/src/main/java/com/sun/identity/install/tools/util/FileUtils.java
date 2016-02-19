@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,13 @@
  *
  * $Id: FileUtils.java,v 1.3 2010/02/09 21:34:01 hari44 Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ */
+
+/*
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.install.tools.util;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -328,7 +329,7 @@ public class FileUtils {
     public static void backupFile(String fileName, String suffix)
             throws Exception {
         // Obtain the current time
-        Date currentDate = newDate();
+        Date currentDate = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
         String tstamp = formatter.format(currentDate);
 

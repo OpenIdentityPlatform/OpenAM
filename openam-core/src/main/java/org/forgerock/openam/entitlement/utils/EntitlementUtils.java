@@ -16,10 +16,10 @@
 package org.forgerock.openam.entitlement.utils;
 
 import static com.sun.identity.entitlement.opensso.EntitlementService.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import java.security.AccessController;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -356,7 +356,7 @@ public final class EntitlementUtils {
             return Long.parseLong(getAttribute(data, attributeName));
         } catch (NumberFormatException e) {
             PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong", e);
-            return newDate().getTime();
+            return new Date().getTime();
         }
     }
 

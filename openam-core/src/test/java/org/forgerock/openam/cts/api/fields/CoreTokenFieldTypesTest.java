@@ -11,12 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.cts.api.fields;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import org.fest.assertions.Assertions;
 import org.fest.assertions.Condition;
@@ -52,7 +49,7 @@ public class CoreTokenFieldTypesTest {
     public void shouldValidateDateField() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.DATE_ONE;
-        Calendar value = getCalendarInstance();
+        Calendar value = Calendar.getInstance();
 
         // When / Then
         CoreTokenFieldTypes.validateType(key, value);

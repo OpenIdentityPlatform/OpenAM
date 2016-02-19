@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: Archiver.java,v 1.3 2008/06/25 05:43:39 qcheng Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.log.spi;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -101,7 +98,7 @@ public class Archiver {
         Logger logger =
             (com.sun.identity.log.Logger)Logger.getLogger(fileName);
         filesPerKeystoreCounter ++;
-        Date d = newDate();
+        Date d = new Date();
         
         String timestampedFileName = location + PREFIX + fileName + "." +
             sdf.format(d).toString();

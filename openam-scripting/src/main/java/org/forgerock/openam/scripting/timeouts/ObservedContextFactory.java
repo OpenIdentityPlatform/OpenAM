@@ -11,12 +11,10 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2016 ForgeRock AS.
+* Copyright 2014 ForgeRock AS.
 */
 package org.forgerock.openam.scripting.timeouts;
 
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.concurrent.TimeUnit;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
@@ -56,7 +54,7 @@ public class ObservedContextFactory extends ContextFactory {
         final ObservedJavaScriptContext context = (ObservedJavaScriptContext) cx;
         final long timeout = TimeUnit.MILLISECONDS.convert(manager.getConfiguration().getScriptExecutionTimeout(),
                 TimeUnit.SECONDS);
-        if (timeout > 0 && currentTimeMillis() - context.getStartTime() > timeout) {
+        if (timeout > 0 && System.currentTimeMillis() - context.getStartTime() > timeout) {
             throw new Error("Interrupt.");
         }
     }
@@ -74,7 +72,7 @@ public class ObservedContextFactory extends ContextFactory {
 
         public ObservedJavaScriptContext(final ObservedContextFactory factory) {
             super(factory);
-            this.startTime = currentTimeMillis();
+            this.startTime = System.currentTimeMillis();
             this.setOptimizationLevel(-1);
             this.setInstructionObserverThreshold(OBSERVER_THRESHOLD);
         }

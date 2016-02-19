@@ -24,7 +24,7 @@
  *
  * $Id: PolicyRequestHandler.java,v 1.8 2008/12/04 00:38:52 dillidorai Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.policy.remote;
@@ -32,7 +32,6 @@ package com.sun.identity.policy.remote;
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
@@ -158,7 +157,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 pRes.setMethodID(PolicyResponse.POLICY_EXCEPTION);
                 pRes.setRequestId(pe.getRequestId());
                 pRes.setExceptionMsg(pe.getMessage());
-                pRes.setIssueInstant(currentTimeMillis());
+                pRes.setIssueInstant(System.currentTimeMillis());
                 ps.setMethodID(PolicyService.POLICY_RESPONSE_ID);
                 ps.setPolicyResponse(pRes);
                 res = new Response(ps.toXMLString());
@@ -243,7 +242,7 @@ public class PolicyRequestHandler implements RequestHandler {
             psRes.setRevision(getPolicyServiceRevision());
 
             PolicyResponse policyRes = processPolicyRequest(policyReq, auditor);
-            policyRes.setIssueInstant(currentTimeMillis());
+            policyRes.setIssueInstant(System.currentTimeMillis());
             psRes.setMethodID(PolicyService.POLICY_RESPONSE_ID);
             psRes.setPolicyResponse(policyRes);
             return psRes;

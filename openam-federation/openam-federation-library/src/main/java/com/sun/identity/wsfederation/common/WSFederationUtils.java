@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -27,8 +27,6 @@
  * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.wsfederation.common;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
@@ -308,8 +306,8 @@ public class WSFederationUtils {
     public static boolean isTimeValid(Assertion assertion, int timeskew)
     {
         String classMethod = "WSFederationUtils.isTimeValid: ";
-
-        long timeNow = currentTimeMillis();
+        
+        long timeNow = System.currentTimeMillis();
         Date notOnOrAfter = assertion.getConditions().getNotOnorAfter();
         String assertionID = assertion.getAssertionID();
         if (notOnOrAfter == null ) {

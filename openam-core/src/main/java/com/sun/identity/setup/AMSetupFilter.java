@@ -30,7 +30,6 @@
 package com.sun.identity.setup;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Collection;
 
 import javax.servlet.Filter;
@@ -45,7 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.Time;
 
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.shared.Constants;
@@ -76,9 +74,6 @@ public final class AMSetupFilter implements Filter {
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-        // Initialise the OpenAM Time enum.
-        System.out.println("Starting up OpenAM at " +
-                DateFormat.getDateTimeInstance().format(Time.getCalendarInstance().getTime()));
         ServletContext servletContext = config.getServletContext();
         SystemStartupInjectorHolder startupInjectorHolder = SystemStartupInjectorHolder.getInstance();
         setupManager = startupInjectorHolder.getInstance(AMSetupManager.class);

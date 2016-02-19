@@ -11,11 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.record;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
@@ -97,7 +95,7 @@ public class RecordReport {
 
         JsonObject report = JsonValueBuilder.jsonValue();
         synchronized (dateFormat) {
-            report.put(DATE_LABEL, dateFormat.format(newDate()));
+            report.put(DATE_LABEL, dateFormat.format(new Date()));
         }
         report.put(OPENAM_VERSION_LABEL, SystemPropertiesManager.get(Constants.AM_VERSION));
 
@@ -219,7 +217,7 @@ public class RecordReport {
     public String getThreadDump() {
         StringBuilder report = new StringBuilder();
 
-        report.append("DATE : ").append(dateFormat.format(newDate())).append("\n");
+        report.append("DATE : ").append(dateFormat.format(new Date())).append("\n");
 
         final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), 100);
         for (ThreadInfo threadInfo : threadInfos) {

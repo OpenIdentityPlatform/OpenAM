@@ -18,7 +18,6 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 import static org.forgerock.util.query.QueryFilter.or;
 
@@ -157,9 +156,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         long expiryTime = 0;
         if (clientRegistration == null) {
-            expiryTime = providerSettings.getAuthorizationCodeLifetime() + currentTimeMillis();
+            expiryTime = providerSettings.getAuthorizationCodeLifetime() + System.currentTimeMillis();
         } else {
-            expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + currentTimeMillis();
+            expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + System.currentTimeMillis();
         }
 
         final String ssoTokenId = getSsoTokenId(request);
@@ -240,7 +239,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
-        final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
+        final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         final long exp = TimeUnit.MILLISECONDS.toSeconds(clientRegistration.getJwtTokenLifeTime(providerSettings)) +
                 currentTimeInSeconds;
 
@@ -485,9 +484,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         long expiryTime = 0;
         if (clientRegistration == null) {
-            expiryTime = providerSettings.getAccessTokenLifetime() + currentTimeMillis();
+            expiryTime = providerSettings.getAccessTokenLifetime() + System.currentTimeMillis();
         } else {
-            expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + currentTimeMillis();
+            expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + System.currentTimeMillis();
         }
         
         final AccessToken accessToken;
@@ -547,7 +546,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             lifeTime = clientRegistration.getRefreshTokenLifeTime(providerSettings);
         }
 
-        long expiryTime = lifeTime < 0 ? -1 : lifeTime + currentTimeMillis();
+        long expiryTime = lifeTime < 0 ? -1 : lifeTime + System.currentTimeMillis();
 
         AuthorizationCode token = request.getToken(AuthorizationCode.class);
         String authModules = null;
@@ -855,7 +854,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not generate a unique user code");
         }
 
-        long expiryTime = currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
+        long expiryTime = System.currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
         String resourceOwnerId = resourceOwner == null ? null : resourceOwner.getId();
         final DeviceCode code = new DeviceCode(deviceCode, userCode, resourceOwnerId, clientId, nonce,
                 responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,

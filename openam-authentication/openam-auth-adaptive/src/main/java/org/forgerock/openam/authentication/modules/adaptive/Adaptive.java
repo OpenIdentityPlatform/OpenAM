@@ -1,7 +1,7 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2016 ForgeRock AS.
+ * Copyright (c) 2011-2016 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,8 +25,6 @@
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6AddressRange;
@@ -834,7 +832,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkLastLogin() {
         DateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-        Date now = newDate();
+        Date now = new Date();
         Date loginTime = null;
         String lastLoginEnc = null;
         String lastLogin = null;

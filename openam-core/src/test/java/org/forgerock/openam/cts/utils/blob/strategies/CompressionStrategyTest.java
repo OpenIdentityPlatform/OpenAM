@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
@@ -34,7 +34,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.utils.Time.*;
 
 public class CompressionStrategyTest {
     private CompressionStrategy compression;
@@ -219,22 +218,22 @@ public class CompressionStrategyTest {
         public byte[] perform(final byte[] data) throws TokenStrategyFailedException {
             // Cannot use System.nanoTime() as it gives invalid results if thread gets scheduled to
             // a different CPU during the test (highly likely in the large thread count tests).
-            final long start = currentTimeMillis();
+            final long start = System.currentTimeMillis();
             try {
                 return super.perform(data);
             } finally {
-                final long end = currentTimeMillis();
+                final long end = System.currentTimeMillis();
                 performSamples.recordValue(end - start);
             }
         }
 
         @Override
         public byte[] reverse(final byte[] data) throws TokenStrategyFailedException {
-            final long start = currentTimeMillis();
+            final long start = System.currentTimeMillis();
             try {
                 return super.reverse(data);
             } finally {
-                final long end = currentTimeMillis();
+                final long end = System.currentTimeMillis();
                 reverseSamples.recordValue(end - start);
             }
         }

@@ -32,7 +32,6 @@ package com.sun.identity.setup;
 import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
-import static org.forgerock.openam.utils.Time.*;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -313,7 +312,7 @@ public class AMSetupServlet extends HttpServlet {
         String baseDir = getBaseDir();
         String backupDir = baseDir + "/backups/";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String dateStamp = dateFormat.format(newDate());
+        String dateStamp = dateFormat.format(new Date());
         File backupFile = new File(backupDir + "opendj.backup." + dateStamp + ".zip");
   
         if (backupFile.exists()) {

@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2016 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
-
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Simple Class to Provide Time Duration Calculation for certain
@@ -41,7 +39,7 @@ public class TimeDuration {
      * Set Current Time as Start Time.
      */
     public void start() {
-        start = currentTimeMillis();
+        start = System.currentTimeMillis();
         end = start;
     } // End of start Method.
 
@@ -49,7 +47,7 @@ public class TimeDuration {
      * Set Current Time as End Time.
      */
     public void stop() {
-        end = currentTimeMillis();
+        end = System.currentTimeMillis();
     } // End of stop Method.
 
     /**

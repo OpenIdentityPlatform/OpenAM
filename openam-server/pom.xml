@@ -91,16 +91,6 @@
 
     <profiles>
         <profile>
-            <id>forgerock-dev</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.forgerock.openam</groupId>
-                    <artifactId>openam-time-travel</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>with-oem</id>
             <build>
                 <plugins>

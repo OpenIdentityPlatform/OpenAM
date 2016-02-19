@@ -21,7 +21,6 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
@@ -127,7 +126,7 @@ class CrestAuditor {
     void auditAccessSuccess(JsonValue responseDetail) {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = currentTimeMillis();
+            final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpRequest(context, request)
@@ -165,7 +164,7 @@ class CrestAuditor {
     void auditAccessFailure(int resultCode, String message) {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = currentTimeMillis();
+            final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)

@@ -18,7 +18,6 @@ package com.iplanet.dpro.session.operations.strategies;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -66,7 +65,7 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
         final SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
-        if (sessionInfo.getExpiryTime() < currentTimeMillis()) {
+        if (sessionInfo.getExpiryTime() < System.currentTimeMillis()) {
             throw new SessionTimedOutException("Stateless session corresponding to client "
                     + sessionInfo.getClientID() + " timed out.");
         }

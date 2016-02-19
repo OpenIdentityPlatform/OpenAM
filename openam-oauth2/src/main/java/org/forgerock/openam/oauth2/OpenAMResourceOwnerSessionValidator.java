@@ -24,7 +24,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
 import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
@@ -254,7 +253,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      * maxAge in seconds, authTime in miliseconds, maxAge not in play if set to -1.
      */
     private boolean isPastMaxAge(long maxAge, long authTime) throws SSOException {
-        return maxAge > -1 && maxAge <= currentTimeMillis() - authTime;
+        return maxAge > -1 && maxAge <= System.currentTimeMillis() - authTime;
     }
 
     /**

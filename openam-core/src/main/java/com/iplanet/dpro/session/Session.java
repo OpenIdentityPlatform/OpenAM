@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -30,7 +30,6 @@
 package com.iplanet.dpro.session;
 
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
@@ -526,7 +525,7 @@ public class Session extends GeneralTaskRunnable {
             try {
                 refresh(false);
             } catch (SessionTimedOutException e) {
-                latestRefreshTime = currentTimeMillis() / 1000;
+                latestRefreshTime = System.currentTimeMillis() / 1000;
                 timedOutAt = latestRefreshTime; //
             }
         }
@@ -553,7 +552,7 @@ public class Session extends GeneralTaskRunnable {
          * Return the extra time left, if the session has timed out due to
          * idle/max time out period
          */
-        long now = currentTimeMillis() / 1000;
+        long now = System.currentTimeMillis() / 1000;
         long left = (timedOutAt + SessionMeta.getPurgeDelay() * 60 - now);
         return (left > 0) ? left : 0;
     }
@@ -750,7 +749,7 @@ public class Session extends GeneralTaskRunnable {
      * Used to find out if the maximum caching time has reached or not.
      */
     public boolean maxCachingTimeReached() {
-        long cachingtime = currentTimeMillis() / 1000 - latestRefreshTime;
+        long cachingtime = System.currentTimeMillis() / 1000 - latestRefreshTime;
         return cachingtime > maxCachingTime * 60;
     }
 
@@ -1105,7 +1104,7 @@ public class Session extends GeneralTaskRunnable {
                 }
             }
         }
-        latestRefreshTime = currentTimeMillis() / 1000;
+        latestRefreshTime = System.currentTimeMillis() / 1000;
         // note : do not use getProperty() call here to avoid unexpected
         // recursion via
         // refresh()
@@ -1174,7 +1173,7 @@ public class Session extends GeneralTaskRunnable {
             String exceptionMessage = sres.getException();
             if(timedOutAt <= 0) {
                if (exceptionMessage.indexOf("SessionTimedOutException") != -1) {
-                    timedOutAt = currentTimeMillis() / 1000;
+                    timedOutAt = System.currentTimeMillis()/1000;
                 }
             }
             if (exceptionMessage.indexOf(SessionBundle.getString(

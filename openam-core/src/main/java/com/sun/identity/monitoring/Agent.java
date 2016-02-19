@@ -24,12 +24,10 @@
  *
  * $Id: Agent.java,v 1.9 2009/11/10 01:33:22 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.monitoring;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -1213,7 +1211,7 @@ public class Agent {
             }
             return;
         }
-        Date startDate = newDate();
+        Date startDate = new Date();
         siteToURL = sNames;
         URLToSite = urlSites;
 
@@ -1321,7 +1319,7 @@ public class Agent {
                 }
             }
         }
-        Date stopDate = newDate();
+        Date stopDate = new Date();
         if (debug.messageEnabled()) {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
@@ -1340,7 +1338,7 @@ public class Agent {
          *  no realm "service", so have to create the
          *  realm table here.
          */
-        Date startDate = newDate();
+        Date startDate = new Date();
         StringBuilder sb =
                 new StringBuilder("receiving list of realms (size = ");
         sb.append(realmList.size()).append("):\n");
@@ -1471,7 +1469,7 @@ public class Agent {
                     "Entitlement NetworkMonitor list empty.");
         }
 
-        Date stopDate = newDate();
+        Date stopDate = new Date();
         if (debug.messageEnabled()) {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
@@ -1980,7 +1978,7 @@ public class Agent {
         int sz = s1TPInfo.size();
         boolean skipSAML1EndPoints = true;  // until instrumentation done
 
-        Date startDate = newDate();
+        Date startDate = new Date();
         if (debug.messageEnabled()) {
             sb.append("number of SAML1 Trusted Partners = ").append(sz).
                     append("\n");
@@ -2240,7 +2238,7 @@ public class Agent {
             }
         } // if (!skipSAML1EndPoints)
 
-        Date stopDate = newDate();
+        Date stopDate = new Date();
         if (debug.messageEnabled()) {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
@@ -2255,7 +2253,7 @@ public class Agent {
     {
         String classMethod = "Agent.federationConfig:";
 
-        Date startDate = newDate();
+        Date startDate = new Date();
         String realm = srfi.realmName;
         Integer ri = getRealmIndexFromName(realm);
         Set<String> cots = srfi.cots;
@@ -2862,7 +2860,7 @@ public class Agent {
                     "\n    port = " + dirPort + "\n    ssl = " + drSSL +
                     "\n    dirSSL = " + dirSSL);
 
-            Date stopDate = newDate();
+            Date stopDate = new Date();
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
             debug.message("Agent.federationConfig:\n    Start Time = " +

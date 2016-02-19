@@ -24,13 +24,12 @@
  *
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.policy;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;
@@ -1752,7 +1751,7 @@ public class PolicyEvaluator {
                     if (results != null) {
                         resourceResult = (ResourceResult)results.get(scope);
                         if (resourceResult != null) {
-                            long currentTime = currentTimeMillis();
+                            long currentTime = System.currentTimeMillis();
                             long ttlMinimal = resourceResult.getTimeToLive();
                             if (ttlMinimal > currentTime) {
 
@@ -2496,7 +2495,7 @@ public class PolicyEvaluator {
             if (timeStamp != null) {
                 timeToLive = timeStamp.longValue();
             }
-            long currentTime = currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
             if (timeToLive > currentTime) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("PolicyEvaluator.getUserNSRoleValues():"
@@ -2539,8 +2538,8 @@ public class PolicyEvaluator {
                             + " added user nsRoles: " + roleSet);
             }
             Object[] elem = new Object[2];
-            elem[0] = new Long(currentTimeMillis()
-                    + userNSRoleCacheTTL);
+            elem[0] = new Long(System.currentTimeMillis() 
+                               + userNSRoleCacheTTL);
             elem[1] = roleSet;
             userNSRoleCache.put(tokenIDStr, elem);
             if (!ssoListenerRegistry.containsKey(tokenIDStr)) {

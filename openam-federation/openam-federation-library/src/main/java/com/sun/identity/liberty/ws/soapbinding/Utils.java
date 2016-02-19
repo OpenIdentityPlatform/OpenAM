@@ -24,12 +24,10 @@
  *
  * $Id: Utils.java,v 1.9 2008/11/10 22:56:59 veiming Exp $
  *
- * Portions Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyright 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.liberty.ws.soapbinding; 
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.ByteArrayInputStream;
 
@@ -234,7 +232,7 @@ public class Utils {
         messageIDMap = new PeriodicCleanUpMap(
             message_ID_cleanup_interval, stale_time_limit);
         SystemTimerPool.getTimerPool().schedule((TaskRunnable) messageIDMap,
-            new Date(((currentTimeMillis() + message_ID_cleanup_interval)
+            new Date(((System.currentTimeMillis() + message_ID_cleanup_interval)
             / 1000) * 1000));
     }
 
@@ -560,7 +558,7 @@ public class Utils {
         }
         
         Date timestamp = corrH.getTimestamp();
-        Date now = newDate();
+        Date now = new Date();
         if ((now.getTime() - timestamp.getTime()) > stale_time_limit) {
             if (isServer) {
                 SOAPFaultDetail sfd =
@@ -577,7 +575,7 @@ public class Utils {
         }
         
         Long prevMsgIDTime = (Long)messageIDMap.get(messageID);
-        long currentTime = currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
         if (prevMsgIDTime != null &&
                 currentTime - prevMsgIDTime.longValue() < stale_time_limit) {
             

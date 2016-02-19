@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
@@ -81,7 +79,7 @@ public class ProfilePersister {
                 removeOldestProfile(profiles);
             }
 
-            long lastSelectedDate = currentTimeMillis();
+            long lastSelectedDate = System.currentTimeMillis();
             Map<String, Object> profile = new HashMap<String, Object>();
             profile.put("uuid", uuid);
             profile.put("name", (name == null || name.isEmpty()) ? generateProfileName(new Date(lastSelectedDate)) : name);
@@ -115,7 +113,7 @@ public class ProfilePersister {
      */
     private void removeOldestProfile(List<Map<String, Object>> profiles) {
         Map<String, Object> oldestProfile = null;
-        long oldestDate = currentTimeMillis();
+        long oldestDate = System.currentTimeMillis();
 
         for (Map<String, Object> profile : profiles) {
             long lastSelectedDate = (Long)profile.get("lastSelectedDate");

@@ -24,11 +24,9 @@
  *
  * $Id: NameIDMapping.java,v 1.6 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -236,7 +234,7 @@ public class NameIDMapping {
         nimResponse.setID(responseID);
         nimResponse.setInResponseTo(nimRequest.getID());
         nimResponse.setVersion(SAML2Constants.VERSION_2_0);
-        nimResponse.setIssueInstant(newDate());
+        nimResponse.setIssueInstant(new Date());
         nimResponse.setIssuer(SAML2Utils.createIssuer(idpEntityID)); 
 
         SAML2Utils.verifyRequestIssuer(realm, idpEntityID,
@@ -327,7 +325,7 @@ public class NameIDMapping {
         nimRequest.setDestination(XMLUtils.escapeSpecialCharacters(
             destination));
         nimRequest.setIssuer(SAML2Utils.createIssuer(spEntityID));
-        nimRequest.setIssueInstant(newDate());
+        nimRequest.setIssueInstant(new Date());
 
         setNameIDForNIMRequest(nimRequest, realm, spEntityID, idpEntityID,
             targetSPEntityID, targetNameIDFormat, userID);

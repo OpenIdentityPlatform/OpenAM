@@ -11,11 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -46,10 +44,10 @@ public class TokenTestUtilsTest {
     public void shouldCompareDateWithMilliseconds() {
         // Given
         Token expected = new Token("", TokenType.SESSION);
-        expected.setExpiryTimestamp(getCalendarInstance());
+        expected.setExpiryTimestamp(Calendar.getInstance());
 
         Token result = new Token("", TokenType.SESSION);
-        Calendar resultCal = getCalendarInstance();
+        Calendar resultCal = Calendar.getInstance();
         resultCal.add(Calendar.MILLISECOND, 1);
         result.setExpiryTimestamp(resultCal);
 
@@ -61,12 +59,12 @@ public class TokenTestUtilsTest {
     public void shouldFailBecauseTokenTimestampsAreDifferentTimeZones() {
         // Given
         Token expected = new Token("", TokenType.SESSION);
-        Calendar expectedCal = getCalendarInstance();
+        Calendar expectedCal = Calendar.getInstance();
         expectedCal.setTimeZone(LDAPDataConversionTest.CHICAGO);
         expected.setExpiryTimestamp(expectedCal);
 
         Token result = new Token("", TokenType.SESSION);
-        Calendar resultCal = getCalendarInstance();
+        Calendar resultCal = Calendar.getInstance();
         resultCal.setTimeZone(LDAPDataConversionTest.BERLIN);
         result.setExpiryTimestamp(resultCal);
 

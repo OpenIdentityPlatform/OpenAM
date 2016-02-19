@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: IDPPBaseContainer.java,v 1.2 2008/06/25 05:47:15 qcheng Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import javax.xml.bind.JAXBException;
@@ -226,7 +223,7 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
             DSTDate dstDate = IDPPUtils.getIDPPFactory().createDSTDate();
             Date date = 
                  DateFormat.getDateInstance(DateFormat.MEDIUM).parse(value);
-            Calendar cal = getCalendarInstance();
+            Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             dstDate.setValue(cal);
             return dstDate;

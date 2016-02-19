@@ -24,11 +24,9 @@
  *
  * $Id: ResponseInfo.java,v 1.6 2009/06/17 03:09:13 exu Exp $
  *
- * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Map;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -63,7 +61,7 @@ public class ResponseInfo extends CacheObject {
         this.resp = response;
         this.profileBinding = binding;
         this.relayState = relayState;
-        time = currentTimeMillis();
+        time = System.currentTimeMillis();
     }
 
     /**

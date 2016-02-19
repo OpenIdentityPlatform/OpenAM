@@ -29,8 +29,6 @@
 
 package com.sun.identity.policy.plugins;
 
-import static com.sun.identity.policy.PolicyConfig.*;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
@@ -478,7 +476,7 @@ public class LDAPFilterCondition implements Condition {
      */
     private void resetPolicyConfig(Map env) throws PolicyException, SSOException {
 
-        if (currentTimeMillis() > policyConfigExpiresAt) {
+        if (System.currentTimeMillis() > policyConfigExpiresAt) {
 
             String realmDn = CollectionHelper.getMapAttr(env, PolicyEvaluator.REALM_DN);
             if (realmDn == null) {
@@ -497,7 +495,7 @@ public class LDAPFilterCondition implements Condition {
      * Sets the policy configuration parameters used by this condition.
      */
     private synchronized void setPolicyConfig(Map configParams, String realmDn) throws PolicyException {
-        if (currentTimeMillis() < policyConfigExpiresAt) {
+        if (System.currentTimeMillis() < policyConfigExpiresAt) {
             return;
         }
         if (debug.messageEnabled()) {
@@ -588,7 +586,7 @@ public class LDAPFilterCondition implements Condition {
                     }
                 });
 
-        policyConfigExpiresAt = currentTimeMillis() + getSubjectsResultTtl(configParams);
+        policyConfigExpiresAt = System.currentTimeMillis() + PolicyConfig.getSubjectsResultTtl(configParams);
     }
 
     /**

@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,13 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSNameRegistrationRequest.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
- *
- * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -85,7 +82,7 @@ public class FSNameRegistrationRequest extends AbstractRequest {
      */
     
     public FSNameRegistrationRequest() { 
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());
     }
         
     /**
@@ -165,7 +162,7 @@ public class FSNameRegistrationRequest extends AbstractRequest {
         String relayState) throws FSMsgException {
      
         int length = 0;
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());    
         if ((respondWiths != null) &&
             (respondWiths != Collections.EMPTY_LIST)) {
             length = respondWiths.size();

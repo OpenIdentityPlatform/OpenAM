@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: XACMLRequestProcessor.java,v 1.4 2009/09/22 23:00:34 madan_ranganath Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.xacml.client;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Date;
 import java.util.List;
@@ -176,7 +173,7 @@ public class XACMLRequestProcessor {
                 = ContextFactory.getInstance().createXACMLAuthzDecisionQuery();
         query.setID("query-1");
         query.setVersion("2.0");
-        query.setIssueInstant(newDate());
+        query.setIssueInstant(new Date());
         query.setDestination("destination-uri");
         query.setConsent("consent-uri");
 

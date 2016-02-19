@@ -24,12 +24,10 @@
  *
  * $Id: SMSJAXRPCObjectImpl.java,v 1.22 2009/10/28 04:24:27 hengming Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm.jaxrpc;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.server.PLLServer;
@@ -482,8 +480,8 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         }
         Set answer = new HashSet();
         // Get the cache index for times upto time+2
-        Calendar calendar = getCalendarInstance();
-        calendar.setTime(newDate());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
         // Add 1 minute to offset, the initial lookup
         calendar.add(Calendar.MINUTE, 1);
         for (int i = 0; i < time + 3; i++) {
@@ -498,8 +496,8 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
 
     // Implementation for SMSObjectListener
     public synchronized void objectChanged(String name, int type) {
-        Calendar calendar = getCalendarInstance();
-        calendar.setTime(newDate());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
         String cacheIndex = calendarToString(calendar);
         Set modDNs = (Set) cache.get(cacheIndex);
         if (modDNs == null) {

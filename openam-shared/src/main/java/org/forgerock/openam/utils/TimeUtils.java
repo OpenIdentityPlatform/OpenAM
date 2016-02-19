@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.utils;
 
-import static org.forgerock.openam.utils.Time.*;
-
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +73,7 @@ public final class TimeUtils {
      * @return Non null Calendar representing this timestamp.
      */
     public static Calendar fromUnixTime(long unixTime, TimeUnit timeUnit) {
-        Calendar calendar = getCalendarInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getDefault());
         long millis = timeUnit.toMillis(unixTime);
         calendar.setTimeInMillis(millis);
@@ -88,8 +86,8 @@ public final class TimeUtils {
      * @return A long representing seconds from the epoch.
      */
     public static long currentUnixTime() {
-        Calendar calendar = getCalendarInstance();
-        calendar.setTimeInMillis(currentTimeMillis());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
         return toUnixTime(calendar);
     }
 }

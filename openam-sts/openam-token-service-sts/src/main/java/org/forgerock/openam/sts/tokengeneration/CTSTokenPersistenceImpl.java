@@ -11,14 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration;
-
-import static java.util.Locale.*;
-import static java.util.TimeZone.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -136,7 +132,7 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
     }
 
     private Calendar now() {
-        return getCalendarInstance(getTimeZone("UTC"), ROOT);
+        return Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
     }
 
     private Calendar timeOf(final long utcMillis) {

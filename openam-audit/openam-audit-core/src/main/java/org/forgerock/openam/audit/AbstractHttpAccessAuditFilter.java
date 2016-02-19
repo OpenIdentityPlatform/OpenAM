@@ -25,7 +25,6 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailabl
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_RESPONSE_DETAIL_REASON;
 import static org.forgerock.openam.audit.AuditConstants.Component;
 import static org.forgerock.openam.audit.AuditConstants.EventName;
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Set;
 
@@ -104,7 +103,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         String realm = getRealm(context);
         if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            long endTime = currentTimeMillis();
+            long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
@@ -125,7 +124,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         String realm = getRealm(context);
         if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            long endTime = currentTimeMillis();
+            long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
             JsonValue responseDetail = json(object(

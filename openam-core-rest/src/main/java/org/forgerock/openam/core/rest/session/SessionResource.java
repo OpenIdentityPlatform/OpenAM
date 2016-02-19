@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,7 +18,6 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.iplanet.am.util.SystemProperties;
@@ -353,7 +352,7 @@ public class SessionResource implements CollectionResourceProvider {
         if (KEYWORD_LIST.equals(id)) {
             Collection<String> servers = generateListServers();
             LOGGER.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
-            handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(currentTimeMillis()),
+            handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(System.currentTimeMillis()),
                     new JsonValue(servers)));
         } else {
             Collection<SessionInfo> sessions;
@@ -375,7 +374,7 @@ public class SessionResource implements CollectionResourceProvider {
                 map.put(HEADER_USER_ID, username);
                 map.put(HEADER_TIME_REMAINING, timeleft);
 
-                handler.handleResource(newResourceResponse("Sessions", String.valueOf(currentTimeMillis()),
+                handler.handleResource(newResourceResponse("Sessions", String.valueOf(System.currentTimeMillis()),
                         new JsonValue(map)));
             }
         }

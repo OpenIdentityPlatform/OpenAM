@@ -24,12 +24,10 @@
  *
  * $Id: CoreTokenUtils.java,v 1.1 2009/11/19 00:07:40 qcheng Exp $
  *
- * Portions Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.coretoken;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;
@@ -66,7 +64,7 @@ public class CoreTokenUtils {
         throws CoreTokenException {
         try {
             Date expiryDate = DateUtils.stringToDate(tokenExpiry);
-            long now = currentTimeMillis();
+            long now = System.currentTimeMillis();
             if (expiryDate.getTime() <= now) {
                 return true;
             } else {

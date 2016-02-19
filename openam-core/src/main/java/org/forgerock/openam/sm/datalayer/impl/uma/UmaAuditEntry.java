@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Calendar;
 
@@ -56,7 +55,7 @@ public class UmaAuditEntry {
         this.resourceOwnerId = resourceOwnerId;
         this.type = type;
         this.requestingPartyId = requestingPartyId;
-        this.eventTime = getCalendarInstance();
+        this.eventTime = Calendar.getInstance();
     }
 
     public String getId() {

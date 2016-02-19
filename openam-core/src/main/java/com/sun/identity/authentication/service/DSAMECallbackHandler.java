@@ -24,12 +24,9 @@
  *
  * $Id: DSAMECallbackHandler.java,v 1.7 2008/08/19 19:08:54 veiming Exp $
  *
- * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
 package com.sun.identity.authentication.service;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 
@@ -77,7 +74,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
     private void setPageTimeout(Callback[] callbacks) {
         long pageTimeOut = getTimeOut(callbacks);
         loginState.setPageTimeOut(pageTimeOut);
-        long lastCallbackSent = currentTimeMillis();
+        long lastCallbackSent = System.currentTimeMillis();
         loginState.setLastCallbackSent(lastCallbackSent);
     }
         
@@ -225,7 +222,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
 
         long lastCallbackSent = loginState.getLastCallbackSent();
         long pageTimeOut = loginState.getPageTimeOut();
-        long now = currentTimeMillis();
+        long now = System.currentTimeMillis();
         if ((lastCallbackSent + ((pageTimeOut-3)*1000)) < now) {
             debug.message("Page Timeout");
             loginState.setTimedOut(true);

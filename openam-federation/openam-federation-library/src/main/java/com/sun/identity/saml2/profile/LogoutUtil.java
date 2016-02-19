@@ -24,11 +24,9 @@
  *
  * $Id: LogoutUtil.java,v 1.16 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -222,7 +220,7 @@ public class LogoutUtil {
         // set required attributes / elements
         logoutReq.setID(requestID);
         logoutReq.setVersion(SAML2Constants.VERSION_2_0);
-        logoutReq.setIssueInstant(newDate());
+        logoutReq.setIssueInstant(new Date());
         setNameIDForSLORequest(logoutReq, nameID, realm, requesterEntityID, hostEntityRole, recipientEntityID);
 
         // set optional attributes / elements
@@ -246,7 +244,7 @@ public class LogoutUtil {
                     effectiveTime = SAML2Constants.ASSERTION_EFFECTIVE_TIME;
                 }
             }
-            Date date = newDate();
+            Date date = new Date();
             date.setTime(date.getTime() + effectiveTime * 1000);
             logoutReq.setNotOnOrAfter(date);
         }
@@ -764,7 +762,7 @@ public class LogoutUtil {
             logoutResponse.setID(responseID);
             logoutResponse.setInResponseTo(inResponseTo);
             logoutResponse.setVersion(SAML2Constants.VERSION_2_0);
-            logoutResponse.setIssueInstant(newDate());
+            logoutResponse.setIssueInstant(new Date()); 
             logoutResponse.setIssuer(issuer);
         } catch (SAML2Exception e) {
             debug.error("Error in generating LogoutResponse.", e);

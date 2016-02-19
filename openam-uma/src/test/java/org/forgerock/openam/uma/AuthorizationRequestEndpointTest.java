@@ -19,7 +19,6 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.Matchers.anyBoolean;
@@ -162,7 +161,7 @@ public class AuthorizationRequestEndpointTest {
         rpt = mock(RequestingPartyToken.class);
         given(rpt.getId()).willReturn("1");
         permissionTicket = mock(PermissionTicket.class);
-        given(permissionTicket.getExpiryTime()).willReturn(currentTimeMillis() + 10000);
+        given(permissionTicket.getExpiryTime()).willReturn(System.currentTimeMillis() + 10000);
         given(permissionTicket.getResourceSetId()).willReturn(RS_ID);
         given(permissionTicket.getResourceServerClientId()).willReturn(RS_CLIENT_ID);
         given(permissionTicket.getRealm()).willReturn("REALM");

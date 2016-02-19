@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2016 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,7 +31,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.sun.identity.common.ISLocaleContext;
@@ -572,7 +571,7 @@ public class TokenResource implements CollectionResourceProvider {
                 expireTime = Long.parseLong(expireTimeSet.iterator().next());
             }
 
-            if (currentTimeMillis() > expireTime) {
+            if (System.currentTimeMillis() > expireTime) {
                 throw new NotFoundException("Could not find valid token with given ID");
             }
 
@@ -580,7 +579,7 @@ public class TokenResource implements CollectionResourceProvider {
 
             if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
                 resource =
-                        newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(currentTimeMillis()), response);
+                        newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
                 return newResultPromise(resource);
             } else {
                 String realm = getAttributeValue(response, REALM);
@@ -595,7 +594,7 @@ public class TokenResource implements CollectionResourceProvider {
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(adminUserId) || uid.equals(uid2)) {
                     resource =
-                            newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(currentTimeMillis()), response);
+                            newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
                     return newResultPromise(resource);
                 } else {
                     if (debug.errorEnabled()) {

@@ -24,12 +24,10 @@
  *
  * $Id: IdRemoteEventListener.java,v 1.7 2009/01/28 05:35:00 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.idm.remote;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.net.URL;
 import java.util.Date;
@@ -209,7 +207,7 @@ public class IdRemoteEventListener {
             NotificationRunnable nt = new NotificationRunnable(
                     cachePollingInterval);
             SystemTimer.getTimer().schedule(nt, new Date((
-                    currentTimeMillis() / 1000) * 1000));
+                System.currentTimeMillis() / 1000) * 1000));
         } else {
             if (DEBUG.warningEnabled()) {
                 DEBUG.warning("IdRemoteEventListener: Polling mode DISABLED. " +

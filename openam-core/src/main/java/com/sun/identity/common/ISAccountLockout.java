@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: ISAccountLockout.java,v 1.15 2009/03/07 08:01:50 veiming Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ */
+
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
  */
 package com.sun.identity.common;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.AMSendMail;
 import javax.mail.MessagingException;
@@ -215,8 +216,8 @@ public class ISAccountLockout {
                 "ISAccountLockout.invalidPasswd with userDN, AMIdentity");
             debug.message("userDN : " + userDN);
         }
-
-        long now = currentTimeMillis();
+        
+        long now = System.currentTimeMillis();
         int fail_count = acInfo.getFailCount();
         long lastFailTime = acInfo.getLastFailTime();
         long lockedAt = acInfo.getLockoutAt();
@@ -413,7 +414,7 @@ public class ISAccountLockout {
         Object subject,
         AccountLockoutInfo acInfo
     ) {
-        long now = currentTimeMillis();
+        long now = System.currentTimeMillis();
         if (acInfo == null) {
             // first failure. store key
             debug.message("ISAccountLockout.invalidPasswdEx: First failure." );
@@ -544,7 +545,7 @@ public class ISAccountLockout {
             // add loginFailureLockoutDuration
             // if less than now then still locked out else
             // reset lock out
-            long now = currentTimeMillis();
+            long now = System.currentTimeMillis();
             long lockOutTime = acInfo.getLockoutAt();
             
             if ((lockOutTime + acInfo.getActualLockoutDuration()) < now) {
@@ -686,7 +687,7 @@ public class ISAccountLockout {
             fail_count = acInfo.getFailCount();
             lastFailTime = acInfo.getLastFailTime();
             locked_out_at = acInfo.getLockoutAt();
-            long now = currentTimeMillis();
+            long now = System.currentTimeMillis();
             if (!resetDuration) { 
                 actualLockoutDuration = currentLockoutDuration;
                 if (debug.messageEnabled()) {

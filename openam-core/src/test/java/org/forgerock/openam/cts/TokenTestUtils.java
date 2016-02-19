@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Provides CTS based Token testing functionality, specifically for unit testing.
@@ -141,7 +140,7 @@ public class TokenTestUtils {
         Token token = new Token(id, TokenType.SESSION);
 
         // Set to expire now.
-        token.setExpiryTimestamp(getCalendarInstance());
+        token.setExpiryTimestamp(Calendar.getInstance());
 
         // Some extra data
         token.setAttribute(CoreTokenField.STRING_ONE, RandomStringUtils.randomAlphabetic(20));

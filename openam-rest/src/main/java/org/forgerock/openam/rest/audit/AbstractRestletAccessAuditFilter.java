@@ -23,7 +23,6 @@ import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getAllAvailabl
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
-import static org.forgerock.openam.utils.Time.*;
 import static org.restlet.ext.servlet.ServletUtils.getRequest;
 
 import java.util.Set;
@@ -136,7 +135,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         String realm = getRealmFromRequest(request);
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            long endTime = currentTimeMillis();
+            long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - request.getDate().getTime();
 
             final Representation entity = response.getEntity();
@@ -172,7 +171,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         String realm = getRealmFromRequest(request);
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            long endTime = currentTimeMillis();
+            long endTime = System.currentTimeMillis();
             String responseCode = Integer.toString(response.getStatus().getCode());
             long elapsedTime = endTime - request.getDate().getTime();
             JsonValue responseDetail = json(object(

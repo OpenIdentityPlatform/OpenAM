@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: Subjects.java,v 1.4 2008/06/25 05:43:45 qcheng Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ */
+
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
  */
 package com.sun.identity.policy;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.*;
 
@@ -605,7 +606,7 @@ public class Subjects {
             PolicyException {
 
         boolean member = false;
-		long currentTime = currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
         long[]  cachedResult = null;
         cachedResult = (long[])resultCache.get(token.getTokenID().toString());
         if (cachedResult == null) {

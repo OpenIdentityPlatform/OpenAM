@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,13 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSNameRegistrationResponse.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
- *
- * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -78,7 +75,7 @@ public class FSNameRegistrationResponse extends AbstractResponse {
      */
     public FSNameRegistrationResponse() {
         try {
-            setIssueInstant(newDate());
+            setIssueInstant(new Date());
             StatusCode statusCode = new StatusCode(IFSConstants.SAML_SUCCESS);
             status = new Status(statusCode);
         } catch(Exception e){
@@ -201,7 +198,7 @@ public class FSNameRegistrationResponse extends AbstractResponse {
         this.status = status;
         this.providerId = providerId;
         this.relayState = relayState;
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());
     }
     
     /**

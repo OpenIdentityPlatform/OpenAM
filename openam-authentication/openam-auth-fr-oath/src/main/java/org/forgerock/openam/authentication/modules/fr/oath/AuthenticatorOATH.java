@@ -17,8 +17,6 @@
 
 package org.forgerock.openam.authentication.modules.fr.oath;
 
-import static org.forgerock.openam.utils.Time.*;
-
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -404,7 +402,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         }
 
         //get Arrival time of the OTP
-        time = currentTimeMillis() / 1000L;
+        time = System.currentTimeMillis() / 1000L;
 
         if (isRecoveryCode(OTP, deviceToAuthAgainst, id)) {
             return RECOVERY_USED;

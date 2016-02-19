@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,14 +23,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthnResponse.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
- *
- * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
 package com.sun.identity.federation.message;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -92,7 +89,7 @@ public class FSAuthnResponse extends Response {
                            Status status, List contents, String relayState)
                            throws SAMLException, FSMsgException {
         super( responseID, inResponseTo, status, contents);
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());
         this.relayState = relayState;
     }
 

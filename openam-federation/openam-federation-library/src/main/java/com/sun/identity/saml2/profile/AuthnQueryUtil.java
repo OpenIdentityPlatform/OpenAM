@@ -24,11 +24,9 @@
  *
  * $Id: AuthnQueryUtil.java,v 1.8 2008/12/03 00:32:31 hengming Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -330,7 +328,7 @@ public class AuthnQueryUtil {
         samlResp.setInResponseTo(authnQuery.getID());
 
         samlResp.setVersion(SAML2Constants.VERSION_2_0);
-        samlResp.setIssueInstant(newDate());
+        samlResp.setIssueInstant(new Date());
     
         Status status = protocolFactory.createStatus();
         StatusCode statusCode = protocolFactory.createStatusCode();

@@ -24,12 +24,10 @@
  *
  * $Id: AMClientCapData.java,v 1.7 2009/01/28 05:34:49 ww203982 Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.iplanet.services.cdm.clientschema;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -1098,18 +1096,18 @@ public class AMClientCapData implements IDSEventListener {
         amsrchCntrl.setReturnAttributes(minClient);
 
         try {
-            long st = currentTimeMillis();
+            long st = System.currentTimeMillis();
             AMSearchResults results = amClientOrg.searchEntities("*",
                     amsrchCntrl, null, UMS_SRCH_TEMPLATE_NAME);
 
-            long end = currentTimeMillis();
+            long end = System.currentTimeMillis();
             if (debug.messageEnabled()) {
                 debug.message(dbStr
                         + "getMinimalClientInfo() Srch Time (ms) = "
                         + (end - st));
             }
 
-            st = currentTimeMillis();
+            st = System.currentTimeMillis();
             Map m = results.getResultAttributes();
             Iterator keys = m.keySet().iterator();
 
@@ -1119,7 +1117,7 @@ public class AMClientCapData implements IDSEventListener {
                 Map data = parsePropertyNames(attrsMap);
                 clients.add(data);
             }
-            end = currentTimeMillis();
+            end = System.currentTimeMillis();
             if (debug.messageEnabled()) {
                 debug.message(dbStr
                         + "getMinimalClientInfo() Parse Time (ms) = "

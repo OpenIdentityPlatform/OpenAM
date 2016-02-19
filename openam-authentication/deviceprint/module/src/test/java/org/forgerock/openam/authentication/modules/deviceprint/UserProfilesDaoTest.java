@@ -22,8 +22,10 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ */
+/*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2013 ForgeRock Inc.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -43,7 +45,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -154,7 +155,7 @@ public class UserProfilesDaoTest {
     }
 
     private Date getDate() {
-        Calendar calendar = getCalendarInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.set(2013, 4, 15, 17, 11, 0);
         return calendar.getTime();
     }

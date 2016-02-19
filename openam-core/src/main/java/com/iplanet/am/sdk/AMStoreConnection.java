@@ -24,12 +24,10 @@
  *
  * $Id: AMStoreConnection.java,v 1.13 2009/01/28 05:34:47 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.sso.SSOException;
@@ -1689,7 +1687,7 @@ public final class AMStoreConnection implements AMConstants {
         }
 
         Date modDate = df.parse(n.toString(), pp);
-        Date nowDate = newDate();
+        Date nowDate = new Date();
 
         // getTime() fn returns number of milliseconds
         // since January 1, 1970, 00:00:00 GMT

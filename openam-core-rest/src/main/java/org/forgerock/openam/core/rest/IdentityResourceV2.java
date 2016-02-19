@@ -25,7 +25,6 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.mail.MessagingException;
@@ -294,7 +293,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      */
     private org.forgerock.openam.cts.api.tokens.Token generateToken(String resource, String userId,
             Long tokenLifeTimeSeconds, String realmName) {
-        Calendar ttl = getCalendarInstance();
+        Calendar ttl = Calendar.getInstance();
         org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
         if (!StringUtils.isBlank(userId)) {

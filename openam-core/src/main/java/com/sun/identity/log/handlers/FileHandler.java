@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: FileHandler.java,v 1.14 2009/07/27 19:50:55 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ */
+/*
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
-
 package com.sun.identity.log.handlers;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -305,7 +304,7 @@ public class FileHandler extends java.util.logging.Handler {
                 rotationInterval = -1;
             }
             if (rotationInterval > 0) {
-                lastRotation = currentTimeMillis();
+                lastRotation = System.currentTimeMillis();
                 rotatingBySize = false;
             }
         }
@@ -422,7 +421,7 @@ public class FileHandler extends java.util.logging.Handler {
             suffixDateFormat = new SimpleDateFormat(DEFAULT_LOG_SUFFIX_FORMAT);
         }
         if (suffixDateFormat != null) {
-            newFileName.append(suffixDateFormat.format(newDate()));
+            newFileName.append(suffixDateFormat.format(new Date()));
         }
         return newFileName.toString();
 
@@ -571,8 +570,8 @@ public class FileHandler extends java.util.logging.Handler {
                     return true;
                 }
             } else {
-                Calendar now = getCalendarInstance();
-                Calendar then = getCalendarInstance();
+                Calendar now = Calendar.getInstance();
+                Calendar then = Calendar.getInstance();
                 then.setTimeInMillis(lastRotation);
 
                 then.add(Calendar.MINUTE, rotationInterval);
@@ -623,7 +622,7 @@ public class FileHandler extends java.util.logging.Handler {
             }
         } else {
             // remember when we last rotated
-            lastRotation = currentTimeMillis();
+            lastRotation = System.currentTimeMillis();
             // Delete the oldest file if it exists
             if (files[count].exists()) {
                 try {
@@ -832,7 +831,7 @@ public class FileHandler extends java.util.logging.Handler {
         if (bufferTask == null) {
             bufferTask = new TimeBufferingTask(interval);
             try {
-                SystemTimer.getTimer().schedule(bufferTask, new Date(((currentTimeMillis() + interval) / 1000) * 1000));
+                SystemTimer.getTimer().schedule(bufferTask, new Date(((System.currentTimeMillis() + interval) / 1000) * 1000));
             } catch (IllegalArgumentException e) {
                 Debug.error(fileName + ":FileHandler:BuffTimeArg: " +
                         e.getMessage());

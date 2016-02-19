@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,9 @@
  *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -282,7 +279,7 @@ public class IDPProxyUtil {
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             try {
                 // sessionExpireTime is counted in seconds
-                long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval;
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
                 SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(requestID, new AuthnRequestInfoCopy(reqInfo),
                         sessionExpireTime);
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -371,7 +368,7 @@ public class IDPProxyUtil {
             newRequest.setRequestedAuthnContext(origRequest.
                 getRequestedAuthnContext());
             newRequest.setExtensions(origRequest.getExtensions()); 
-            newRequest.setIssueInstant(newDate());
+            newRequest.setIssueInstant(new Date());
             newRequest.setVersion(SAML2Constants.VERSION_2_0);
             Scoping scoping = origRequest.getScoping(); 
             if (scoping != null) {

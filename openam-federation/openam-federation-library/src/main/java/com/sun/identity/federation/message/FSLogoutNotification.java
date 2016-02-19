@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,13 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSLogoutNotification.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
- *
- * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.Base64;
@@ -85,7 +82,7 @@ public class FSLogoutNotification extends AbstractRequest {
      * Default Constructor.
      */
     public FSLogoutNotification() {
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());
     }
     
     /**
@@ -243,7 +240,7 @@ public class FSLogoutNotification extends AbstractRequest {
     public FSLogoutNotification(String requestId,String providerID,
             NameIdentifier nameId, String relayState)
             throws FSMsgException {
-        setIssueInstant(newDate());
+        setIssueInstant(new Date());
         if ((requestId != null) && (requestId.length() != 0)) {
             requestID = requestId;
         } else {

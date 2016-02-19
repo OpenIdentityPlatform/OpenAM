@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,11 @@
  *
  * $Id: CramMD5MechanismHandler.java,v 1.8 2008/12/16 20:54:03 hengming Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.liberty.ws.authnsvc.mechanism;
 
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
@@ -150,7 +147,7 @@ public class CramMD5MechanismHandler implements MechanismHandler {
             }
         }
         SystemTimerPool.getTimerPool().schedule((TaskRunnable) challengeMap, 
-            new Date(((currentTimeMillis() + challenge_cleanup_interval)
+            new Date(((System.currentTimeMillis() + challenge_cleanup_interval)
             / 1000) * 1000));
     }
 
@@ -391,7 +388,7 @@ public class CramMD5MechanismHandler implements MechanismHandler {
         sb.append(randomIntString).append(".");
 
         // append timestamp
-        sb.append(currentTimeMillis()).append("@");
+        sb.append(System.currentTimeMillis()).append("@");
 
         // append hostname
         sb.append(serverHost).append(">");

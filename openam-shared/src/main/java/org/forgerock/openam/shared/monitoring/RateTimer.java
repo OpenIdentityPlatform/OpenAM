@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.monitoring;
-
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Tiny class to allow us to mock out calls to the current time for
@@ -30,7 +28,7 @@ public class RateTimer {
      * @return The current milliseconds.
      */
     public long now() {
-        return currentTimeMillis();
+        return System.currentTimeMillis();
     }
 
 }

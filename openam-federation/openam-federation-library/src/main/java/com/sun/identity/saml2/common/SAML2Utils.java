@@ -22,12 +22,10 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.saml2.common;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.SystemConfigurationException;
@@ -750,7 +748,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             Date notOnOrAfter = subjectConfData.getNotOnOrAfter();
             if (notOnOrAfter == null ||
                     ((notOnOrAfter.getTime() + timeskew * 1000) <
-                            currentTimeMillis())) {
+                            System.currentTimeMillis())) {
                 if (debug.messageEnabled()) {
                     debug.message(method + "Time in SubjectConfirmationData of "
                             + "Assertion:" + assertionID + " is invalid.");
@@ -768,7 +766,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             Date notBefore = subjectConfData.getNotBefore();
             if (notBefore != null) {
                 if ((notBefore.getTime() + timeskew * 1000) >
-                        currentTimeMillis()) {
+                        System.currentTimeMillis()) {
                     if (debug.messageEnabled()) {
                         debug.message(method + "SubjectConfirmationData included "
                                 + "NotBefore.");
@@ -929,7 +927,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         // SessionNotOnOrAfter
         if (sessionNotOnOrAfter != null) {
             long maxSessionTime = (sessionNotOnOrAfter.getTime() -
-                    currentTimeMillis()) / 60000;
+                    System.currentTimeMillis()) / 60000;
             if (maxSessionTime > 0) {
                 smap.put(SAML2Constants.MAX_SESSION_TIME,
                         new Long(maxSessionTime));
@@ -1778,7 +1776,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             errResp.setInResponseTo(request.getID());
         }
         errResp.setVersion(SAML2Constants.VERSION_2_0);
-        errResp.setIssueInstant(newDate());
+        errResp.setIssueInstant(new Date());
 
         // set the idp entity id as the response issuer
         if (issuerEntityID != null) {

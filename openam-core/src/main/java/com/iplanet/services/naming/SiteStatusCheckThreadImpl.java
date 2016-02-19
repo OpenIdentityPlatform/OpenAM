@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,13 @@
  *
  * $Id: SiteStatusCheckThreadImpl.java,v 1.7 2009/10/16 16:43:08 qcheng Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ */
+
+/**
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.iplanet.services.naming;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -108,7 +109,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
                 checker.check();
             }
             SystemTimer.getTimer().schedule(checker, new Date(((
-                    currentTimeMillis() + urlCheckerSleep) / 1000) * 1000));
+                System.currentTimeMillis() + urlCheckerSleep) / 1000) * 1000));
             synchronized(checker) {
                 try {
                     checker.wait(timeout);
@@ -161,7 +162,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
         public URLStatus() {
             super();
             setStatus(STATUS_UNKNOWN);
-            lastStatusUpdatedTime= getCalendarInstance().getTime();
+            lastStatusUpdatedTime=Calendar.getInstance().getTime();
         }
 
         public int getStatus() {
@@ -171,7 +172,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
         public void setStatus(int status) {
             this.status = status;
             if(getStatus() != STATUS_UNKNOWN) {
-                lastStatusUpdatedTime= getCalendarInstance().getTime();
+                lastStatusUpdatedTime=Calendar.getInstance().getTime();
             }
         }
 
@@ -202,7 +203,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
                     } else {
                         Date t0 = null;
                         if (debug.messageEnabled()) {
-                            t0 = getCalendarInstance().getTime();
+                            t0 = Calendar.getInstance().getTime();
                         }
 
                         HttpURLConnection huc = 
@@ -212,7 +213,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
                         int responseCode = huc.getResponseCode();
                         
                         if (debug.messageEnabled()) {
-                            Date t1 = getCalendarInstance().getTime();
+                            Date t1 = Calendar.getInstance().getTime();
                             long t = t1.getTime() - t0.getTime();
                             debug.message("URLChecker.check() : " +
                                 "Http connection took " + t + " ms");
@@ -284,7 +285,7 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
         }
 
         public int getStatus() {
-            if ((getCalendarInstance().getTimeInMillis() - getUrlStatus()
+            if ((Calendar.getInstance().getTimeInMillis() - getUrlStatus()
                     .getLastStatusUpdatedTime().getTime()) > 
                     urlCheckerInvalidateInterval) {
                 if (debug.messageEnabled()) {

@@ -24,14 +24,13 @@
  *
  * $Id: OpenSSOPrivilege.java,v 1.5 2009/10/07 01:36:55 veiming Exp $
  *
- * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.entitlement.opensso;
 
 import static com.iplanet.am.util.SystemProperties.isServerMode;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.Entitlement;
@@ -100,14 +99,14 @@ public class OpenSSOPrivilege extends Privilege {
 
                         @Override
                         public List<Entitlement> run() throws Exception {
-                            long startTime = currentTimeMillis();
+                            long startTime = System.currentTimeMillis();
 
                             List<Entitlement> entitlements = internalEvaluate(
                                     adminSubject, realm, subject, applicationName,
                                     normalisedResourceName, actionNames, environment, recursive);
 
                             if (MonitoringUtil.isRunning()) {
-                                long duration = currentTimeMillis() - startTime;
+                                long duration = System.currentTimeMillis() - startTime;
                                 policyMonitor.addEvaluation(policyName, duration, realm,
                                         applicationName, normalisedResourceName, subject);
                             }

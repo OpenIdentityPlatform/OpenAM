@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Date;
 
@@ -52,6 +50,6 @@ public class PersistentLicense extends License {
     @Override
     public void accept() {
         super.accept();
-        log.logLicenseAccepted(this, user, newDate());
+        log.logLicenseAccepted(this, user, new Date());
     }
 }

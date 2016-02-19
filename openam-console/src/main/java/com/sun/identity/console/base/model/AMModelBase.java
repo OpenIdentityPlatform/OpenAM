@@ -24,12 +24,10 @@
  *
  * $Id: AMModelBase.java,v 1.18 2009/12/11 23:25:19 veiming Exp $
  *
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -300,7 +298,7 @@ public class AMModelBase
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(currentTimeMillis());
+        sb.append(System.currentTimeMillis());
         sb.append(Base64.encode(keyRandom));
         return(sb.toString().replace('/', '.'));
     }

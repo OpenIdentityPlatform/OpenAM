@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -47,7 +45,7 @@ public class OpenAMResourceOwner implements ResourceOwner {
      * @param amIdentity The resource owner's identity.
      */
     OpenAMResourceOwner(String id, AMIdentity amIdentity) {
-        this(id, amIdentity, currentTimeMillis());
+        this(id, amIdentity, System.currentTimeMillis());
     }
 
     /**

@@ -11,12 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.record;
-
-import static org.forgerock.openam.core.rest.record.RecordStatus.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.json.JsonValue;
 
@@ -46,7 +43,7 @@ public class Record {
      */
     public Record(RecordProperties recordProperties, String folderPath) {
         this.recordProperties = recordProperties;
-        this.recordHistory.put(newDate(), INITIALIZED);
+        this.recordHistory.put(new Date(), RecordStatus.INITIALIZED);
         this.recordStatus = RecordStatus.INITIALIZED;
         this.folderPath = folderPath;
     }
@@ -85,7 +82,7 @@ public class Record {
         if (recordStatus == RecordStatus.RUNNING) {
             throw new IllegalStateException("Record '" + this + "' is already running.");
         }
-        recordHistory.put(newDate(), RUNNING);
+        recordHistory.put(new Date(), RecordStatus.RUNNING);
         recordStatus = RecordStatus.RUNNING;
     }
 
@@ -96,7 +93,7 @@ public class Record {
         if (recordStatus != RecordStatus.RUNNING) {
             return;
         }
-        recordHistory.put(newDate(), STOPPED);
+        recordHistory.put(new Date(), RecordStatus.STOPPED);
         recordStatus = RecordStatus.STOPPED;
     }
 

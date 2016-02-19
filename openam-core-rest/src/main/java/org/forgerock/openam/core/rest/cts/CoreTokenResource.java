@@ -11,12 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.cts;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.text.MessageFormat;
@@ -106,7 +105,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
 
             ResourceResponse resource = newResourceResponse(
                     token.getTokenId(),
-                    String.valueOf(currentTimeMillis()),
+                    String.valueOf(System.currentTimeMillis()),
                     new JsonValue(result));
 
             debug("CREATE by {0}: Stored token with ID: {1}", principal, token.getTokenId());
@@ -139,7 +138,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
 
             ResourceResponse resource = newResourceResponse(
                     tokenId,
-                    String.valueOf(currentTimeMillis()),
+                    String.valueOf(System.currentTimeMillis()),
                     new JsonValue(result));
 
             debug("DELETE by {0}: Deleted token resource with ID: {1}", principal, tokenId);
@@ -174,7 +173,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
             String json = serialisation.serialise(token);
             ResourceResponse response = newResourceResponse(
                     tokenId,
-                    String.valueOf(currentTimeMillis()),
+                    String.valueOf(System.currentTimeMillis()),
                     JsonValueBuilder.toJsonValue(json));
 
             debug("READ by {0}: Read token resource with ID: {1}", principal, tokenId);
@@ -204,7 +203,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
 
             ResourceResponse resource = newResourceResponse(
                     newToken.getTokenId(),
-                    String.valueOf(currentTimeMillis()),
+                    String.valueOf(System.currentTimeMillis()),
                     new JsonValue("Token Updated"));
 
             debug("UPDATE by {0}: Updated token resource with ID: {1}", principal, tokenId);

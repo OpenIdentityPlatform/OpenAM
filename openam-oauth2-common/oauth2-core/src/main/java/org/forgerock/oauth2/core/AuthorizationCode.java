@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -180,7 +178,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return {@code true} if current time is greater than the expiry time.
      */
     public final boolean isExpired() {
-        return currentTimeMillis() > getExpiryTime();
+        return System.currentTimeMillis() > getExpiryTime();
     }
 
     /**
@@ -336,7 +334,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         final Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
         tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                (getExpiryTime() - currentTimeMillis()) / 1000);
+                (getExpiryTime() - System.currentTimeMillis()) / 1000);
         return tokenMap;
     }
 
@@ -347,7 +345,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         final Map<String, Object> tokenInfo = new HashMap<String, Object>();
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                (getExpiryTime() - currentTimeMillis()) / 1000);
+                (getExpiryTime() - System.currentTimeMillis()) / 1000);
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenInfo;
     }

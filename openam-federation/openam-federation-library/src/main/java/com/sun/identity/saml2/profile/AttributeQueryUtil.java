@@ -24,11 +24,9 @@
  *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
- * Portions copyright 2010-2016 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
-
-import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -395,7 +393,7 @@ public class AttributeQueryUtil {
         samlResp.setInResponseTo(attrQuery.getID());
 
         samlResp.setVersion(SAML2Constants.VERSION_2_0);
-        samlResp.setIssueInstant(newDate());
+        samlResp.setIssueInstant(new Date());
     
         Status status = protocolFactory.createStatus();
         StatusCode statusCode = protocolFactory.createStatusCode();
@@ -759,7 +757,7 @@ public class AttributeQueryUtil {
         Assertion assertion = assertionFactory.createAssertion();
         assertion.setID(SAML2Utils.generateID());    
         assertion.setVersion(SAML2Constants.VERSION_2_0);
-        assertion.setIssueInstant(newDate());
+        assertion.setIssueInstant(new Date());
         Issuer issuer = assertionFactory.createIssuer();
         issuer.setValue(attrAuthorityEntityID);
         assertion.setIssuer(issuer);
@@ -1463,7 +1461,7 @@ public class AttributeQueryUtil {
         attrQuery.setIssuer(issuer);
         attrQuery.setID(SAML2Utils.generateID());
         attrQuery.setVersion(SAML2Constants.VERSION_2_0);
-        attrQuery.setIssueInstant(newDate());
+        attrQuery.setIssueInstant(new Date());
 
         List attrs = new ArrayList();
         for (String attributeName : attrsList) {

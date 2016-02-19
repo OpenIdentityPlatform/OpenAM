@@ -27,7 +27,6 @@
 package com.iplanet.am.util;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.AttributeStruct;
@@ -750,7 +749,7 @@ public class SystemProperties {
         PropertiesHolder() {
             this.properties = Collections.emptyMap();
             this.tagSwapValues = Collections.emptyMap();
-            this.lastModified = currentTimeMillis();
+            this.lastModified = System.currentTimeMillis();
         }
 
         PropertiesHolder(final Map<String, String> properties) {
@@ -766,7 +765,7 @@ public class SystemProperties {
             }
             this.properties = Collections.unmodifiableMap(properties);
             this.tagSwapValues = Collections.unmodifiableMap(tagSwapMap);
-            this.lastModified = currentTimeMillis();
+            this.lastModified = System.currentTimeMillis();
         }
 
         String getProperty(String name) {
