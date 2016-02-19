@@ -1,7 +1,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright 2014-2015 ForgeRock AS.
+    Copyright 2014-2016 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -80,7 +80,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
-                                 type="single" syntax="string" i18nKey="princial_mapper_class"
+                                 type="single" syntax="string" i18nKey="principal_mapper_class"
                                  validator="RequiredValueValidator"
                                  resourceName="principalMapperClass">
                     <DefaultValues>
@@ -169,7 +169,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
-                                     type="single" syntax="string" i18nKey="principal_provider_class"
+                                     type="single" syntax="string" i18nKey="account_provider_class"
                                      validator="RequiredValueValidator"
                                      resourceName="accountProviderClass">
                         <DefaultValues>
