@@ -24,9 +24,11 @@
  *
  * $Id: PolicyPrivilegeManager.java,v 1.9 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -277,7 +279,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             privilege.setCreationDate(origPrivilege.getCreationDate());
         }
 
-        Date date = new Date();
+        Date date = newDate();
         privilege.setLastModifiedDate(date.getTime());
 
         Set<Principal> principals = getAdminSubject().getPrincipals();

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: DiscoveryDataCache.java,v 1.2 2008/06/25 05:49:45 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.service.model;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -163,7 +162,7 @@ public class DiscoveryDataCache
 	StringBuilder sb = new StringBuilder(30);
 	byte[] keyRandom = new byte[5];
 	random.nextBytes(keyRandom);
-	sb.append(System.currentTimeMillis());
+	sb.append(currentTimeMillis());
 	sb.append(Base64.encode(keyRandom));
 	return (sb.toString());
     }

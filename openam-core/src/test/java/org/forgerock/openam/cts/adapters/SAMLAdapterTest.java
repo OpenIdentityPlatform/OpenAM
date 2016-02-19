@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
@@ -68,7 +69,7 @@ public class SAMLAdapterTest {
         Token token = new Token(tokenId, TokenType.SAML2);
 
         // SAML tokens only store time to seconds resolution
-        Calendar now = Calendar.getInstance();
+        Calendar now = getCalendarInstance();
         now.set(Calendar.MILLISECOND, 0);
         token.setExpiryTimestamp(now);
 

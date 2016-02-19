@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,14 @@
  *
  * $Id: AuthSchemeCondition.java,v 1.6 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
- */
-/*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 
 
 package com.sun.identity.policy.plugins;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.policy.interfaces.Condition;
@@ -347,7 +347,7 @@ public class AuthSchemeCondition implements Condition {
         long timeToLive = Long.MAX_VALUE;
 
         //following additions are to support application idle timeout
-        long currentTimeMillis = System.currentTimeMillis(); 
+        long currentTimeMillis = currentTimeMillis();
         Set expiredAuthSchemes = new HashSet(); //a collector
         if (appIdleTimeoutEnabled) {
             if (allowed) { //condition satisfied pending idletimeout check

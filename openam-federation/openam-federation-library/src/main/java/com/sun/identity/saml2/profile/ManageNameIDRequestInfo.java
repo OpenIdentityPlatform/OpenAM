@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,13 @@
  *
  * $Id: ManageNameIDRequestInfo.java,v 1.4 2009/11/20 21:41:16 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Map;
 
@@ -75,7 +78,7 @@ public class ManageNameIDRequestInfo extends CacheObject {
         this.paramsMap = paramsMap;
         this.request = request;
         this.response = response;
-        time = System.currentTimeMillis();
+        time = currentTimeMillis();
         oldSession = session;
     }
 

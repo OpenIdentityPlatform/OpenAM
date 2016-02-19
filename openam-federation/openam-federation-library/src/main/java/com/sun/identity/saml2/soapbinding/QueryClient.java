@@ -24,9 +24,11 @@
  *
  * $Id: QueryClient.java,v 1.9 2009/10/29 00:19:21 madan_ranganath Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.soapbinding;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -151,7 +153,7 @@ public class QueryClient {
                 String requestID = SAML2SDKUtils.generateID();
                 xacmlQuery.setID(requestID);
                 xacmlQuery.setVersion(SAML2Constants.VERSION_2_0);
-                xacmlQuery.setIssueInstant(new Date());
+                xacmlQuery.setIssueInstant(newDate());
 
                 XACMLPDPConfigElement pdpConfig = getPDPConfig(realm,
                                                                pdpEntityID);

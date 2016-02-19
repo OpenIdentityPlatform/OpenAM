@@ -24,7 +24,7 @@
  *
  * $Id: LogWriter.java,v 1.3 2008/06/25 05:42:09 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -34,6 +34,7 @@ import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.
 import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -174,7 +175,7 @@ public class LogWriter {
         }
 
         JsonValue eventJson = builder.transactionId(CommandManager.TRANSACTION_ID.getValue())
-                .timestamp(System.currentTimeMillis())
+                .timestamp(currentTimeMillis())
                 .userId(ssoToken.getPrincipal().getName())
                 .trackingIdFromSSOToken(ssoToken)
                 .component(AuditConstants.Component.SSOADM)

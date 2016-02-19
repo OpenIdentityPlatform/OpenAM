@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,14 @@
  *
  * $Id: CorrelationHeader.java,v 1.3 2008/06/25 05:47:22 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.liberty.ws.soapbinding; 
 
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.text.ParseException;
 
@@ -64,7 +67,7 @@ public class CorrelationHeader {
     public CorrelationHeader() {
         messageID = SAMLUtils.generateID();
         id = messageID;
-        timestamp = new Date();
+        timestamp = newDate();
         actor = SOAPBindingConstants.DEFAULT_SOAP_ACTOR;
         mustUnderstand = Boolean.TRUE;
     }

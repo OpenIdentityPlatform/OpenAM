@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
@@ -65,7 +66,7 @@ public class DefaultSubjectProviderTest {
     public void testBearerStateSettings() throws TokenCreationException {
         SubjectProvider subjectProvider =
                 new DefaultSubjectProvider(Guice.createInjector(new MyModule()).getInstance(KeyInfoFactory.class));
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         ProofTokenState proof = null; //must be set only when SubjectConfirmation is HoK
         Subject subject = subjectProvider.get(SUBJECT_ID, AUDIENCE_ID, createSAML2Config(),
                 SAML2SubjectConfirmation.BEARER, issueInstant, proof);
@@ -82,7 +83,7 @@ public class DefaultSubjectProviderTest {
     public void testHoKSubjectConfirmation() throws Exception {
         SubjectProvider subjectProvider =
                 new DefaultSubjectProvider(Guice.createInjector(new MyModule()).getInstance(KeyInfoFactory.class));
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         Subject subject = subjectProvider.get(SUBJECT_ID, AUDIENCE_ID, createSAML2Config(),
                 SAML2SubjectConfirmation.HOLDER_OF_KEY, issueInstant, getProofState());
         assertEquals(SUBJECT_ID, subject.getNameID().getValue());

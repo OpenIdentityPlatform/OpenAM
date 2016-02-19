@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: PageTrailManager.java,v 1.3 2008/07/10 23:27:22 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.base;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.console.base.model.AMAdminConstants;
@@ -156,7 +155,7 @@ public class PageTrailManager
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(System.currentTimeMillis());
+        sb.append(currentTimeMillis());
         sb.append(Base64.encode(keyRandom));
         return (sb.toString());
     }

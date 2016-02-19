@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,14 @@
  *
  * $Id: AuthThreadManager.java,v 1.4 2008/06/25 05:42:04 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 
 package com.sun.identity.authentication.service;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -111,7 +114,7 @@ public class AuthThreadManager extends Thread   {
      * @return <code>true</code> if the thread is timed out. 
      */
     public boolean isLoginTimeout(long lastCallbackSent, long timeout) {
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         long timeoutVal = lastCallbackSent + (timeout -3) * 1000;
         return (timeoutVal < now);
     }

@@ -24,10 +24,12 @@
  *
  * $Id: SPCache.java,v 1.5 2009/12/14 23:42:48 mallas Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -71,7 +73,7 @@ public class SPCache {
         assertionByIDCache = new PeriodicCleanUpMap(interval * 1000,
                                  interval * 1000);
         SystemTimerPool.getTimerPool().schedule(assertionByIDCache,
-                new Date(System.currentTimeMillis() + interval * 1000));
+                new Date(currentTimeMillis() + interval * 1000));
     }
 
     private SPCache() {

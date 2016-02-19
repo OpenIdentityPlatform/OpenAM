@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,13 @@
  *
  * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.password.ui.model;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -404,7 +406,7 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
         if ((accountLife != null) && (accountLife.length() > 0)) {
             Date expDate = Locale.parseNormalizedDateString(accountLife);
             if (expDate != null) {
-                expired = expDate.before(new Date());
+                expired = expDate.before(newDate());
             }
         }
         return expired;

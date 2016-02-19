@@ -1,22 +1,23 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2015-2016 ForgeRock AS.
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015-2016 ForgeRock AS.
+ */
 package org.forgerock.openam.authentication.modules.saml2;
 
 import static com.sun.identity.shared.Constants.*;
 import static org.forgerock.openam.authentication.modules.saml2.Constants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
@@ -255,7 +256,7 @@ public class SAML2 extends AMLoginModule {
             throws SAML2Exception {
 
         final long sessionExpireTimeInSeconds
-                = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + SPCache.interval;
+                = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) + SPCache.interval;
         final String key = authnRequest.getID();
 
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {

@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.core.rest.record;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.services.util.ConfigurableKey;
@@ -292,7 +294,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_UID);
 
                 String xmlName = RecordConstants.OPENAM_CONFIG_EXPORT_FILE_NAME.replace("$DATE$", dateFormat.format
-                        (new Date()));
+                        (newDate()));
 
                 File file = new File(currentRecord.getFolderPath() + File.separator + xmlName);
                 PrintWriter printWriter = new PrintWriter(new FileWriter(file, false), true);
@@ -405,7 +407,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
 
         if (record.getRecordProperties().isZipEnabled()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_UID);
-            String zipArchiveName = record.getFolderPath() + "_" + dateFormat.format(new Date()) + ".zip";
+            String zipArchiveName = record.getFolderPath() + "_" + dateFormat.format(newDate()) + ".zip";
             try {
                 ZipUtils.generateZip(record.getFolderPath(), zipArchiveName);
                 delete(record.getFolderPath());
@@ -454,7 +456,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
             } catch (IOException | ParseException | JsonValueException e) {
                 debug.error("Can't extract starting date from previous record. We will use the current date instead",
                         e);
-                previousRecordDate = new Date();
+                previousRecordDate = newDate();
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_UID);
             dir.renameTo(new File(debugDirectory + "_" + dateFormat.format(previousRecordDate)));
@@ -508,7 +510,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_UID);
                 String threadDumpFileName = RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator +
-                        RecordConstants.TREADS_DUMP_FILE_NAME.replace("$DATE$", dateFormat.format(new Date()));
+                        RecordConstants.TREADS_DUMP_FILE_NAME.replace("$DATE$", dateFormat.format(newDate()));
 
                 try {
                     PrintWriter printWriterThreadsDump = getPrintWriterForFile(currentRecord, threadDumpFileName);

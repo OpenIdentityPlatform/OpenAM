@@ -24,10 +24,12 @@
  *
  * $Id: WebServiceAuthenticatorImpl.java,v 1.4 2008/08/06 17:29:25 exu Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.soapbinding;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -212,7 +214,7 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
                 attrs, CACHE_TIME, DEFAULT_CACHE_TIME, debug));
             is.putProperty(AUTH_TYPE_PROP,
                     message.getAuthenticationMechanism());
-            authInstant = DateUtils.toUTCDateFormat(new Date());
+            authInstant = DateUtils.toUTCDateFormat(newDate());
             is.putProperty(AUTH_INSTANT_PROP, authInstant);
             
             ssoToken = SSOTokenManager.getInstance()

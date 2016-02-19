@@ -24,11 +24,13 @@
  *
  * $Id: IDPSSOUtil.java,v 1.56 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.NameIDInfo;
@@ -839,7 +841,7 @@ public class IDPSSOUtil {
             res.setInResponseTo(authnReq.getID());
         }
         res.setVersion(SAML2Constants.VERSION_2_0);
-        res.setIssueInstant(new Date());
+        res.setIssueInstant(newDate());
         res.setID(SAML2Utils.generateID());
 
         // set the idp entity id as the response issuer
@@ -887,7 +889,7 @@ public class IDPSSOUtil {
         String assertionID = SAML2Utils.generateID();
         assertion.setID(assertionID);
         assertion.setVersion(SAML2Constants.VERSION_2_0);
-        assertion.setIssueInstant(new Date());
+        assertion.setIssueInstant(newDate());
         Issuer issuer = AssertionFactory.getInstance().createIssuer();
         issuer.setValue(idpEntityID);
 
@@ -1103,7 +1105,7 @@ public class IDPSSOUtil {
         //  Save to SAML2 Token Repository
         try {
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
+                long sessionExpireTime = currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
                 SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex, new IDPSessionCopy(idpSession),
                         sessionExpireTime);
             }
@@ -1164,7 +1166,7 @@ public class IDPSSOUtil {
                     SAML2Utils.bundle.getString("errorGettingAuthnStatement"));
         }
         if (authInstant == null) {
-            authInstant = new Date();
+            authInstant = newDate();
         }
         authnStatement.setAuthnInstant(authInstant);
 
@@ -1652,7 +1654,7 @@ public class IDPSSOUtil {
             scd.setInResponseTo(inResponseTo);
         }
 
-        Date date = new Date();
+        Date date = newDate();
         date.setTime(date.getTime() + effectiveTime * 1000);
         scd.setNotOnOrAfter(date);
         sc.setSubjectConfirmationData(scd);
@@ -1676,11 +1678,11 @@ public class IDPSSOUtil {
 
         Conditions conditions = AssertionFactory.getInstance().
                 createConditions();
-        Date date = new Date();
+        Date date = newDate();
         date.setTime(date.getTime() - notBeforeSkewTime * 1000);
         conditions.setNotBefore(date);
 
-        date = new Date();
+        date = newDate();
         date.setTime(date.getTime() + effectiveTime * 1000);
         conditions.setNotOnOrAfter(date);
 
@@ -2845,7 +2847,7 @@ public class IDPSSOUtil {
         List assertions = response.getAssertion();
         if ((assertions == null) || (assertions.size() == 0)) {
             // failed case
-            return (System.currentTimeMillis()
+            return (currentTimeMillis()
                     + getEffectiveTime(realm, idpEntityID)
                     + timeskew * 1000);
         }
@@ -2859,7 +2861,7 @@ public class IDPSSOUtil {
 
         long ret = notOnOrAfter.getTime() + timeskew * 1000;
         if (notOnOrAfter == null ||
-                (ret < System.currentTimeMillis())) {
+                (ret < currentTimeMillis())) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("Time in Assertion "
                         + " is invalid.");

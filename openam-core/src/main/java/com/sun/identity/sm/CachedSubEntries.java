@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: CachedSubEntries.java,v 1.10 2008/07/11 01:46:21 arviranga Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -95,8 +97,8 @@ public class CachedSubEntries {
                     "cache: " + subEntries);
             }
             // Check if cached entries can be used
-            if (CachedSMSEntry.ttlEnabled && ((System.currentTimeMillis() -
-                lastUpdated) > CachedSMSEntry.ttl)) {
+            if (CachedSMSEntry.ttlEnabled && ((currentTimeMillis() -
+                    lastUpdated) > CachedSMSEntry.ttl)) {
                 // Clear the cache
                 ssoTokenToSubEntries.clear();
             } else {
@@ -110,7 +112,7 @@ public class CachedSubEntries {
             Set answer = new LinkedHashSet(subEntries);
             ssoTokenToSubEntries.put(tokenID, answer);
             subEntries = new LinkedHashSet(answer);
-            lastUpdated = System.currentTimeMillis();
+            lastUpdated = currentTimeMillis();
         }
         if (debug.messageEnabled()) {
             debug.message("CachedSubEntries:getSubEntries Entries from " +

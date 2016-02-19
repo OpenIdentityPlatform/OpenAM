@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -27,11 +27,13 @@
  */
 
 /*
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service.cluster;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
@@ -261,7 +263,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             // to ensure that ordering in different server instances is identical
             Arrays.sort(serverSelectionList);
             SystemTimer.getTimer().schedule(this, new Date((
-                    System.currentTimeMillis() / 1000) * 1000));
+                    currentTimeMillis() / 1000) * 1000));
         } // End of Synchronized Block.
     }
 

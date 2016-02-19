@@ -59,6 +59,7 @@ import java.util.Set;
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
 import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 /**
  * @since 12.0.0
@@ -294,7 +295,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
                 final SubjectConfirmationData subjectConfirmationData = subjectConfirmation.getSubjectConfirmationData();
                 if (subjectConfirmationData == null) {
                     continue;
-                } else if (subjectConfirmationData.getNotOnOrAfter().before(new Date())
+                } else if (subjectConfirmationData.getNotOnOrAfter().before(newDate())
                         && subjectConfirmationData.getRecipient().equalsIgnoreCase(deploymentURL)) {
                     found = true;
                 }

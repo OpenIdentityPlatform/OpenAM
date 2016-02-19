@@ -24,10 +24,12 @@
  *
  * $Id: ConfigFedMonitoring.java,v 1.2 2009/10/29 00:03:51 exu Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.configuration;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -105,7 +107,7 @@ public class ConfigFedMonitoring {
      */
     public void configureFedMonitoring() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date1 = new Date();
+        Date date1 = newDate();
         String startDate = sdf.format(date1);
         debug = Debug.getInstance("amMonitoring");
         String classMethod = "ConfigFedMonitoring.configureMonitoring: ";
@@ -131,7 +133,7 @@ public class ConfigFedMonitoring {
 
         //  now all the realms' federation configs
         getAllRealms("/");
-        date1 = new Date();
+        date1 = newDate();
         if (debug.messageEnabled()) {
             debug.message(classMethod + "\n" +
                 "    Start time " + startDate + "\n" +

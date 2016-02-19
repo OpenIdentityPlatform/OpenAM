@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.entitlement.indextree.events.ErrorEventType;
@@ -163,7 +165,7 @@ public class IndexChangeManagerImpl implements IndexChangeManager, IndexChangeOb
                 // Failed to start monitor, reschedule to try again.
                 scheduler.schedule(tryAgainTask, RETRY_DELAY, DELAY_UNIT);
 
-                long now = System.currentTimeMillis();
+                long now = currentTimeMillis();
 
                 if (lastLog == 0 || now - lastLog > LOG_DURATION) {
                     // Log every 60 seconds.

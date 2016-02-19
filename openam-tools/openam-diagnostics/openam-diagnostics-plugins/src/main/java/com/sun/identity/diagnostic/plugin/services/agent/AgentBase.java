@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: AgentBase.java,v 1.1 2008/11/22 02:41:19 ak138937 Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.diagnostic.plugin.services.agent;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,7 +55,7 @@ public abstract class AgentBase extends ClientBase implements AgentConstants {
      SimpleDateFormat dateFormat =
          new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
      dateFormat.setTimeZone(new SimpleTimeZone(0, "GMT"));
-     Date date = new Date();
+     Date date = newDate();
      return dateFormat.format(date);
  }
  

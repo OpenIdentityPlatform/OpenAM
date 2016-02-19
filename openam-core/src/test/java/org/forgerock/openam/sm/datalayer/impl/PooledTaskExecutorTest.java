@@ -18,6 +18,7 @@ package org.forgerock.openam.sm.datalayer.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 
 import javax.inject.Provider;
@@ -90,11 +91,11 @@ public class PooledTaskExecutorTest {
         debug("Tasks 1 and 2 should now be executing and will shortly be blocked - starting task 3");
         task3.start();
 
-        long timeout = System.currentTimeMillis() + 5000;
+        long timeout = currentTimeMillis() + 5000;
         while (!semaphore.hasQueuedThreads()) {
             debug("Waiting for task 3 to be queued on semaphore");
             Thread.sleep(50);
-            if (System.currentTimeMillis() > timeout) {
+            if (currentTimeMillis() > timeout) {
                 fail("Where did my thread go?");
             }
         }

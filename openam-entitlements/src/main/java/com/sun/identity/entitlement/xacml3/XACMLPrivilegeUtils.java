@@ -24,10 +24,12 @@
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.entitlement.xacml3;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
@@ -872,13 +874,13 @@ public class XACMLPrivilegeUtils {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String currentTime = sdf.format(System.currentTimeMillis());
+        String currentTime = sdf.format(currentTimeMillis());
         String policySetId  = realm + ":" + currentTime;
 
         policySet.setPolicySetId(policySetId);
 
         Version version = new Version();
-        version.setValue(sdf.format(System.currentTimeMillis()));
+        version.setValue(sdf.format(currentTimeMillis()));
         policySet.setVersion(version);
 
         // FIXME: is there a better choice?
@@ -898,13 +900,13 @@ public class XACMLPrivilegeUtils {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String currentTime = sdf.format(System.currentTimeMillis());
+        String currentTime = sdf.format(currentTimeMillis());
         String policySetId  = realm + ":" + currentTime;
 
         policySet.setPolicySetId(policySetId);
 
         Version version = new Version();
-        version.setValue(sdf.format(System.currentTimeMillis()));
+        version.setValue(sdf.format(currentTimeMillis()));
         policySet.setVersion(version);
 
         // FIXME: is there a better choice?

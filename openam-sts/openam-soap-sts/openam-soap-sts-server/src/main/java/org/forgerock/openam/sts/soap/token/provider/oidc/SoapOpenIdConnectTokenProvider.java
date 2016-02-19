@@ -11,10 +11,12 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.oidc;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -201,7 +203,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
             String token;
             try {
                 token = getAssertion(getValidationInvocationContext(tokenProviderParameters), authNContextClassRef,
-                        authNMethodsReferences, System.currentTimeMillis() / 1000, NULL_NONCE);
+                        authNMethodsReferences, currentTimeMillis() / 1000, NULL_NONCE);
                 Element tokenElement = buildTokenElement(token);
                 tokenProviderResponse.setToken(tokenElement);
                 tokenProviderResponse.setTokenId(getTokenId(token));

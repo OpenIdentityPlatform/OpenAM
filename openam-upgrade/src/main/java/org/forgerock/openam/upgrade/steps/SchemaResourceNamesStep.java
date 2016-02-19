@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.sm.SMSUtils.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
@@ -122,11 +123,11 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
         for (Map.Entry<String, Function<Document, Boolean, XPathExpressionException>> service :
                 serviceModifications.entrySet()) {
             try {
-                long startTime = System.currentTimeMillis();
+                long startTime = currentTimeMillis();
                 UpgradeProgress.reportStart(PROGRESS, service.getKey());
                 DEBUG.message("Found resource names for {}. Applying now.", service.getKey());
                 new ServiceSchemaManager(service.getKey(), getAdminToken()).modifySchema(service.getValue());
-                DEBUG.message("Completed ({}ms)", System.currentTimeMillis() - startTime);
+                DEBUG.message("Completed ({}ms)", currentTimeMillis() - startTime);
                 UpgradeProgress.reportEnd("upgrade.success");
             } catch (XPathExpressionException | SMSException | SSOException e) {
                 throw new UpgradeException(e);

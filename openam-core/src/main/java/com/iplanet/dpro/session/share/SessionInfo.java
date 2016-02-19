@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: SessionInfo.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.share;
+
+import static java.util.concurrent.TimeUnit.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -240,12 +240,12 @@ public class SessionInfo {
         if (isNeverExpiring()) {
             return 0;
         } else {
-            return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - lastActivityTime);
+            return TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis() - lastActivityTime);
         }
     }
 
     public void setTimeIdle(final long timeidle) {
-        this.lastActivityTime = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(timeidle);
+        this.lastActivityTime = currentTimeMillis() - SECONDS.toMillis(timeidle);
     }
 
     /**
@@ -256,12 +256,12 @@ public class SessionInfo {
         if (isNeverExpiring()) {
             return Long.MAX_VALUE;
         } else {
-            return TimeUnit.MILLISECONDS.toSeconds(expiryTime - System.currentTimeMillis());
+            return TimeUnit.MILLISECONDS.toSeconds(expiryTime - currentTimeMillis());
         }
     }
 
     public void setTimeLeft(final long timeleft) {
-        expiryTime = TimeUnit.SECONDS.toMillis(timeleft) + System.currentTimeMillis();
+        expiryTime = SECONDS.toMillis(timeleft) + currentTimeMillis();
         // Check for overflow - expiryTime should always be positive
         if (expiryTime < 0) {
             expiryTime = Long.MAX_VALUE;

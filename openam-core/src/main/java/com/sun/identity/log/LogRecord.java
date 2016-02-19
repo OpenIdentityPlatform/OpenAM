@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: LogRecord.java,v 1.7 2009/03/05 22:55:37 veiming Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.log;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.log.spi.Debug;
@@ -126,7 +129,7 @@ public class LogRecord extends java.util.logging.LogRecord
                    ipAddress);
             }
         }
-        Date date = new Date();
+        Date date = newDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         /*
          * these are the compulsory fields ... to be logged even if there are

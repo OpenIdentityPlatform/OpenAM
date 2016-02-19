@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: LibSecurityTokenProvider.java,v 1.3 2008/08/06 17:28:11 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.security;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -527,8 +530,8 @@ public class LibSecurityTokenProvider implements SecurityTokenProvider {
             }
         }
 
-        
-        Date issueInstant = new Date();
+
+        Date issueInstant = newDate();
         try {
             if (recipientProviderID != null) {
                 List audience = new ArrayList();

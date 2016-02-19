@@ -24,10 +24,12 @@
  *
  * $Id: SMSJAXRPCObject.java,v 1.21 2009/10/28 04:24:26 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm.jaxrpc;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.client.NotificationHandler;
@@ -585,7 +587,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
             NotificationRunnable nr = new NotificationRunnable(
                     cachePollingInterval);
             SystemTimerPool.getTimerPool().schedule(nr, new Date(
-                    ((System.currentTimeMillis() + nr.getRunPeriod()) / 1000)
+                    ((currentTimeMillis() + nr.getRunPeriod()) / 1000)
                     * 1000));
         } else {
             if (debug.warningEnabled()) {

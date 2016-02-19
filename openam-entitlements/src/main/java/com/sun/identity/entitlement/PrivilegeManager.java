@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
@@ -214,7 +215,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     @Override
     public void add(Privilege privilege) throws EntitlementException {
         validate(privilege);
-        Date date = new Date();
+        Date date = newDate();
         privilege.setCreationDate(date.getTime());
         privilege.setLastModifiedDate(date.getTime());
 

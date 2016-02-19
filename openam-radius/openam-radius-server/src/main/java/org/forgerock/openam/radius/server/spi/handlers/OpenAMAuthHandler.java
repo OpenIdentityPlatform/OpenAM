@@ -12,8 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package org.forgerock.openam.radius.server.spi.handlers;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -439,7 +442,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             }
             // update the
             holder.setMillisExpiryForCurrentCallbacks(1000L * pp.getTimeOutValue());
-            holder.setMillisExpiryPoint(System.currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
+            holder.setMillisExpiryPoint(currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
         } else {
             LOG.error("Callback at index 0 is not of type PagePropertiesCallback!!!");
             rejectAccessAndTerminateProcess(response, holder);
@@ -616,7 +619,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             return false;
         }
         // reset the timeout since we just received confirmation that the user is still there.
-        holder.setMillisExpiryPoint(System.currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
+        holder.setMillisExpiryPoint(currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
         return true;
     }
 

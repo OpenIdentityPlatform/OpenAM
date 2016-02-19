@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
@@ -94,7 +95,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
                 RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
         Request request = new Request();
-        request.setDate(new Date());
+        request.setDate(newDate());
         Response response = new Response(request);
         request.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
@@ -117,7 +118,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
                 RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
         Request request = new Request();
-        request.setDate(new Date());
+        request.setDate(newDate());
         Response response = new Response(request);
         response.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: SubjectEvaluationCache.java,v 1.4 2008/06/25 05:43:45 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -138,7 +137,7 @@ public class SubjectEvaluationCache {
             String subjectId = ldapServer+":"+valueDN;            
             Long[] elem = new Long[2];
             synchronized (subjectEvaluationCache) {
-                elem[0] = System.currentTimeMillis() + getSubjectEvalTTL();
+                elem[0] = currentTimeMillis() + getSubjectEvalTTL();
                 elem[1] = (member == true) ? Long.valueOf(1) : Long.valueOf(0);
                 Map<String, Long[]> subjectEntries = subjectEvaluationCache.get(tokenID);
                 if (subjectEntries != null) {
@@ -174,7 +173,7 @@ public class SubjectEvaluationCache {
                 Long[] element = subjectEntries.get(subjectId);
                 if (element != null) {
                     long timeToLive = element[0].longValue();
-                    long currentTime = System.currentTimeMillis();
+                    long currentTime = currentTimeMillis();
                     if (timeToLive > currentTime) {
                         if (DEBUG.messageEnabled()) {
                             DEBUG.message("SubjectEvaluationCache.isMember():"

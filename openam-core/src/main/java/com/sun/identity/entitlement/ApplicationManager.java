@@ -28,10 +28,10 @@
  */
 package com.sun.identity.entitlement;
 
-import static com.sun.identity.entitlement.EntitlementException.MODIFY_APPLICATION_FAIL;
-import static com.sun.identity.entitlement.EntitlementException.PERMISSION_DENIED;
+import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
-import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -392,7 +392,7 @@ public final class ApplicationManager {
     }
 
     private static void setApplicationMetaData(Subject adminSubject, String realm, Application application) {
-        Date date = new Date();
+        Date date = newDate();
         Set<Principal> principals = adminSubject.getPrincipals();
         String principalName = isNotEmpty(principals) ? principals.iterator().next().getName() : null;
         if (application.getCreationDate() == -1) {

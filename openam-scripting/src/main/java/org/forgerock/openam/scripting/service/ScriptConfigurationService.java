@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting.service;
 
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.ScriptException.createAndLogDebug;
 import static org.forgerock.openam.scripting.ScriptException.createAndLogError;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -126,7 +127,7 @@ public class ScriptConfigurationService implements ScriptingService {
     }
 
     private ScriptConfiguration setMetaData(ScriptConfiguration config) throws ScriptException {
-        final long now = new Date().getTime();
+        final long now = newDate().getTime();
         final String principalName = SubjectUtils.getPrincipalId(subject);
         final ScriptConfiguration.Builder builder = config.populatedBuilder();
 

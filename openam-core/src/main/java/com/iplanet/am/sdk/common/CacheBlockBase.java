@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -26,7 +26,10 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
+
 package com.iplanet.am.sdk.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.sdk.AMObject;
@@ -142,13 +145,13 @@ public abstract class CacheBlockBase {
 
     private void setLastModifiedTime() {
         if (isEntryExpirationEnabled()) { // First time setup
-            lastModifiedTime = System.currentTimeMillis();
+            lastModifiedTime = currentTimeMillis();
         }
     }
 
     private void updateLastModifiedTime() {
         if (isEntryExpirationEnabled() && isExpired) {
-            lastModifiedTime = System.currentTimeMillis();
+            lastModifiedTime = currentTimeMillis();
             isExpired = false;
         }
     }
@@ -222,7 +225,7 @@ public abstract class CacheBlockBase {
                 expirationTime = getDefaultEntryExpirationTime();
                 break;
             }
-            long elapsedTime = System.currentTimeMillis() - lastModifiedTime;
+            long elapsedTime = currentTimeMillis() - lastModifiedTime;
             if (elapsedTime >= expirationTime) { // Expired
                 // Send notifications first to the SDK listeners
                 isExpired = true;

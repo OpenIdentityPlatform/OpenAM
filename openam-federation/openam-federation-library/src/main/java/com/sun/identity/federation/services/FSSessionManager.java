@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,13 @@
  *
  * $Id: FSSessionManager.java,v 1.6 2009/08/03 18:18:36 bigfatrat Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.federation.services;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.Constants;
@@ -586,7 +589,7 @@ public final class FSSessionManager {
             cRunnable = new FSRequestCleanUpRunnable(idAuthnRequestMap,
                 idDestnMap, cleanupInterval, requestTimeout);
             SystemTimerPool.getTimerPool().schedule(cRunnable, new Date(
-                ((System.currentTimeMillis() + cleanupInterval) / 1000) *
+                ((currentTimeMillis() + cleanupInterval) / 1000) *
                 1000));
         }
     }

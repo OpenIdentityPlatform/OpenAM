@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: SecureTimestampGenerator.java,v 1.4 2008/06/25 05:43:40 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.log.spi;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -55,7 +54,7 @@ public class SecureTimestampGenerator implements ITimestampGenerator {
      * @return generated time stamp.
      */
     public String getTimestamp() {
-        Date date = new Date();
+        Date date = newDate();
         return sdf.format(date);
     }
 }

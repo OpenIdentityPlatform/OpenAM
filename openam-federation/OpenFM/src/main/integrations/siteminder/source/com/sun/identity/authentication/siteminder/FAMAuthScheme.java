@@ -24,7 +24,7 @@
  *
  * $Id: FAMAuthScheme.java,v 1.5 2008/08/19 19:11:40 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.siteminder;
@@ -331,7 +331,7 @@ public class FAMAuthScheme implements SmAuthScheme {
         // in the "PIN" user property as a printable date&time string.
 
         String timeString = DateFormat.getDateTimeInstance(
-               DateFormat.MEDIUM,DateFormat.MEDIUM).format(new Date());
+               DateFormat.MEDIUM,DateFormat.MEDIUM).format(org.forgerock.openam.utils.Time.newDate());
 
         // put single quotes around the string if the user directory is "ODBC:"
         String theNameSpace = theUserContext.getDirNameSpace();

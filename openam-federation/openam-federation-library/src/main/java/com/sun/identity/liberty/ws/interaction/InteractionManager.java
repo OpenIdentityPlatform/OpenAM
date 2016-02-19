@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: InteractionManager.java,v 1.5 2008/08/06 17:28:10 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.interaction;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.common.SystemTimerPool;
@@ -1252,7 +1255,7 @@ public class InteractionManager {
                         + CACHE_ENTRY_MAX_IDLE_TIME);
             }
             SystemTimerPool.getTimerPool().schedule((TaskRunnable) cache,
-                new Date(((System.currentTimeMillis() + SWEEP_INTERVAL) / 1000)
+                new Date(((currentTimeMillis() + SWEEP_INTERVAL) / 1000)
                 * 1000));
             if (debug.messageEnabled()) {
                 debug.message("InteactionCache.InteractionCache() "

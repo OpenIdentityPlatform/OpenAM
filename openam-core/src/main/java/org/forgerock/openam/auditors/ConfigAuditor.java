@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.auditors;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOToken;
@@ -75,7 +76,7 @@ public abstract class ConfigAuditor {
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.objectId = objectId;
-        this.startTime = System.currentTimeMillis();
+        this.startTime = currentTimeMillis();
         this.filters = filters;
         this.runAs = runAs;
 

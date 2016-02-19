@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -70,10 +71,10 @@ public class DevicePrintDaoTest {
         List<Map<String, Object>> profiles = new ArrayList<Map<String, Object>>();
         Map<String, Object> profileOne = new HashMap<String, Object>();
         profileOne.put("uuid", "UUID1");
-        profileOne.put("lastSelectedDate", new Date(new Date().getTime() - 172800));
+        profileOne.put("lastSelectedDate", new Date(newDate().getTime() - 172800));
         Map<String, Object> profileTwo = new HashMap<String, Object>();
         profileTwo.put("uuid", "UUID2");
-        profileTwo.put("lastSelectedDate", new Date(new Date().getTime() - 86400));
+        profileTwo.put("lastSelectedDate", new Date(newDate().getTime() - 86400));
         profiles.add(profileOne);
         profiles.add(profileTwo);
 

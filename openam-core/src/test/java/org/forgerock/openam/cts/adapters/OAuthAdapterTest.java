@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import static java.util.TimeZone.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.testng.Assert.assertEquals;
@@ -123,7 +125,7 @@ public class OAuthAdapterTest {
         // Then
         // The result timezone is set to local time.
         // Convert this timestamp to a known timezone.
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+        Calendar c = getCalendarInstance(getTimeZone("Europe/London"));
         c.setTimeInMillis(result.getTimeInMillis());
 
         // Wed, 05 Jun 2013 10:48:41 BST

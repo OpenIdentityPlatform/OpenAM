@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -22,11 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * 
- *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.fedlet.ag;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.*;
@@ -67,7 +68,7 @@ public class AssertionGen {
             res.setAssertion(assertionList);
             res.setID(SAML2Utils.generateID());
             res.setVersion(SAML2Constants.VERSION_2_0);
-            res.setIssueInstant(new Date());
+            res.setIssueInstant(newDate());
 
             scode.setValue(SAML2Constants.SUCCESS);
             status.setStatusCode(scode);
@@ -101,7 +102,7 @@ public class AssertionGen {
         try {
             assertion.setID(SAML2Utils.generateID());
             assertion.setVersion(SAML2Constants.VERSION_2_0);
-            assertion.setIssueInstant(new Date());
+            assertion.setIssueInstant(newDate());
             
             Issuer issuer = AssertionFactory.getInstance().createIssuer();
             issuer.setValue(IDPEntityID);
@@ -164,7 +165,7 @@ public class AssertionGen {
 
             authnContext.setAuthnContextClassRef(SAML2Constants.CLASSREF_PASSWORD_PROTECTED_TRANSPORT);
             authnStatement.setAuthnContext(authnContext);
-            authnStatement.setAuthnInstant(new Date());
+            authnStatement.setAuthnInstant(newDate());
             
             authnStatement.setSessionIndex("session_index");
             AuthStatementList.add(authnStatement);
@@ -197,7 +198,7 @@ public class AssertionGen {
             sc.setMethod(SAML2Constants.SUBJECT_CONFIRMATION_METHOD_BEARER);
             
             int effectiveTime = SAML2Constants.ASSERTION_EFFECTIVE_TIME;
-            Date date = new Date();
+            Date date = newDate();
             date.setTime(date.getTime() + effectiveTime * 1000);
                 
 
@@ -226,7 +227,7 @@ public class AssertionGen {
         List ARList = new ArrayList();
         try {
 
-            conditions.setNotBefore(new Date());
+            conditions.setNotBefore(newDate());
             SPIDList.add(SPEntityID);
             ar.setAudience(SPIDList);
             ARList.add(ar);

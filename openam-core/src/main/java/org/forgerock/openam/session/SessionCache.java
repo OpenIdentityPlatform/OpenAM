@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session;
@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.forgerock.openam.session.SessionConstants.DESTROYED;
+import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Responsible for providing a single point of contact for all Sessions stored in memory.
@@ -128,7 +129,7 @@ public class SessionCache {
         Session session = readSession(sid);
         if (session != null) {
 
-            long eventTime = System.currentTimeMillis();
+            long eventTime = currentTimeMillis();
 
             // remove from sessionTable if there is no purge delay or it has elapsed
             if (session.getPurgeAt() <= eventTime) {
@@ -189,7 +190,7 @@ public class SessionCache {
                 }
             }
 
-            session.setPurgeAt(System.currentTimeMillis() + (purgeDelay * 60 * 1000));
+            session.setPurgeAt(currentTimeMillis() + (purgeDelay * 60 * 1000));
             session.cancel();
             if (!session.isScheduled()) {
                 SystemTimerPool.getTimerPool().schedule(session, new Date(session.getPurgeAt()));

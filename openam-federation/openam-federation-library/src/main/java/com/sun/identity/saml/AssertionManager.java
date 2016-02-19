@@ -24,10 +24,12 @@
  *
  * $Id: AssertionManager.java,v 1.13 2010/01/09 19:41:06 qcheng Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -230,7 +232,7 @@ public final class AssertionManager {
         assertionTimeoutRunnable = new PeriodicGroupRunnable(
             assertionTimeoutAction, cleanUpInterval, assertionTimeout, true);
         timerPool.schedule(assertionTimeoutRunnable, new Date(((
-            System.currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
+                currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
         
         ScheduleableGroupAction artifactTimeoutAction = new
             ScheduleableGroupAction() {
@@ -243,12 +245,12 @@ public final class AssertionManager {
             artifactTimeoutAction, cleanUpInterval, artifactTimeout, true);
         
         timerPool.schedule(artifactTimeoutRunnable, new Date(((
-            System.currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
+                currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
         
         goThroughRunnable = new GoThroughRunnable(cleanUpInterval);
         
         timerPool.schedule(goThroughRunnable, new Date(((
-            System.currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
+                currentTimeMillis() + cleanUpInterval) / 1000) * 1000));
         
         if (assStats.isEnabled()) {
             artifactStats = new ArtifactStats(artEntryMap);
@@ -492,8 +494,8 @@ public final class AssertionManager {
             Object oldEntry = null;
             synchronized (artEntryMap) {
                 oldEntry = artEntryMap.put(artString, new
-                    ArtEntry(aID, System.currentTimeMillis() +
-                    artifactTimeout));
+                    ArtEntry(aID, currentTimeMillis() +
+                        artifactTimeout));
             }
             if (oldEntry != null) {
                 artifactTimeoutRunnable.removeElement(artString);
@@ -754,7 +756,7 @@ public final class AssertionManager {
             String authSSOInstant = (String)
                 sessionProvider.getProperty(token,"authInstant")[0]; 
             if (authSSOInstant == null || authSSOInstant.equals("")) {
-                authInstant = new Date();
+                authInstant = newDate();
             } else {
                 authInstant = DateUtils.stringToDate(authSSOInstant);
             }                
@@ -840,7 +842,7 @@ public final class AssertionManager {
         if ((attributes != null) && (!attributes.isEmpty())) {
             statements.add(new AttributeStatement(sub, attributes));
         }
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         Date notBefore = new Date(issueInstant.getTime() - notBeforeSkew);
         // TODO: this period will be different for bearer
         Date notAfter = new Date(issueInstant.getTime() + assertionTimeout);
@@ -902,7 +904,7 @@ public final class AssertionManager {
                 synchronized (artEntryMap) {
                     oldEntry = artEntryMap.put(artString, new
                         ArtEntry(aIDString,
-                        (System.currentTimeMillis() + artifactTimeout)));
+                        (currentTimeMillis() + artifactTimeout)));
                 }
                 if (oldEntry != null) {
                     artifactTimeoutRunnable.removeElement(artString);
@@ -1072,7 +1074,7 @@ public final class AssertionManager {
         }
 
         timeout = artEntry.getExpireTime();
-        if (System.currentTimeMillis() > timeout) {
+        if (currentTimeMillis() > timeout) {
             if (SAMLUtils.debug.messageEnabled()) {
                 SAMLUtils.debug.message("AssertionManager.getAssertion(art, "
                     + "destid): artifact timed out.");
@@ -1434,7 +1436,7 @@ public final class AssertionManager {
 
         Set stmtSet = new HashSet();
         stmtSet.add(new AttributeStatement(subject, attributes));
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         Date notBefore = new Date(issueInstant.getTime() - notBeforeSkew);
         Date notAfter = new Date(issueInstant.getTime() + assertionTimeout);
         Conditions cond = new Conditions(notBefore, notAfter);
@@ -1621,7 +1623,7 @@ public final class AssertionManager {
         AuthenticationStatement statement =
             new AuthenticationStatement(authMethod, authInstant, subject,
                 subjLocality, null);
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         // get this period from the config
         Date notAfter = new Date(issueInstant.getTime() + assertionTimeout);
         Date notBefore = new Date(issueInstant.getTime() - notBeforeSkew);
@@ -2100,7 +2102,7 @@ public final class AssertionManager {
                         query.getSubject(), query.getResource(), decision,
                         newActions, query.getEvidence());
 
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         Date notAfter = new Date(issueInstant.getTime() + assertionTimeout);
         Date notBefore = new Date(issueInstant.getTime() - notBeforeSkew);
         Conditions cond = new Conditions(notBefore, notAfter);
@@ -2584,7 +2586,7 @@ public final class AssertionManager {
         }
         
         public void run() {
-            long currentTime = System.currentTimeMillis();
+            long currentTime = currentTimeMillis();
             String keyString;
             Entry entry;
             Assertion assertion;

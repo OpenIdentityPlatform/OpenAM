@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: Evaluator.java,v 1.2 2009/09/10 16:35:38 veiming Exp $
  *
- * Portions copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -199,7 +201,7 @@ public class Evaluator {
             boolean recursive
     ) throws EntitlementException {
 
-        long startTime = System.currentTimeMillis();
+        long startTime = currentTimeMillis();
 
         // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         Application application = ApplicationManager
@@ -218,7 +220,7 @@ public class Evaluator {
                 applicationName, normalisedResourceName, resourceName, environment, recursive);
 
         if (configWrapper.isMonitoringRunning()) {
-            policyMonitor.addEvaluation(System.currentTimeMillis() - startTime, realm, applicationName, resourceName,
+            policyMonitor.addEvaluation(currentTimeMillis() - startTime, realm, applicationName, resourceName,
                     subject, recursive ? PolicyMonitoringType.SUBTREE : PolicyMonitoringType.SELF);
         }
 

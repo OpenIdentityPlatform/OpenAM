@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.authentication;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -82,7 +84,7 @@ public class Saml2SessionUpgradeHandler implements SessionUpgradeHandler {
                 if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                     try {
                         SAML2FailoverUtils.deleteSAML2Token(sessionIndex);
-                        long expirationTime = System.currentTimeMillis() / 1000 + newSession.getTimeLeft();
+                        long expirationTime = currentTimeMillis() / 1000 + newSession.getTimeLeft();
                         SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex,
                                 new IDPSessionCopy(idpSession), expirationTime);
                     } catch (SAML2TokenRepositoryException stre) {

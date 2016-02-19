@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: AuthSSOToken.java,v 1.4 2009/01/16 10:49:02 manish_rustagi Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.internal;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -114,7 +113,7 @@ public class AuthSSOToken implements SSOToken {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        key += Long.toString(System.currentTimeMillis());
+        key += Long.toString(currentTimeMillis());
         return (Base64.encode(key.getBytes()));
     }
 

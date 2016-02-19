@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: SsoServerAuthSvcImpl.java,v 1.2 2009/10/21 00:02:10 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-13 ForgeRock Inc.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.monitoring;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
@@ -51,7 +50,7 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
      */
     private long interval;
     private long frequency;
-    private long lastCheckpoint = System.currentTimeMillis();
+    private long lastCheckpoint = currentTimeMillis();
     private static long DEFAULT_INTERVAL = 3600;
     private static int MINIMUM_FREQUENCY = 250;
     private static int AVERAGE_RECORD_COUNT = 1000;
@@ -113,8 +112,8 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
     protected void updateSsoServerAuthenticationRates() {
 
         // if our checkpoint is stale, replace it with a new one
-        if (System.currentTimeMillis() > (lastCheckpoint + (interval * 1000))) {
-            lastCheckpoint = System.currentTimeMillis();
+        if (currentTimeMillis() > (lastCheckpoint + (interval * 1000))) {
+            lastCheckpoint = currentTimeMillis();
         }
 
         // remove success records that are older than the interval we're interested in
@@ -165,7 +164,7 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         long li = AuthenticationFailureCount.longValue();
         li++;
         AuthenticationFailureCount = Long.valueOf(li);
-        historicFailureRecords.add(System.currentTimeMillis());
+        historicFailureRecords.add(currentTimeMillis());
 
         updateSsoServerAuthenticationRates();
     }
@@ -174,7 +173,7 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         long li = AuthenticationSuccessCount.longValue();
         li++;
         AuthenticationSuccessCount = Long.valueOf(li);
-        historicSuccessRecords.add(System.currentTimeMillis());
+        historicSuccessRecords.add(currentTimeMillis());
 
         updateSsoServerAuthenticationRates();
     }

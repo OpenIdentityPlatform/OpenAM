@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.oidc;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import org.apache.commons.collections.MapUtils;
@@ -82,7 +84,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
                            TokenGenerationServiceInvocationState invocationState) throws TokenCreationException {
 
         final OpenIdConnectTokenConfig tokenConfig = stsInstanceState.getConfig().getOpenIdConnectTokenConfig();
-        final long issueInstant = System.currentTimeMillis();
+        final long issueInstant = currentTimeMillis();
         final String subject = ssoTokenIdentity.validateAndGetTokenPrincipal(subjectToken);
 
         STSOpenIdConnectToken openIdConnectToken = buildToken(subjectToken, tokenConfig,

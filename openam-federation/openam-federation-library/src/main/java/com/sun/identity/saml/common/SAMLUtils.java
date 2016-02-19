@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,12 @@
  *
  * $Id: SAMLUtils.java,v 1.16 2010/01/09 19:41:06 qcheng Exp $
  *
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Collections;
 import java.util.Date;
@@ -138,8 +140,8 @@ public class SAMLUtils  extends SAMLUtilsCommon {
                         SAMLConstants.CLEANUP_INTERVAL_NAME)).intValue() * 1000;
             cGoThrough = new POSTCleanUpRunnable(period, idTimeMap);
             TimerPool timerPool = SystemTimerPool.getTimerPool();
-            timerPool.schedule(cGoThrough, new Date(((System.currentTimeMillis()
-                + period) / 1000) * 1000));
+            timerPool.schedule(cGoThrough, new Date(((currentTimeMillis()
+                    + period) / 1000) * 1000));
             ScheduleableGroupAction periodicAction = new
                 ScheduleableGroupAction() {
                 public void doGroupAction(Object obj) {
@@ -148,8 +150,8 @@ public class SAMLUtils  extends SAMLUtilsCommon {
             };
             cPeriodic = new PeriodicGroupRunnable(periodicAction, period,
                 180000, true);
-            timerPool.schedule(cPeriodic, new Date(((System.currentTimeMillis() +
-                period) / 1000) * 1000));
+            timerPool.schedule(cPeriodic, new Date(((currentTimeMillis() +
+                    period) / 1000) * 1000));
         }
         try {
             maxContentLength = Integer.parseInt(SystemConfigurationUtil.

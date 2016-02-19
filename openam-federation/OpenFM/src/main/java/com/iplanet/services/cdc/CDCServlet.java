@@ -29,6 +29,8 @@
 
 package com.iplanet.services.cdc;
 
+import static org.forgerock.openam.utils.Time.*;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.SessionService;
@@ -802,7 +804,7 @@ public class CDCServlet extends HttpServlet {
             authMethod, authInstant, sub, authLocality, null, authnContextStmt);
 
         //setReauthenticateOnOrAfter date
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         // get this period from the config
         Integer assertionTimeout = new Integer(
             IFSConstants.ASSERTION_TIMEOUT_DEFAULT);
@@ -860,7 +862,7 @@ public class CDCServlet extends HttpServlet {
                 }
             }
         }
-        return (authInstant == null) ? new java.util.Date() : authInstant;
+        return (authInstant == null) ? newDate() : authInstant;
     }
     
     private void sendAuthnResponse(HttpServletRequest request,

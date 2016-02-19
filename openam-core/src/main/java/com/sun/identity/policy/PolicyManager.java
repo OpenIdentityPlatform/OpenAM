@@ -24,7 +24,7 @@
  *
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy;
@@ -76,6 +76,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.forgerock.openam.utils.Time;
 import org.forgerock.opendj.ldap.DN;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -593,7 +594,7 @@ public final class PolicyManager {
         String testCreatedBy = policy.getCreatedBy();
         //testCreatedBy is set if we are doing policy replaced.
         if ((testCreatedBy == null) || (testCreatedBy.length() == 0)) {
-            Date creationDate = new Date();
+            Date creationDate = Time.newDate();
             policy.setCreatedBy(token.getPrincipal().getName());
             policy.setCreationDate(creationDate.getTime());
             policy.setLastModifiedBy(token.getPrincipal().getName());
@@ -703,7 +704,7 @@ public final class PolicyManager {
         }
 
         policy.setLastModifiedBy(token.getPrincipal().getName());
-        Date lastModifiedDate = new Date();
+        Date lastModifiedDate = Time.newDate();
         policy.setLastModifiedDate(lastModifiedDate.getTime());
 
         // Construct the named policy

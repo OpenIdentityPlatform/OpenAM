@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,6 +14,8 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
@@ -183,7 +185,7 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
     private boolean validateSuffix(int field, int amount) throws IllegalArgumentException {
         // Check the rotation and suffix consistency
         SimpleDateFormat dateFormat = new SimpleDateFormat(getDebugSuffix());
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = getCalendarInstance();
         cal.setTimeInMillis(0);
         String initialSuffix = dateFormat.format(cal.getTime());
         cal.add(field, amount);

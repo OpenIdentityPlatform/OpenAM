@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
@@ -183,7 +184,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() - 10);
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() - 10);
 
         //When
         grantTypeHandler.handle(request);
@@ -212,7 +213,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
                 eq(request), isNull(String.class))).willReturn(refreshToken);
@@ -255,7 +256,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
@@ -296,7 +297,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))

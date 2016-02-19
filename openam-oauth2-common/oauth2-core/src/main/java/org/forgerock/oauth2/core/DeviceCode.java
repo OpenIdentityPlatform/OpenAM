@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.jdi.IntegerValue;
 import java.util.Collections;
@@ -210,7 +211,7 @@ public class DeviceCode extends JsonValue implements Token {
      * Updates the last poll time of this device code.
      */
     public void poll() {
-        this.put("lastQueried", CollectionUtils.asSet(String.valueOf(System.currentTimeMillis())));
+        this.put("lastQueried", CollectionUtils.asSet(String.valueOf(currentTimeMillis())));
     }
 
     /**

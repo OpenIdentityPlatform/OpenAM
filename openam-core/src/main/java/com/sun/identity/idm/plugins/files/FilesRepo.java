@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.plugins.files;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -244,8 +246,8 @@ public class FilesRepo extends IdRepo {
                 }
                 SystemTimer.getTimer().schedule(
                     new CacheUpdateRunnable(this), new Date(
-                        ((System.currentTimeMillis() + (updateCacheInterval *
-                        60 * 1000)) / 1000) * 1000));
+                        ((currentTimeMillis() + (updateCacheInterval *
+                                60 * 1000)) / 1000) * 1000));
             }
         }
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -40,6 +40,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.openam.entitlement.conditions.environment.SessionCondition.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -118,7 +119,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         long tokenCreationTime = now - (5 * 60000) + 1;
 
         given(timeService.now()).willReturn(now);
@@ -146,7 +147,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         long tokenCreationTime = now - (5 * 60000);
 
         given(timeService.now()).willReturn(now);
@@ -175,7 +176,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         long tokenCreationTime = now - (5 * 60000);
 
         given(timeService.now()).willReturn(now);
@@ -206,7 +207,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         String tokenCreationTime = DateUtils.dateToString(new Date(now - (5 * 60000) + 60000));
 
         given(timeService.now()).willReturn(now);
@@ -235,7 +236,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         String tokenCreationTime = DateUtils.dateToString(new Date(now - (5 * 60000)));
 
         given(timeService.now()).willReturn(now);
@@ -264,7 +265,7 @@ public class SessionConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         SSOToken ssoToken = mock(SSOToken.class);
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         String tokenCreationTime = DateUtils.dateToString(new Date(now - (5 * 60000)));
 
         given(timeService.now()).willReturn(now);

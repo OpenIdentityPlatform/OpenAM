@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,12 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
@@ -167,7 +169,7 @@ public class SessionNotificationSender {
             if (!sessionEventURLs.isEmpty()) {
 
                 SessionNotification globalNotification =
-                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
+                        new SessionNotification(session.toSessionInfo(), eventType, currentTimeMillis());
 
                 for (String globalUrl : sessionEventURLs) {
                     try {
@@ -198,7 +200,7 @@ public class SessionNotificationSender {
                             for (SessionID sid : entry.getValue()) {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, System.currentTimeMillis());
+                                        new SessionNotification(info, eventType, currentTimeMillis());
                                 SessionNotificationHandler.handler.processLocalNotification(notification);
                             }
                         } else {
@@ -227,7 +229,7 @@ public class SessionNotificationSender {
             if (!sessionEventURLs.isEmpty()) {
 
                 SessionNotification globalNotification =
-                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
+                        new SessionNotification(session.toSessionInfo(), eventType, currentTimeMillis());
                 Notification globalNotificationXml = new Notification(globalNotification.toXMLString());
                 NotificationSet globalNotificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
                 globalNotificationSet.addNotification(globalNotificationXml);
@@ -257,7 +259,7 @@ public class SessionNotificationSender {
 
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, System.currentTimeMillis());
+                                        new SessionNotification(info, eventType, currentTimeMillis());
                                 Notification notificationXml = new Notification(notification.toXMLString());
                                 NotificationSet notificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
                                 notificationSet.addNotification(notificationXml);

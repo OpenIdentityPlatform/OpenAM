@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,13 @@
  *
  * $Id: AssertionImpl.java,v 1.8 2009/05/09 15:43:59 mallas Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.assertion.impl;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -752,7 +754,7 @@ public class AssertionImpl implements Assertion {
             return true;
         }
         else  {
-            return conditions.checkDateValidity(System.currentTimeMillis());
+            return conditions.checkDateValidity(currentTimeMillis());
         }
     }
 

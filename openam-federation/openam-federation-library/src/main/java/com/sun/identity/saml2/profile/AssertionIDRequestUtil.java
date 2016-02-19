@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: AssertionIDRequestUtil.java,v 1.8 2009/06/12 22:21:40 mallas Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -465,7 +467,7 @@ public class AssertionIDRequestUtil {
         samlResp.setInResponseTo(assertionIDRequest.getID());
 
         samlResp.setVersion(SAML2Constants.VERSION_2_0);
-        samlResp.setIssueInstant(new Date());
+        samlResp.setIssueInstant(newDate());
     
         Status status = protocolFactory.createStatus();
         StatusCode statusCode = protocolFactory.createStatusCode();

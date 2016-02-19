@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -14,6 +14,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  */
 package org.forgerock.openam.cts.adapters;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -63,7 +65,7 @@ public class OAuthValues {
         String dateString = values.iterator().next();
         long timestamp = Long.parseLong(dateString);
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarInstance();
         calendar.setTimeInMillis(timestamp);
 
         return calendar;

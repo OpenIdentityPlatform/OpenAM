@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,14 @@
  *
  * $Id: GetHttpSession.java,v 1.5 2008/08/19 19:08:38 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
+
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.dpro.session.SessionException;
@@ -137,7 +136,7 @@ public final class GetHttpSession extends HttpServlet {
             StringTokenizer st = new StringTokenizer(decryptedCookie, "@");
             String serverURL = st.nextToken();
             long requestTimeStamp = Long.parseLong(st.nextToken());
-            long currentTime = System.currentTimeMillis();
+            long currentTime = currentTimeMillis();
             if (Math.abs(currentTime - requestTimeStamp) > MAX_TIMESTAMP_DIFF) {
                 sessionDebug.error("GetHttpSession.validateRequest: Max time elapsed for the Request");
                 return false;
