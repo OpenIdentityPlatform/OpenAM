@@ -28,6 +28,10 @@
 
 package com.sun.identity.console.realm;
 
+import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
@@ -50,6 +54,8 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
+import org.forgerock.http.util.Uris;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -127,28 +133,33 @@ public class ServicesViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException {
-        super.beginDisplay(event);
-        resetButtonState(TBL_BUTTON_DELETE);
-        getServiceNames();
-        setPageTitle(getModel(), "page.title.realms.services");
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (isXuiAdminConsoleEnabled()) {
+            String redirectRealm = getRedirectRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm,
+                    "realms/" + Uris.urlEncodePathElement(redirectRealm) + "/services");
+        } else {
+            super.beginDisplay(event);
+            resetButtonState(TBL_BUTTON_DELETE);
+            getServiceNames();
+            setPageTitle(getModel(), "page.title.realms.services");
 
-        ServicesModel model = (ServicesModel)getModel();
-        String curRealm = (String)getPageSessionAttribute(
-            AMAdminConstants.CURRENT_REALM);
-        try {
-            if (model.getAssignableServiceNames(curRealm).isEmpty()) {
+            ServicesModel model = (ServicesModel)getModel();
+            String curRealm = (String)getPageSessionAttribute(
+                AMAdminConstants.CURRENT_REALM);
+            try {
+                if (model.getAssignableServiceNames(curRealm).isEmpty()) {
+                    CCButton btnAdd = (CCButton)getChild(TBL_BUTTON_ADD);
+                    btnAdd.setDisabled(true);
+                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
+                        "services.noservices.for.assignment.message");
+                }
+            } catch (AMConsoleException e) {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
+                    e.getMessage());
                 CCButton btnAdd = (CCButton)getChild(TBL_BUTTON_ADD);
                 btnAdd.setDisabled(true);
-                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
-                    "services.noservices.for.assignment.message");
             }
-        } catch (AMConsoleException e) {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                e.getMessage());
-            CCButton btnAdd = (CCButton)getChild(TBL_BUTTON_ADD);
-            btnAdd.setDisabled(true);
         }
     }
 
