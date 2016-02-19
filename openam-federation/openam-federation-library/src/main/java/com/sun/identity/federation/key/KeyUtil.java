@@ -24,7 +24,7 @@
  *
  * $Id: KeyUtil.java,v 1.5 2009/06/08 23:41:03 madan_ranganath Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2016 ForgeRock AS
  */
 
 package com.sun.identity.federation.key;
@@ -137,13 +137,21 @@ public class KeyUtil {
 
         Map map = IDFFMetaUtils.getAttributes(baseConfig);
         List list = (List)map.get(IFSConstants.ENCRYPTION_CERT_ALIAS);
+        String alias = null;
         PrivateKey decryptionKey = null;
         if ((list != null) && (!list.isEmpty())) {
-            String alias = (String)list.get(0);
+            alias = (String)list.get(0);
             if ((alias != null) && (alias.length() != 0) && (kp != null)) {
                 decryptionKey = kp.getPrivateKey(alias);
+            } else {
+                FSUtils.debug.error("KeyUtil.getDecryptionKey: alias: {} or keyProvider: {} was null.", alias, kp);
             }
         }
+
+        if (decryptionKey == null) {
+            FSUtils.debug.error("KeyUtil.getDecryptionKey: No decryptionKey found for alias: {}", alias);
+        }
+
         return decryptionKey;
     }
 

@@ -34,9 +34,9 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathException;
 
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -120,34 +120,25 @@ public final class FMSigProvider implements SigProvider {
      * @return Element representing the signature element
      * @throws SAML2Exception if the document could not be signed
      */
-    public Element sign(
-	String xmlString,
-	String idValue,
-	PrivateKey privateKey,
-	X509Certificate cert
-    ) throws SAML2Exception {
+    public Element sign(String xmlString, String idValue, PrivateKey privateKey, X509Certificate cert)
+            throws SAML2Exception {
 	
-	String classMethod = "FMSigProvider.sign: ";
-        if (xmlString == null ||
-	    xmlString.length() == 0 ||
-	    idValue == null ||
-	    idValue.length() == 0 ||
-	    privateKey == null) {
-	    
-            SAML2SDKUtils.debug.error(
-		classMethod +
-		"Either input xml string or id value or "+
-		"private key is null.");  
-            throw new SAML2Exception( 
-		SAML2SDKUtils.bundle.getString("nullInput"));  
+	    String classMethod = "FMSigProvider.sign: ";
+        if (StringUtils.isEmpty(xmlString)) {
+            SAML2SDKUtils.debug.error(classMethod + "The xml to sign was empty.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage", new String[]{"xml"});
+        }
+        if (StringUtils.isEmpty(idValue)) {
+            SAML2SDKUtils.debug.error(classMethod + "The idValue was empty.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage", new String[]{"idValue"});
+        }
+	    if (privateKey == null) {
+            SAML2SDKUtils.debug.error(classMethod + "The private key was null.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "nullInputMessage", new String[]{"private key"});
         }                                                 
-	Document doc =
-	    XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
+	    Document doc = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
         if (doc == null) {
-            throw new SAML2Exception(
-                SAML2SDKUtils.bundle.getString(
-		    "errorObtainingElement")
-	    );
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("errorObtainingElement"));
         }
 	Element root = doc.getDocumentElement();
 	XMLSignature sig = null;

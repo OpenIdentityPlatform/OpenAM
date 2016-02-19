@@ -24,7 +24,7 @@
  *
  * $Id: FMEncProvider.java,v 1.5 2008/06/25 05:48:03 qcheng Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.xmlenc;
 
@@ -487,20 +487,22 @@ public final class FMEncProvider implements EncProvider {
     @Override
     public Element decrypt(String xmlString, Set<PrivateKey> privateKeys) throws SAML2Exception {
 
-	String classMethod = "FMEncProvider.decrypt: ";
+		String classMethod = "FMEncProvider.decrypt: ";
         if (SAML2SDKUtils.debug.messageEnabled()) {
             SAML2SDKUtils.debug.message(classMethod + "Entering ...");
         }
-        if (StringUtils.isEmpty(xmlString) || CollectionUtils.isEmpty(privateKeys)) {
-	    throw new SAML2Exception(
-		SAML2SDKUtils.bundle.getString("nullInput"));
+        if (StringUtils.isEmpty(xmlString)) {
+			SAML2SDKUtils.debug.error(classMethod + "The xmlString to decrypt was empty.");
+			throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage", new String[]{"xmlString"});
         }
-        Document doc = XMLUtils.toDOMDocument(
-	    xmlString, SAML2SDKUtils.debug);
+		if (CollectionUtils.isEmpty(privateKeys)) {
+			SAML2SDKUtils.debug.error(classMethod + "The set of private keys for decryption was empty.");
+			throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage",
+					new String[]{"private key set"});
+		}
+        Document doc = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
         if (doc == null) {
-            throw new SAML2Exception(
-                SAML2SDKUtils.bundle.getString(
-		    "errorObtainingElement"));
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("errorObtainingElement"));
         }
 	Element rootElement = doc.getDocumentElement();
 	if (rootElement == null) {

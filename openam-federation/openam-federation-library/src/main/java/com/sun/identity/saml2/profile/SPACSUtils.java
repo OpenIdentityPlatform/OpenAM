@@ -95,6 +95,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,7 +112,6 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
-import org.forgerock.openam.saml2.audit.SAML2Auditor;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -1938,9 +1938,17 @@ public class SPACSUtils {
     public static Map processResponseForFedlet (HttpServletRequest request,
         HttpServletResponse response, PrintWriter out) throws SAML2Exception, IOException,
         SessionException, ServletException {
-        if ((request == null) || (response == null)) {
-            throw new ServletException(
-                SAML2SDKUtils.bundle.getString("nullInput"));
+        if (request == null) {
+            String message =
+                    MessageFormat.format(SAML2SDKUtils.bundle.getString("nullInputMessage"), new String[]{"request"});
+            SAML2SDKUtils.debug.error("SPACSUtils.processResponseForFedlet: " + message);
+            throw new ServletException(message);
+        }
+        if (response == null) {
+            String message =
+                    MessageFormat.format(SAML2SDKUtils.bundle.getString("nullInputMessage"), new String[]{"response"});
+            SAML2SDKUtils.debug.error("SPACSUtils.processResponseForFedlet: " + message);
+            throw new ServletException(message);
         }
         
         String requestURL = request.getRequestURL().toString();
