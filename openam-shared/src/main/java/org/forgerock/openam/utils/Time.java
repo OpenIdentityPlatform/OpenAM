@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public enum Time implements DateTimeUtils.MillisProvider {
 
-    /** Singleton Instance */
+    /** Singleton Instance. */
     INSTANCE;
 
     private final TimeService timeService;
