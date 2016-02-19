@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public enum Time implements DateTimeUtils.MillisProvider {
 
+    /** Singleton Instance */
     INSTANCE;
 
     private final TimeService timeService;
@@ -48,8 +49,8 @@ public enum Time implements DateTimeUtils.MillisProvider {
             TimeService service = services.next();
             if (services.hasNext()) {
                 LoggerFactory.getLogger(Time.class).
-                        error("More than one TimeService configured in META-INF/services." +
-                        " Defaulting to TimeService.SYSTEM");
+                        error("More than one TimeService configured in META-INF/services."
+                                + " Defaulting to TimeService.SYSTEM");
                 timeService = TimeService.SYSTEM;
             } else {
                 timeService = service;
