@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -285,7 +286,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @return {@code true} if current time is greater than the expiry time.
      */
     public boolean isExpired() {
-        return System.currentTimeMillis() > getExpiryTime();
+        return currentTimeMillis() > getExpiryTime();
     }
 
     /**
@@ -375,7 +376,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
         tokenMap.put(getResourceString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenId());
         tokenMap.put(getResourceString(TOKEN_TYPE), getTokenType());
         tokenMap.put(getResourceString(EXPIRE_TIME),
-                (getExpiryTime() - System.currentTimeMillis()) / 1000);
+                (getExpiryTime() - currentTimeMillis()) / 1000);
         tokenMap.putAll(extraData);
         return tokenMap;
     }
@@ -388,7 +389,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
         tokenInfo.put(getResourceString(ID), getTokenId());
         tokenInfo.put(getResourceString(TOKEN_TYPE), getTokenType());
         tokenInfo.put(getResourceString(EXPIRE_TIME),
-                (getExpiryTime() - System.currentTimeMillis())/1000);
+                (getExpiryTime() - currentTimeMillis())/1000);
         tokenInfo.put(getResourceString(SCOPE), getScope());
         tokenInfo.put(getResourceString(OAuth2Constants.Params.GRANT_TYPE), getGrantType());
         return tokenInfo;

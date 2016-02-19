@@ -17,6 +17,7 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.security.auth.Subject;
@@ -277,7 +278,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     }
 
     private boolean hasExpired(PermissionTicket permissionTicket) {
-        return permissionTicket.getExpiryTime() < System.currentTimeMillis();
+        return permissionTicket.getExpiryTime() < currentTimeMillis();
     }
 
     private boolean isEntitled(UmaProviderSettings umaProviderSettings, OAuth2ProviderSettings oauth2ProviderSettings,

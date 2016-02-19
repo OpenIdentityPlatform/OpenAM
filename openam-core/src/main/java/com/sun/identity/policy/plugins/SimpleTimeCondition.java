@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: SimpleTimeCondition.java,v 1.5 2010/01/05 22:00:26 dillidorai Exp $
  *
- */
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy.plugins;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.PolicyManager;
@@ -723,8 +723,8 @@ public class SimpleTimeCondition implements Condition {
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env) 
             throws PolicyException, SSOException {
-        boolean allowed = false; 
-        long currentGmt = System.currentTimeMillis();
+        boolean allowed = false;
+        long currentGmt = currentTimeMillis();
         if (env != null) {
             Long currentGmtLong = (Long) env.get(REQUEST_TIME);
             if ( currentGmtLong != null ) {

@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,6 +24,8 @@
  */
 
 package org.forgerock.openam.authentication.modules.oath;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -291,7 +293,7 @@ public class OATH extends AMLoginModule {
                     }
 
                     // get Arrival time of the OTP
-                    timeInSeconds = System.currentTimeMillis() / 1000L;
+                    timeInSeconds = currentTimeMillis() / 1000L;
 
                     if (checkOTP(OTP)) {
                         return ISAuthConstants.LOGIN_SUCCEED;

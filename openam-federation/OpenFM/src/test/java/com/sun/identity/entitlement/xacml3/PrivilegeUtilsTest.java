@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,13 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeUtilsTest.java,v 1.1 2009/08/19 05:41:02 veiming Exp $
- */
-
-/**
- * Portions copyright 2014 ForgeRock AS.
+ *
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Entitlement;
@@ -145,8 +145,8 @@ public class PrivilegeUtilsTest {
         privilege.setResourceAttributes(ra);
         privilege.setCreatedBy("amadmin");
         privilege.setLastModifiedBy("amadmin");
-        privilege.setCreationDate(System.currentTimeMillis());
-        privilege.setLastModifiedDate(System.currentTimeMillis());
+        privilege.setCreationDate(currentTimeMillis());
+        privilege.setLastModifiedDate(currentTimeMillis());
 
         UnittestLog.logMessage("PrivilegeUtils.testPrivilegeToXACMLPolicy():"
                 + "Privilege=" + privilege.toString());

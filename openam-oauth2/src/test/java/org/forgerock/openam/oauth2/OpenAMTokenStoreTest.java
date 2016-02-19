@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.data.Offset.offset;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
@@ -249,7 +250,7 @@ public class OpenAMTokenStoreTest {
         assertThat(code.getCodeChallengeMethod()).isEqualTo("CODE METHOD");
         assertThat(code.getMaxAge()).isEqualTo(55);
         assertThat(code.getTokenName()).isEqualTo("device_code");
-        assertThat(code.getExpiryTime()).isCloseTo(System.currentTimeMillis() + 10000, offset(1000L));
+        assertThat(code.getExpiryTime()).isCloseTo(currentTimeMillis() + 10000, offset(1000L));
         assertThat(code.getTokenId()).matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
         assertThat(code.getUserCode()).matches("[" + OpenAMTokenStore.ALPHABET + "]{8}");
         assertThat(code.getRealm()).isEqualTo("MY_REALM");

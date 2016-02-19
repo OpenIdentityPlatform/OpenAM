@@ -30,6 +30,8 @@
 
 package com.sun.identity.policy.plugins;
 
+import static com.sun.identity.policy.SubjectEvaluationCache.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.REQUEST_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
@@ -621,7 +623,7 @@ public class LDAPRoles implements Subject {
             if (element != null) {
                 long timeToLive = (element[0] == null) ? 
                     0:((Long)element[0]).longValue();
-                long currentTime = System.currentTimeMillis();
+                long currentTime = currentTimeMillis();
                 if (timeToLive > currentTime) {
                     if (debug.messageEnabled()) {
                         debug.message("LDAPRoles.getUserRoles():"
@@ -646,8 +648,8 @@ public class LDAPRoles implements Subject {
             // If the cache is enabled
             if (SubjectEvaluationCache.getSubjectEvalTTL() > 0) {
                 Object[] elem = new Object[2];
-                elem[0] = new Long(System.currentTimeMillis()
-                                + SubjectEvaluationCache.getSubjectEvalTTL());
+                elem[0] = new Long(currentTimeMillis()
+                        + getSubjectEvalTTL());
                 elem[1] = roles;
                 serverRoleMap = null;
                 if ((serverRoleMap = (Map)userLDAPRoleCache.get(tokenIDStr))

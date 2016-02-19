@@ -24,9 +24,11 @@
  *
  * $Id: DoManageNameID.java,v 1.26 2009/11/24 21:53:27 madan_ranganath Exp $
  *
- * Portions copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -1216,7 +1218,7 @@ public class DoManageNameID {
             mniResponse.setID(responseID);
             mniResponse.setInResponseTo(mniRequest.getID());
             mniResponse.setVersion(SAML2Constants.VERSION_2_0);
-            mniResponse.setIssueInstant(new Date());
+            mniResponse.setIssueInstant(newDate());
             mniResponse.setIssuer(SAML2Utils.createIssuer(hostEntityID)); 
             if (destination != null && (destination.length() != 0)) {
                 mniResponse.setDestination(
@@ -1341,7 +1343,7 @@ public class DoManageNameID {
         mniRequest.setDestination(XMLUtils.escapeSpecialCharacters(
             destination));
         mniRequest.setIssuer(SAML2Utils.createIssuer(hostEntityID));
-        mniRequest.setIssueInstant(new Date());
+        mniRequest.setIssueInstant(newDate());
         setNameIDForMNIRequest(mniRequest, nameID, changeID, realm,
             hostEntityID, hostEntityRole, remoteEntityID);
 

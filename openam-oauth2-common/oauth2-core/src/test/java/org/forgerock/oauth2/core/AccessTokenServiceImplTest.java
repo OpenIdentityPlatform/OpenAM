@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.anySetOf;
 import static org.mockito.Mockito.anyString;
@@ -184,7 +185,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() - 10);
+        given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() - 10);
 
         //When
         accessTokenService.refreshToken(request);
@@ -209,7 +210,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
@@ -241,7 +242,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
@@ -278,7 +279,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
 

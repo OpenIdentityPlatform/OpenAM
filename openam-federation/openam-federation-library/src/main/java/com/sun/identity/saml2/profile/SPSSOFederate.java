@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: SPSSOFederate.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.liberty.ws.paos.PAOSConstants;
@@ -312,7 +314,7 @@ public class SPSSOFederate {
 
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 // sessionExpireTime is counted in seconds
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
+                long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval;
                 String key = authnRequest.getID();
                 try {
                     SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, new AuthnRequestInfoCopy(reqInfo), sessionExpireTime);
@@ -678,7 +680,7 @@ public class SPSSOFederate {
             }
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 // sessionExpireTime is counted in seconds
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
+                long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval;
                 String key = authnRequest.getID();
                 try {
                     SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, new AuthnRequestInfoCopy(reqInfo), sessionExpireTime);
@@ -879,7 +881,7 @@ public class SPSSOFederate {
         // Required attributes in authn request
         authnReq.setID(requestID);
         authnReq.setVersion(SAML2Constants.VERSION_2_0);
-        authnReq.setIssueInstant(new Date());
+        authnReq.setIssueInstant(newDate());
         //IDP Proxy 
         Boolean enableIDPProxy = 
             getAttrValueFromMap(spConfigMap, 
@@ -1190,7 +1192,7 @@ public class SPSSOFederate {
         
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             // sessionExpireTime is counted in seconds
-            long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
+            long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval;
             // Need to make the key unique due to the requestID also being used to
             // store a copy of the AuthnRequestInfo
             String key = requestID + requestID;

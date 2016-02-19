@@ -47,7 +47,7 @@
             guice,guice-assistedinject,commons-lang,commons-collections,org.apache.servicemix.bundles.javax-inject,
             slf4j-api,slf4j-nop,opendj-core,opendj-grizzly,i18n-core,openam-ldap-utils,grizzly-framework,
             forgerock-audit-core,openam-audit-configuration,i18n-slf4j,
-            opendj-server-legacy,opendj-config,opendj-cli,chf-http-core
+            opendj-server-legacy,opendj-config,opendj-cli,chf-http-core,joda-time
         </setupArtifactIDs>
     </properties>
 

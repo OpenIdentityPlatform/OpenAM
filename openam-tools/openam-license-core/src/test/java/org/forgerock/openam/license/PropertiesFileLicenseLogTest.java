@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -91,7 +92,7 @@ public class PropertiesFileLicenseLogTest {
         String user = "testuser";
         License license = new License(name + ".txt", "...");
         LicenseLog log = new PropertiesFileLicenseLog(logDir);
-        Date acceptedDate = new Date();
+        Date acceptedDate = newDate();
 
         // When
         log.logLicenseAccepted(license, user, acceptedDate);
@@ -108,7 +109,7 @@ public class PropertiesFileLicenseLogTest {
         String user = "testuser";
         License license = new License(name + ".txt", "...");
         LicenseLog log = new PropertiesFileLicenseLog(logDir);
-        Date acceptedDate = new Date();
+        Date acceptedDate = newDate();
 
         // When
         log.logLicenseAccepted(license, user, acceptedDate);

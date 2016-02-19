@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.license;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.DateUtils;
 
@@ -97,7 +99,7 @@ public class PropertiesFileLicenseLog implements LicenseLog {
         Properties log = loadLogFile(license, false);
 
         Date logDate = getLogDate(log, user);
-        Date now = new Date();
+        Date now = newDate();
 
         // Ignore acceptance dates that are in the future (invalid data).
         return logDate != null && now.after(logDate);
@@ -173,7 +175,7 @@ public class PropertiesFileLicenseLog implements LicenseLog {
         try {
             final OutputStream out = new FileOutputStream(logFile);
             try {
-                props.store(out, String.format(LOG_HEADER, new Date()));
+                props.store(out, String.format(LOG_HEADER, newDate()));
             } finally {
                 out.close();
             }

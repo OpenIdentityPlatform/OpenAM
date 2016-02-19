@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class LdapQueryBuilderTest {
 
         // Ensure that the Token Conversion returns a Token
         given(tokenEntryConverter.convert(any(Entry.class), any(String[].class))).willReturn(
-                new Token(Long.toString(System.currentTimeMillis()), TokenType.SESSION));
+                new Token(Long.toString(currentTimeMillis()), TokenType.SESSION));
 
         // When
         Iterator<Collection<Token>> results = builder.execute(mockConnection);

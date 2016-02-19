@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -27,11 +27,12 @@ import static com.sun.identity.entitlement.xacml3.Assertions.*;
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.*;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asList;
+import static org.forgerock.openam.utils.Time.*;
 
 public class XACMLReaderWriterTest {
 
     private static final String ROOT_REALM = "/";
-    private long now = Calendar.getInstance().getTimeInMillis();
+    private long now = getCalendarInstance().getTimeInMillis();
 
     @Test
     public void canReadAndWritePrivilegesAsXACML() throws Exception {

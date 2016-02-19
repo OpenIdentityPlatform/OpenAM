@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -23,6 +23,7 @@ import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import static com.sun.identity.entitlement.xacml3.XACMLExportImport.PrivilegeManagerFactory;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
@@ -53,7 +54,7 @@ public class XACMLExportImportTest {
     private static final String ROOT_REALM = "/";
     private static final Subject NULL_SUBJECT = null;
     private static final InputStream NULL_INPUT = null;
-    private final long now = Calendar.getInstance().getTimeInMillis();
+    private final long now = getCalendarInstance().getTimeInMillis();
 
     private SearchFilterFactory searchFilterFactory;
     private PrivilegeValidator validator;

@@ -11,30 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest;
 
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asAttributeArray;
-import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
-import static org.forgerock.json.JsonValue.array;
+import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.*;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
-import static org.forgerock.openam.rest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.rest.RestUtils.isAdmin;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.enforceWhiteList;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.getSSOToken;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.identityDetailsToJsonValue;
-import static org.forgerock.openam.core.rest.IdentityRestUtils.jsonValueToIdentityDetails;
+import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.util.promise.Promises.*;
 
-import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.security.AccessController;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,37 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.NeedMoreCredentials;
-import com.sun.identity.idsvcs.ObjectNotFound;
-import com.sun.identity.idsvcs.TokenExpired;
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceNotFoundException;
+import javax.mail.MessagingException;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.sm.config.ConsoleConfigHandler;
-import org.forgerock.selfservice.core.SelfServiceContext;
-import org.forgerock.openam.utils.Config;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -105,19 +71,42 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idsvcs.AccessDenied;
+import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.NeedMoreCredentials;
+import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.TokenExpired;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -265,7 +254,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      */
     private org.forgerock.openam.cts.api.tokens.Token generateToken(String resource, String userId,
                                                                     Long tokenLifeTimeSeconds, String realmName) {
-        Calendar ttl = Calendar.getInstance();
+        Calendar ttl = getCalendarInstance();
         org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
         if (!StringUtils.isBlank(userId)) {

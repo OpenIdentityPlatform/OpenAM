@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: Request.java,v 1.2 2008/06/25 05:47:37 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.protocol;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -222,7 +225,7 @@ public class Request extends AbstractRequest {
 	}
 
 	parseContents(contents);
-	issueInstant = new Date();
+		issueInstant = newDate();
     }
 
     private String checkAndGetRespondWith(String respondWith)
@@ -404,7 +407,7 @@ public class Request extends AbstractRequest {
 			SAMLUtils.bundle.getString("queryNotSupported"));
 	}
 	this.query = query;
-	issueInstant = new Date();
+		issueInstant = newDate();
     }
 
     /**
@@ -436,7 +439,7 @@ public class Request extends AbstractRequest {
 	    }
 	}
 	parseContents(contents);
-	issueInstant = new Date();
+		issueInstant = newDate();
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SystemTimer.java,v 1.4 2008/08/08 00:40:59 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-14 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.common;
 
@@ -39,8 +36,11 @@ import org.forgerock.util.thread.listener.ShutdownListener;
  */
 
 public class SystemTimer {
-    
 
+    /** The name of the {@link TimerPool} instance. */
+    public static final String TIMER_NAME = "SystemTimer";
+    /** The name of the {@link TimerPool} scheduler. */
+    public static final String SCHEDULER_NAME = TIMER_NAME + TimerPool.SCHEDULER_SUFFIX;
     protected static TimerPool instance;
     
     /**
@@ -52,7 +52,7 @@ public class SystemTimer {
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
             // Don't load the Debug object in static block as it can
             // cause issues when doing a container restart.
-            instance = new TimerPool("SystemTimer", 1, false, Debug.getInstance("SystemTimer"));
+            instance = new TimerPool(TIMER_NAME, 1, false, Debug.getInstance("SystemTimer"));
             shutdownMan.addShutdownListener(new ShutdownListener() {
                 public void shutdown() {
                     instance.shutdown();

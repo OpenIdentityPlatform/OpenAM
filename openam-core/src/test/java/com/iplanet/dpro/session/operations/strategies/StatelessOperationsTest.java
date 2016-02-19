@@ -17,6 +17,7 @@
 package com.iplanet.dpro.session.operations.strategies;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mock;
@@ -77,7 +78,7 @@ public class StatelessOperationsTest {
     public void shouldRefreshFromStatelessSessionFactory() throws Exception {
         // Given
         SessionInfo info = new SessionInfo();
-        info.setExpiryTime(System.currentTimeMillis() + (1000 * 60 * 10));
+        info.setExpiryTime(currentTimeMillis() + (1000 * 60 * 10));
         given(mockSessionFactory.getSessionInfo(sid)).willReturn(info);
 
         // When

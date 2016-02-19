@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: CollectionHelper.java,v 1.6 2010/01/06 22:31:55 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.datastruct;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -323,7 +325,7 @@ public class CollectionHelper {
             return Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
             logger.error("Unable to parse " + name + "=" + valueString, nfe);
-            return new Date().getTime();
+            return newDate().getTime();
         }
     }
 

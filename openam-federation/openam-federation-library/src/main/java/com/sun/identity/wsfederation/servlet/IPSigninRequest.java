@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -28,6 +28,8 @@
  */
 
 package com.sun.identity.wsfederation.servlet;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionProvider;
@@ -328,7 +330,7 @@ public class IPSigninRequest extends WSFederationAction {
 
         Date authInstant = null;
         if (authSSOInstant == null || authSSOInstant.equals("")) {
-            authInstant = new Date();
+            authInstant = newDate();
         } else {
             try {
                 authInstant = DateUtils.stringToDate(authSSOInstant);

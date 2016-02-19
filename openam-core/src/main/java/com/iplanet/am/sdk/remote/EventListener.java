@@ -24,10 +24,12 @@
  *
  * $Id: EventListener.java,v 1.12 2008/06/27 20:56:23 arviranga Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.remote;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMEventManagerException;
@@ -210,7 +212,7 @@ class EventListener {
             NotificationRunnable nt = new NotificationRunnable(
                     cachePollingInterval);
             SystemTimer.getTimer().schedule(nt, new Date((
-                System.currentTimeMillis() / 1000) * 1000));
+                    currentTimeMillis() / 1000) * 1000));
         } else {
             if (debug.warningEnabled()) {
                 debug.warning("EventListener: Polling mode DISABLED. " +

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -33,6 +33,7 @@ import static java.util.Collections.*;
 import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.net.InetAddress;
 import java.security.AccessController;
@@ -1301,7 +1302,7 @@ public class LoginState {
             session = oldSession;
         }
 
-        Date authInstantDate = new Date();
+        Date authInstantDate = newDate();
         String authInstant = DateUtils.toUTCDateFormat(authInstantDate);
 
         String moduleAuthTime = null;

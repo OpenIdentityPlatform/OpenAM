@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.rest;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.json.resource.ResourceException.getException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -336,7 +337,7 @@ public class ResourceTypesResource extends RealmAwareResource {
             JsonResourceType wrapper = new JsonResourceType(resourceType);
 
             final ResourceResponse resource = newResourceResponse(resourceId,
-                    String.valueOf(System.currentTimeMillis()),
+                    String.valueOf(currentTimeMillis()),
                     JsonValue.json(wrapper.toJsonValue()));
             return newResultPromise(resource);
 

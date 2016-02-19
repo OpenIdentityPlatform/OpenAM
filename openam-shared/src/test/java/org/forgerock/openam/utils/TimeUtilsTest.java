@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -20,14 +20,15 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertEquals;
 
 public class TimeUtilsTest {
     @Test
     public void shouldConvertTimeToEpochedTimeAndBackAgain() {
         // Given
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        Calendar calendar = getCalendarInstance();
+        calendar.setTimeInMillis(currentTimeMillis());
         calendar.set(Calendar.MILLISECOND, 0);
 
         // When

@@ -24,10 +24,12 @@
  *
  * $Id: OpenSSOCoreTokenStore.java,v 1.1 2009/11/19 00:07:41 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.coretoken.spi;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -89,8 +91,8 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
         long interval = CoreTokenConfigService.cleanupInt;
         TokenCleanupRunnable tcRun = new TokenCleanupRunnable(interval);
         TimerPool timerPool = SystemTimerPool.getTimerPool();
-        timerPool.schedule(tcRun, new Date(((System.currentTimeMillis()
-            + interval) / 1000) * 1000));
+        timerPool.schedule(tcRun, new Date(((currentTimeMillis()
+                + interval) / 1000) * 1000));
     }
 
     /**

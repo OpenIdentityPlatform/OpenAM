@@ -24,10 +24,12 @@
  *
  * $Id: IdRepoJAXRPCObjectImpl.java,v 1.13 2010/01/06 01:58:27 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.idm.server;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.sdk.remote.*;
 import com.iplanet.am.util.SystemProperties;
@@ -938,7 +940,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     }
 
     protected static long getCacheIndex() {
-        return System.currentTimeMillis() / 60000;
+        return currentTimeMillis() / 60000;
     }
 
     private Map IdSearchResultsToMap(IdSearchResults res) {

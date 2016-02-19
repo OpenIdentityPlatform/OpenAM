@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query.reaper;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -47,7 +49,7 @@ public class ReaperImpl<C, F> implements ReaperQuery {
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
         int pageSize = config.getCleanupPageSize();
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarInstance();
 
         QueryFilter<CoreTokenField> filter = QueryFilter.lessThan(CoreTokenField.EXPIRY_DATE, calendar);
         query = queryFactoryProvided.createInstance()

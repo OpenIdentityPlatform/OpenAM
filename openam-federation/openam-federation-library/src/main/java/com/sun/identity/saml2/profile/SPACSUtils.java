@@ -24,9 +24,11 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.soapbinding.Message;
@@ -342,7 +344,7 @@ public class SPACSUtils {
             resolve = ProtocolFactory.getInstance().createArtifactResolve();
             resolve.setID(SAML2Utils.generateID());
             resolve.setVersion(SAML2Constants.VERSION_2_0);
-            resolve.setIssueInstant(new Date());
+            resolve.setIssueInstant(newDate());
             resolve.setArtifact(art);
             resolve.setDestination(XMLUtils.escapeSpecialCharacters(location));
             Issuer issuer = AssertionFactory.getInstance().createIssuer();

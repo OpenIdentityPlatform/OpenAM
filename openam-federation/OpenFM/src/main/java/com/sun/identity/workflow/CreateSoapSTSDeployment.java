@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.JCEEncryption;
@@ -286,7 +288,7 @@ public class CreateSoapSTSDeployment extends Task {
     }
 
     private String getCurrentTimeAsString() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(getCalendarInstance().getTime());
     }
 
     /*

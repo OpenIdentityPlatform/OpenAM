@@ -24,11 +24,13 @@
  *
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.authentication.modules.hotp;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -129,7 +131,7 @@ public class HOTPService {
             throw new AuthLoginException("amAuth", "invalidKey", null);
         }
         sendHOTP(sentHOTPCode, messageSubject, messageContent);
-        sentHOTPCodeTime = System.currentTimeMillis();
+        sentHOTPCodeTime = currentTimeMillis();
     }
 
     private byte[] getSharedSecret() {
@@ -149,7 +151,7 @@ public class HOTPService {
     public boolean isValidHOTP(String enteredHOTPCode) {
 
         if (sentHOTPCode != null && sentHOTPCode.equals(enteredHOTPCode)) {
-            long timePassed = System.currentTimeMillis() - sentHOTPCodeTime;
+            long timePassed = currentTimeMillis() - sentHOTPCodeTime;
             if (timePassed <= (codeValidityDuration * 60000)) {
                 // one time use only
                 sentHOTPCode = null;

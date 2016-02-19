@@ -24,10 +24,12 @@
  *
  * $Id: CachedSMSEntry.java,v 1.16 2009/10/08 20:33:54 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import java.io.IOException;
@@ -126,7 +128,7 @@ public class CachedSMSEntry {
     // Used by JAXRPCObjectImpl
     public boolean isDirty() {
         if (ttlEnabled && !dirty &&
-            ((System.currentTimeMillis() - lastUpdate) > ttl)) {
+            ((currentTimeMillis() - lastUpdate) > ttl)) {
             synchronized (dirtyLock) {
                 dirty = true;
             }
@@ -167,7 +169,7 @@ public class CachedSMSEntry {
                 SSOToken t = getValidSSOToken();
                 if (t != null) {
                     smsEntry.read(t);
-                    lastUpdate = System.currentTimeMillis();
+                    lastUpdate = currentTimeMillis();
                     updated = true;
                 } else if (SMSEntry.debug.warningEnabled()) {
                     SMSEntry.debug.warning("CachedSMSEntry:update No VALID " +

@@ -24,9 +24,11 @@
  *
  * $Id: WebtopNaming.java,v 1.31 2009/06/20 06:17:02 bigfatrat Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.iplanet.services.naming;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.client.PLLClient;
@@ -1276,7 +1278,7 @@ public class WebtopNaming {
         // Start naming service monitor
         monitorThread = new SiteMonitor(urlList);
         SystemTimer.getTimer().schedule(monitorThread, new Date(
-            System.currentTimeMillis() / 1000 * 1000));
+                currentTimeMillis() / 1000 * 1000));
     }
 
     /**
@@ -1353,11 +1355,11 @@ public class WebtopNaming {
          */
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if (isServerMode() && !MonitoringUtil.isRunning() && !sitemonitorDisabled) {
-            Date date1 = new Date();
+            Date date1 = newDate();
             String startDate = sdf.format(date1);
 
             if (debug.warningEnabled()) {
-                Date date = new Date();
+                Date date = newDate();
                 debug.warning(classMethod +
                     "start monitoring config" + "\n" +
                     "    Start time = " + sdf.format(date));
@@ -1403,7 +1405,7 @@ public class WebtopNaming {
                 Agent.siteAndServerInfo(srvrInfo);
 
                 if (debug.messageEnabled()) {
-                    Date date = new Date();
+                    Date date = newDate();
                     debug.message(classMethod +
                         "monitoring agent config returned\n" +
                         "    End time = " + sdf.format(date));

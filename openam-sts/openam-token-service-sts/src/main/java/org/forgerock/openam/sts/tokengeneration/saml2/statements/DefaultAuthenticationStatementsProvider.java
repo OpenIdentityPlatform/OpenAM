@@ -11,10 +11,12 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS. All rights reserved.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.AuthnContext;
@@ -39,7 +41,7 @@ public class DefaultAuthenticationStatementsProvider implements AuthenticationSt
     public List<AuthnStatement> get(SAML2Config saml2Config, String authNContextClassRef) throws TokenCreationException {
         try {
             AuthnStatement authnStatement = AssertionFactory.getInstance().createAuthnStatement();
-            authnStatement.setAuthnInstant(new Date());
+            authnStatement.setAuthnInstant(newDate());
             AuthnContext authnContext = AssertionFactory.getInstance().createAuthnContext();
             authnContext.setAuthnContextClassRef(authNContextClassRef);
             authnStatement.setAuthnContext(authnContext);

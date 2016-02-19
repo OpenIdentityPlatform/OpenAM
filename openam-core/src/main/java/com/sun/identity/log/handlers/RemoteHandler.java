@@ -24,10 +24,12 @@
  *
  * $Id: RemoteHandler.java,v 1.18 2009/12/13 22:58:06 hvijay Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.log.handlers;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.ThreadPoolException;
 import java.net.MalformedURLException;
@@ -430,7 +432,7 @@ public class RemoteHandler extends Handler {
             bufferTask = new TimeBufferingTask(interval);
             try {
                 SystemTimer.getTimer().schedule(bufferTask, new Date(((
-                    System.currentTimeMillis() + interval) / 1000) * 1000));
+                        currentTimeMillis() + interval) / 1000) * 1000));
             } catch (IllegalArgumentException e) {
                 Debug.error (logName + ":RemoteHandler:BuffTimeArg: " +
                     e.getMessage());

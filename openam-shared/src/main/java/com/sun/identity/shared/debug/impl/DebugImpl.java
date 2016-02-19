@@ -24,15 +24,13 @@
  *
  * $Id: DebugImpl.java,v 1.4 2009/03/07 08:01:53 veiming Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.impl;
 
 import static java.util.Collections.newSetFromMap;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -249,7 +247,7 @@ public class DebugImpl implements IDebug {
         StringBuilder prefix = new StringBuilder();
         String dateFormatted;
         synchronized (dateFormat) {
-            dateFormatted = this.dateFormat.format(new Date());
+            dateFormatted = this.dateFormat.format(newDate());
         }
         prefix.append(debugName)
                 .append(":").append(dateFormatted)
@@ -301,8 +299,8 @@ public class DebugImpl implements IDebug {
                      * In order to have less logs for this kind of issue. It's waiting an interval of time before
                      * printing this error again.
                      */
-                    if (lastDirectoryIssue + DIR_ISSUE_ERROR_INTERVAL_IN_MS < System.currentTimeMillis()) {
-                        lastDirectoryIssue = System.currentTimeMillis();
+                    if (lastDirectoryIssue + DIR_ISSUE_ERROR_INTERVAL_IN_MS < currentTimeMillis()) {
+                        lastDirectoryIssue = currentTimeMillis();
                         stdoutDebugFile.writeIt(prefix, "Debug file can't be written : " + e.getMessage(), null);
                     }
                     stdoutDebugFile.writeIt(prefix, msg, th);

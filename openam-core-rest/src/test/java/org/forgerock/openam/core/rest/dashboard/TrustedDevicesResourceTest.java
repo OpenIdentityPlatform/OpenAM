@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.dashboard;
@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Resources.newCollection;
 import static org.forgerock.json.resource.Resources.newInternalConnection;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -83,8 +84,8 @@ public class TrustedDevicesResourceTest {
         Connection connection = newInternalConnection(newCollection(resource));
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
         List<JsonValue> devices = new ArrayList<>();
-        devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
-        devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", new Date().getTime() + 1000))));
+        devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", newDate().getTime()))));
+        devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", newDate().getTime() + 1000))));
 
         given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
 

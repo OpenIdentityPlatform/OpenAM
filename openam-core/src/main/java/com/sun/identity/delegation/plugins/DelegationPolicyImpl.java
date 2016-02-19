@@ -24,10 +24,12 @@
  *
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.delegation.plugins;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -606,7 +608,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         PolicyDecision pd = (PolicyDecision) al.get(1);
                         if (pd != null) {
                             long pdTTL = pd.getTimeToLive();
-                            long currentTime = System.currentTimeMillis();
+                            long currentTime = currentTimeMillis();
                             if (pdTTL > currentTime) {
                                 return pd;
                             } else {

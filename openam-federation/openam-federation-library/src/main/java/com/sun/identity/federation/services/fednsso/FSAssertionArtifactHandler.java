@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -28,6 +28,8 @@
  */
 
 package com.sun.identity.federation.services.fednsso;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.PeriodicGroupRunnable;
 import com.sun.identity.common.ScheduleableGroupAction;
@@ -152,8 +154,8 @@ public class FSAssertionArtifactHandler {
             SAMLConstants.CLEANUP_INTERVAL_NAME)).intValue() * 1000;
         cGoThrough = new POSTCleanUpRunnable(period, idTimeMap);
         TimerPool timerPool = SystemTimerPool.getTimerPool();
-        timerPool.schedule(cGoThrough, new Date(((System.currentTimeMillis()
-            + period) / 1000) * 1000));
+        timerPool.schedule(cGoThrough, new Date(((currentTimeMillis()
+                + period) / 1000) * 1000));
         ScheduleableGroupAction periodicAction = new ScheduleableGroupAction() {
             public void doGroupAction(Object obj) {
                 idTimeMap.remove(obj);
@@ -161,8 +163,8 @@ public class FSAssertionArtifactHandler {
         };
         cPeriodic = new PeriodicGroupRunnable(periodicAction, period, 180000,
             true);
-        timerPool.schedule(cPeriodic, new Date(((System.currentTimeMillis() +
-            period) / 1000) * 1000));
+        timerPool.schedule(cPeriodic, new Date(((currentTimeMillis() +
+                period) / 1000) * 1000));
     }
     
     /**
@@ -653,7 +655,7 @@ public class FSAssertionArtifactHandler {
         String confMethod = null;
         Date date = null;
         
-        long time = System.currentTimeMillis() + 180000;
+        long time = currentTimeMillis() + 180000;
         while (iter.hasNext()) {
             assertion =(FSAssertion) iter.next();
             
@@ -1831,7 +1833,7 @@ public class FSAssertionArtifactHandler {
      * @return <code>AuthInstant</code> in UTC date format.
      */
     public String getAuthInstant() {
-        return DateUtils.toUTCDateFormat(new Date());
+        return DateUtils.toUTCDateFormat(newDate());
     }
     
     /**

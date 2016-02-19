@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  */
 package com.sun.identity.authentication.modules.radius.client;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.authentication.modules.radius.RADIUSServer;
 import com.sun.identity.common.GeneralTaskRunnable;
@@ -84,7 +83,7 @@ public class RadiusConn {
     /**
      * The source of id generation for access request packets.
      */
-    private short id = (short) System.currentTimeMillis();
+    private short id = (short) currentTimeMillis();
     /**
      * Source of random bytes.
      */
@@ -279,7 +278,7 @@ public class RadiusConn {
                         if (serverMonitor == null || serverMonitor.scheduledExecutionTime() == -1) {
                             serverMonitor = new RADIUSMonitor();
                             SystemTimer.getTimer().schedule(serverMonitor,
-                                    new Date(((System.currentTimeMillis()) / 1000) * 1000));
+                                    new Date(((currentTimeMillis()) / 1000) * 1000));
                         }
                     }
                 } else {

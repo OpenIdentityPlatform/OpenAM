@@ -12,9 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006 Sun Microsystems Inc
- */
-/*
- * Portions Copyright 2011-2015 ForgeRock AS.
+ * Portions Copyright 2011-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -45,6 +43,7 @@ import java.util.TimeZone;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 public class SimpleTimeCondition extends EntitlementConditionAdaptor {
 
@@ -114,7 +113,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         this(PrivilegeManager.debug, new TimeService() {
             @Override
             public long now() {
-                return System.currentTimeMillis();
+                return currentTimeMillis();
             }
 
             @Override

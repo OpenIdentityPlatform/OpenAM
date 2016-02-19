@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: OAuthResourceManager.java,v 1.2 2010/01/20 17:51:37 huacui Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.oauth.service;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.oauth.service.models.AccessToken;
 import com.sun.identity.oauth.service.models.Consumer;
@@ -97,7 +100,7 @@ public class OAuthResourceManager implements OAuthServiceConstants {
         attributes.put(CONSUMER_RSA_KEY, consumerRASKey);
         String consumerKey = consumer.getConsKey();
         attributes.put(CONSUMER_KEY, consumerKey);
-        Date longExpiry = new Date(System.currentTimeMillis() + 86400000 * 1000);
+        Date longExpiry = new Date(currentTimeMillis() + 86400000 * 1000);
         String consumerId = em.createEntity(CONSUMER_TYPE, entitySubject,
                                             attributes, longExpiry);
         consumer.setId(consumerId);

@@ -21,6 +21,7 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.newReadRequest;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -307,23 +308,23 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
     private Promise<Void, ResourceException> awaitCreation(Context context, String resourceId) {
         final PromiseImpl<Void, ResourceException> awaitPromise = PromiseImpl.create();
-        await(context, resourceId, awaitPromise, System.currentTimeMillis(), awaitCreationResultHandler(awaitPromise),
-                awaitCreationExceptionHandler(context, resourceId, awaitPromise, System.currentTimeMillis()));
+        await(context, resourceId, awaitPromise, currentTimeMillis(), awaitCreationResultHandler(awaitPromise),
+                awaitCreationExceptionHandler(context, resourceId, awaitPromise, currentTimeMillis()));
         return awaitPromise;
     }
 
     private Promise<Void, ResourceException> awaitDeletion(Context context, String resourceId) {
         final PromiseImpl<Void, ResourceException> awaitPromise = PromiseImpl.create();
-        await(context, resourceId, awaitPromise, System.currentTimeMillis(),
-                awaitDeletionResultHandler(context, resourceId, awaitPromise, System.currentTimeMillis()),
-                awaitDeletionExceptionHandler(context, resourceId, awaitPromise, System.currentTimeMillis()));
+        await(context, resourceId, awaitPromise, currentTimeMillis(),
+                awaitDeletionResultHandler(context, resourceId, awaitPromise, currentTimeMillis()),
+                awaitDeletionExceptionHandler(context, resourceId, awaitPromise, currentTimeMillis()));
         return awaitPromise;
     }
 
     private void await(Context context, String resourceId, PromiseImpl<Void, ResourceException> awaitPromise,
             long startTime, ResultHandler<ResourceResponse> resultHandler,
             ExceptionHandler<ResourceException> exceptionHandler) {
-        if (System.currentTimeMillis() - startTime > MAX_AWAIT_TIMEOUT) {
+        if (currentTimeMillis() - startTime > MAX_AWAIT_TIMEOUT) {
             awaitPromise.handleResult(null);
             return;
         }

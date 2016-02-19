@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: VerifierList.java,v 1.5 2008/06/25 05:43:38 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
-
-
 package com.sun.identity.log.secure;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -79,7 +80,7 @@ public class VerifierList {
                  */
                 
                 SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyHHmmss");
-                Date d = new Date();
+                Date d = newDate();
                 logFiles.addAll(getLogFilesForKey(dir, filter,
                                 "_secure.log." + filter + "." + sdf.format(d), 
                                 keyFiles[keyFiles.length - 1]));

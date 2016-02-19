@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,13 @@
  *
  * $Id: SecureAttrs.java,v 1.12 2009/03/31 17:18:10 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.sae.api;
 
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.*;
 import java.io.*;
@@ -620,7 +623,7 @@ public class SecureAttrs
         // Normalize     
         StringBuffer str = normalize(attrs);
         // Setup a fresh timestamp
-        long timestamp = (new Date()).getTime();
+        long timestamp = (newDate()).getTime();
 
         String signature = null;
 
@@ -661,7 +664,7 @@ public class SecureAttrs
         int idx = token.indexOf("TS", 2);
         String ts = token.substring(2, idx);
         long signts = Long.parseLong(ts);
-        long nowts = (new Date()).getTime();
+        long nowts = (newDate()).getTime();
 
         // Check timestamp validity
         if ((nowts - signts) > tsDuration)

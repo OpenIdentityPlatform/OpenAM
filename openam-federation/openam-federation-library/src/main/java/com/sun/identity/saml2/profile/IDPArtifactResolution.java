@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,12 @@
  *
  * $Id: IDPArtifactResolution.java,v 1.13 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -493,7 +495,7 @@ public class IDPArtifactResolution {
         artResponse.setID(SAML2Utils.generateID());
         artResponse.setInResponseTo(artResolve.getID());
         artResponse.setVersion(SAML2Constants.VERSION_2_0);
-        artResponse.setIssueInstant(new Date());
+        artResponse.setIssueInstant(newDate());
         artResponse.setAny(res.toXMLString(true,true));
         artResponse.setIssuer(issuer);
         artResponse.setDestination(XMLUtils.escapeSpecialCharacters(acsURL)); 

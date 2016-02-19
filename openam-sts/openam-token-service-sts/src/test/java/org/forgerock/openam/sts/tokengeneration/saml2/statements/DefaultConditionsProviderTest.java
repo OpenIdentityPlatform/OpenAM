@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertTrue;
 
 public class DefaultConditionsProviderTest {
@@ -36,7 +37,7 @@ public class DefaultConditionsProviderTest {
     private static final int TOKEN_LIFETIME_SECONDS = 600;
     @Test
     public void testBearerWithAudiences() throws TokenCreationException, UnsupportedEncodingException {
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
                 conditionsProvider.get(createSAML2Config(), issueInstant,
@@ -49,7 +50,7 @@ public class DefaultConditionsProviderTest {
 
     @Test
     public void testNoBearer() throws TokenCreationException, UnsupportedEncodingException {
-        Date issueInstant = new Date();
+        Date issueInstant = newDate();
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
                 conditionsProvider.get(createSAML2Config(), issueInstant,

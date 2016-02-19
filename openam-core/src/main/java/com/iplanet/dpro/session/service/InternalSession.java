@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -74,8 +74,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.*;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal
@@ -574,7 +576,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                         long timeToWait = Math.min(timeLeft, idleTimeLeft);
                         if (timerPool != null) {
                             timerPool.schedule(this, new Date(((
-                                System.currentTimeMillis() / 1000) +
+                                    currentTimeMillis() / 1000) +
                                 timeToWait) * 1000));
                         }
                     }
@@ -795,7 +797,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @return session idle time
      */
     public long getIdleTime() {
-        long now = System.currentTimeMillis() / 1000;
+        long now = currentTimeMillis() / 1000;
         return now - latestAccessTime;
     }
 
@@ -804,7 +806,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @return Time left for the internal session to be invalid
      */
     public long getTimeLeft() {
-        long now = System.currentTimeMillis() / 1000;
+        long now = currentTimeMillis() / 1000;
         long left = creationTime + maxSessionTime * 60 - now;
         if (left >= 0) {
             return left;
@@ -831,7 +833,7 @@ public class InternalSession implements TaskRunnable, Serializable {
          * Return the extra time left, if the session has timed out due to
          * idle/max time out period
          */
-        long now = System.currentTimeMillis() / 1000;
+        long now = currentTimeMillis() / 1000;
         long left = (timedOutAt + purgeDelay * 60 - now);
         return (left > 0) ? left : 0;
     }
@@ -1201,7 +1203,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @return <code>true</code> if the max default idle time expires
      */
     private boolean checkInvalidSessionDefaultIdleTime() {
-        long now = System.currentTimeMillis() / 1000;
+        long now = currentTimeMillis() / 1000;
         long left = creationTime + maxDefaultIdleTime * 60 - now;
         if (left >= 0) {
             return false;
@@ -1264,7 +1266,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     private void changeStateAndNotify(int eventType) {
         sessionLogging.logEvent(toSessionInfo(), eventType);
-        setTimedOutAt(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        setTimedOutAt(TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
         putProperty("SessionTimedOut", String.valueOf(timedOutAt));
         sessionService.execSessionTimeoutHandlers(sessionID, eventType);
         if(purgeDelay == 0) {
@@ -1343,7 +1345,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void setLatestAccessTime() {
         long oldLatestAccessTime = latestAccessTime;
-        latestAccessTime = System.currentTimeMillis() / 1000;
+        latestAccessTime = currentTimeMillis() / 1000;
         if ((latestAccessTime - oldLatestAccessTime) > interval) {
             updateForFailover();
         }
@@ -1478,7 +1480,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (httpSession != null) {
             creationTime = httpSession.getCreationTime() / 1000;
         } else {
-            creationTime = System.currentTimeMillis() / 1000;
+            creationTime = currentTimeMillis() / 1000;
         }
     }
 
@@ -1834,7 +1836,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             timeLeftSeconds = getTimeLeftBeforePurge();
         }
 
-        return timeUnit.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+        return timeUnit.convert(currentTimeMillis(), MILLISECONDS)
                 + Math.min(timeUnit.convert(getTimeLeft(), TimeUnit.SECONDS),
                            timeUnit.convert(timeLeftSeconds, TimeUnit.SECONDS));
     }
@@ -1849,7 +1851,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 if (isInvalid()) {
                     long expectedTime = creationTime +
                         (maxDefaultIdleTime * 60);
-                    if (expectedTime > (System.currentTimeMillis() / 1000)) {
+                    if (expectedTime > (currentTimeMillis() / 1000)) {
                         if (timerPool != null) {
                             timerPool.schedule(this, new Date(expectedTime *
                                 1000));
@@ -1880,7 +1882,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                             long timeToWait = Math.min(timeLeft, idleTimeLeft);
                             if (timerPool != null) {
                                 timerPool.schedule(this, new Date(((
-                                    System.currentTimeMillis() / 1000) +
+                                        currentTimeMillis() / 1000) +
                                     timeToWait) * 1000));
                             }
                         }
@@ -1888,7 +1890,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 }
             } else {
                 long expectedTime = timedOutAt + purgeDelay * 60;
-                if (expectedTime > (System.currentTimeMillis() / 1000)) {
+                if (expectedTime > (currentTimeMillis() / 1000)) {
                     if (timerPool != null) {
                         timerPool.schedule(this, new Date(expectedTime *
                             1000));

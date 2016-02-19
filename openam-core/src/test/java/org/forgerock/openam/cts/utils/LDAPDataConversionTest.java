@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertEquals;
 
 public class LDAPDataConversionTest {
@@ -33,9 +34,9 @@ public class LDAPDataConversionTest {
         // Given
         LDAPDataConversion conversion = new LDAPDataConversion();
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarInstance();
         calendar.setTimeZone(MALDIVES);
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(currentTimeMillis());
 
         // When
         Calendar result = conversion.fromLDAPDate(conversion.toLDAPDate(calendar));

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2015 ForgeRock AS.
+ * Copyright (c) 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,6 +24,7 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Named;
@@ -226,7 +227,7 @@ public class ClientResource implements CollectionResourceProvider {
 
             JsonValue response = new JsonValue(responseVal);
 
-            ResourceResponse resource = newResourceResponse("results", String.valueOf(System.currentTimeMillis()), response);
+            ResourceResponse resource = newResourceResponse("results", String.valueOf(currentTimeMillis()), response);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"CREATED_CLIENT", responseVal.toString()};
                 auditLogger.logAccessMessage("CREATED_CLIENT", obs, null);

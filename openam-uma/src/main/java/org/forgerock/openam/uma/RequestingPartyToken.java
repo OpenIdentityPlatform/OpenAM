@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -85,7 +86,7 @@ public class RequestingPartyToken implements UmaToken {
     }
 
     public boolean isExpired() {
-        return System.currentTimeMillis() > expiryTime;
+        return currentTimeMillis() > expiryTime;
     }
 
     public void setExpiryTime(Long expiryTime) {

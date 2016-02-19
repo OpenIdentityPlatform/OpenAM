@@ -11,12 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session.blacklist;
 
+import static java.util.Locale.*;
+import static java.util.TimeZone.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.query.QueryFilter.*;
 
 import com.iplanet.dpro.session.Session;
@@ -155,7 +158,7 @@ public final class CTSSessionBlacklist implements SessionBlacklist {
     }
 
     private Calendar now() {
-        return Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
+        return getCalendarInstance(getTimeZone("UTC"), ROOT);
     }
 
     private Calendar timeOf(final long utcMillis) {
@@ -221,7 +224,7 @@ public final class CTSSessionBlacklist implements SessionBlacklist {
         public void run() {
             DEBUG.message("CTSSessionBlacklist: polling for new blacklisted sessions");
             final Collection<PartialToken> results =
-                    findSessionsBlacklistedSince(lastPollTime.getAndSet(System.currentTimeMillis()));
+                    findSessionsBlacklistedSince(lastPollTime.getAndSet(currentTimeMillis()));
             if (results != null) {
                 DEBUG.message("CTSSessionBlacklist: Processing {} session blacklist notifications", results.size());
                 for (PartialToken token : results) {

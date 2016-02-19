@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: SAML11RequestedSecurityToken.java,v 1.7 2009/12/14 23:42:48 mallas Exp $
- * 
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.assertion.AttributeStatement;
@@ -187,7 +190,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
                 statements.add(new AttributeStatement(sub, attributes));
             }
 
-            Date issueInstant = new Date();
+            Date issueInstant = newDate();
 
             long skewPeriod = (long)notBeforeSkew * 1000L;
             Date notBefore = new Date(issueInstant.getTime() - skewPeriod);            
@@ -436,7 +439,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
         Date sessionNotOnOrAfter = assertion.getConditions().getNotOnorAfter();
         if (sessionNotOnOrAfter != null) {
             long maxSessionTime = (sessionNotOnOrAfter.getTime() -
-                    System.currentTimeMillis()) / 60000;
+                    currentTimeMillis()) / 60000;
             if (maxSessionTime > 0) {
                 attrMap.put(SAML2Constants.MAX_SESSION_TIME,
                         new Long(maxSessionTime));

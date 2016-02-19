@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
- */
-/*
- * Portions Copyright 2015 ForgeRock AS
+ *
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.radius.server.spi.handlers.amhandler;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import javax.security.auth.callback.Callback;
 
@@ -125,7 +126,7 @@ public class ContextHolder {
      * set of callbacks has its own declared number of seconds allows for response and that value will be set here when
      * that callback set is incurred.
      */
-    private Long millisExpiryPoint = System.currentTimeMillis() + millisExpiryForCurrentCallbacks;
+    private Long millisExpiryPoint = currentTimeMillis() + millisExpiryForCurrentCallbacks;
 
     /**
      * The key for this object in the server-side cache.

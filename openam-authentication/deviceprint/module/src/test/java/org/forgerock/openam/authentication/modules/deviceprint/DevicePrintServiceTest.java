@@ -22,10 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-/*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -50,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
@@ -177,7 +176,7 @@ public class DevicePrintServiceTest {
     }
 
     private Date getDate(int daysAgo) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarInstance();
         calendar.add(Calendar.DAY_OF_YEAR, -daysAgo);
         return calendar.getTime();
     }

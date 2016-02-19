@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.cts.utils;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
@@ -115,9 +116,9 @@ public class LdapTokenAttributeConversionTest {
         // Given
         LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarInstance();
         calendar.setTimeZone(LDAPDataConversionTest.BERLIN);
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(currentTimeMillis());
 
         Token token = new Token("badger", TokenType.SESSION);
         token.setAttribute(CoreTokenField.STRING_ONE, "Ferret");

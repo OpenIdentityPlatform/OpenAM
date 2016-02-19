@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,13 @@
  *
  * $Id: AssertionBase.java,v 1.2 2008/06/25 05:47:31 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
   
 package com.sun.identity.saml.assertion;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.saml.common.SAMLUtilsCommon;
@@ -494,7 +497,7 @@ public abstract class AssertionBase {
         }
         else  {
             
-            return _conditions.checkDateValidity(System.currentTimeMillis());
+            return _conditions.checkDateValidity(currentTimeMillis());
         }
     }
  
@@ -548,7 +551,7 @@ public abstract class AssertionBase {
             _issueInstant = issueInstant;
         }
         else {
-            _issueInstant = new Date();
+            _issueInstant = newDate();
         }
     }
 
@@ -604,7 +607,7 @@ public abstract class AssertionBase {
         if (issueInstant != null)  {
             _issueInstant = issueInstant;
         } else  {
-            _issueInstant = new Date();
+            _issueInstant = newDate();
         }
         if (conditions != null)  {
             _conditions = conditions;
@@ -666,7 +669,7 @@ public abstract class AssertionBase {
         if (issueInstant != null)  {
             _issueInstant = issueInstant;
         } else  {
-            _issueInstant = new Date();
+            _issueInstant = newDate();
         }
         if (conditions != null)  {
             _conditions = conditions;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,13 @@
  *
  * $Id: SessionCondition.java,v 1.4 2008/06/25 05:43:52 qcheng Exp $
  *
+ * Portions Copyright 2014-2016 ForgeRock AS.
  */
-/*
- * Portions Copyright 2014 ForgeRock AS
- */
-
-
 
 package com.sun.identity.policy.plugins;
 
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
@@ -293,7 +291,7 @@ public class SessionCondition implements Condition {
             }
         }
 
-        long currentTime = System.currentTimeMillis();
+        long currentTime = currentTimeMillis();
         long timeToLive = Long.MAX_VALUE;
         long expiredTime = tokenCreationTime + maxSessionTime;
         if (debug.messageEnabled()) {

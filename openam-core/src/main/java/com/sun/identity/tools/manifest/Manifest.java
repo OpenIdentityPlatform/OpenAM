@@ -1,31 +1,35 @@
-/**
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-*
-* Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
-*
-* The contents of this file are subject to the terms
-* of the Common Development and Distribution License
-* (the License). You may not use this file except in
-* compliance with the License.
-*
-* You can obtain a copy of the License at
-* https://opensso.dev.java.net/public/CDDLv1.0.html or
-* opensso/legal/CDDLv1.0.txt
-* See the License for the specific language governing
-* permission and limitations under the License.
-*
-* When distributing Covered Code, include this CDDL
-* Header Notice in each file and include the License file
-* at opensso/legal/CDDLv1.0.txt.
-* If applicable, add the following below the CDDL Header,
-* with the fields enclosed by brackets [] replaced by
-* your own identifying information:
-* "Portions Copyrighted [year] [name of copyright owner]"
-*
-* $Id: Manifest.java,v 1.3 2009/02/17 18:41:41 kevinserwin Exp $
-*/
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: Manifest.java,v 1.3 2009/02/17 18:41:41 kevinserwin Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
 
 package com.sun.identity.tools.manifest;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedOutputStream;
@@ -213,7 +217,7 @@ public class Manifest implements ManifestConstants{
                         fr.close();
                     } 
                 } else {
-                    long currentTimeInMillis = System.currentTimeMillis();
+                    long currentTimeInMillis = currentTimeMillis();
             
                     // Create Date object.
                     Date date = new Date(currentTimeInMillis);
@@ -271,7 +275,7 @@ public class Manifest implements ManifestConstants{
             this.destFilePath = destFilePath;
             writeDestFile();
         } else {
-            long currentTimeInMillis = System.currentTimeMillis();
+            long currentTimeInMillis = currentTimeMillis();
             
             // Create Date object.
             Date date = new Date(currentTimeInMillis);

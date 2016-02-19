@@ -24,10 +24,12 @@
  *
  * $Id: DBHandler.java,v 1.19 2009/12/15 17:59:16 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.log.handlers;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -1282,7 +1284,7 @@ public class DBHandler extends Handler {
             bufferTask = new TimeBufferingTask(interval);
             try {
                 SystemTimer.getTimer().schedule(bufferTask,
-                    new Date(((System.currentTimeMillis() + interval) / 1000) *
+                    new Date(((currentTimeMillis() + interval) / 1000) *
                     1000));
             } catch (IllegalArgumentException e) {
                 Debug.error (tableName + ":DBHandler:BuffTimeArg: " + e.getMessage());

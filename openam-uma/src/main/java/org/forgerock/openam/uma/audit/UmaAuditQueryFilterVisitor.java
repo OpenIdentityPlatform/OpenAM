@@ -11,10 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.audit;
+
+import static java.util.TimeZone.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.util.query.QueryFilter;
@@ -49,7 +52,7 @@ public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forger
     public org.forgerock.util.query.QueryFilter<String> visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
         final String fieldName = field.get(0);
         if (fieldName.equals("eventTime")) {
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            Calendar cal = getCalendarInstance(getTimeZone("UTC"));
             cal.setTimeInMillis((Long) valueAssertion);
             return QueryFilter.equalTo(field.get(0), cal);
         } else {

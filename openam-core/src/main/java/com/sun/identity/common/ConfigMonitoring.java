@@ -24,9 +24,12 @@
  *
  * $Id: ConfigMonitoring.java,v 1.6 2009/12/23 23:50:21 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
+
 package com.sun.identity.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
@@ -103,7 +106,7 @@ public class ConfigMonitoring {
      */
     public void configureMonitoring() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date1 = new Date();
+        Date date1 = newDate();
         String startDate = sdf.format(date1);
         debug = Debug.getInstance("amMonitoring");
         String classMethod = "ConfigMonitoring.configureMonitoring: ";
@@ -190,7 +193,7 @@ public class ConfigMonitoring {
         if (debug.messageEnabled()) {
             doSubRealms("/");  // start with the root realm ("/")
         }
-        date1 = new Date();
+        date1 = newDate();
         if (debug.messageEnabled()) {
             debug.message(classMethod + "\n" +
                 "    Start time " + startDate + "\n" +

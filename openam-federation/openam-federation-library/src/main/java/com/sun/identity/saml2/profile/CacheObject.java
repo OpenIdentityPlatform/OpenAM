@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,14 @@
  *
  * $Id: CacheObject.java,v 1.3 2008/06/25 05:47:53 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 /**
  * This is a base class to be extended by classes that needs to be
@@ -44,7 +47,7 @@ public class CacheObject {
 
     public CacheObject(Object object) {
         obj = object;
-        time = System.currentTimeMillis();
+        time = currentTimeMillis();
     }
 
     public long getTime() {

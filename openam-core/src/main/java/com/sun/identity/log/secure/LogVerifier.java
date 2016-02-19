@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: LogVerifier.java,v 1.7 2008/06/25 05:43:38 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.log.secure;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +146,7 @@ public class LogVerifier{
         if(verifier == null){
             verifier = new VerifyTask(interval);
             SystemTimer.getTimer().schedule(verifier, new Date(((
-                System.currentTimeMillis() + interval) / 1000) * 1000));
+                    currentTimeMillis() + interval) / 1000) * 1000));
             if (Debug.messageEnabled()) {
                 Debug.message(name+":Verifier Thread Started");
             }
@@ -231,7 +230,7 @@ public class LogVerifier{
         Object token = new Object();
         synchronized(logger) {
             verificationOn = true;
-            long start = System.currentTimeMillis();
+            long start = currentTimeMillis();
             helper = SecureFileHandler.getSecureLogHelper(name);
             fileList = SecureFileHandler.getCurrentFileList(name);
             if (fileList == null) {

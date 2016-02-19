@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,13 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
 
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -98,7 +100,7 @@ public class HttpConnectionFactory {
             StringBuilder securityCookieValue = new StringBuilder();
             securityCookieValue.append(serverConfig.getLocalServerURL().toString());
             securityCookieValue.append(Constants.AT);
-            securityCookieValue.append(System.currentTimeMillis());
+            securityCookieValue.append(currentTimeMillis());
 
             String securityCookie = AccessController.doPrivileged(new EncodeAction(securityCookieValue.toString()));
 

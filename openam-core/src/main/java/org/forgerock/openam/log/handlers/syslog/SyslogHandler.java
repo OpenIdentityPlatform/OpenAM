@@ -12,9 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 Cybernetica AS
- * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.log.handlers.syslog;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.ThreadPoolException;
 import com.sun.identity.common.GeneralTaskRunnable;
@@ -162,7 +164,7 @@ public class SyslogHandler extends Handler {
         bufferingTask = new TimeBufferingTask(interval);
         try {
             SystemTimer.getTimer().schedule(bufferingTask,
-                    new Date(((System.currentTimeMillis() + interval) / 1000) * 1000));
+                    new Date(((currentTimeMillis() + interval) / 1000) * 1000));
         } catch (IllegalArgumentException e) {
             Debug.error("SyslogHandler:startTimeBufferingThread: Unable to schedule buffering task"
                     + e.getMessage());

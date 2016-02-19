@@ -22,13 +22,13 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-/*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.authentication.modules.deviceprint.comparators.ComparisonResult;
@@ -155,7 +155,7 @@ public class DevicePrintService {
      */
     public void createNewProfile(DevicePrint devicePrint) throws NotUniqueUserProfileException {
 
-        UserProfile profile = new UserProfile(new Date(), new Date(), 1L);
+        UserProfile profile = new UserProfile(newDate(), newDate(), 1L);
         profile.setDevicePrint(devicePrint);
         profile.setUuid(new RandomHashGenerator().getRandomHash());
 
@@ -173,7 +173,7 @@ public class DevicePrintService {
     public void updateProfile(UserProfile profile, DevicePrint devicePrint) throws NotUniqueUserProfileException {
 
         profile.setSelectionCounter(profile.getSelectionCounter() + 1L);
-        profile.setLastSelectedDate(new Date());
+        profile.setLastSelectedDate(newDate());
         profile.setDevicePrint(devicePrint);
 
         saveProfile(profile);
@@ -215,7 +215,7 @@ public class DevicePrintService {
      */
 	private void removeOldestProfile() {
 		UserProfile oldestProfile = null;
-		Date oldestDate = new Date();
+        Date oldestDate = newDate();
 		
 		for (UserProfile userProfile : userProfilesDao.getProfiles()) {
 			if (userProfile.getLastSelectedDate().before(oldestDate)) {
@@ -254,7 +254,7 @@ public class DevicePrintService {
      * @return If the user profile has expired or not.
      */
 	private boolean isExpiredProfile(UserProfile userProfile) {
-		Calendar c = Calendar.getInstance();
+        Calendar c = getCalendarInstance();
 		c.add(Calendar.DAY_OF_YEAR, -profileExpirationDays);
 
 		if (userProfile.getLastSelectedDate().before(c.getTime())) {

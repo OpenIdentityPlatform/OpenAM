@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,6 +25,8 @@
 
 package org.forgerock.openam.session.model;
 
+import static org.forgerock.openam.utils.Time.*;
+
 /**
  * This singleton class is used to keep statistics about the running db.
  * 
@@ -41,7 +43,7 @@ public class DBStatistics {
     
     private static void initialize() {
         // remember when we started.
-        startTime = System.currentTimeMillis();
+        startTime = currentTimeMillis();
     }
     
     private DBStatistics() {
@@ -80,6 +82,6 @@ public class DBStatistics {
      * @return 
      */
     public long getUptime() {
-        return System.currentTimeMillis() - startTime;
+        return currentTimeMillis() - startTime;
     }
 }

@@ -374,6 +374,9 @@ Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 Version: wss4j-1.6.18.jar
 Copyright: Copyright 2004-2015 The Apache Software Foundation
 
+Version: joda-time-2.7.jar
+Copyright 2001-2016 Stephen Colebourne
+
 ==================
 Full license text:
 ==================

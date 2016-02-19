@@ -13,7 +13,7 @@
  *
  * Copyright 2014 Nomura Research Institute, Ltd.
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -36,6 +36,7 @@ import java.util.Set;
 import static com.sun.identity.entitlement.xacml3.Assertions.*;
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.*;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.*;
 
 /**
@@ -50,7 +51,7 @@ import static org.testng.Assert.*;
  */
 public class XACMLPrivilegeUtilsTest {
 
-    private long now = Calendar.getInstance().getTimeInMillis();
+    private long now = getCalendarInstance().getTimeInMillis();
 
     @Test
     public void shouldReturnEmptyListWhenNull() {

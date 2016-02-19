@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: AccessToken.java,v 1.1 2009/11/20 19:31:57 huacui Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.oauth.service.models;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.oauth.service.PathDefs;
 import com.sun.identity.oauth.service.util.OAuthProperties;
@@ -60,7 +63,7 @@ public class AccessToken {
     }
 
     public AccessToken() {
-        setAcctLifetime(new Date(System.currentTimeMillis() + lifeTime * 1000));
+        setAcctLifetime(new Date(currentTimeMillis() + lifeTime * 1000));
     }
 
     public String getId() {

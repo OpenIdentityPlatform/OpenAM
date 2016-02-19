@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.tokens;
 
+import static java.util.TimeZone.*;
+
 import java.util.Calendar;
-import java.util.TimeZone;
 
 /**
  * A custom converter that converted {@code Long}s to {@code Calendar}s.
@@ -31,7 +32,7 @@ public class LongToCalendarConverter implements Converter<Long, Calendar> {
         if (aLong == null) {
             return null;
         }
-        Calendar result = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Calendar result = org.forgerock.openam.utils.Time.getCalendarInstance(getTimeZone("UTC"));
         result.setTimeInMillis(aLong);
         return result;
     }

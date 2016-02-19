@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: SecureFileHandler.java,v 1.12 2009/07/27 22:29:42 hvijay Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.log.handlers;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -976,7 +975,7 @@ public class SecureFileHandler extends java.util.logging.Handler {
         if (signTask == null){
             signTask = new SignTask(signInterval);
             SystemTimer.getTimer().schedule(signTask, new Date(((
-                    System.currentTimeMillis() + signInterval) / 1000) * 1000));
+                    currentTimeMillis() + signInterval) / 1000) * 1000));
         }
     }
     

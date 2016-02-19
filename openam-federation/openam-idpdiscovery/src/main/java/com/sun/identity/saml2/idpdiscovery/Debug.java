@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: Debug.java,v 1.5 2008/06/25 05:47:47 qcheng Exp $
  *
- *  Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
-
 package com.sun.identity.saml2.idpdiscovery;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import java.io.BufferedWriter;
@@ -511,7 +512,7 @@ public class Debug {
         StringWriter swriter = new StringWriter(160);
         PrintWriter buf = new PrintWriter(swriter, true);
         synchronized (dateFormat) {
-            buf.write(dateFormat.format(new Date()));
+            buf.write(dateFormat.format(newDate()));
         }
         buf.write(": ");
         buf.write(Thread.currentThread().toString());

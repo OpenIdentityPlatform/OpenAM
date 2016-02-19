@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,12 @@
  *
  * $Id: SessionContext.java,v 1.2 2008/06/25 05:47:21 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
-
 package com.sun.identity.liberty.ws.security;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.DateUtils;
 
@@ -94,8 +96,8 @@ public class SessionContext {
 	_sessionSubject = sessionSubject;
 	_authnContext = authnContext;
 	_providerID = providerID;
-	_issueInstant = new Date();
-	_authenticationInstant = new Date();
+        _issueInstant = newDate();
+        _authenticationInstant = newDate();
     }
 
     /**

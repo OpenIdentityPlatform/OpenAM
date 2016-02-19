@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.services.comm.server;
 
@@ -24,6 +24,7 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
@@ -110,7 +111,7 @@ public class PLLAuditor {
         }
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
@@ -156,7 +157,7 @@ public class PLLAuditor {
         }
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             final JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
@@ -181,7 +182,7 @@ public class PLLAuditor {
      */
     private void reset() {
         accessAttemptAudited = false;
-        startTime = System.currentTimeMillis();
+        startTime = currentTimeMillis();
         method = "unknown";
         userId = "";
         trackingId = "";

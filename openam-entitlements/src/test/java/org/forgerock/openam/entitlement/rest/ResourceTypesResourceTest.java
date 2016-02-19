@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.rest;
 
@@ -20,6 +20,7 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.entitlement.rest.EntitlementTestUtils.assertResourcePromiseFailedWithCodes;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -160,8 +161,8 @@ public class ResourceTypesResourceTest {
         rawData.put("realm", Collections.singleton("/"));
         rawData.put("actions", Collections.singleton("CREATE"));
         rawData.put("patterns", Collections.singleton("http://example.com:80/*"));
-        rawData.put("creationDate", Collections.singleton(String.valueOf(new Date().getTime())));
-        rawData.put("lastModifiedDate", Collections.singleton(String.valueOf(new Date().getTime())));
+        rawData.put("creationDate", Collections.singleton(String.valueOf(newDate().getTime())));
+        rawData.put("lastModifiedDate", Collections.singleton(String.valueOf(newDate().getTime())));
     }
 
     @Test

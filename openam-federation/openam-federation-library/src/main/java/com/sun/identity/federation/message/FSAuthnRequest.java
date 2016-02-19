@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthnRequest.java,v 1.4 2008/07/08 06:03:37 exu Exp $
- * Portions Copyrighted 2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.message;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -87,7 +90,7 @@ public class FSAuthnRequest extends AbstractRequest {
      * Default AuthnRequest construtor
      */
     public FSAuthnRequest() {
-        setIssueInstant(new Date());
+        setIssueInstant(newDate());
     }
     
     /**
@@ -120,7 +123,7 @@ public class FSAuthnRequest extends AbstractRequest {
             String authContextCompType)
             throws FSMsgException {
         
-        setIssueInstant(new Date());
+        setIssueInstant(newDate());
         if((respondWiths != null) && (respondWiths != Collections.EMPTY_LIST)) {
             int length = respondWiths.size();
             for(int i = 0; i < length; i++) {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: PolicyCache.java,v 1.2 2008/06/25 05:43:07 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.policy.model;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
@@ -213,7 +212,7 @@ public class PolicyCache
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(System.currentTimeMillis());
+        sb.append(currentTimeMillis());
         sb.append(Base64.encode(keyRandom));
         return (sb.toString());
     }

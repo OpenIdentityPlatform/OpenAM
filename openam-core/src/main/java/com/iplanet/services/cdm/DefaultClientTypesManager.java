@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: DefaultClientTypesManager.java,v 1.4 2008/09/04 16:16:34 dillidorai Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.services.cdm;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.services.cdm.clientschema.AMClientCapData;
 import com.iplanet.services.cdm.clientschema.AMClientCapException;
@@ -187,7 +186,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
             if (!isInitialized) {
                 isInitialized = true;
 
-                long st = System.currentTimeMillis();
+                long st = currentTimeMillis();
 
                 // Load minimal client info for all internal clients
                 if (intCapInstance != null) {
@@ -205,7 +204,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
                 // Load maps for searching by useragent, clientType
                 loadMaps();
 
-                long end = System.currentTimeMillis();
+                long end = currentTimeMillis();
                 if (debug.messageEnabled()) {
                     debug.message(CLASS + "Load AllClients Time (ms) = "
                             + (end - st));
@@ -784,7 +783,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
      */
     protected Client loadClient(String clientType) {
         Client client = null;
-        long st = System.currentTimeMillis();
+        long st = currentTimeMillis();
         Map iMap = loadInternalClient(clientType);
 
         Map eMap = loadExternalClient(clientType);
@@ -826,7 +825,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
         client = new Client(clientType, mergedMap);
         loadedClientsMap.put(clientType, client);
 
-        long end = System.currentTimeMillis();
+        long end = currentTimeMillis();
 
         if (debug.messageEnabled()) {
             debug.message(CLASS + "Load Client " + clientType + " Time (ms) = "

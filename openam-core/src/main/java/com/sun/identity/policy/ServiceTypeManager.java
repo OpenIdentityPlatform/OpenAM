@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,13 @@
  *
  * $Id: ServiceTypeManager.java,v 1.6 2009/06/30 17:46:02 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.policy;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.*;
 import java.security.AccessController;
@@ -226,7 +225,7 @@ public class ServiceTypeManager {
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(System.currentTimeMillis()).toString();
+        sb.append(currentTimeMillis()).toString();
         return (sb.append(Base64.encode(keyRandom)).toString());
     }
 

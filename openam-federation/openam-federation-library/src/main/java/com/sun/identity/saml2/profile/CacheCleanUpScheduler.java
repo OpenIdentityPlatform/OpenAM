@@ -24,10 +24,13 @@
  *
  * $Id: CacheCleanUpScheduler.java,v 1.8 2009/05/14 17:23:44 exu Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
+
+import static com.sun.identity.saml2.profile.SPCache.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TimerPool;
@@ -38,8 +41,8 @@ public class CacheCleanUpScheduler {
     /* Schedule the periodic containers to SystemTimerPool. */
     public static void doSchedule() {
         TimerPool pool = SystemTimerPool.getTimerPool();
-        Date nextRun = new Date(((System.currentTimeMillis() +
-            (SPCache.interval * 1000)) / 1000) * 1000);
+        Date nextRun = new Date(((currentTimeMillis() +
+                (interval * 1000)) / 1000) * 1000);
         pool.schedule(SPCache.requestHash, nextRun);
         pool.schedule(SPCache.responseHash, nextRun);
         pool.schedule(SPCache.mniRequestHash, nextRun);

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.oidc;
@@ -40,6 +40,7 @@ import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -87,7 +88,7 @@ public class OpenIdConnectTokenGenerationImplTest {
         OpenIdConnectTokenClaimMapper mockClaimMapper = mock(OpenIdConnectTokenClaimMapper.class);
         when(mockClaimMapperProvider.getClaimMapper(any(OpenIdConnectTokenConfig.class))).thenReturn(mockClaimMapper);
         when(mockClaimMapper.getCustomClaims(mockSSOToken, mappedClaimConfig)).thenReturn(mappedClaimAttributes);
-        long authTime = System.currentTimeMillis() / 1000;
+        long authTime = currentTimeMillis() / 1000;
         OpenIdConnectTokenGenerationState openIdConnectTokenGenerationState = buildOpenIdConnectTokenGenerationState(authTime);
         when(mockTokenGenerationInvocationState.getOpenIdConnectTokenGenerationState()).thenReturn(openIdConnectTokenGenerationState);
         String oidcToken = new OpenIdConnectTokenGenerationImpl(mockSSOTokenIdentity, new JwtBuilderFactory(),
@@ -120,7 +121,7 @@ public class OpenIdConnectTokenGenerationImplTest {
         OpenIdConnectTokenClaimMapper mockClaimMapper = mock(OpenIdConnectTokenClaimMapper.class);
         when(mockClaimMapperProvider.getClaimMapper(any(OpenIdConnectTokenConfig.class))).thenReturn(mockClaimMapper);
         when(mockClaimMapper.getCustomClaims(mockSSOToken, mappedClaimConfig)).thenReturn(mappedClaimAttributes);
-        long authTime = System.currentTimeMillis() / 1000;
+        long authTime = currentTimeMillis() / 1000;
         OpenIdConnectTokenGenerationState openIdConnectTokenGenerationState = buildOpenIdConnectTokenGenerationState(authTime);
         when(mockTokenGenerationInvocationState.getOpenIdConnectTokenGenerationState()).thenReturn(openIdConnectTokenGenerationState);
         String oidcToken = new OpenIdConnectTokenGenerationImpl(mockSSOTokenIdentity, new JwtBuilderFactory(),

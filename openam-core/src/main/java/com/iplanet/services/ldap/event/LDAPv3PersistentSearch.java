@@ -17,6 +17,7 @@
 package com.iplanet.services.ldap.event;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
@@ -230,7 +231,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             try {
                // Schedules the task for the exact second without any non-zero milliseconds
                SystemTimerPool.getTimerPool().schedule(retryTask,
-                    new Date(System.currentTimeMillis() + retryInterval / 1000 * 1000));
+                    new Date(currentTimeMillis() + retryInterval / 1000 * 1000));
             } catch (IllegalMonitorStateException e) {
                 DEBUG.warning("PSearch was not restarted, application may be shutting down:", e);
             }
@@ -368,7 +369,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 runPeriod = -1;
                 lastLogged = 0;
             } catch (Exception ex) {
-                long now = System.currentTimeMillis();
+                long now = currentTimeMillis();
                 if (now - lastLogged > 60000) {
                     DEBUG.error("Unable to start persistent search: " + ex.getMessage());
                     lastLogged = now;

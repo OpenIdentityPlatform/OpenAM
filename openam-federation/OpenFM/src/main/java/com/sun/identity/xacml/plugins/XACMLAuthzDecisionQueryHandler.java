@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: XACMLAuthzDecisionQueryHandler.java,v 1.6 2008/06/25 05:50:16 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.xacml.plugins;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -369,7 +368,7 @@ public class XACMLAuthzDecisionQueryHandler implements RequestHandler {
                 = ProtocolFactory.getInstance().createResponse();
         samlpResponse.setID("response-id:1");
         samlpResponse.setVersion("2.0");
-        samlpResponse.setIssueInstant(new Date());
+        samlpResponse.setIssueInstant(newDate());
 
         com.sun.identity.saml2.protocol.StatusCode samlStatusCode
                 = ProtocolFactory.getInstance().createStatusCode();
@@ -382,7 +381,7 @@ public class XACMLAuthzDecisionQueryHandler implements RequestHandler {
         Assertion assertion = AssertionFactory.getInstance().createAssertion();
         assertion.setVersion("2.0");
         assertion.setID("response-id:1");
-        assertion.setIssueInstant(new Date());
+        assertion.setIssueInstant(newDate());
         Issuer issuer = AssertionFactory.getInstance().createIssuer();
         issuer.setValue("issuer-1");
         assertion.setIssuer(issuer);

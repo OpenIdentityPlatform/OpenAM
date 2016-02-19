@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import javax.inject.Inject;
 
@@ -74,7 +75,7 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
                 field(USER_ID, token.getResourceOwnerId()),
                 field(TOKEN_TYPE, token instanceof AccessToken ? ACCESS_TOKEN_TYPE : REFRESH_TOKEN_TYPE),
                 field(OAuth2Constants.JWTTokenParams.EXP, token.getExpiryTime() == -1 ? null : (token.getExpiryTime
-                        () - System.currentTimeMillis()) / 1000),
+                        () - currentTimeMillis()) / 1000),
                 field(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId()),
                 field(OAuth2Constants.JWTTokenParams.ISS, urisFactory.get(request).getIssuer())
         ));

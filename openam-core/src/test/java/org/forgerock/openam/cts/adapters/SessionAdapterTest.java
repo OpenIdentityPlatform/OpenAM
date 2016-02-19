@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.*;
@@ -63,7 +64,7 @@ public class SessionAdapterTest {
         // Given
 
         // Sessions can only measure time to the closest second.
-        Calendar now = Calendar.getInstance();
+        Calendar now = getCalendarInstance();
         now.set(Calendar.MILLISECOND, 0);
         long mockTimestamp = TimeUtils.toUnixTime(now);
 
@@ -135,7 +136,7 @@ public class SessionAdapterTest {
 
         // Then
         // if latestAccessTime was zero, this would fail
-        long epochedSeconds = System.currentTimeMillis() / 1000;
+        long epochedSeconds = currentTimeMillis() / 1000;
         long idleTime = session.getIdleTime();
         assertTrue(idleTime < epochedSeconds);
 

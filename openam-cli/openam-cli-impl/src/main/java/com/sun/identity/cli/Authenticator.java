@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,11 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Authenticator.java,v 1.9 2008/08/19 19:08:57 veiming Exp $
- * Portions Copyrighted 2011-2015 ForgeRock AS.
  *
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -336,7 +338,7 @@ class Authenticator {
         boolean expired = false;
         if ((strDate != null) && (strDate.trim().length() > 0)) {
             Date exprDate = Locale.parseNormalizedDateString(strDate);
-            expired = exprDate.before(new Date());
+            expired = exprDate.before(newDate());
         }
         return expired;
     }
