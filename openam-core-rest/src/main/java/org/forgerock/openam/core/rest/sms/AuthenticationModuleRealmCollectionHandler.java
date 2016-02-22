@@ -54,12 +54,16 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-public class AuthenticationModuleRealmSmsHandler extends AuthenticationModuleGlobalSmsHandler {
+public class AuthenticationModuleRealmCollectionHandler extends AuthenticationModuleGlobalCollectionHandler {
 
     @Inject
-    public AuthenticationModuleRealmSmsHandler(@Named("frRest") Debug debug, @Named("adminToken") SSOToken adminToken,
-            @Named("AMAuthenticationServices") Set<String> authenticationServiceNames, @Named("AMResourceBundleCache")
-            AMResourceBundleCache resourceBundleCache, @Named("DefaultLocale") Locale defaultLocale) {
+    public AuthenticationModuleRealmCollectionHandler(@Named("frRest") Debug debug,
+                                                      @Named("adminToken") SSOToken adminToken,
+                                                      @Named("AMAuthenticationServices")
+                                                      Set<String> authenticationServiceNames,
+                                                      @Named("AMResourceBundleCache")
+                                                      AMResourceBundleCache resourceBundleCache,
+                                                      @Named("DefaultLocale") Locale defaultLocale) {
         super(debug, adminToken, authenticationServiceNames, resourceBundleCache, defaultLocale);
     }
 

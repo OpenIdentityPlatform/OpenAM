@@ -24,5 +24,5 @@ import com.sun.identity.sm.ServiceSchema;
 public interface SmsCollectionProviderFactory {
 
     SmsCollectionProvider create(SmsJsonConverter converter, ServiceSchema schema, SchemaType type,
-                                 List<ServiceSchema> subSchemaPath, String uriPath, boolean serviceHasInstanceName);
+            List<ServiceSchema> subSchemaPath, String uriPath, boolean serviceHasInstanceName);
 }

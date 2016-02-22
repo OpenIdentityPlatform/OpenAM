@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.sms;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.RestConstants.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
@@ -45,6 +47,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
@@ -56,16 +59,14 @@ import org.forgerock.util.promise.Promise;
  * service types on the server, regardless of those currently instantiated. Requesting
  * 'getCreatableTypes' will return the set of all service types which have not been
  * instantiated on the server.
- *
- * @since 14.0.0
  */
-public class ServicesRealmSmsHandler extends DefaultSmsHandler {
+public class ServicesRealmCollectionHandler extends NoOpCollectionHandler {
 
     private final Debug debug;
     private final SmsConsoleServiceNameFilter consoleNameFilter;
 
     @Inject
-    ServicesRealmSmsHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
+    ServicesRealmCollectionHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
         this.debug = debug;
         this.consoleNameFilter = consoleNameFilter;
     }
@@ -117,70 +118,77 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
     }
 
     @Override
-    public JsonValue getAllTypes(Context context, ActionRequest request) throws InternalServerErrorException {
-        try {
-            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            final ServiceManager sm = getServiceManager(ssoToken);
-            final OrganizationConfigManager ocm = sm.getOrganizationConfigManager(realm);
-            final List<Object> jsonArray = array();
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest actionRequest) {
+        switch (actionRequest.getAction()) {
 
-            final Set<String> services = ocm.getAssignableServices();
-            services.addAll(ocm.getAssignedServices());
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignedServices());
-            consoleNameFilter.filter(services);
-
-            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
-
-            for (String instanceName : serviceNameMap.keySet()) {
-                jsonArray.add(object(
-                        field(ResourceResponse.FIELD_CONTENT_ID, instanceName),
-                        field(NAME, serviceNameMap.get(instanceName))));
-            }
-
-            return json(object(field(RESULT, jsonArray)));
-        } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException();
+            case GET_ALL_TYPES :
+                try {
+                    return getAllTypesAction(context);
+                } catch (SMSException | SSOException | IdRepoException e) {
+                    debug.error("ServiceInstanceCollectionHandler::getAllTypes - Unable to query SMS config", e);
+                    return new InternalServerErrorException("Unable to query SMS config: "
+                            + e.getMessage(), e).asPromise();
+                }
+            case GET_CREATABLE_TYPES :
+                try {
+                    return getCreatableTypesAction(context);
+                } catch (SMSException | SSOException | IdRepoException e) {
+                    debug.error("ServiceInstanceCollectionHandler::getCreatableTypes - Unable to query SMS config", e);
+                    return new InternalServerErrorException("Unable to query SMS config: "
+                            + e.getMessage(), e).asPromise();
+                }
+            default :
+                return RestUtils.generateUnsupportedOperation();
         }
     }
 
-    @Override
-    public JsonValue getCreatableTypes(Context context, ActionRequest request) throws InternalServerErrorException {
-        try {
-            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            final ServiceManager sm = getServiceManager(ssoToken);
-            final List<Object> jsonOutput = array();
+    private Promise<ActionResponse, ResourceException> getCreatableTypesAction(Context context)
+            throws SMSException, SSOException, IdRepoException {
 
-            final Set<String> services = sm.getOrganizationConfigManager(realm).getAssignableServices();
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
-            consoleNameFilter.filter(services);
+        final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
+        final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        final ServiceManager sm = getServiceManager(ssoToken);
+        final List<Object> jsonOutput = array();
 
-            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
+        final Set<String> services = sm.getOrganizationConfigManager(realm).getAssignableServices();
+        services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
+        consoleNameFilter.filter(services);
 
-            for (Map.Entry<String, String> entry : serviceNameMap.entrySet()) {
-                jsonOutput.add(object(
-                        field(ResourceResponse.FIELD_CONTENT_ID, entry.getKey()),
-                        field(NAME, entry.getValue())));
-            }
+        final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
 
-            return json(object(field(RESULT, jsonOutput)));
-        } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException();
+        for (Map.Entry<String, String> entry : serviceNameMap.entrySet()) {
+            jsonOutput.add(object(
+                    field(ResourceResponse.FIELD_CONTENT_ID, entry.getKey()),
+                    field(NAME, entry.getValue())));
         }
+
+        return newResultPromise(newActionResponse(json(object(field(RESULT, jsonOutput)))));
     }
 
-    @Override
-    public JsonValue getSchema(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("Operation not supported.");
-    }
+    private Promise<ActionResponse, ResourceException> getAllTypesAction(Context context)
+            throws SMSException, SSOException, IdRepoException {
 
-    @Override
-    public JsonValue getTemplate(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("Operation not supported.");
+        final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
+        final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        final ServiceManager sm = getServiceManager(ssoToken);
+        final OrganizationConfigManager ocm = sm.getOrganizationConfigManager(realm);
+        final List<Object> jsonArray = array();
+
+        final Set<String> services = ocm.getAssignableServices();
+        services.addAll(ocm.getAssignedServices());
+        services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
+        services.addAll(getIdentityServices(realm, ssoToken).getAssignedServices());
+        consoleNameFilter.filter(services);
+
+        final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
+
+        for (String instanceName : serviceNameMap.keySet()) {
+            jsonArray.add(object(
+                    field(ResourceResponse.FIELD_CONTENT_ID, instanceName),
+                    field(NAME, serviceNameMap.get(instanceName))));
+        }
+
+        return newResultPromise(newActionResponse(json(object(field(RESULT, jsonArray)))));
     }
 
     ServiceManager getServiceManager(SSOToken token) throws SMSException, SSOException {

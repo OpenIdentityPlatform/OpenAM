@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -357,7 +357,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context serverContext, QueryRequest queryRequest,
             QueryResourceHandler handler) {
-        return new NotSupportedException("AME-9665").asPromise();
+        return new NotSupportedException("query operation not supported").asPromise();
     }
 
     @Override
