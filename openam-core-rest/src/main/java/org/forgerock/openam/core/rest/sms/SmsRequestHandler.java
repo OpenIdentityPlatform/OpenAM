@@ -21,22 +21,6 @@ import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -54,6 +38,21 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
@@ -111,9 +110,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
-    private final AuthenticationModuleRealmCollectionHandler authenticationModuleRealmCollectionHandler;
-    private final AuthenticationModuleGlobalCollectionHandler authenticationModuleGlobalCollectionHandler;
-    private final ServicesRealmCollectionHandler servicesRealmCollectionHandler;
     private final RealmContextFilter realmContextFilter;
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
             new HashMap<>();
@@ -132,13 +128,11 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory,
-            AuthenticationModuleRealmCollectionHandler authenticationModuleRealmCollectionHandler,
-            ServicesRealmCollectionHandler servicesRealmCollectionHandler,
-            AuthenticationModuleGlobalCollectionHandler authenticationModuleGlobalCollectionHandler,
             SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
-            PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction)
+            PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
+            PrivilegedAction<SSOToken> adminTokenAction)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -150,9 +144,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.coreWrapper = coreWrapper;
         this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
-        this.authenticationModuleGlobalCollectionHandler = authenticationModuleGlobalCollectionHandler;
-        this.authenticationModuleRealmCollectionHandler = authenticationModuleRealmCollectionHandler;
-        this.servicesRealmCollectionHandler = servicesRealmCollectionHandler;
         this.realmContextFilter = realmContextFilter;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
@@ -162,31 +153,32 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         routeTree = tree(authzModules, privilegeAuthzModule,
                 branch("/authentication", smsServiceHandlerFunction.AUTHENTICATION_HANDLES_FUNCTION,
                         leaf("/modules", smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION),
-                        filter("/chains", smsServiceHandlerFunction.AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
+                        filter("/chains", smsServiceHandlerFunction.AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
+                                authenticationChainsFilter)),
                 branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", smsServiceHandlerFunction)
         );
-        this.smsServiceHandlerFunction = smsServiceHandlerFunction;
-        addExcludedServiceProviders();
 
+        this.smsServiceHandlerFunction = smsServiceHandlerFunction;
+
+        addExcludedServiceProviders();
         createServices();
-        addSpecialCaseRoutes();
+        addSpecialCaseRoutes(adminTokenAction);
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
-        registerServiceListener();
+        registerServiceListener(adminTokenAction);
     }
 
-    private void registerServiceListener() throws SSOException, SMSException {
-        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        ServiceConfigManager serviceConfigManager = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME, token);
+    private void registerServiceListener(PrivilegedAction<SSOToken> adminTokenAction) throws SSOException, SMSException {
+        ServiceConfigManager serviceConfigManager = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME,
+                adminTokenAction.run());
         if (serviceConfigManager.addListener(this) == null) {
             debug.error("Could not add listener to ServiceConfigManager instance. Auth Module " +
                     "changes will not be dynamically updated");
         }
     }
 
-    private void addSpecialCaseRoutes() throws SMSException, SSOException {
-        addServiceInstancesQueryHandler();
+    private void addSpecialCaseRoutes(PrivilegedAction<SSOToken> adminTokenAction) throws SMSException, SSOException {
         addAuthenticationHandlers();
         addRealmHandler();
         addCommonTasksHandler();
@@ -195,36 +187,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     //hard-coded authentication routes
     private void addAuthenticationHandlers() {
-        // realm-config/authentication -> realm module collection handler
+        // realm-config/authentication/modules -> realm module collection handler
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "", authenticationModuleRealmCollectionHandler);
+            getAuthenticationModuleRouter().addRoute(EQUALS, "",
+                    InjectorHolder.getInstance(AuthenticationModuleRealmSmsHandler.class));
         }
 
         // global-config/authentication/modules -> global module collection handler
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(EQUALS, "/authentication/modules", authenticationModuleGlobalCollectionHandler);
-        }
-    }
-
-    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
-
-        final Set<String> serviceNames = getServiceManager().getServiceNames();
-
-        for (String serviceName : serviceNames) {
-            if (smsServiceHandlerFunction.apply(serviceName)) {
-                return routeTree.handles(serviceName);
-            }
-        }
-
-        throw new IllegalStateException("Services SmsRouteTree could not be located");
-
-    }
-
-    //hard-coded services routes
-    private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
-        // realm-config/services -> service realm collection
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getServiceInstanceRouter().addRoute(EQUALS, "", servicesRealmCollectionHandler);
+            getAuthenticationModuleRouter().addRoute(EQUALS, "",
+                    InjectorHolder.getInstance(AuthenticationModuleGlobalSmsHandler.class));
         }
     }
 
@@ -251,14 +223,32 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
+    /**
+     * Identifies the first node in the SMS tree which isn't explicitly handled by another handler.
+     */
+    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
+
+        final Set<String> serviceNames = getServiceManager().getServiceNames();
+
+        for (String serviceName : serviceNames) {
+            if (smsServiceHandlerFunction.apply(serviceName)) {
+                return routeTree.handles(serviceName);
+            }
+        }
+
+        throw new IllegalStateException("Services SmsRouteTree could not be located");
+    }
+
     private SmsRouteTree getAuthenticationModuleRouter() {
         return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
     }
 
     private void addExcludedServiceProviders() {
         excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Function<String, Boolean>>asSet());
-        excludedServiceSingletons.put(SchemaType.ORGANIZATION, asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
-        excludedServiceCollections.put(SchemaType.GLOBAL, asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceSingletons.put(SchemaType.ORGANIZATION,
+                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.GLOBAL,
+                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
         excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Function<String, Boolean>>asSet());
     }
 
@@ -423,18 +413,22 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (hasGlobalSchema(globalSchema)) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema,
+                        dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             } else if (organizationSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema,
+                        dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             }
         } else {
             if (organizationSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes,
+                        DEFAULT_IGNORED_ROUTES, null);
             } else if (dynamicSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes,
+                        DEFAULT_IGNORED_ROUTES, null);
             }
         }
         return routes;
@@ -467,7 +461,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         String path = getPath(parentPath, schemaName, schemaPath, globalSchema);
 
         SmsGlobalSingletonProvider handler = globalSingletonProviderFactory.create(new SmsJsonConverter(globalSchema),
-                globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
+                globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
                 parentPath, true);
         debug.message("Adding singleton path {}", path);
         serviceRoutes.putAll(addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree));
@@ -537,7 +531,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
             throws SMSException {
         for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
-            addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema),
+            addPaths(parentPath, new ArrayList<>(schemaPath), schema.getSubSchema(subSchema),
                     null, serviceRoutes, ignoredRoutes, routeTree);
         }
     }

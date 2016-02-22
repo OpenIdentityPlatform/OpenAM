@@ -16,36 +16,34 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.RestConstants.*;
-import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-import java.util.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.Promise;
 
 /**
  * Handler for the global-realm/authentication/modules endpoint, which must
  * support getAllTypes functionality.
+ *
+ * @since 14.0.0
  */
-public class AuthenticationModuleGlobalCollectionHandler extends NoOpCollectionHandler {
+public class AuthenticationModuleGlobalSmsHandler extends DefaultSmsHandler {
 
     protected SSOToken adminToken;
     protected Debug debug;
@@ -54,14 +52,10 @@ public class AuthenticationModuleGlobalCollectionHandler extends NoOpCollectionH
     protected java.util.Locale defaultLocale;
 
     @Inject
-    public AuthenticationModuleGlobalCollectionHandler(@Named("frRest") Debug debug,
-                                                       @Named("adminToken") SSOToken adminToken,
-                                                       @Named("AMAuthenticationServices")
-                                                       Set<String> authenticationServiceNames,
-                                                       @Named("AMResourceBundleCache")
-                                                       AMResourceBundleCache resourceBundleCache,
-                                                       @Named("DefaultLocale")
-                                                       Locale defaultLocale) {
+    public AuthenticationModuleGlobalSmsHandler(@Named("frRest") Debug debug, @Named("adminToken") SSOToken adminToken,
+            @Named("AMAuthenticationServices") Set<String> authenticationServiceNames,
+            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
+            @Named("DefaultLocale") Locale defaultLocale) {
         this.debug = debug;
         this.adminToken = adminToken;
         this.authenticationServiceNames = authenticationServiceNames;
@@ -70,17 +64,8 @@ public class AuthenticationModuleGlobalCollectionHandler extends NoOpCollectionH
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest actionRequest) {
-        switch (actionRequest.getAction()) {
-            case GET_ALL_TYPES :
-                    return getAllTypesAction();
-            default :
-                return RestUtils.generateUnsupportedOperation();
-        }
-    }
-
-    private Promise<ActionResponse, ResourceException> getAllTypesAction() {
-
+    public JsonValue getAllTypes(Context context, ActionRequest request)
+            throws NotSupportedException, InternalServerErrorException {
         final List<Object> jsonArray = array();
 
         try {
@@ -94,11 +79,29 @@ public class AuthenticationModuleGlobalCollectionHandler extends NoOpCollectionH
                         field(NAME, typeI18N)));
             }
 
-            return newResultPromise(newActionResponse(json(object(field(RESULT, jsonArray)))));
+            return json(object(field(RESULT, jsonArray)));
         } catch (SMSException | SSOException e) {
             debug.error("AuthenticationModuleGlobalCollectionHandler::getAllTypes - Unable to query SMS config", e);
-            return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage(), e).asPromise();
+            throw new InternalServerErrorException("Unable to query SMS config: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public JsonValue getCreatableTypes(Context context, ActionRequest request)
+            throws NotSupportedException, InternalServerErrorException {
+        throw new NotSupportedException("Operation not supported");
+    }
+
+    @Override
+    public JsonValue getSchema(Context context, ActionRequest request)
+            throws NotSupportedException, InternalServerErrorException {
+        throw new NotSupportedException("Operation not supported");
+    }
+
+    @Override
+    public JsonValue getTemplate(Context context, ActionRequest request)
+            throws NotSupportedException, InternalServerErrorException {
+        throw new NotSupportedException("Operation not supported");
     }
 
     protected String getI18NValue(ServiceSchemaManager schemaManager, String authType, Debug debug) {

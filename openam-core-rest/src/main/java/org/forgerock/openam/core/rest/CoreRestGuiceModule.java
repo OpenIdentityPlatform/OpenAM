@@ -98,23 +98,6 @@ import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.routing.RouteMatcher;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SchemaType;
-
 /**
  * Guice module for binding the core REST endpoints.
  *
