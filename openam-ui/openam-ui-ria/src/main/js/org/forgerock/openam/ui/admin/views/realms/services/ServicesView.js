@@ -48,6 +48,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
 
     var ServicesView = AbstractView.extend({
         template: "templates/admin/views/realms/services/ServicesTemplate.html",
+        partials: [
+            "partials/util/_HelpLink.html"
+        ],
         events: {
             "change [data-select-service]": "serviceSelected",
             "click [data-delete-service]": "onDeleteSingle",

@@ -18,9 +18,9 @@
 
 define("org/forgerock/openam/ui/common/util/ExternalLinks", [
     "lodash"
-], function (_) {
+], (_) => {
 
-    var backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13/admin-guide";
+    const backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13/";
 
     return {
         backstage: {
@@ -28,9 +28,10 @@ define("org/forgerock/openam/ui/common/util/ExternalLinks", [
                 policySets: "#configure-apps-with-console",
                 policies: "#configure-policies-with-console",
                 resourceTypes: "#configure-resource-types-with-console"
-            }, function (hash) {
-                return backstageDocsUrl + hash;
-            })
+            }, (hash) => backstageDocsUrl + "admin-guide" + hash),
+            config: {
+                services : backstageDocsUrl + "reference" + "#chap-config-ref"
+            }
         }
     };
 });
