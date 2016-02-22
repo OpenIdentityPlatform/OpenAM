@@ -21,10 +21,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/openam/ui/common/util/Promise"
-], function ($, _, Messages, AbstractView, SMSRealmService, FormHelper, AddChainDialog, arrayify, Promise) {
+], function ($, _, Messages, AbstractView, SMSRealmService, FormHelper, arrayify, Promise) {
     function getChainNameFromElement (element) {
         return $(element).data().chainName;
     }
