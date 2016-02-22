@@ -75,6 +75,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     } else {
                         input.className += "form-control";
                     }
+                    input.setAttribute("autocomplete", "off");
 
                     return input;
                 },
