@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  *
  */
+@SuppressWarnings({"PMD.AvoidCalenderGetInstance"})
 public enum Time implements DateTimeUtils.MillisProvider {
 
     /** Singleton Instance. */
