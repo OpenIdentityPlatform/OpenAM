@@ -1,7 +1,7 @@
-<button type="button" id="addNewScript" class="btn btn-primary">
+<button type="button" class="btn btn-primary" data-add-entity>
     <span class="fa fa-plus"></span> {{t "console.scripts.list.addNew"}}
 </button>
 
-<button type="button" id="deleteRecords" class="btn btn-default" {{#unless selectedUUIDs}} disabled {{/unless}}>
+<button type="button" class="btn btn-default" {{#unless selectedUUIDs}} disabled {{/unless}} data-delete-scripts>
     <span class="fa fa-close"></span> {{t "common.form.delete"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
 </button>

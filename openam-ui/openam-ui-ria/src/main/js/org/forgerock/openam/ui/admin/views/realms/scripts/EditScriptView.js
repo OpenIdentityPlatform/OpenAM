@@ -50,15 +50,15 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
         events: {
-            "click #upload": "uploadScript",
+            "click [data-upload-script]": "uploadScript",
             "change [name=upload]": "readUploadedFile",
-            "click #validateScript": "validateScript",
-            "click #changeContext": "openDialog",
+            "click [data-validation-script]": "validateScript",
+            "click [data-change-context]": "openDialog",
             "change input[name=language]": "onChangeLanguage",
             "click [data-save]": "submitForm",
             "click [data-delete]": "onDeleteClick",
-            "click #editFullScreen": "editFullScreen",
-            "click .full-screen-bar button": "exitFullScreen",
+            "click [data-show-fullscreen]": "editFullScreen",
+            "click [data-exit-fullscreen]": "exitFullScreen",
             "change [data-field]": "checkChanges",
             "keyup [data-field]": "checkChanges"
         },
@@ -422,7 +422,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             //       Opera 11.5; Safari (WebKit) 6.0
             // FileReader: Firefox (Gecko) 3.6 (1.9.2);	Chrome 7; Internet Explorer 10; Opera 12.02; Safari 6.0.2
             if (window.File && window.FileReader && window.FileList) {
-                this.$el.find("#upload").show();
+                this.$el.find("[data-upload-scripts]").show();
             }
         },
 

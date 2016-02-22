@@ -28,7 +28,7 @@
 
             <div class="col-sm-9 script-context">
                 <span class="form-control" id="context">{{contextName}}</span>
-                <button type="button" id="changeContext" class="btn fr-btn-secondary pull-right">
+                <button type="button" class="btn fr-btn-secondary pull-right" data-change-context>
                     <i class="fa fa-gear"></i> {{t "common.form.change"}}
                 </button>
             </div>
@@ -65,12 +65,12 @@
                     <textarea id="script">{{entity.script}}</textarea>
                 </div>
 
-                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
+                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}" data-upload-script>
                 <input type="file" name="upload" class="hidden">
 
-                <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
+                <input type="button" class="btn btn-default" value="{{t 'common.form.validate'}}" data-validation-script>
 
-                <button type="button" class="btn btn-default" id="editFullScreen">
+                <button type="button" class="btn btn-default" data-show-fullscreen>
                     <i class="fa fa-expand"></i> {{t "console.common.editFullScreen"}}
                 </button>
 
@@ -87,7 +87,7 @@
     </div>
 
     <div class="full-screen-bar">
-        <button type="button" class="btn btn-link pull-right">
+        <button type="button" class="btn btn-link pull-right" data-exit-fullscreen>
             <i class="fa fa-compress"></i> {{t "console.common.exitFullScreen"}}
         </button>
     </div>

@@ -43,8 +43,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
         events: {
-            "click #addNewScript": "addNewScript",
-            "click #deleteRecords": "onDeleteClick"
+            "click [data-add-entity]": "addNewScript",
+            "click [data-delete-scripts]": "onDeleteClick"
         },
 
         render: function (args, callback) {
