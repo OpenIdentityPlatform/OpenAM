@@ -264,6 +264,17 @@ public class AttributeSchema {
     }
 
     /**
+     * Returns the example values of the attribute. If there are no example
+     * values defined for this attribute in the schema then this method returns
+     * a Collections.EMPTY_SET
+     *
+     * @return set of example values of the attribute
+     */
+    public Set<String> getExampleValues() {
+        return (as.getExampleValues());
+    }
+
+    /**
      * Sets the default values of the attribute.
      * 
      * @param values

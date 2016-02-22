@@ -186,6 +186,8 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_DEFAULT_ELEMENT = "DefaultValues";
 
+    protected static final String ATTRIBUTE_EXAMPLE_ELEMENT = "ExampleValue";
+
     protected static final String ATTRIBUTE_DEFAULT_CLASS =
         "DefaultValuesClassName";
 
@@ -226,7 +228,7 @@ public class SMSUtils {
     }
 
     // Performs a deep copy of the Map
-    public static Map<String, Object> copyAttributes(Map<String, Object> attributes) {
+    public static Map<String, Object> copyAttributes(Map<String, Set<String>> attributes) {
         if (attributes == null) {
             return new HashMap<String, Object>();
         }
@@ -237,7 +239,7 @@ public class SMSUtils {
             return answer;
         }
 
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+        for (Map.Entry<String, Set<String>> entry : attributes.entrySet()) {
             String attrName = entry.getKey();
             Object value = entry.getValue();
             if (value instanceof Set) {

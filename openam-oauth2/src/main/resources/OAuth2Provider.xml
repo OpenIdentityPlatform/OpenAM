@@ -255,9 +255,9 @@
                                  syntax="string"
                                  resourceName="hashSalt"
                                  i18nKey="a124">
-                    <DefaultValues>
+                    <ExampleValue>
                         <Value>changeme</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-code-verifier-enforced"

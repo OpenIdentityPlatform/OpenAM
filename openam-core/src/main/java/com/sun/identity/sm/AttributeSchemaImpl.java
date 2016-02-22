@@ -24,14 +24,10 @@
  *
  * $Id: AttributeSchemaImpl.java,v 1.3 2008/06/25 05:44:03 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
-
-import static com.sun.identity.sm.AttributeSchema.ListOrder.*;
-import static java.util.Collections.emptySet;
-import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -45,6 +41,10 @@ import java.util.Map;
 import java.util.Set;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static com.sun.identity.sm.AttributeSchema.ListOrder.INSERTION;
+import static java.util.Collections.emptySet;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 
 
 /**
@@ -72,6 +72,8 @@ public class AttributeSchemaImpl {
     private AttributeSchema.Syntax syntax;
 
     private Set defaultValues = null;
+
+    private Set<String> exampleValues = null;
 
     private DefaultValues defaultsObject = null;
 
@@ -189,12 +191,12 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues();
         }
-        return getDefaultValuesCopy(defaultValues);
+        return getValuesCopy(defaultValues);
     }
 
     /**
      * Returns the default values of the attribute.
-     * 
+     *
      * @param envParams
      *            Map of environment parameter to a set of values
      * @return default values for the attribute
@@ -203,10 +205,17 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues(envParams);
         }
-        return getDefaultValuesCopy(defaultValues);
+        return getValuesCopy(defaultValues);
     }
 
-    private Set<?> getDefaultValuesCopy(Set<?> defaultValues) {
+    /**
+     * Returns the example values of the attribute.
+     */
+    public Set getExampleValues() {
+        return getValuesCopy(exampleValues);
+    }
+
+    private Set<?> getValuesCopy(Set<?> defaultValues) {
         if (isEmpty(defaultValues)) {
             return emptySet();
         }
@@ -656,6 +665,10 @@ public class AttributeSchemaImpl {
             } else {
                 defaultValues = getValues(node);
             }
+        }
+
+        if ((node = XMLUtils.getChildNode(n, SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT)) != null) {
+            exampleValues = getValues(node);
         }
 
         // If syntax is password, decrypt the attribute values

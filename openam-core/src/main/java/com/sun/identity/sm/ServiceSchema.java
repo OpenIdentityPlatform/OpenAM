@@ -539,6 +539,17 @@ public class ServiceSchema {
     }
 
     /**
+     * Returns a map of all the attribute and their example values in this
+     * schema.
+     *
+     * @return Map of Attribute Names and Sets of their example values as
+     *         defined in the Schema
+     */
+    public Map<String, Set<String>> getAttributeExamples() {
+        return (ss.getAttributeExamples());
+    }
+
+    /**
      * Returns an unmodifiable map of all the attribute and their default values
      * in this schema.
      * 

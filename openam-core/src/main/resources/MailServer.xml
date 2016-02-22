@@ -68,18 +68,15 @@
                                  syntax="string"
                                  resourceName="username"
                                  i18nKey="a103">
-                    <DefaultValues>
+                    <ExampleValue>
                         <Value>forgerocksmtp</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPUserPassword"
                                  type="single"
                                  syntax="password"
                                  resourceName="password"
                                  i18nKey="a104">
-                    <DefaultValues>
-                        <Value>F0rgeRock2013!</Value>
-                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
                                  type="single_choice"
@@ -99,9 +96,9 @@
                                  syntax="string"
                                  resourceName="from"
                                  i18nKey="a106">
-                    <DefaultValues>
-                        <Value>no-reply@openam.org</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>no-reply@openam.example.org</Value>
+                    </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="openamEmailAttribute"
                                  type="single"

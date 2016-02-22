@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -273,8 +274,18 @@ abstract class SmsResourceProvider {
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), i18NKey);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
                 addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, context);
+                addExampleValue(result, path, attribute, attributePath);
             }
         }
+    }
+
+    private void addExampleValue(JsonValue result, String path, AttributeSchema attribute, String attributePath) {
+        final Iterator iterator = attribute.getExampleValues().iterator();
+        String exampleValue = "";
+        if (iterator.hasNext()) {
+            exampleValue = (String) iterator.next();
+        }
+        result.addPermissive(new JsonPointer(path + attributePath + "/" + EXAMPLE_VALUE), exampleValue);
     }
 
     static String getSchemaDescription(ResourceBundle i18n, String i18NKey) {

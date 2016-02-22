@@ -34,6 +34,7 @@ public class SmsJsonSchema {
     static final String PROPERTY_ORDER = "propertyOrder";
     static final String DESCRIPTION = "description";
     static final String REQUIRED = "required";
+    static final String EXAMPLE_VALUE = "exampleValue";
     static final String ENUM = "enum";
     static final String NUMBER_TYPE = "number";
     static final String BOOLEAN_TYPE = "boolean";

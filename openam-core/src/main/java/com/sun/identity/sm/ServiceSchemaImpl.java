@@ -84,6 +84,8 @@ class ServiceSchemaImpl {
 
     Map attrDefaults;
 
+    Map<String, Set<String>> attributeExamples;
+
     Map attrReadOnlyDefaults;
 
     Map subSchemas;
@@ -238,6 +240,13 @@ class ServiceSchemaImpl {
      */
     Map getAttributeDefaults() {
         return (SMSUtils.copyAttributes(attrDefaults));
+    }
+
+    /**
+     * Get a map of all the attribute and their example values in this schema
+     */
+    Map getAttributeExamples() {
+        return (SMSUtils.copyAttributes(attributeExamples));
     }
 
     /**
@@ -400,6 +409,7 @@ class ServiceSchemaImpl {
         Map<String, AttributeSchemaImpl> newAttrSchemas = new HashMap<String, AttributeSchemaImpl>();
         Map newAttrValidators = new HashMap();
         Map newAttrDefaults = new HashMap();
+        Map<String, Set<String>> newAttrExamples = new HashMap();
         Map newSubSchemas = new CaseInsensitiveHashMap();
         Map tempUnmodifiableDefaults = new HashMap();
         NodeList children = schemaNode.getChildNodes();
@@ -427,6 +437,7 @@ class ServiceSchemaImpl {
                 }
                 newAttrValidators.put(name, new AttributeValidator(asi));
                 newAttrDefaults.put(name, asi.getDefaultValues());
+                newAttrExamples.put(name, asi.getExampleValues());
                 tempUnmodifiableDefaults.put(name, Collections
                         .unmodifiableSet(asi.getDefaultValues()));
             } else if (node.getNodeName().equals(SMSUtils.SUB_SCHEMA)) {
@@ -451,6 +462,7 @@ class ServiceSchemaImpl {
         searchableAttributeNames = newSearchableAttributeNames;
         attrValidators = newAttrValidators;
         attrDefaults = newAttrDefaults;
+        attributeExamples = newAttrExamples;
         attrReadOnlyDefaults = Collections
                 .unmodifiableMap(tempUnmodifiableDefaults);
         subSchemas = newSubSchemas;
