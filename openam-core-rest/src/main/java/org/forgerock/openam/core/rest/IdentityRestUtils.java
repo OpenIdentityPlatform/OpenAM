@@ -34,6 +34,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -112,7 +113,7 @@ public final class IdentityRestUtils {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>());
         try {
             result.put(USERNAME, details.getName());
-            result.put("realm", details.getRealm());
+            result.put("realm", new CoreWrapper().convertOrgNameToRealmName(details.getRealm()));
             Map<String, Set<String>> attrs = asMap(details.getAttributes());
 
             for (Map.Entry<String, Set<String>> entry : attrs.entrySet()) {
