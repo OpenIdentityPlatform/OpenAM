@@ -94,9 +94,9 @@
             <id>forgerock-dev</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.forgerock.openam</groupId>
+                    <groupId>com.forgerock.openam</groupId>
                     <artifactId>openam-time-travel</artifactId>
-                    <version>${project.version}</version>
+                    <version>1.0.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
