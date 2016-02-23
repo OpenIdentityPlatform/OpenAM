@@ -1044,11 +1044,12 @@ public class SPACSUtils {
         SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, hostEntityId);
         SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, hostEntityId);
 
-        String assertionEncryptedAttr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+        boolean needAssertionEncrypted =
+                Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                        SAML2Constants.WANT_ASSERTION_ENCRYPTED));
 
-        boolean needAttributeEncrypted = getNeedAttributeEncrypted(assertionEncryptedAttr, spssoconfig);
-        boolean needNameIDEncrypted = getNeedNameIDEncrypted(assertionEncryptedAttr, spssoconfig);
+        boolean needAttributeEncrypted = getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
+        boolean needNameIDEncrypted = getNeedNameIDEncrypted(needAssertionEncrypted, spssoconfig);
 
         Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
         if (needNameIDEncrypted && encId == null) {
@@ -1413,25 +1414,19 @@ public class SPACSUtils {
         return session;
     }
 
-    private static boolean getNeedNameIDEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
-        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
-            String idEncryptedStr = SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
-                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (Boolean.parseBoolean(idEncryptedStr)) {
-                return true;
-            }
+    private static boolean getNeedNameIDEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
+        if (!needAssertionEncrypted) {
+            return Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_NAMEID_ENCRYPTED));
         }
 
         return false;
     }
 
-    public static boolean getNeedAttributeEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
-        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
-            String attrEncryptedStr =
-                    SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
-            if (Boolean.parseBoolean(attrEncryptedStr)) {
-                return true;
-            }
+    public static boolean getNeedAttributeEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
+        if (!needAssertionEncrypted) {
+            return Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED));
         }
 
         return false;
@@ -2102,12 +2097,10 @@ public class SPACSUtils {
 
         String assertionEncryptedAttr =
                 SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        if (assertionEncryptedAttr == null || !Boolean.parseBoolean(assertionEncryptedAttr)) {
+        if (!Boolean.parseBoolean(assertionEncryptedAttr)) {
             String idEncryptedStr =
                     SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (idEncryptedStr != null && Boolean.parseBoolean(idEncryptedStr)) {
-                needNameIDEncrypted = true;
-            }
+            needNameIDEncrypted = Boolean.parseBoolean(idEncryptedStr);
         }
 
         if (needNameIDEncrypted && encId == null) {
