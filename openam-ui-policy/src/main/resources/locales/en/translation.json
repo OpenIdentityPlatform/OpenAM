@@ -256,6 +256,7 @@
       "subjectAttributes": "Subject attributes",
       "availablePatterns": "Available patterns",
       "staticAttributes": "Static attributes",
+      "customAttributes": "Custom attributes",
 
       "realms": "Realms",
       "actions": "Actions",

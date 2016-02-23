@@ -1,30 +1,17 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- */
-
-/**
- * @author Aleanora Kaladzinskaya
- * @author Eugenia Sergueeva
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 /*global window, define, $, form2js, _, js2form, document, console */
@@ -71,7 +58,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     subjects = [],
                     conditions = [],
                     staticAttributes = [],
-                    userAttributes = [];
+                    userAttributes = [],
+                    customAttributes = [];
 
                 if (policyName) {
                     policy.actions = policy.actionValues;
@@ -88,13 +76,18 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
                 // here we split by type
                 staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType});
-                staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);
 
                 userAttributes = _.where(policy.resourceAttributes, {type: responseAttrsUserView.attrType});
                 allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
+                customAttributes = _.difference(policy.resourceAttributes, staticAttributes, userAttributes);
+
+                // only split the static attributes once we have determined the correct list of customAttributes
+                staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);
+
                 data.entity.applicationName = appName;
                 data.entity.encodedAppName = encodeURIComponent(appName);
+                data.entity.customAttributes = customAttributes;
 
                 data.options = {};
                 data.options.realm = app[0].realm;
@@ -174,7 +167,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             });
 
             persistedPolicy.actionValues = persistedPolicy.actions;
-            persistedPolicy.resourceAttributes = _.union( responseAttrsStaticView.getCombinedAttrs(), responseAttrsUserView.getAttrs());
+            persistedPolicy.resourceAttributes = _.union(responseAttrsStaticView.getCombinedAttrs(),
+                responseAttrsUserView.getAttrs(), this.data.entity.customAttributes);
 
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy)

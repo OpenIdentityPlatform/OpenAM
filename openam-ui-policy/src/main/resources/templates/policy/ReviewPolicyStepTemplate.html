@@ -119,5 +119,17 @@
             <p>{{t "policy.common.noSubjectAttributes"}}</p>
             {{/if}}
         </div>
+        {{#if entity.customAttributes}}
+        <div class="advanced-mode">
+            <h3>{{t "policy.common.customAttributes"}}</h3>
+            <ul>
+                {{#each entity.customAttributes}}
+                <li>
+                    <span>{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{/if}}
     </div>
 </div>
