@@ -365,8 +365,8 @@
         <!-- Final Packaging Distribution Kit -->
         <module>openam-dashboard</module>
 
-	<!-- Radius Server and common libs. -->
-	<module>openam-radius</module>
+        <!-- Radius Server and common libs. -->
+        <module>openam-radius</module>
 
         <module>openam-examples</module>
         <module>openam-annotations</module>
@@ -379,6 +379,9 @@
         <module>openam-upgrade</module>
         <module>openam-audit</module>
         <module>openam-selfservice</module>
+
+        <!-- (Mobile) Push Notification Service -->
+        <module>openam-push-notification</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -551,6 +554,12 @@
 	        	<version>${project.version}</version>
 	        </dependency>
 
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-push-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Include all Authentication Modules -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -662,6 +671,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-saml2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-push</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

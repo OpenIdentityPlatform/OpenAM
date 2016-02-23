@@ -181,7 +181,7 @@
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
@@ -604,7 +604,7 @@
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">

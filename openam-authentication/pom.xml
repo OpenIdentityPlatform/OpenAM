@@ -59,6 +59,7 @@
         <module>openam-auth-fr-oath</module>
         <module>openam-auth-oauth2</module>
         <module>openam-auth-radius</module>
+        <module>openam-auth-push</module>
         <module>openam-auth-windowsdesktopsso</module>
         <module>openam-auth-persistentcookie</module>
         <module>deviceprint</module>

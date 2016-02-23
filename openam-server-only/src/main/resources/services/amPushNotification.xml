@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2016 ForgeRock AS.
+  -->
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="PushNotificationService" version="1.0">
+
+        <Schema
+                serviceHierarchy="/DSAMEConfig/PushNotificationService"
+                i18nFileName="amPushNotification"
+                revisionNumber="1"
+                resourceName="pushNotification"
+                i18nKey="push-notification-description">
+            <Organization>
+
+                <!-- validators -->
+
+                <AttributeSchema name="PortValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.PortValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="EndpointValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.EndpointValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- configuration settings -->
+
+                <AttributeSchema name="username" type="single" i18nKey="a010" validator="RequiredValueValidator">
+                </AttributeSchema>
+
+                <AttributeSchema name="password" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
+
+                <AttributeSchema name="endpoint" type="single" i18nKey="a030" validator="EndpointValidator">
+                    <DefaultValues>
+                        <Value>https://gcm-http.googleapis.com/gcm/send</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="port" type="single" i18nKey="a040" validator="PortValidator">
+                    <DefaultValues>
+                        <Value>443</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="delegateFactory" type="single" i18nKey="a050" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.services.push.gcm.GcmHttpDelegateFactory</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

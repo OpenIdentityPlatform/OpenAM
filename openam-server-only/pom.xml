@@ -740,6 +740,11 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-push-notification</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-configuration</artifactId>
         </dependency>
 
@@ -852,6 +857,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-saml2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-push</artifactId>
         </dependency>
 
         <dependency>

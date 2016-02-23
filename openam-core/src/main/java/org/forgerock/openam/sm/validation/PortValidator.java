@@ -13,31 +13,25 @@
 *
 * Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.audit.validation;
+package org.forgerock.openam.sm.validation;
+
+import java.util.Set;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
 
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
- * Service Manager validator for hostnames.
+ * Service Manager validator for ports.
  *
  * @since 13.0.0
  */
-public class HostnameValidator implements ServiceAttributeValidator {
-
-    private static final Pattern VALID_HOSTNAME_CHARACTERS = Pattern.compile("^[a-zA-Z0-9.]*$");
+public class PortValidator implements ServiceAttributeValidator {
 
     /**
-     * Validates the {@link Set} of values to ensure that all of them conform to the regular
-     * expression "^[a-zA-Z0-9.]*$" - which indicates the permitted structure of a hostname - and that none
-     * of them start with a ".". If the set is an empty set this indicates that no values were entered
-     * and classes as a validation failure.
+     * Validates the {@link Set} of values to ensure all of them are valid ports, and that no other set members
+     * exist. An empty set will result in a failure also, as this indicates no values were entered.
      *
      * @param values the {@link Set} of attribute values to validate
-     * @return true if the {@link Set} has one or more members, and all of those members are valid hostnames,
+     * @return true if the {@link Set} has one or more members, and all of those members are valid port numbers,
      * false otherwise.
      */
     @Override
@@ -47,11 +41,13 @@ public class HostnameValidator implements ServiceAttributeValidator {
         }
 
         for (String value : (Set<String>) values) {
-            Matcher matcher = VALID_HOSTNAME_CHARACTERS.matcher(value);
-            if (!matcher.matches()) {
+            int intValue;
+            try {
+                intValue = Integer.parseInt(value);
+            } catch (NumberFormatException nfe) {
                 return false;
             }
-            if (value.startsWith(".")) {
+            if (intValue <= 0 || intValue > 65535) {
                 return false;
             }
         }
