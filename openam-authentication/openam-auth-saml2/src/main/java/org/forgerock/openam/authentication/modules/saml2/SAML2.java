@@ -637,10 +637,11 @@ public class SAML2 extends AMLoginModule {
 
         final String spName = metaManager.getEntityByMetaAlias(metaAlias);
         final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spName);
-        final String assertionEncryptedAttr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        final boolean needAttributeEncrypted = SPACSUtils.getNeedAttributeEncrypted(assertionEncryptedAttr,
-                spssoconfig);
+        final boolean needAssertionEncrypted =
+                Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                        SAML2Constants.WANT_ASSERTION_ENCRYPTED));
+        final boolean needAttributeEncrypted =
+                SPACSUtils.getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
         final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
         final List<Attribute> attrs = SPACSUtils.getAttrs(assertion, needAttributeEncrypted, decryptionKeys);
 
