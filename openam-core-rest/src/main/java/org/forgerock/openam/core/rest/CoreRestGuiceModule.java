@@ -389,6 +389,7 @@ public class CoreRestGuiceModule extends AbstractModule {
         hiddenServices.add("iPlanetAMAuthService");
         hiddenServices.add("RestSecurityTokenService");
         hiddenServices.add("SoapSecurityTokenService");
+        hiddenServices.add("sunIdentityServerDiscoveryService");
         return hiddenServices;
     }
 
