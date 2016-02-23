@@ -20,17 +20,6 @@ import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,12 +30,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
+
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -59,6 +51,18 @@ import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -213,7 +217,29 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
 
     @Override
     public JsonValue getAllTypes(Context context, ActionRequest request) throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("AME-9668");
+        JsonValue result = json(object());
+
+        Set<String> subSchemaNames = schema.getSubSchemaNames();
+        Set<Object> subSchemas = new HashSet<>();
+
+
+        try {
+            for(String subSchemaName : subSchemaNames) {
+                ServiceSchema subSchema = schema.getSubSchema(subSchemaName);
+                ResourceBundle schemaI18n = ResourceBundle.getBundle(subSchema.getI18NFileName(), getLocale(context));
+                String i18NKey = subSchema.getI18NKey();
+                String name = schemaI18n.containsKey(i18NKey) ? schemaI18n.getString(i18NKey) : subSchemaName;
+                subSchemas.add(object(
+                        field("_id", subSchema.getResourceName()),
+                        field("name", name)
+                ));
+            }
+            result.add("result", subSchemas);
+
+            return result;
+        } catch (SMSException e) {
+            throw new InternalServerErrorException("Error reading subschema", e);
+        }
     }
 
     @Override

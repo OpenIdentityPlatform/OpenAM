@@ -88,7 +88,7 @@ class ServiceSchemaImpl {
 
     Map attrReadOnlyDefaults;
 
-    Map subSchemas;
+    Map<String, ServiceSchemaImpl> subSchemas;
 
     ServiceSchemaImpl orgAttrSchema;
 
@@ -260,8 +260,8 @@ class ServiceSchemaImpl {
     /**
      * Returns the names of sub-schemas for the service.
      */
-    Set getSubSchemaNames() {
-        return (new HashSet(subSchemas.keySet()));
+    Set<String> getSubSchemaNames() {
+        return new HashSet<>(subSchemas.keySet());
     }
 
     /**
@@ -384,7 +384,7 @@ class ServiceSchemaImpl {
             serviceAttributes = new HashSet();
             searchableAttributeNames = new HashSet();
             attrSchemas = attrValidators = attrDefaults = new HashMap();
-            subSchemas = new CaseInsensitiveHashMap();
+            subSchemas = new CaseInsensitiveHashMap<>();
             attrReadOnlyDefaults = Collections.unmodifiableMap(new HashMap());
         }
 
@@ -410,7 +410,7 @@ class ServiceSchemaImpl {
         Map newAttrValidators = new HashMap();
         Map newAttrDefaults = new HashMap();
         Map<String, Set<String>> newAttrExamples = new HashMap();
-        Map newSubSchemas = new CaseInsensitiveHashMap();
+        Map<String, ServiceSchemaImpl> newSubSchemas = new CaseInsensitiveHashMap<>();
         Map tempUnmodifiableDefaults = new HashMap();
         NodeList children = schemaNode.getChildNodes();
 

@@ -651,8 +651,8 @@ public class ServiceSchema {
      * 
      * @return the names of service's sub-schemas
      */
-    public Set getSubSchemaNames() {
-        return (ss.getSubSchemaNames());
+    public Set<String> getSubSchemaNames() {
+        return ss.getSubSchemaNames();
     }
 
     /**
