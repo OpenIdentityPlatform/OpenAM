@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
@@ -106,7 +106,13 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                     events: { "click": "share" },
                     share: function () {
                         var shareView = new CommonShare();
-                        shareView.renderDialog(this.model.get("_id"));
+                        shareView.renderDialog({
+                            _id: this.model.get("_id"),
+                            toBeCreated: this.model.toBeCreated,
+                            share: () => {
+                                this.model.toBeCreated = false;
+                            }
+                        });
                     },
                     render: function () {
                         this.$el.attr({ "title": $.t("uma.share.shareResource") });

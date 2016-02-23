@@ -95,6 +95,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         renderDialog: function (args, callback) {
             var self = this,
                 $div = $("<div></div>"),
+                modelId = args._id || args,
                 options = {
                     type: BootstrapDialog.TYPE_PRIMARY,
                     title: $.t("uma.share.shareResource"),
@@ -110,7 +111,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     }],
                     onshow: function () {
                         self.element = $div;
-                        self.render(args, callback);
+                        self.render(modelId, callback);
                     },
 
                     onshown: function () {
@@ -118,6 +119,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     }
                 };
 
+            this.toBeCreated = args.toBeCreated;
+            this.afterShare = args.share;
             BootstrapDialog.show(options);
         },
 
@@ -130,7 +133,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             if (args instanceof Array) {
                 args = args[0];
             }
-
             /**
              * Guard clause to check if model requires sync'ing/updating
              * Reason: We do not know the id of the data we need until the render function is called with args,
@@ -257,13 +259,13 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.renderShareCounter();
         },
         save: function () {
-            var self = this,
-                permissions = this.parentModel.get("policy").get("permissions"),
+            var permissions = this.parentModel.get("policy").get("permissions"),
                 subjects = this.$el.find("#selectUser select")[0].selectize.getValue(),
                 scopes = _.each(this.$el.find("#selectPermission select")[0].selectize.getValue(), function (scope) {
                     return UMAPolicyPermissionScope.find({ id: scope });
                 }),
-                newPermissions = [];
+                newPermissions = [],
+                policy;
             _.forEach(subjects, function (subject) {
                 var permission = UMAPolicyPermission.findOrCreate({
                     subject: subject,
@@ -273,18 +275,25 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 newPermissions.push(permission);
             });
 
-            this.parentModel.get("policy").save()
-            .done(function () {
+            policy = this.parentModel.get("policy");
+            if (this.toBeCreated) {
+                policy.toBeCreated = this.toBeCreated;
+            }
+            policy.save().then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
-                self.reset();
-            })
-            .fail(function (response) {
+                this.reset();
+            }, (response) => {
                 if (response.status && response.status === 500) {
                     _.forEach(newPermissions, function (permission) {
                         permissions.remove(permission);
                     });
                 }
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
+            }).always(() => {
+                this.toBeCreated = false;
+                if (this.afterShare) {
+                    this.afterShare();
+                }
             });
         },
 

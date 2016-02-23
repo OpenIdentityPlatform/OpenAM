@@ -118,6 +118,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         self.model.get("policy").destroy().then(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.onModelChange(self.model);
+                            self.model.toBeCreated = true;
                         }, function (response) {
                             Messages.addMessage({
                                 response: response,
@@ -132,7 +133,13 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         },
         onShare: function () {
             var shareView = new CommonShare();
-            shareView.renderDialog(this.model.id);
+            shareView.renderDialog({
+                _id: this.model.id,
+                toBeCreated: this.model.toBeCreated,
+                share: () => {
+                    this.model.toBeCreated = false;
+                }
+            });
         },
         onToggleStarred: function () {
             var self = this,
