@@ -26,7 +26,7 @@
 
     $Id: amAuthLDAP.xml,v 1.8 2010/01/25 22:09:17 qcheng Exp $
 
-    Portions Copyrighted 2011-2015 ForgeRock AS.
+    Portions Copyrighted 2011-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -121,6 +121,19 @@
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>@LDAP_CONNECTION_MODE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-secure-protocol-version"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a11021">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a110211">TLSv1</ChoiceValue>
+                        <ChoiceValue i18nKey="a110212">TLSv1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>TLSv1</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
@@ -297,6 +310,19 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>@LDAP_CONNECTION_MODE@</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-ldap-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a11021">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a110211">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a110212">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"

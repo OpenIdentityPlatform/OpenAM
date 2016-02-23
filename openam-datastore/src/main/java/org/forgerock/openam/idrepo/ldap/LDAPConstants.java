@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -52,6 +52,8 @@ public class LDAPConstants {
     public static final String LDAP_CONNECTION_MODE = "sun-idrepo-ldapv3-config-connection-mode";
     public static final String LDAP_CONNECTION_MODE_LDAPS = "LDAPS";
     public static final String LDAP_CONNECTION_MODE_STARTTLS = "StartTLS";
+    public static final String LDAP_SERVER_SECURE_PROTOCOL_VERSION =
+            "openam-idrepo-ldapv3-config-secure-protocol-version";
     public static final String LDAP_PERSISTENT_SEARCH_BASE_DN = "sun-idrepo-ldapv3-config-psearchbase";
     public static final String LDAP_PERSISTENT_SEARCH_FILTER = "sun-idrepo-ldapv3-config-psearch-filter";
     public static final String LDAP_PERSISTENT_SEARCH_SCOPE = "sun-idrepo-ldapv3-config-psearch-scope";

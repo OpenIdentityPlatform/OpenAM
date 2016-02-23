@@ -26,7 +26,7 @@
 
    $Id: idRepoService.xml,v 1.37 2009/11/10 01:50:57 hengming Exp $
 
-   Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2012-2016 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -305,6 +305,20 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>LDAP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -859,6 +873,20 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>LDAP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1520,6 +1548,20 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
                         type="single"
                         syntax="number"
@@ -2050,6 +2092,20 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>LDAP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2585,6 +2641,20 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
                         type="single"
                         syntax="number"
@@ -3094,6 +3164,20 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>LDAP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a200731">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
