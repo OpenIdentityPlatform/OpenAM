@@ -12,6 +12,7 @@
 -- information: "Portions copyright [year] [name of copyright owner]".
 --
 -- Copyright 2016 ForgeRock AS.
+-- Copyright 2016 Nomura Research Institute, Ltd.
 -- -----------------------------------------------------
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -115,7 +116,7 @@ CREATE  TABLE IF NOT EXISTS `audit`.`am_auditconfig` (
   `userid` VARCHAR(255) NULL ,
   `trackingids` MEDIUMTEXT,
   `runas` VARCHAR(255) NULL ,
-  `configobjectid` VARCHAR(255) NULL ,
+  `objectid` VARCHAR(255) NULL ,
   `operation` VARCHAR(255) NULL ,
   `beforeObject` MEDIUMTEXT NULL ,
   `afterObject` MEDIUMTEXT NULL ,
