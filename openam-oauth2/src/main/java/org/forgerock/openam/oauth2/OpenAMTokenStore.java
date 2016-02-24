@@ -259,21 +259,23 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String kid = generateKid(providerSettings.getJWKSet(), algorithm);
 
-        final String opsId = UUID.randomUUID().toString();
-
         final long authTime = resourceOwner.getAuthTime();
 
         final String subId = clientRegistration.getSubValue(resourceOwner.getId(), providerSettings);
 
-        try {
-            tokenStore.create(json(object(
-                    field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
-                    field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
-                    field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(TimeUnit.SECONDS.toMillis(exp)
-                    ))))));
-        } catch (CoreTokenException e) {
-            logger.error("Unable to create id_token user session token", e);
-            throw new ServerException("Could not create token in CTS");
+        String opsId = null;
+        if (providerSettings.shouldStoreOpsTokens()) {
+            opsId = UUID.randomUUID().toString();
+            try {
+                tokenStore.create(json(object(
+                        field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
+                        field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
+                        field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(TimeUnit.SECONDS.toMillis(exp)
+                        ))))));
+            } catch (CoreTokenException e) {
+                logger.error("Unable to create id_token user session token", e);
+                throw new ServerException("Could not create token in CTS");
+            }
         }
 
         final OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm,

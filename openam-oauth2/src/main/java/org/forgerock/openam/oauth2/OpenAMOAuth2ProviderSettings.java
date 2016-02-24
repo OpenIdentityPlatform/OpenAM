@@ -982,6 +982,11 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return (int) getLongSettingValue(OAuth2ProviderService.DEVICE_CODE_POLL_INTERVAL);
     }
 
+    @Override
+    public boolean shouldStoreOpsTokens() throws ServerException {
+        return Boolean.parseBoolean(getStringSettingValue(OAuth2ProviderService.STORE_OPS_TOKENS));
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

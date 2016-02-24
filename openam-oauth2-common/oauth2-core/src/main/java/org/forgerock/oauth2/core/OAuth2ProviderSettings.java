@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -453,5 +453,12 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If the setting could not be retrieved.
      */
     int getDeviceCodePollInterval() throws ServerException;
+
+    /**
+     * Whether to generate and store an ops token in CTS for this OIDC provider.
+     * @return <code>true</code> if ops tokens should be generated/stored in CTS.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    boolean shouldStoreOpsTokens() throws ServerException;
 
 }

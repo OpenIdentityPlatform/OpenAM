@@ -16,7 +16,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 -->
 
@@ -393,6 +393,15 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="storeOpsTokens" type="single" i18nKey="a131" syntax="boolean">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
     </Service>
