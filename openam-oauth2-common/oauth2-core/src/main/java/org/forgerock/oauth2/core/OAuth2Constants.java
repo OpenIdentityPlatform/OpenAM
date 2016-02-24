@@ -875,6 +875,7 @@ public class OAuth2Constants {
         public static final String EMAIL_MAPPING = "org-forgerock-oidc-email-attribute-mapping";
         public static final String ADDRESS_MAPPING = "org-forgerock-oidc-address-attribute-mapping";
         public static final String PHONE_MAPPING = "org-forgerock-oidc-phone-attribute-mapping";
+        public static final String STORE_OPS_TOKENS = "storeOpsTokens";
 
         public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
         public static final String DEFAULT_SCOPES = "forgerock-oauth2-provider-default-scopes";
