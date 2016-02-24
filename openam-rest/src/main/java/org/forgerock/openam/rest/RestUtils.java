@@ -42,6 +42,8 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.Request;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
@@ -139,6 +141,10 @@ final public class RestUtils {
      */
     public static <T> Promise<T, ResourceException> generateUnsupportedOperation() {
         return new NotSupportedException("Operation is not supported.").asPromise();
+    }
+
+    public static <T> Promise<T, ResourceException> generateNotFoundException(Request request) {
+        return new NotFoundException("Resource '" + request.getResourcePath() + "' not found").asPromise();
     }
 
     /**

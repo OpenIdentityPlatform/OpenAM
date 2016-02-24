@@ -39,37 +39,37 @@ public class NoOpCollectionHandler implements RequestHandler {
 
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest actionRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(actionRequest);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest createRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(createRequest);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest deleteRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(deleteRequest);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest patchRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(patchRequest);
     }
 
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest queryRequest,
-                                                                 QueryResourceHandler queryResourceHandler) {
-        return RestUtils.generateUnsupportedOperation();
+            QueryResourceHandler queryResourceHandler) {
+        return RestUtils.generateNotFoundException(queryRequest);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest readRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(readRequest);
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest updateRequest) {
-        return RestUtils.generateUnsupportedOperation();
+        return RestUtils.generateNotFoundException(updateRequest);
     }
 }
