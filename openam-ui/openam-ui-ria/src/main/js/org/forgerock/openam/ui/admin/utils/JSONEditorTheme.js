@@ -82,7 +82,6 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                         input.setAttribute("placeholder", placeholder);
                     }
                     input.setAttribute("autocomplete", "off");
-
                     return input;
                 },
 
@@ -161,6 +160,12 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                 getButton: function (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += "btn btn-default";
+                    return el;
+                },
+
+                getInlineButton: function (text, icon, title) {
+                    var el = this._super(text, icon, title);
+                    el.className += "btn btn-link delete-row-item";
                     return el;
                 },
 
@@ -266,6 +271,57 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     bar.removeAttribute("aria-valuenow");
                     bar.style.width = "100%";
                     bar.innerHTML = "";
+                },
+
+                getFirstColumnWrapper: function() {
+                    var wrapper = document.createElement('div');
+                    wrapper.className = "col-sm-" + gridColWidth1;
+                    return wrapper;
+                },
+
+                getSecondColumnWrapper: function() {
+                    var wrapper = document.createElement('div');
+                    wrapper.className = "col-sm-offset-1 col-sm-" + (gridColWidth2 - 1);
+                    return wrapper;
+                },
+
+                addError: function (element) {
+                    $(element).addClass("has-error");
+                },
+
+                removeError: function (element) {
+                    $(element).removeClass("has-error");
+                },
+
+                addBorder: function (element) {
+                    element.style.border = "solid 1px rgb(204, 204, 204)";
+                    element.style.marginBottom = "15px";
+                },
+
+                getMapHeader: function (text) {
+                    var el = document.createElement("div"), header = document.createElement("label");
+                    el.appendChild(header);
+                    if(typeof text === "string") {
+                        header.textContent = text;
+                    }
+                    el.style.display = "inline-block";
+                    el.className = "col-sm-offset-1";
+                    return el;
+                },
+
+                getKeyFormInputField: function () {
+                    return this.getFormInputField('text', $.t("common.form.key"));
+                },
+
+                getValueFormInputField: function () {
+                    return this.getFormInputField('text', $.t("common.form.value"));
+                },
+
+                getModal: function () {
+                    var el = document.createElement("div");
+                    el.style.display = "block";
+                    el.className = "form-group"
+                    return el;
                 }
             });
 

@@ -36,7 +36,6 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.editor = new JSONEditor(element, {
             "disable_collapse": true,
             "disable_edit_json": true,
-            "disable_properties": true,
             "iconlib": "fontawesome4",
             "schema": schema,
             "theme": "openam"
