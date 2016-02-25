@@ -44,10 +44,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
-            "change input.select-module": "moduleSelected",
-            "click button.delete-module-button": "onDeleteSingle",
-            "click #deleteModules": "onDeleteMultiple",
-            "click .check-before-edit": "editModule"
+            "change [data-select-module]"   : "moduleSelected",
+            "click [data-delete-module]"    : "onDeleteSingle",
+            "click [data-delete-modules]"   : "onDeleteMultiple",
+            "click [data-check-before-edit]": "editModule"
         },
         partials: [
             "partials/alerts/_Alert.html"
@@ -58,7 +58,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
 
-            this.$el.find("#deleteModules").prop("disabled", !hasModuleSelected);
+            this.$el.find("[data-delete-modules]").prop("disabled", !hasModuleSelected);
             if (checked) {
                 row.addClass("selected");
             } else {
@@ -72,21 +72,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             EditModuleDialog(data.moduleName, data.moduleChains, href);
         },
-        onDeleteSingle: function (e) {
-            e.preventDefault();
+        onDeleteSingle: function (event) {
+            event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 type: $.t("console.authentication.common.module")
-            }, _.bind(this.deleteModule, this, e));
+            }, _.bind(this.deleteModule, this, event));
         },
-        onDeleteMultiple: function (e) {
-            e.preventDefault();
+        onDeleteMultiple: function (event) {
+            event.preventDefault();
 
             var selectedModules = this.$el.find("input[type=checkbox]:checked");
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.authentication.modules.confirmDeleteSelected", { count: selectedModules.length })
-            }, _.bind(this.deleteModules, this, e, selectedModules));
+            }, _.bind(this.deleteModules, this, event, selectedModules));
         },
         deleteModule: function (event) {
             var self = this,

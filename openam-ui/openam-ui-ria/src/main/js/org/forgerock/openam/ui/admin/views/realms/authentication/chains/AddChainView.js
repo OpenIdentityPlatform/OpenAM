@@ -42,8 +42,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChai
         template: "templates/admin/views/realms/authentication/chains/AddChainTemplate.html",
         events: {
             "keyup [data-chain-name]" : "onValidateChainProps",
-            "change [data-chain-name]" : "onValidateChainProps",
-            "click [data-save]": "save"
+            "change [data-chain-name]": "onValidateChainProps",
+            "click [data-save]"       : "save"
         },
         render: function (args, callback) {
             var self = this,

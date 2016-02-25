@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
@@ -26,10 +26,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
     var PostProcessView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/PostProcessTemplate.html",
         events: {
-            "click .delete-btn": "remove",
-            "click #addBtn": "add",
-            "change #newProcessClass": "change",
-            "keyup  #newProcessClass": "change"
+            "click [data-delete-process-class]": "remove",
+            "click [data-add-process-class]"   : "add",
+            "change [data-new-process-class]"  : "change",
+            "keyup  [data-new-process-class]"  : "change"
         },
         element: "#postProcessView",
         partials: [
@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
         ],
 
         add: function () {
-            var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
+            var newProcessClass = this.$el.find("[data-new-process-class]").val().trim(),
                 invalidName = _.find(this.data.chainData.loginPostProcessClass, function (className) {
                     return className === newProcessClass;
                 });
@@ -59,15 +59,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
         },
 
         change: function (e) {
-            this.$el.find("#addBtn").prop("disabled", (e.currentTarget.value.length === 0));
+            this.$el.find("[data-add-process-class]").prop("disabled", (e.currentTarget.value.length === 0));
         },
 
         addClassNameDialog: function () {
             var self = this,
                 promise = $.Deferred(),
-                newProcessClass = this.$el.find("#newProcessClass").val().trim();
+                newProcessClass = this.$el.find("[data-new-process-class]").val().trim();
             if (newProcessClass === "") {
-                self.$el.find("#newProcessClass").val("");
+                self.$el.find("[data-new-process-class]").val("");
                 promise.resolve();
             } else {
                 BootstrapDialog.show({
@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
                     buttons: [{
                         label: $.t("common.form.cancel"),
                         action: function (dialog) {
-                            self.$el.find("#newProcessClass").val("");
+                            self.$el.find("[data-new-process-class]").val("");
                             dialog.close();
                             promise.resolve();
                         }

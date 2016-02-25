@@ -17,7 +17,7 @@
         <div role="tabpanel" class="tab-pane active" id="chains">
 
             <div class="panel-body">
-                <button type="button" class="btn btn-primary add-new-module">
+                <button type="button" class="btn btn-primary" data-add-new-module>
                     <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
                 </button>
                 <div class="pull-right text-valign-middle auth-chains-legend">
@@ -36,7 +36,7 @@
                     </div>
                     <div class="call-to-action-block hidden">
                         <h3>{{t 'console.authentication.editChains.callToAction'}}</h3>
-                        <button type="button" class="btn btn-primary add-new-module">
+                        <button type="button" class="btn btn-primary" data-add-new-module>
                             <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
                         </button>
                     </div>
@@ -60,8 +60,8 @@
 
             <div class="panel-footer clearfix">
                 <div class="pull-right">
-                    {{!-- TODO: remove ID after refactoring of the save logic --}}
-                    <button data-save id="saveEditChain" class="btn btn-primary" type="button" disabled>
+                    {{!-- TODO: change to data-save after refactoring of the save logic --}}
+                    <button data-save-chain class="btn btn-primary" type="button" disabled>
                         <span>{{t "common.form.saveChanges"}}</span>
                     </button>
                 </div>
@@ -100,8 +100,8 @@
 
                 <div class="panel-footer clearfix">
                     <div class="pull-right">
-                        {{!-- TODO: remove ID after refactoring of the save logic --}}
-                        <button data-save id="saveSettings" class="btn btn-primary" type="button">
+                        {{!-- TODO: change to data-save after refactoring of the save logic --}}
+                        <button data-save-settings class="btn btn-primary" type="button">
                             <span>{{t "common.form.saveChanges"}}</span>
                         </button>
                     </div>

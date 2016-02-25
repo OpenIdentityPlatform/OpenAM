@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddMod
             "change [data-module-name]": "onValidateModuleProps",
             "keyup  [data-module-name]": "onValidateModuleProps",
             "change [data-module-type]": "onValidateModuleProps",
-            "click [data-save]": "save"
+            "click [data-save]"        : "save"
         },
         render: function (args, callback) {
             var self = this;

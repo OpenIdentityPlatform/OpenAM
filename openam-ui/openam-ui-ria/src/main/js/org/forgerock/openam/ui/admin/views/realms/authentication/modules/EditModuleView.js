@@ -17,9 +17,7 @@
 define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/models/Form",
@@ -27,13 +25,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, Configuration, EventManager, Router, Constants,
+], function ($, AbstractView, EventManager, Constants,
              SMSRealmService, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
-            "click [data-revert]": "revert",
-            "click [data-save]": "save",
+            "click [data-revert]"          : "revert",
+            "click [data-save]"            : "save",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
         render: function (args, callback) {

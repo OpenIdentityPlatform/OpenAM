@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView", [
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         initSortable = function (self) {
 
             self.$el.find("ol#sortableAuthChain").nestingSortable({
-                exclude:"li:not(.chain-link)",
+                exclude: "li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
                 placeholder: "<li class='placeholder'><div class='placeholder-inner'></div></i>",
@@ -101,10 +101,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     return AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
-            "click #saveEditChain":  "saveChain",
-            "click #saveSettings":   "saveSettings",
-            "click .add-new-module": "addNewModule",
-            "click [data-delete]":   "onDeleteClick"
+            "click [data-save-chain]"    : "saveChain",
+            "click [data-save-settings]" : "saveSettings",
+            "click [data-add-new-module]": "addNewModule",
+            "click [data-delete]"        : "onDeleteClick"
         },
         partials: [
             "partials/alerts/_Alert.html",
@@ -296,7 +296,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             }
 
             this.$el.find("#alertContainer").html(alert);
-            this.$el.find("#saveEditChain").prop("disabled", invalid);
+            this.$el.find("[data-save-chain]").prop("disabled", invalid);
         }
 
     });

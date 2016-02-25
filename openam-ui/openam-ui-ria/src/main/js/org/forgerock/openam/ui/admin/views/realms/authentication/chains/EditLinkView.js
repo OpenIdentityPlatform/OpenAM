@@ -110,7 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 }
                             });
 
-                            dialog.getModalBody().on("click", "#addOption", function (e) {
+                            dialog.getModalBody().on("click", "[data-add-option]", function (e) {
                                 var
                                     $tr = $(e.target).closest("tr"),
                                     optionsKey = $tr.find("#optionsKey").val(),
@@ -125,7 +125,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 }
                             });
 
-                            dialog.getModalBody().on("click", ".delete-option", function (e) {
+                            dialog.getModalBody().on("click", "[data-delete-option]", function (e) {
                                 var optionsKey = $(e.target).closest("tr").find(".optionsKey").html();
                                 if (_.has(linkConfig.options, optionsKey)) {
                                     delete linkConfig.options[optionsKey];

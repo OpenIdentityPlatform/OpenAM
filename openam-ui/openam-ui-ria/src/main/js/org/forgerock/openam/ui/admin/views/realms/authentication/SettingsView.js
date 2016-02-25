@@ -18,8 +18,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -28,13 +26,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSServiceUtils,
+], function ($, _, AbstractView, Form, FormHelper, Messages, SMSServiceUtils,
              SMSRealmService) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            "click [data-revert]": "revert",
-            "click [data-save]": "save",
+            "click [data-revert]"          : "revert",
+            "click [data-save]"            : "save",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 

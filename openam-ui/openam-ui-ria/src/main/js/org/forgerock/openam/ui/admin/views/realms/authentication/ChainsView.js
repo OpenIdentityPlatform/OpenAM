@@ -37,22 +37,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
             "change input[data-chain-name]" : "chainSelected",
-            "click  button.delete-chain-btn": "onDeleteSingle",
-            "click  #deleteChains"          : "onDeleteMultiple",
-            "click  #selectAll"             : "selectAll"
+            "click  [data-delete-chain]"    : "onDeleteSingle",
+            "click  [data-delete-chains]"   : "onDeleteMultiple",
+            "click  [data-select-all]"      : "selectAll"
         },
         chainSelected: function (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
 
-            this.$el.find("#deleteChains").prop("disabled", !hasChainsSelected);
+            this.$el.find("[data-delete-chains]").prop("disabled", !hasChainsSelected);
 
             if (checked) {
                 row.addClass("selected");
             } else {
                 row.removeClass("selected");
-                this.$el.find("#selectAll").prop("checked", false);
+                this.$el.find("[data-select-all]").prop("checked", false);
             }
         },
         selectAll: function (event) {
@@ -64,23 +64,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             } else {
                 this.$el.find(".sorted-chains").removeClass("selected");
             }
-            this.$el.find("#deleteChains").prop("disabled", !checked);
+            this.$el.find("[data-delete-chains]").prop("disabled", !checked);
         },
-        onDeleteSingle: function (e) {
-            e.preventDefault();
+        onDeleteSingle: function (event) {
+            event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 type: $.t("console.authentication.common.chain")
-            }, _.bind(this.deleteChain, this, e));
+            }, _.bind(this.deleteChain, this, event));
         },
-        onDeleteMultiple: function (e) {
-            e.preventDefault();
+        onDeleteMultiple: function (event) {
+            event.preventDefault();
 
             var selectedChains = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked");
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.authentication.chains.confirmDeleteSelected", { count: selectedChains.length })
-            }, _.bind(this.deleteChains, this, e, selectedChains));
+            }, _.bind(this.deleteChains, this, event, selectedChains));
         },
         deleteChain: function (event) {
             var self = this,

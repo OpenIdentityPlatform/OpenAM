@@ -31,14 +31,14 @@
 
             <div class="col-xs-12 col-sm-9 col-md-6 col-lg-4">
                 <div class="select-group">
-                    <select class="form-control inline-block" id="selectCriteria">
+                    <select class="form-control inline-block" data-select-criteria>
                         {{#each allCriteria}}
                             <option value="{{@key}}" {{#equals ../linkConfig.criteria @key}}selected{{/equals}}>
                                 {{this}}
                             </option>
                         {{/each}}
                     </select>
-                    <button type="button" class="btn btn-link auth-criteria-info hidden-xs"><i class="fa fa-info-circle"></i></button>
+                    <button type="button" class="btn btn-link hidden-xs" data-auth-criteria-info><i class="fa fa-info-circle"></i></button>
                 </div>
             </div>
 
@@ -51,10 +51,10 @@
             <button type="button" class="btn btn-link">
                 <i class="fa fa-arrows "></i>
             </button>
-            <button type="button" class="btn btn-link" id="editBtn">
+            <button type="button" class="btn btn-link" data-edit>
                 <i class="fa fa-pencil "></i>
             </button>
-            <button type="button" class="btn btn-link" id="deleteBtn">
+            <button type="button" class="btn btn-link" data-delete>
                 <i class="fa fa-times"></i>
             </button>
         </div>

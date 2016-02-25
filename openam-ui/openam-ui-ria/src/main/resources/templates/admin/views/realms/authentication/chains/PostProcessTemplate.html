@@ -10,16 +10,16 @@
         <td><code>{{this}}</code></td>
         <td class="fr-col-btn-1">
             <div class="btn-group">
-                <button class="btn btn-link delete-btn"><i class="fa fa-times"></i></button>
+                <button class="btn btn-link" data-delete-process-class><i class="fa fa-times"></i></button>
             </div>
         </td>
     </tr>
     {{/each}}
     <tr class="tr-row">
-        <td><input type="text" class="form-control" id="newProcessClass" placeholder="{{t 'console.authentication.editChains.addValue'}}"></td>
+        <td><input type="text" class="form-control" data-new-process-class placeholder="{{t 'console.authentication.editChains.addValue'}}"></td>
         <td class="fr-col-btn-1">
             <div class="btn-group">
-                <button id="addBtn" class="btn btn-default" disabled type="button"><i class="fa fa-plus"></i></button>
+                <button data-add-process-class class="btn btn-default" disabled type="button"><i class="fa fa-plus"></i></button>
             </div>
         </td>
     </tr>
