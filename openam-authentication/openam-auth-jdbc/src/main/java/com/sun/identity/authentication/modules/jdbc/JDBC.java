@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,10 @@
  *
  * $Id: JDBC.java,v 1.5 2008/08/28 21:56:45 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
+
 package com.sun.identity.authentication.modules.jdbc;
 
 import com.sun.identity.shared.debug.Debug;
@@ -66,6 +64,7 @@ public class JDBC extends AMLoginModule {
     private static final String amAuthJDBC = "amAuthJDBC";
     private static Debug debug = Debug.getInstance(amAuthJDBC);
     private ResourceBundle bundle = null;
+    private static final String INVALID_CHARS = "forgerock-am-auth-jdbc-invalid-chars";
     
     private Map options;
     
@@ -130,7 +129,7 @@ public class JDBC extends AMLoginModule {
             debug.message("amAuthJDBC Authentication resource bundle locale="+
                           locale);
         }
-        
+
         this.options = options;
         this.sharedState = sharedState;
         
@@ -313,6 +312,9 @@ public class JDBC extends AMLoginModule {
         if (userName.length() > MAX_NAME_LENGTH ) {
             throw new AuthLoginException(amAuthJDBC, "userNameTooLong", null);
         } 
+   
+        validateUserName(userName, CollectionHelper.getMapAttr(options, INVALID_CHARS));
+
         Connection database = null;
         PreparedStatement thisStatement = null;
         ResultSet results = null;
