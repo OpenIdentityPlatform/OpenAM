@@ -31,7 +31,9 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -91,6 +93,7 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String ROOT_SERVICE = "";
     private static final String BAD_REQUEST_REALM_NAME_ERROR_MESSAGE
             = "Realm name specified in URL does not match realm name specified in JSON";
+    private static final String SMS_REALM_NAME_NOT_FOUND = "sms-REALM_NAME_NOT_FOUND";
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private RealmNormaliser realmNormaliser;
@@ -299,6 +302,13 @@ public class SmsRealmProvider implements RequestHandler {
         String realmPath = realmContext.getResolvedRealm();
 
         try {
+
+            //To determine whether the realm to delete exists we have to check if the request.getResourcePath() is empty or not.
+            //It gets emptied if the realm was found.
+            if (!Strings.isNullOrEmpty(request.getResourcePath())){
+                throw new SMSException(SMSException.STATUS_ABORT, SMS_REALM_NAME_NOT_FOUND);
+            }
+
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
             final ResourceResponse resource = getResource(getJsonValue(realmPath));
             realmManager.deleteSubOrganization(null, false);
