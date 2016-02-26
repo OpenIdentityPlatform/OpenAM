@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.sms;
 
@@ -69,6 +69,8 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,6 +96,9 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String BAD_REQUEST_REALM_NAME_ERROR_MESSAGE
             = "Realm name specified in URL does not match realm name specified in JSON";
     private static final String SMS_REALM_NAME_NOT_FOUND = "sms-REALM_NAME_NOT_FOUND";
+    private static final String ERR_NO_PARAMETER_PROVIDED = "No %s parameter provided";
+    private static final String ERR_WRONG_PARAMETER_TYPE = "Wrong parameter type provided in %s. Expected %s";
+    private static final String ERR_REALM_CANNOT_CONTAIN = "Realm names cannot contain: %s";
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private RealmNormaliser realmNormaliser;
@@ -208,20 +213,15 @@ public class SmsRealmProvider implements RequestHandler {
             CreateRequest createRequest) {
 
         final JsonValue jsonContent = createRequest.getContent();
-        final String realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
+        String realmName = null;
 
         try {
-            if (StringUtils.isBlank(realmName)) {
-                throw new BadRequestException("No realm name provided");
-            }
 
-            if (containsBlacklistedCharacters(realmName)) {
-                throw new BadRequestException("Realm names cannot contain: " + BLACKLIST_CHARACTERS.toString());
-            }
+            jsonContentValidation(jsonContent);
 
+            realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
             StringBuilder realmPath = new StringBuilder(realmContext.getResolvedRealm());
-
             String location = jsonContent.get(new JsonPointer(PATH_ATTRIBUTE_NAME)).asString();
 
             if (realmPath.length() > 1) {
@@ -265,6 +265,37 @@ public class SmsRealmProvider implements RequestHandler {
         } catch (BadRequestException fe) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, fe);
             return fe.asPromise();
+        }
+    }
+
+    private void jsonContentValidation(JsonValue jsonContent) throws BadRequestException {
+
+        final JsonValue realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME);
+        final JsonValue parentPath = jsonContent.get(PATH_ATTRIBUTE_NAME);
+        final JsonValue active = jsonContent.get(ACTIVE_ATTRIBUTE_NAME);
+        final JsonValue aliases = jsonContent.get(ALIASES_ATTRIBUTE_NAME);
+
+        //realmNameChecks
+        checkArgument(realmName.isNotNull(), ERR_NO_PARAMETER_PROVIDED, REALM_NAME_ATTRIBUTE_NAME);
+        checkArgument(StringUtils.isNotBlank(realmName.asString()), ERR_NO_PARAMETER_PROVIDED, REALM_NAME_ATTRIBUTE_NAME);
+        checkArgument(!containsBlacklistedCharacters(realmName.asString()), ERR_REALM_CANNOT_CONTAIN, BLACKLIST_CHARACTERS.toString());
+        //parentPathChecks
+        checkArgument(parentPath.isNotNull(), ERR_NO_PARAMETER_PROVIDED, PATH_ATTRIBUTE_NAME);
+        checkArgument(StringUtils.isNotBlank(parentPath.asString()), ERR_NO_PARAMETER_PROVIDED, PATH_ATTRIBUTE_NAME);
+        //activeChecks
+        checkArgument(active.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
+        checkArgument(!active.toString().equals("null"), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
+        checkArgument(active.isBoolean(), ERR_WRONG_PARAMETER_TYPE , ACTIVE_ATTRIBUTE_NAME, Boolean.TYPE.toString());
+        //aliasesChecks
+        checkArgument(aliases.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
+        checkArgument(!aliases.toString().equals("null"), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
+        checkArgument(aliases.isCollection(), ERR_WRONG_PARAMETER_TYPE , ALIASES_ATTRIBUTE_NAME, "list");
+
+    }
+
+    private void checkArgument(boolean expression, String errorMessageTemplate, Object... errorMessageArgs) throws BadRequestException {
+        if(!expression) {
+            throw new BadRequestException(String.format(errorMessageTemplate, errorMessageArgs));
         }
     }
 
