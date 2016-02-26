@@ -43,7 +43,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 (obj.type === "number" && value !== ""));
     }
 
-
     function toggleHideSchemaGroup (schema, hide) {
         _.set(schema, "options.hidden", hide);
     }
@@ -68,6 +67,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceTemplate.html",
+        partials: [
+            "partials/alerts/_Alert.html"
+        ],
         events: {
             "click [data-create]": "onCreateClick",
             "change #serviceSelection": "onSelectService"

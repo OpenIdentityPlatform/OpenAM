@@ -23,19 +23,21 @@
                             <div class="">
                                 <input type="text" id="serviceSelection" class="form-control" value="{{creatableTypes.[0].name}}" readonly="true" >
                             </div>
-                            {{else}}
-                                {{!-- TODO Add warning that no creatables exist. Bearing in mind you shouldn't be able to get here --}}
                             {{/if}}
                         {{/if}}
                     </div>
                 </div>
             </div>
 
-            <div class="clearfix" data-service-form-holder>
-                <div class="col-sm-12 col-sm-offset-0">
-                    <div data-service-form></div>
+            {{#if creatableTypes.[0]}}
+                <div class="clearfix" data-service-form-holder>
+                    <div class="col-sm-12 col-sm-offset-0">
+                        <div data-service-form></div>
+                    </div>
                 </div>
-            </div>
+            {{else}}
+                {{> alerts/_Alert text="console.services.edit.unavaliableAlert" type="info"}}
+            {{/if}}
 
         </div>
     </div>

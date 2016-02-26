@@ -3,9 +3,9 @@
 <p class="page-description">{{t "console.services.list.description"}}</p>
 {{#if this.services.length}}
     <div class="btn-toolbar page-toolbar">
-        <a class="btn btn-primary" href="{{routeTo 'realmsServiceNew' realmPath}}">
+        <button class="btn btn-primary" data-add-service>
             <i class="fa fa-plus"></i> {{t "console.services.list.addService"}}
-        </a>
+        </button>
         <button data-delete-services disabled class="btn btn-default" type="button"><i class="fa fa-times"></i> {{t 'common.form.delete'}}</button>
     </div>
 

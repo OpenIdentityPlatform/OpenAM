@@ -20,13 +20,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
-], ($, _, Messages, AbstractView, ServicesService, FormHelper) => {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/common/util/Promise"
+], ($, _, Messages, AbstractView, ServicesService, Router, FormHelper, Promise) => {
     function getServiceIdFromElement (element) {
         return $(element).closest("tr").data("serviceId");
     }
-    function loadServicesFromServer (realmPath) {
+    function getServices (realmPath) {
         return ServicesService.instance.getAll(realmPath);
+    }
+    function getCreatables (realmPath) {
+        return ServicesService.type.getCreatables(realmPath);
     }
     function deleteServices (ids) {
         FormHelper.showConfirmationBeforeDeleting({
@@ -43,7 +48,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             });
         });
     }
-
     const ServicesView = AbstractView.extend({
         template: "templates/admin/views/realms/services/ServicesTemplate.html",
         partials: [
@@ -51,8 +55,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         ],
         events: {
             "change [data-select-service]": "serviceSelected",
-            "click [data-delete-service]": "onDeleteSingle",
-            "click [data-delete-services]": "onDeleteMultiple"
+            "click [data-delete-service]":  "onDeleteSingle",
+            "click [data-delete-services]": "onDeleteMultiple",
+            "click [data-add-service]":     "onAddService"
         },
         serviceSelected: function (event) {
             const anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked"),
@@ -61,11 +66,16 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             row.toggleClass("selected");
             this.$el.find("[data-delete-services]").prop("disabled", !anyServicesSelected);
         },
+        onAddService: function (event) {
+            event.preventDefault();
+            Router.routeTo(Router.configuration.routes.realmsServiceNew, {
+                args: [encodeURIComponent(this.data.realmPath)],
+                trigger: true
+            });
+        },
         onDeleteSingle: function (event) {
             event.preventDefault();
-
             const id = getServiceIdFromElement(event.currentTarget);
-
             _.bind(deleteServices, this)([id]);
         },
         onDeleteMultiple: function (event) {
@@ -75,14 +85,29 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
 
             _.bind(deleteServices, this)(ids);
         },
+        validateAddButton: function (creatables) {
+            if (!_.isEmpty(creatables)) {
+                return;
+            }
+            this.$el.find("[data-add-service]").addClass("disabled").popover({
+                trigger : "hover",
+                container : "body",
+                placement : "top",
+                content: $.t("console.services.edit.unavaliable")
+            });
+        },
         render: function (args, callback) {
             this.data.args = args;
             this.data.realmPath = args[0];
 
-            loadServicesFromServer(this.data.realmPath).then((services) => {
-                this.data.services = services;
+            Promise.all([getServices(this.data.realmPath), getCreatables(this.data.realmPath)]).then((data) => {
 
+                const services = data[0],
+                    creatables = data[1];
+
+                this.data.services = services;
                 this.parentRender(() => {
+                    this.validateAddButton(creatables);
                     if (callback) {
                         callback();
                     }

@@ -812,7 +812,9 @@
                 "chooseServiceType": "Choose a service type",
                 "serviceTypes": "Service Types...",
                 "secondaryConfiguration": "Secondary Configuration",
-                "settings": "Settings"
+                "settings": "Settings",
+                "unavaliable": "No services available to add", 
+                "unavaliableAlert": "No services available to add. To view a list of the existing services, click Cancel."
             },
             "list": {
                 "service": "Service",

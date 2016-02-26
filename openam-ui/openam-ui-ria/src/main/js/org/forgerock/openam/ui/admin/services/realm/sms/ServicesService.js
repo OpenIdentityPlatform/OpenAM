@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             return obj.serviceCall({
                 url: scopedByRealm(realm, "services?_queryFilter=true"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).then((response) => response.result);
+            }).then((response) => _.sortBy(response.result, "name"));
         },
         get: function (realm, type) {
             function getInstance () {
