@@ -31,6 +31,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PolicyActionsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView",
+    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/CustomResponseAttributesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
@@ -38,7 +39,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "selectize"
 ], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
              PoliciesService, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
-             SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView, FormHelper) {
+             SubjectResponseAttributesView, CustomResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView,
+             FormHelper) {
     return AbstractView.extend({
         partials: [
             "partials/breadcrumb/_Breadcrumb.html",
@@ -54,7 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         getAllResponseAttributes: function () {
             this.model.attributes.resourceAttributes = _.union(
                 this.staticAttrsView.getCombinedAttrs(),
-                SubjectResponseAttributesView.getAttrs());
+                SubjectResponseAttributesView.getAttrs(),
+                CustomResponseAttributesView.getAttrs());
         },
 
         tabs: [
@@ -148,6 +151,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
                         self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
                         self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
+                        self.customAttributes = _.difference(self.model.attributes.resourceAttributes,
+                            self.staticAttributes, self.userAttributes);
                         self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
                         self.data.options.availableEnvironments =
@@ -183,6 +188,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
                             SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes],
                                 resolve());
+                            CustomResponseAttributesView.render(self.customAttributes, resolve());
 
                             $.when.apply($, promises).done(function () {
                                 FormHelper.setActiveTab(self);

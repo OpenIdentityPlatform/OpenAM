@@ -907,6 +907,7 @@
                 "patterns": "Patterns",
                 "responseAttributes": "Response attributes",
                 "subjectAttributes": "Subject attributes",
+                "customAttributes": "Custom attributes",
                 "availablePatterns": "Available patterns",
                 "staticAttributes": "Static attributes",
                 "action": "Action",

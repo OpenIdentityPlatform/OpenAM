@@ -1,22 +1,23 @@
-<div class="list-table created-items">
-    <h5 class="list-group-header">{{t "console.authorization.common.staticAttributes"}}</h5>
+<div class="block clearfix">
+    <h3 class="block-header">{{t "console.authorization.common.staticAttributes"}}</h3>
+    <div class="list-table created-items">
+        <ul class="list-group">
+            {{#if items}}
+            {{#each items}}
+            <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" class="list-group-item {{#equals this ../../options.justAdded}}text-success{{/equals}}">
+                <span class="key">{{propertyName}}:</span>{{propertyValues}}
+                <span tabindex="0" data-delete class="fa fa-close pull-right"></span>
+            </li>
+            {{/each}}
+            {{else}}
+            <li class="list-group-item">{{t "console.authorization.common.noStaticAttributes"}}</li>
+            {{/if}}
 
-    <ul class="list-group">
-        {{#if items}}
-        {{#each items}}
-        <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" class="list-group-item {{#equals this ../../options.justAdded}}text-success{{/equals}}">
-            <span class="key">{{propertyName}}:</span>{{propertyValues}}
-            <span tabindex="0" data-delete class="fa fa-close pull-right"></span>
-        </li>
-        {{/each}}
-        {{else}}
-        <li class="list-group-item">{{t "console.authorization.common.noStaticAttributes"}}</li>
-        {{/if}}
-
-        <li class="list-group-item editing clearfix form-inline">
-            <input type="text" class="form-control" placeholder="{{t 'common.form.key'}}" data-attr-key data-editing-input />
-            <input type="text" class="form-control" placeholder="{{t 'common.form.value'}}" data-attr-val data-editing-input />
-            <span tabindex="0" class="fa fa-plus pull-right" data-add-item ></span>
-        </li>
-    </ul>
+            <li class="list-group-item editing clearfix form-inline">
+                <input type="text" class="form-control" placeholder="{{t 'common.form.key'}}" data-attr-key data-editing-input />
+                <input type="text" class="form-control" placeholder="{{t 'common.form.value'}}" data-attr-val data-editing-input />
+                <span tabindex="0" class="fa fa-plus pull-right" data-add-item ></span>
+            </li>
+        </ul>
+    </div>
 </div>
