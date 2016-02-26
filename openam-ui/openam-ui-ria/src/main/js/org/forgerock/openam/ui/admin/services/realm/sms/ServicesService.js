@@ -20,9 +20,11 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise, RealmHelper) => {
     /**
      * @exports org/forgerock/openam/ui/admin/services/realm/sms/ServicesService
      */
@@ -34,22 +36,22 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             encodedRealm = RealmHelper.encodeRealm(realm);
         }
 
-        return encodedRealm + "/realm-config/" + path;
-    };
-    const getServiceSchema = function (realm, type) {
-        return obj.serviceCall({
-            url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            type: "POST"
-        }).then((data) => SMSServiceUtils.sanitizeSchema(data));
-    };
-    const getServiceSubSchema = function (realm, serviceType, subSchemaType) {
-        return obj.serviceCall({
-            url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            type: "POST"
-        }).then((data) => SMSServiceUtils.sanitizeSchema(data));
-    };
+            return encodedRealm + "/realm-config/" + path;
+        },
+        getServiceSchema = function (realm, type) {
+            return obj.serviceCall({
+                url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            });
+        },
+        getServiceSubSchema = function (realm, serviceType, subSchemaType) {
+            return obj.serviceCall({
+                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }).then((data) => SMSServiceUtils.sanitizeSchema(data));
+        };
 
     obj.instance = {
         getAll: function (realm) {
@@ -84,14 +86,12 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             }
 
             return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
-                .then((data) => {
-                    return {
-                        schema: data[0],
-                        values: data[1][0],
-                        name:  data[2],
-                        subSchemaTypes: data[3][0].result
-                    };
-                });
+                .then((data) => ({
+                    schema: data[0][0],
+                    values: data[1][0],
+                    name:  data[2],
+                    subSchemaTypes: data[3][0].result
+                }));
         },
         getInitialState: function (realm, type) {
             function getTemplate () {
@@ -102,8 +102,10 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 });
             }
 
-            return $.when(getServiceSchema(realm, type), getTemplate())
-                .then((schema, values) => ({ schema: schema, values: values[0] }));
+            return Promise.all([getServiceSchema(realm, type), getTemplate()]).then((response) => ({
+                schema: new JSONSchema(response[0][0]),
+                values: new JSONValues(response[1][0])
+            }));
         },
         remove: function (realm, types) {
             if (!_.isArray(types)) {

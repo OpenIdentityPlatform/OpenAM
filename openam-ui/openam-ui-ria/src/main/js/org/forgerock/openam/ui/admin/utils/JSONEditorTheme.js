@@ -298,6 +298,17 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     element.style.marginBottom = "15px";
                 },
 
+                getHeader: function (text) {
+                    const el = document.createElement("h3");
+
+                    el.className = "block-header";
+                    el.setAttribute("data-header", true);
+                    if (typeof text === "string") {
+                        el.textContent = text;
+                    }
+                    return el;
+                },
+
                 getMapHeader: function (text) {
                     var el = document.createElement("div"), header = document.createElement("label");
                     el.appendChild(header);

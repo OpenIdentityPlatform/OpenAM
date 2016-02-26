@@ -24,45 +24,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService) => {
-
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, JSONSchemaView) => {
     function toggleCreate (el, enable) {
         el.find("[data-create]").prop("disabled", !enable);
-    }
-
-    function shouldHideProperty (obj, key, value) {
-
-        return obj.required === true &&
-                (obj.type === "boolean" ||
-                 obj.type === "object" ||  // Remove once AME-9762 is completed
-                (obj.type === "string" && !_.isEmpty(value)) ||
-                (obj.type === "array" && !_.isEmpty(value)) ||
-                (obj.type === "number" && value !== ""));
-    }
-
-    function toggleHideSchemaGroup (schema, hide) {
-        _.set(schema, "options.hidden", hide);
-    }
-
-    function hideProperty (schema, key) {
-        _.set(schema, "properties[" + key + "].options.hidden", true);
-    }
-
-    function hideProps (schema, values) {
-
-        toggleHideSchemaGroup(schema, true);
-        _.each(schema.properties, (obj, key) => {
-            if (shouldHideProperty(obj, key, values[key])) {
-                hideProperty(schema, key);
-            } else {
-                toggleHideSchemaGroup(schema, false);
-            }
-        });
-
-        return schema;
     }
 
     return AbstractView.extend({
@@ -92,8 +60,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
             });
         },
 
-        onSelectService: function (e) {
-            this.selectService(e.target.value);
+        onSelectService: function (event) {
+            this.selectService(event.target.value);
         },
 
         selectService: function (service) {
@@ -101,36 +69,32 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
             if (service && service !== this.data.type) {
                 this.data.type = service;
 
-                if (this.form) {
-                    this.form.destroy();
+                if (this.jsonSchemaView) {
+                    this.jsonSchemaView.remove();
                 }
 
-                ServicesService.instance.getInitialState(this.data.realmPath, this.data.type)
-                    .then((data) => {
-                        let schemaWithHiddenProperties = _.clone(data.schema, true);
-                        data.schema.grouped = false; // FIXME: Remove once AME-9670 is fixed
-                        if (data.schema.grouped) {
-                            _.each(data.schema.properties, (groupedSchema, key) => {
-                                schemaWithHiddenProperties.properties[key] = hideProps(groupedSchema, data.values[key]);
-                            });
-                        } else {
-                            schemaWithHiddenProperties = hideProps(data.schema, data.values);
-                        }
+                ServicesService.instance.getInitialState(this.data.realmPath, this.data.type).then((response) => {
+                    this.jsonSchemaView = new JSONSchemaView({
+                        schema: response.schema,
+                                // .filterProperties({ required: true })
+                                // .filterPropertiesKeys(response.values.mapEmpty()),
+                        // values: response.values.pick(response.values.mapEmpty())
+                        //         // schema.properties = _.pick(this.raw.properties, _.matches(predicate));
 
-                        this.form = new Form(
-                            this.$el.find("[data-service-form]")[0],
-                            schemaWithHiddenProperties,
-                            data.values
-                        );
-                        toggleCreate(this.$el, true);
-                    }, () => {
-                        toggleCreate(this.$el, false);
+                        values: response.values
                     });
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
+
+                    toggleCreate(this.$el, true);
+                }, () => {
+                    toggleCreate(this.$el, false);
+                });
             }
         },
 
         onCreateClick: function () {
-            ServicesService.instance.create(this.data.realmPath, this.data.type, this.form.data()).then(() => {
+            ServicesService.instance.create(this.data.realmPath, this.data.type, this.jsonSchemaView.values())
+            .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
                     args: _.map([this.data.realmPath, this.data.type], encodeURIComponent),
