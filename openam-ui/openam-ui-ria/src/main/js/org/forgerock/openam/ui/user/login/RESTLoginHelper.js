@@ -176,19 +176,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.removeSessionCookie = function () {
-        var auth = Configuration.globalData.auth;
-        if (auth.cookieDomains && auth.cookieDomains.length !== 0) {
-            _.each(auth.cookieDomains, function (cookieDomain) {
-                CookieHelper.deleteCookie(auth.cookieName, "/", cookieDomain);
-            });
-        } else {
-            CookieHelper.deleteCookie(auth.cookieName, "/", location.hostname);
-        }
+        CookieHelper.deleteCookie(Configuration.globalData.auth.cookieName, "/",
+            Configuration.globalData.auth.cookieDomains);
     };
 
     obj.removeAuthCookie = function () {
-        var auth = Configuration.globalData.auth;
-        CookieHelper.deleteCookie("authId", "/", auth.cookieDomains ? auth.cookieDomains : location.hostname);
+        CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
     };
 
     return obj;
