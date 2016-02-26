@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -62,6 +62,7 @@ import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
@@ -788,5 +789,22 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getAllowedSAML2Audience() {
+        try {
+            Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE);
+            if (CollectionUtils.isNotEmpty(set)) {
+                return set.iterator().next();
+            }
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE + " from repository");
+        }
+        return null;
     }
 }

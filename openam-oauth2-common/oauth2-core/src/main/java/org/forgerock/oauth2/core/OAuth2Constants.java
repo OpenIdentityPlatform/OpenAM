@@ -953,6 +953,8 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.accessTokenLifeTime";
         public static final String REFRESH_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.refreshTokenLifeTime";
         public static final String JWT_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.jwtTokenLifeTime";
+        
+        public static final String ALLOWED_SAML_AUDIENCE = "com.forgerock.openam.oauth2provider.allowedSaml2Audience";
     }
 
     public class JWTTokenParams {

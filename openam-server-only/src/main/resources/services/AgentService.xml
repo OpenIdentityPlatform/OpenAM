@@ -26,7 +26,7 @@
 
    $Id: AgentService.xml,v 1.87 2009/12/19 00:05:46 subbae Exp $
 
-   Portions Copyrighted 2011-2015 ForgeRock AS.
+   Portions Copyrighted 2011-2016 ForgeRock AS.
    Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 -->
 
@@ -523,6 +523,11 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema
+                            name="com.forgerock.openam.oauth2provider.allowedSaml2Audience"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a758" />
                     
                 </SubSchema>
                 <SubSchema name="WebAgent" inheritance="multiple">

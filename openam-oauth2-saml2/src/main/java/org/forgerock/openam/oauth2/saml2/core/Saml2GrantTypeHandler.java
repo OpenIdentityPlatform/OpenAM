@@ -26,6 +26,7 @@ import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
 import com.sun.identity.saml2.common.SAML2Exception;
+
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -48,10 +49,12 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64;
 import org.restlet.Request;
+import org.restlet.engine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -99,12 +102,18 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         final String finalAssertion = new String(decodedAssertion);
         logger.trace("Decoded assertion:\n" + finalAssertion);
 
+        String allowedSaml2Audience = clientRegistration.getAllowedSAML2Audience();
+        if (StringUtils.isNullOrEmpty(allowedSaml2Audience)) {
+            allowedSaml2Audience = clientRegistration.getClientId();
+        }
+        logger.trace("Allowed SAML2 Audience:" + allowedSaml2Audience);
+
         final Assertion assertionObject;
         final boolean valid;
         try {
             final AssertionFactory factory = AssertionFactory.getInstance();
             assertionObject = factory.createAssertion(finalAssertion);
-            valid = validAssertion(assertionObject, getDeploymentUrl(request));
+            valid = validAssertion(assertionObject, allowedSaml2Audience);
         } catch (SAML2Exception e) {
             logger.error("Error parsing assertion", e);
             throw new InvalidGrantException("Assertion is invalid");
@@ -152,11 +161,6 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         throw new UnsupportedOperationException();
     }
 
-    private String getDeploymentUrl(OAuth2Request request) {
-        final Request req = request.getRequest();
-        return req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
-    }
-
     private String normaliseRealm(String realm) {
         if (realm == null) {
             return "/";
@@ -164,7 +168,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         return realm;
     }
 
-    private boolean validAssertion(Assertion assertion, String deploymentURL) throws SAML2Exception {
+    private boolean validAssertion(Assertion assertion, String allowedAudienceURL) throws SAML2Exception {
         //must contain issuer
         final Issuer issuer = assertion.getIssuer();
         if (issuer == null) {
@@ -195,24 +199,17 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
             return false;
         }
         boolean found = false;
-        logger.trace("Saml2BearerServerResource.validAssertion(): URL of authorization server: " + deploymentURL);
+        logger.trace("Saml2BearerServerResource.validAssertion(): URL of authorization server: " + allowedAudienceURL);
         for (final AudienceRestriction restriction : audienceRestriction) {
             final List<String> audiences = restriction.getAudience();
             if (audiences == null || audiences.isEmpty()) {
                 continue;
             }
             for (final String audience : audiences) {
-                String deployURL = deploymentURL;
+                String audienceURL = allowedAudienceURL;
                 String aud = audience;
                 //TODO ADD service provider SAML entity of its controlling domain
-                //check for the url with and without trailing /
-                if (deployURL.endsWith("/")) {
-                    deployURL = deploymentURL.substring(0, deployURL.length() - 1);
-                }
-                if (aud.endsWith("/")) {
-                    aud = aud.substring(0, aud.length() - 1);
-                }
-                if (aud.equalsIgnoreCase(deployURL)) {
+                if (aud.equalsIgnoreCase(audienceURL)) {
                     found = true;
                 }
             }
@@ -295,7 +292,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
                 if (subjectConfirmationData == null) {
                     continue;
                 } else if (subjectConfirmationData.getNotOnOrAfter().before(new Date())
-                        && subjectConfirmationData.getRecipient().equalsIgnoreCase(deploymentURL)) {
+                        && subjectConfirmationData.getRecipient().equalsIgnoreCase(allowedAudienceURL)) {
                     found = true;
                 }
                 //TODO check Client Address

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -141,4 +141,11 @@ public interface ClientRegistration {
      * Verifies that the supplied jwt is signed by this client.
      */
     boolean verifyJwtIdentity(OAuth2Jwt jwt);
+
+    /**
+     * Gets the allowed SAML2 audience configured for the client.
+     *
+     * @return The allowed SAML2 audience.
+     */
+    String getAllowedSAML2Audience();
 }
