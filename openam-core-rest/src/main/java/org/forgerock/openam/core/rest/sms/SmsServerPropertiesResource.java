@@ -307,9 +307,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             }
 
             JsonValue schema;
-            final JsonPointer tabPointer = new JsonPointer("_schema/properties/" + tabName);
+            final JsonPointer tabPointer = new JsonPointer("properties/" + tabName);
             if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
-                schema = directoryConfigSchema;
+                schema = directoryConfigSchema.get("_schema");
             } else if (serverName.equals(SERVER_DEFAULT_NAME)) {
                 schema = defaultSchema.get(tabPointer);
             } else {
