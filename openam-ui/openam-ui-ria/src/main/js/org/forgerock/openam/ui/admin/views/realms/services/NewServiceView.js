@@ -34,12 +34,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     }
 
     function shouldHideProperty (obj, key, value) {
-        return (obj.required === true &&
+
+        return obj.required === true &&
                 (obj.type === "boolean" ||
                  obj.type === "object" ||  // Remove once AME-9762 is completed
-                (obj.type === "string" && value !== "") ||
-                (obj.type === "array" && value.length > 0) ||
-                (obj.type === "number" && value !== "")));
+                (obj.type === "string" && !_.isEmpty(value)) ||
+                (obj.type === "array" && !_.isEmpty(value)) ||
+                (obj.type === "number" && value !== ""));
     }
 
 

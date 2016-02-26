@@ -92,12 +92,14 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
                 .then((data) => {
                     const schema = data[0],
+                        values = data[1][0],
+                        name = data[2],
                         subSchemaTypes = data[3];
 
                     return {
                         schema: schema,
-                        values: data[1],
-                        name: data[2],
+                        values: values,
+                        name:  name,
                         subSchemaTypes: subSchemaTypes
                     };
                 });
