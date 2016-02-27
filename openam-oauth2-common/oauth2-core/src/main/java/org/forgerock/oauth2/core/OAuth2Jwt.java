@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -96,7 +97,7 @@ public class OAuth2Jwt {
         return jwt.getClaimsSet().getExpirationTime().getTime() > (timeService.now() + UNREASONABLE_LIFETIME_LIMIT);
     }
 
-    private boolean isExpired() {
+    public boolean isExpired() {
         return jwt.getClaimsSet().getExpirationTime().getTime() <= (timeService.now() - SKEW_ALLOWANCE);
     }
 

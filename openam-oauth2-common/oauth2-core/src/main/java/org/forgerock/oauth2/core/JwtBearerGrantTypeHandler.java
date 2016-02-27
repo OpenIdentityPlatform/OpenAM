@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -61,8 +62,12 @@ public class JwtBearerGrantTypeHandler implements GrantTypeHandler {
         final String jwtParameter = request.getParameter("assertion");
         final OAuth2Jwt jwt = OAuth2Jwt.create(jwtParameter);
 
+        if (jwt.isExpired()) {
+            throw new InvalidGrantException("JWT has expired");
+        }
+
         if (!jwt.isValid(clientRegistration.getClientJwtSigningHandler())) {
-            throw new InvalidGrantException();
+            throw new InvalidGrantException("JWT is not valid");
         }
 
         final String redirectUri = request.getParameter("redirect_uri");

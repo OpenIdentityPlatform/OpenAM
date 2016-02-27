@@ -11,11 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
- */
-
-/*
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -190,8 +187,12 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         SigningHandler signingHandler = clientRegistration.getClientJwtSigningHandler();
 
+        if (jwt.isExpired()) {
+            throw new InvalidClientException("JWT has expired");
+        }
+
         if (!jwt.isValid(signingHandler)) {
-            throw new InvalidClientException("JWT is has expired or is not valid");
+            throw new InvalidClientException("JWT is not valid");
         }
 
         if (basicAuth && jwt.getSubject() != null) {
