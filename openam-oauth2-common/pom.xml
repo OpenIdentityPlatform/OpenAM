@@ -44,7 +44,6 @@
         <module>oauth2-restlet</module>
         <module>openid-connect-core</module>
         <module>openid-connect-restlet</module>
-        <module>oauth2-oidc-test-server</module>
     </modules>
 
 </project>
