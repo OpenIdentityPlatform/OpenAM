@@ -16,7 +16,9 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -166,7 +168,7 @@ public class SmsJsonConverter {
             throw new JsonException("Unable to validate attributes", e);
         }
 
-        JsonValue parentJson = json(new HashMap<String, Object>());
+        JsonValue parentJson = json(object(field("type", "object")));
 
         if (validAttributes) {
             for (String attributeName : attributeValuePairs.keySet()) {

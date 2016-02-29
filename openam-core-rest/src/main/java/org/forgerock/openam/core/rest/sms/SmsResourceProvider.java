@@ -226,7 +226,7 @@ abstract class SmsResourceProvider {
     }
 
     protected JsonValue createSchema(Context context) {
-        JsonValue result = json(object());
+        JsonValue result = json(object(field("type", "object")));
 
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
         ResourceBundle console = ResourceBundle.getBundle("amConsole", getLocale(context));
