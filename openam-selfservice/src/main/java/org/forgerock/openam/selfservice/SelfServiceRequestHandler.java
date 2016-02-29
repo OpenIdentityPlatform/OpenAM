@@ -15,6 +15,10 @@
  */
 package org.forgerock.openam.selfservice;
 
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.forgerock.json.resource.AbstractRequestHandler;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -35,10 +39,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Abstract request handler used to setup the self services.
@@ -106,7 +106,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
     }
 
     private RequestHandler getService(Context context) throws NotSupportedException {
-        String realm = RealmContext.getRealm(context);
+        String realm = RealmContext.getRealm(context).toLowerCase();
         RequestHandler service = serviceCache.get(realm);
 
         if (service == null) {
@@ -137,7 +137,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
     @Override
     public final void configUpdate(String source, String realm) {
         synchronized (serviceCache) {
-            serviceCache.remove(realm);
+            serviceCache.remove(realm.toLowerCase());
         }
     }
 
