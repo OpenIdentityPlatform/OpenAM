@@ -158,15 +158,6 @@ public interface EntitlementConfiguration {
     boolean hasEntitlementDITs();
 
     /**
-     * Returns <code>true</code> if the system is migrated to support
-     * entitlement services.
-     *
-     * @return <code>true</code> if the system is migrated to support
-     * entitlement services.
-     */
-    boolean migratedToEntitlementService();
-    
-    /**
      * Returns <code>true</code> if the network monitoring for entitlements
      * is enabled
      *

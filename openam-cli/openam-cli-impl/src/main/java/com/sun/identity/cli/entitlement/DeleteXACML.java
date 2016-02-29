@@ -73,23 +73,6 @@ public class DeleteXACML extends AuthenticatedCommand {
         Subject adminSubject = SubjectUtils.createSubject(adminSSOToken);
         String realm = getStringOptionValue(IArgument.REALM_NAME);
 
-        // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
-        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
-        if(!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY", 
-                    "list-xacml not supported in  legacy policy mode"};
-            debugError("DeleteXACML.handleRequest(): "
-                    + "delete-xacml not supported in  legacy policy mode");
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_DELETE_POLICY_IN_REALM", 
-                args);
-            throw new CLIException(
-                getResourceString( 
-                    "delete-xacml-not-supported-in-legacy-policy-mode"), 
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                "delete-xacml");
-        }
-
         List policyNames = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
         String file = getStringOptionValue(IArgument.FILE);
         if (policyNames == null) {

@@ -752,21 +752,6 @@ public class PolicyModelImpl
 
         if (managedResources == null) {
             managedResources = Collections.EMPTY_LIST;
-            try {
-                PolicyManager mgr = getPolicyManager(realmName);
-                if (mgr != null) {
-                    Set resources = mgr.getManagedResourceNames(
-                        serviceTypeName);
-                    if ((resources != null) && !resources.isEmpty()) {
-                        managedResources = AMFormatUtils.sortItems(
-                            resources, getUserLocale());
-                    }
-                }
-            } catch (PolicyException e) {
-                debug.warning("PolicyModelImpl.getManagedResources", e);
-            } catch (AMConsoleException e) {
-                debug.warning("PolicyModelImpl.getManagedResources", e);
-            } 
             mapSvcNameToManagedResource.put(serviceTypeName, managedResources);
         }
 

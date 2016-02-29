@@ -98,7 +98,6 @@ public class EntitlementService implements EntitlementConfiguration {
     private static final String SCHEMA_SUBJECT_ATTRIBUTES_COLLECTORS = "subjectAttributesCollectors";
     private static final String SCHEMA_OPENSSO_SUBJECT_ATTRIBUTES_COLLECTOR = "OpenSSOSubjectAttributesCollector";
     private static final String NETWORK_MONITOR_ENABLED = "network-monitor-enabled";
-    private static final String MIGRATED_TO_ENTITLEMENT_SERVICES = "migratedtoentitlementservice";
     private static final String XACML_PRIVILEGE_ENABLED = "xacml-privilege-enabled";
     private static final String REALM_DN_TEMPLATE = "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou="
             + SERVICE_NAME + ",ou=services,{1}";
@@ -966,26 +965,6 @@ public class EntitlementService implements EntitlementConfiguration {
         } catch (SSOException ex) {
             return false;
         }
-    }
-
-    /**
-     * Returns <code>true</code> if the system is migrated to support
-     * entitlement services.
-     *
-     * @return <code>true</code> if the system is migrated to support
-     * entitlement services.
-     */
-    @Override
-    public boolean migratedToEntitlementService() {
-        if (!hasEntitlementDITs()) {
-            return false;
-        }
-
-        Set<String> setMigrated = getConfiguration(
-            MIGRATED_TO_ENTITLEMENT_SERVICES);
-        String migrated = ((setMigrated != null) && !setMigrated.isEmpty()) ?
-            setMigrated.iterator().next() : null;
-        return (migrated != null) ? Boolean.parseBoolean(migrated) : false;
     }
 
     /**

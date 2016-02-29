@@ -48,15 +48,4 @@ public class EntitlementServiceTest {
             "EntitlementServiceTest.hasEntitlementDITs: returns " + result);
     }
     
-    @Test
-    public void migratedToEntitlementService() {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-
-        EntitlementConfiguration ec = new EntitlementService(SubjectUtils.createSubject(adminToken), "/");
-        boolean result = ec.migratedToEntitlementService();
-        UnittestLog.logMessage(
-            "EntitlementServiceTest.migratedToEntitlementService: returns " +
-            result);
-    }
 }

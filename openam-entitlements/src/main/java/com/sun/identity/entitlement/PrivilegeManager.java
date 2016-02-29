@@ -81,12 +81,6 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      * @return instance of configured <code>PrivilegeManager</code>
      */
     static public PrivilegeManager getInstance(String realm, Subject subject) {
-        EntitlementConfiguration ec = getEntitlementConfiguration(subject, realm);
-        if (!ec.migratedToEntitlementService()) {
-            throw new UnsupportedOperationException(
-                "Updating of DITs is required before using the entitlement service");
-        }
-
         try {
             final Class<? extends PrivilegeManager> clazz = Class
                     .forName("com.sun.identity.entitlement.opensso.PolicyPrivilegeManager")

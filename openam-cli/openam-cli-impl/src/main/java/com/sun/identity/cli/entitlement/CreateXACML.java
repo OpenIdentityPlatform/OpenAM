@@ -100,8 +100,6 @@ public class CreateXACML extends AuthenticatedCommand {
         Subject adminSubject = SubjectUtils.createSubject(adminSSOToken);
         String realm = getStringOptionValue(IArgument.REALM_NAME);
 
-        ensureEntitlementServiceActive(adminSubject, realm);
-
         InputStream xacmlInputStream = getXacmlInputStream(realm);
 
         logStart(realm);
@@ -186,20 +184,7 @@ public class CreateXACML extends AuthenticatedCommand {
             writeLog(LOG_ACCESS, INFO, "SUCCEED_CREATE_POLICY_IN_REALM", new String[]{realm});
         }
     }
-
-    private void ensureEntitlementServiceActive(Subject adminSubject, String realm) throws CLIException {
-        // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
-        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
-        if (!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY", "create-xacml not supported in  legacy policy mode"};
-            debugError("CreateXACML.handleRequest(): create-xacml not supported in  legacy policy mode");
-            writeLog(LOG_ERROR, INFO, "FAILED_CREATE_POLICY_IN_REALM", args);
-            throw new CLIException(getResourceString("create-xacml-not-supported-in-legacy-policy-mode"),
-                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                    "create-xacml");
-        }
-    }
-
+    
     private InputStream getXacmlInputStream(String realm) throws CLIException {
         InputStream inputStream;
 

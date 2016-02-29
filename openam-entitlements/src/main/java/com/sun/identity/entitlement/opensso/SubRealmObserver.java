@@ -67,20 +67,16 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         SSOToken adminToken =
             (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-
-        EntitlementConfiguration ec = getEntitlementConfiguration(SubjectUtils.createSubject(adminToken), "/");
-        if (ec.migratedToEntitlementService()) {
-            try {
-                ServiceConfigManager scm = new ServiceConfigManager(
-                    IdConstants.REPO_SERVICE, adminToken);
-                scm.addListener(new SubRealmObserver());
-            } catch (SMSException e) {
-                PrivilegeManager.debug.error(
-                    "SubRealmObserver.registerListener", e);
-            } catch (SSOException e) {
-                PrivilegeManager.debug.error(
-                    "SubRealmObserver.registerListener", e);
-            }
+        try {
+            ServiceConfigManager scm = new ServiceConfigManager(
+                IdConstants.REPO_SERVICE, adminToken);
+            scm.addListener(new SubRealmObserver());
+        } catch (SMSException e) {
+            PrivilegeManager.debug.error(
+                "SubRealmObserver.registerListener", e);
+        } catch (SSOException e) {
+            PrivilegeManager.debug.error(
+                "SubRealmObserver.registerListener", e);
         }
     }
     

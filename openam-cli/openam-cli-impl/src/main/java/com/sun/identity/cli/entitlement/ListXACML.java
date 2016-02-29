@@ -98,23 +98,6 @@ public class ListXACML extends AuthenticatedCommand {
         super.handleRequest(rc);
         ldapLogin();
 
-        // FIXME: change to use entitlementService.xacmlPrivilegeEnabled()
-        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
-        if(!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY",
-                    "list-xacml not supported in  legacy policy mode"};
-            debugError("ListXACML.handleRequest(): "
-                    + "list-xacml not supported in  legacy policy mode");
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM",
-                args);
-            throw new CLIException(
-                getResourceString(
-                    "list-xacml-not-supported-in-legacy-policy-mode"),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                "list-xacml");
-        }
-
         adminSSOToken = getAdminSSOToken();
 
         if (!XACMLUtils.hasPermission(realm, adminSSOToken, "READ")) {

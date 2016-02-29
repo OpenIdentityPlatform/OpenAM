@@ -71,6 +71,7 @@ import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * The class <code>PolicyEvaluator</code> evaluates policies
@@ -465,7 +466,8 @@ public class PolicyEvaluator {
      */
     public boolean isAllowed(SSOToken token, String resourceName,
         String actionName) throws PolicyException, SSOException {
-        return (isAllowed(token, resourceName, actionName, 
+        PolicyManager.initAdminSubject();
+        return (isAllowed(token, resourceName, actionName,
                 new HashMap()));
     }
 
@@ -491,45 +493,16 @@ public class PolicyEvaluator {
      * @supported.api
      */
     public boolean isAllowed(SSOToken token, String resourceName,
-        String actionName, Map envParameters) throws SSOException,
-        PolicyException {
-        if (PolicyManager.isMigratedToEntitlementService()) {
-            return isAllowedE(token, resourceName, actionName, envParameters);
-        }
-        return isAllowedO(token, resourceName, actionName, envParameters);
-    }
-
-    public boolean isAllowedO(SSOToken token, String resourceName,
-            String actionName, Map envParameters) throws SSOException,
+                              String actionName, Map envParameters) throws SSOException,
             PolicyException {
 
+        if (CollectionUtils.isEmpty(envParameters)) {
+            envParameters = new HashMap();
+        }
+
+        padEnvParameters(token, resourceName, actionName, envParameters);
+
         ActionSchema schema = serviceType.getActionSchema(actionName);
-
-        // Cache the false values for the action names
-        if (booleanActionNameFalseValues == null) {
-            booleanActionNameFalseValues = new HashMap(10);
-        }
-        String falseValue = null;
-        if ((falseValue = (String)
-                booleanActionNameFalseValues.get(actionName)) == null) {
-            falseValue = schema.getFalseValue();
-            // Add it to the cache
-            booleanActionNameFalseValues.put(actionName, falseValue);
-        }
-
-
-        // Cache the true values for the action names
-        if (booleanActionNameTrueValues == null) {
-            booleanActionNameTrueValues = new HashMap(10);
-        }
-
-        String trueValue = null;
-        if ((trueValue = (String)
-                booleanActionNameTrueValues.get(actionName)) == null) {
-            trueValue = schema.getTrueValue();
-            // Add it to the cache
-            booleanActionNameTrueValues.put(actionName, trueValue);
-        }
 
         if (!AttributeSchema.Syntax.BOOLEAN.equals(schema.getSyntax())) {
             String objs[] = {actionName};
@@ -538,27 +511,23 @@ public class PolicyEvaluator {
                     "action_does_not_have_boolean_syntax", objs, null);
         }
 
-        boolean actionAllowed = false;
-        HashSet actionNames = new HashSet(2);
-        actionNames.add(actionName);
-        PolicyDecision policyDecision = getPolicyDecision(token, resourceName,
-                                   actionNames, envParameters);
-        ActionDecision actionDecision =
-                (ActionDecision) policyDecision.getActionDecisions()
-                .get(actionName);
+        HashSet actions = new HashSet(2);
+        actions.add(actionName);
+        SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction.getInstance());
 
-        if ( actionDecision != null ) {
-            Set set = (Set) actionDecision.getValues();
-            if ( (set != null) ) {
-                if ( set.contains(falseValue) ) {
-                    actionAllowed = false;
-                } else if ( set.contains(trueValue) ) {
-                    actionAllowed = true;
-                }
-            }
+        try {
+            Subject adminSubject =  SubjectUtils.createSubject(token);
+
+            Entitlement entitlement = new Entitlement(serviceTypeName, resourceName, actions);
+            entitlement.canonicalizeResources(adminSubject, realm);
+
+            Evaluator eval = new Evaluator(adminSubject, applicationName);
+            return eval.hasEntitlement(realm, SubjectUtils.createSubject(token), entitlement, envParameters);
+
+        } catch (EntitlementException e) {
+            throw new PolicyException(e);
         }
-
-        return actionAllowed;
     }
 
     private void padEnvParameters(SSOToken token, String resourceName,
@@ -615,44 +584,6 @@ public class PolicyEvaluator {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("PolicyEvaluator.padEnvParameters() unable to get userid from token.");
             }
-        }
-    }
-
-    private boolean isAllowedE(SSOToken token, String resourceName,
-        String actionName, Map envParameters) throws SSOException,
-        PolicyException {
-
-        if ((envParameters == null) || envParameters.isEmpty()) {
-            envParameters = new HashMap();
-        }
-
-        padEnvParameters(token, resourceName, actionName, envParameters);
-
-        ActionSchema schema = serviceType.getActionSchema(actionName);
-        
-        if (!AttributeSchema.Syntax.BOOLEAN.equals(schema.getSyntax())) {
-            String objs[] = {actionName};
-            throw new PolicyException(
-                    ResBundleUtils.rbName,
-                    "action_does_not_have_boolean_syntax", objs, null);
-        }
-
-        HashSet actions = new HashSet(2);
-        actions.add(actionName);
-        SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-
-        try {
-            Subject adminSubject =  SubjectUtils.createSubject(token);
-
-            Entitlement entitlement = new Entitlement(serviceTypeName, resourceName, actions);
-            entitlement.canonicalizeResources(adminSubject, realm);
-
-            Evaluator eval = new Evaluator(adminSubject, applicationName);
-            return eval.hasEntitlement(realm, SubjectUtils.createSubject(token), entitlement, envParameters);
-
-        } catch (EntitlementException e) {
-            throw new PolicyException(e);
         }
     }
 
@@ -817,11 +748,36 @@ public class PolicyEvaluator {
         }
 
         try {
-            return (PolicyManager.isMigratedToEntitlementService()) ? 
-                getPolicyDecisionE(token, resourceName, actionNames,
-                envParameters) : getPolicyDecisionO(token, resourceName,
-                actionNames,
-                envParameters, visitedOrgs);
+
+            if ( DEBUG.messageEnabled() ) {
+                DEBUG.message("Evaluating policies at org " + orgName);
+            }
+
+            /* compute for all action names if passed in actionNames is
+           null or empty */
+            if ( (actionNames == null) || (actionNames.isEmpty()) ) {
+                actionNames = serviceType.getActionNames();
+            }
+
+            SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(
+                    AdminTokenAction.getInstance());
+
+            try {
+                Evaluator eval = new Evaluator(
+                        SubjectUtils.createSubject(adminSSOToken), applicationName);
+                Subject sbj = (token != null) ? SubjectUtils.createSubject(token) :
+                        null;
+                List<Entitlement> entitlements = eval.evaluate(
+                        orgName, sbj, resourceName, envParameters, false);
+                if ((entitlements != null) && !entitlements.isEmpty()) {
+                    Entitlement e = entitlements.iterator().next();
+                    return (entitlementToPolicyDecision(e, actionNames));
+                }
+            } catch (EntitlementException e) {
+                throw new PolicyException(e);
+            }
+            return (new PolicyDecision());
+
         } finally {
             if (MonitoringUtil.isRunning()) {
                 SsoServerPolicySvcImpl sspsi =
@@ -829,57 +785,6 @@ public class PolicyEvaluator {
                 sspsi.incPolicyEvalsOut();
             }
         }
-    }
-
-
-    /**
-     * Evaluates privileges of the user to perform the specified actions
-     * on the specified resource. The evaluation depends on user's
-     * application environment parameters.
-     *
-     * @param token single sign on token of the user evaluating policies
-     * @param resourceName name of the resource the user is trying to access
-     * @param actionNames <code>Set</code> of names(<code>String</code>) of the
-     * action the user is trying to perform on the resource.
-     * @param envParameters run-time environment parameters
-     * @return policy decision
-     *
-     * @exception SSOException single-sign-on token invalid or expired
-     * @exception PolicyException if any policy evaluation error.
-     */
-    private PolicyDecision getPolicyDecisionE(
-        SSOToken token, String resourceName, Set actionNames,
-        Map envParameters)
-        throws PolicyException, SSOException {
-
-        if ( DEBUG.messageEnabled() ) {
-            DEBUG.message("Evaluating policies at org " + orgName);
-        }
-
-        /* compute for all action names if passed in actionNames is
-           null or empty */
-        if ( (actionNames == null) || (actionNames.isEmpty()) ) {
-            actionNames = serviceType.getActionNames();
-        }
-
-        SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-
-        try {
-            Evaluator eval = new Evaluator(
-                SubjectUtils.createSubject(adminSSOToken), applicationName);
-            Subject sbj = (token != null) ? SubjectUtils.createSubject(token) :
-                null;
-            List<Entitlement> entitlements = eval.evaluate(
-                orgName, sbj, resourceName, envParameters, false);
-            if ((entitlements != null) && !entitlements.isEmpty()) {
-                Entitlement e = entitlements.iterator().next();
-                return (entitlementToPolicyDecision(e, actionNames));
-            }
-        } catch (EntitlementException e) {
-            throw new PolicyException(e);
-        }
-        return (new PolicyDecision());
     }
 
     private PolicyDecision getPolicyDecisionO(
@@ -890,6 +795,8 @@ public class PolicyEvaluator {
         if ( DEBUG.messageEnabled() ) {
             DEBUG.message("Evaluating policies at org " + orgName);
         }
+
+        PolicyManager.initAdminSubject();
 
         /* compute for all action names if passed in actionNames is
            null or empty */
@@ -1416,43 +1323,13 @@ public class PolicyEvaluator {
     public Set getResourceResults(SSOToken token, 
             String resourceName, String scope, Map envParameters) 
             throws SSOException, PolicyException {
-        return (PolicyManager.isMigratedToEntitlementService()) ?
-            getResourceResultsE(token, resourceName, scope, envParameters) :
-            getResourceResultsO(token, resourceName, scope, envParameters);
-    }
-    
-    private Set getResourceResultsO(SSOToken token,
-            String resourceName, String scope, Map envParameters)
-            throws SSOException, PolicyException {
-        Set resultsSet;
-
-        if (ResourceResult.SUBTREE_SCOPE.equals(scope)) {
-            resultsSet = getResourceResultTree(token, resourceName, scope,
-                                         envParameters).getResourceResults();
-        } else if (ResourceResult.STRICT_SUBTREE_SCOPE.equals(scope)
-                   || ResourceResult.SELF_SCOPE.equals(scope)) {
-            ResourceResult result = getResourceResultTree(token, resourceName,
-                                         scope, envParameters);
-            resultsSet = new HashSet();
-            resultsSet.add(result);
-        } else {
-            DEBUG.error("PolicyEvaluator: invalid request scope: " + scope);
-            String objs[] = {scope};
-            throw new PolicyException(ResBundleUtils.rbName,
-                "invalid_request_scope", objs, null);
-        }
-
-        return resultsSet;
-    }
-
-    private Set getResourceResultsE(SSOToken token,
-            String resourceName, String scope, Map envParameters)
-            throws SSOException, PolicyException {
 
         if ((envParameters == null) || envParameters.isEmpty()) {
             envParameters = new HashMap();
         }
         padEnvParameters(token, resourceName, null, envParameters);
+
+        PolicyManager.initAdminSubject();
 
         Set resultsSet;
         boolean subTreeSearch = false;

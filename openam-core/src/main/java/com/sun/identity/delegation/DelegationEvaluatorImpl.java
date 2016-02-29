@@ -117,11 +117,6 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
         Map envParameters,
         boolean subTreeMode
     ) throws SSOException, DelegationException {
-        EntitlementConfiguration ec = getEntitlementConfiguration(SUPER_ADMIN_SUBJECT, "/");
-        if (!ec.migratedToEntitlementService()) {
-            return false;
-        }
-
         try {
             AMIdentity user = new AMIdentity(token);
             if (((privilegedUser != null) && user.equals(privilegedUser)) ||
