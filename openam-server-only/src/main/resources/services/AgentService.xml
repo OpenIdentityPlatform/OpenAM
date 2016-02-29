@@ -441,6 +441,42 @@
                   </DefaultValues>
               </AttributeSchema>
 
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.authorizationCodeLifeTime"
+                      type="single"
+                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                      i18nKey="a754">
+                  <DefaultValues>
+                      <Value>0</Value>
+                  </DefaultValues>
+              </AttributeSchema>
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.refreshTokenLifeTime"
+                      type="single"
+                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                      i18nKey="a755">
+                  <DefaultValues>
+                      <Value>0</Value>
+                  </DefaultValues>
+              </AttributeSchema>
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.accessTokenLifeTime"
+                      type="single"
+                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                      i18nKey="a756">
+                  <DefaultValues>
+                      <Value>0</Value>
+                  </DefaultValues>
+              </AttributeSchema>
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.jwtTokenLifeTime"
+                      type="single"
+                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                      i18nKey="a757">
+                  <DefaultValues>
+                      <Value>0</Value>
+                  </DefaultValues>
+              </AttributeSchema>
           </SubSchema>
 
 	      <SubSchema name="WebAgent" inheritance="multiple">

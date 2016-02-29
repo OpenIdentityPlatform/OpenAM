@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -864,6 +865,11 @@ public class OAuth2Constants {
         public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
         public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
         public static final String CLIENT_JWT_PUBLIC_KEY = "com.forgerock.openam.oauth2provider.clientJwtPublicKey";
+
+        public static final String AUTHORIZATION_CODE_LIFE_TIME = "com.forgerock.openam.oauth2provider.authorizationCodeLifeTime";
+        public static final String ACCESS_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.accessTokenLifeTime";
+        public static final String REFRESH_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.refreshTokenLifeTime";
+        public static final String JWT_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.jwtTokenLifeTime";
     }
 
     public class JWTTokenParams {

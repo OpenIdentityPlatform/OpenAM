@@ -23,7 +23,9 @@ import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
 
@@ -364,6 +366,56 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_TYPE +" from repository");
         }
         return clientType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getAuthorizationCodeLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException {
+        return getTokenLifeTime(OAuth2Constants.OAuth2Client.AUTHORIZATION_CODE_LIFE_TIME,
+                providerSettings.getAuthorizationCodeLifetime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getAccessTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException {
+        return getTokenLifeTime(OAuth2Constants.OAuth2Client.ACCESS_TOKEN_LIFE_TIME,
+                providerSettings.getAccessTokenLifetime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getRefreshTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException {
+        return getTokenLifeTime(OAuth2Constants.OAuth2Client.REFRESH_TOKEN_LIFE_TIME,
+                providerSettings.getRefreshTokenLifetime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getJwtTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException {
+        return getTokenLifeTime(OAuth2Constants.OAuth2Client.JWT_TOKEN_LIFE_TIME,
+                providerSettings.getOpenIdTokenLifetime());
+    }
+
+    private long getTokenLifeTime(String tokenLifeTimeProperty, long defaultLifeTime) {
+        long tokenLifeTime = 0L;
+        try {
+            Set<String> lifeTimeSet = amIdentity.getAttribute(tokenLifeTimeProperty);
+            if (lifeTimeSet != null && !lifeTimeSet.isEmpty()) {
+                tokenLifeTime = Long.parseLong(lifeTimeSet.iterator().next());
+            }
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", tokenLifeTimeProperty, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + tokenLifeTimeProperty + " from repository");
+        }
+        if (tokenLifeTime == 0) {
+            tokenLifeTime = defaultLifeTime;
+        }
+        return tokenLifeTime * 1000;
     }
 
     private Set<String> convertAttributeValues(Set<String> input) {
