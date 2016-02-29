@@ -30,6 +30,8 @@ public class SessionServerConfigTest extends PowerMockTestCase {
         String primary = "01";
         PowerMockito.mockStatic(WebtopNaming.class);
         given(WebtopNaming.getServerID("http", "openam.example.com", "8080", "/openam")).willReturn(primary);
+        given(WebtopNaming.getAMServerID()).willReturn("01");
+        given(WebtopNaming.getLocalServer()).willReturn("http://openam.example.com:8080/openam");
 
         // When
         SessionServerConfig config = new SessionServerConfig(mock(Debug.class), mock(SessionServiceURLService.class));
@@ -52,6 +54,8 @@ public class SessionServerConfigTest extends PowerMockTestCase {
         given(WebtopNaming.getServerID("http", "openam.example.com", "8080", "/openam")).willReturn(primary);
         given(WebtopNaming.isSiteEnabled(anyString())).willReturn(true); // enable site
         given(WebtopNaming.getSiteID(anyString())).willReturn("02");
+        given(WebtopNaming.getAMServerID()).willReturn("01");
+        given(WebtopNaming.getLocalServer()).willReturn("http://openam.example.com:8080/openam");
 
         // When
         SessionServerConfig config = new SessionServerConfig(mock(Debug.class), mock(SessionServiceURLService.class));

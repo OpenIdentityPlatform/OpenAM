@@ -64,14 +64,10 @@ public class SessionServerConfig {
      * Local server details are those of the server on which the code is executing.
      */
     private String localServerID;
-    private final String localServerProtocol;
-    private final String localServerHost;
-    private final int localServerPort;
     private final String localServerDeploymentPath;
     private final URL localServerURL;
     private final URL localServerSessionServiceURL;
     private final Debug sessionDebug;
-    private final String localServerPortAsString;
 
     /**
      * Constructor called by Guice to initialize the Singleton instance of SessionServerConfig.
@@ -85,19 +81,11 @@ public class SessionServerConfig {
         this.sessionDebug = sessionDebug;
         try {
 
-            localServerProtocol = requiredSystemProperty(AM_SERVER_PROTOCOL);
-            localServerHost = requiredSystemProperty(AM_SERVER_HOST);
-            localServerPortAsString = requiredSystemProperty(AM_SERVER_PORT);
-            localServerPort = Integer.parseInt(localServerPortAsString);
             localServerDeploymentPath = requiredSystemProperty(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-            // TODO: Establish whether or not the previous fields can be dropped in favour of WebtopNaming.getLocalServer()
-
-            localServerURL = new URL(localServerProtocol, localServerHost, localServerPort, localServerDeploymentPath);
-
-            localServerSessionServiceURL = sessionServiceURLService.getSessionServiceURL(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
-
             localServerID = refreshLocalServerID();
+            localServerURL = new URL(WebtopNaming.getLocalServer());
+            localServerSessionServiceURL = sessionServiceURLService.getSessionServiceURL(localServerID);
+
 
         } catch (Exception ex) {
             sessionDebug.error("Failed to load Session Server configuration", ex);
@@ -144,6 +132,8 @@ public class SessionServerConfig {
     public String getLocalServerID(boolean forceReload) {
         return (forceReload)? refreshLocalServerID() : localServerID ;
     }
+
+    
 
     /**
      * Gets the full URL for this OpenAM server.
@@ -281,7 +271,7 @@ public class SessionServerConfig {
      * https://openam.example.com:8080/openam/GetHttpSession?op=create
      */
     public URL createLocalServerURL(String path) throws MalformedURLException {
-        return new URL(localServerProtocol, localServerHost, localServerPort, localServerDeploymentPath + "/" + path);
+        return new URL(WebtopNaming.getLocalServer() + "/" + path);
     }
 
     /**
@@ -404,8 +394,7 @@ public class SessionServerConfig {
 
     private String refreshLocalServerID() {
         try {
-            localServerID = WebtopNaming.getServerID(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
+            localServerID = WebtopNaming.getAMServerID();
         } catch (ServerEntryNotFoundException e) {
             throw new IllegalStateException("Failed to load Session Server configuration", e);
         }
