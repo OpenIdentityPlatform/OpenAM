@@ -425,7 +425,7 @@ public class SmsJsonConverter {
 
     protected HashMap<String, String> getAttributeNameToSection() {
         HashMap<String, String> result = new HashMap<String, String>();
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/" + schema.getName() + ".section" +
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(schema.getServiceName() + ".section" +
                 ".properties");
 
         if (inputStream != null) {
