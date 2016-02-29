@@ -938,7 +938,12 @@ public class OAuth2Constants {
         DEFAULT_SCOPES("default_scopes"),
         DISPLAY_NAME("display_name"),
         CLIENT_DESCRIPTION("client_description"),
-        REALM("realm");
+        REALM("realm"),
+
+        AUTHORIZATION_CODE_LIFE_TIME("authorization_code_lifetime"),
+        ACCESS_TOKEN_LIFE_TIME("access_token_lifetime"),
+        REFRESH_TOKEN_LIFE_TIME("refresh_token_lifetime"),
+        JWT_TOKEN_LIFE_TIME("jwt_token_lifetime");
 
         private String name;
 

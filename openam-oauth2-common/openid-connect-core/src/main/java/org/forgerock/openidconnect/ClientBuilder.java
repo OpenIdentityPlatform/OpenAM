@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
@@ -42,6 +43,10 @@ public class ClientBuilder {
     private String clientSecret;
     private List<String> responseTypes;
     private List<String> contacts;
+    private Long authorizationCodeLifeTime;
+    private Long accessTokenLifeTime;
+    private Long refreshTokenLifeTime;
+    private Long jwtTokenLifeTime;
 
     /**
      * Sets the client id of the OAuth2Client.
@@ -215,6 +220,46 @@ public class ClientBuilder {
     }
 
     /**
+     * Sets the authorization code lifetime.
+     *
+     * @param authorizationCodeLifeTime Authorization code lifetime.
+     */
+    public ClientBuilder setAuthorizationCodeLifeTime(Long authorizationCodeLifeTime) {
+        this.authorizationCodeLifeTime = authorizationCodeLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the Access token lifetime.
+     *
+     * @param accessTokenLifeTime Access token lifetime.
+     */
+    public ClientBuilder setAccessTokenLifeTime(Long accessTokenLifeTime) {
+        this.accessTokenLifeTime = accessTokenLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the Refresh token lifetime.
+     *
+     * @param refreshTokenLifeTime Refresh token lifetime.
+     */
+    public ClientBuilder setRefreshTokenLifeTime(Long refreshTokenLifeTime) {
+        this.refreshTokenLifeTime = refreshTokenLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the JWT token lifetime.
+     *
+     * @param jwtTokenLifeTime JWT token lifetime.
+     */
+    public ClientBuilder setJwtTokenLifeTime(Long jwtTokenLifeTime) {
+        this.jwtTokenLifeTime = jwtTokenLifeTime;
+        return this;
+    }
+
+    /**
      * Creates the OAuth2 Client.
      *
      * @return The OAuth2 Client.
@@ -222,6 +267,7 @@ public class ClientBuilder {
     public Client createClient() {
         return new Client(clientID, clientType, redirectionURIs, allowedGrantScopes, defaultGrantScopes, displayName,
                 displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURI,
-                accessToken, clientSessionURI,applicationType, clientSecret, responseTypes, contacts);
+                accessToken, clientSessionURI,applicationType, clientSecret, responseTypes, contacts,
+                authorizationCodeLifeTime, accessTokenLifeTime, refreshTokenLifeTime, jwtTokenLifeTime);
     }
 }

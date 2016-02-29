@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -253,6 +254,27 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 List<String> defaultResponseTypes = new ArrayList<String>();
                 defaultResponseTypes.add("code");
                 clientBuilder.setResponseTypes(defaultResponseTypes);
+            }
+
+            if (input.get(AUTHORIZATION_CODE_LIFE_TIME.getType()).asLong() != null) {
+                clientBuilder.setAuthorizationCodeLifeTime(input.get(AUTHORIZATION_CODE_LIFE_TIME.getType()).asLong());
+            } else {
+                clientBuilder.setAuthorizationCodeLifeTime(0L);
+            }
+            if (input.get(ACCESS_TOKEN_LIFE_TIME.getType()).asLong() != null) {
+                clientBuilder.setAccessTokenLifeTime(input.get(ACCESS_TOKEN_LIFE_TIME.getType()).asLong());
+            } else {
+                clientBuilder.setAccessTokenLifeTime(0L);
+            }
+            if (input.get(REFRESH_TOKEN_LIFE_TIME.getType()).asLong() != null) {
+                clientBuilder.setRefreshTokenLifeTime(input.get(REFRESH_TOKEN_LIFE_TIME.getType()).asLong());
+            } else {
+                clientBuilder.setRefreshTokenLifeTime(0L);
+            }
+            if (input.get(JWT_TOKEN_LIFE_TIME.getType()).asLong() != null) {
+                clientBuilder.setJwtTokenLifeTime(input.get(JWT_TOKEN_LIFE_TIME.getType()).asLong());
+            } else {
+                clientBuilder.setJwtTokenLifeTime(0L);
             }
 
             if (input.get(CONTACTS.getType()).asList() != null) {
