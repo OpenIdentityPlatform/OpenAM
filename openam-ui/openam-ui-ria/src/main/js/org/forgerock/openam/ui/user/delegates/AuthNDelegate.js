@@ -110,18 +110,14 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 CookieHelper.setCookie(
                     "authId",
                     requirements.authId, "", "/",
-                    Configuration.globalData.auth.cookieDomains
-                        ? Configuration.globalData.auth.cookieDomains
-                        : location.hostname,
+                    Configuration.globalData.auth.cookieDomains,
                     Configuration.globalData.secureCookie);
             }
         } else if (requirements.hasOwnProperty("tokenId")) {
             CookieHelper.setCookie(
                 Configuration.globalData.auth.cookieName,
                 requirements.tokenId, "", "/",
-                Configuration.globalData.auth.cookieDomains
-                    ? Configuration.globalData.auth.cookieDomains
-                    : location.hostname,
+                Configuration.globalData.auth.cookieDomains,
                 Configuration.globalData.secureCookie);
         }
     };
@@ -247,9 +243,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             return obj.submitRequirements(_.extend({ "authId": CookieHelper.getCookie("authId") },
                 Configuration.globalData.auth.urlParams)).done(function () {
                     knownAuth = _.clone(Configuration.globalData.auth);
-                    CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains
-                        ? Configuration.globalData.auth.cookieDomains
-                        : location.hostname);
+                    CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
                 });
         } else if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
             obj.resetProcess();
