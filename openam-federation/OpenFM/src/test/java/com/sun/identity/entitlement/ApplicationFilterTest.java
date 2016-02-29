@@ -90,7 +90,7 @@ public class ApplicationFilterTest {
         // appResources.add(DELEGATED_RESOURCE_BASE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1);
         createDelegationPrivilege();
@@ -107,8 +107,8 @@ public class ApplicationFilterTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
-        ApplicationManager.deleteApplication(adminSubject, "/", 
-            APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                adminSubject, "/", APPL_NAME);
     }
 
     private void createDelegationPrivilege()
@@ -141,14 +141,14 @@ public class ApplicationFilterTest {
         SSOToken userToken = AuthUtils.authenticate("/", USER1, USER1);
         Subject userSubject = SubjectUtils.createSubject(userToken);
 
-        Set<Application> apps = ApplicationManager.search(userSubject, "/",
-                QueryFilter.equalTo(NAME_ATTRIBUTE, "ApplicationFilterTes*"));
+        Set<Application> apps = ApplicationServiceTestHelper.search(
+                userSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, "ApplicationFilterTes*"));
         if (apps.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return one entry");
         }
 
-        apps = ApplicationManager.search(userSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, "4rwrwr*"));
+        apps = ApplicationServiceTestHelper.search(userSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, "4rwrwr*"));
         if (!apps.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return no entries");

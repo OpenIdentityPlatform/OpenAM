@@ -28,6 +28,8 @@
  */
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
@@ -49,7 +51,6 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -431,8 +432,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
 
         if (policyCache != null) {
             // Retrieve the underlying application type to map to the legacy service type model.
-            final Application application = ApplicationManager
-                    .getApplication(PrivilegeManager.superAdminSubject, realm, applicationName);
+            Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
 
             if (application == null) {
                 throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new Object[] {realm});

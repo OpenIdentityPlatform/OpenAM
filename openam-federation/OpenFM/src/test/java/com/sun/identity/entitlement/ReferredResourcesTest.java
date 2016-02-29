@@ -105,7 +105,7 @@ public class ReferredResourcesTest {
         // appResources.add("http://www.ReferredResourcesTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     private void createReferral1(Subject adminSubject)
@@ -138,7 +138,7 @@ public class ReferredResourcesTest {
         if (!migrated) {
             return;
         }
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");
         String subRealm = SUB_REALM1.substring(1);
@@ -154,9 +154,8 @@ public class ReferredResourcesTest {
         if (!migrated) {
             return;
         }
-        Set<String> resources = ApplicationManager.getReferredResources(
-            PrivilegeManager.superAdminSubject, SUB_REALM1,
-            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Set<String> resources = ApplicationServiceTestHelper.getReferredResources(
+                PrivilegeManager.superAdminSubject, SUB_REALM1, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
         if (OpenSSOIndexStore.isOrgAliasMappingResourceEnabled(adminToken)) {
             if (resources.size() != 4) {
                 throw new Exception(

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DeleteApplications.java,v 1.1 2009/08/19 05:40:31 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -33,14 +35,29 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
 import java.text.MessageFormat;
 import java.util.List;
+
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+
 public class DeleteApplications extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public DeleteApplications(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -60,8 +77,9 @@ public class DeleteApplications extends ApplicationImpl {
 
         Subject adminSubject = getAdminSubject();
         try {
+            ApplicationService applicationService = applicationServiceFactory.create(adminSubject, "/");
             for (String a : appNames) {
-                ApplicationManager.deleteApplication(adminSubject, "/", a);
+                applicationService.deleteApplication(a);
             }
             IOutput writer = getOutputWriter();
             writer.printlnMessage(MessageFormat.format(getResourceString(

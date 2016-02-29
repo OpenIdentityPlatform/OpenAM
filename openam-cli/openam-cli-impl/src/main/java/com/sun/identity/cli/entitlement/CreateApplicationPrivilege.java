@@ -24,7 +24,7 @@
  *
  * $Id: CreateApplicationPrivilege.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -39,6 +39,8 @@ import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.text.MessageFormat;
@@ -55,8 +57,9 @@ import javax.security.auth.Subject;
 public class CreateApplicationPrivilege extends ApplicationPrivilegeBase {
 
     @Inject
-    public CreateApplicationPrivilege(ResourceTypeService resourceTypeService) {
-        super(resourceTypeService);
+    public CreateApplicationPrivilege(ResourceTypeService resourceTypeService,
+            ApplicationServiceFactory applicationServiceFactory) {
+        super(resourceTypeService, applicationServiceFactory);
     }
 
     /**

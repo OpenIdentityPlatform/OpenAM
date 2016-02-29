@@ -11,20 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.utils;
 
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.testng.Assert.assertEquals;
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.testng.annotations.Test;
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.shared.Constants;
 
 /**
  * Unit test to exercise the behaviour of {@link EntitlementUtils}.
@@ -67,5 +75,31 @@ public class EntitlementUtilsTest {
 
         //Then
         assertEquals(actualDescription, null, "Actual description expected to be null.");
+    }
+
+    @Test
+    public void shouldConstructEntitlementConfigurationWithoutGuice() {
+        // Given
+        System.setProperty(Constants.SERVER_MODE, "false");
+
+        // When
+        EntitlementConfiguration configuration = EntitlementUtils.getEntitlementConfiguration(new Subject(), "/");
+
+        // Then
+        assertThat(SystemProperties.isServerMode()).isFalse();
+        assertThat(configuration).isNotNull();
+    }
+
+    @Test
+    public void shouldConstructApplicationServiceWithoutGuice() {
+        // Given
+        System.setProperty(Constants.SERVER_MODE, "false");
+
+        // When
+        ApplicationService service = EntitlementUtils.getApplicationService(new Subject(), "/");
+
+        // Then
+        assertThat(SystemProperties.isServerMode()).isFalse();
+        assertThat(service).isNotNull();
     }
 }

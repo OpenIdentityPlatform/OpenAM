@@ -97,7 +97,7 @@ public class ApplicationDelegationTest {
         // appResources.add(DELEGATED_RESOURCE_BASE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1);
         createDelegationPrivilege();
@@ -119,8 +119,8 @@ public class ApplicationDelegationTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
-        ApplicationManager.deleteApplication(adminSubject, "/", 
-            APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                adminSubject, "/", APPL_NAME);
     }
 
     private void createPrivileges() throws EntitlementException {
@@ -198,13 +198,13 @@ public class ApplicationDelegationTest {
     public void negativeTest() throws Exception {
         SSOToken ssoToken = authenticate(USER1, USER1);
         testUserSubject = SubjectUtils.createSubject(ssoToken);
-        Application appl = ApplicationManager.getApplication(
-            testUserSubject, "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                testUserSubject, "/", APPL_NAME);
         //should be able to get application but cannot save it
         // because he is not a policy administrator
 
         try {
-            ApplicationManager.saveApplication(testUserSubject, "/", appl);
+            ApplicationServiceTestHelper.saveApplication(testUserSubject, "/", appl);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 326) {
                 throw e;
@@ -217,8 +217,8 @@ public class ApplicationDelegationTest {
 
     @Test (dependsOnMethods={"negativeTest"})
     public void test() throws Exception {
-        Application appl = ApplicationManager.getApplication(
-            testUserSubject, "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                testUserSubject, "/", APPL_NAME);
 
         // Test disabled, unable to fix model change.
         // Set<String> resources = appl.getResources();

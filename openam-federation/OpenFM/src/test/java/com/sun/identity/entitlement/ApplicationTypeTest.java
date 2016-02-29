@@ -64,12 +64,12 @@ public class ApplicationTypeTest {
         Set<String> subjects = new HashSet<String>();
         subjects.add("com.sun.identity.admin.model.OrViewSubject");
         appl.setSubjects(subjects);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test
@@ -89,8 +89,8 @@ public class ApplicationTypeTest {
     
     @Test
     public void testApplication() throws Exception {
-        Application app = ApplicationManager.getApplication(adminSubject,
-            "/", APPL_NAME);
+        Application app = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
         if (app == null) {
             throw new Exception("ApplicationTypeTest.testApplication cannot get application");
         }
@@ -99,10 +99,10 @@ public class ApplicationTypeTest {
         // Map<String, Boolean> actions = new HashMap<String, Boolean>();
         // actions.put("action", true);
         // app.setActions(actions);
-        ApplicationManager.saveApplication(adminSubject,"/", app);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", app);
 
-        app = ApplicationManager.getApplication(adminSubject, "/",
-            APPL_NAME);
+        app = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
         if (app == null) {
             throw new Exception("ApplicationTypeTest.testApplication application lost");
         }

@@ -34,9 +34,12 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.util.Reject;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
@@ -45,6 +48,7 @@ import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 
@@ -465,6 +469,34 @@ public final class EntitlementUtils {
      * @return The {@link EntitlementConfiguration} for the given realm.
      */
     public static EntitlementConfiguration getEntitlementConfiguration(Subject subject, String realm) {
-        return InjectorHolder.getInstance(EntitlementConfigurationFactory.class).create(subject, realm);
+        if (SystemProperties.isServerMode()) {
+            return InjectorHolder.getInstance(EntitlementConfigurationFactory.class).create(subject, realm);
+        }
+
+        return new EntitlementService(subject, realm);
+    }
+
+    /**
+     * Get a new instance of the {@link ApplicationService}.
+     *
+     * @param subject The requesting Subject.
+     * @param realm The realm for which the configuration is required.
+     * @return The {@link ApplicationService} for the given realm.
+     */
+    public static ApplicationService getApplicationService(Subject subject, String realm) {
+        if (SystemProperties.isServerMode()) {
+            return InjectorHolder.getInstance(ApplicationServiceFactory.class).create(subject, realm);
+        }
+
+        try {
+            Class<? extends ApplicationServiceFactory> factoryClass = Class
+                    .forName("org.forgerock.openam.entitlement.service.ApplicationServiceFactoryImpl")
+                    .asSubclass(ApplicationServiceFactory.class);
+            return factoryClass.newInstance().create(subject, realm);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            PolicyConstants.DEBUG.error("EntitlementUtils.getApplicationService", e);
+        }
+
+        throw new UnsupportedOperationException("Requested operation is not supported in Client Mode.");
     }
 }

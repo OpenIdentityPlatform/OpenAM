@@ -29,6 +29,7 @@
 package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.security.Principal;
@@ -388,8 +389,7 @@ class PrivilegeEvaluator {
     private Application getApplication()
         throws EntitlementException {
         if (application == null) {
-            application = ApplicationManager.getApplicationForEvaluation(
-                realm, applicationName);
+            application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
             // If application is still null, throw an exception
             if (application == null) {
                 String[] params = { realm };

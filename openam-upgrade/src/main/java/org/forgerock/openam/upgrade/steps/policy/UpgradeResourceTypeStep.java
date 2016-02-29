@@ -37,6 +37,8 @@ import javax.inject.Named;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -57,7 +59,6 @@ import org.w3c.dom.NodeList;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -98,6 +99,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     private final ServiceConfigManager configManager;
     private final Set<String> defaultApplicationNames;
     private final Set<String> removedDefaultApplications;
+    private final ApplicationServiceFactory applicationServiceFactory;
 
     private class ResourceTypeState {
         private boolean applicationNeedsResourceType = false;
@@ -120,7 +122,8 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             final ResourceTypeService resourceTypeService,
             final PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory,
-            @Named("removedDefaultApplications") Set<String> removedDefaultApplications) {
+            @Named("removedDefaultApplications") Set<String> removedDefaultApplications,
+            ApplicationServiceFactory applicationServiceFactory) {
         super(adminTokenAction, connectionFactory);
 
         this.configManager = configManager;
@@ -128,6 +131,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         this.defaultApplicationNames = new HashSet<String>();
         this.resourceTypeStatePerRealm = new HashMap<String, Set<ResourceTypeState>>();
         this.removedDefaultApplications = removedDefaultApplications;
+        this.applicationServiceFactory = applicationServiceFactory;
     }
 
     /**
@@ -226,13 +230,14 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             final String realm = entry.getKey();
             final EntitlementConfiguration ec = getEntitlementConfiguration(getAdminSubject(), realm);
             final PrivilegeManager pm = PrivilegeManager.getInstance(realm, getAdminSubject());
+            ApplicationService applicationService = applicationServiceFactory.create(getAdminSubject(), realm);
 
             for (ResourceTypeState state : entry.getValue()) {
                 if (state.applicationNeedsResourceType) {
                     ResourceType resourceType = createResourceType(state, realm);
                     upgradeApplication(ec, state.appName, resourceType.getUUID());
                     // Application modified, clear cache.
-                    ApplicationManager.clearCache(realm);
+                    applicationService.clearCache();
                 }
 
                 if (state.policiesNeedsResourceType) {

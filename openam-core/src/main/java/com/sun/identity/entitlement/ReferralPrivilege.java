@@ -30,6 +30,8 @@
 package com.sun.identity.entitlement;
 
 import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.policy.PolicyConfig;
@@ -290,8 +292,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         ResourceSaveIndexes result = null;
 
         for (String app : mapApplNameToResources.keySet()) {
-            Application appl = ApplicationManager.getApplication(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, app);
+            Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(app);
             for (String r : mapApplNameToResources.get(app)) {
                 ResourceSaveIndexes rsi = appl.getResourceSaveIndex(r);
                 if (result == null) {
@@ -430,8 +431,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         Subject adminSubject,
         String realm,
         String applName) throws EntitlementException {
-        Application appl = ApplicationManager.getApplication(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applName);
+        Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applName);
         return appl.getResourceComparator();
     }
 
@@ -453,9 +453,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             return Collections.EMPTY_LIST;
         }
 
-        Application application =
-            ApplicationManager.getApplication(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
+        Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
         EntitlementCombiner entitlementCombiner =
             application.getEntitlementCombiner();
         entitlementCombiner.init("/", applicationName, normalisedResourceName, requestedResourceName, actionNames,
@@ -570,8 +568,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
     ) throws EntitlementException {
         Set<String> results = new HashSet<String>();
         for (String a : mapApplNameToResources.keySet()) {
-            Application appl = ApplicationManager.getApplication(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, a);
+            Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(a);
             results.add(appl.getApplicationType().getName());
         }
         return results;

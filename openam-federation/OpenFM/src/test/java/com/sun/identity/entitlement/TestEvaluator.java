@@ -85,7 +85,7 @@ public class TestEvaluator {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         createReferral(adminToken, adminSubject);
     }
@@ -147,7 +147,7 @@ public class TestEvaluator {
         identities.add(user2);
         IdRepoUtils.deleteIdentities("/", identities);
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");

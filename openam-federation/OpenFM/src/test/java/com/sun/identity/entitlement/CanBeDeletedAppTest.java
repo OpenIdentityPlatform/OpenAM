@@ -103,7 +103,7 @@ public class CanBeDeletedAppTest {
         // appResources.add("http://www.CanBeDeletedAppTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     private void createPrivilege() throws EntitlementException {
@@ -146,7 +146,7 @@ public class CanBeDeletedAppTest {
         // at this point, we have privilege, referral privilege and application
         // privilege, so application cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -160,7 +160,7 @@ public class CanBeDeletedAppTest {
         // at this point, we have referral privilege and application
         // privilege, so application cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -170,7 +170,7 @@ public class CanBeDeletedAppTest {
         // at this point, we still have application privilege, so application
         // still cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -182,6 +182,6 @@ public class CanBeDeletedAppTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         // can delete now
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 }

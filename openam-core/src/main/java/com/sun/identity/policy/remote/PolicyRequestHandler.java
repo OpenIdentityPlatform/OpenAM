@@ -31,6 +31,7 @@ package com.sun.identity.policy.remote;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 import static org.forgerock.openam.utils.Time.*;
 
@@ -42,7 +43,6 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -733,7 +733,7 @@ public class PolicyRequestHandler implements RequestHandler {
                     appAttributes.get(EVALUATION_APPLICATION), serviceTypeName);
 
             final Subject appSubject = SubjectUtils.createSubject(appToken);
-            final Application application = ApplicationManager.getApplication(appSubject, realm, applicationName);
+            final Application application = getApplicationService(appSubject, realm).getApplication(applicationName);
 
             if (application == null) {
                 throw new PolicyException(

@@ -24,12 +24,14 @@
  *
  * $Id: NotificationServlet.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
-import com.sun.identity.entitlement.ApplicationManager;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import org.forgerock.openam.entitlement.PolicyConstants;
@@ -142,7 +144,7 @@ public class NotificationServlet extends HttpServlet {
 
     private void handleApplicationsChanged(HttpServletRequest req) {
         String realm = req.getParameter(ATTR_REALM_NAME);
-        ApplicationManager.clearCache(realm);
+        getApplicationService(SUPER_ADMIN_SUBJECT, realm).clearCache();
     }
 
 }

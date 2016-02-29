@@ -29,6 +29,8 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.security.AccessController;
@@ -37,7 +39,6 @@ import javax.security.auth.Subject;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -103,7 +104,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         // Only clear cache and remove referrals if the realm is being removed
         if (type == ServiceListener.REMOVED &&
                 (serviceComponent == null || serviceComponent.trim().isEmpty() || serviceComponent.equals("/"))) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            getApplicationService(SUPER_ADMIN_SUBJECT, DNMapper.orgNameToRealmName(orgName)).clearCache();
             try {
                 OpenSSOApplicationPrivilegeManager.removeAllPrivileges(orgName);
             } catch (EntitlementException ex) {
@@ -113,7 +114,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
             }
 
         } else if (type == ServiceListener.MODIFIED) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            getApplicationService(SUPER_ADMIN_SUBJECT, DNMapper.orgNameToRealmName(orgName)).clearCache();
         }
     }
 

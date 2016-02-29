@@ -104,8 +104,8 @@ public class DelegationPrivilegeIdRepoAccessTest {
         // resources.add(DELEGATED_RESOURCE);
         // appl.setResources(resources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
+        ApplicationServiceTestHelper.saveApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
     }
 
     @AfterTest
@@ -115,9 +115,8 @@ public class DelegationPrivilegeIdRepoAccessTest {
         identities.add(delegatedUser1);
         IdRepoUtils.deleteIdentities(SUB_REALM, identities);
 
-        ApplicationManager.deleteApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM,
-            APPLICATION_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM, APPLICATION_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");

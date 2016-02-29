@@ -74,7 +74,7 @@ public class ApplicationMetaData {
         // appResources.add("http://www.applicationmetadata.com");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -83,7 +83,7 @@ public class ApplicationMetaData {
             return;
         }
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test
@@ -91,8 +91,8 @@ public class ApplicationMetaData {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationManager.getApplication(adminSubject,
-            "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
         String createdBy = appl.getCreatedBy();
         long creationTime = appl.getCreationDate();
         long modifiedTime = appl.getLastModifiedDate();
@@ -101,7 +101,7 @@ public class ApplicationMetaData {
             throw new Exception(
                 "ApplicationMetaData.test: modified and creation time diff");
         }
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
         creationTime = appl.getCreationDate();
         modifiedTime = appl.getLastModifiedDate();
 
@@ -115,8 +115,8 @@ public class ApplicationMetaData {
                 "ApplicationMetaData.test: createdBy and modifiedBy should be the same");
         }
 
-        Set<Application> results = ApplicationManager.search(adminSubject, "/",
-                QueryFilter.equalTo(NAME_ATTRIBUTE, APPL_NAME));
+        Set<Application> results = ApplicationServiceTestHelper.search(
+                adminSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, APPL_NAME));
         if (!results.isEmpty()) {
             throw new Exception(
                 "ApplicationMetaData.test: search fails");

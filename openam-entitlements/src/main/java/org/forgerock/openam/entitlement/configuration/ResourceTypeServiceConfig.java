@@ -36,7 +36,7 @@ import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
  * This class is the base for entitlement configuration and contains common tasks for interacting with the
  * persisted entitlement configuration model.
  */
-class ResourceTypeServiceConfig {
+public class ResourceTypeServiceConfig {
 
     /**
      * Get the organization configuration for the sunEntitlementService service.

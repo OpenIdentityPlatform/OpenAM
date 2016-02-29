@@ -27,6 +27,7 @@ import static java.text.MessageFormat.format;
 import static java.util.Collections.singleton;
 import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
@@ -54,6 +55,7 @@ import org.forgerock.openam.entitlement.rest.PolicyStore;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
@@ -66,7 +68,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
@@ -293,7 +294,8 @@ public class ConfigureOAuth2 extends Task {
     private String getUrlResourceTypeId(Subject adminSubject, String realm)
             throws EntitlementException, WorkflowException {
 
-        Application application = ApplicationManager.getApplication(adminSubject, realm, POLICY_APPLICATION_NAME);
+        ApplicationService applicationService = getApplicationService(adminSubject, realm);
+        Application application = applicationService.getApplication(POLICY_APPLICATION_NAME);
         if (application == null) {
             ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(adminSubject,
                     ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
@@ -325,7 +327,7 @@ public class ConfigureOAuth2 extends Task {
         }
         application.addAllResourceTypeUuids(asSet(resourceType.getUUID()));
         application.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, realm, application);
+        applicationService.saveApplication(application);
         return resourceType.getUUID();
     }
 

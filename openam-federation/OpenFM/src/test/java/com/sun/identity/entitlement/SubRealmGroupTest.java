@@ -85,7 +85,7 @@ public class SubRealmGroupTest {
         // avaliableResources.add(RESOURCE2);
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1_NAME);
         group1 = IdRepoUtils.createGroup("/", GROUP1_NAME);
@@ -108,7 +108,7 @@ public class SubRealmGroupTest {
 
     @AfterClass
     public void cleanup() throws Exception {
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     private void removeOrganization() throws Exception {

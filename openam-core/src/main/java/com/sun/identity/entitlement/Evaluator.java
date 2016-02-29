@@ -28,6 +28,8 @@
  */
 package com.sun.identity.entitlement;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
@@ -38,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.monitoring.EntitlementConfigurationWrapper;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitoringType;
@@ -204,8 +205,7 @@ public class Evaluator {
         long startTime = currentTimeMillis();
 
         // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
-        Application application = ApplicationManager
-                .getApplication(PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
+        Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
 
         if (application == null) {
             // App retrieval error.

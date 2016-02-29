@@ -89,7 +89,7 @@ public class TestAttributeEvaluator {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         PrivilegeManager pm = new PolicyPrivilegeManager(
                 applicationServiceFactory, resourceTypeService, constraintValidator);
@@ -125,7 +125,7 @@ public class TestAttributeEvaluator {
 
         IdRepoUtils.deleteIdentity("/", user1);
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test

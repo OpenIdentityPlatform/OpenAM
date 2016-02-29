@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ListApplicationTypes.java,v 1.1 2009/08/19 05:40:31 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -35,7 +37,22 @@ import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.log.Level;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+
 public class ListApplicationTypes extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public ListApplicationTypes(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *

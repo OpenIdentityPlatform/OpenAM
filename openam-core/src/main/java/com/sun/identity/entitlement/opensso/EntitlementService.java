@@ -32,7 +32,9 @@ package com.sun.identity.entitlement.opensso;
 import static com.sun.identity.entitlement.ApplicationTypeManager.getAppplicationType;
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.openam.entitlement.PolicyConstants.DEBUG;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -56,7 +58,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -258,7 +259,7 @@ public class EntitlementService implements EntitlementConfiguration {
     }
 
     private SSOToken getSSOToken() {
-        return (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) ?
+        return (SUPER_ADMIN_SUBJECT.equals(subject)) ?
             EntitlementUtils.getAdminToken() :
             SubjectUtils.getSSOToken(subject);
     }
@@ -295,7 +296,7 @@ public class EntitlementService implements EntitlementConfiguration {
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
+        if (SUPER_ADMIN_SUBJECT.equals(subject)) {
             return EntitlementUtils.getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
@@ -431,8 +432,7 @@ public class EntitlementService implements EntitlementConfiguration {
                 throw new EntitlementException(225);
             }
 
-            Application appl = ApplicationManager.getApplication(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
+            Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
             if (appl != null) {
                 appl.addAttributeNames(names);
             }
@@ -791,8 +791,7 @@ public class EntitlementService implements EntitlementConfiguration {
     @Override
     public Set<String> getSubjectAttributeNames(String application) {
         try {
-            Application app = ApplicationManager.getApplication(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, application);
+            Application app = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(application);
             if (app != null) {
                 return app.getAttributeNames();
             }
@@ -1036,7 +1035,7 @@ public class EntitlementService implements EntitlementConfiguration {
         Set<Application> appls = getApplications();
         for (Application a : appls) {
             try {
-                ApplicationManager.saveApplication(subject, realm, a);
+                getApplicationService(subject, realm).saveApplication(a);
             } catch (EntitlementException ex) {
                 //ignore
             }

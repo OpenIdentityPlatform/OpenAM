@@ -36,7 +36,6 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
@@ -45,9 +44,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 
 public class CreateApplication extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public CreateApplication(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -81,7 +94,7 @@ public class CreateApplication extends ApplicationImpl {
             Application appl = EntitlementUtils.newApplication(appName, applicationType);
             setApplicationAttributes(appl, attributeValues,
                 true);
-            ApplicationManager.saveApplication(getAdminSubject(), realm, appl);
+            applicationServiceFactory.create(getAdminSubject(), realm).saveApplication(appl);
             String[] param = {appName};
             getOutputWriter().printlnMessage(
                 MessageFormat.format(getResourceString(

@@ -75,14 +75,14 @@ public class SubRealmEvaluationTest {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
     }
 
 
     @AfterClass
     public void cleanup() throws EntitlementException {
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     private void removeOrganization() throws Exception {

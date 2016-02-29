@@ -119,9 +119,8 @@ public class DelegationPrivilegeTest {
             ApplicationPrivilege.PossibleAction.READ_MODIFY_DELEGATE);
         mgr.addPrivilege(ap);
 
-        Application app = ApplicationManager.getApplication(
-            PrivilegeManager.superAdminSubject, realm,
-            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Application app = ApplicationServiceTestHelper.getApplication(
+                PrivilegeManager.superAdminSubject, realm, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model change.
         // if (app.getResources().contains(delResource)) {

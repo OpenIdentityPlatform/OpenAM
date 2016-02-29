@@ -24,7 +24,7 @@
  *
  * $Id4
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -36,15 +36,28 @@ import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+
 public class ShowApplication extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public ShowApplication(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -63,9 +76,7 @@ public class ShowApplication extends ApplicationImpl {
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_SHOW_APPLICATION", params);
         try {
-            Application appl = ApplicationManager.getApplication(
-                getAdminSubject(),
-                realm, appName);
+            Application appl = applicationServiceFactory.create(getAdminSubject(), realm).getApplication(appName);
             IOutput writer = getOutputWriter();
 
             if (appl == null) {

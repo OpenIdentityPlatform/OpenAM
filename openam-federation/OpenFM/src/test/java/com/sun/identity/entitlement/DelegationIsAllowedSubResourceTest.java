@@ -97,7 +97,7 @@ public class DelegationIsAllowedSubResourceTest {
         // appResources.add(DELEGATED_RESOURCE_BASE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1);
         createDelegationPrivilege();
@@ -118,8 +118,8 @@ public class DelegationIsAllowedSubResourceTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
-        ApplicationManager.deleteApplication(adminSubject, "/",
-            APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                adminSubject, "/", APPL_NAME);
     }
 
     private void createPrivilege() throws EntitlementException {

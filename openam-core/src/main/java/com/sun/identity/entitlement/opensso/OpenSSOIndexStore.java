@@ -29,6 +29,8 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.security.AccessController;
@@ -49,7 +51,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
@@ -789,8 +790,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                     Map<String, Set<String>> map =
                         r.getOriginalMapApplNameToResources();
                     for (String a : map.keySet()) {
-                        Application appl = ApplicationManager.getApplication(
-                            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, a);
+                        Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realmName).getApplication(a);
                         if (appl.getApplicationType().getName().equals(
                             applicationTypeName)) {
                             results.addAll(map.get(a));
@@ -998,7 +998,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 // Realm has been deleted, clear the indexCaches &
                 indexCaches.remove(orgName);
                 referralIndexCaches.remove(orgName);
-                ApplicationManager.clearCache(DNMapper.orgNameToDN(orgName));
+                getApplicationService(SUPER_ADMIN_SUBJECT, orgName).clearCache();
             }
         }
     }

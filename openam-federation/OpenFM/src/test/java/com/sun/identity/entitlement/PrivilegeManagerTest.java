@@ -111,7 +111,7 @@ public class PrivilegeManagerTest {
         // appResources.add(RESOURCE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, realm, appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, realm, appl);
     }
 
     @AfterClass
@@ -126,8 +126,8 @@ public class PrivilegeManagerTest {
 
         PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.remove(PRIVILEGE_NAME);
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
-        ApplicationManager.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(adminToken, "/");
         orgMgr.deleteSubOrganization(SUB_REALM, true);

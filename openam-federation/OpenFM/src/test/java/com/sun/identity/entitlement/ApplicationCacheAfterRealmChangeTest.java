@@ -106,8 +106,8 @@ public class ApplicationCacheAfterRealmChangeTest {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationManager.getApplication(adminSubject,
-            SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model changes
         // Set<String> resources = appl.getResources();
@@ -129,8 +129,8 @@ public class ApplicationCacheAfterRealmChangeTest {
 
         ocm.setAttributes(IdConstants.REPO_SERVICE, attributes);
 
-        appl = ApplicationManager.getApplication(adminSubject,
-            SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model changes.
         // resources = appl.getResources();

@@ -1,3 +1,4 @@
+
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -24,7 +25,7 @@
  *
  * $Id: ApplicationImpl.java,v 1.2 2009/09/25 05:52:53 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -42,10 +43,11 @@ import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 
 public class ApplicationImpl extends AuthenticatedCommand {
     public static final String PARAM_APPL_TYPE_NAME = "applicationtype";
@@ -70,6 +72,17 @@ public class ApplicationImpl extends AuthenticatedCommand {
     public static final String ATTR_LAST_MODIFICATION_DATE = "lastModifiedDate";
 
     private Subject adminSubject;
+    protected final ApplicationServiceFactory applicationServiceFactory;
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    public ApplicationImpl(ApplicationServiceFactory applicationServiceFactory) {
+        this.applicationServiceFactory = applicationServiceFactory;
+    }
+
     /**
      * Services a Commandline Request.
      *

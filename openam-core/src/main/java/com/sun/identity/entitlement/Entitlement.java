@@ -24,11 +24,12 @@
  *
  * $Id: Entitlement.java,v 1.7 2010/01/25 23:48:14 veiming Exp $
  *
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
-import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.JSONUtils;
@@ -807,8 +808,7 @@ public class Entitlement {
     public Application getApplication(Subject adminSubject, String realm)
         throws EntitlementException {
         if (application == null) {
-            application = ApplicationManager.getApplication(
-                    PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
+            application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
         }
         if (application == null) {
             PolicyConstants.DEBUG.error("Entitlement.getApplication null"
@@ -818,7 +818,7 @@ public class Entitlement {
     }
 
     ResourceName getResourceComparator(Subject adminSubject, String realm) throws EntitlementException {
-        final Application application = getApplication(PolicyConstants.SUPER_ADMIN_SUBJECT, realm);
+        final Application application = getApplication(SUPER_ADMIN_SUBJECT, realm);
 
         if (application == null) {
             throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION, applicationName);

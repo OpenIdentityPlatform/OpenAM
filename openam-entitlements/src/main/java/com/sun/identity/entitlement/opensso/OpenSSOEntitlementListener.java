@@ -23,16 +23,19 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOEntitlementListener.java,v 1.4 2009/12/15 00:44:19 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementListener;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.interfaces.IEntitlementListenerRegistry;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.AttributeSchema;
@@ -171,8 +174,7 @@ public class OpenSSOEntitlementListener
 
     private boolean doesApplicationExist(String applName) 
         throws EntitlementException {
-        Set<String> names = ApplicationManager.getApplicationNames(
-            PrivilegeManager.superAdminSubject, "/");
+        Set<String> names = getApplicationService(SUPER_ADMIN_SUBJECT, "/").getApplicationNames();
         return names.contains(applName);
     }
 

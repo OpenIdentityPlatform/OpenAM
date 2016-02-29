@@ -30,6 +30,7 @@
 package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.io.BufferedReader;
@@ -150,7 +151,7 @@ public class PrivilegeChangeNotifier {
                     return true;
                 }
 
-                Application app = ApplicationManager.getApplication(SUPER_ADMIN_SUBJECT, realm, appName);
+                Application app = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(appName);
                 ResourceName resourceComp = app.getResourceComparator();
 
                 for (String r : res) {

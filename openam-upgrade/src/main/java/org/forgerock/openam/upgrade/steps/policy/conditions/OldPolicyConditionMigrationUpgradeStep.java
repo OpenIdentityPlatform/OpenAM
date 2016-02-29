@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
 import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
 
@@ -38,11 +40,11 @@ import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+
 import org.forgerock.openam.utils.CollectionUtils;
 
 /**
@@ -188,7 +190,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
 
         for (Map.Entry<String, Set<Privilege>> entry : privilegesToUpgrade.entrySet()) {
             String realm = entry.getKey();
-            ApplicationManager.clearCache(realm); //ensure reading apps cleanly
+            getApplicationService(SUPER_ADMIN_SUBJECT, realm).clearCache(); //ensure reading apps cleanly
 
             PrivilegeManager privilegeManager = getPrivilegeManager(realm);
 

@@ -66,7 +66,7 @@ public class ApplicationCreatorNDateTest {
         // appResources.add("http://www.ApplicationCreatorNDateTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -75,14 +75,14 @@ public class ApplicationCreatorNDateTest {
             return;
         }
 
-        ApplicationManager.deleteApplication(adminSubject, "/",
-            APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                adminSubject, "/", APPL_NAME);
     }
 
     @Test
     public void test() throws Exception {
-        Application appl = ApplicationManager.getApplication(
-            adminSubject, "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
 
         long creationDate = appl.getCreationDate();
         String createdBy = appl.getCreatedBy();
@@ -90,10 +90,10 @@ public class ApplicationCreatorNDateTest {
         //reset createdBy and creationDate
         appl.setCreatedBy(null);
         appl.setCreationDate(-1);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
-        appl = ApplicationManager.getApplication(
-            adminSubject, "/", APPL_NAME);
+        appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
 
         if (!appl.getCreatedBy().equals(createdBy)) {
             throw new Exception(
