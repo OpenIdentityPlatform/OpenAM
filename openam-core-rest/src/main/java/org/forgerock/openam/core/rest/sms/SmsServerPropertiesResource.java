@@ -21,6 +21,7 @@ import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.util.Iterator;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.parsers.DocumentBuilder;
@@ -362,7 +363,6 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             String nodeValue = defaultValues.item(i).getNodeValue().replace('-', '.');
             if (nodeValue.substring(0, 3).equals("csc")) {
                 nodeValue = nodeValue.substring(3, nodeValue.length());
-                nodeValue = "amconfig.".concat(nodeValue);
             }
             defaultValueNames.add(nodeValue);
         }
@@ -435,9 +435,10 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     private InputStream getInputStream(String tabName) {
+
         final String propertyFileName = "propertyServerEdit" + tabName + ".xml";
         return this.getClass().getClassLoader().getResourceAsStream
-                ("com/sun/identity/console/" + propertyFileName);
+                ("/com/sun/identity/console/" + propertyFileName);
     }
 
     protected ServiceConfigManager getServiceConfigManager(Context context) throws SSOException, SMSException {
@@ -492,40 +493,48 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             List<String> attributeNamesForTab;
             if (tabName.equalsIgnoreCase(DIRECTORY_CONFIGURATION_TAB_NAME)) {
-                InputStream resourceStream = new StringInputStream(getServerConfigXml(serverConfig));
+                final String serverConfigXml = getServerConfigXml(serverConfig);
 
-                Document serverXml = dBuilder.parse(resourceStream);
+                if (serverConfigXml != null) {
+                    InputStream resourceStream = new StringInputStream(serverConfigXml);
 
-                XPath xPath = XPathFactory.newInstance().newXPath();
+                    Document serverXml = dBuilder.parse(resourceStream);
 
-                final String baseExpression = "//iPlanetDataAccessLayer/ServerGroup[@name='sms']/";
-                String minConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MIN_CONN_POOL).evaluate(serverXml, XPathConstants.STRING);
-                String maxConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MAX_CONN_POOL).evaluate(serverXml, XPathConstants.STRING);
-                String dirDN = (String) xPath.compile(baseExpression + "User/DirDN").evaluate(serverXml, XPathConstants.STRING);
-                String directoryPassword = (String) xPath.compile(baseExpression + "User/DirPassword").evaluate(serverXml, XPathConstants.STRING);
+                    XPath xPath = XPathFactory.newInstance().newXPath();
 
-                result.put("minConnections", minConnections);
-                result.put("maxConnections", maxConnections);
-                result.put("dirDN", dirDN);
-                result.put("directoryPassword", directoryPassword);
+                    final String baseExpression = "//iPlanetDataAccessLayer/ServerGroup[@name='sms']/";
+                    String minConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MIN_CONN_POOL).evaluate(serverXml,
+                            XPathConstants.STRING);
+                    String maxConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MAX_CONN_POOL).evaluate(serverXml,
+                            XPathConstants.STRING);
+                    String dirDN = (String) xPath.compile(baseExpression + "User/DirDN").evaluate(serverXml,
+                            XPathConstants.STRING);
+                    String directoryPassword = (String) xPath.compile(baseExpression + "User/DirPassword").evaluate(
+                            serverXml, XPathConstants.STRING);
 
-                NodeList serverNames = (NodeList) xPath.compile(baseExpression + "Server/@name").evaluate
-                        (serverXml, XPathConstants.NODESET);
+                    result.put("minConnections", minConnections);
+                    result.put("maxConnections", maxConnections);
+                    result.put("dirDN", dirDN);
+                    result.put("directoryPassword", directoryPassword);
 
-                for (int i = 0; i < serverNames.getLength(); i++) {
-                    final String directoryServerName = serverNames.item(i).getNodeValue();
-                    final String serverExpression = baseExpression + "Server[@name='" + directoryServerName + "']";
-                    String hostExpression = serverExpression + "/@host";
-                    String portExpression = serverExpression + "/@port";
-                    String typeExpression = serverExpression + "/@type";
+                    NodeList serverNames = (NodeList) xPath.compile(baseExpression + "Server/@name").evaluate(serverXml,
+                            XPathConstants.NODESET);
 
-                    NodeList serverAttributes = (NodeList) xPath.compile(hostExpression + "|" + portExpression + "|" +
-                            typeExpression).evaluate(serverXml, XPathConstants.NODESET);
+                    for (int i = 0; i < serverNames.getLength(); i++) {
+                        final String directoryServerName = serverNames.item(i).getNodeValue();
+                        final String serverExpression = baseExpression + "Server[@name='" + directoryServerName + "']";
+                        String hostExpression = serverExpression + "/@host";
+                        String portExpression = serverExpression + "/@port";
+                        String typeExpression = serverExpression + "/@type";
 
-                    for (int a = 0; a < serverAttributes.getLength(); a++) {
-                        final Node serverAttribute = serverAttributes.item(a);
-                        result.addPermissive(new JsonPointer("servers/" + directoryServerName + "/" + serverAttribute
-                                .getNodeName()), serverAttribute.getNodeValue());
+                        NodeList serverAttributes = (NodeList) xPath.compile(hostExpression + "|" + portExpression + "|" +
+                                typeExpression).evaluate(serverXml, XPathConstants.NODESET);
+
+                        for (int a = 0; a < serverAttributes.getLength(); a++) {
+                            final Node serverAttribute = serverAttributes.item(a);
+                            result.addPermissive(new JsonPointer("servers/" + directoryServerName + "/" + serverAttribute.getNodeName()),
+                                    serverAttribute.getNodeValue());
+                        }
                     }
                 }
             } else {
@@ -559,8 +568,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     private String getServerConfigXml(ServiceConfig serverConfig) {
-        return (String) ((Set) serverConfig.getAttributes().get("serverconfigxml"))
-                .iterator().next();
+        final Iterator serverconfigXml = ((Set) serverConfig.getAttributes().get("serverconfigxml")).iterator();
+        if (serverconfigXml.hasNext()) {
+            return (String) serverconfigXml.next();
+        } else {
+            return null;
+        }
     }
 
     private List<String> getAdvancedTabAttributeNames(ServiceConfig serverConfig) {
