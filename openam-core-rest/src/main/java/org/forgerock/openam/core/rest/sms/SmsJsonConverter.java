@@ -168,7 +168,7 @@ public class SmsJsonConverter {
             throw new JsonException("Unable to validate attributes", e);
         }
 
-        JsonValue parentJson = json(object(field("type", "object")));
+        JsonValue parentJson = json(object());
 
         if (validAttributes) {
             for (String attributeName : attributeValuePairs.keySet()) {
