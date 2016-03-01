@@ -488,8 +488,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             Properties serverSpecificAttributes = getAttributes(serverConfig);
             Map<String, String> defaultSection = new HashMap<>();
 
-            JsonValue result = json(object(
-                    field("default", defaultSection)));
+            JsonValue result = json(object());
+
+            final boolean isServerDefault = serverName.equalsIgnoreCase(SERVER_DEFAULT_NAME);
+            if (!isServerDefault) {
+                result.put("default", defaultSection);
+            }
 
             List<String> attributeNamesForTab;
             if (tabName.equalsIgnoreCase(DIRECTORY_CONFIGURATION_TAB_NAME)) {
@@ -546,7 +550,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
                 for (String attributeName : attributeNamesForTab) {
                     final String defaultAttribute = (String) defaultAttributes.get(attributeName);
-                    if (defaultAttribute != null) {
+                    if (defaultAttribute != null && !isServerDefault) {
                         defaultSection.put(attributeName, (String) defaultAttributes.get(attributeName));
                     }
 
