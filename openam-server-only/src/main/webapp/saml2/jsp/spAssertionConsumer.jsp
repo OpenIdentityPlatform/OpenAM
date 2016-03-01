@@ -296,7 +296,7 @@ java.io.PrintWriter
     if (isProxyOn) { 
         try {
             IDPProxyUtil.generateProxyResponse(request, response, new PrintWriter(out, true), metaAlias, respInfo,
-                    newSession);
+                    newSession, saml2Auditor);
             saml2Auditor.auditForwardToProxy();
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("Failed sending proxy response", se);

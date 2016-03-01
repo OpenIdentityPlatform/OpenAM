@@ -209,7 +209,7 @@ public class IDPSSOUtil {
      * @param nameIDFormat the <code>NameIDFormat</code>
      * @param relayState   the relay state
      * @param newSession   Session used in IDP Proxy Case
-     * @param auditor      the auditor for logging SAML2 Events - may be null
+     * @param auditor      the auditor for logging SAML2 Events
      * @throws SAML2Exception if the operation is not successful
      */
     public static void doSSOFederate(HttpServletRequest request,
