@@ -35,15 +35,20 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -63,6 +68,7 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
 
     private final Debug debug;
     private final SmsConsoleServiceNameFilter consoleNameFilter;
+    private SmsRouteTree routeTree;
 
     @Inject
     ServicesRealmSmsHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
@@ -141,7 +147,7 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
 
             return json(object(field(RESULT, jsonArray)));
         } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException("Unable to query SMS config.", e);
         }
     }
 
@@ -167,7 +173,7 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
 
             return json(object(field(RESULT, jsonOutput)));
         } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException("Unable to query SMS config.", e);
         }
     }
 
@@ -191,6 +197,22 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
             throws IdRepoException, SSOException {
         AMIdentityRepository repo = new AMIdentityRepository(realmName, userSSOToken);
         return repo.getRealmIdentity();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
+        UriRouterContext ctx = context.asContext(UriRouterContext.class);
+        String serviceResourceId = request.getNewResourceId();
+        UriRouterContext subRequestCtx = new UriRouterContext(context, "", serviceResourceId,
+                ctx.getUriTemplateVariables());
+        CreateRequest subRequest = Requests.copyOfCreateRequest(request)
+                .setNewResourceId("")
+                .setResourcePath(serviceResourceId);
+        return routeTree.handleCreate(subRequestCtx, subRequest);
+    }
+
+    void setSmsRouteTree(SmsRouteTree routeTree) {
+        this.routeTree = routeTree;
     }
 
 }

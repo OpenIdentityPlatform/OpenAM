@@ -39,6 +39,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.forgerock.guava.common.collect.BiMap;
+import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -46,6 +48,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -77,7 +80,7 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
      * requests to the authentication module endpoint can check if they need to check the
      * special place that these auto created modules are stored.
      */
-    private static final Map<String, String> AUTO_CREATED_AUTHENTICATION_MODULES = new HashMap<>();
+    static final BiMap<String, String> AUTO_CREATED_AUTHENTICATION_MODULES = HashBiMap.create(7);
 
     static {
         AUTO_CREATED_AUTHENTICATION_MODULES.put("hotp", "hotp");
@@ -216,7 +219,7 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
     }
 
     @Override
-    public JsonValue getAllTypes(Context context, ActionRequest request) throws NotSupportedException, InternalServerErrorException {
+    public JsonValue getAllTypes(Context context, ActionRequest request) throws ResourceException {
         JsonValue result = json(object());
 
         Set<String> subSchemaNames = schema.getSubSchemaNames();
@@ -228,7 +231,9 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
                 ServiceSchema subSchema = schema.getSubSchema(subSchemaName);
                 ResourceBundle schemaI18n = ResourceBundle.getBundle(subSchema.getI18NFileName(), getLocale(context));
                 String i18NKey = subSchema.getI18NKey();
-                String name = schemaI18n.containsKey(i18NKey) ? schemaI18n.getString(i18NKey) : subSchemaName;
+                String name = i18NKey != null && schemaI18n.containsKey(i18NKey)
+                        ? schemaI18n.getString(i18NKey)
+                        : subSchemaName;
                 subSchemas.add(object(
                         field("_id", subSchema.getResourceName()),
                         field("name", name)

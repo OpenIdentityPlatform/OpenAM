@@ -28,6 +28,8 @@
  */
 package com.sun.identity.sm;
 
+import static java.util.Arrays.asList;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.Constants;
@@ -269,8 +271,12 @@ public class ServiceSchema {
      * Returns the name for the service schema when used in a CREST representation.
      */
     public String getResourceName() {
-        String resourceName = ss.getResourceName();
-        return resourceName == null ? getName() : resourceName;
+        for (String name : asList(ss.getResourceName(), getName())) {
+            if (name != null) {
+                return name;
+            }
+        }
+        return getServiceName();
     }
 
     /**

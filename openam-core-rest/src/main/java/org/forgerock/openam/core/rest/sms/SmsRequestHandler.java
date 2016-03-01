@@ -16,28 +16,10 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static java.util.Collections.*;
 import static org.forgerock.http.routing.RoutingMode.*;
-import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.configuration.ConfigurationBase;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -51,11 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Function;
-import org.forgerock.guava.common.collect.Maps;
+import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
@@ -76,6 +59,7 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
@@ -85,6 +69,24 @@ import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
+
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.configuration.ConfigurationBase;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -111,12 +113,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
     private final RealmContextFilter realmContextFilter;
-    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceSingletons =
             new HashMap<>();
-    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceCollections =
             new HashMap<>();
     private final SitesResourceProvider sitesResourceProvider;
     private final RealmNormaliser realmNormaliser;
+    private final ServicesRealmSmsHandler servicesRealmSmsHandler;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
     private final SmsRouteTree routeTree;
     private final SessionCache sessionCache;
@@ -127,12 +130,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
-            ExcludedServicesFactory excludedServicesFactory,
-            SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
-            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
-            RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
+            ExcludedServicesFactory excludedServicesFactory, SitesResourceProvider sitesResourceProvider,
+            AuthenticationChainsFilter authenticationChainsFilter, RealmContextFilter realmContextFilter,
+            SessionCache sessionCache, CoreWrapper coreWrapper, RealmNormaliser realmNormaliser,
+            Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
             PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
-            PrivilegedAction<SSOToken> adminTokenAction)
+            PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -145,6 +148,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
         this.realmContextFilter = realmContextFilter;
+        this.servicesRealmSmsHandler = servicesRealmSmsHandler;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         Map<MatchingResourcePath, CrestAuthorizationModule> authzModules = type.equals(SchemaType.GLOBAL)
@@ -164,7 +168,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
         addExcludedServiceProviders();
         createServices();
-        addSpecialCaseRoutes(adminTokenAction);
+        addSpecialCaseRoutes();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
         registerServiceListener(adminTokenAction);
     }
@@ -178,7 +182,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
-    private void addSpecialCaseRoutes(PrivilegedAction<SSOToken> adminTokenAction) throws SMSException, SSOException {
+    private void addSpecialCaseRoutes() throws SMSException, SSOException {
+        addServiceInstancesQueryHandler();
         addAuthenticationHandlers();
         addRealmHandler();
         addCommonTasksHandler();
@@ -197,6 +202,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         if (SchemaType.GLOBAL.equals(schemaType)) {
             getAuthenticationModuleRouter().addRoute(EQUALS, "",
                     InjectorHolder.getInstance(AuthenticationModuleGlobalSmsHandler.class));
+        }
+    }
+
+    //hard-coded services routes
+    private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
+        // realm-config/services -> service realm collection
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            SmsRouteTree serviceInstanceRouter = getServiceInstanceRouter();
+            servicesRealmSmsHandler.setSmsRouteTree(serviceInstanceRouter);
+            serviceInstanceRouter.addRoute(EQUALS, "", servicesRealmSmsHandler);
         }
     }
 
@@ -244,12 +259,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     }
 
     private void addExcludedServiceProviders() {
-        excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Function<String, Boolean>>asSet());
+        excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Predicate<String>>asSet());
         excludedServiceSingletons.put(SchemaType.ORGANIZATION,
                 asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
         excludedServiceCollections.put(SchemaType.GLOBAL,
                 asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
-        excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Function<String, Boolean>>asSet());
+        excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Predicate<String>>asSet());
     }
 
     /**
@@ -396,7 +411,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addService(ServiceManager sm, String serviceName, String serviceVersion)
+    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addService(ServiceManager sm, String serviceName,
+            String serviceVersion)
             throws SMSException, SSOException {
         if (excludedServices.contains(serviceName)) {
             debug.message("Excluding service from REST SMS: {}", serviceName);
@@ -404,7 +420,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
 
         ServiceSchemaManager ssm = sm.getSchemaManager(serviceName, serviceVersion);
-        String resourceName = EMPTY_PATH.equals(ssm.getResourceName()) ? "" : ssm.getResourceName();
         Map<SmsRouteTree, Set<RouteMatcher<Request>>> routes = new HashMap<>();
 
         ServiceSchema organizationSchema = ssm.getOrganizationSchema();
@@ -413,21 +428,21 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (hasGlobalSchema(globalSchema)) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema,
+                addGlobalPaths("", new ArrayList<ServiceSchema>(), globalSchema, organizationSchema,
                         dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             } else if (organizationSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema,
+                addGlobalPaths("", new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema,
                         dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             }
         } else {
             if (organizationSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes,
+                addPaths("", new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes,
                         DEFAULT_IGNORED_ROUTES, null);
             } else if (dynamicSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes,
+                addPaths("", new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes,
                         DEFAULT_IGNORED_ROUTES, null);
             }
         }
@@ -458,16 +473,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
             List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
         String schemaName = globalSchema.getResourceName();
-        String path = getPath(parentPath, schemaName, schemaPath, globalSchema);
+        String path = updatePaths(parentPath, schemaName, schemaPath, globalSchema);
 
         SmsGlobalSingletonProvider handler = globalSingletonProviderFactory.create(new SmsJsonConverter(globalSchema),
                 globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
                 parentPath, true);
         debug.message("Adding singleton path {}", path);
-        serviceRoutes.putAll(addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree));
+        routeTree = addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree, serviceRoutes);
 
         if (globalSchema != organizationSchema) {
-            addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
+            addPaths("", schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
         }
     }
 
@@ -479,8 +494,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         return exclude(excludedServiceCollections.get(schemaType), serviceName);
     }
 
-    private boolean exclude(Collection<Function<String, Boolean>> excludeFunctions, String serviceName) {
-        for (Function<String, Boolean> f : excludeFunctions) {
+    private boolean exclude(Collection<Predicate<String>> excludeFunctions, String serviceName) {
+        for (Predicate<String> f : excludeFunctions) {
             if (f.apply(serviceName)) {
                 return true;
             }
@@ -502,62 +517,74 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      */
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes,
-            SmsRouteTree routeTree) throws SMSException {
+            ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
+            List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
         String schemaName = schema.getResourceName();
-        String path = getPath(parentPath, schemaName, schemaPath, schema);
+        String path = updatePaths(parentPath, schemaName, schemaPath, schema);
+        SmsRouteTree subtree = routeTree;
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
             if (schema.supportsMultipleConfigurations() && !excludeCollection(schema.getServiceName())) {
                 RequestHandler handler = Resources.newCollection(collectionProviderFactory.create(
-                        new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
+                        new SmsJsonConverter(schema), schema, schemaType, new ArrayList<>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
-                serviceRoutes.putAll(addRoute(schema, STARTS_WITH, path, handler, ignoredRoutes, routeTree));
-                parentPath = path + "/{" + schemaName + "}";
+                subtree = addRoute(schema, STARTS_WITH, path, handler, ignoredRoutes, routeTree, serviceRoutes);
+                parentPath = "/{" + schemaName + "}";
             } else if (!excludeSingleton(schema.getServiceName())) {
                 RequestHandler handler = singletonProviderFactory.create(
-                        new SmsJsonConverter(schema), schema, dynamicSchema, schemaType,
-                        new ArrayList<ServiceSchema>(schemaPath), parentPath, true);
+                        new SmsJsonConverter(schema), schema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
+                        parentPath, true);
                 debug.message("Adding singleton path {}", path);
-                serviceRoutes.putAll(addRoute(schema, EQUALS, path, handler, ignoredRoutes, routeTree));
-                parentPath = path;
+                subtree = addRoute(schema, EQUALS, path, handler, ignoredRoutes, routeTree, serviceRoutes);
+                parentPath = "";
             }
         }
 
-        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes, routeTree);
+        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes, subtree);
     }
 
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
+            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes,
+            SmsRouteTree routeTree)
             throws SMSException {
-        for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
-            addPaths(parentPath, new ArrayList<>(schemaPath), schema.getSubSchema(subSchema),
-                    null, serviceRoutes, ignoredRoutes, routeTree);
+        for (String subSchema : schema.getSubSchemaNames()) {
+            ServiceSchema subServiceSchema = schema.getSubSchema(subSchema);
+            if (USE_PARENT_PATH.equals(subServiceSchema.getResourceName()) && "".equals(parentPath)) {
+                parentPath = schema.getResourceName();
+            }
+            addPaths(parentPath, new ArrayList<>(schemaPath), subServiceSchema, null, serviceRoutes,
+                    ignoredRoutes, routeTree);
         }
     }
 
-    private String getPath(String parentPath, String schemaName, List<ServiceSchema> schemaPath, ServiceSchema schema) {
+    private String updatePaths(String parentPath, String schemaName, List<ServiceSchema> schemaPath,
+            ServiceSchema schema) {
         String path = parentPath;
         // Top-level schemas don't have a name and we don't want them in our schema path
-        if (schemaName != null && schemaName.length() > 0) {
+        if (schema.getName() != null) {
             schemaPath.add(schema);
-            if (!USE_PARENT_PATH.equals(schemaName)) {
-                path += "/" + schemaName;
-            }
+        }
+        if (EMPTY_PATH.equals(schemaName) || (USE_PARENT_PATH.equals(schemaName) && EMPTY_PATH.equals(parentPath))) {
+            return "";
+        }
+        if (!USE_PARENT_PATH.equals(schemaName)) {
+            path += (path.equals("") ? "" : "/") + schemaName;
         }
         return path;
     }
 
-    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addRoute(ServiceSchema schema, RoutingMode mode, String path,
-            RequestHandler handler, List<Pattern> ignoredRoutes, SmsRouteTree routeTree) {
+    private SmsRouteTree addRoute(ServiceSchema schema, RoutingMode mode, String path,
+            RequestHandler handler, List<Pattern> ignoredRoutes, SmsRouteTree routeTree,
+            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes) {
         for (Pattern ignored : ignoredRoutes) {
             if (ignored.matcher(path).matches()) {
-                return emptyMap();
+                return routeTree;
             }
         }
         SmsRouteTree tree = routeTree == null ? this.routeTree.handles(schema.getServiceName()) : routeTree;
-        RouteMatcher<Request> route = tree.addRoute(mode, path, handler);
-        return Maps.newHashMap(Collections.singletonMap(tree, asSet(route)));
+        SmsRouteTree.Route route = tree.addRoute(mode, path, handler);
+        serviceRoutes.put(tree, asSet(route.matcher));
+        return route.tree;
     }
 
     /**

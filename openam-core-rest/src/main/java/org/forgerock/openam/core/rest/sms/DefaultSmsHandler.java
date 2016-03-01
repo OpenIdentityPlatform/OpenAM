@@ -66,9 +66,11 @@ public abstract class DefaultSmsHandler implements RequestHandler {
                 return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
             }
         } catch (NotSupportedException e) {
-            return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
+            return new NotSupportedException("Action not supported: " + request.getAction(), e).asPromise();
         } catch (InternalServerErrorException e) {
-            return new InternalServerErrorException("Internal error executing: " + request.getAction()).asPromise();
+            return new InternalServerErrorException("Internal error executing: " + request.getAction(), e).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
         }
     }
 
@@ -121,7 +123,7 @@ public abstract class DefaultSmsHandler implements RequestHandler {
      * @throws InternalServerErrorException If this method errors handling the request.
      */
     protected abstract JsonValue getAllTypes(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException;
+            throws ResourceException;
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest createRequest) {

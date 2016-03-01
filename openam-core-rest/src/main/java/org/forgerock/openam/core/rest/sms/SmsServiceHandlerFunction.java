@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.forgerock.guava.common.base.Function;
+import org.forgerock.guava.common.base.Predicate;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -35,23 +36,23 @@ import com.sun.identity.authentication.util.ISAuthConstants;
  * Services which do not define specific handling will be handled by the SMS Root Tree
  * in an appropriate manner.
  */
-public class SmsServiceHandlerFunction implements Function<String, Boolean> {
+public class SmsServiceHandlerFunction implements Predicate<String> {
 
     public static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
     public static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
     public static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
     public static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
 
-    public final Function<String, Boolean> CIRCLES_OF_TRUST_HANDLES_FUNCTION;
-    public final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION;
-    public final Function<String, Boolean> AUTHENTICATION_CHAINS_HANDLES_FUNCTION;
-    public final Function<String, Boolean> ENTITYPROVIDER_HANDLES_FUNCTION;
-    public final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION;
+    public final Predicate<String> CIRCLES_OF_TRUST_HANDLES_FUNCTION;
+    public final Predicate<String> AUTHENTICATION_HANDLES_FUNCTION;
+    public final Predicate<String> AUTHENTICATION_CHAINS_HANDLES_FUNCTION;
+    public final Predicate<String> ENTITYPROVIDER_HANDLES_FUNCTION;
+    public final Predicate<String> AUTHENTICATION_MODULE_HANDLES_FUNCTION;
 
     /**
      * List of services which are known to have their own handling registered.
      */
-    private final List<Function<String, Boolean>> ALREADY_HANDLED;
+    private final List<Predicate<String>> ALREADY_HANDLED;
 
     @Inject
     public SmsServiceHandlerFunction(@Named("AMAuthenticationServices") Set<String> authenticationServiceNames) {
@@ -77,8 +78,8 @@ public class SmsServiceHandlerFunction implements Function<String, Boolean> {
      * @return True if the service requires handling, false indicates it is already handled.
      */
     @Override
-    public Boolean apply(String serviceName) {
-        for (Function<String, Boolean> handled : ALREADY_HANDLED) {
+    public boolean apply(String serviceName) {
+        for (Predicate<String> handled : ALREADY_HANDLED) {
             if (handled.apply(serviceName)) {
                 return false;
             }
@@ -86,7 +87,7 @@ public class SmsServiceHandlerFunction implements Function<String, Boolean> {
         return true;
     }
 
-    private static final class SingleServiceFunction implements Function<String, Boolean> {
+    private static final class SingleServiceFunction implements Predicate<String> {
 
         private final String serviceName;
 
@@ -96,12 +97,12 @@ public class SmsServiceHandlerFunction implements Function<String, Boolean> {
 
         @Nullable
         @Override
-        public Boolean apply(String name) {
+        public boolean apply(String name) {
             return serviceName.equals(name);
         }
     }
 
-    private static final class MultiServiceFunction implements Function<String, Boolean> {
+    private static final class MultiServiceFunction implements Predicate<String> {
         private final Collection<String> serviceNames;
 
         MultiServiceFunction(String... serviceNames) {
@@ -114,7 +115,7 @@ public class SmsServiceHandlerFunction implements Function<String, Boolean> {
 
         @Nullable
         @Override
-        public Boolean apply(String name) {
+        public boolean apply(String name) {
             return serviceNames.contains(name);
         }
     }

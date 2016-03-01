@@ -23,6 +23,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
 
 /**
@@ -55,7 +56,7 @@ public class ResourcelessSmsHandler extends SmsResourceProvider {
 
     @Override
     public JsonValue getAllTypes(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException
+            throws ResourceException
     {
         throw new NotSupportedException();
     }

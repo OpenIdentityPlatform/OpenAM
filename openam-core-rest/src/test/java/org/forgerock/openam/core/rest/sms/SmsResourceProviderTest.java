@@ -16,26 +16,31 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchema;
-import org.assertj.core.api.Assertions;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.LocaleContext;
-import org.forgerock.services.context.Context;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import static org.forgerock.json.JsonValue.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import org.assertj.core.api.Assertions;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.LocaleContext;
+import org.forgerock.services.context.Context;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceSchema;
 
 
 public class SmsResourceProviderTest {
@@ -64,7 +69,14 @@ public class SmsResourceProviderTest {
     private Locale local = new Locale("Test");
 
     MySmsResourceProvider resourceProvider;
-
+    private LocaleContext context = new LocaleContext(new HttpContext(
+            json(object(field("headers", object()), field("parameters", object()))),
+            this.getClass().getClassLoader())) {
+        @Override
+        public Locale getLocale() {
+            return Locale.UK;
+        }
+    };
 
 
     @BeforeTest
@@ -72,8 +84,8 @@ public class SmsResourceProviderTest {
         MockitoAnnotations.initMocks(this);
         resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath, uriPath, true,
                 jsonConverter, debug);
-        Mockito.when(localeContext.getLocale()).thenReturn(local);
-        Mockito.when(theContext.asContext(LocaleContext.class)).thenReturn(localeContext);
+        when(localeContext.getLocale()).thenReturn(local);
+        when(theContext.asContext(LocaleContext.class)).thenReturn(localeContext);
     }
 
     @Test
@@ -87,9 +99,9 @@ public class SmsResourceProviderTest {
         // Given
         String mockReturn = "ToReturn";
 
-        Mockito.when(theContext.containsContext(RealmContext.class)).thenReturn(true);
-        Mockito.when(realmContext.getResolvedRealm()).thenReturn(mockReturn);
-        Mockito.when(theContext.asContext(RealmContext.class)).thenReturn(realmContext);
+        when(theContext.containsContext(RealmContext.class)).thenReturn(true);
+        when(realmContext.getResolvedRealm()).thenReturn(mockReturn);
+        when(theContext.asContext(RealmContext.class)).thenReturn(realmContext);
 
         // When
         String returnedRealm = resourceProvider.realmFor(theContext);
@@ -102,21 +114,37 @@ public class SmsResourceProviderTest {
     public void verifyExpectedJsonValueIsReturnedByCreateAllSubSchema() throws Exception{
 
         // Given
-        Set<Object> preDefinedSubSchemas = new HashSet<Object>(Arrays.asList("subOne", "subTwo", "subThree"));
-        Object jvSubOne = JsonValue.object(
-                JsonValue.field("_id", "subOne"),
-                JsonValue.field("name", "subOne"));
-        Object jvSubTwo = JsonValue.object(
-                JsonValue.field("_id", "subTwo"),
+        Set<String> preDefinedSubSchemas = new HashSet<>(Arrays.asList("subOne", "subTwo", "subThree"));
+        Object jvSubOne = object(
+                JsonValue.field("_id", "one"),
+                JsonValue.field("name", "Sub Schema One"));
+        Object jvSubTwo = object(
+                JsonValue.field("_id", "two"),
                 JsonValue.field("name", "subTwo"));
-        Object jvSubThree = JsonValue.object(
-                JsonValue.field("_id", "subThree"),
+        Object jvSubThree = object(
+                JsonValue.field("_id", "three"),
                 JsonValue.field("name", "subThree"));
 
-        Mockito.when(serviceSchema.getSubSchemaNames()).thenReturn(preDefinedSubSchemas);
+        when(serviceSchema.getSubSchemaNames()).thenReturn(preDefinedSubSchemas);
+        ServiceSchema subSchemaOne = mock(ServiceSchema.class);
+        ServiceSchema subSchemaTwo = mock(ServiceSchema.class);
+        ServiceSchema subSchemaThree = mock(ServiceSchema.class);
+        when(serviceSchema.getSubSchema("subOne")).thenReturn(subSchemaOne);
+        when(serviceSchema.getSubSchema("subTwo")).thenReturn(subSchemaTwo);
+        when(serviceSchema.getSubSchema("subThree")).thenReturn(subSchemaThree);
+
+        when(subSchemaOne.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
+        when(subSchemaTwo.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
+        when(subSchemaThree.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
+
+        when(subSchemaOne.getResourceName()).thenReturn("one");
+        when(subSchemaTwo.getResourceName()).thenReturn("two");
+        when(subSchemaThree.getResourceName()).thenReturn("three");
+
+        when(subSchemaOne.getI18NKey()).thenReturn("subOne");
 
         // When
-        JsonValue returnedJV = resourceProvider.getAllTypes(null, null);
+        JsonValue returnedJV = resourceProvider.getAllTypes(context, null);
 
         // Then
         AssertJJsonValueAssert.assertThat(returnedJV)

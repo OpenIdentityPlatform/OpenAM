@@ -11,21 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.sms;
+package org.forgerock.openam.core.rest.sms.tree;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.resource.ResourcePath.resourcePath;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.resource.ResourcePath.*;
 
 import java.util.Collections;
 
-import javax.annotation.Nullable;
-
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Function;
-import org.forgerock.json.resource.ResourcePath;
+import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.testng.annotations.BeforeClass;
@@ -39,16 +36,14 @@ public class SmsRouteTreeLeafTest {
     @BeforeClass
     public void setup() {
         Router router = new Router();
-        Function<String, Boolean> handlesFunction = new Function<String, Boolean>() {
-            @Nullable
-            @Override
-            public Boolean apply(String serviceName) {
+        Predicate<String> handlesFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
                 return "SERVICE_NAME".equals(serviceName);
             }
         };
 
-        routeTree = new SmsRouteTreeLeaf(Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap(), null,
-                router, handlesFunction, null, resourcePath(""));
+        routeTree = new SmsRouteTree(Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap(), null, false,
+                router, null, resourcePath(""), handlesFunction, null);
     }
 
     @DataProvider(name = "handlesFunction")

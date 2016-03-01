@@ -11,15 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.sms;
+package org.forgerock.openam.core.rest.sms.tree;
 
 import static org.forgerock.authz.filter.api.AuthorizationResult.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 import static org.forgerock.util.promise.Promises.*;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
@@ -35,12 +34,12 @@ import java.util.Map;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Function;
+import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.services.context.Context;
@@ -62,27 +61,23 @@ public class SmsRouteTreeTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        Function<String, Boolean> leafOneFunction = new Function<String, Boolean>() {
-            @Override
-            public Boolean apply(String serviceName) {
+        Predicate<String> leafOneFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
                 return "SERVICE_ONE".equals(serviceName);
             }
         };
-        Function<String, Boolean> leafTwoFunction = new Function<String, Boolean>() {
-            @Override
-            public Boolean apply(String serviceName) {
+        Predicate<String> leafTwoFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
                 return "SERVICE_TWO".equals(serviceName);
             }
         };
-        Function<String, Boolean> leafThreeFunction = new Function<String, Boolean>() {
-            @Override
-            public Boolean apply(String serviceName) {
+        Predicate<String> leafThreeFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
                 return "SERVICE_THREE".equals(serviceName);
             }
         };
-        Function<String, Boolean> leafFourFunction = new Function<String, Boolean>() {
-            @Override
-            public Boolean apply(String serviceName) {
+        Predicate<String> leafFourFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
                 return "NOT_AUTHORIZED".equals(serviceName);
             }
         };
@@ -90,13 +85,13 @@ public class SmsRouteTreeTest {
         Map<MatchingResourcePath, CrestAuthorizationModule> authModules = Collections.singletonMap(
                 resourcePath("/not-authorized/service"), authModule
         );
-        routeTree = tree(authModules, defaultAuthModule,
-                branch("branch1",
-                        leaf("leaf1", leafOneFunction)),
-                branch("branch2",
-                        leaf("leaf2", leafTwoFunction),
-                        leaf("leaf3", leafThreeFunction)),
-                leaf("not-authorized", leafFourFunction));
+        routeTree = SmsRouteTreeBuilder.tree(authModules, defaultAuthModule,
+                SmsRouteTreeBuilder.branch("branch1",
+                        SmsRouteTreeBuilder.leaf("leaf1", leafOneFunction)),
+                SmsRouteTreeBuilder.branch("branch2",
+                        SmsRouteTreeBuilder.leaf("leaf2", leafTwoFunction),
+                        SmsRouteTreeBuilder.leaf("leaf3", leafThreeFunction)),
+                SmsRouteTreeBuilder.leaf("not-authorized", leafFourFunction));
     }
 
     @DataProvider(name = "handleRoutes")

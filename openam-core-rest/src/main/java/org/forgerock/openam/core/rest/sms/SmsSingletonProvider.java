@@ -219,7 +219,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         try {
             Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent(), realm);
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
-            ServiceConfig config;
+                                          ServiceConfig config;
             if (subSchemaPath.isEmpty()) {
                 if (type == SchemaType.GLOBAL) {
                     config = scm.createGlobalConfig(attrs);
@@ -352,12 +352,6 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      */
     private String resourceId() {
         return subSchemaPath.isEmpty() ? null : lastSchemaNodeName();
-    }
-
-    @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(Context serverContext, QueryRequest queryRequest,
-            QueryResourceHandler handler) {
-        return new NotSupportedException("AME-9665").asPromise();
     }
 
     @Override

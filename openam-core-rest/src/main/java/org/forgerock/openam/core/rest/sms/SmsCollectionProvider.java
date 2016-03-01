@@ -17,6 +17,7 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.newReadRequest;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
@@ -33,6 +34,7 @@ import java.util.TreeSet;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -60,6 +62,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
@@ -74,6 +77,9 @@ import org.forgerock.util.promise.ResultHandler;
  */
 public class SmsCollectionProvider extends SmsResourceProvider implements CollectionResourceProvider {
 
+    private final boolean autoCreatedAuthModule;
+    private final String authModuleResourceName;
+
     @Inject
     SmsCollectionProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
                           @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
@@ -81,6 +87,9 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
         Reject.ifTrue(subSchemaPath.isEmpty(), "Root schemas do not support multiple instances");
+        autoCreatedAuthModule = subSchemaPath.size() == 1 && getAuthenticationServiceNames().contains(serviceName) &&
+                super.uriPath.size() == 1 && AUTO_CREATED_AUTHENTICATION_MODULES.containsValue(super.uriPath.get(0));
+        authModuleResourceName = autoCreatedAuthModule ? super.uriPath.get(0) : null;
     }
 
     @Override
@@ -259,16 +268,19 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     ServiceConfig config = type == SchemaType.GLOBAL ? scm.getGlobalConfig(instanceName) :
                             scm.getOrganizationConfig(realm, instanceName);
                     if (config != null) {
-                        JsonValue value = getJsonValue(realm, config);
-                        handler.handleResource(newResourceResponse(instanceName, String.valueOf(value.hashCode()), value));
+                        handleServiceConfig(handler, realm, instanceName, config);
                     }
                 }
             } else {
                 ServiceConfig config = parentSubConfigFor(context, scm);
                 Set<String> names = config.getSubConfigNames("*", lastSchemaNodeName());
                 for (String configName : names) {
-                    JsonValue value = getJsonValue(realm, config.getSubConfig(configName));
-                    handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
+                    ServiceConfig subConfig = config.getSubConfig(configName);
+                    handleServiceConfig(handler, realm, configName, subConfig);
+                }
+                if (autoCreatedAuthModule) {
+                    String instanceName = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
+                    handleServiceConfig(handler, realm, instanceName, config);
                 }
             }
 
@@ -282,13 +294,22 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    private void handleServiceConfig(QueryResourceHandler handler, String realm, String configName, ServiceConfig subConfig) {
+        JsonValue value = getJsonValue(realm, subConfig);
+        handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
+    }
+
     /**
      * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
      * property for the name of the config.
      */
     private JsonValue getJsonValue(String realm, ServiceConfig result) {
         JsonValue value = converter.toJson(realm, result.getAttributes());
-        value.add("_id", result.getName());
+        String id = result.getName();
+        if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
+            id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
+        }
+        value.add("_id", id);
         return value;
     }
 

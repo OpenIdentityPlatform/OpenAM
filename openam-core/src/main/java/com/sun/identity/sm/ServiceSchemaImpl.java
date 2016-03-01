@@ -398,18 +398,21 @@ class ServiceSchemaImpl {
                 SMSUtils.INHERITANCE);
         validate = XMLUtils
                 .getNodeAttributeValue(schemaNode, SMSUtils.VALIDATE);
-        resourceName = XMLUtils
-                .getNodeAttributeValue(schemaNode, SMSUtils.RESOURCE_NAME);
+        if (schemaNode.getNodeName().equals(SMSUtils.SUB_SCHEMA)) {
+            resourceName = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.RESOURCE_NAME);
+        } else if (ssm != null) {
+            resourceName = ssm.getResourceName();
+        }
         hideConfigUI = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.HIDE_CONFIG_UI);
         realmCloneable = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.REALM_CLONEABLE);
 
         // Update sub-schema's, organization schema and attributes
         Set newServiceAttributes = new HashSet();
         Set newSearchableAttributeNames = new HashSet();
-        Map<String, AttributeSchemaImpl> newAttrSchemas = new HashMap<String, AttributeSchemaImpl>();
+        Map<String, AttributeSchemaImpl> newAttrSchemas = new HashMap<>();
         Map newAttrValidators = new HashMap();
         Map newAttrDefaults = new HashMap();
-        Map<String, Set<String>> newAttrExamples = new HashMap();
+        Map<String, Set<String>> newAttrExamples = new HashMap<>();
         Map<String, ServiceSchemaImpl> newSubSchemas = new CaseInsensitiveHashMap<>();
         Map tempUnmodifiableDefaults = new HashMap();
         NodeList children = schemaNode.getChildNodes();
