@@ -85,6 +85,7 @@ import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Element;
 
@@ -508,6 +509,9 @@ public class IDPProxyUtil {
      * @param requestID request ID 
      * @param idpMetaAlias meta Alias 
      * @param newSession Session object
+     * @param nameIDFormat name identifier format
+     * @param saml2Auditor a <code>SAML2EventLogger</code> auditor object to hook into
+     *                tracking information for the saml request
      * @throws SAML2Exception for any SAML2 failure.
      */
     private static void sendProxyResponse(
@@ -517,7 +521,8 @@ public class IDPProxyUtil {
         String requestID,
         String idpMetaAlias,
         Object newSession,
-        String nameIDFormat)
+        String nameIDFormat,
+        SAML2EventLogger saml2Auditor)
         throws SAML2Exception 
     { 
         String classMethod = "IDPProxyUtil.sendProxyResponse: "; 
@@ -561,7 +566,7 @@ public class IDPProxyUtil {
                                   nameIDFormat, 
                                   relayState,
                                   newSession,
-                                  null);
+                                  saml2Auditor);
     }
 
     /**
@@ -596,10 +601,11 @@ public class IDPProxyUtil {
      * @param metaAlias The meta alias.
      * @param respInfo ResponseInfo object.
      * @param newSession Session object.
+     * @param auditor a <code>SAML2EventLogger</code> auditor
      * @throws SAML2Exception for any SAML2 failure.
      */
     public static void generateProxyResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-            String metaAlias, ResponseInfo respInfo, Object newSession) throws SAML2Exception {
+            String metaAlias, ResponseInfo respInfo, Object newSession, SAML2EventLogger auditor) throws SAML2Exception {
         Response saml2Resp = respInfo.getResponse();
         String requestID = saml2Resp.getInResponseTo();
         String nameidFormat = getNameIDFormat(saml2Resp);
@@ -610,7 +616,7 @@ public class IDPProxyUtil {
         // Save the SAML response received from the IdP in the request object, so that we can access the original
         // assertion when generating the new one.
         request.setAttribute(SAML2Constants.SAML_PROXY_IDP_RESPONSE_KEY, saml2Resp);
-        sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat);
+        sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat, auditor);
     }
     
     private static String getNameIDFormat(Response res)  
