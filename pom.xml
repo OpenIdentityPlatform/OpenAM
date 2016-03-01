@@ -122,8 +122,8 @@
 
         <commons.forgerock-util.version>1.3.6</commons.forgerock-util.version>
         <commons.authfilter.version>1.5.1</commons.authfilter.version>
-        <forgerock.json.version>2.4.3-SNAPSHOT</forgerock.json.version>
-        <forgerock-ui.version>1.1.10-2-SNAPSHOT</forgerock-ui.version>
+        <forgerock.json.version>2.4.3</forgerock.json.version>
+        <forgerock-ui.version>1.1.10-2</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.4.2</jackson.version>
