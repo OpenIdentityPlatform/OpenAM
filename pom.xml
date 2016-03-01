@@ -162,7 +162,7 @@
         <jsr311-api.version>1.1.1</jsr311-api.version>
         <jstl.version>1.1.2</jstl.version>
         <log4j.version>1.2.16</log4j.version>
-        <mail.version>1.4.5</mail.version>
+        <mail.version>1.5.1</mail.version>
         <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
         <relaxngDatatype.version>20020414</relaxngDatatype.version>
         <rhino.version>1.7R4</rhino.version>
@@ -1409,8 +1409,8 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
                 <version>${mail.version}</version>
             </dependency>
 
