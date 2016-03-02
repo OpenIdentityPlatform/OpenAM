@@ -48,9 +48,11 @@ public interface PushNotificationDelegate extends Closeable {
 
     /**
      * Returns whether or not the new config is so different from the old that the existing delegate
-     * should be removed from the pool
+     * should be removed from the pool.
      *
-     @return True if the configuration change requires the PushNotificationService to instantiate a new instance of this delegate.
+     * @param newConfig The new configuration to check against the old.
+     * @return True if the configuration change requires the PushNotificationService to instantiate a new instance of
+     * this delegate.
      */
     boolean isRequireNewDelegate(PushNotificationServiceConfig newConfig);
 

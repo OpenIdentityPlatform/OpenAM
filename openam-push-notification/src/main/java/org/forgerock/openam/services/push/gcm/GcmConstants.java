@@ -32,22 +32,22 @@ final class GcmConstants {
      */
 
     /** Key to the recipient of the message. */
-    public static String TO = "to";
+    public static final String TO = "to";
     /** Key to the content of the message. */
-    public static String DATA = "data";
+    public static final String DATA = "data";
 
     /**
      * HTTP.
      */
 
     /** Message method used. */
-    public static String HTTP_METHOD = "POST";
+    public static final String HTTP_METHOD = "POST";
     /** Key to the auth header. */
-    public static String HTTP_AUTH_HEADER = "Authorization";
+    public static final String HTTP_AUTH_HEADER = "Authorization";
     /** Key to the content-type header. */
-    public static String HTTP_CONTENT_TYPE_HEADER = "Content-Type";
+    public static final String HTTP_CONTENT_TYPE_HEADER = "Content-Type";
     /** Content of the messages. */
-    public static String HTTP_CONTENT_TYPE = "application/json";
+    public static final String HTTP_CONTENT_TYPE = "application/json";
     /** Prefix to auth header value. */
-    public static String HTTP_AUTH_KEY = "key=";
+    public static final String HTTP_AUTH_KEY = "key=";
 }

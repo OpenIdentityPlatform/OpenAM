@@ -71,6 +71,11 @@ public class PushNotificationService {
     /**
      * Constructor (called by Guice), registers a listener for this class against all
      * PushNotificationService changes in a realm.
+     * @param debug A debugger for logging.
+     * @param configHelperFactory Factory used to produce config helpers, which in turn are used to generate
+     *                            delegates.
+     * @param pushRealmMap Map holding all delegates mapped to the realm in which they belong.
+     * @param pushFactoryMap Map holding all factories registered during the lifetime of this service.
      */
     @Inject
     public PushNotificationService(@Named("frPush") Debug debug,

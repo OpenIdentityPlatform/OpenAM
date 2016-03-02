@@ -37,7 +37,7 @@ import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 
 /**
- * ForgeRock Authentication (Push) Authentication Module
+ * ForgeRock Authentication (Push) Authentication Module.
  */
 public class AuthenticatorPush extends AMLoginModule {
 
@@ -59,7 +59,7 @@ public class AuthenticatorPush extends AMLoginModule {
         bundle = amCache.getResBundle(AM_AUTH_AUTHENTICATOR_PUSH, getLoginLocale());
         realm = DNMapper.orgNameToRealmName(getRequestOrg());
 
-        String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);;
+        String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
 
         if (authLevel != null) {
             try {
@@ -119,7 +119,7 @@ public class AuthenticatorPush extends AMLoginModule {
 
     /**
      * Writes out an error debug (if a throwable and debug message are provided) and returns a user-facing
-     * error page.PushNotificationServiceTest
+     * error page.
      */
     private int processError(String headerMessage, String debugMessage,
                              Object... messageParameters) throws AuthLoginException {

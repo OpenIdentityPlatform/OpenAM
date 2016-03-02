@@ -26,10 +26,10 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-        .withPort(111)
-        .withEndpoint("www.forgerock.org")
-        .withApiKey("apiKey")
-        .withSenderId("senderId");
+            .withPort(111)
+            .withEndpoint("www.forgerock.org")
+            .withApiKey("apiKey")
+            .withSenderId("senderId");
 
         //when
         PushNotificationServiceConfig config = builder.build();

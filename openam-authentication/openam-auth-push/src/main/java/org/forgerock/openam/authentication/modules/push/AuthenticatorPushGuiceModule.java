@@ -42,9 +42,9 @@ public class AuthenticatorPushGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Debug.class).annotatedWith(Names.named("frPush")).toInstance(Debug.getInstance("frPush"));
-        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegate>>(){})
+        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegate>>() { })
                 .toInstance(new ConcurrentHashMap<String, PushNotificationDelegate>());
-        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegateFactory>>(){})
+        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegateFactory>>() { })
                 .toInstance(new ConcurrentHashMap<String, PushNotificationDelegateFactory>());
     }
 

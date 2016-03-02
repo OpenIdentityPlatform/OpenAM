@@ -48,6 +48,7 @@ public class PushNotificationServiceConfigHelper {
     /**
      * Retrieve a new PushNotificationServiceConfig from this Helper.
      * @return A valid PushNotificationServiceConfig for the delegate described by this service config.
+     * @throws PushNotificationException if there was an issue building a config object from the service data.
      */
     public PushNotificationServiceConfig getConfig() throws PushNotificationException {
 

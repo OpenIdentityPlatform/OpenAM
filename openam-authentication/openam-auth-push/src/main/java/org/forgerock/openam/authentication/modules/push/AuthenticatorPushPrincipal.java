@@ -28,7 +28,9 @@ public class AuthenticatorPushPrincipal implements Principal, java.io.Serializab
     private String name;
 
     /**
-     * Public constructor that takes user name
+     * Public constructor that takes user name.
+     *
+     * @param name name of the principal to represent
      */
     public AuthenticatorPushPrincipal(String name) {
         if (name == null) {

@@ -35,7 +35,7 @@ public class PushNotificationServiceTest {
 
     private PushNotificationServiceConfigHelperFactory mockHelperFactory;
     private PushNotificationServiceConfigHelper mockHelper;
-    private PushNotificationServiceConfig mockConfig;
+    private PushNotificationServiceConfig config;
     private PushNotificationDelegateFactory mockDelegateFactory;
     private PushNotificationDelegate mockDelegate;
     private PushNotificationDelegate mockOldDelegate;
@@ -48,7 +48,12 @@ public class PushNotificationServiceTest {
     public void theSetUp() throws SMSException, SSOException, PushNotificationException { //you need this
         this.mockHelperFactory = mock(PushNotificationServiceConfigHelperFactory.class);
         this.mockHelper = mock(PushNotificationServiceConfigHelper.class);
-        this.mockConfig = mock(PushNotificationServiceConfig.class);
+        this.config = new PushNotificationServiceConfig.Builder()
+                .withApiKey("apiKey")
+                .withEndpoint("endpoint")
+                .withPort(111)
+                .withSenderId("senderId")
+                .build();
         this.mockDelegateFactory = mock(PushNotificationDelegateFactory.class);
         this.mockDelegate = mock(PushNotificationDelegate.class);
         this.mockOldDelegate = mock(PushNotificationDelegate.class);
@@ -60,7 +65,7 @@ public class PushNotificationServiceTest {
         ConcurrentMap<String, PushNotificationDelegateFactory> pushFactoryMap = new ConcurrentHashMap<>();
         pushFactoryMap.put("factoryClass", mockDelegateFactory);
 
-        given(mockHelper.getConfig()).willReturn(mockConfig);
+        given(mockHelper.getConfig()).willReturn(config);
         given(mockHelperFactory.getConfigHelperFor("realm2")).willReturn(mockHelper);
         given(mockHelperFactory.getConfigHelperFor("realm4")).willThrow(new SMSException("Error reading service"));
 
@@ -153,14 +158,16 @@ public class PushNotificationServiceTest {
 
     public static class TestDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException {
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config)
+                throws PushNotificationException {
             return mockTestDelegate;
         }
     }
 
     public static class TestBrokenDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException {
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config)
+                throws PushNotificationException {
             throw new PushNotificationException("Broken implementation.");
         }
     }
@@ -172,27 +179,27 @@ public class PushNotificationServiceTest {
     @Test
     public void shouldKeepExistingDelegate() throws PushNotificationException {
         //given
-        given(mockOldDelegate.isRequireNewDelegate(mockConfig)).willReturn(false);
+        given(mockOldDelegate.isRequireNewDelegate(config)).willReturn(false);
 
         //when
-        notificationService.new PushNotificationDelegateUpdater().replaceDelegate("oldRealm", mockDelegate, mockConfig);
+        notificationService.new PushNotificationDelegateUpdater().replaceDelegate("oldRealm", mockDelegate, config);
 
         //then
-        verify(mockOldDelegate, times(1)).isRequireNewDelegate(mockConfig);
-        verify(mockOldDelegate, times(1)).updateDelegate(mockConfig);
+        verify(mockOldDelegate, times(1)).isRequireNewDelegate(config);
+        verify(mockOldDelegate, times(1)).updateDelegate(config);
         verifyNoMoreInteractions(mockOldDelegate);
     }
 
     @Test
     public void shouldCloseAndReplaceOldDelegate() throws PushNotificationException, IOException {
         //given
-        given(mockOldDelegate.isRequireNewDelegate(mockConfig)).willReturn(true);
+        given(mockOldDelegate.isRequireNewDelegate(config)).willReturn(true);
 
         //when
-        notificationService.new PushNotificationDelegateUpdater().replaceDelegate("oldRealm", mockDelegate, mockConfig);
+        notificationService.new PushNotificationDelegateUpdater().replaceDelegate("oldRealm", mockDelegate, config);
 
         //then
-        verify(mockOldDelegate, times(1)).isRequireNewDelegate(mockConfig);
+        verify(mockOldDelegate, times(1)).isRequireNewDelegate(config);
         verify(mockOldDelegate, times(1)).close();
         verify(mockDelegate, times(1)).startServices();
         verifyNoMoreInteractions(mockOldDelegate);

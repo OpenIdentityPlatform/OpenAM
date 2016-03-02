@@ -21,7 +21,7 @@ import org.forgerock.openam.utils.StringUtils;
 /**
  * Config class for a Push Notification Service.
  */
-public class PushNotificationServiceConfig {
+public final class PushNotificationServiceConfig {
 
     private String apiKey;
     private String senderId;
@@ -52,12 +52,14 @@ public class PushNotificationServiceConfig {
     }
 
     private boolean isValid() {
-        return StringUtils.isNotBlank(apiKey) &&  StringUtils.isNotBlank(endpoint) &&
-                StringUtils.isNotBlank(senderId) && port > 0;
+        return StringUtils.isNotBlank(apiKey)
+                && StringUtils.isNotBlank(endpoint)
+                && StringUtils.isNotBlank(senderId) && port > 0;
     }
 
     /**
      * Get the api key to allow access to the remote service.
+     * @return the api key.
      */
     public String getApiKey() {
         return apiKey;
@@ -65,6 +67,7 @@ public class PushNotificationServiceConfig {
 
     /**
      * Get the sender ID to authenticate to the remote service.
+     * @return the sender id.
      */
     public String getSenderId() {
         return senderId;
@@ -72,6 +75,7 @@ public class PushNotificationServiceConfig {
 
     /**
      * Get the endpoint for this notification service to connect to.
+     * @return the endpoint.
      */
     public String getEndpoint() {
         return endpoint;
@@ -79,6 +83,7 @@ public class PushNotificationServiceConfig {
 
     /**
      * Get the port for this notification service to connect to.
+     * @return the port.
      */
     public int getPort() {
         return port;
@@ -171,8 +176,8 @@ public class PushNotificationServiceConfig {
          */
         public PushNotificationServiceConfig build() throws PushNotificationException {
             if (!config.isValid()) {
-                throw new PushNotificationException("Attempted to construct a " +
-                        "PushNotificationServiceConfig in an invalid state.");
+                throw new PushNotificationException("Attempted to construct a "
+                        + "PushNotificationServiceConfig in an invalid state.");
             }
             return config;
         }
