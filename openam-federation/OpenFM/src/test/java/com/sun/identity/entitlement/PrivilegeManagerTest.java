@@ -359,17 +359,6 @@ public class PrivilegeManagerTest {
         }
     }
 
-    @Test(dependsOnMethods = {"testAddPrivilege", "testAddPrivilege2"})
-    public void testGetPrivilegesXML() throws Exception {
-        PrivilegeManager prm = PrivilegeManager.getInstance("/",
-            SubjectUtils.createSubject(adminToken));
-        Set<String> names = new HashSet<String>();
-        names.add(PRIVILEGE_NAME);
-        names.add(PRIVILEGE_NAME2);
-        String xml = prm.getPrivilegesXML(names);
-        UnittestLog.logMessage("PrivilegeManagerTest.testGetPrivilegesXML():\n" + xml);
-    }
-
     @Test(dependsOnMethods = {"testAddPrivilege"})
     public void testSerializePrivilege() throws Exception {
         if (!migrated) {
@@ -429,11 +418,6 @@ public class PrivilegeManagerTest {
                     + "failed to get privilege description.");
         }
 
-        String xml = prm.getPrivilegeXML(PRIVILEGE_NAME);
-        if ((xml == null) || (xml.trim().length() == 0)) {
-            throw new Exception("PrivilegeManagerTest.testGetPrivilege: "
-                    + "failed to get privilege XML.");
-        }
     }
 
     @Test(dependsOnMethods = {"testAddPrivilege"})

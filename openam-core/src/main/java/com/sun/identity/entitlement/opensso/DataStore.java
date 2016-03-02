@@ -359,6 +359,10 @@ public class DataStore {
             createDefaultSubConfig(adminToken, realm, null);
             dn = getPrivilegeDistinguishedName(p.getName(), realm, null);
 
+            if (SMSEntry.checkIfEntryExists(dn, adminToken)) {
+                throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS);
+            }
+
             SMSEntry s = new SMSEntry(adminToken, dn);
             Map<String, Set<String>> map = new HashMap<String, Set<String>>();
 

@@ -361,26 +361,6 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         return realm;
     }
 
-    /**
-     * Returns the XML representation of this privilege.
-     *
-     * @param name Name of Privilege.
-     * @return XML representation of this privilege.
-     * @throws EntitlementException if privilege is not found, or cannot
-     * be obtained.
-     */
-    public abstract String getPrivilegeXML(String name) throws EntitlementException;
-
-    /**
-     * Returns the XML representation of this privilege.
-     *
-     * @param names Name of Privileges to export as XML.
-     * @return XML representation of the specified privileges
-     * @throws EntitlementException if a specified privilege is not found, or cannot
-     * be obtained.
-     */
-    public abstract String getPrivilegesXML(Set<String> names) throws EntitlementException;
-
     protected Subject getAdminSubject() {
         return adminSubject;
     }
