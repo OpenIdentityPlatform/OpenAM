@@ -62,18 +62,24 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     }
                 },
 
-                getTextareaInput: function () {
+                getTextareaInput: function (placeholder) {
                     var el = document.createElement("textarea");
                     el.className = "form-control";
+                    if (placeholder) {
+                        el.setAttribute("placeholder", placeholder);
+                    }
                     return el;
                 },
 
-                getFormInputField: function (type) {
+                getFormInputField: function (type, placeholder) {
                     var input = this._super(type);
                     if (type === "checkbox") {
                         input.style.marginTop = "12px";
                     } else {
                         input.className += "form-control";
+                    }
+                    if (placeholder) {
+                        input.setAttribute("placeholder", placeholder);
                     }
                     input.setAttribute("autocomplete", "off");
 
