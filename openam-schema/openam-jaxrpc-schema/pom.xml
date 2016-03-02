@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>12.0.3-SNAPSHOT</version>
+        <version>12.0.3-RC1</version>
     </parent>
 
     <!-- Component Definition -->
@@ -57,8 +57,8 @@
                                 <property name="build.class.path" refid="maven.compile.classpath" />
 
                                 <mkdir dir="${project.build.directory}/classes" />
-                                <mkdir dir="${project.build.directory}/generated-sources/wscompile"/>
-                                <mkdir dir="${project.build.directory}/unwanted"/>
+                                <mkdir dir="${project.build.directory}/generated-sources/wscompile" />
+                                <mkdir dir="${project.build.directory}/unwanted" />
 
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}" failonerror="true">
                                     <arg value="-g" />
