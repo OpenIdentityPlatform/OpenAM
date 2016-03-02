@@ -478,9 +478,9 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/fr-branches/12.0.x</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/fr-branches/12.0.x</developerConnection>
-        <url>http://sources.forgerock.org/browse/openam/fr-branches/12.0.x</url>
+       <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
+       <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
+       <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
     </scm>
 
     <!-- Dependency Management -->
