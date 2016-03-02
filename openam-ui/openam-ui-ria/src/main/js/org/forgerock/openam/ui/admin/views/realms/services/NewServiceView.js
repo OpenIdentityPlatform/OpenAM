@@ -97,8 +97,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         },
 
         selectService: function (service) {
-            toggleCreate(this.$el, service);
-
+            toggleCreate(this.$el, false);
             if (service && service !== this.data.type) {
                 this.data.type = service;
 
@@ -123,6 +122,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                             schemaWithHiddenProperties,
                             data.values
                         );
+                        toggleCreate(this.$el, true);
                     }, () => {
                         toggleCreate(this.$el, false);
                     });
