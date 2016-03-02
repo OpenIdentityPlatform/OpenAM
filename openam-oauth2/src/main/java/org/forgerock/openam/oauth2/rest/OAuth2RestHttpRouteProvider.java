@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2.rest;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH;
+import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,15 +57,17 @@ public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
     public Set<HttpRoute> get() {
 
         rootRouter.route("token")
+                .authenticateWith(ssoToken().exceptActions("revokeTokens"))
                 .auditAs(OAUTH)
                 .toCollection(TokenResource.class);
 
         rootRouter.route("client")
+                .authenticateWith(ssoToken())
                 .auditAs(OAUTH)
                 .authorizeWith(AdminOnlyAuthzModule.class)
                 .toCollection(ClientResource.class);
 
         return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2",
-                Handlers.chainOf(newHttpHandler(rootRouter.getRouter()), authenticationFilter)));
+              Handlers.chainOf(newHttpHandler(rootRouter.getRouter()), authenticationFilter)));
     }
 }
