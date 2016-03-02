@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.selfservice;
 
@@ -24,7 +24,6 @@ import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
@@ -63,12 +62,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
-        install(new FactoryModuleBuilder()
-                .implement(SnapshotTokenHandlerFactory.class, JwtSnapshotTokenHandlerFactory.class)
-                .build(new TypeLiteral<KeyPairInjector<SnapshotTokenHandlerFactory>>() { }));
-
         bind(ProcessStore.class).to(ProcessStoreImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
+        bind(SnapshotTokenHandlerFactory.class).to(JwtSnapshotTokenHandlerFactory.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
         bind(KbaResource.class);
 
@@ -81,9 +77,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         }
 
         // Registration CREST services
-        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { });
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() { });
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() { });
+        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
         expose(UserUpdateService.class);
         expose(KbaResource.class);
         // Exposed to be accessible to custom progress stages

@@ -11,16 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.selfservice.config.flows;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
-import org.forgerock.json.jose.jwe.EncryptionMethod;
-import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.openam.selfservice.KeyStoreJwtTokenConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
 import org.forgerock.selfservice.core.StorageType;
@@ -31,7 +30,6 @@ import org.forgerock.selfservice.stages.email.VerifyEmailAccountConfig;
 import org.forgerock.selfservice.stages.kba.KbaConfig;
 import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionConfig;
 import org.forgerock.selfservice.stages.registration.UserRegistrationConfig;
-import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
 import org.forgerock.selfservice.stages.user.UserDetailsConfig;
 import org.forgerock.services.context.Context;
 
@@ -90,18 +88,15 @@ public final class UserRegistrationConfigProvider
                 .setIdentityServiceUrl("/users"));
 
         String secret = SystemProperties.get(Constants.ENC_PWD_PROPERTY);
-        JwtTokenHandlerConfig jwtTokenConfig = new JwtTokenHandlerConfig()
-                .setSharedKey(secret)
-                .setKeyPairAlgorithm("RSA")
-                .setKeyPairSize(1024)
-                .setJweAlgorithm(JweAlgorithm.RSAES_PKCS1_V1_5)
-                .setEncryptionMethod(EncryptionMethod.A128CBC_HS256)
-                .setJwsAlgorithm(JwsAlgorithm.HS256)
-                .setTokenLifeTimeInSeconds(config.getTokenExpiry());
+        KeyStoreJwtTokenConfig extendedJwtTokenConfig = new KeyStoreJwtTokenConfig()
+                .withEncryptionKeyPairAlias(config.getEncryptionKeyPairAlias())
+                .withSigningSymmetricKey(secret)
+                .withSigningAlgorithm(JwsAlgorithm.HS256.name())
+                .withTokenLifeTimeInSeconds(config.getTokenExpiry());
 
         return new ProcessInstanceConfig()
                 .setStageConfigs(stages)
-                .setSnapshotTokenConfig(jwtTokenConfig)
+                .setSnapshotTokenConfig(extendedJwtTokenConfig)
                 .setStorageType(StorageType.STATELESS);
     }
 

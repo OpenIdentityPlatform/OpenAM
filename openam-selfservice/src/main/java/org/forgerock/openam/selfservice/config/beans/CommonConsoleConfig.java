@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.selfservice.config.beans;
 
@@ -34,6 +34,7 @@ import java.util.Set;
  */
 abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
 
+    private final String encryptionKeyPairAlias;
     private final Map<String, Set<String>> attributes;
     private final String siteKey;
     private final String secretKey;
@@ -42,12 +43,22 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
     private final String emailAttributeName;
 
     protected CommonConsoleConfig(CommonConsoleConfigBuilder builder) {
+        encryptionKeyPairAlias = builder.encryptionKeyPairAlias;
         attributes = builder.attributes;
         siteKey = builder.siteKey;
         secretKey = builder.secretKey;
         verificationUrl = builder.verificationUrl;
         securityQuestions = builder.securityQuestions;
         emailAttributeName = builder.emailAttributeName;
+    }
+
+    /**
+     * Gets the encryption key pair alias.
+     *
+     * @return the encryption key pair alias
+     */
+    public final String getEncryptionKeyPairAlias() {
+        return encryptionKeyPairAlias;
     }
 
     /**
@@ -127,6 +138,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
 
     protected abstract static class CommonConsoleConfigBuilder<C> implements ConsoleConfigBuilder<C> {
 
+        private String encryptionKeyPairAlias;
         private Map<String, Set<String>> attributes;
         private String siteKey;
         private String secretKey;
@@ -136,6 +148,11 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
 
         protected CommonConsoleConfigBuilder() {
             securityQuestions = new HashMap<>();
+        }
+
+        @ConfigAttribute("selfServiceEncryptionKeyPairAlias")
+        public final void setEncryptionKeyPairAlias(String encryptionKeyPairAlias) {
+            this.encryptionKeyPairAlias = encryptionKeyPairAlias;
         }
 
         @ConfigAttribute(value = "selfServiceCaptchaSiteKey", required = false)

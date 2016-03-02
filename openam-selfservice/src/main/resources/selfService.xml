@@ -32,6 +32,15 @@
 
                 <!-- General configuration -->
 
+                <AttributeSchema name="selfServiceEncryptionKeyPairAlias"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="encryptionKeyPairAlias"
+                                 i18nKey="encryption.key.pair.alias">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="selfServiceCaptchaSiteKey"
                                  type="single"
                                  syntax="string"
