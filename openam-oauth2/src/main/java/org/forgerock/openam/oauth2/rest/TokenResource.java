@@ -64,7 +64,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -162,14 +162,6 @@ public class TokenResource implements CollectionResourceProvider {
                             return newResultPromise(newActionResponse((json(object()))));
                         }
                     });
-        } else if ("revokeTokens".equalsIgnoreCase(actionId)) {
-            return revokeTokens(resourceId, request)
-                    .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
-                        @Override
-                        public Promise<ActionResponse, ResourceException> apply(Void value) {
-                            return newResultPromise(newActionResponse((json(object()))));
-                        }
-                    });
         } else {
             if (debug.errorEnabled()) {
                 debug.error("TokenResource :: ACTION : Unsupported action request performed, " + actionId + " on " +
@@ -197,7 +189,13 @@ public class TokenResource implements CollectionResourceProvider {
         try {
             AMIdentity uid = getUid(context);
 
-            JsonValue token = getToken(tokenId);
+            JsonValue token = tokenStore.read(tokenId);
+            if (token == null) {
+                if (debug.errorEnabled()) {
+                    debug.error("TokenResource :: DELETE : No token with ID, " + tokenId + " found to delete");
+                }
+                throw new NotFoundException("Token Not Found", null);
+            }
             String username = getAttributeValue(token, USERNAME);
             if (username == null || username.isEmpty()) {
                 if (debug.errorEnabled()) {
@@ -247,56 +245,6 @@ public class TokenResource implements CollectionResourceProvider {
             debug.error("TokenResource :: DELETE : Requesting user is unauthorized.");
             return new PermanentException(401, "Unauthorized", e).asPromise();
         }
-    }
-
-    /**
-     * Deletes an access token and its associated refresh token or just the provided refresh token.
-     * @param tokenId The token id.
-     * @param request The action request.
-     * @return {@code true} if the token has been deleted.
-     */
-    private Promise<Void, ResourceException> revokeTokens(final String tokenId, ActionRequest request) {
-        try {
-            JsonValue token = getToken(tokenId);
-
-            String username = getAttributeValue(token, USERNAME);
-            if (StringUtils.isEmpty(username)) {
-                debug.error("TokenResource :: revokeTokens : No username associated with " +
-                        "token with ID, " + tokenId + ".");
-                throw new NotFoundException("Not Found", null);
-            }
-
-            final JsonValue jVal = request.getContent();
-            final String clientIdParameter = jVal.get(OAuth2Constants.Params.CLIENT_ID).asString();
-            if (StringUtils.isEmpty(clientIdParameter)) {
-                debug.error("TokenResource :: revokeTokens : No clientId provided");
-                throw new BadRequestException("Missing clientId", null);
-            }
-
-            final String clientId = getAttributeValue(token, OAuthTokenField.CLIENT_ID.getOAuthField());
-            if (!clientId.equalsIgnoreCase(clientIdParameter)) {
-                debug.error("TokenResource :: revokeTokens : clientIds do not match");
-                throw new ForbiddenException("Unauthorized", null);
-            } else {
-                deleteAccessTokensRefreshToken(token);
-                tokenStore.delete(tokenId);
-            }
-
-            return newResultPromise(null);
-        } catch (CoreTokenException e) {
-            return new ServiceUnavailableException(e.getMessage(), e).asPromise();
-        } catch (ResourceException e) {
-            return e.asPromise();
-        }
-    }
-
-    private JsonValue getToken(String tokenId) throws CoreTokenException, NotFoundException {
-        JsonValue token = tokenStore.read(tokenId);
-        if (token == null) {
-            debug.error("TokenResource :: No token with ID, " + tokenId + " found");
-            throw new NotFoundException("Token Not Found", null);
-        }
-        return token;
     }
 
     /**
