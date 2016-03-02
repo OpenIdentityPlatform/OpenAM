@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>12.0.3-SNAPSHOT</version>
+        <version>12.0.3-RC3</version>
     </parent>
 
     <!-- Documentation Module -->
@@ -76,7 +76,7 @@
         <url>https://svn.forgerock.org/openam/trunk/openam/</url>
         <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
-      <tag>HEAD</tag>
+      <tag>12.0.3-RC3</tag>
   </scm>
 
     <issueManagement>
