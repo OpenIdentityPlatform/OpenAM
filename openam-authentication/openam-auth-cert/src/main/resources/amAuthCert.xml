@@ -26,7 +26,7 @@
 
     $Id: amAuthCert.xml,v 1.9 2008/06/25 05:45:41 qcheng Exp $
 
-    Portions Copyrighted 2011-2015 ForgeRock AS.
+    Portions Copyrighted 2011-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -241,6 +241,14 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert-gw-cert-preferred"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1151">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-cert-check-cert-in-ldap"
                         type="single"
@@ -438,6 +446,14 @@
                         resourceName="clientCertificateHttpHeaderName">
                         <DefaultValues>
                             <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert-gw-cert-preferred"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a1151">
+                        <DefaultValues>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

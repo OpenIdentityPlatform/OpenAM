@@ -24,7 +24,7 @@
  *
  * $Id: Cert.java,v 1.14 2009/03/13 20:54:42 beomsuk Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.cert;
@@ -129,6 +129,7 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_emailAddrTag; 
     private int amAuthCert_serverPort =389;
     private boolean portal_gw_cert_auth_enabled = false;
+    private boolean portal_gw_cert_preferred = false;
     private Set portalGateways = null;
     // HTTP Header name to have clien certificate in servlet request.
     private String certParamName = null;
@@ -308,6 +309,11 @@ public class Cert extends AMLoginModule {
                  }
             }
 
+            // Switch to decide if provided certs in portal gateway (header)
+            // is preferred over certs provided from servlet request
+            portal_gw_cert_preferred = Boolean.valueOf(CollectionHelper.getMapAttr(
+                options, "iplanet-am-auth-cert-gw-cert-preferred"));
+
             amAuthCert_emailAddrTag = bundle.getString("emailAddrTag");
 
             amAuthCert_serverHost = CollectionHelper.getServerMapAttr(
@@ -349,29 +355,33 @@ public class Cert extends AMLoginModule {
             }
 
             if (debug.messageEnabled()) {
-                debug.message("\nldapProviderUrl="+ amAuthCert_serverHost +
-                    "\n\tamAuthCert_serverPort = " + amAuthCert_serverPort +
-                    "\n\tstartSearchLoc=" + amAuthCert_startSearchLoc +
-                    "\n\tsecurityType=" + amAuthCert_securityType +
-                    "\n\tprincipleUser=" + amAuthCert_principleUser +
-                    "\n\tauthLevel="+authLevel+
-                    "\n\tuseSSL=" + amAuthCert_useSSL +
-                    "\n\tocspEnable=" + ocspEnabled +
-                    "\n\tuserProfileMapper=" + amAuthCert_userProfileMapper +
-                    "\n\tsubjectAltExtMapper=" + 
-                        amAuthCert_subjectAltExtMapper +
-                    "\n\taltUserProfileMapper=" + 
-                        amAuthCert_altUserProfileMapper +
-                    "\n\tchkCRL=" + amAuthCert_chkCRL +
-                    "\n\tchkAttrCRL=" + amAuthCert_chkAttrCRL +
-                    "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL) +
-                    "\n\tcacheCRL=" + doCRLCaching +
-                    "\n\tupdateCRLs=" + doCRLUpdate +
-                    "\n\tchkCertInLDAP=" + amAuthCert_chkCertInLDAP +
-                    "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP +
-                    "\n\temailAddr=" + amAuthCert_emailAddrTag +
-                    "\n\tgw-cert-auth-enabled="+portal_gw_cert_auth_enabled +
-                    "\n\tclient=" + client);
+                StringBuilder sb = new StringBuilder();
+                sb.append("\nldapProviderUrl=").append(amAuthCert_serverHost)
+                    .append("\n\tamAuthCert_serverPort=").append(amAuthCert_serverPort)
+                    .append("\n\tstartSearchLoc=").append(amAuthCert_startSearchLoc)
+                    .append("\n\tsecurityType=").append(amAuthCert_securityType)
+                    .append("\n\tprincipleUser=").append(amAuthCert_principleUser)
+                    .append("\n\tauthLevel=").append(authLevel)
+                    .append("\n\tuseSSL=").append(amAuthCert_useSSL)
+                    .append("\n\tocspEnable=").append(ocspEnabled)
+                    .append("\n\tuserProfileMapper=").append(amAuthCert_userProfileMapper)
+                    .append("\n\tsubjectAltExtMapper=")
+                        .append(amAuthCert_subjectAltExtMapper)
+                    .append("\n\taltUserProfileMapper=")
+                        .append(amAuthCert_altUserProfileMapper)
+                    .append("\n\tchkCRL=").append(amAuthCert_chkCRL)
+                    .append("\n\tchkAttrCRL=").append(amAuthCert_chkAttrCRL)
+                    .append("\n\tchkAttributesCRL=").append(Arrays.toString(amAuthCert_chkAttributesCRL))
+                    .append("\n\tcacheCRL=").append(doCRLCaching)
+                    .append("\n\tupdateCRLs=").append(doCRLUpdate)
+                    .append("\n\tchkCertInLDAP=").append(amAuthCert_chkCertInLDAP)
+                    .append("\n\tchkAttrCertInLDAP=").append(amAuthCert_chkAttrCertInLDAP)
+                    .append("\n\temailAddr=").append(amAuthCert_emailAddrTag)
+                    .append("\n\tgw-cert-auth-enabled=").append(portal_gw_cert_auth_enabled)
+                    .append("\n\tgw-cert-ParamName=").append(certParamName)
+                    .append("\n\tgw_cert_preferred=").append(portal_gw_cert_preferred)
+                    .append("\n\tclient=").append(client);
+                debug.message(sb.toString());
             }
         } else {
             debug.error("options is null");
@@ -404,15 +414,19 @@ public class Cert extends AMLoginModule {
                         throw new AuthLoginException(amAuthCert, 
                             "noURLCertAuth", null);
                     }
-
                     thecert = getPortalStyleCert(servletRequest);
                     allCerts = new X509Certificate[] { thecert };
                 } else {
-                    if (debug.messageEnabled()) {
-                        debug.message("Certificate: got all certs from " + 
-                            "HttpServletRequest =" + allCerts.length);
+                    if (portal_gw_cert_auth_enabled && portal_gw_cert_preferred) {
+                        thecert = getPortalStyleCert(servletRequest);
+                        allCerts = new X509Certificate[] { thecert };
+                    } else {
+                       if (debug.messageEnabled()) {
+                           debug.message("Certificate: got all certs from " +
+                               "HttpServletRequest = {}", allCerts.length);
+                       }
+                       thecert = allCerts[0];
                     }
-                    thecert = allCerts[0];
                 }
             } else {
                 thecert = sendCallback();
@@ -707,7 +721,7 @@ public class Cert extends AMLoginModule {
             }
 
             if (debug.messageEnabled()) {
-                debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + userTokenId);
+                debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + " " + userTokenId);
             }
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -846,7 +860,7 @@ public class Cert extends AMLoginModule {
            debug.message ("in Certificate. validate certParam: " + certParam);
        }
        if (certParam == null || certParam.equals("")) {
-           debug.message("Certificate: no cert from HttpServletRequest");
+           debug.message("Certificate: no cert from HttpServletRequest header");
            throw new AuthLoginException(amAuthCert, "noCert", null);
        }
 
