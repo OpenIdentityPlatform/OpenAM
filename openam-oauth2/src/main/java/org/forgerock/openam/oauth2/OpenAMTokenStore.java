@@ -285,8 +285,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         //See spec section 5.4. - add claims to id_token based on 'response_type' parameter
         String responseType = request.getParameter(OAuth2Constants.Params.RESPONSE_TYPE);
-        if (providerSettings.isAlwaysAddClaimsToToken() ||
-                (responseType != null && responseType.trim().equals(OAuth2Constants.JWTTokenParams.ID_TOKEN))) {
+        if (OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS.equals(request.getParameter(OAuth2Constants.Params.GRANT_TYPE)) ) {
+            logger.message("Can't add claims for the client credentials flow.");
+        } else if (providerSettings.isAlwaysAddClaimsToToken() ||
+                    (responseType != null && responseType.trim().equals(OAuth2Constants.JWTTokenParams.ID_TOKEN))) {
             appendIdTokenClaims(request, providerSettings, oidcToken);
         } else if (providerSettings.getClaimsParameterSupported()) {
             appendRequestedIdTokenClaims(request, providerSettings, oidcToken);
