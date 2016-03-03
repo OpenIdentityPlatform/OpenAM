@@ -20,7 +20,7 @@ Copyright 2014 ForgeRock AS.
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>12.0.3-RC5</version>
+        <version>12.0.3-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
@@ -47,7 +47,7 @@ Copyright 2014 ForgeRock AS.
         <url>https://svn.forgerock.org/commons/forgerock-http-client/trunk</url>
         <connection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</developerConnection>
-      <tag>12.0.3-RC5</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <repositories>
