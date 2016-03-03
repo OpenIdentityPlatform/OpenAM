@@ -76,31 +76,20 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
 
 
             function getSubSchemaTypes () {
-                // return obj.serviceCall({
-                //     url: scopedByRealm(realm, "services/" + type + "?_action=getAllTypes"),
-                //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                //     type: "POST"
-                // });
-
-                return $.Deferred().resolve([
-                    { "_id":"CSV", "description":"CSV" },
-                    { "_id":"JDBC", "description":"CSV" },
-                    { "_id":"Syslog", "description":"JDBC" }
-                ]);
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "services/" + type + "?_action=getAllTypes"),
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                });
             }
 
             return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
                 .then((data) => {
-                    const schema = data[0],
-                        values = data[1][0],
-                        name = data[2],
-                        subSchemaTypes = data[3];
-
                     return {
-                        schema: schema,
-                        values: values,
-                        name:  name,
-                        subSchemaTypes: subSchemaTypes
+                        schema: data[0],
+                        values: data[1][0],
+                        name:  data[2],
+                        subSchemaTypes: data[3][0].result
                     };
                 });
         },
