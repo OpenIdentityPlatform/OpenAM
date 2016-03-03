@@ -23,8 +23,8 @@ import org.forgerock.util.Reject;
  */
 public class PushMessage {
 
-    private String recipient;
-    private JsonValue data;
+    private final String recipient;
+    private final JsonValue data;
 
     /**
      * Create a new PushMessage.

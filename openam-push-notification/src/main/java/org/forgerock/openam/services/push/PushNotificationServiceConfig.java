@@ -26,7 +26,6 @@ public final class PushNotificationServiceConfig {
     private String apiKey;
     private String senderId;
     private String endpoint;
-    private int port;
 
     /**
      * Only access is via the Builder.
@@ -43,18 +42,14 @@ public final class PushNotificationServiceConfig {
         this.endpoint = endpoint;
     }
 
-    private void setPort(int port) {
-        this.port = port;
-    }
-
     private void setSenderId(String senderId) {
         this.senderId = senderId;
     }
 
     private boolean isValid() {
-        return StringUtils.isNotBlank(apiKey)
-                && StringUtils.isNotBlank(endpoint)
-                && StringUtils.isNotBlank(senderId) && port > 0;
+        return StringUtils.isNotBlank(senderId)
+                && StringUtils.isNotBlank(apiKey)
+                && StringUtils.isNotBlank(endpoint);
     }
 
     /**
@@ -81,14 +76,6 @@ public final class PushNotificationServiceConfig {
         return endpoint;
     }
 
-    /**
-     * Get the port for this notification service to connect to.
-     * @return the port.
-     */
-    public int getPort() {
-        return port;
-    }
-
     @Override
     public boolean equals(Object underTest) {
         if (underTest == null) {
@@ -106,13 +93,12 @@ public final class PushNotificationServiceConfig {
         final PushNotificationServiceConfig that = (PushNotificationServiceConfig) underTest;
         return Objects.equals(this.endpoint, that.endpoint)
                 && Objects.equals(this.senderId, that.senderId)
-                && Objects.equals(this.apiKey, that.apiKey)
-                && Objects.equals(this.port, that.port);
+                && Objects.equals(this.apiKey, that.apiKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiKey, senderId, endpoint, port);
+        return Objects.hash(apiKey, senderId, endpoint);
     }
 
     /**
@@ -157,16 +143,6 @@ public final class PushNotificationServiceConfig {
          */
         public Builder withEndpoint(String endpoint) {
             config.setEndpoint(endpoint);
-            return this;
-        }
-
-        /**
-         * The port on the remote service to connect to.
-         * @param port The port on the remote service to connect to.
-         * @return The builder.
-         */
-        public Builder withPort(int port) {
-            config.setPort(port);
             return this;
         }
 

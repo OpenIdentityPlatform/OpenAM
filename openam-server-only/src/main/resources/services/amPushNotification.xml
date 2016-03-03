@@ -46,10 +46,9 @@
 
                 <!-- configuration settings -->
 
-                <AttributeSchema name="username" type="single" i18nKey="a010" validator="RequiredValueValidator">
-                </AttributeSchema>
+                <AttributeSchema name="senderId" type="single" i18nKey="a010" validator="RequiredValueValidator"/>
 
-                <AttributeSchema name="password" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
+                <AttributeSchema name="apiKey" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
 
                 <AttributeSchema name="endpoint" type="single" i18nKey="a030" validator="EndpointValidator">
                     <DefaultValues>
@@ -57,13 +56,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="port" type="single" i18nKey="a040" validator="PortValidator">
-                    <DefaultValues>
-                        <Value>443</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="delegateFactory" type="single" i18nKey="a050" validator="RequiredValueValidator">
+                <AttributeSchema name="delegateFactory" type="single" i18nKey="a040" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>org.forgerock.openam.services.push.gcm.GcmHttpDelegateFactory</Value>
                     </DefaultValues>

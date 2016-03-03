@@ -52,16 +52,14 @@ public class PushNotificationServiceConfigHelper {
      */
     public PushNotificationServiceConfig getConfig() throws PushNotificationException {
 
-        String senderId = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_USERNAME);
-        String apiKey = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_PASSWORD);
+        String senderId = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_SENDER_ID);
+        String apiKey = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_API_KEY);
         String endpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_ENDPOINT);
-        int port = CollectionHelper.getIntMapAttr(serviceConfig.getAttributes(), DELEGATE_PORT, DEFAULT_PORT, null);
 
         return new PushNotificationServiceConfig.Builder()
                 .withSenderId(senderId)
                 .withApiKey(apiKey)
                 .withEndpoint(endpoint)
-                .withPort(port)
                 .build();
     }
 

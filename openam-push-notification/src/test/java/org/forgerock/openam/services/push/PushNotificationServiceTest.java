@@ -51,7 +51,6 @@ public class PushNotificationServiceTest {
         this.config = new PushNotificationServiceConfig.Builder()
                 .withApiKey("apiKey")
                 .withEndpoint("endpoint")
-                .withPort(111)
                 .withSenderId("senderId")
                 .build();
         this.mockDelegateFactory = mock(PushNotificationDelegateFactory.class);

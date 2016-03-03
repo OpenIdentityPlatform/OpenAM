@@ -26,7 +26,6 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-            .withPort(111)
             .withEndpoint("www.forgerock.org")
             .withApiKey("apiKey")
             .withSenderId("senderId");
@@ -37,24 +36,8 @@ public class PushNotificationServiceConfigTest {
         //then
         assertThat(config).isNotNull();
         assertThat(config.getEndpoint()).isEqualTo("www.forgerock.org");
-        assertThat(config.getPort()).isEqualTo(111);
         assertThat(config.getApiKey()).isEqualTo("apiKey");
         assertThat(config.getSenderId()).isEqualTo("senderId");
-    }
-
-    @Test (expectedExceptions = PushNotificationException.class)
-    public void shouldNotCreateConfigMissingPort() throws PushNotificationException {
-
-        //given
-        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withEndpoint("www.forgerock.org")
-                .withApiKey("apiKey")
-                .withSenderId("senderId");
-
-        //when
-        builder.build();
-
-        //then
     }
 
     @Test (expectedExceptions = PushNotificationException.class)
@@ -62,7 +45,6 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withPort(111)
                 .withApiKey("apiKey")
                 .withSenderId("senderId");
 
@@ -77,7 +59,6 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withPort(111)
                 .withApiKey("apiKey")
                 .withEndpoint("www.forgerock.org");
 
@@ -92,7 +73,6 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withPort(111)
                 .withSenderId("senderId")
                 .withEndpoint("www.forgerock.org");
 

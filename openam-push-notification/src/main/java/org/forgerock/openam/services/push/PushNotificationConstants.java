@@ -31,14 +31,12 @@ public final class PushNotificationConstants {
      * DELEGATE.
      */
 
-    /** Key to the service configuration username field. */
-    static final String DELEGATE_USERNAME = "username";
+    /** Key to the service configuration senderId field. */
+    static final String DELEGATE_SENDER_ID = "senderId";
     /** Key to the service configuration endpoint field. */
     static final String DELEGATE_ENDPOINT = "endpoint";
-    /** Key to the service configuration port field. */
-    static final String DELEGATE_PORT = "port";
-    /** Key to the service configuration password field. */
-    static final String DELEGATE_PASSWORD = "password";
+    /** Key to the service configuration apiKey field. */
+    static final String DELEGATE_API_KEY = "apiKey";
     /** Key to the service configuration factory field. */
     static final String DELEGATE_FACTORY_CLASS = "delegateFactory";
 
@@ -47,9 +45,7 @@ public final class PushNotificationConstants {
      */
 
     /** Default delegate factory class used if the factory entry is missing. */
-    static final String DEFAULT_DELEGATE_FACTORY_CLASS = "org.forgerock.openam.push.gcm.GcmHTTPDelegateFactory";
-    /** Default port used if the port entry is missing. */
-    static final int DEFAULT_PORT = 443;
+    static final String DEFAULT_DELEGATE_FACTORY_CLASS = "org.forgerock.openam.push.gcm.GcmHttpDelegateFactory";
 
     /**
      * SERVICE.

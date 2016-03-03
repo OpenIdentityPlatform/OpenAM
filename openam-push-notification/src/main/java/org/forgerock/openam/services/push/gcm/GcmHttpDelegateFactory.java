@@ -24,7 +24,7 @@ import org.forgerock.openam.services.push.PushNotificationServiceConfig;
 import org.forgerock.util.Options;
 
 /**
- * Produces GcmHTTPDelegates matching the PushNotificationServiceFactory interface.
+ * Produces GcmHttpDelegates matching the PushNotificationServiceFactory interface.
  */
 public class GcmHttpDelegateFactory implements PushNotificationDelegateFactory {
 
@@ -46,7 +46,7 @@ public class GcmHttpDelegateFactory implements PushNotificationDelegateFactory {
         try {
             handler = new HttpClientHandler(options);
         } catch (HttpApplicationException e) {
-            throw new PushNotificationException("Unable to generate HTTP client for the GcmHTTPDelegate.", e);
+            throw new PushNotificationException("Unable to generate HTTP client for the GcmHttpDelegate.", e);
         }
 
         return new GcmHttpDelegate(handler, config, debug);
