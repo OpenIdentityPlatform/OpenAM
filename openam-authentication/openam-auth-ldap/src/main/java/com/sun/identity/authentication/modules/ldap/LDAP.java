@@ -24,7 +24,7 @@
  *
  * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -82,6 +82,7 @@ public class LDAP extends AMLoginModule {
     private String regEx;
     private String currentConfigName;
     private String bindDN;
+    private String protocolVersion;
     private int currentState;
     protected LDAPAuthUtils ldapUtil;
     private boolean isReset;
@@ -202,6 +203,7 @@ public class LDAP extends AMLoginModule {
                 currentConfig, "openam-auth-ldap-connection-mode", "LDAP");
             useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
             isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
+            protocolVersion = CollectionHelper.getMapAttr(currentConfig, "openam-auth-ldap-secure-protocol-version", "TLSv1");
 
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,
@@ -263,6 +265,7 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setHeartBeatInterval(heartBeatInterval);
             ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
             ldapUtil.setOperationTimeout(operationTimeout);
+            ldapUtil.setProtocolVersion(protocolVersion);
 
             if (debug.messageEnabled()) {
                 debug.message("bindDN-> " + bindDN

@@ -99,6 +99,9 @@ public final class LDAPConstants {
     /** LDAP connection mode start TLS. */
     public static final String LDAP_CONNECTION_MODE_STARTTLS = "StartTLS";
 
+    /** LDAP secure connection protocol version. */
+    public static final String LDAP_SERVER_SECURE_PROTOCOL_VERSION = "openam-idrepo-ldapv3-config-secure-protocol-version";
+
     /** LDAP persistent search base DN property key. */
     public static final String LDAP_PERSISTENT_SEARCH_BASE_DN = "sun-idrepo-ldapv3-config-psearchbase";
 

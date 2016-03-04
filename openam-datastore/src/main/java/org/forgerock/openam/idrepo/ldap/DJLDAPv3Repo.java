@@ -177,6 +177,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
     private boolean isSecure = false;
     private boolean useStartTLS = false;
+    private String protocolVersion;
 
     /**
      * Initializes the IdRepo instance, basically within this method we process
@@ -223,6 +224,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         String connectionMode = CollectionHelper.getMapAttr(configParams, LDAP_CONNECTION_MODE);
         useStartTLS = LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode);
         isSecure = LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) || useStartTLS;
+        protocolVersion = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_SECURE_PROTOCOL_VERSION, "TLSv1");
 
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
@@ -313,7 +315,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         if (isSecure) {
             try {
-                ldapOptions = ldapOptions.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+                ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                        new SSLContextBuilder().setProtocol(protocolVersion).getSSLContext());
 
                 if (useStartTLS) {
                     ldapOptions = ldapOptions.set(SSL_USE_STARTTLS, true);
@@ -2161,22 +2164,23 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     /**
      * This method constructs a persistent search "key", which will be used to
      * figure out whether there is an existing persistent search for the same
-     * ldap server, base DN, filter, scope combination. By doing this we can
+     * ldap server, secureProtocolVersion, base DN, filter, scope combination. By doing this we can
      * "reuse" the results of other datastore implementations without the need
      * of two or more persistent search connections with the same parameters.
      *
-     * @return a unique ID based on the LDAP URLs, psearch base DN, filter and
+     * @return a unique ID based on the LDAP URLs, secure protocol version, psearch base DN, filter and
      * scope settings.
      */
     private String getPSearchId() {
         String psearchBase = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN);
         String pfilter = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER);
         String scope = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE);
+        String secureProtocolVersion = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_SECURE_PROTOCOL_VERSION);
         //creating a natural order of the ldap servers, so the "key" should be always the same regardless of the server
         //order in the configuration.
         LDAPURL[] servers = ldapServers.toArray(new LDAPURL[ldapServers.size()]);
         Arrays.sort(servers);
-        String psIdKey = Arrays.toString(servers) + psearchBase + pfilter + scope + userSearchAttr;
+        String psIdKey = Arrays.toString(servers) + secureProtocolVersion + psearchBase + pfilter + scope + userSearchAttr;
         return psIdKey;
     }
 
