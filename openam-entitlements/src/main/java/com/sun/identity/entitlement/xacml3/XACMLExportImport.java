@@ -11,20 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
+import static com.sun.identity.entitlement.EntitlementException.NO_RESOURCE_TYPE_MATCH_FOUND;
+
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.IPrivilegeManager;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ResourceMatch;
+import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.inject.Inject;
@@ -54,6 +64,8 @@ public class XACMLExportImport {
     private final Debug debug;
     private final PrivilegeValidator privilegeValidator;
     private final PrivilegeManagerFactory privilegeManagerFactory;
+    private final ApplicationServiceFactory applicationServiceFactory;
+    private final ResourceTypeService resourceTypeService;
 
     /**
      * Creates an instance of the XACMLExportImport with dependencies provided.
@@ -69,13 +81,17 @@ public class XACMLExportImport {
                              XACMLReaderWriter xacmlReaderWriter,
                              PrivilegeValidator privilegeValidator,
                              SearchFilterFactory searchFilterFactory,
-                             @Named(XACMLConstants.DEBUG) Debug debug) {
+                             @Named(XACMLConstants.DEBUG) Debug debug,
+            ApplicationServiceFactory applicationServiceFactory,
+            ResourceTypeService resourceTypeService) {
 
         this.privilegeManagerFactory = privilegeManagerFactory;
         this.xacmlReaderWriter = xacmlReaderWriter;
         this.searchFilterFactory = searchFilterFactory;
         this.privilegeValidator = privilegeValidator;
         this.debug = debug;
+        this.applicationServiceFactory = applicationServiceFactory;
+        this.resourceTypeService = resourceTypeService;
     }
 
     /**
@@ -120,6 +136,7 @@ public class XACMLExportImport {
         List<ImportStep> importSteps = new ArrayList<ImportStep>();
 
         PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
+        ApplicationService applicationService = applicationServiceFactory.create(admin, realm);
 
         for (Privilege privilege : privilegeSet.getPrivileges()) {
 
@@ -132,6 +149,7 @@ public class XACMLExportImport {
             }
 
             privilegeValidator.validatePrivilege(privilege);
+            privilege.setResourceTypeUuid(getResourceTypeId(applicationService, privilege, realm, admin));
             if (pm.canFindByName(privilege.getName())) {
                 importSteps.add(privilegeImportStep(pm, DiffStatus.UPDATE, privilege));
             } else {
@@ -140,6 +158,29 @@ public class XACMLExportImport {
         }
 
         return importSteps;
+    }
+
+    private String getResourceTypeId(ApplicationService applicationService, Privilege privilege, String realm,
+            Subject subject) throws EntitlementException {
+
+        Application application = applicationService.getApplication(privilege.getEntitlement().getApplicationName());
+        ResourceName resourceComparator = application.getResourceComparator();
+        Set<String> resourceTypeIds = application.getResourceTypeUuids();
+        Set<String> resources = privilege.getEntitlement().getResourceNames();
+        for (String resource : resources) {
+            for (String resourceTypeId : resourceTypeIds) {
+                ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, resourceTypeId);
+                Set<String> patterns = resourceType.getPatterns();
+                for (String pattern : patterns) {
+                    ResourceMatch match = resourceComparator.compare(resource, pattern, true);
+                    if (match.equals(ResourceMatch.EXACT_MATCH) || match.equals(ResourceMatch.WILDCARD_MATCH)) {
+                        return resourceTypeId;
+                    }
+                }
+            }
+        }
+
+        throw new EntitlementException(NO_RESOURCE_TYPE_MATCH_FOUND);
     }
 
     /**

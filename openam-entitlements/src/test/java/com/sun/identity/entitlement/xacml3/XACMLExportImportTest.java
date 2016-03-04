@@ -26,20 +26,27 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.fail;
 
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ResourceMatch;
+import com.sun.identity.entitlement.URLResourceName;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -62,6 +69,9 @@ public class XACMLExportImportTest {
     private XACMLReaderWriter xacmlReaderWriter;
     private PrivilegeManagerFactory pmFactory;
     private Debug debug;
+    private ApplicationServiceFactory applicationServiceFactory;
+    private ApplicationService applicationService;
+    private ResourceTypeService resourceTypeService;
 
     private XACMLExportImport xacmlExportImport;
 
@@ -77,15 +87,30 @@ public class XACMLExportImportTest {
         validator = mock(PrivilegeValidator.class);
         searchFilterFactory = new SearchFilterFactory();
         debug = mock(Debug.class);
+        applicationServiceFactory = mock(ApplicationServiceFactory.class);
+        applicationService = mock(ApplicationService.class);
+        resourceTypeService = mock(ResourceTypeService.class);
+        Application application = mock(Application.class);
+        URLResourceName urlResourceName = mock(URLResourceName.class);
+        ResourceType resourceType = ResourceType.builder()
+                .setName("TestResourceType")
+                .setUUID("123")
+                .setPatterns(Collections.singleton("*://*:*/*")).build();
 
         // Class under test
 
-        xacmlExportImport = new XACMLExportImport(pmFactory,
-                xacmlReaderWriter, validator, searchFilterFactory, debug);
+        xacmlExportImport = new XACMLExportImport(pmFactory, xacmlReaderWriter, validator, searchFilterFactory, debug,
+                applicationServiceFactory, resourceTypeService);
 
         // Given (shared test state)
 
         given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(pm);
+        given(applicationServiceFactory.create(any(Subject.class), anyString())).willReturn(applicationService);
+        given(applicationService.getApplication(anyString())).willReturn(application);
+        given(application.getResourceComparator()).willReturn(urlResourceName);
+        given(urlResourceName.compare(anyString(), anyString(), anyBoolean())).willReturn(ResourceMatch.EXACT_MATCH);
+        given(application.getResourceTypeUuids()).willReturn(Collections.singleton("123"));
+        given(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).willReturn(resourceType);
     }
 
     @Test

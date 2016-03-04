@@ -44,7 +44,10 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cli.entitlement.XACMLUtils;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.sso.SSOToken;
@@ -115,12 +118,16 @@ public class CreateXACML extends AuthenticatedCommand {
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, realm)));
+            ApplicationServiceFactory factory = InjectorHolder.getInstance(ApplicationServiceFactory.class);
+            ResourceTypeService service = InjectorHolder.getInstance(ResourceTypeService.class);
             XACMLExportImport xacmlExportImport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),
-                    PrivilegeManager.debug);
+                    PrivilegeManager.debug,
+                    factory,
+                    service);
 
             importSteps = xacmlExportImport.importXacml(realm, xacmlInputStream, adminSubject, isDryRun());
         } catch (EntitlementException e) {
