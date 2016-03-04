@@ -66,7 +66,6 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
 
         render: function (args, callback) {
             var self = this;
-
             this.args = args;
 
             self.parentRender(function () {

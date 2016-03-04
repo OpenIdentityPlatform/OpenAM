@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  *
  * $Id: AuthPropertiesViewBean.java,v 1.5 2008/07/07 20:39:19 veiming Exp $
  *
@@ -198,7 +198,7 @@ public  class AuthPropertiesViewBean
         if (isXuiAdminConsoleEnabled()) {
             String redirectRealm = getRedirectRealm(this);
             redirectToXui(getRequestContext().getRequest(), redirectRealm,
-                MessageFormat.format("realms/{0}/authentication/settings", Uris.urlEncodePathElement(redirectRealm)));
+                MessageFormat.format("realms/{0}/authentication-settings", Uris.urlEncodePathElement(redirectRealm)));
         }
     }
 

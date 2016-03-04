@@ -1,8 +1,4 @@
 <header class="page-header page-header-no-border clearfix">
-    <div class="pull-left">
-        <h1>{{t title}}</h1>
-    </div>
-
     {{#if buttons}}
         <div class="shallow-page-header-button-group button-group pull-right">
             {{partial this.buttons this}}
@@ -12,4 +8,7 @@
     {{#if helpLink}}
         {{> util/_HelpLink className="shallow-page-header-button-group"}}
     {{/if}}
+    <div class="pull-left">
+        <h1>{{t title}}</h1>
+    </div>
 </header>
