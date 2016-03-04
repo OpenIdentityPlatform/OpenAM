@@ -16,48 +16,6 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.sm.AttributeSchema.Syntax.*;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.openam.rest.RestConstants.*;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import org.forgerock.guava.common.collect.BiMap;
-import org.forgerock.guava.common.collect.HashBiMap;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Responses;
-import org.forgerock.json.resource.annotations.Action;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.LocaleContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.Promise;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
@@ -71,6 +29,47 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import org.forgerock.guava.common.collect.BiMap;
+import org.forgerock.guava.common.collect.HashBiMap;
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.annotations.Action;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.LocaleContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
+
+import static com.sun.identity.sm.AttributeSchema.Syntax.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
+import static org.forgerock.openam.rest.RestConstants.COLLECTION;
+import static org.forgerock.openam.rest.RestConstants.NAME;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -235,7 +234,8 @@ public abstract class SmsResourceProvider {
 
     @Action
     public Promise<ActionResponse, ResourceException> template() {
-        return newActionResponse(converter.toJson(schema.getAttributeDefaults())).asPromise();
+        //when retrieving the template we don't want to validate the attributes
+        return newActionResponse(converter.toJson(schema.getAttributeDefaults(), false)).asPromise();
     }
 
     @Action
@@ -271,29 +271,17 @@ public abstract class SmsResourceProvider {
         return i18nName;
     }
 
-
     protected JsonValue createSchema(Context context) {
         JsonValue result = json(object(field("type", "object")));
-
-        Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
-        ResourceBundle console = ResourceBundle.getBundle("amConsole", getLocale(context));
-        String serviceType = schema.getServiceType().getType();
-
-        String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
-        List<String> sections = new ArrayList<>();
-        if (StringUtils.isNotEmpty(sectionOrder)) {
-            sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
-        }
-
-        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, sections, attributeSectionMap, console, serviceType,
-                context);
-
+        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
         return result;
     }
 
-    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schema, List<String> sections,
-            Map<String, String> attributeSectionMap, ResourceBundle consoleI18n, String serviceType,
-                                      Context context) {
+    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
+        Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
+        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
+        String serviceType = schemas.getServiceType().getType();
+        List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
 
         ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName(), getLocale(context));
         NumberFormat sectionFormat = new DecimalFormat("00");
@@ -323,6 +311,25 @@ public abstract class SmsResourceProvider {
                 addExampleValue(result, path, attribute, attributePath);
             }
         }
+    }
+
+    private List<String> getSections(Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
+
+        List<String> sections = new ArrayList<>();
+        String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
+
+        if (StringUtils.isNotEmpty(sectionOrder)) {
+            sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
+        }
+
+        if (sections.isEmpty()) {
+            for (String attributeSection : attributeSectionMap.values()) {
+                if (!sections.contains(attributeSection)) {
+                    sections.add(attributeSection);
+                }
+            }
+        }
+        return sections;
     }
 
     private void addExampleValue(JsonValue result, String path, AttributeSchema attribute, String attributePath) {
@@ -437,10 +444,12 @@ public abstract class SmsResourceProvider {
         return type;
     }
 
-    protected HashMap<String, String> getAttributeNameToSection(ServiceSchema schema) {
-        HashMap<String, String> result = new HashMap<String, String>();
+    protected Map<String, String> getAttributeNameToSection(ServiceSchema schema) {
+        Map<String, String> result = new LinkedHashMap<>();
 
-        String serviceSectionFilename = schema.getServiceName() + ".section.properties";
+        String serviceSectionFilename = schema.getName() != null ? schema.getName() : schema.getServiceName();
+        serviceSectionFilename = serviceSectionFilename + ".section.properties";
+
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
 
         if (inputStream != null) {

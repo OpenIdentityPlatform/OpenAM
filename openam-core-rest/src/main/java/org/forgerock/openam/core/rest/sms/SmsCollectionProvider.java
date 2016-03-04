@@ -310,7 +310,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * property for the name of the config.
      */
     private JsonValue getJsonValue(String realm, ServiceConfig result) {
-        JsonValue value = converter.toJson(realm, result.getAttributes());
+        JsonValue value = converter.toJson(realm, result.getAttributes(), true);
         String id = result.getName();
         if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
             id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);

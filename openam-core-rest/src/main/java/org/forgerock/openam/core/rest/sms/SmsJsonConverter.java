@@ -20,6 +20,7 @@ import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 
+import java.util.LinkedHashMap;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -73,7 +74,7 @@ public class SmsJsonConverter {
 
     private BiMap<String, String> attributeNameToResourceName;
     private BiMap<String, String> resourceNameToAttributeName;
-    private HashMap<String, String> attributeNameToSection;
+    private Map<String, String> attributeNameToSection;
     private List<String> hiddenAttributeNames;
     private boolean initialised = false;
 
@@ -136,8 +137,8 @@ public class SmsJsonConverter {
      * @param attributeValuePairs The schema attribute values.
      * @return Json representation of attributeValuePairs
      */
-    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs) {
-        return toJson(null, attributeValuePairs);
+    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs, boolean validate) {
+        return toJson(null, attributeValuePairs, validate);
     }
 
     /**
@@ -148,24 +149,25 @@ public class SmsJsonConverter {
      * @param realm The realm, or null if global.
      * @return Json representation of attributeValuePairs
      */
-    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs) {
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate) {
         if (!initialised) {
             init();
         }
-        final boolean validAttributes;
-        try {
-            if (realm == null) {
-                validAttributes = schema.validateAttributes(attributeValuePairs);
-            } else {
-                validAttributes = schema.validateAttributes(attributeValuePairs, realm);
+
+        boolean validAttributes = true;
+        if (validate) {
+            try {
+                if (realm == null) {
+                    validAttributes = schema.validateAttributes(attributeValuePairs);
+                } else {
+                    validAttributes = schema.validateAttributes(attributeValuePairs, realm);
+                }
+            } catch (SMSException e) {
+                debug.error(
+                        "schema validation threw an exception while validating the attributes: realm=" + realm + " attributes: " + attributeValuePairs,
+                        e);
+                throw new JsonException("Unable to validate attributes", e);
             }
-        } catch (SMSException e) {
-            debug.error("schema validation threw an exception while validating the attributes: realm="
-                    + realm
-                    + " attributes: "
-                    + attributeValuePairs,
-                    e);
-            throw new JsonException("Unable to validate attributes", e);
         }
 
         JsonValue parentJson = json(object());
@@ -425,10 +427,12 @@ public class SmsJsonConverter {
         return hiddenAttributeNames;
     }
 
-    protected HashMap<String, String> getAttributeNameToSection() {
-        HashMap<String, String> result = new HashMap<String, String>();
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(schema.getServiceName() + ".section" +
-                ".properties");
+    protected Map<String, String> getAttributeNameToSection() {
+        Map<String, String> result = new LinkedHashMap();
+        String serviceSectionFilename = schema.getName() != null ? schema.getName() : schema.getServiceName();
+        serviceSectionFilename = serviceSectionFilename + ".section.properties";
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
 
         if (inputStream != null) {
             String line;

@@ -16,29 +16,6 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.annotations.RequestHandler;
-import org.forgerock.json.resource.annotations.Update;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.Promise;
-
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
@@ -48,6 +25,22 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST singleton provider for SMS global schema config.
@@ -108,7 +101,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
 
     @Override
     protected JsonValue convertToJson(String realm, ServiceConfig config) {
-        return converter.toJson(schema.getAttributeDefaults());
+        return converter.toJson(schema.getAttributeDefaults(), true);
     }
 
 
@@ -121,7 +114,8 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     @Override
     protected JsonValue withExtraAttributes(String realm, JsonValue value) {
         if (organizationSchema != null) {
-            value.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults()).getObject());
+            value.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults(), true)
+                    .getObject());
         }
         return super.withExtraAttributes(null, value);
     }
@@ -130,16 +124,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (organizationSchema != null) {
-            Map<String, String> attributeSectionMap = getAttributeNameToSection(organizationSchema);
-            ResourceBundle console = ResourceBundle.getBundle("amConsole");
-            String serviceType = organizationSchema.getServiceType().getType();
-            String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
-            List<String> sections = new ArrayList<String>();
-            if (StringUtils.isNotEmpty(sectionOrder)) {
-                sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
-            }
-            addAttributeSchema(result, "/properties/defaults/", organizationSchema, sections,
-                    attributeSectionMap, console, serviceType, context);
+            addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
         }
         return result;
     }

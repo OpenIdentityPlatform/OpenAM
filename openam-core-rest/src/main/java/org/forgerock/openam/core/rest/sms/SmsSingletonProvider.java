@@ -130,7 +130,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
      */
     protected JsonValue withExtraAttributes(String realm, JsonValue value) {
         if (dynamicConverter != null) {
-            value.add("dynamic", dynamicConverter.toJson(realm, getDynamicAttributes(realm)).getObject());
+            value.add("dynamic", dynamicConverter.toJson(realm, getDynamicAttributes(realm), true).getObject());
         }
         return value;
     }
@@ -255,16 +255,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
-            Map<String, String> attributeSectionMap = getAttributeNameToSection(dynamicSchema);
-            ResourceBundle console = ResourceBundle.getBundle("amConsole");
-            String serviceType = dynamicSchema.getServiceType().getType();
-            String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
-            List<String> sections = new ArrayList<String>();
-            if (StringUtils.isNotEmpty(sectionOrder)) {
-                sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
-            }
-            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, sections, attributeSectionMap,
-                    console, serviceType, context);
+            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
         }
         return result;
     }
@@ -326,7 +317,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         if (config == null) {
             return json(object());
         } else {
-            return converter.toJson(realm, config.getAttributes());
+            return converter.toJson(realm, config.getAttributes(), true);
         }
     }
 
