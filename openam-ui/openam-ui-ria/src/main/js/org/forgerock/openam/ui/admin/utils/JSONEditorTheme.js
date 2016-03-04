@@ -273,14 +273,14 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     bar.innerHTML = "";
                 },
 
-                getFirstColumnWrapper: function() {
-                    var wrapper = document.createElement('div');
+                getFirstColumnWrapper: function () {
+                    var wrapper = document.createElement("div");
                     wrapper.className = "col-sm-" + gridColWidth1;
                     return wrapper;
                 },
 
-                getSecondColumnWrapper: function() {
-                    var wrapper = document.createElement('div');
+                getSecondColumnWrapper: function () {
+                    var wrapper = document.createElement("div");
                     wrapper.className = "col-sm-offset-1 col-sm-" + (gridColWidth2 - 1);
                     return wrapper;
                 },
@@ -301,7 +301,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                 getMapHeader: function (text) {
                     var el = document.createElement("div"), header = document.createElement("label");
                     el.appendChild(header);
-                    if(typeof text === "string") {
+                    if (typeof text === "string") {
                         header.textContent = text;
                     }
                     el.style.display = "inline-block";
@@ -310,17 +310,17 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                 },
 
                 getKeyFormInputField: function () {
-                    return this.getFormInputField('text', $.t("common.form.key"));
+                    return this.getFormInputField("text", $.t("common.form.key"));
                 },
 
                 getValueFormInputField: function () {
-                    return this.getFormInputField('text', $.t("common.form.value"));
+                    return this.getFormInputField("text", $.t("common.form.value"));
                 },
 
                 getModal: function () {
                     var el = document.createElement("div");
                     el.style.display = "block";
-                    el.className = "form-group"
+                    el.className = "form-group";
                     return el;
                 }
             });
