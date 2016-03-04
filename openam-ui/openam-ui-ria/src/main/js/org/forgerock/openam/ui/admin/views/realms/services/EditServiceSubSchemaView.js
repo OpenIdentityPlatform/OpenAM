@@ -56,7 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/EditServiceSubSchemaTemplate.html",
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
+            "partials/breadcrumb/_Breadcrumb.html"
         ],
         events: {
             "click [data-save]": "onSave",
@@ -69,6 +70,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             this.data.serviceType = args[1];
             this.data.subSchemaType = args[2];
             this.data.id = args[3];
+
+            this.data.backLink = {
+                href: "#" + Router.getLink(Router.configuration.routes.realmsServiceEdit,
+                    _.map([this.data.realmPath, this.data.serviceType], encodeURIComponent)),
+                text: this.data.serviceType,
+                icon: "fa-plug"
+            };
 
             var self = this;
 

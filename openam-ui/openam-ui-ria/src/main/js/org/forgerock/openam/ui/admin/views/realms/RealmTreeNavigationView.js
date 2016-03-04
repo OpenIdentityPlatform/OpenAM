@@ -21,33 +21,17 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/common/components/TreeNavigation",
-    "org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs"
-], ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation, createRealmsBreadcrumbs) => {
-
-    function shortenRealmName (realmPath) {
-        let realmName;
-        if (realmPath === "/") {
-            realmName = $.t("console.common.topLevelRealm");
-        } else {
-            realmName = _.last(realmPath.split("/"));
-        }
-        return realmName;
-    }
-
-    const RealmTreeNavigationView = TreeNavigation.extend({
+    "org/forgerock/openam/ui/common/components/TreeNavigation"
+], function ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation) {
+    var RealmTreeNavigationView = TreeNavigation.extend({
         events: {
             "click [data-event]": "sendEvent"
         },
-        template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
-        partials: [
-            "partials/breadcrumb/_Breadcrumb.html"
-        ],
         sendEvent: function (e) {
             e.preventDefault();
             EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
         },
-
+        template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
         realmExists: function (path) {
             return SMSGlobalService.realms.get(path);
         },
@@ -55,9 +39,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             var self = this;
 
             this.data.realmPath = args[0];
-            this.data.realmName = shortenRealmName(this.data.realmPath);
-
-            this.data.crumbs = createRealmsBreadcrumbs();
+            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm")
+                : this.data.realmPath;
 
             this.realmExists(this.data.realmPath).then(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);

@@ -665,31 +665,27 @@
             "realmDnsAliases": "Aliases/DNS Aliases",
             "noResults": "No results to display",
             "name": "Name",
-            "navigation": {
+            "id": "ID",
+            "nav": {
                 "dashboard": "Dashboard",
-                "authentication": "Authentication",
-                "settings": "Settings",
-                "chains": "Chains",
-                "modules": "Modules",
+                "authn": {
+                    "authn": "Authentication",
+                    "settings": "Settings",
+                    "chains": "Chains",
+                    "modules": "Modules"
+                },
                 "services": "Services",
                 "dataStores": "Data Stores",
                 "privileges": "Privileges",
-                "authorization": "Authorization",
-                "policySets": "Policy Sets",
-                "resourceTypes": "Resource Types",
+                "authz": {
+                    "authz": "Authorization",
+                    "policies": "Policy Sets",
+                    "resourceTypes": "Resource Types"
+                },
                 "subjects": "Subjects",
                 "agents": "Agents",
                 "sts": "STS",
-                "scripts": "Scripts",
-                "policies": "Policies",
-                "new" : "New",
-                "edit" : "Edit",
-                "authentication-settings": "Authentication - Settings",
-                "authentication-chains": "Authentication - Chains",
-                "authentication-modules": "Authentication - Modules",
-                "authorization-policySets": "Authorization - Policy Sets",
-                "authorization-resourceTypes": "Authorization - Resource Types"
-
+                "scripts": "Scripts"
             },
             "description": "Description",
             "type": "Type",
@@ -704,10 +700,10 @@
                 "chain": "chain"
             },
             "settings": {
-                "title": "Settings"
+                "title": "Authentication Settings"
             },
             "modules": {
-                "title" : "Modules",
+                "title" : "Authentication Modules",
                 "newModule": "New Module",
                 "description" : "OpenAM uses authentication modules to identify the user. Normally authentication modules are associated with an authentication chain. Each realm has a default authentication chain that will be used to authenticate users. This section is used to add, configure or remove authentication module available for authentication into this realm.",
                 "addModuleTitle" : "New Module",
@@ -726,8 +722,8 @@
                 "confirmDeleteSelected_plural": "Are you sure you want to delete the selected modules?"
             },
             "chains": {
-                "title" : "Chains",
-                "newChain" : "Add Chain",
+                "title" : "Authentication Chains",
+                "newChain": "New Chain",
                 "chainName" : "Chain Name",
                 "description" : "Use authentication chains to define the steps a subject takes to authenticate. Authentication chains consist of a series of one or more authentication modules, with credentials being passed down the chain to each module instance.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
@@ -817,7 +813,7 @@
                 "serviceTypes": "Service Types...",
                 "secondaryConfiguration": "Secondary Configuration",
                 "settings": "Settings",
-                "unavaliable": "No services available to add",
+                "unavaliable": "No services available to add", 
                 "unavaliableAlert": "No services available to add. To view a list of the existing services, click Cancel."
             },
             "list": {
@@ -884,7 +880,7 @@
                 }
             },
             "list": {
-                "title": "Scripts",
+                "title": "Scripts List",
                 "addNew": "New Script",
                 "grid": ["Name", "Script Type", "Language", "Description"],
                 "confirmDeleteText": "Are you sure you want to delete the selected scripts?"

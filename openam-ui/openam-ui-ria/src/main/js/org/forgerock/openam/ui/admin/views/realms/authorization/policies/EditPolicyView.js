@@ -43,6 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
              FormHelper) {
     return AbstractView.extend({
         partials: [
+            "partials/breadcrumb/_Breadcrumb.html",
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
@@ -102,6 +103,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
         renderPolicy: function () {
             var self = this;
+
+            this.data.backLink = {
+                href: "#" + Router.getLink(Router.configuration.routes.realmsPolicySetEdit,
+                    _.map([self.data.realmPath, self.data.policySetName], encodeURIComponent)),
+                text: self.data.policySetName,
+                icon: "fa-folder"
+            };
 
             this.data.entity = _.cloneDeep(this.model.attributes);
             // this line is needed for the correctly saving policy
