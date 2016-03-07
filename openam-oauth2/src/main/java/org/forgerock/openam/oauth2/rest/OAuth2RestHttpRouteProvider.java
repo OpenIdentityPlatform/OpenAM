@@ -68,6 +68,6 @@ public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
                 .toCollection(ClientResource.class);
 
         return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2",
-                newHttpHandler(rootRouter.getRouter())));
+                Handlers.chainOf(newHttpHandler(rootRouter.getRouter()), authenticationFilter)));
     }
 }
