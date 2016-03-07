@@ -84,6 +84,7 @@ public class EntitlementException extends Exception {
     public static final int APP_RETRIEVAL_ERROR = 248;
     public static final int MISSING_RESOURCE_TYPE_NAME = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
+    public static final int NO_RESOURCE_TYPE_MATCH_FOUND = 242;
 
     public static final int INCONSISTENT_WILDCARDS = 300;
     public static final int INVALID_PORT = 301;

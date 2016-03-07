@@ -51,7 +51,10 @@ import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.openam.cli.entitlement.XACMLUtils;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
+import org.forgerock.guice.core.InjectorHolder;
 import javax.security.auth.Subject;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -291,12 +294,15 @@ public class ListXACML extends AuthenticatedCommand {
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
+            ApplicationServiceFactory factory = InjectorHolder.getInstance(ApplicationServiceFactory.class);
+            ResourceTypeService service = InjectorHolder.getInstance(ResourceTypeService.class);
             XACMLExportImport importExport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),
-                    PrivilegeManager.debug);
+                    PrivilegeManager.debug,
+                    factory, service);
 
             policySet = importExport.exportXACML(realm, adminSubject, filters);
         } catch (EntitlementException e) {
