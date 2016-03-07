@@ -113,7 +113,6 @@
             <Value>false</Value>
         </Attribute>
         <Attribute name="idpProxyList">
-            <Value></Value>
         </Attribute>
         <Attribute name="idpProxyCount">
             <Value>0</Value>

@@ -23,9 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: AuthnRequest.cs,v 1.2 2010/01/19 18:23:09 ggennaro Exp $
- */
-/*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ *
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 using System;
@@ -313,12 +312,19 @@ namespace Sun.Identity.Saml2
         {
             Scoping scoping = null;
 
-            if (serviceProvider.ScopingProxyCount > 0)
+            if (serviceProvider.IDPProxyEnabled)
             {
                 scoping = new Scoping();
-                ArrayList idpEntry = new ArrayList();
-                idpEntry.AddRange(serviceProvider.ScopingIDPList);
-                scoping.SetIDPEntry(idpEntry);
+                int proxyCount = serviceProvider.IDPProxyCount;
+                if (serviceProvider.IDPProxyCount != 0)
+                {
+                    scoping.ProxyCount = serviceProvider.IDPProxyCount;
+                }
+                ArrayList idpEntries = serviceProvider.ScopingIDPList;
+                if (idpEntries.Count != 0)
+                {
+                    scoping.SetIDPEntry(idpEntries);
+                }
             }
 
             return scoping;

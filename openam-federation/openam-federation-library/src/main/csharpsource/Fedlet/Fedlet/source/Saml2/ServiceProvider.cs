@@ -23,9 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: ServiceProvider.cs,v 1.6 2010/01/26 01:20:14 ggennaro Exp $
- */
-/*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ *
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 using System;
@@ -287,7 +286,7 @@ namespace Sun.Identity.Saml2
         /// <summary>
         /// Gets a value indicating whether the IPD Proxy setting is true or false.
         /// </summary>
-        public bool ScopingIDPProxyEnabled
+        public bool IDPProxyEnabled
         {
             get
             {
@@ -304,21 +303,18 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the IPD Proxy count
+        /// Gets the IDP Proxy count
         /// </summary>
-        public int ScopingProxyCount
+        public int IDPProxyCount
         {
             get
             {
                 string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='idpProxyCount']/mdx:Value";
-                if (this.ScopingIDPProxyEnabled)
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
                 {
-                    XmlNode root = this.extendedMetadata.DocumentElement;
-                    XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
-                    if (node != null)
-                    {
-                        return Convert.ToInt32(node.InnerText.Trim(), CultureInfo.InvariantCulture);
-                    }
+                    return Convert.ToInt32(node.InnerText.Trim(), CultureInfo.InvariantCulture);
                 }
                 return 0;
             }
