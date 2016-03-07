@@ -83,8 +83,8 @@ define("org/forgerock/openam/ui/common/models/cleanJSONSchema", [
      * @param {String} name Raw property name
      */
     function warnOnInferredPasswordWithoutFormat (property, name) {
-        const possiblePassword = name.toLowerCase().indexOf("password", name.length - 8) !== -1,
-            hasFormat = property.format === "password";
+        const possiblePassword = name.toLowerCase().indexOf("password", name.length - 8) !== -1;
+        const hasFormat = property.format === "password";
         if (property.type === "string" && possiblePassword && !hasFormat) {
             console.warn("JSON schema password property detected (inferred) without format of \"password\"");
         }

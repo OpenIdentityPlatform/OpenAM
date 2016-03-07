@@ -43,10 +43,19 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
             });
         });
     }
+    /**
+     * Passwords are not delivered to the UI from the server. Thus we set a placeholder informing the user that
+     * the password will remain unchanged if they do nothing.
+     * @param {DOMElement} element The element to perform the element search from
+     */
+    function setPlaceholderOnPasswords (element) {
+        $(element).find("input:password").attr("placeholder", $.t("common.form.passwordPlaceholder"));
+    }
 
     function applyJSONEditorToElement (element, schema, values) {
-        const GRID_COLUMN_WIDTH_1 = 6,
-            GRID_COLUMN_WIDTH_2 = 4;
+        const GRID_COLUMN_WIDTH_1 = 6;
+        const GRID_COLUMN_WIDTH_2 = 4;
+
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(GRID_COLUMN_WIDTH_1, GRID_COLUMN_WIDTH_2);
 
@@ -60,6 +69,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
         });
 
         convertHelpBlocksToPopOvers(element);
+        setPlaceholderOnPasswords(element);
 
         editor.setValue(values.raw);
 
@@ -92,7 +102,15 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
             return this;
         },
         values: function () {
-            return this.jsonEditor.getValue();
+            const passwordKeys = this.options.schema.passwordKeys();
+            const values = new JSONValues(this.jsonEditor.getValue());
+            const valuesWithoutEmptyPasswords = values.omit((value, key) => {
+                if (passwordKeys.indexOf(key) !== -1 && _.isEmpty(value)) {
+                    return true;
+                }
+            });
+
+            return valuesWithoutEmptyPasswords.raw;
         }
     });
 

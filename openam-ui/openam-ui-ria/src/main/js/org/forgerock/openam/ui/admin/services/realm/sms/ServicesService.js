@@ -36,22 +36,22 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             encodedRealm = RealmHelper.encodeRealm(realm);
         }
 
-            return encodedRealm + "/realm-config/" + path;
-        },
-        getServiceSchema = function (realm, type) {
-            return obj.serviceCall({
-                url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            });
-        },
-        getServiceSubSchema = function (realm, serviceType, subSchemaType) {
-            return obj.serviceCall({
-                url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            }).then((data) => SMSServiceUtils.sanitizeSchema(data));
-        };
+        return encodedRealm + "/realm-config/" + path;
+    };
+    const getServiceSchema = function (realm, type) {
+        return obj.serviceCall({
+            url: scopedByRealm(realm, "services/" + type + "?_action=schema"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST"
+        });
+    };
+    const getServiceSubSchema = function (realm, serviceType, subSchemaType) {
+        return obj.serviceCall({
+            url: scopedByRealm(realm, "services/" + serviceType + "/" + subSchemaType + "?_action=schema"),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST"
+        }).then((data) => SMSServiceUtils.sanitizeSchema(data));
+    };
 
     obj.instance = {
         getAll: function (realm) {

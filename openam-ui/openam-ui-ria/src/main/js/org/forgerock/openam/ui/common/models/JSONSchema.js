@@ -66,6 +66,12 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         }
     };
 
+    JSONSchema.prototype.passwordKeys = function () {
+        const passwordProperties = _.pick(this.raw.properties, _.matches({ format: "password" }));
+
+        return _.keys(passwordProperties);
+    };
+
     JSONSchema.prototype.pick = function (predicate) {
         const schema = _.cloneDeep(this.raw);
         schema.properties = _.pick(this.raw.properties, predicate);

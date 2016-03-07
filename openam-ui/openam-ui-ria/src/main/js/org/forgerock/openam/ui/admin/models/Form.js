@@ -28,7 +28,8 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.values = values;
 
         // Attributes that are identifiable as passwords
-        this.passwordAttributes = _.pluck(_.where(schema.properties, { format: "password" }), "_id");
+        const passwordProperties = _.where(schema.properties, { format: "password" });
+        this.passwordAttributes = _.map(passwordProperties, (property) => _.findKey(schema.properties, property));
 
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(6, 4);
