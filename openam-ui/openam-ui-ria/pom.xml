@@ -277,8 +277,8 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.2.6</nodeVersion>
-                            <npmVersion>3.7.1</npmVersion>
+                            <nodeVersion>v4.3.2</nodeVersion>
+                            <npmVersion>3.8.0</npmVersion>
                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
                         </configuration>
                     </execution>
