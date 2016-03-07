@@ -1,15 +1,13 @@
 {{#if customAttributes}}
-<div class="block clearfix">
-    <h3 class="block-header">{{t "console.authorization.common.customAttributes"}}</h3>
-    <div class="list-table created-items">
+<h3 class="block-header">{{t "console.authorization.common.customAttributes"}}</h3>
+<div class="list-table created-items">
 
-        <ul class="list-group">
-            {{#each customAttributes}}
-            <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" class="list-group-item">
-                <span class="key">{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-            </li>
-            {{/each}}
-        </ul>
-    </div>
+    <ul class="list-group">
+        {{#each customAttributes}}
+        <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" class="list-group-item">
+            <span class="key">{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+        </li>
+        {{/each}}
+    </ul>
 </div>
 {{/if}}
