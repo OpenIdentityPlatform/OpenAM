@@ -1392,4 +1392,9 @@ public interface Constants {
      * Property that allows the AM_ACCESS_ATTEMPT event name to be audited.
      */
     public static final String AUDIT_AM_ACCESS_ATTEMPT_ENABLED = "org.forgerock.openam.audit.access.attempt.enabled";
+
+    /**
+     * Property to specify the TLS version to connect to the secure ldap server.
+     */
+    public static final String LDAP_SERVER_TLS_VERSION = "org.forgerock.openam.ldap.secure.protocol.version";
 }

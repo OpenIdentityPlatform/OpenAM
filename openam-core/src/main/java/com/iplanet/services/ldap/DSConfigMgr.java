@@ -24,15 +24,18 @@
  *
  * $Id: DSConfigMgr.java,v 1.18 2009/01/28 05:34:49 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap;
+
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.SSL_CONTEXT;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -46,10 +49,12 @@ import com.iplanet.services.util.I18n;
 import com.iplanet.services.util.XMLParser;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.ServerInstanceAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.util.Options;
 
 /**
@@ -75,8 +80,8 @@ public class DSConfigMgr implements IDSConfigMgr {
     private int connNumRetry = 3;
 
     private int connRetryInterval = 1000;
-
     private HashSet retryErrorCodes = new HashSet();
+    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
 
     static Debug debugger = null;
 
@@ -255,9 +260,19 @@ public class DSConfigMgr implements IDSConfigMgr {
         // The 389 port number passed is overridden by the hostName:port
         // constructed by the getHostName method.  So, this is not
         // a hardcoded port number.
+        Options ldapOptions = Options.defaultOptions();
+        boolean sslEnabled = Server.Type.CONN_SSL.equals(sCfg.getConnectionType());
+        if (sslEnabled) {
+            try {
+                ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                        new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
+            } catch (GeneralSecurityException gse) {
+                debugger.error("An error occurred while setting the SSLContext", gse);
+            }
+        }
         return LDAPUtils.newFailoverConnectionFactory(
-                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
-                authID, passwd.toCharArray(), 0, null, null);
+                getLdapUrls(serverGroupID, sslEnabled),
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, ldapOptions);
     }
 
     /**
@@ -321,9 +336,19 @@ public class DSConfigMgr implements IDSConfigMgr {
             passwd = (String) AccessController
                     .doPrivileged(new ServerInstanceAction(sCfg));
         }
+        Options ldapOptions = Options.defaultOptions();
+        boolean sslEnabled = Server.Type.CONN_SSL.equals(sCfg.getConnectionType());
+        if (sslEnabled) {
+            try {
+                ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                        new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
+            } catch (GeneralSecurityException gse) {
+                debugger.error("An error occurred while setting the SSLContext", gse);
+            }
+        }
         return LDAPUtils.newFailoverConnectionFactory(
-                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
-                authID, passwd != null ? passwd.toCharArray() : null, 0, null, Options.defaultOptions());
+                getLdapUrls(serverGroupID, sslEnabled),
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, ldapOptions);
     }
 
     private Set<LDAPURL> getLdapUrls(String serverGroupID, boolean isSSL) {

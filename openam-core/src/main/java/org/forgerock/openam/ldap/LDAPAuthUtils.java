@@ -125,6 +125,7 @@ public class LDAPAuthUtils {
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
     private boolean isAd = false;
+    private String protocolVersion;
 
     // Resource Bundle used to get l10N message
     private ResourceBundle bundle;
@@ -337,7 +338,7 @@ public class LDAPAuthUtils {
                                 builder.setTrustManager(TrustManagers.trustAll());
                             }
 
-                            SSLContext sslContext = builder.getSSLContext();
+                            SSLContext sslContext = builder.setProtocol(protocolVersion).getSSLContext();
                             options.set(SSL_CONTEXT, sslContext);
                             if (useStartTLS) {
                                 options.set(SSL_USE_STARTTLS, true);
@@ -1554,6 +1555,15 @@ public class LDAPAuthUtils {
      */
     public void setUseStartTLS(boolean useStartTLS) {
         this.useStartTLS = useStartTLS;
+    }
+
+    /**
+     * Sets the LDAP Server connection protocol version.
+     *
+     * @param tlsVersion values TLSv1/TLSv1.1/TLSv1.2
+     */
+    public void setProtocolVersion(String tlsVersion) {
+        this.protocolVersion = tlsVersion;
     }
 
     class PasswordPolicyResult {

@@ -31,10 +31,12 @@ package com.sun.identity.config.util;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
@@ -169,7 +171,9 @@ public abstract class AjaxPage extends Page {
                 .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDN, bindPwd));
 
         if (isSSl) {
-            ldapOptions = ldapOptions.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                    new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
         }
 
         ConnectionFactory factory = new LDAPConnectionFactory(host, port, ldapOptions);

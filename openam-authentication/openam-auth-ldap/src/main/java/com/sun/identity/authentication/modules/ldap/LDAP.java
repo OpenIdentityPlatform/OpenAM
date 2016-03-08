@@ -84,6 +84,7 @@ public class LDAP extends AMLoginModule {
     private String regEx;
     private String currentConfigName;
     private String bindDN;
+    private String protocolVersion;
     private int currentState;
     protected LDAPAuthUtils ldapUtil;
     private boolean isReset;
@@ -204,6 +205,8 @@ public class LDAP extends AMLoginModule {
                 currentConfig, "openam-auth-ldap-connection-mode", "LDAP");
             useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
             isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
+            protocolVersion = CollectionHelper.getMapAttr(
+                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLSv1");
 
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,
@@ -265,6 +268,7 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setHeartBeatInterval(heartBeatInterval);
             ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
             ldapUtil.setOperationTimeout(operationTimeout);
+            ldapUtil.setProtocolVersion(protocolVersion);
 
             if (debug.messageEnabled()) {
                 debug.message("bindDN-> " + bindDN
