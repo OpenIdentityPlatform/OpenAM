@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2016 ForgeRock AS. All rights reserved.
- * Copyright (c) 2011 Cybernetica AS.
+ * Copyright 2011-2016 ForgeRock AS.
+ * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -58,6 +59,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -283,7 +285,8 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
-                    String tokenSvcResponse = getContent(config.getTokenServiceUrl(code, proxyURL), null);
+                    String tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
+                            config.getTokenServicePOSTparameters(code, proxyURL));
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     JwtClaimsSet jwtClaims = null;
@@ -309,7 +312,8 @@ public class OAuth extends AMLoginModule {
 
                     String profileSvcResponse = null;
                     if (StringUtils.isNotEmpty(config.getProfileServiceUrl())) {
-                        profileSvcResponse = getContent(config.getProfileServiceUrl(), "Bearer " + token);
+                        profileSvcResponse = getContentUsingGET(config.getProfileServiceUrl(), "Bearer " + token,
+                                config.getProfileServiceGetParameters());
                         OAuthUtil.debugMessage("OAuth.process(): Profile Svc response: " + profileSvcResponse);
                     }
 
@@ -623,14 +627,31 @@ public class OAuth extends AMLoginModule {
         return dynamicUser;
     }
 
+    private String getContentUsingPOST(String serviceUrl, String authorizationHeader, Map<String, String> getParameters,
+            Map<String, String> postParameters) throws LoginException {
+        return getContent(serviceUrl, authorizationHeader, getParameters, postParameters, "POST");
+    }
 
-    // Obtain the user profile information from the OAuth 2.0 Identity Provider
-    // Profile service configured for this module, either using first GET and
-    // POST as a fall back
-    private String getContent(String serviceUrl, String authorizationHeader) throws LoginException {
+    private String getContentUsingGET(String serviceUrl, String authorizationHeader, Map<String, String> getParameters)
+            throws LoginException {
+        return getContent(serviceUrl, authorizationHeader, getParameters, null, "GET");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                getContentStreamByGET(serviceUrl, authorizationHeader)));
+    }
+
+    private String getContent(String serviceUrl, String authorizationHeader, Map<String, String> getParameters,
+            Map<String, String> postParameters, String httpMethod) throws LoginException {
+
+        InputStream inputStream;
+        if ("GET".equals(httpMethod)) {
+            inputStream = getContentStreamByGET(serviceUrl, authorizationHeader, getParameters);
+        } else if ("POST".equals(httpMethod)) {
+            inputStream = getContentStreamByPOST(serviceUrl, authorizationHeader, getParameters, postParameters);
+        } else {
+            throw new IllegalArgumentException("httpMethod='" + httpMethod + "' is not valid. Expecting POST or GET");
+        }
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+
         StringBuilder buf = new StringBuilder();
         try {
             String str;
@@ -673,12 +694,21 @@ public class OAuth extends AMLoginModule {
             }     
     }
 
-    public InputStream getContentStreamByGET(String serviceUrl, String authorizationHeader)
-            throws LoginException {
+    public InputStream getContentStreamByGET(String serviceUrl, String authorizationHeader,
+            Map<String, String> getParameters) throws LoginException {
 
         OAuthUtil.debugMessage("service url: " + serviceUrl);
+        OAuthUtil.debugMessage("GET parameters: " + getParameters);
         try {
             InputStream is;
+            if (!CollectionUtils.isEmpty(getParameters)) {
+                if (!serviceUrl.contains("?")) {
+                    serviceUrl += "?";
+                } else {
+                    serviceUrl += "&";
+                }
+                serviceUrl += getDataString(getParameters);
+            }
             URL urlC = new URL(serviceUrl);
 
             HttpURLConnection connection = HttpURLConnectionManager.getConnection(urlC);
@@ -701,7 +731,8 @@ public class OAuth extends AMLoginModule {
                         " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + errorStream + "\n");
                 }
-                is = getContentStreamByPOST(serviceUrl, authorizationHeader);
+                is = getContentStreamByPOST(serviceUrl, authorizationHeader, getParameters, Collections
+                .<String, String>emptyMap());
             }
 
             return is;
@@ -739,16 +770,25 @@ public class OAuth extends AMLoginModule {
         }
     }
 
-    public InputStream getContentStreamByPOST(String serviceUrl, String authorizationHeader)
-            throws LoginException {
+    public InputStream getContentStreamByPOST(String serviceUrl, String authorizationHeader,
+            Map<String, String> getParameters, Map<String, String> postParameters) throws LoginException {
 
         InputStream is = null;
 
         try {
             OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: URL = " + serviceUrl);
+            OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: GET parameters = " + getParameters);
+            OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: POST parameters = " + postParameters);
 
+            if (!CollectionUtils.isEmpty(getParameters)) {
+                if (!serviceUrl.contains("?")) {
+                    serviceUrl += "?";
+                } else {
+                    serviceUrl += "&";
+                }
+                serviceUrl += getDataString(getParameters);
+            }
             URL url = new URL(serviceUrl);
-
             String query = url.getQuery();
             OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: Query: " + query);
 
@@ -758,10 +798,11 @@ public class OAuth extends AMLoginModule {
             if (authorizationHeader != null) {
                 connection.setRequestProperty("Authorization", authorizationHeader);
             }
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(query);
-            writer.close();
-
+            if (postParameters != null && !postParameters.isEmpty()) {
+                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+                writer.write(getDataString(postParameters));
+                writer.close();
+            }
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: HTTP Conn OK");
                 is = connection.getInputStream();
@@ -852,5 +893,24 @@ public class OAuth extends AMLoginModule {
         config = null;
         sharedState = null;
     }
-    
+
+    private String getDataString(Map<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+
+            if (first) {
+                first = false;
+            } else {
+                result.append("&");
+            }
+            // We don't need to encode the key/value as they are already encoded
+            result.append(entry.getKey());
+            result.append("=");
+            result.append(entry.getValue());
+        }
+
+        return result.toString();
+    }
+
 }

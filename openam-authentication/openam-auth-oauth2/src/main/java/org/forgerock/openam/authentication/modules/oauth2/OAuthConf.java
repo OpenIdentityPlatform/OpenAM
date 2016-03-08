@@ -2,7 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Copyright © 2011 Cybernetica AS.
+ * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,18 +21,22 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- */
+ *
+ */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+
+import org.forgerock.oauth2.core.OAuth2Constants;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.utils.MappingUtils;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
@@ -254,50 +258,41 @@ public class OAuthConf {
         }
     }
 
-    String getTokenServiceUrl(String code, String authServiceURL)
+    public String getTokenServiceUrl(){
+        return tokenServiceUrl;
+    }
+
+    public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
             throws AuthLoginException {
 
+        Map<String, String> postParameters = new HashMap<String, String>();
         if (code == null) {
             OAuthUtil.debugError("process: code == null");
-            throw new AuthLoginException(BUNDLE_NAME,
-                    "authCode == null", null);
+            throw new AuthLoginException(BUNDLE_NAME, "authCode == null", null);
         }
         OAuthUtil.debugMessage("authentication code: " + code);
-        if (tokenServiceUrl.indexOf("?") == -1) {
-            tokenServiceUrl = tokenServiceUrl + "?"
-                    + PARAM_CLIENT_ID + "=" + clientId;
-        } else {
-            tokenServiceUrl = tokenServiceUrl + "&"
-                    + PARAM_CLIENT_ID + "=" + clientId;
-        }
 
         try {
-            return tokenServiceUrl
-                    + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL))
-                    + param(PARAM_CLIENT_SECRET, clientSecret)
-                    + param(PARAM_CODE, OAuthUtil.oAuthEncode(code))
-                    + param("grant_type", "authorization_code");
+            postParameters.put(PARAM_CLIENT_ID, clientId);
+            postParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
+            postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
+            postParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
+            postParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
+
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "and building the Token Service URL", ex);
             throw new AuthLoginException("Problem to build the Token Service URL", ex);
         }
+        return postParameters;
     }
 
-    String getProfileServiceUrl() {
+    public String getProfileServiceUrl() {
         return profileServiceUrl;
     }
 
-    String getProfileServiceUrl(String token) {
-
-        if (profileServiceUrl.indexOf("?") == -1) {
-            return profileServiceUrl + "?" + profileServiceParam
-                    + "=" + token;
-        } else {
-            return profileServiceUrl + "&" + profileServiceParam
-                    + "=" + token;
-        }
-
+    public Map<String, String> getProfileServiceGetParameters() {
+        return Collections.<String, String>emptyMap();
     }
 
     private String param(String key, String value) {
