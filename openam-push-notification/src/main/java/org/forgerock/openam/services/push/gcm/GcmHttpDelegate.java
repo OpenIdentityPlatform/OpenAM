@@ -99,7 +99,7 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
         JsonValue toSend = json(object(field(TO, message.getRecipient())));
 
         if (message.getData().size() > 0) {
-            toSend.put(DATA, message.getData());
+            toSend.put(DATA, message.getData().getObject());
         }
 
         return toSend;

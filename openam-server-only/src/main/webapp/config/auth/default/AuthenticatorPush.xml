@@ -22,14 +22,4 @@ Copyright 2016 ForgeRock AS.
 <ModuleProperties moduleName="AuthenticatorPush" version="1.0" >
     <Callbacks length="0" order="1" timeout="120" header="AuthenticatorPush">
     </Callbacks>
-    <Callbacks length="1" order="2" timeout="120" header="Provide Username" >
-        <NameCallback>
-            <Prompt>User Name:</Prompt>
-        </NameCallback>
-    </Callbacks>
-    <Callbacks length="1" order="3" timeout="600" header="AuthenticatorPush" error="true" >
-        <NameCallback>
-            <Prompt>#THE DUMMY WILL NEVER BE SHOWN#</Prompt>
-        </NameCallback>
-    </Callbacks>
 </ModuleProperties>

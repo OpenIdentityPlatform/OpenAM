@@ -26,7 +26,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import java.security.Principal;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
@@ -50,13 +49,11 @@ public class AuthenticatorPush extends AMLoginModule {
     private String deviceId;
 
     //Internal state
-    private ResourceBundle bundle = null;
     private String realm;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         deviceId = CollectionHelper.getMapAttr(options, DEVICE_MESSAGING_ID);
-        bundle = amCache.getResBundle(AM_AUTH_AUTHENTICATOR_PUSH, getLoginLocale());
         realm = DNMapper.orgNameToRealmName(getRequestOrg());
 
         String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
@@ -79,8 +76,7 @@ public class AuthenticatorPush extends AMLoginModule {
         final HttpServletRequest request = getHttpServletRequest();
 
         if (null == request) {
-            return processError(bundle.getString("pushNullRequest"),
-                    "AuthenticatorPush :: process() : HTTP Request is null - programmatic login is not supported.");
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
         }
 
         switch (state) {
@@ -88,16 +84,18 @@ public class AuthenticatorPush extends AMLoginModule {
             if (sendMessage(getDeviceId())) {
                 return ISAuthConstants.LOGIN_SUCCEED;
             } else {
-                return processError(bundle.getString("invalidLoginState"), "Push Failure", state);
+                throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
             }
         default:
-            return processError(bundle.getString("invalidLoginState"), "Unrecognised login state: {}", state);
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
         }
 
     }
 
     private boolean sendMessage(String deviceId) {
-        PushMessage message = new PushMessage(deviceId, json(object()));
+        PushMessage message = new PushMessage(deviceId, json(object(
+                field("message", "User logged in to realm \"" + realm + "\" using OpenAM")
+        )));
         try {
             pushService.send(message, realm);
             return true;
@@ -115,19 +113,6 @@ public class AuthenticatorPush extends AMLoginModule {
     @Override
     public Principal getPrincipal() {
         return null;
-    }
-
-    /**
-     * Writes out an error debug (if a throwable and debug message are provided) and returns a user-facing
-     * error page.
-     */
-    private int processError(String headerMessage, String debugMessage,
-                             Object... messageParameters) throws AuthLoginException {
-        if (null != debugMessage) {
-            DEBUG.error(debugMessage, messageParameters);
-        }
-        substituteHeader(STATE_ERROR, headerMessage);
-        return STATE_ERROR;
     }
 
 }
