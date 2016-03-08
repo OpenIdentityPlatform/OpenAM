@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -23,6 +23,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.service.LoginState;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -39,6 +40,8 @@ import javax.inject.Singleton;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
@@ -116,11 +119,13 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         AuthContext lc = null;
         try {
             lc = new AuthContext(realm);
+            HttpServletRequest request = ServletUtils.getRequest(Request.getCurrent());
+            request.setAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR, "true");
             if (service != null) {
-                lc.login(AuthContext.IndexType.SERVICE, service, null, ServletUtils.getRequest(Request.getCurrent()),
+                lc.login(AuthContext.IndexType.SERVICE, service, null, request,
                         ServletUtils.getResponse(Response.getCurrent()));
             } else {
-                lc.login(ServletUtils.getRequest(Request.getCurrent()), ServletUtils.getResponse(Response.getCurrent()));
+                lc.login(request, ServletUtils.getResponse(Response.getCurrent()));
             }
 
             while (lc.hasMoreRequirements()) {
@@ -160,24 +165,15 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         } catch (AuthLoginException le) {
             logger.error("AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
-        } finally {
-            if (lc != null && AuthContext.Status.SUCCESS.equals(lc.getStatus())) {
-                try {
-                    lc.logout();
-                    logger.message("Logged user out.");
-                } catch (AuthLoginException e) {
-                    logger.error("Exception caught logging out of AuthContext after successful login", e);
-                }
-            }
         }
         return ret;
     }
 
     private ResourceOwner createResourceOwner(AuthContext authContext) throws Exception {
-        SSOToken token = authContext.getSSOToken();
-        final AMIdentity id = IdUtils.getIdentity(
-                AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
+        LoginState loginState = authContext.getAuthContextLocal().getLoginState();
+        String universalId = loginState.getUserUniversalId(loginState.getUserDN());
+        final AMIdentity id = IdUtils.getIdentity(AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                universalId);
         return new OpenAMResourceOwner(id.getName(), id);
     }
 }

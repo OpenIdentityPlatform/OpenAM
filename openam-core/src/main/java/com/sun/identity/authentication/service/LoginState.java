@@ -3904,10 +3904,12 @@ public class LoginState {
     }
 
     /**
-     * @return <code>true</code> if the authentication request was made with the noSession query parameter set to true.
+     * @return <code>true</code> if noSession mode was enabled in the request.
      */
     public boolean isNoSession() {
-        return Boolean.parseBoolean(requestMap.get(NO_SESSION_QUERY_PARAM));
+        return Boolean.parseBoolean(requestMap.get(NO_SESSION_QUERY_PARAM))
+                || (servletRequest != null && Boolean.parseBoolean(
+                (String) servletRequest.getAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR)));
     }
 
     /**
