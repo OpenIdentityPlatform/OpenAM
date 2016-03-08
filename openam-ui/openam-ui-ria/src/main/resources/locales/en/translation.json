@@ -660,6 +660,7 @@
     },
     "console": {
         "common": {
+            "id": "Id",
             "topLevelRealm": "Top Level Realm",
             "realmStatus": "Status",
             "realmDnsAliases": "Aliases/DNS Aliases",
@@ -745,7 +746,7 @@
                 "chains" : "Chains",
                 "editChain" : "Edit Chain",
                 "newModule" : "New Module",
-                "addModule": "Add Module",
+                "addModule": "Add a Module",
                 "editModule" : "Edit Module",
                 "gotoNextModule" : "Pass through to next module",
                 "gotoSuccessUrl" : "Go to Successful Login URL",
@@ -793,7 +794,7 @@
                 "alerts" : {
                     "reqdFailSuffPass" : "Warning: Passing a SUFFICIENT module after the failing a REQUIRED module will continue through the chain and will not exit at that point. Consider using REQUISITE instead of REQUIRED."
                 },
-                "callToAction" : "You must add at least one authentication module",
+                "callToAction" : "Chains require at least one module",
                 "lastCriteria" : "Will advance to success or failure URL",
                 "deletedChain": "Chain deleted successfully",
                 "deleteBtnTooltip": {
@@ -815,7 +816,7 @@
                 "titleNew": "New Service",
                 "chooseServiceType": "Choose a service type",
                 "serviceTypes": "Service Types...",
-                "secondaryConfiguration": "Secondary Configuration",
+                "secondaryConfigurations": "Secondary Configurations",
                 "settings": "Settings",
                 "unavaliable": "No services available to add",
                 "unavaliableAlert": "No services available to add. To view a list of the existing services, click Cancel."
@@ -824,8 +825,8 @@
                 "service": "Service",
                 "title": "Services",
                 "description": "Configure realm-specific properties for OpenAM functionality.",
-                "addService": "Add Service",
-                "addServicePrompt": "Add your first service.",
+                "addService": "Add a Service",
+                "addServicePrompt": "No services found",
                 "grid": {
                     "header": ["Name"]
                 },
@@ -833,11 +834,12 @@
                 "confirmDeleteSelected_plural": "Are you sure you want to delete the selected services?"
             },
             "subSchema": {
-                "add": "Add new instance",
-                "title": "__subSchema__ instance",
+                "add": "Add a Secondary Configuration",
+                "title": "__subSchema__ configuration",
                 "new": {
-                    "title": "New __subSchema__ instance"
-                }
+                    "title": "New __subSchema__ configuration"
+                },
+                "callToAction": "No secondary configurations found"
             }
         },
         "realms": {
@@ -1167,9 +1169,9 @@
                 },
                 "list": {
                     "grid": ["Name", "Status"],
-                    "addNew": "Add a New Policy",
-                    "description": "Create, edit or delete authorization policies that apply to this policy set.",
-                    "noPolicies": "You haven't added any policies to this set yet."
+                    "addNew": "Add a Policy",
+                    "description": "Configure this policy set by adding, editing, or removing authorization policies.",
+                    "noPolicies": "No policies found"
                 }
             },
 
@@ -1189,7 +1191,7 @@
                     "specifyPatterns" : "Specify Patterns",
                     "addPattern": "Add Pattern",
                     "addNewPatternPlaceholder": "Add a new pattern...",
-                    "noResourceTypesMessage" : "You must add a Resource Type to create a Policy Set.",
+                    "noResourceTypesMessage" : "Policy Sets require a resource type",
                     "addNewResourceType" : "Add a Resource Type"
                 }
             }

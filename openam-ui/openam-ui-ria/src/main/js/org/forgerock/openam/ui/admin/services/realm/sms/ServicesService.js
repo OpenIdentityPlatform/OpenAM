@@ -173,11 +173,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     //     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     // });
 
-                    return $.Deferred().resolve([
-                        { "_id":"csv1", "type":"CSV", "typeDescription":"CSV" },
-                        { "_id":"csv2", "type":"CSV", "typeDescription":"CSV" },
-                        { "_id":"jdbc", "type":"JDBC", "typeDescription":"JDBC" }
-                    ]);
+                    return $.Deferred().resolve([]);
                 },
                 get: function (realm, serviceType, subSchemaType, subSchemaInstance) {
                     function getInstance () {
