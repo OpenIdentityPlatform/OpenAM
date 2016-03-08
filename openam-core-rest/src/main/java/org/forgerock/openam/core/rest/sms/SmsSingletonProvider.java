@@ -17,30 +17,21 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.services.context.Context;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -50,23 +41,38 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Delete;
+import org.forgerock.json.resource.annotations.Read;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A CREST singleton provider for SMS schema config.
  * @since 13.0.0
  */
-public class SmsSingletonProvider extends SmsResourceProvider implements RequestHandler {
+@RequestHandler
+public class SmsSingletonProvider extends SmsResourceProvider {
 
     final ServiceSchema dynamicSchema;
     private final SmsJsonConverter dynamicConverter;
@@ -75,8 +81,11 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     SmsSingletonProvider(@Assisted SmsJsonConverter converter,  @Assisted("schema") ServiceSchema schema,
             @Assisted("dynamic") @Nullable ServiceSchema dynamicSchema, @Assisted SchemaType type,
             @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
-            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
-        super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
+            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug,
+            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
+            @Named("DefaultLocale") Locale defaultLocale) {
+        super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug, resourceBundleCache,
+                defaultLocale);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
         this.dynamicSchema = dynamicSchema;
         if (dynamicSchema != null) {
@@ -90,9 +99,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * Reads config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext,
-            ReadRequest readRequest) {
+    @Read
+    public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext) {
         String resourceId = resourceId();
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
@@ -142,7 +150,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * Updates config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Override
+    @Update
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         String resourceId = resourceId();
@@ -183,9 +191,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * Deletes config for the singleton instance referenced.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext,
-            DeleteRequest deleteRequest) {
+    @Delete
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             if (subSchemaPath.isEmpty()) {
@@ -212,7 +219,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * Creates config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Override
+    @Create
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
         final String realm = realmFor(serverContext);
@@ -242,11 +249,6 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         } catch (ResourceException e) {
             return e.asPromise();
         }
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return super.handleAction(context, request);
     }
 
     @Override
@@ -354,9 +356,4 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         return subSchemaPath.isEmpty() ? null : lastSchemaNodeName();
     }
 
-    @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(Context serverContext,
-            PatchRequest patchRequest) {
-        return new NotSupportedException("patch operation not supported").asPromise();
-    }
 }

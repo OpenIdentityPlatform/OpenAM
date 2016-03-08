@@ -22,6 +22,8 @@ import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 import static org.forgerock.util.promise.Promises.*;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,17 +35,22 @@ import java.util.Map;
 
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.http.routing.RoutingMode;
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Responses;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -163,5 +170,88 @@ public class SmsRouteTreeTest {
         assertThat(result).succeeded();
         verify(defaultAuthModule).authorizeRead(any(Context.class), any(ReadRequest.class));
         verifyNoMoreInteractions(authModule);
+    }
+
+    @Test
+    public void shouldFindAllTypes() throws Exception {
+        //Given
+        RequestHandler handler1 = createTypeHandler(1, "one", false);
+        RequestHandler handler2 = createTypeHandler(2, "two", false);
+        RequestHandler handler3 = createTypeHandler(3, "three", true);
+
+        Context context = new UriRouterContext(mock(Context.class), "", "", Collections.<String, String>emptyMap());
+        ActionRequest request = Requests.newActionRequest("", "getAllTypes");
+
+        Promise<AuthorizationResult, ResourceException> successResult = newResultPromise(accessPermitted());
+        given(defaultAuthModule.authorizeAction(any(Context.class), any(ActionRequest.class))).willReturn(successResult);
+
+        //When
+        Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
+
+        //Then
+        assertThat(result).succeeded();
+        assertThat(result.getOrThrow().getJsonContent()).hasArray("result").hasSize(3).containsOnly(
+                object(field("_id", "service1"), field("name", "one"), field("collection", false)),
+                object(field("_id", "service2"), field("name", "two"), field("collection", false)),
+                object(field("_id", "service3"), field("name", "three"), field("collection", true))
+        );
+        verifyGetTypeAction(handler1);
+        verifyGetTypeAction(handler2);
+        verifyGetTypeAction(handler3);
+    }
+
+    @Test
+    public void shouldFindCreatableTypes() throws Exception {
+        //Given
+        RequestHandler handler1 = createTypeHandler(1, "one", false);
+        RequestHandler handler2 = createTypeHandler(2, "two", false);
+        RequestHandler handler3 = createTypeHandler(3, "three", true);
+
+        Promise<ResourceResponse, ResourceException> exceptionPromise = new NotFoundException().asPromise();
+        when(handler1.handleRead(any(Context.class), any(ReadRequest.class))).thenReturn(exceptionPromise);
+        when(handler2.handleRead(any(Context.class), any(ReadRequest.class)))
+                .thenReturn(Responses.newResourceResponse("1", "1", json(object())).asPromise());
+
+        Context context = new UriRouterContext(mock(Context.class), "", "", Collections.<String, String>emptyMap());
+        ActionRequest request = Requests.newActionRequest("", "getCreatableTypes");
+
+        Promise<AuthorizationResult, ResourceException> successResult = newResultPromise(accessPermitted());
+        given(defaultAuthModule.authorizeAction(any(Context.class), any(ActionRequest.class))).willReturn(successResult);
+        given(defaultAuthModule.authorizeRead(any(Context.class), any(ReadRequest.class))).willReturn(successResult);
+
+        //When
+        Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
+
+        //Then
+        assertThat(result).succeeded();
+        verifyGetTypeAction(handler1);
+        verifyGetTypeAction(handler2);
+        verifyGetTypeAction(handler3);
+        verify(handler1).handleRead(any(Context.class), any(ReadRequest.class));
+        verify(handler2).handleRead(any(Context.class), any(ReadRequest.class));
+        verifyNoMoreInteractions(handler3);
+        assertThat(result.getOrThrow().getJsonContent()).hasArray("result").hasSize(2).containsOnly(
+                object(field("_id", "service1"), field("name", "one"), field("collection", false)),
+                object(field("_id", "service3"), field("name", "three"), field("collection", true))
+        );
+    }
+
+    private void verifyGetTypeAction(RequestHandler handler) {
+        ArgumentCaptor<ActionRequest> captor = ArgumentCaptor.forClass(ActionRequest.class);
+        verify(handler).handleAction(any(Context.class), captor.capture());
+        assertThat(captor.getValue().getAction()).isEqualTo("getType");
+    }
+
+    private RequestHandler createTypeHandler(int id, String name, boolean collection) {
+        RequestHandler handler = mock(RequestHandler.class);
+        given(handler.handleAction(any(Context.class), any(ActionRequest.class)))
+                .willReturn(
+                        newActionResponse(json(object(
+                                field("_id", "service" + id),
+                                field("collection", collection),
+                                field("name", name))))
+                                .asPromise());
+        routeTree.handles("OTHERSERVICE" + id).addRoute(RoutingMode.STARTS_WITH, "/service" + id, handler);
+        return handler;
     }
 }

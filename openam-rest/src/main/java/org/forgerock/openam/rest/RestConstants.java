@@ -27,13 +27,19 @@ public final class RestConstants {
     public static final String TEMPLATE = "template";
     /** The action ID for the schema action. */
     public static final String SCHEMA = "schema";
+    /** The action ID to return the type of an endpoint.  */
+    public static final String GET_TYPE = "getType";
     /** The action ID to return all possible subschema types.  */
     public static final String GET_ALL_TYPES = "getAllTypes";
     /** The action ID to return all creatable subschema types. */
     public static final String GET_CREATABLE_TYPES = "getCreatableTypes";
+    /** The action ID to return all created instances. */
+    public static final String NEXT_DESCENDENTS = "nextdescendents";
 
-    /** The name field constants. **/
+    /** The name field constant. **/
     public final static String NAME = "name";
+    /** The collection field constants. **/
+    public final static String COLLECTION = "collection";
     /** The result field constant. **/
     public final static String RESULT = "result";
 

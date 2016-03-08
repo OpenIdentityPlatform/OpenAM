@@ -18,7 +18,9 @@ package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
+import static org.forgerock.openam.rest.RestConstants.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,42 +32,45 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Responses;
+import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -73,7 +78,7 @@ import com.sun.identity.sm.ServiceSchema;
  * creatable types, while allowing all of those mechanisms to be overridden by more specific subclasses.
  * @since 13.0.0
  */
-abstract class SmsResourceProvider extends DefaultSmsHandler {
+public abstract class SmsResourceProvider {
 
     /**
      * Contains the mapping of auto created authentication modules and their type so that
@@ -102,9 +107,12 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
     protected final SmsJsonConverter converter;
     protected final Debug debug;
     protected final ServiceSchema schema;
+    private final AMResourceBundleCache resourceBundleCache;
+    private final Locale defaultLocale;
 
     SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
-            boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug) {
+            boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug,
+            AMResourceBundleCache resourceBundleCache, Locale defaultLocale) {
         this.schema = schema;
         this.serviceName = schema.getServiceName();
         this.serviceVersion = schema.getVersion();
@@ -114,6 +122,8 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
         this.hasInstanceName = serviceHasInstanceName;
         this.converter = converter;
         this.debug = debug;
+        this.resourceBundleCache = resourceBundleCache;
+        this.defaultLocale = defaultLocale;
     }
 
     /**
@@ -160,7 +170,7 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
         for (int i = 0; i < subSchemaPath.size() - 1; i++) {
             ServiceSchema schema = subSchemaPath.get(i);
             String pathFragment = schema.getResourceName();
-            if (pathFragment == null || "USE-PARENT".equals(pathFragment)) {
+            if (pathFragment == null || SmsRequestHandler.USE_PARENT_PATH.equals(pathFragment)) {
                 pathFragment = schema.getName();
             }
             if (uriPath.contains("{" + pathFragment + "}")) {
@@ -218,49 +228,49 @@ abstract class SmsResourceProvider extends DefaultSmsHandler {
         return schema.getName();
     }
 
-    @Override
-    public JsonValue getAllTypes(Context context, ActionRequest request) throws ResourceException {
-        JsonValue result = json(object());
+    @Action
+    public Promise<ActionResponse, ResourceException> schema(Context context) {
+        return newActionResponse(createSchema(context)).asPromise();
+    }
 
-        Set<String> subSchemaNames = schema.getSubSchemaNames();
-        Set<Object> subSchemas = new HashSet<>();
+    @Action
+    public Promise<ActionResponse, ResourceException> template() {
+        return newActionResponse(converter.toJson(schema.getAttributeDefaults())).asPromise();
+    }
 
-
-        try {
-            for(String subSchemaName : subSchemaNames) {
-                ServiceSchema subSchema = schema.getSubSchema(subSchemaName);
-                ResourceBundle schemaI18n = ResourceBundle.getBundle(subSchema.getI18NFileName(), getLocale(context));
-                String i18NKey = subSchema.getI18NKey();
-                String name = i18NKey != null && schemaI18n.containsKey(i18NKey)
-                        ? schemaI18n.getString(i18NKey)
-                        : subSchemaName;
-                subSchemas.add(object(
-                        field("_id", subSchema.getResourceName()),
-                        field("name", name)
-                ));
-            }
-            result.add("result", subSchemas);
-
-            return result;
-        } catch (SMSException e) {
-            throw new InternalServerErrorException("Error reading subschema", e);
+    @Action
+    public Promise<ActionResponse, ResourceException> getType(Context context) {
+        String resourceId = schema.getResourceName();
+        for (int i = subSchemaPath.size() - 1; i >= 0 && SmsRequestHandler.USE_PARENT_PATH.equals(resourceId); i--) {
+            resourceId = subSchemaPath.get(i).getResourceName();
         }
+        if (SmsRequestHandler.USE_PARENT_PATH.equals(resourceId)) {
+            SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
+            try {
+                resourceId = new ServiceSchemaManager(ssoToken, serviceName, serviceVersion).getResourceName();
+            } catch (SMSException | SSOException e) {
+                return new InternalServerErrorException("Could not get service schema", e).asPromise();
+            }
+        }
+        return newActionResponse(json(object(
+                field(ResourceResponse.FIELD_CONTENT_ID, resourceId),
+                field(NAME, getI18NName()),
+                field(COLLECTION, schema.supportsMultipleConfigurations())))).asPromise();
     }
 
-    @Override
-    public JsonValue getSchema(Context context, ActionRequest request) {
-        return createSchema(context);
+    private String getI18NName() {
+        String i18nKey = schema.getI18NKey();
+        String i18nName = schema.getName();
+        if (StringUtils.isEmpty(i18nName)) {
+            i18nName = schema.getServiceName();
+        }
+        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), defaultLocale);
+        if (rb != null && StringUtils.isNotEmpty(i18nKey)) {
+            i18nName = com.sun.identity.shared.locale.Locale.getString(rb, i18nKey, debug);
+        }
+        return i18nName;
     }
 
-    @Override
-    public JsonValue getTemplate(Context context, ActionRequest request) {
-        return converter.toJson(schema.getAttributeDefaults());
-    }
-
-    @Override
-    public JsonValue getCreatableTypes(Context context, ActionRequest request) throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("AME-9667");
-    }
 
     protected JsonValue createSchema(Context context) {
         JsonValue result = json(object(field("type", "object")));

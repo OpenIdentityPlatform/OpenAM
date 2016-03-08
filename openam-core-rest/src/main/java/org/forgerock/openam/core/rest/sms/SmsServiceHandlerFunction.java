@@ -55,7 +55,7 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
     private final List<Predicate<String>> ALREADY_HANDLED;
 
     @Inject
-    public SmsServiceHandlerFunction(@Named("AMAuthenticationServices") Set<String> authenticationServiceNames) {
+    public SmsServiceHandlerFunction(@Named("authenticationServices") Set<String> authenticationServiceNames) {
 
         CIRCLES_OF_TRUST_HANDLES_FUNCTION = new SingleServiceFunction(COT_CONFIG_SERVICE);
         AUTHENTICATION_HANDLES_FUNCTION = new SingleServiceFunction(ISAuthConstants.AUTH_SERVICE_NAME);

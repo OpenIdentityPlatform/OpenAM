@@ -377,12 +377,6 @@ public class CoreRestGuiceModule extends AbstractModule {
     }
 
     @Provides
-    @Named("AMAuthenticationServices")
-    public Set<String> getAMAuthenticationServices() {
-        return AMAuthenticationManager.getAuthenticationServiceNames();
-    }
-
-    @Provides
     @Named("AMResourceBundleCache")
     public AMResourceBundleCache getAMResourceBundleCache() {
         return AMResourceBundleCache.getInstance();

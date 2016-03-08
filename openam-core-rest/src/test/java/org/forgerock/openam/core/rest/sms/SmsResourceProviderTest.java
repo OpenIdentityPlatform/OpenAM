@@ -33,12 +33,14 @@ import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.test.assertj.Conditions;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 
@@ -111,50 +113,23 @@ public class SmsResourceProviderTest {
     }
 
     @Test
-    public void verifyExpectedJsonValueIsReturnedByCreateAllSubSchema() throws Exception{
+    public void verifyTypeAction() throws Exception {
 
         // Given
-        Set<String> preDefinedSubSchemas = new HashSet<>(Arrays.asList("subOne", "subTwo", "subThree"));
-        Object jvSubOne = object(
-                JsonValue.field("_id", "one"),
-                JsonValue.field("name", "Sub Schema One"));
-        Object jvSubTwo = object(
-                JsonValue.field("_id", "two"),
-                JsonValue.field("name", "subTwo"));
-        Object jvSubThree = object(
-                JsonValue.field("_id", "three"),
-                JsonValue.field("name", "subThree"));
-
-        when(serviceSchema.getSubSchemaNames()).thenReturn(preDefinedSubSchemas);
-        ServiceSchema subSchemaOne = mock(ServiceSchema.class);
-        ServiceSchema subSchemaTwo = mock(ServiceSchema.class);
-        ServiceSchema subSchemaThree = mock(ServiceSchema.class);
-        when(serviceSchema.getSubSchema("subOne")).thenReturn(subSchemaOne);
-        when(serviceSchema.getSubSchema("subTwo")).thenReturn(subSchemaTwo);
-        when(serviceSchema.getSubSchema("subThree")).thenReturn(subSchemaThree);
-
-        when(subSchemaOne.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
-        when(subSchemaTwo.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
-        when(subSchemaThree.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
-
-        when(subSchemaOne.getResourceName()).thenReturn("one");
-        when(subSchemaTwo.getResourceName()).thenReturn("two");
-        when(subSchemaThree.getResourceName()).thenReturn("three");
-
-        when(subSchemaOne.getI18NKey()).thenReturn("subOne");
+        when(serviceSchema.getI18NFileName()).thenReturn("org/forgerock/openam/core/rest/sms/SmsResourceProviderTest");
+        when(serviceSchema.getResourceName()).thenReturn("one");
+        when(serviceSchema.getI18NKey()).thenReturn("subOne");
+        when(serviceSchema.supportsMultipleConfigurations()).thenReturn(false);
 
         // When
-        JsonValue returnedJV = resourceProvider.getAllTypes(context, null);
+        JsonValue returnedJV = resourceProvider.getType(mock(Context.class)).getOrThrow().getJsonContent();
 
         // Then
         AssertJJsonValueAssert.assertThat(returnedJV)
                 .isObject()
-                .containsField("result");
-
-        AssertJJsonValueAssert.assertThat(returnedJV.get("result"))
-                .isArray()
-                .hasSize(3)
-                .containsOnly(jvSubOne, jvSubTwo, jvSubThree);
+                .stringIs("_id", Conditions.equalTo("one"))
+                .stringIs("name", Conditions.equalTo("Sub Schema One"))
+                .booleanAt("collection").isFalse();
     }
 
     /**
@@ -164,7 +139,8 @@ public class SmsResourceProviderTest {
 
         MySmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
                               boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug) {
-            super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
+            super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug,
+                    AMResourceBundleCache.getInstance(), Locale.UK);
         }
     }
 }

@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.sms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -32,6 +33,8 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -39,6 +42,7 @@ import org.forgerock.util.promise.Promise;
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
@@ -50,6 +54,7 @@ import com.sun.identity.sm.ServiceSchema;
  *
  * @since 13.0.0
  */
+@RequestHandler
 public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
 
     private final SmsJsonConverter organizationConverter;
@@ -61,8 +66,11 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
             @Assisted("organization") @Nullable ServiceSchema organizationSchema,
             @Assisted("dynamic") @Nullable ServiceSchema dynamicSchema, @Assisted SchemaType type,
             @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
-            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
-        super(globalConverter, globalSchema, dynamicSchema, type, subSchemaPath, uriPath, serviceHasInstanceName, debug);
+            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug,
+            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
+            @Named("DefaultLocale") Locale defaultLocale) {
+        super(globalConverter, globalSchema, dynamicSchema, type, subSchemaPath, uriPath, serviceHasInstanceName, debug,
+                resourceBundleCache, defaultLocale);
         this.organizationSchema = organizationSchema;
         if (organizationSchema != null) {
             this.organizationConverter = new SmsJsonConverter(organizationSchema);
@@ -71,7 +79,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
         }
     }
 
-    @Override
+    @Update
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         if (organizationSchema != null) {

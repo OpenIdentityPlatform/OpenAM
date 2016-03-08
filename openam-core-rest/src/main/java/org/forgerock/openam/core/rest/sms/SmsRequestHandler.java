@@ -17,6 +17,7 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.http.routing.RoutingMode.*;
+import static org.forgerock.json.resource.Resources.*;
 import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
@@ -103,7 +104,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private static final List<Pattern> DEFAULT_IGNORED_ROUTES =
             Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
     private static final String DEFAULT_VERSION = "1.0";
-    private static final String USE_PARENT_PATH = "USE-PARENT";
+    static final String USE_PARENT_PATH = "USE-PARENT";
     private static final String EMPTY_PATH = "EMPTY";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
@@ -195,13 +196,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         // realm-config/authentication/modules -> realm module collection handler
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
             getAuthenticationModuleRouter().addRoute(EQUALS, "",
-                    InjectorHolder.getInstance(AuthenticationModuleRealmSmsHandler.class));
-        }
-
-        // global-config/authentication/modules -> global module collection handler
-        if (SchemaType.GLOBAL.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "",
-                    InjectorHolder.getInstance(AuthenticationModuleGlobalSmsHandler.class));
+                    newAnnotatedRequestHandler(InjectorHolder.getInstance(AuthenticationModuleRealmSmsHandler.class)));
         }
     }
 
@@ -211,7 +206,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
             SmsRouteTree serviceInstanceRouter = getServiceInstanceRouter();
             servicesRealmSmsHandler.setSmsRouteTree(serviceInstanceRouter);
-            serviceInstanceRouter.addRoute(EQUALS, "", servicesRealmSmsHandler);
+            serviceInstanceRouter.addRoute(EQUALS, "", newAnnotatedRequestHandler(servicesRealmSmsHandler));
         }
     }
 
@@ -219,7 +214,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private void addCommonTasksHandler() {
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
             routeTree.addRoute(STARTS_WITH, "/commontasks",
-                    Resources.newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
+                    newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
         }
     }
 
@@ -234,7 +229,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     //routes under global-config/sites
     private void addSitesHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
+            routeTree.addRoute(STARTS_WITH, "sites", newCollection(sitesResourceProvider));
         }
     }
 
@@ -470,8 +465,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      */
     private void addGlobalPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema globalSchema,
-            ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
-            List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
+            ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree,
+            Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
+            throws SMSException {
         String schemaName = globalSchema.getResourceName();
         String path = updatePaths(parentPath, schemaName, schemaPath, globalSchema);
 
@@ -479,7 +475,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
                 parentPath, true);
         debug.message("Adding singleton path {}", path);
-        routeTree = addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree, serviceRoutes);
+        routeTree = addRoute(globalSchema, EQUALS, path, newAnnotatedRequestHandler(handler), ignoredRoutes, routeTree,
+                serviceRoutes);
 
         if (globalSchema != organizationSchema) {
             addPaths("", schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
@@ -524,16 +521,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         SmsRouteTree subtree = routeTree;
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
             if (schema.supportsMultipleConfigurations() && !excludeCollection(schema.getServiceName())) {
-                RequestHandler handler = Resources.newCollection(collectionProviderFactory.create(
+                RequestHandler handler = newCollection(collectionProviderFactory.create(
                         new SmsJsonConverter(schema), schema, schemaType, new ArrayList<>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
                 subtree = addRoute(schema, STARTS_WITH, path, handler, ignoredRoutes, routeTree, serviceRoutes);
                 parentPath = "/{" + schemaName + "}";
             } else if (!excludeSingleton(schema.getServiceName())) {
-                RequestHandler handler = singletonProviderFactory.create(
+                RequestHandler handler = newAnnotatedRequestHandler(singletonProviderFactory.create(
                         new SmsJsonConverter(schema), schema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
-                        parentPath, true);
+                        parentPath, true));
                 debug.message("Adding singleton path {}", path);
                 subtree = addRoute(schema, EQUALS, path, handler, ignoredRoutes, routeTree, serviceRoutes);
                 parentPath = "";

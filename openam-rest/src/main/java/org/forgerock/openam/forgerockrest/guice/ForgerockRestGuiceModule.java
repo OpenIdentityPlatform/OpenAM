@@ -93,6 +93,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 PrivilegeDefinition.getInstance(RestConstants.GET_ALL_TYPES, PrivilegeDefinition.Action.READ));
         definitions.put(RestConstants.GET_CREATABLE_TYPES,
                 PrivilegeDefinition.getInstance(RestConstants.GET_CREATABLE_TYPES, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.NEXT_DESCENDENTS,
+                PrivilegeDefinition.getInstance(RestConstants.NEXT_DESCENDENTS, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_TYPE,
+                PrivilegeDefinition.getInstance(RestConstants.GET_TYPE, PrivilegeDefinition.Action.READ));
         definitions.put("getPropertyNames",
                 PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));
         definitions.put("getProperty",

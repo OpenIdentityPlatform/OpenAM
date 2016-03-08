@@ -28,6 +28,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,6 +37,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceAlreadyExistsException;
@@ -62,6 +64,12 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Delete;
+import org.forgerock.json.resource.annotations.Query;
+import org.forgerock.json.resource.annotations.Read;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
@@ -75,16 +83,20 @@ import org.forgerock.util.promise.ResultHandler;
  * A CREST collection provider for SMS schema config.
  * @since 13.0.0
  */
-public class SmsCollectionProvider extends SmsResourceProvider implements CollectionResourceProvider {
+@RequestHandler
+public class SmsCollectionProvider extends SmsResourceProvider {
 
     private final boolean autoCreatedAuthModule;
     private final String authModuleResourceName;
 
     @Inject
     SmsCollectionProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
-                          @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
-                          @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
-        super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
+            @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
+            @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug,
+            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
+            @Named("DefaultLocale") Locale defaultLocale) {
+        super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug, resourceBundleCache,
+                defaultLocale);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
         Reject.ifTrue(subSchemaPath.isEmpty(), "Root schemas do not support multiple instances");
         autoCreatedAuthModule = subSchemaPath.size() == 1 && getAuthenticationServiceNames().contains(serviceName) &&
@@ -92,18 +104,13 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         authModuleResourceName = autoCreatedAuthModule ? super.uriPath.get(0) : null;
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return super.handleAction(context, request);
-    }
-
     /**
      * Creates a new child instance of config. The parent config referenced by the request path is found, and
      * new config is created using the provided name property.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
+    @Create
+    public Promise<ResourceResponse, ResourceException> create(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         final String realm = realmFor(context);
         try {
@@ -149,9 +156,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * the config is deleted using the resourceId.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
-            DeleteRequest request) {
+    @Delete
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
@@ -188,9 +194,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * the config is read using the resourceId.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
-            ReadRequest request) {
+    @Read
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
@@ -214,8 +219,9 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * the config is updated using the resourceId.
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId, UpdateRequest request) {
+    @Update
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
+            UpdateRequest request) {
         JsonValue content = request.getContent();
         String realm = realmFor(context);
         try {
@@ -249,7 +255,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * Sorting and paging are not supported.
      * {@inheritDoc}
      */
-    @Override
+    @Query
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
@@ -313,18 +319,6 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         return value;
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return new NotSupportedException(request.getAction() + " action not supported").asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return new NotSupportedException("patch operation not supported").asPromise();
-    }
-
     private static final long MAX_AWAIT_TIMEOUT = 5000L;
 
     private Promise<Void, ResourceException> awaitCreation(Context context, String resourceId) {
@@ -355,7 +349,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             debug.error("Thread interrupted while awaiting SMS resource creation/deletion", e);
             awaitPromise.handleException(new InternalServerErrorException("", e));
         }
-        readInstance(context, resourceId, newReadRequest(""))
+        readInstance(context, resourceId)
                 .thenOnResult(resultHandler)
                 .thenOnException(exceptionHandler);
     }

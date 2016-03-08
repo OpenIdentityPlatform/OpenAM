@@ -51,7 +51,9 @@ public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeA
             RestConstants.SCHEMA,
             RestConstants.TEMPLATE,
             RestConstants.GET_ALL_TYPES,
-            RestConstants.GET_CREATABLE_TYPES);
+            RestConstants.GET_CREATABLE_TYPES,
+            RestConstants.GET_TYPE,
+            RestConstants.NEXT_DESCENDENTS);
 
     private final AnyPrivilegeAuthzModule anyPrivilegeAuthzModule;
     @Inject

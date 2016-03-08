@@ -48,6 +48,9 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Query;
+import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
@@ -64,7 +67,8 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 14.0.0
  */
-public class ServicesRealmSmsHandler extends DefaultSmsHandler {
+@RequestHandler
+public class ServicesRealmSmsHandler {
 
     private final Debug debug;
     private final SmsConsoleServiceNameFilter consoleNameFilter;
@@ -76,7 +80,7 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
         this.consoleNameFilter = consoleNameFilter;
     }
 
-    @Override
+    @Query
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest queryRequest,
                                                                  QueryResourceHandler queryResourceHandler) {
         String searchForId;
@@ -122,84 +126,24 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
         return QueryResponsePresentation.perform(queryResourceHandler, queryRequest, resourceResponses);
     }
 
-    @Override
-    public JsonValue getAllTypes(Context context, ActionRequest request) throws InternalServerErrorException {
-        try {
-            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            final ServiceManager sm = getServiceManager(ssoToken);
-            final OrganizationConfigManager ocm = sm.getOrganizationConfigManager(realm);
-            final List<Object> jsonArray = array();
-
-            final Set<String> services = ocm.getAssignableServices();
-            services.addAll(ocm.getAssignedServices());
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignedServices());
-            consoleNameFilter.filter(services);
-
-            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
-
-            for (String instanceName : serviceNameMap.keySet()) {
-                jsonArray.add(object(
-                        field(ResourceResponse.FIELD_CONTENT_ID, instanceName),
-                        field(NAME, serviceNameMap.get(instanceName))));
-            }
-
-            return json(object(field(RESULT, jsonArray)));
-        } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException("Unable to query SMS config.", e);
-        }
-    }
-
-    @Override
-    public JsonValue getCreatableTypes(Context context, ActionRequest request) throws InternalServerErrorException {
-        try {
-            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            final ServiceManager sm = getServiceManager(ssoToken);
-            final List<Object> jsonOutput = array();
-
-            final Set<String> services = sm.getOrganizationConfigManager(realm).getAssignableServices();
-            services.addAll(getIdentityServices(realm, ssoToken).getAssignableServices());
-            consoleNameFilter.filter(services);
-
-            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
-
-            for (Map.Entry<String, String> entry : serviceNameMap.entrySet()) {
-                jsonOutput.add(object(
-                        field(ResourceResponse.FIELD_CONTENT_ID, entry.getKey()),
-                        field(NAME, entry.getValue())));
-            }
-
-            return json(object(field(RESULT, jsonOutput)));
-        } catch (SSOException | IdRepoException | SMSException e) {
-            throw new InternalServerErrorException("Unable to query SMS config.", e);
-        }
-    }
-
-    @Override
-    public JsonValue getSchema(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("Operation not supported.");
-    }
-
-    @Override
-    public JsonValue getTemplate(Context context, ActionRequest request)
-            throws NotSupportedException, InternalServerErrorException {
-        throw new NotSupportedException("Operation not supported.");
-    }
-
-    ServiceManager getServiceManager(SSOToken token) throws SMSException, SSOException {
+    private ServiceManager getServiceManager(SSOToken token) throws SMSException, SSOException {
         return new ServiceManager(token);
     }
 
-    AMIdentity getIdentityServices(String realmName, SSOToken userSSOToken)
+    private AMIdentity getIdentityServices(String realmName, SSOToken userSSOToken)
             throws IdRepoException, SSOException {
         AMIdentityRepository repo = new AMIdentityRepository(realmName, userSSOToken);
         return repo.getRealmIdentity();
     }
 
-    @Override
+    /**
+     * The create request for services will be received at this level, but this handler does not know how to create
+     * the singleton services. Instead we pass the create method on to the handler for the created resource ID.
+     * @param context The request context.
+     * @param request The request.
+     * @return The result from the downstream handler.
+     */
+    @Create
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         UriRouterContext ctx = context.asContext(UriRouterContext.class);
         String serviceResourceId = request.getNewResourceId();
@@ -211,6 +155,11 @@ public class ServicesRealmSmsHandler extends DefaultSmsHandler {
         return routeTree.handleCreate(subRequestCtx, subRequest);
     }
 
+    /**
+     * Set the route tree that handles services, so that the create request can be sent on to the service handler for
+     * the service that is being created.
+     * @param routeTree The SMS route tree.
+     */
     void setSmsRouteTree(SmsRouteTree routeTree) {
         this.routeTree = routeTree;
     }

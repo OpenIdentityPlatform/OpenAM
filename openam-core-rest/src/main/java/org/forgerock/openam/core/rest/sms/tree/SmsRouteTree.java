@@ -17,17 +17,16 @@
 package org.forgerock.openam.core.rest.sms.tree;
 
 import static org.forgerock.authz.filter.crest.AuthorizationFilters.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.*;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.ResourcePath.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.json.resource.Router.*;
-import static org.forgerock.openam.rest.query.QueryResponsePresentation.*;
+import static org.forgerock.openam.rest.RestConstants.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,6 +55,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.RouteMatcher;
@@ -71,10 +71,9 @@ import org.forgerock.util.query.QueryFilter;
 public class SmsRouteTree implements RequestHandler {
 
     private static final QueryFilter<JsonPointer> ALWAYS_TRUE = QueryFilter.alwaysTrue();
-    private static final String NEXTDESCENDENTS_QUERY = "nextdescendents";
-    private final Predicate<String> handlesFunction;
 
     final Map<MatchingResourcePath, CrestAuthorizationModule> authzModules;
+    private final Predicate<String> handlesFunction;
     final CrestAuthorizationModule defaultAuthzModule;
     final Router router;
     final ResourcePath path;
@@ -186,65 +185,101 @@ public class SmsRouteTree implements RequestHandler {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
-            QueryResourceHandler handler) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         String remainingUri = context.asContext(UriRouterContext.class).getRemainingUri();
-        if (NEXTDESCENDENTS_QUERY.equals(request.getQueryId()) && remainingUri.isEmpty()) {
-            final List<ResourceResponse> responses = new ArrayList<>();
+        String action = request.getAction();
+        if (NEXT_DESCENDENTS.equals(action) && remainingUri.isEmpty()) {
+            JsonValue result = json(object(field("result", array())));
             for (Map.Entry<String, RequestHandler> subRoute : handlers.entrySet()) {
                 if (!subRoute.getKey().equals("")) {
                     final ResourcePath subPath = resourcePath(subRoute.getKey());
                     try {
-                        readInstances(context, responses, subPath, subRoute.getValue());
+                        readInstances(context, result.get("result"), subPath, subRoute.getValue());
                     } catch (ResourceException e) {
                         return e.asPromise();
                     }
                 }
             }
-            return perform(handler, request, responses);
+            return newActionResponse(result).asPromise();
+        } else if (GET_ALL_TYPES.equals(action) && remainingUri.isEmpty()) {
+            try {
+                return readTypes(context, ALL_CHILD_TYPES);
+            } catch (ResourceException e) {
+                return e.asPromise();
+            }
+        } else if (GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
+            try {
+                return readTypes(context, NOT_CREATED_SINGLETONS);
+            } catch (ResourceException e) {
+                return e.asPromise();
+            }
         } else {
-            return router.handleQuery(context, request, handler);
+            return router.handleAction(context, request);
         }
     }
 
-    private void readInstances(Context context, List<ResourceResponse> responses,
+    private Promise<ActionResponse, ResourceException> readTypes(Context context, ChildTypePredicate includeType)
+            throws ResourceException {
+        JsonValue result = json(array());
+        for (Map.Entry<String, RequestHandler> subRoute : handlers.entrySet()) {
+            if (!subRoute.getKey().equals("")) {
+                try {
+                    ActionResponse response = subRoute.getValue()
+                            .handleAction(context, newActionRequest(empty(), GET_TYPE))
+                            .getOrThrowUninterruptibly();
+
+                    JsonValue jsonContent = response.getJsonContent();
+                    if (includeType.apply(jsonContent, context, subRoute.getValue())) {
+                        result.add(jsonContent.getObject());
+                    }
+                } catch (ResourceException e) {
+                    if (e.getCode() != NOT_SUPPORTED && e.getCode() != BAD_REQUEST && e.getCode() != NOT_FOUND) {
+                        throw e;
+                    }
+                }
+            }
+        }
+        return newActionResponse(json(object(field("result", result.getObject())))).asPromise();
+    }
+
+    private void readInstances(Context context, JsonValue response,
             ResourcePath subPath, RequestHandler handler) throws ResourceException {
         try {
             QueryRequest subRequest = newQueryRequest(empty()).setQueryFilter(ALWAYS_TRUE);
-            handler.handleQuery(context, subRequest, new ChildQueryResourceHandler(subPath, responses))
+            handler.handleQuery(context, subRequest, new ChildQueryResourceHandler(subPath, response))
                     .getOrThrowUninterruptibly();
         } catch (ResourceException e) {
             if (e.getCode() == NOT_SUPPORTED || e.getCode() == BAD_REQUEST) {
-                getSingletonInstance(context, responses, subPath, handler);
+                getSingletonInstance(context, response, subPath, handler);
             } else if (e.getCode() != NOT_FOUND){
                 throw e;
             }
         }
     }
 
-    private void getSingletonInstance(Context context, List<ResourceResponse> responses, ResourcePath subPath,
+    private void getSingletonInstance(Context context, JsonValue response, ResourcePath subPath,
             RequestHandler handler) throws ResourceException {
         try {
             ResourceResponse instance = handler.handleRead(context, newReadRequest(empty()))
                     .getOrThrowUninterruptibly();
-            String id = subPath.toString();
-            responses.add(newResourceResponse(id, instance.getRevision(),
-                    instance.getContent().put("_id", id)));
+            response.add(instance.getContent().put("_id", subPath.toString()).getObject());
         } catch (ResourceException e) {
             if (e.getCode() == NOT_SUPPORTED || e.getCode() == BAD_REQUEST) {
-                findFurtherDescendents(context, responses, subPath, handler);
+                findFurtherDescendents(context, response, subPath, handler);
             } else if (e.getCode() != NOT_FOUND) {
                 throw e;
             }
         }
     }
 
-    private void findFurtherDescendents(Context context, List<ResourceResponse> responses, ResourcePath subPath,
+    private void findFurtherDescendents(Context context, JsonValue response, ResourcePath subPath,
             RequestHandler handler) throws ResourceException {
-        QueryRequest subRequest = newQueryRequest(empty()).setQueryId(NEXTDESCENDENTS_QUERY);
+        ActionRequest subRequest = newActionRequest(empty(), NEXT_DESCENDENTS);
         try {
-            handler.handleQuery(context, subRequest, new ChildQueryResourceHandler(subPath, responses))
-                    .getOrThrowUninterruptibly();
+            JsonValue result = handler.handleAction(context, subRequest).getOrThrowUninterruptibly().getJsonContent();
+            for (JsonValue item : result.get(RestConstants.RESULT)) {
+                addItemWithSubPath(response, subPath, item);
+            }
         } catch (ResourceException e) {
             if (e.getCode() != NOT_FOUND) {
                 throw e;
@@ -252,9 +287,9 @@ public class SmsRouteTree implements RequestHandler {
         }
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return router.handleAction(context, request);
+    private static void addItemWithSubPath(JsonValue response, ResourcePath subPath, JsonValue item) {
+        String id = subPath.child(item.get(ResourceResponse.FIELD_CONTENT_ID).asString()).toString();
+        response.add(item.put(ResourceResponse.FIELD_CONTENT_ID, id).getObject());
     }
 
     @Override
@@ -270,6 +305,12 @@ public class SmsRouteTree implements RequestHandler {
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         return router.handlePatch(context, request);
+    }
+
+    @Override
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
+            QueryResourceHandler handler) {
+        return router.handleQuery(context, request, handler);
     }
 
     @Override
@@ -292,19 +333,17 @@ public class SmsRouteTree implements RequestHandler {
 
     private static class ChildQueryResourceHandler implements QueryResourceHandler {
         private final ResourcePath subPath;
-        private final List<ResourceResponse> responses;
+        private final JsonValue response;
 
-        private ChildQueryResourceHandler(ResourcePath subPath, List<ResourceResponse> responses) {
+        private ChildQueryResourceHandler(ResourcePath subPath, JsonValue response) {
             this.subPath = subPath;
-            this.responses = responses;
+            this.response = response;
         }
 
         public boolean handleResource(ResourceResponse resource) {
-                JsonValue content = resource.getContent();
-                String id = subPath.child(content.get("_id").asString()).toString();
-                responses.add(newResourceResponse(id, resource.getRevision(), content.put("_id", id)));
-                return true;
-            }
+            addItemWithSubPath(response, subPath, resource.getContent());
+            return true;
+        }
     }
 
     /**
@@ -322,4 +361,33 @@ public class SmsRouteTree implements RequestHandler {
             this.tree = tree;
         }
     }
+
+    private interface ChildTypePredicate {
+        boolean apply(JsonValue type, Context context, RequestHandler handler) throws ResourceException;
+    }
+
+    private static final ChildTypePredicate ALL_CHILD_TYPES = new ChildTypePredicate() {
+        public boolean apply(JsonValue type, Context context, RequestHandler handler) {
+            return true;
+        }
+    };
+
+    private static final ChildTypePredicate NOT_CREATED_SINGLETONS =
+            new ChildTypePredicate() {
+                @Override
+                public boolean apply(JsonValue type, Context context, RequestHandler handler) throws ResourceException {
+                    if (!type.get("collection").asBoolean()) {
+                        try {
+                            handler.handleRead(context, newReadRequest(empty())).getOrThrowUninterruptibly();
+                            return false;
+                        } catch (ResourceException e) {
+                            if (e.getCode() == NOT_FOUND) {
+                                return true;
+                            }
+                            throw e;
+                        }
+                    }
+                    return true;
+                }
+            };
 }
