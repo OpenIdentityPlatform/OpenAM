@@ -19,10 +19,12 @@ define([
     "sinon"
 ], function (Squire, sinon) {
     describe("org/forgerock/openam/ui/admin/views/createRealmsBreadcrumbs", function () {
-        let createRealmsBreadcrumbs, URIUtils, $;
+        let createRealmsBreadcrumbs;
+        let URIUtils;
+        let $;
 
         beforeEach(function (done) {
-            var injector = new Squire();
+            const injector = new Squire();
 
             URIUtils = {
                 getCurrentFragment: sinon.stub()

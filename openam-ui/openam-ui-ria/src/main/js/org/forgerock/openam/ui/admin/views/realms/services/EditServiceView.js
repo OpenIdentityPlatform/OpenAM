@@ -112,9 +112,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         },
 
         renderTab: function (event) {
-            const tabId = $(event.target).data("tabId"),
-                schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema,
-                element = this.$el.find("#tabpanel").empty().get(0);
+            const tabId = $(event.target).data("tabId");
+            const schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema;
+            const element = this.$el.find("#tabpanel").empty().get(0);
 
             if (tabId === "subschema") {
                 SubschemaListView.render(this.data);

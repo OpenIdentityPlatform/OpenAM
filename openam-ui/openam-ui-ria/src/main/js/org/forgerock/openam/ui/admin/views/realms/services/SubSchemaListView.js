@@ -69,9 +69,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
         onDelete: function (e) {
             e.preventDefault();
 
-            const target = $(e.currentTarget),
-                subSchemaInstance = target.closest("tr").data("subschemaId"),
-                subSchemaType = target.closest("tr").data("subschemaType");
+            const target = $(e.currentTarget);
+            const subSchemaInstance = target.closest("tr").data("subschemaId");
+            const subSchemaType = target.closest("tr").data("subschemaType");
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.services.list.confirmDeleteSelected")

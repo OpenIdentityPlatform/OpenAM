@@ -56,8 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
         },
 
         onSave: function () {
-            const formData = this.form.data(),
-                subSchemaInstanceId = this.$el.find("[data-name]").val();
+            const formData = this.form.data();
+            const subSchemaInstanceId = this.$el.find("[data-name]").val();
 
             formData["_id"] = subSchemaInstanceId;
 

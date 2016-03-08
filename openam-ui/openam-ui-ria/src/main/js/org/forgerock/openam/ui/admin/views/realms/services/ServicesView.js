@@ -60,8 +60,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             "click [data-add-service]":     "onAddService"
         },
         serviceSelected: function (event) {
-            const anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked"),
-                row = $(event.currentTarget).closest("tr");
+            const anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked");
+            const row = $(event.currentTarget).closest("tr");
 
             row.toggleClass("selected");
             this.$el.find("[data-delete-services]").prop("disabled", !anyServicesSelected);
@@ -101,9 +101,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             this.data.realmPath = args[0];
 
             Promise.all([getServices(this.data.realmPath), getCreatables(this.data.realmPath)]).then((data) => {
-
-                const services = data[0],
-                    creatables = data[1];
+                const services = data[0];
+                const creatables = data[1];
 
                 this.data.services = services;
                 this.parentRender(() => {

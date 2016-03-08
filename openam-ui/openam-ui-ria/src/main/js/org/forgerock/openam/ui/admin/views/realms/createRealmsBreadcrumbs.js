@@ -59,13 +59,13 @@ define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
          * 5: Actions are not displayed - unless its also the last crumb.
          * */
 
-        const allFragments = getAllfragments(),
-            base = getBaseURI(allFragments),
-            fragmentPaths = getPathFragments(allFragments),
-            fragmentTypes = ["INSTANCE", "ACTION", "COLLECTION"],
-            FIRST_CRUMB = 0,
-            LAST_CRUMB = fragmentPaths.length - 1,
-            breadcrumbs = [];
+        const allFragments = getAllfragments();
+        const base = getBaseURI(allFragments);
+        const fragmentPaths = getPathFragments(allFragments);
+        const fragmentTypes = ["INSTANCE", "ACTION", "COLLECTION"];
+        const FIRST_CRUMB = 0;
+        const LAST_CRUMB = fragmentPaths.length - 1;
+        const breadcrumbs = [];
 
         /* We work this out in reverse because while the beginings of the routes vary, they all end in either an
          * INSTANCE or the NEW-action. So the reversed pattern we look for becomes:
@@ -74,9 +74,8 @@ define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
          * */
         let count = shiftStartPosition(fragmentPaths);
         _.forEachRight(fragmentPaths, (crumb, index) => {
-
-            const title = getTitle(crumb, index),
-                path = createPath(fragmentPaths, index, base);
+            const title = getTitle(crumb, index);
+            const path = createPath(fragmentPaths, index, base);
 
             if (index === LAST_CRUMB) {
                 breadcrumbs.unshift({

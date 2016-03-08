@@ -15,7 +15,7 @@
  */
 
 define("config/routes/admin/RealmsRoutes", function () {
-    const scopedByRealm = function (fragment) {
+    var scopedByRealm = function (fragment) {
             return new RegExp("^realms\/([^\/]+)\/" + fragment + "$");
         },
         defaultScopedByRealm = function (fragment) {
