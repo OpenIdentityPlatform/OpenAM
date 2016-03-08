@@ -855,6 +855,7 @@
                 "new": {
                     "title": "New __subSchema__ configuration"
                 },
+                "confirmDeleteSelected": "Are you sure you want to delete the selected configuration?",
                 "callToAction": "No secondary configurations found"
             }
         },

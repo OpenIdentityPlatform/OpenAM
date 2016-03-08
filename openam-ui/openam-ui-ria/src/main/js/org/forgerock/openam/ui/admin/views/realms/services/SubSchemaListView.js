@@ -47,12 +47,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
         ).then(() => {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             renderView.call(this);
-        }, (response) => {
-            Messages.addMessage({
-                response: response,
-                type: Messages.TYPE_DANGER
-            });
-        });
+        }, (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER }));
     }
 
     const SubschemaListView = AbstractView.extend({
@@ -61,12 +56,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
             "click [data-subschema-delete]" : "onDelete"
         },
 
-        render: function (data) {
+        render (data) {
             _.extend(this.data, data);
             renderView.call(this);
         },
 
-        onDelete: function (e) {
+        onDelete (e) {
             e.preventDefault();
 
             const target = $(e.currentTarget);
@@ -74,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
             const subSchemaType = target.closest("tr").data("subschemaType");
 
             FormHelper.showConfirmationBeforeDeleting({
-                message: $.t("console.services.list.confirmDeleteSelected")
+                message: $.t("console.services.subSchema.confirmDeleteSelected")
             }, _.bind(deleteSubSchema, this, subSchemaType, subSchemaInstance));
         }
     });

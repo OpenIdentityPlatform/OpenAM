@@ -10,15 +10,15 @@
             </thead>
             <tbody>
                 {{#each instances}}
-                    <tr data-subschema-id="{{_id}}" data-subschema-type="{{type}}">
+                    <tr data-subschema-id="{{_id}}" data-subschema-type="{{_type._id}}">
                         <td class="wordwrap">
-                            <a href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type type _id}}"
+                            <a href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type _type._id _id}}"
                                 title="{{t 'common.form.edit'}}">{{_id}}</a>
                         </td>
-                        <td class="wordwrap">{{type}}</td>
+                        <td class="wordwrap">{{_type.name}}</td>
                         <td class="fr-col-btn-2">
                             <div class="btn-group">
-                                <a class="btn btn-link" href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type type _id}}"
+                                <a class="btn btn-link" href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type _type._id _id}}"
                                     title="{{t 'common.form.edit'}}">
                                     <i class="fa fa-pencil"/>
                                 </a>
@@ -42,7 +42,7 @@
 
             <ul class="dropdown-menu">
                 {{#each creatables}}
-                <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{description}}</a></li>
+                <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{name}}</a></li>
                 {{/each}}
             </ul>
         </div>
@@ -65,7 +65,7 @@
 
                 <ul class="dropdown-menu">
                     {{#each creatables}}
-                    <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{description}}</a></li>
+                    <li><a href="{{routeTo 'realmsServiceSubSchemaNew' ../realmPath ../type _id}}">{{name}}</a></li>
                     {{/each}}
                 </ul>
             </div>
@@ -75,6 +75,5 @@
                 <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
             </a>
         {{/if}}
-
     </div>
 {{/if}}
