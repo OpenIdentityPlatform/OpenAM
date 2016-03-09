@@ -118,17 +118,6 @@
         </copy>
 
         <!-- Align in fedlet -->
-        <mkdir dir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
-        <copy todir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
-              filtering="false">
-            <fileset
-                    dir="${project.basedir}/../openam-federation/openam-federation-library/target/classes/com/sun/identity/fedlet/ag">
-                <include name="UserData.class"/>
-                <include name="AssertionGen.class"/>
-                <include name="MetaDataParser.class"/>
-            </fileset>
-        </copy>
-
         <copy todir="${openam.temp.target}/WEB-INF/fedlet" filtering="false">
             <fileset dir="src/main/resources">
                 <include name="FederationConfig.properties"/>

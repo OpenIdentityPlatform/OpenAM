@@ -120,9 +120,6 @@
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
 
-        <!-- Required for setting classpaths on tools and fedlet -->
-        <forgerock.util.version>3.0.1</forgerock.util.version>
-
         <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
         <forgerock.ui.version>12.0.0</forgerock.ui.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
@@ -752,6 +749,12 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-federation-library</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-fedlet-unconfigured-war</artifactId>
+                <type>war</type>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

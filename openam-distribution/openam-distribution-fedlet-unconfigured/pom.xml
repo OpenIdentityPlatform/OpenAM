@@ -48,21 +48,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>fedlet-assembly_1</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <tarLongFileMode>gnu</tarLongFileMode>
-                            <descriptors>
-                                <descriptor>src/main/assembly/openAMFedlet_WAR_Assembly_Descriptor.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>fedlet-assembly_2</id>
+                        <id>fedlet-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -81,84 +67,10 @@
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-shared</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-dtd-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-jaxrpc-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-mib-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-liberty-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-wsfederation-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>relaxngDatatype</groupId>
-            <artifactId>relaxngDatatype</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>jaxrpc-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-       	    <artifactId>xmlsec</artifactId>
-        </dependency>
-
-        <dependency>
-        	<groupId>commons-logging</groupId>
-        	<artifactId>commons-logging-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.msv.datatype.xsd</groupId>
-            <artifactId>xsdlib</artifactId>
+            <artifactId>openam-fedlet-unconfigured-war</artifactId>
+            <type>war</type>
         </dependency>
     </dependencies>
 </project>
