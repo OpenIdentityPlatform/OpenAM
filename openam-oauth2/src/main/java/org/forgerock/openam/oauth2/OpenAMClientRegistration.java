@@ -581,7 +581,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     "Unable to get " + OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD + " from repository");
         }
 
-        if (authMethodSet.iterator().hasNext()){
+        if (CollectionUtils.isNotEmpty(authMethodSet)){
             tokenEndpointAuthMethod = authMethodSet.iterator().next();
         } else { //default to client_secret_basic
             tokenEndpointAuthMethod = Client.TokenEndpointAuthMethod.CLIENT_SECRET_BASIC.getType();
