@@ -16,8 +16,9 @@
 
 define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
     "jquery",
+    "lodash",
     "jsonEditor"
-], function ($, JSONEditor) {
+], function ($, _, JSONEditor) {
     var obj = {};
 
     obj.getTheme = function (gridColWidth1, gridColWidth2) {
@@ -120,7 +121,6 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     if (description) {
                         group.appendChild(description);
                     }
-
                     return group;
                 },
 
@@ -326,6 +326,10 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
 
                 getValueFormInputField: function () {
                     return this.getFormInputField("text", $.t("common.form.value"));
+                },
+
+                getInputId: function () {
+                    return _.uniqueId();
                 },
 
                 getModal: function () {
