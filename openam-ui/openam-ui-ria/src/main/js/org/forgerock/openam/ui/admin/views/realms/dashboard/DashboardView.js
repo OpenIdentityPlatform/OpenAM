@@ -11,40 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
     "org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/services/SMSRealmService"
-], function ($, _, AbstractView, CreateUpdateRealmDialog, DashboardTasksView, Messages, SMSGlobalService,
-             SMSRealmService) {
-    var DashboardView = AbstractView.extend({
+], function ($, _, AbstractView, DashboardTasksView, Messages, SMSGlobalService, SMSRealmService) {
+    return AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTemplate.html",
-        events: {
-            "click [data-edit-properties]" : "editProperties"
-        },
         partials: [
             "partials/util/_Status.html"
         ],
-
-        editProperties: function (event) {
-            event.preventDefault();
-            var self = this;
-            CreateUpdateRealmDialog.show({
-                realmPath : this.data.realmPath,
-                callback : function () {
-                    self.render([self.data.realmPath]);
-                }
-            });
-        },
         render: function (args, callback) {
             var self = this,
                 realmPromise = SMSGlobalService.realms.get(args[0]),
@@ -74,6 +58,4 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
 
         }
     });
-
-    return DashboardView;
 });

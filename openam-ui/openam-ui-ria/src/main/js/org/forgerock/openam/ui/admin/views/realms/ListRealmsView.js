@@ -19,43 +19,28 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
-    "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/NavigationHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
-], ($, _, AbstractView, BootstrapDialog, CreateUpdateRealmDialog, Messages, NavigationHelper, Router, SMSGlobalService,
-    TemplateBasedView, ToggleCardListView) => {
-    var ListRealmsView = AbstractView.extend({
+], ($, _, AbstractView, BootstrapDialog, Messages, NavigationHelper, Router, SMSGlobalService, TemplateBasedView,
+    ToggleCardListView) => {
+    const ListRealmsView = AbstractView.extend({
         template: "templates/admin/views/realms/ListRealmsTemplate.html",
-        editDetailsDialogTemplate: "templates/admin/views/realms/RealmPropertiesDialogTemplate.html",
         events: {
             "click [data-delete-realm]" : "deleteRealm",
-            "click [data-add-realm]"    : "addRealm",
-            "click [data-edit-realm]"   : "editRealm",
             "click [data-toogle-realm]" : "toggleRealmActive"
         },
         partials: [
-            "partials/alerts/_Alert.html", // needed in CreateUpdateRealmDialog
             "partials/util/_Status.html",
             "partials/util/_ButtonLink.html",
             "templates/admin/views/realms/_RealmCard.html"
         ],
-        addRealm (event) {
-            event.preventDefault();
-            var self = this;
-
-            CreateUpdateRealmDialog.show({
-                allRealmPaths :  this.data.allRealmPaths,
-                callback () {
-                    self.render();
-                }
-            });
-        },
         deleteRealm (event) {
             event.preventDefault();
+
             var self = this,
                 realm = this.getRealmFromEvent(event),
                 buttons = [{
@@ -104,23 +89,9 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
             });
 
         },
-        editRealm (event) {
-            event.preventDefault();
-            var realm = this.getRealmFromEvent(event),
-                self = this;
-
-            CreateUpdateRealmDialog.show({
-                allRealmPaths :  this.data.allRealmPaths,
-                realmPath : realm.path,
-                callback () {
-                    self.render();
-                }
-            });
-        },
         getRealmFromEvent (event) {
             var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
                 realm = _.find(this.data.realms, { path: path });
-
             return realm;
         },
         getRealmFromList (path) {
@@ -181,8 +152,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                         activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
                         button: {
                             btnClass: "btn-primary",
-                            href: "#",
-                            dataAttr: "data-add-realm",
+                            href: "#realms/new",
                             icon: "fa-plus",
                             title: $.t("console.realms.newRealm")
                         }

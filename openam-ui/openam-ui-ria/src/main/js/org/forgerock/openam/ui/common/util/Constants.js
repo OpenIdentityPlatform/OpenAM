@@ -36,9 +36,6 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     // Realm
     Constants.EVENT_INVALID_REALM = "main.EVENT_INVALID_REALM";
 
-    // Admin
-    Constants.EVENT_ADD_NEW_REALM_DIALOG = "admin.realms.EVENT_ADD_NEW_REALM_DIALOG";
-
     // Patterns
     Constants.IPV4_PATTERN =
         "^(((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d)))((\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){3})";

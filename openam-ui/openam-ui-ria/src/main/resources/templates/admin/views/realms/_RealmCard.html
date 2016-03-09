@@ -5,7 +5,7 @@
                 <i class="fa fa-ellipsis-v fa-lg"></i>
             </button>
             <ul class="dropdown-menu pull-left" role="menu">
-                <li><a href="#" data-edit-realm><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
+                <li><a href="{{routeTo 'realmEdit' path}}"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                 {{#if active}}
                     <li><a href="#" data-toggle-realm><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
                 {{else}}

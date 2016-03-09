@@ -67,9 +67,10 @@ define([
 
     "./views/realms/services/SubSchemaListView",
 
+
+    "./views/realms/EditRealmView",
     "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
-    "./views/realms/CreateUpdateRealmDialog",
 
     "./views/global/createConfigurationListView",
     "./views/global/createConfigurationBacklink",

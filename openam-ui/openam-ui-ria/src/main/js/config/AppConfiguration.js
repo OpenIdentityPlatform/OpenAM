@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 define("config/AppConfiguration", [
@@ -149,7 +149,7 @@ define("config/AppConfiguration", [
                                     "name": "config.AppConfiguration.Navigation.links.realms.showAll",
                                     "icon": "fa fa-th"
                                 }, {
-                                    "event": Constants.EVENT_ADD_NEW_REALM_DIALOG,
+                                    "url": "#realms/new",
                                     "name": "config.AppConfiguration.Navigation.links.realms.newRealm",
                                     "icon": "fa fa-plus"
                                 }, {

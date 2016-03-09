@@ -14,22 +14,24 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+/**
+ * @module org/forgerock/openam/ui/admin/services/SMSGlobalService
+ */
 define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, RealmHelper) => {
-    /**
-     * @exports org/forgerock/openam/ui/admin/services/SMSGlobalService
-     */
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/`);
-    const schemaWithValues = function (url) {
-        return $.when(
+
+    function schemaWithValues (url) {
+        return Promise.all([
             obj.serviceCall({
-                url: url + "?_action=schema",
+                url: `${url}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }),
@@ -37,33 +39,36 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
                 url,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             })
-        ).then(function (schemaData, valuesData) {
+        ]).then(function (results) {
             return {
-                schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
-                values: valuesData[0]
+                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
+                values: results[1][0]
             };
         });
-    };
-    const schemaWithDefaults = function (url) {
-        return $.when(
+    }
+
+    function schemaWithDefaults (url) {
+        return Promise.all([
             obj.serviceCall({
-                url: url + "?_action=schema",
+                url: `${url}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }),
             obj.serviceCall({
-                url: url + "?_action=template",
+                url: `${url}?_action=template`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             })
-        ).then(function (schemaData, templateData) {
+
+        ]).then(function (results) {
             return {
-                schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
-                values: templateData[0]
+                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
+                values: results[1][0]
             };
         });
-    };
-    const getRealmPath = function (realm) {
+    }
+
+    function getRealmPath (realm) {
         if (realm.parentPath === "/") {
             return realm.parentPath + realm.name;
         } else if (realm.parentPath) {
@@ -71,7 +76,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
         } else {
             return "/";
         }
-    };
+    }
 
     obj.authentication = {
         getAll () {
@@ -84,7 +89,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
         get (id) {
             const url = id === "core" ? "authentication" : `authentication/modules/${id}`;
 
-            return $.when(
+            return Promise.all([
                 obj.serviceCall({
                     url: `${url}?_action=schema`,
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -94,9 +99,9 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
                     url,
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 })
-            ).then((schemaData, valuesData) => ({
-                schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
-                values: valuesData[0]
+            ]).then((results) => ({
+                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
+                values: results[1][0]
             }));
         },
         update (id, data) {

@@ -86,35 +86,6 @@ define("config/process/AMConfig", [
             }
         }
     }, {
-        startEvent: Constants.EVENT_ADD_NEW_REALM_DIALOG,
-        override: true,
-        dependencies: [
-            "org/forgerock/commons/ui/common/main/Router",
-            "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
-            "org/forgerock/openam/ui/admin/views/realms/ListRealmsView",
-            "org/forgerock/openam/ui/admin/services/SMSGlobalService"
-        ],
-        processDescription: function (event, Router, CreateUpdateRealmDialog, ListRealmsView, SMSGlobalService) {
-            Router.routeTo(Router.configuration.routes.realms, {
-                args: [],
-                trigger: true
-            });
-
-            SMSGlobalService.realms.all().done(function (data) {
-                var allRealmPaths = [];
-                _.each(data.result, function (realm) {
-                    allRealmPaths.push(realm.path);
-                });
-
-                CreateUpdateRealmDialog.show({
-                    allRealmPaths : allRealmPaths,
-                    callback : function () {
-                        ListRealmsView.render();
-                    }
-                });
-            });
-        }
-    }, {
         startEvent: Constants.EVENT_RETURN_TO_AM_CONSOLE,
         description: "",
         dependencies: [

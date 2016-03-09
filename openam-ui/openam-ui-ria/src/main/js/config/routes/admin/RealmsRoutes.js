@@ -16,7 +16,7 @@
 
 define("config/routes/admin/RealmsRoutes", function () {
     var scopedByRealm = function (fragment) {
-            return new RegExp("^realms\/([^\/]+)\/" + fragment + "$");
+            return new RegExp("^realms\/((?:%2F)[^\/]*)\/" + fragment + "$");
         },
         defaultScopedByRealm = function (fragment) {
             return scopedByRealm("?(?:" + fragment + ")?");
@@ -28,6 +28,22 @@ define("config/routes/admin/RealmsRoutes", function () {
                 pattern: "realms",
                 role: "ui-realm-admin",
                 navGroup: "admin"
+            },
+            "realmEdit": {
+                view: "org/forgerock/openam/ui/admin/views/realms/EditRealmView",
+                url: scopedByRealm("edit"),
+                pattern: "realms/?/edit",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/EditRealmView",
+                url: /^realms\/new/,
+                pattern: "realms/new",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
             },
             "realmsDashboard": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",

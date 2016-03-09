@@ -882,14 +882,13 @@
                 "header": ["Realm name", "Status", "Path", "Realm/DNS Aliases"]
             },
             "parentRealmCannotDeleted": "Parent-realms cannot be deleted. Please delete any sub-realms first.",
+            "edit": {
+                "title": "Realm"
+            },
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
                 "activateMessage": "This is an active realm. All configuration data will be lost if deleted. You can set the realm as inactive to prevent login but retain configuration data. <br>Do you want to delete this realm?",
                 "deactivateMessage": "This is an inactive realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete this realm?"
-            },
-            "createUpdateRealmDialog": {
-                "createTitle": "New Realm",
-                "updateTitle": "__realmPath__ - Properties"
             },
             "realmStatusPopover": {
                 "title": "Realm Status",
