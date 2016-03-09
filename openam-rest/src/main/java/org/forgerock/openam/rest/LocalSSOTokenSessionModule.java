@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -65,8 +65,8 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
 
     private final AuthUtilsWrapper authUtilsWrapper;
 
-    private AuthnRequestUtils requestUtils;
-    private SSOTokenFactory factory;
+    private volatile AuthnRequestUtils requestUtils;
+    private volatile SSOTokenFactory factory;
     private CallbackHandler handler;
 
     /**
@@ -95,15 +95,17 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
      * @return False if the dependencies have not been initialised.
      */
     private boolean isInitialised() {
-        return getFactory() != null;
+        return getFactory() != null && getRequestUtils() != null;
     }
 
     /**
      * Use Guice to initalise the dependencies.
      */
-    private void initDependencies() {
-        factory = InjectorHolder.getInstance(SSOTokenFactory.class);
-        requestUtils = InjectorHolder.getInstance(AuthnRequestUtils.class);
+    private synchronized void initDependencies() {
+        if (!isInitialised()) {
+            factory = InjectorHolder.getInstance(SSOTokenFactory.class);
+            requestUtils = InjectorHolder.getInstance(AuthnRequestUtils.class);
+        }
     }
 
     @Override
