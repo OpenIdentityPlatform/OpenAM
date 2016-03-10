@@ -138,6 +138,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 toBeCreated: this.model.toBeCreated,
                 share: () => {
                     this.model.toBeCreated = false;
+                    this.updateUnshareButton();
                 }
             });
         },
@@ -364,9 +365,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
                     self.renderLabelsOptions();
 
-                    if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0) {
-                        self.$el.find("li#unshare").removeClass("disabled").find("a").attr("aria-disabled", false);
-                    }
+                    self.updateUnshareButton();
 
                     self.$el.find(".table-container").append(grid.render().el);
                     // FIXME: Re-enable filtering and pagination
@@ -455,6 +454,11 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         discardLabelsChanges: function () {
             this.stopEditingLabels();
             this.updateLabelOptions();
+        },
+        updateUnshareButton: function () {
+            if (this.model.has("policy") && this.model.get("policy").get("permissions").length > 0) {
+                this.$el.find("li#unshare").removeClass("disabled").find("a").attr("aria-disabled", false);
+            }
         }
     });
     return ResourcePage;
