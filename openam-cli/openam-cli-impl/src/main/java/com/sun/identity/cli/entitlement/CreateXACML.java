@@ -63,7 +63,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
-import com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
+import org.forgerock.openam.xacml.v3.ImportStep;
 import com.sun.identity.entitlement.xacml3.XACMLReaderWriter;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
@@ -212,7 +212,7 @@ public class CreateXACML extends AuthenticatedCommand {
         StringBuffer sb = new StringBuffer();
         for (ImportStep step : importSteps) {
             sb.append(MessageFormat.format(
-                    "{0} {1}\n", step.getDiffStatus().getCode(), step.getPrivilege().getName()));
+                    "{0} {1} {2}\n", step.getDiffStatus().getCode(), step.getName(), step.getType()));
         }
 
         if (isOutfileSet()) {

@@ -234,4 +234,16 @@ public class XACMLPrivilegeUtilsTest {
                 "to be added.");
     }
 
+    @Test
+    public void testUndesirablePrivilegeNames() {
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary-name")).isFalse();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary+name")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("+")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("+name")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary-name+")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary>name")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary<name")).isTrue();
+        assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary\\name")).isTrue();
+    }
+
 }

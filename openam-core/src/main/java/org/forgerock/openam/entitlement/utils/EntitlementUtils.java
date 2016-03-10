@@ -46,8 +46,10 @@ import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -385,7 +387,7 @@ public final class EntitlementUtils {
         try {
             return Long.parseLong(getAttribute(data, attributeName));
         } catch (NumberFormatException e) {
-            PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong", e);
+            PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong attributeName={}", attributeName, e);
             return newDate().getTime();
         }
     }
@@ -439,6 +441,26 @@ public final class EntitlementUtils {
             PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }
         return DenyOverride.class;
+    }
+
+    /**
+     * Returns all the short names of {@link EntitlementSubject}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unique EntitlementSubject registered at point of query.
+     */
+    public static Set<String> getSubjectsShortNames() {
+        return registry.getSubjectsShortNames();
+    }
+
+    /**
+     * Returns all the short names of {@link EntitlementCondition}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unique EntitlementConditions registered at point of query.
+     */
+    public static Set<String> getConditionsShortNames() {
+        return registry.getConditionsShortNames();
     }
 
     /**

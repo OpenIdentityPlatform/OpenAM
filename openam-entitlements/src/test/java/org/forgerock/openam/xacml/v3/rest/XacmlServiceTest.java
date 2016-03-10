@@ -16,13 +16,10 @@
 
 package org.forgerock.openam.xacml.v3.rest;
 
-import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.mockito.Mockito.*;
 
-import javax.security.auth.Subject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +30,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.xacml.v3.DiffStatus;
+import org.forgerock.openam.xacml.v3.ImportStep;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.Disposition;
+import org.restlet.data.Form;
+import org.restlet.data.Status;
+import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ResourceException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOException;
@@ -46,32 +68,10 @@ import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.entitlement.rest.StubPrivilege;
-import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.testng.PowerMockTestCase;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.data.Disposition;
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ResourceException;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RestLog.class})
-public class XacmlServiceTest extends PowerMockTestCase {
+public class XacmlServiceTest  {
 
     private static final ConcurrentMap<String, Object> REQUEST_ATTRIBUTES = new ConcurrentHashMap<String, Object>() {{
         put("realm", "/");
@@ -96,7 +96,7 @@ public class XacmlServiceTest extends PowerMockTestCase {
     private JacksonRepresentationFactory jacksonRepresentationFactory =
             new JacksonRepresentationFactory(new ObjectMapper());
 
-    @BeforeMethod
+    @Before
     public void setup() throws Exception {
         this.importExport = mock(XACMLExportImport.class);
         this.debug = mock(Debug.class);
@@ -121,13 +121,22 @@ public class XacmlServiceTest extends PowerMockTestCase {
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
 
-        StubPrivilege privilege = new StubPrivilege();
-        privilege.setName("fred");
-        XACMLExportImport.ImportStep importStep = mock(XACMLExportImport.ImportStep.class);
-        doReturn(XACMLExportImport.DiffStatus.ADD).when(importStep).getDiffStatus();
-        doReturn(privilege).when(importStep).getPrivilege();
+        ImportStep importStepPrivilege = mock(ImportStep.class);
+        doReturn(DiffStatus.ADD).when(importStepPrivilege).getDiffStatus();
+        doReturn("policy1").when(importStepPrivilege).getName();
+        doReturn("privilege").when(importStepPrivilege).getType();
 
-        List<ImportStep> steps = Arrays.asList(importStep);
+        ImportStep importStepApplication = mock(ImportStep.class);
+        doReturn(DiffStatus.UPDATE).when(importStepApplication).getDiffStatus();
+        doReturn("iPlanetAMWebAgentService").when(importStepApplication).getName();
+        doReturn("application").when(importStepApplication).getType();
+
+        ImportStep importStepResourceType = mock(ImportStep.class);
+        doReturn(DiffStatus.UPDATE).when(importStepResourceType).getDiffStatus();
+        doReturn("URL").when(importStepResourceType).getName();
+        doReturn("resourceType").when(importStepResourceType).getType();
+
+        List<ImportStep> steps = Arrays.asList(importStepPrivilege, importStepApplication, importStepResourceType);
         doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
 
         //when
@@ -135,8 +144,17 @@ public class XacmlServiceTest extends PowerMockTestCase {
 
         //then
         assertThat(result).isInstanceOf(JacksonRepresentation.class);
+
         Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
-        assertThat(resultMap).contains(entry("status", "A"), entry("name", "fred"));
+        assertThat(resultMap).contains(entry("status", "A"), entry("name", "policy1"), entry("type", "privilege"));
+
+        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(1).asMap();
+        assertThat(resultMap).contains(
+                entry("status", "U"), entry("name", "iPlanetAMWebAgentService"), entry("type", "application"));
+
+        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(2).asMap();
+        assertThat(resultMap).contains(entry("status", "U"), entry("name", "URL"), entry("type", "resourceType"));
+
         verify(response).setStatus(Status.SUCCESS_OK);
     }
 
@@ -148,13 +166,22 @@ public class XacmlServiceTest extends PowerMockTestCase {
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
 
-        StubPrivilege privilege = new StubPrivilege();
-        privilege.setName("fred");
-        XACMLExportImport.ImportStep importStep = mock(XACMLExportImport.ImportStep.class);
-        doReturn(XACMLExportImport.DiffStatus.ADD).when(importStep).getDiffStatus();
-        doReturn(privilege).when(importStep).getPrivilege();
+        ImportStep importStepPrivilege = mock(ImportStep.class);
+        doReturn(DiffStatus.ADD).when(importStepPrivilege).getDiffStatus();
+        doReturn("policy1").when(importStepPrivilege).getName();
+        doReturn("privilege").when(importStepPrivilege).getType();
 
-        List<ImportStep> steps = Arrays.asList(importStep);
+        ImportStep importStepApplication = mock(ImportStep.class);
+        doReturn(DiffStatus.UPDATE).when(importStepApplication).getDiffStatus();
+        doReturn("iPlanetAMWebAgentService").when(importStepApplication).getName();
+        doReturn("application").when(importStepApplication).getType();
+
+        ImportStep importStepResourceType = mock(ImportStep.class);
+        doReturn(DiffStatus.UPDATE).when(importStepResourceType).getDiffStatus();
+        doReturn("URL").when(importStepResourceType).getName();
+        doReturn("resourceType").when(importStepResourceType).getType();
+
+        List<ImportStep> steps = Arrays.asList(importStepPrivilege, importStepApplication, importStepResourceType);
         doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(true));
 
         //when
@@ -162,8 +189,17 @@ public class XacmlServiceTest extends PowerMockTestCase {
 
         //then
         assertThat(result).isInstanceOf(JacksonRepresentation.class);
+
         Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
-        assertThat(resultMap).contains(entry("status", "A"), entry("name", "fred"));
+        assertThat(resultMap).contains(entry("status", "A"), entry("name", "policy1"), entry("type", "privilege"));
+
+        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(1).asMap();
+        assertThat(resultMap).contains(
+                entry("status", "U"), entry("name", "iPlanetAMWebAgentService"), entry("type", "application"));
+
+        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(2).asMap();
+        assertThat(resultMap).contains(entry("status", "U"), entry("name", "URL"), entry("type", "resourceType"));
+
         verify(response).setStatus(Status.SUCCESS_OK);
     }
 
@@ -190,7 +226,8 @@ public class XacmlServiceTest extends PowerMockTestCase {
         Representation representation = mock(Representation.class);
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
-        doReturn(Collections.emptyList()).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
+        doReturn(Collections.emptyList()).
+                when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
 
         try {
             //when
@@ -316,11 +353,11 @@ public class XacmlServiceTest extends PowerMockTestCase {
 
     @Test
     public void testPermissionsCheckSuccess() {
-
         RestLog restLog = PowerMockito.mock(RestLog.class);
 
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator, jacksonRepresentationFactory);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator,
+                jacksonRepresentationFactory);
 
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
@@ -348,11 +385,11 @@ public class XacmlServiceTest extends PowerMockTestCase {
 
     @Test
     public void testPermissionsCheckFail() {
-
         RestLog restLog = PowerMockito.mock(RestLog.class);
 
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator, jacksonRepresentationFactory);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator,
+                jacksonRepresentationFactory);
 
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
@@ -377,4 +414,5 @@ public class XacmlServiceTest extends PowerMockTestCase {
             fail("Did not expect " + e.getClass().getName() + " with message " + e.getMessage());
         }
     }
+
 }

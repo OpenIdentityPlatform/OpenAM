@@ -16,37 +16,33 @@
 
 package com.sun.identity.entitlement.xacml3;
 
-import static com.sun.identity.entitlement.EntitlementException.NO_RESOURCE_TYPE_MATCH_FOUND;
+import static org.forgerock.openam.xacml.v3.XACMLApplicationUtils.ApplicationTypeService;
 
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.IPrivilege;
-import com.sun.identity.entitlement.IPrivilegeManager;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ResourceMatch;
-import com.sun.identity.entitlement.interfaces.ResourceName;
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
-import com.sun.identity.shared.debug.Debug;
-
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.service.ApplicationService;
-import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.util.annotations.VisibleForTesting;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.xacml.v3.ImportStep;
+import org.forgerock.openam.xacml.v3.PersistableImportStep;
+import org.forgerock.openam.xacml.v3.ImportStepGenerator;
+
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Utility for handling the Export and subsequent Import of Policies into
@@ -75,16 +71,17 @@ public class XACMLExportImport {
      * @param privilegeValidator Non null, required for validation of imported privileges.
      * @param searchFilterFactory Non null, required for SearchFilter operations.
      * @param debug Non null.
+     * @param applicationServiceFactory Application service factory responsible for creating the application service.
+     * @param resourceTypeService Resource type service responsible for creating resource types.
      */
     @Inject
     public XACMLExportImport(PrivilegeManagerFactory privilegeManagerFactory,
-                             XACMLReaderWriter xacmlReaderWriter,
-                             PrivilegeValidator privilegeValidator,
-                             SearchFilterFactory searchFilterFactory,
-                             @Named(XACMLConstants.DEBUG) Debug debug,
+            XACMLReaderWriter xacmlReaderWriter,
+            PrivilegeValidator privilegeValidator,
+            SearchFilterFactory searchFilterFactory,
+            @Named(XACMLConstants.DEBUG) Debug debug,
             ApplicationServiceFactory applicationServiceFactory,
             ResourceTypeService resourceTypeService) {
-
         this.privilegeManagerFactory = privilegeManagerFactory;
         this.xacmlReaderWriter = xacmlReaderWriter;
         this.searchFilterFactory = searchFilterFactory;
@@ -106,81 +103,53 @@ public class XACMLExportImport {
      */
     public List<ImportStep> importXacml(String realm, InputStream xacml, Subject admin, boolean dryRun)
             throws EntitlementException {
+        PrivilegeSet privilegeSet = xacmlToPrivilegeSet(xacml);
+        List<PersistableImportStep> importSteps = generateImportSteps(realm, privilegeSet, admin);
+        applyIfRequired(dryRun, importSteps);
 
-        PrivilegeSet privilegeSet = xacmlReaderWriter.read(xacml);
-        List<ImportStep> importSteps = generateImportSteps(realm, privilegeSet, admin);
+        return new ArrayList<ImportStep>(importSteps);
+    }
 
-        if (!dryRun) {
-            message("Import: Policies to Import {0}", importSteps.size());
-            for (ImportStep importStep : importSteps) {
-                ((ImportStepImpl) importStep).apply();
-            }
-            message("Import: Complete");
-        }
-
-        return importSteps;
+    private PrivilegeSet xacmlToPrivilegeSet(InputStream xacml) throws EntitlementException {
+        return xacmlReaderWriter.read(xacml);
     }
 
     /**
      * Establishes the sequence of ImportSteps required to import the provided privileges into the specified realm.
      *
      * @param realm Non null Realm to populate with the Policies.
-     * @param privilegeSet Non null, collection of Privileges and ReferralPrivileges to import.
+     * @param privilegeSet Non null, collection of Privileges, ReferralPrivileges etc. to import.
      * @param admin Non null admin Subject.
      * @return The sequence steps that can be used to carry out the import.
      * @throws EntitlementException If there was any unexpected error.
      */
-    private List<ImportStep> generateImportSteps(String realm, PrivilegeSet privilegeSet, Subject admin)
+    private List<PersistableImportStep> generateImportSteps(String realm, PrivilegeSet privilegeSet, Subject admin)
             throws EntitlementException {
-
-        List<ImportStep> importSteps = new ArrayList<ImportStep>();
-
-        PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
         ApplicationService applicationService = applicationServiceFactory.create(admin, realm);
+        PrivilegeManager privilegeManager = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
+        ApplicationTypeService applicationTypeService = new ApplicationTypeService();
 
-        for (Privilege privilege : privilegeSet.getPrivileges()) {
+        ImportStepGenerator importStepGenerator = new ImportStepGenerator(applicationService,
+                resourceTypeService, privilegeManager, privilegeValidator, applicationTypeService,
+                realm, admin, privilegeSet);
 
-            // OPENAM-5031
-            // For the moment, fail the whole import if any single referral is found to have a name which doesn't
-            // suit LDAP.
-            if (containsUndesiredCharacters(privilege.getName())) {
-                throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                        new Object[] { "privilege name " + privilege.getName() });
-            }
+        importStepGenerator.generateImportSteps();
 
-            privilegeValidator.validatePrivilege(privilege);
-            privilege.setResourceTypeUuid(getResourceTypeId(applicationService, privilege, realm, admin));
-            if (pm.canFindByName(privilege.getName())) {
-                importSteps.add(privilegeImportStep(pm, DiffStatus.UPDATE, privilege));
-            } else {
-                importSteps.add(privilegeImportStep(pm, DiffStatus.ADD, privilege));
-            }
-        }
-
-        return importSteps;
+        return importStepGenerator.getAllImportSteps();
     }
 
-    private String getResourceTypeId(ApplicationService applicationService, Privilege privilege, String realm,
-            Subject subject) throws EntitlementException {
+    private void applyIfRequired(boolean dryRun, List<PersistableImportStep> importSteps) throws EntitlementException {
+        if (!dryRun) {
+            message("Import: Policies to Import {0}", importSteps.size());
 
-        Application application = applicationService.getApplication(privilege.getEntitlement().getApplicationName());
-        ResourceName resourceComparator = application.getResourceComparator();
-        Set<String> resourceTypeIds = application.getResourceTypeUuids();
-        Set<String> resources = privilege.getEntitlement().getResourceNames();
-        for (String resource : resources) {
-            for (String resourceTypeId : resourceTypeIds) {
-                ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, resourceTypeId);
-                Set<String> patterns = resourceType.getPatterns();
-                for (String pattern : patterns) {
-                    ResourceMatch match = resourceComparator.compare(resource, pattern, true);
-                    if (match.equals(ResourceMatch.EXACT_MATCH) || match.equals(ResourceMatch.WILDCARD_MATCH)) {
-                        return resourceTypeId;
-                    }
-                }
+            for (PersistableImportStep importStep : importSteps) {
+                message("Import: {0} {1} {2}",
+                        importStep.getDiffStatus().name(), importStep.getType(), importStep.getName());
+                importStep.apply();
             }
-        }
 
-        throw new EntitlementException(NO_RESOURCE_TYPE_MATCH_FOUND);
+            message("Import: Complete");
+        }
     }
 
     /**
@@ -195,7 +164,6 @@ public class XACMLExportImport {
      */
     public PolicySet exportXACML(String realm, Subject admin, List<String> filters)
             throws EntitlementException {
-
         PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
 
         Set<SearchFilter> filterSet = new HashSet<SearchFilter>();
@@ -229,40 +197,6 @@ public class XACMLExportImport {
     }
 
     /**
-     * OPENAM-5031: We would have used DN.escapeAttributeValue to encode the incoming string and compare with the
-     * original string - if there are differences then the incoming string contains characters which LDAP requires
-     * quoted.  However ssoadm doesn't include the jar that the DN class ends up in.  In order to avoid the
-     * overhead of adding a whole jar just for one function in one class, this is provided here.  Thus, this
-     * function returns true if the incoming string contains any character which LDAP requires to be quoted.
-     *
-     * @param s The specified string.
-     * @return true if the string contains characters which require quotation for LDAP to work, false otherwise
-     */
-    @VisibleForTesting
-    boolean containsUndesiredCharacters(String s) {
-
-        // This is done with strings rather than characters because the initialisation of the set is much easier.
-        // Otherwise we end up with a Set<Character> being initialised from a List<char>
-        //
-        final String[] DODGY_LDAP_CHARS = { ",", "+", "\"", "\\", "<", ">", ";" };
-        Set<String> dodgyChars = new HashSet<String>(Arrays.asList(DODGY_LDAP_CHARS));
-        for(int i = 0; i < s.length(); i++) {
-            String sub = s.substring(i, i + 1);
-            if (dodgyChars.contains(sub)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Factory method for Privilege ImportStep
-     */
-    private ImportStep privilegeImportStep(PrivilegeManager pm, DiffStatus type, Privilege privilege) {
-        return new ImportStepImpl<Privilege>(pm, type, privilege, "Privilege");
-    }
-
-    /**
      * Factory to allow PrivilegeManager to be mocked in tests
      */
     public static class PrivilegeManagerFactory {
@@ -270,83 +204,6 @@ public class XACMLExportImport {
         PrivilegeManager createReferralPrivilegeManager(String realm, Subject admin) {
             return PrivilegeManager.getInstance(realm, admin);
         }
-    }
-
-    /**
-     * Diff status types used to describe the change in state of a single resource.
-     */
-    public static enum DiffStatus {
-
-        ADD('A'), UPDATE('U');
-
-        private final char code;
-
-        private DiffStatus(char code) {
-            this.code = code;
-        }
-
-        /**
-         * Single character description of diff status.
-         *
-         * @return Character code description of diff status.
-         */
-        public char getCode() {
-            return code;
-        }
-
-    }
-
-    /**
-     * Describes how a Privilege or ReferralPrivilege read from XACML will be imported into OpenAM.
-     */
-    public interface ImportStep {
-
-        public DiffStatus getDiffStatus();
-
-        public IPrivilege getPrivilege();
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    private final class ImportStepImpl<T extends IPrivilege> implements ImportStep {
-
-        private final IPrivilegeManager<T> privilegeManager;
-        private final DiffStatus diffStatus;
-        private final T privilege;
-        private final String privilegeType;
-
-        public ImportStepImpl(IPrivilegeManager<T> manager, DiffStatus diffStatus, T privilege, String privilegeType) {
-            this.privilegeManager = manager;
-            this.diffStatus = diffStatus;
-            this.privilege = privilege;
-            this.privilegeType = privilegeType;
-        }
-
-        @Override
-        public DiffStatus getDiffStatus() {
-            return diffStatus;
-        }
-
-        @Override
-        public IPrivilege getPrivilege() {
-            return privilege;
-        }
-
-        private void apply() throws EntitlementException {
-
-            message("Import: {0} {1} {2}", diffStatus.name(), privilegeType, privilege.getName());
-            switch (diffStatus) {
-                case ADD:
-                    privilegeManager.add(privilege);
-                    break;
-                case UPDATE:
-                    privilegeManager.modify(privilege);
-                    break;
-            }
-        }
-
     }
 
 }

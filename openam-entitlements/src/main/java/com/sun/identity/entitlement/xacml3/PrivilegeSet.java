@@ -11,21 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.ReferralPrivilege;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.forgerock.openam.entitlement.ResourceType;
+
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.ReferralPrivilege;
+
 /**
- * Simple collection class for passing collections of Privilege and ReferralPrivilege objects as method argument
- * or return type.
+ * Simple collection class for passing collections of Privilege, ReferralPrivilege, Application and ResourceType
+ * objects as method argument or return type.
  *
  * This class was introduced specifically to allow methods to return both Privilege and ReferralPrivilge results
  * in separate collections so later instanceof checks can be avoided.
@@ -35,21 +39,58 @@ import java.util.List;
 public class PrivilegeSet {
 
     private final List<Privilege> privileges;
+    private final List<Application> applications;
+    private final List<ResourceType> resourceTypes;
     private final List<ReferralPrivilege> referralPrivileges;
 
+    /**
+     * Constructs PrivilegeSet instance.
+     */
     public PrivilegeSet() {
-        this.privileges = new ArrayList<Privilege>();
-        this.referralPrivileges = new ArrayList<ReferralPrivilege>();
+        this.privileges = new ArrayList<>();
+        this.applications = new ArrayList<>();
+        this.resourceTypes = new ArrayList<>();
+        this.referralPrivileges = new ArrayList<>();
     }
 
-    public PrivilegeSet(List<ReferralPrivilege> referralPrivileges, List<Privilege> privileges) {
-        this();
-        this.privileges.addAll(privileges);
-        this.referralPrivileges.addAll(referralPrivileges);
-    }
-
+    /**
+     * Adds privilege to this set.
+     *
+     * @param privilege
+     *         to be added.
+     */
     public void addPrivilege(Privilege privilege) {
         privileges.add(privilege);
+    }
+
+    /**
+     * Adds referralPrivilege to this set.
+     *
+     * @param referralPrivilege
+     *         to be added.
+     */
+    public void addReferralPrivilege(ReferralPrivilege referralPrivilege) {
+        referralPrivileges.add(referralPrivilege);
+    }
+
+    /**
+     * Adds application to this set.
+     *
+     * @param application
+     *         to be added.
+     */
+    public void addApplication(Application application) {
+        applications.add(application);
+    }
+
+    /**
+     * Adds resource type to this set.
+     *
+     * @param resourceType
+     *         to be added.
+     */
+    public void addResourceType(ResourceType resourceType) {
+        resourceTypes.add(resourceType);
     }
 
     /**
@@ -61,10 +102,6 @@ public class PrivilegeSet {
         return Collections.unmodifiableList(privileges);
     }
 
-    public void addReferralPrivilege(ReferralPrivilege referralPrivilege) {
-        referralPrivileges.add(referralPrivilege);
-    }
-
     /**
      * Obtain list of ReferralPrivilege objects held by this class.
      *
@@ -73,4 +110,23 @@ public class PrivilegeSet {
     public List<ReferralPrivilege> getReferralPrivileges() {
         return Collections.unmodifiableList(referralPrivileges);
     }
+
+    /**
+     * Obtain list of Application objects held by this class.
+     *
+     * @return Unmodifiable list of Application objects held by this class.
+     */
+    public List<Application> getApplication() {
+        return Collections.unmodifiableList(applications);
+    }
+
+    /**
+     * Obtain list of ResourceType objects held by this class.
+     *
+     * @return Unmodifiable list of ResourceType objects held by this class.
+     */
+    public List<ResourceType> getResourceTypes() {
+        return Collections.unmodifiableList(resourceTypes);
+    }
+
 }
