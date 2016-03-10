@@ -60,8 +60,8 @@ Grunt will then start watching the source and sync any changed files over to you
 
 ### ES6 Transpiling
 * ✅Phase 0 - Babel support (no-op)
-* ❎Phase 1 - Arrow functions, `const` and `let`
-* ❎Phase 2 - TBA
+* ✅Phase 1 - Arrow functions, `const` and `let`
+* ✅Phase 2 - Enhanced object literals, template literals, tagged template literals
 
 ES6 is supported via [Babel](https://babeljs.io) transpiling. The following files and directories are transpiled:
 * `main-authorize.js`

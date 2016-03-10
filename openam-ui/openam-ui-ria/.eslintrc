@@ -9,7 +9,12 @@
     },
     "ecmaFeatures": {
         arrowFunctions: true,
-        blockBindings: true
+        blockBindings: true,
+        objectLiteralComputedProperties: true,
+        objectLiteralDuplicateProperties: true,
+        objectLiteralShorthandMethods: true,
+        objectLiteralShorthandProperties: true,
+        templateStrings: true
     },
     "rules": {
         /*
@@ -454,6 +459,8 @@
         "no-var": 1,
         "prefer-arrow-callback": 1,
         "prefer-const": 1,
+        "prefer-template": 1,
+        "object-shorthand": 1,
 
         /*
          * --------------------------------------------------------------------------------
