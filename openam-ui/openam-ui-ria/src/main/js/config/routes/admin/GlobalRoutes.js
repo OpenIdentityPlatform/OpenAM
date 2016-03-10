@@ -36,6 +36,13 @@ define("config/routes/admin/GlobalRoutes", [], function () {
             pattern: "configuration/console",
             role: "ui-global-admin",
             navGroup: "admin"
+        },
+        editGlobalAuthentication: {
+            view: "org/forgerock/openam/ui/admin/views/global/ConfigurationEditView",
+            url: /configuration\/authentication\/([^\/]+)/,
+            pattern: "configuration/authentication/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
         }
     };
 });

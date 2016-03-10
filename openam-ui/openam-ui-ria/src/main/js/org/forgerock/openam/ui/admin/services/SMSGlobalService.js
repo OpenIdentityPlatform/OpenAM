@@ -80,6 +80,33 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((data) => data.result);
+        },
+        get: function (id) {
+            const url = "authentication/modules/" + id;
+            return $.when(
+                obj.serviceCall({
+                    url: url + "?_action=schema",
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                }),
+                obj.serviceCall({
+                    url: url,
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                })
+            ).then(function (schemaData, valuesData) {
+                return {
+                    schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
+                    values: valuesData[0]
+                };
+            });
+        },
+        update: function (id, data) {
+            return obj.serviceCall({
+                url: "authentication/modules/" + id,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "PUT",
+                data: JSON.stringify(data)
+            });
         }
     };
 

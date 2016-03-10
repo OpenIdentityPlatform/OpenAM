@@ -72,6 +72,8 @@ define([
 
     "./views/global/createConfigurationListView",
     "./views/global/ConsoleConfigurationListView",
-    "./views/global/SystemConfigurationListView"
+    "./views/global/SystemConfigurationListView",
+    "./views/global/AuthenticationConfigurationListView",
+    "./views/global/ConfigurationEditView"
 
 ]);

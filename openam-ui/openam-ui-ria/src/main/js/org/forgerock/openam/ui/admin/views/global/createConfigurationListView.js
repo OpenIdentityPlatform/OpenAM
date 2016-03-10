@@ -26,6 +26,7 @@
       * Returns a list view
       * @param   {string} title Title to display
       * @param   {function} getItems a function that returns items
+      * @param   {string} location the location of list items
       * @returns {function} createConfigurationListView a function that creates a view
       */
      var createConfigurationListView = function (title, getItems) {

@@ -901,7 +901,8 @@
                     "title": "Console Properties"
                 },
                 "authentication" : {
-                    "title" : "Authentication Properties"
+                    "title" : "Authentication Properties",
+                    "itemType" : "Global Authentication Settings"
                 }
             }
         },
