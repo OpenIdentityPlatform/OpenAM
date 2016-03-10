@@ -897,6 +897,9 @@
                 },
                 "console" : {
                     "title": "Console Properties"
+                },
+                "authentication" : {
+                    "title" : "Authentication Properties"
                 }
             }
         },

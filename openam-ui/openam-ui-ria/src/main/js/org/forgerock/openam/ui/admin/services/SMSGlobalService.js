@@ -73,6 +73,16 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
             }
         };
 
+    obj.authentication = {
+        getAll: function () {
+            return obj.serviceCall({
+                url: "authentication/modules?_action=getAllTypes",
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }).then((data) => data.result);
+        }
+    };
+
     obj.realms = {
         /**
          * Gets all realms.

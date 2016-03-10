@@ -23,6 +23,13 @@ define("config/routes/admin/GlobalRoutes", [], function () {
             role: "ui-global-admin",
             navGroup: "admin"
         },
+        configurationAuthentication: {
+            view: "org/forgerock/openam/ui/admin/views/global/AuthenticationConfigurationListView",
+            url: /configuration\/authentication/,
+            pattern: "configuration/authentication",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
         configurationConsole: {
             view: "org/forgerock/openam/ui/admin/views/global/ConsoleConfigurationListView",
             url: /configuration\/console/,
