@@ -12,9 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006 Sun Microsystems Inc.
- */
-/*
- * Portions Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -34,7 +33,6 @@ import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -111,10 +109,6 @@ public class AuthLevelCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
-        if (subject == null) {
-            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
-        }
-        
         if (authLevel == null) {
             throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, new String[]{AUTH_LEVEL}, null);
         }
@@ -127,7 +121,7 @@ public class AuthLevelCondition extends EntitlementConditionAdaptor {
 
         try {
             int maxRequestAuthLevel = getMaxRequestAuthLevel(env);
-            if (maxRequestAuthLevel == Integer.MIN_VALUE) {
+            if (maxRequestAuthLevel == Integer.MIN_VALUE && subject != null) {
                 SSOToken token = (SSOToken) subject.getPrivateCredentials().iterator().next();
                 maxRequestAuthLevel = getMaxRequestAuthLevel(token);
             }
