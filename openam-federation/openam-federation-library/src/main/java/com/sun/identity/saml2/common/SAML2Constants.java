@@ -24,7 +24,7 @@
  *
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.common;
 
@@ -1091,12 +1091,6 @@ public interface SAML2Constants {
     "urn:oasis:names:tc:SAML:2.0:ac:classes:";
 
     /**
-     * Default Service provider AuthnContext Class Reference and 
-     * AuthLevel Mapping value.
-     */
-    public String SP_AUTHCONTEXT_CLASSREF_VALUE=
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0|default";
-    /**
      * Service provider AuthnContext Comparison Type attribute name.
      */
     public String SP_AUTHCONTEXT_COMPARISON_TYPE =
@@ -1188,7 +1182,17 @@ public interface SAML2Constants {
     // AuthnContext Class Reference names
     public String CLASSREF_PASSWORD_PROTECTED_TRANSPORT =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
-        
+
+    // Represents an Authentication Level of 0
+    public Integer AUTH_LEVEL_ZERO = Integer.valueOf(0);
+
+    /**
+     * Default Service provider AuthnContext Class Reference and
+     * AuthLevel Mapping value.
+     */
+    public String SP_AUTHCONTEXT_CLASSREF_VALUE =
+            CLASSREF_PASSWORD_PROTECTED_TRANSPORT + "|" + AUTH_LEVEL_ZERO + "|default";
+
     // COT List
     public String COT_LIST = COTConstants.COT_LIST;
 

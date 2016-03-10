@@ -24,10 +24,7 @@
  *
  * $Id: DefaultIDPAuthnContextMapper.java,v 1.9 2008/11/10 22:57:02 veiming Exp $
  *
- */
-
- /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -37,12 +34,8 @@ import com.sun.identity.saml2.assertion.AuthnContext;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
-import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.profile.IDPCache;
-import com.sun.identity.saml2.profile.IDPSSOUtil;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.RequestedAuthnContext;
 import java.util.ArrayList;
@@ -168,21 +161,20 @@ public class DefaultIDPAuthnContextMapper
                 return null;
             }
         } else {
-            authTypeAndValues = (Set) classRefSchemesMap.get(DEFAULT);
-            classRef = (String) IDPCache.defaultClassRefHash.get(
-                idpEntityID + "|" + realm);
-            authnLevel = (Integer)classRefLevelMap.get(classRef);
+            classRef = (String) IDPCache.defaultClassRefHash.get(idpEntityID + "|" + realm);
+            // If there was no default entry, provide some sensible defaults
             if (classRef == null) {
                 classRef = SAML2Constants.CLASSREF_PASSWORD_PROTECTED_TRANSPORT;
+                authnLevel = SAML2Constants.AUTH_LEVEL_ZERO;
+            } else {
+                authTypeAndValues = (Set) classRefSchemesMap.get(DEFAULT);
+                authnLevel = (Integer) classRefLevelMap.get(classRef);
             }
-
         }
 
-        AuthnContext authnContext = 
-            AssertionFactory.getInstance().createAuthnContext();
+        AuthnContext authnContext = AssertionFactory.getInstance().createAuthnContext();
         authnContext.setAuthnContextClassRef(classRef);
-        IDPAuthnContextInfo info = new IDPAuthnContextInfo(
-            authnContext, authTypeAndValues, authnLevel);
+        IDPAuthnContextInfo info = new IDPAuthnContextInfo(authnContext, authTypeAndValues, authnLevel);
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(classMethod +
                 "\nreturned AuthnContextClassRef=" + classRef + 
