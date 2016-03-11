@@ -74,6 +74,7 @@ define("config/AppConfiguration", [
                 ],
                 partialUrls: [
                     "partials/form/_JSONSchemaFooter.html",
+                    "partials/form/_AutoCompleteOffFix.html",
                     "partials/headers/_Title.html",
                     "partials/headers/_TitleWithSubAndIcon.html",
                     "partials/login/_Choice.html",
