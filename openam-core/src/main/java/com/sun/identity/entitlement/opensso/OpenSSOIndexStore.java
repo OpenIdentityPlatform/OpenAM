@@ -24,7 +24,7 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -338,16 +338,14 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         }
     }
 
-    private void cache(
-        Privilege p,
-        Set<String> subjectSearchIndexes,
-        String realm
-    ) throws EntitlementException {
-        String dn = DataStore.getPrivilegeDistinguishedName(
-            p.getName(), realm, null);
+    private void cache(Privilege p, Set<String> subjectSearchIndexes, String realm) throws EntitlementException {
+        String dn = DataStore.getPrivilegeDistinguishedName(p.getName(), realm, null);
         String realmName = DNMapper.orgNameToRealmName(realm);
-        indexCache.cache(p.getEntitlement().getResourceSaveIndexes(
-            superAdminSubject, realmName), subjectSearchIndexes, dn);
+        if (subjectSearchIndexes == null) {
+            subjectSearchIndexes = SubjectAttributesManager.getSubjectSearchIndexes(p);
+        }
+        indexCache.cache(p.getEntitlement().getResourceSaveIndexes(superAdminSubject, realmName),
+                subjectSearchIndexes, dn);
         policyCache.cache(dn, p, realmDN);
     }
 
