@@ -24,7 +24,7 @@
  *
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -846,16 +846,14 @@ public class DataStore {
         final long start = DB_MONITOR_PRIVILEGE.start();
 
         final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        final Privilege privilege;
+        Privilege privilege = null;
 
         try {
             final Iterator i = SMSEntry.search(token, privilegeDN, NO_FILTER, NO_LIMIT, NO_LIMIT,
                     NOT_SORTED, NOT_SORTED, NO_EXCLUSIONS);
-            if (i.hasNext()) {
+            while (i.hasNext()) {
                 SMSDataEntry e = (SMSDataEntry) i.next();
                 privilege = Privilege.getInstance(new JSONObject(e.getAttributeValue(SERIALIZABLE_INDEX_KEY)));
-            } else {
-                privilege = null;
             }
         } catch (SMSException e) {
             Object[] arg = {privilegeDN};
