@@ -18,11 +18,12 @@
      "jquery",
      "org/forgerock/openam/ui/admin/views/global/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/SMSGlobalService"
- ], function ($, createConfigurationListView, SMSGlobalService) {
+ ], ($, createConfigurationListView, SMSGlobalService) => {
 
-     var ListAuthenticationView = createConfigurationListView(
+     const ListAuthenticationView = createConfigurationListView(
          $.t("config.AppConfiguration.Navigation.links.configure.authentication"),
-         SMSGlobalService.authentication.getAll
+         SMSGlobalService.authentication.getAll,
+         "templates/admin/views/global/authentication/ListAuthenticationConfigurationTemplate.html"
      );
 
      return new ListAuthenticationView();

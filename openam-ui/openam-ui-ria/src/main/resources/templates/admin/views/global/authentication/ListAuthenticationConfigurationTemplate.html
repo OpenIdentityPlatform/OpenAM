@@ -1,0 +1,19 @@
+<div class="container">
+    {{> headers/_Title title=title }}
+
+    <p class="page-description">TODO: AME-10097 To configure individual authentication module settings click on the item in the list below. To configure individual authentication module settings click on the item in the list below. To configure individual authentication module settings click on the item in the list below. More text here explaining why we need these core attributes.</p>
+
+    <div class="panel panel-default">
+        <div class="list-group">
+            <a href="{{routeTo 'editAuthenticationSettings' 'core'}}" class="list-group-item">{{t "console.configuration.global.authentication.coreAttributes"}}</a>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="list-group">
+            {{#each items}}
+            <a href="{{routeTo 'editAuthenticationSettings' this._id}}" class="list-group-item">{{name}}</a>
+            {{/each}}
+        </div>
+    </div>
+</div>

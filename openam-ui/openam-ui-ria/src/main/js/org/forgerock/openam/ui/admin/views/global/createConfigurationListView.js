@@ -18,35 +18,34 @@
   * @module org/forgerock/openam/ui/admin/views/global/createConfigurationListView
   */
  define("org/forgerock/openam/ui/admin/views/global/createConfigurationListView", [
-     "jquery",
      "org/forgerock/commons/ui/common/main/AbstractView"
- ], function ($, AbstractView) {
+ ], (AbstractView) => {
 
      /**
       * Returns a list view
       * @param   {string} title Title to display
       * @param   {function} getItems a function that returns items
-      * @param   {string} location the location of list items
+      * @param   {string} template list template
       * @returns {function} createConfigurationListView a function that creates a view
       */
-     var createConfigurationListView = function (title, getItems) {
-         return AbstractView.extend({
-             template: "templates/admin/views/global/ListConfigurationTemplate.html",
-             render: function () {
-                 var self = this;
-                 self.data.title = title;
-                 getItems().then(function (items) {
-                     self.data.items = items;
-                     self.parentRender();
-                 }, function (reason) {
+     const createConfigurationListView = (title, getItems, template) => (
+         AbstractView.extend({
+             template,
+             render () {
+                 this.data.title = title;
+
+                 getItems().then((items) => {
+                     this.data.items = items;
+                     this.parentRender();
+                 }, (reason) => {
                      console.error(reason);
                      // display reason
                      // TODO data load failed, click to retry
-                     self.parentRender();
+                     this.parentRender();
                  });
              }
-         });
-     };
+         })
+     );
 
      return createConfigurationListView;
  });

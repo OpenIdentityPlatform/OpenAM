@@ -908,6 +908,13 @@
                 "confirmDeleteText": "Are you sure you want to delete the selected scripts?"
             }
         },
+        "configuration" : {
+            "global" : {
+                "authentication" : {
+                    "coreAttributes": "Core Attributes"
+                }
+            }
+        },
         "authorization": {
             "common": {
                 "realm": "Realm",

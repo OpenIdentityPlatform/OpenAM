@@ -14,13 +14,13 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/global/EditServerDefaultsView", [
-     "org/forgerock/commons/ui/common/main/AbstractView"
- ], function (AbstractView) {
+define("org/forgerock/openam/ui/admin/views/global/EditServerDefaultsView", [
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], (AbstractView) => {
 
-     var EditServerDefaultsView = AbstractView.extend(
+    const EditServerDefaultsView = AbstractView.extend({
         // TODO
-     );
+    });
 
-     return new EditServerDefaultsView();
- });
+    return new EditServerDefaultsView();
+});

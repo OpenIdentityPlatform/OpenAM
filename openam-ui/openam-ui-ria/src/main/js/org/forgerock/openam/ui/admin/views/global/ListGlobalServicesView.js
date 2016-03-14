@@ -18,11 +18,12 @@
      "jquery",
      "org/forgerock/openam/ui/admin/views/global/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/SMSGlobalService"
- ], function ($, createConfigurationListView, SMSGlobalService) {
+ ], ($, createConfigurationListView, SMSGlobalService) => {
 
-     var ListGlobalServicesView = createConfigurationListView(
+     const ListGlobalServicesView = createConfigurationListView(
          $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
-         SMSGlobalService.configuration.services.console.getAll
+         SMSGlobalService.configuration.services.console.getAll,
+         "templates/admin/views/global/ListConfigurationTemplate.html"
      );
 
      return new ListGlobalServicesView();
