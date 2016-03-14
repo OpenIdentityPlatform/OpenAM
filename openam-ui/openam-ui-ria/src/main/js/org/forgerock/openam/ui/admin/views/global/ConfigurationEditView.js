@@ -24,12 +24,15 @@ define("org/forgerock/openam/ui/admin/views/global/ConfigurationEditView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/admin/views/global/EditConfigurationBacklink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService) => {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService,
+    EditConfigurationBacklink) => {
 
-    var ConfigurationEditView = AbstractView.extend({
+
+    var EditConfigurationView = AbstractView.extend({
         template: "templates/admin/views/global/ConfigurationEditTemplate.html",
         events: {
             "click [data-save]": "onSave",
@@ -38,11 +41,10 @@ define("org/forgerock/openam/ui/admin/views/global/ConfigurationEditView", [
 
         render: function (args, callback) {
             this.data.id = args[0];
-
             SMSGlobalService.authentication.get(this.data.id).then((data) => {
                 this.data.schema = data.schema;
                 this.data.values = data.values;
-                this.data.name = data.name;
+                this.data.name = "TODO: return of the name"; // data.name
                 this.data.tabbed = this.data.schema.grouped;
 
                 this.parentRender(() => {
@@ -56,6 +58,8 @@ define("org/forgerock/openam/ui/admin/views/global/ConfigurationEditView", [
                             this.data.values
                         );
                     }
+                    const backlink = new EditConfigurationBacklink({ el:"#backlink" });
+                    backlink.render();
                     if (callback) { callback(); }
                 });
             });
@@ -82,5 +86,5 @@ define("org/forgerock/openam/ui/admin/views/global/ConfigurationEditView", [
         }
     });
 
-    return new ConfigurationEditView();
+    return new EditConfigurationView();
 });

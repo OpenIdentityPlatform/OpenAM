@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
                 url: "authentication/modules?_action=getAllTypes",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then((data) => data.result);
+            }).then((data) => _.sortBy(data.result, "name"));
         },
         get: function (id) {
             const url = "authentication/modules/" + id;

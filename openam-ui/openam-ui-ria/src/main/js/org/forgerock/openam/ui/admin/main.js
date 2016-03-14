@@ -71,6 +71,7 @@ define([
     "./views/realms/CreateUpdateRealmDialog",
 
     "./views/global/createConfigurationListView",
+    "./views/global/EditConfigurationBacklink",
     "./views/global/ConsoleConfigurationListView",
     "./views/global/SystemConfigurationListView",
     "./views/global/AuthenticationConfigurationListView",

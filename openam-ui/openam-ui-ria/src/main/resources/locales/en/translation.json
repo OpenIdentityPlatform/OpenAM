@@ -97,6 +97,9 @@
                         "newRealm": "New Realm",
                         "viewAll": "View all..."
                     },
+                    "configure": {
+                        "authentication": "Authentication"
+                    },
                     "federation": "Federation",
                     "configuration": "Configuration",
                     "sessions": "Sessions",
@@ -685,6 +688,8 @@
                 "policies": "Policies",
                 "new" : "New",
                 "edit" : "Edit",
+                "server-settings" : "Server Settings",
+                "global-settings" : "Global Settings",
                 "authentication-settings": "Authentication - Settings",
                 "authentication-chains": "Authentication - Chains",
                 "authentication-modules": "Authentication - Modules",
@@ -895,14 +900,13 @@
         "configuration" : {
             "global" : {
                 "system" : {
-                    "title": "System Properties"
+                    "title": "System"
                 },
                 "console" : {
-                    "title": "Console Properties"
+                    "title": "Console"
                 },
                 "authentication" : {
-                    "title" : "Authentication Properties",
-                    "itemType" : "Global Authentication Settings"
+                    "title" : "Authentication"
                 }
             }
         },
