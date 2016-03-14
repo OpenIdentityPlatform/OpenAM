@@ -123,7 +123,9 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
         Entry previousEntry = conversion.getEntry(previous);
         LdapTokenAttributeConversion.stripObjectClass(previousEntry);
 
-        ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry);
+        ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry,
+            Entries.diffOptions().replaceSingleValuedAttributes());
+
         request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()));
 
         // Test to see if there are any modifications
