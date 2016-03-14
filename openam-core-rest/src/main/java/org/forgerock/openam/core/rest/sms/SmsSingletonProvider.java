@@ -105,15 +105,15 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             String realm = realmFor(serverContext);
-            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
+            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
+        } catch (SSOException | InternalServerErrorException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (NotFoundException e) {
+        } catch (NotFoundException  e) {
             return e.asPromise();
         }
     }
@@ -174,7 +174,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             String realm = realmFor(serverContext);
             saveConfigAttributes(config, convertFromJson(updateRequest.getContent(), realm));
-            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
+            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -238,7 +238,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
-            JsonValue result = withExtraAttributes(realm, convertToJson(realm, config));
+            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -311,14 +311,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             throw new NotFoundException();
         }
         return result;
-    }
-
-    protected JsonValue convertToJson(String realm, ServiceConfig config) {
-        if (config == null) {
-            return json(object());
-        } else {
-            return converter.toJson(realm, config.getAttributes(), true);
-        }
     }
 
     protected JsonValue preprocessJsonValue(JsonValue value) {

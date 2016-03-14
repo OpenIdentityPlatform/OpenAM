@@ -50,7 +50,6 @@ import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
@@ -240,22 +239,26 @@ public abstract class SmsResourceProvider {
 
     @Action
     public Promise<ActionResponse, ResourceException> getType(Context context) {
+        try {
+            return newActionResponse(getTypeValue(context)).asPromise();
+        } catch (SMSException | SSOException e) {
+            return new InternalServerErrorException("Could not get service schema", e).asPromise();
+        }
+    }
+
+    private JsonValue getTypeValue(Context context) throws SSOException, SMSException {
         String resourceId = schema.getResourceName();
         for (int i = subSchemaPath.size() - 1; i >= 0 && SmsRequestHandler.USE_PARENT_PATH.equals(resourceId); i--) {
             resourceId = subSchemaPath.get(i).getResourceName();
         }
         if (SmsRequestHandler.USE_PARENT_PATH.equals(resourceId)) {
             SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            try {
                 resourceId = new ServiceSchemaManager(ssoToken, serviceName, serviceVersion).getResourceName();
-            } catch (SMSException | SSOException e) {
-                return new InternalServerErrorException("Could not get service schema", e).asPromise();
-            }
         }
-        return newActionResponse(json(object(
+        return json(object(
                 field(ResourceResponse.FIELD_CONTENT_ID, resourceId),
                 field(NAME, getI18NName()),
-                field(COLLECTION, schema.supportsMultipleConfigurations())))).asPromise();
+                field(COLLECTION, schema.supportsMultipleConfigurations())));
     }
 
     private String getI18NName() {
@@ -275,6 +278,41 @@ public abstract class SmsResourceProvider {
         JsonValue result = json(object(field("type", "object")));
         addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
         return result;
+    }
+
+    /**
+     * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
+     * property for the name of the config.
+     */
+    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) throws
+            InternalServerErrorException {
+        return getJsonValue(realm, config, context, null, false);
+    }
+
+    /**
+     * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
+     * property for the name of the config.
+     */
+    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context, String authModuleResourceName,
+                                     boolean autoCreatedAuthModule) throws InternalServerErrorException {
+        if (config == null) {
+            return json(object());
+        } else {
+            JsonValue value = converter.toJson(realm, config.getAttributes(), true);
+
+            String id = config.getName();
+            if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
+                id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
+            }
+            value.add("_id", id);
+            try {
+                value.add("_type", getTypeValue(context).getObject());
+            } catch (SSOException | SMSException e) {
+                debug.error("Error reading type for " + authModuleResourceName, e);
+                throw new InternalServerErrorException();
+            }
+            return value;
+        }
     }
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {

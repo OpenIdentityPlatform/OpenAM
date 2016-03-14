@@ -100,7 +100,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue convertToJson(String realm, ServiceConfig config) {
+    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) {
         return converter.toJson(schema.getAttributeDefaults(), true);
     }
 

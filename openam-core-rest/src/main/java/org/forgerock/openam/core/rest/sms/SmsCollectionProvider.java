@@ -19,7 +19,6 @@ package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Requests.newReadRequest;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.utils.Time.*;
@@ -35,7 +34,6 @@ import java.util.TreeSet;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSException;
@@ -46,21 +44,15 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -70,7 +62,6 @@ import org.forgerock.json.resource.annotations.Query;
 import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
@@ -110,7 +101,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * {@inheritDoc}
      */
     @Create
-    public Promise<ResourceResponse, ResourceException> create(Context context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> create(final Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         final String realm = realmFor(context);
         try {
@@ -133,7 +124,13 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                     .then(new Function<Void, ResourceResponse, ResourceException>() {
                         @Override
                         public ResourceResponse apply(Void aVoid) {
-                            JsonValue result = getJsonValue(realm, created);
+                            JsonValue result = null;
+                            try {
+                                result = getJsonValue(realm, created, context, authModuleResourceName,
+                                        autoCreatedAuthModule);
+                            } catch (InternalServerErrorException e) {
+                                debug.warning("Error creating JsonValue", e);
+                            }
                             return newResourceResponse(created.getName(), String.valueOf(result.hashCode()), result);
                         }
                     });
@@ -201,12 +198,13 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfig config = parentSubConfigFor(context, scm);
             ServiceConfig item = checkedInstanceSubConfig(context, resourceId, config);
 
-            JsonValue result = getJsonValue(realmFor(context), item);
+            JsonValue result = getJsonValue(realmFor(context), item, context, authModuleResourceName,
+                    autoCreatedAuthModule);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on read", e);
             return new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
+        } catch (SSOException | InternalServerErrorException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on read", e);
             return new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()).asPromise();
         } catch (NotFoundException e) {
@@ -231,7 +229,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfig node = checkedInstanceSubConfig(context, resourceId, config);
 
             node.setAttributes(attrs);
-            JsonValue result = getJsonValue(realm, node);
+            JsonValue result = getJsonValue(realm, node, context, authModuleResourceName, autoCreatedAuthModule);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on update", e);
@@ -274,7 +272,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                     ServiceConfig config = type == SchemaType.GLOBAL ? scm.getGlobalConfig(instanceName) :
                             scm.getOrganizationConfig(realm, instanceName);
                     if (config != null) {
-                        handleServiceConfig(handler, realm, instanceName, config);
+                        handleServiceConfig(handler, realm, instanceName, config, context);
                     }
                 }
             } else {
@@ -282,11 +280,11 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                 Set<String> names = config.getSubConfigNames("*", lastSchemaNodeName());
                 for (String configName : names) {
                     ServiceConfig subConfig = config.getSubConfig(configName);
-                    handleServiceConfig(handler, realm, configName, subConfig);
+                    handleServiceConfig(handler, realm, configName, subConfig, context);
                 }
                 if (autoCreatedAuthModule) {
                     String instanceName = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
-                    handleServiceConfig(handler, realm, instanceName, config);
+                    handleServiceConfig(handler, realm, instanceName, config, context);
                 }
             }
 
@@ -294,29 +292,16 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on query", e);
             return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
+        } catch (SSOException | InternalServerErrorException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on query", e);
             return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
         }
     }
 
-    private void handleServiceConfig(QueryResourceHandler handler, String realm, String configName, ServiceConfig subConfig) {
-        JsonValue value = getJsonValue(realm, subConfig);
+    private void handleServiceConfig(QueryResourceHandler handler, String realm, String configName, ServiceConfig
+            subConfig, Context context) throws InternalServerErrorException {
+        JsonValue value = getJsonValue(realm, subConfig, context, authModuleResourceName, autoCreatedAuthModule);
         handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
-    }
-
-    /**
-     * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
-     * property for the name of the config.
-     */
-    private JsonValue getJsonValue(String realm, ServiceConfig result) {
-        JsonValue value = converter.toJson(realm, result.getAttributes(), true);
-        String id = result.getName();
-        if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
-            id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
-        }
-        value.add("_id", id);
-        return value;
     }
 
     private static final long MAX_AWAIT_TIMEOUT = 5000L;
