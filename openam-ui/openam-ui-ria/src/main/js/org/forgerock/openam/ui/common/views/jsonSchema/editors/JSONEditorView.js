@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
 
     const JSONEditorView = Backbone.View.extend({
         className: "block",
-        initialize: function (options) {
+        initialize (options) {
             if (!(options.schema instanceof JSONSchema)) {
                 throw new TypeError("[JSONEditorView] \"schema\" argument is not an instance of JSONSchema.");
             }
@@ -90,7 +90,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
                 displayTitle: true
             });
         },
-        render: function () {
+        render () {
             this.jsonEditor = applyJSONEditorToElement(this.$el,
                                                        this.options.schema,
                                                        this.options.values);
@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
 
             return this;
         },
-        values: function () {
+        values () {
             const passwordKeys = this.options.schema.passwordKeys();
             const values = new JSONValues(this.jsonEditor.getValue());
             const valuesWithoutEmptyPasswords = values.omit((value, key) => {

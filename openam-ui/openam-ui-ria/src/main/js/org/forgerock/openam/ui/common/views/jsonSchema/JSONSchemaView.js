@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEditorView"
 ], ($, _, Backbone, JSONSchema, JSONValues, JSONEditorView, TogglableJSONEditorView) => {
     const JSONSchemaView = Backbone.View.extend({
-        initialize: function (options) {
+        initialize (options) {
             if (!(options.schema instanceof JSONSchema)) {
                 throw new TypeError("[JSONSchemaView] \"schema\" argument is not an instance of JSONSchema.");
             }
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
 
             this.options = options;
         },
-        render: function () {
+        render () {
             if (this.options.schema.allPropertiesAreSchemas()) {
                 const schemas = this.options.schema.propertiesToSchemaArray();
 
@@ -67,10 +67,10 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
 
             return this;
         },
-        values: function () {
+        values () {
             const values = _.map(this.views, (view) => view.values());
 
-            return _.spread(_.merge)(values);
+            return _.reduce(values, _.merge, {});
         }
     });
 
