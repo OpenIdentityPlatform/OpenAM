@@ -20,8 +20,8 @@
     border-bottom: 1px solid #ddd;
     -webkit-box-shadow: 0 2px 4px rgba(0,0,0,.2);
     box-shadow: 0 2px 4px rgba(0,0,0,.1);
-    line-height: 55px;
     min-height: 57px;
+    line-height: 55px;
     color: #666;
     a {
         color: #666;
@@ -29,6 +29,19 @@
 
     strong {
         font-weight: 500;
+    }
+    .navbar-default {
+        min-height: 0;
+        border: 0;
+        .navbar-toggle {
+            margin: 10px 0;
+            border: inherit;
+        }
+        .navbar-collapse {
+            padding-top: 20px;
+            line-height: 20px;
+        }
+
     }
 }
 
