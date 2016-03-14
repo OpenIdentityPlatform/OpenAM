@@ -120,6 +120,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 SubschemaListView.render(this.data);
             } else {
                 this.form = new Form(element, schema, this.data.values);
+                this.$el.find("[data-header]").hide();
             }
         }
     });
