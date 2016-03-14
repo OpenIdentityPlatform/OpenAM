@@ -142,7 +142,7 @@ define("config/AppConfiguration", [
                             "realms": {
                                 "url": "#realms",
                                 "name": "config.AppConfiguration.Navigation.links.realms.title",
-                                "icon": "fa fa-cloud",
+                                "icon": "fa fa-cloud hidden-md",
                                 "dropdown" : true,
                                 "urls": [{
                                     "url": "#realms",
@@ -160,7 +160,7 @@ define("config/AppConfiguration", [
                             "federation": {
                                 "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
                                 "name": "config.AppConfiguration.Navigation.links.federation",
-                                "icon": "fa fa-building-o",
+                                "icon": "fa fa-building-o hidden-md",
                                 "visibleToRoles": ["ui-global-admin"]
                             },
                             "configuration": {
@@ -169,10 +169,47 @@ define("config/AppConfiguration", [
                                 "icon": "fa fa-cog",
                                 "visibleToRoles": ["ui-global-admin"]
                             },
+                            //TODO: Remove the comments and delete the configuration object above.
+                            /*"configure": {
+                                "url": "#configure",
+                                "name": "config.AppConfiguration.Navigation.links.configure.title",
+                                "icon": "fa fa-wrench hidden-md",
+                                "dropdown" : true,
+                                "urls": [{
+                                    "url": "#configure/authentication",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.authentication",
+                                    "icon": "fa fa-user"
+                                }, {
+                                    "url": "#configure/global-services",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.global-services",
+                                    "icon": "fa fa-globe"
+                                }, {
+                                    "url": "#configure/server-defaults",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.server-defaults",
+                                    "icon": "fa fa-server"
+                                }],
+                                "visibleToRoles": ["ui-realm-admin"]
+                            },*/
+                            "deployment": {
+                                "url": "#deployment",
+                                "name": "config.AppConfiguration.Navigation.links.deployment.title",
+                                "icon": "fa fa-sitemap hidden-md",
+                                "dropdown" : true,
+                                "urls": [{
+                                    "url": "#deployment/servers",
+                                    "name": "config.AppConfiguration.Navigation.links.deployment.servers",
+                                    "icon": "fa fa-server"
+                                }, {
+                                    "url": "#deployment/sites",
+                                    "name": "config.AppConfiguration.Navigation.links.deployment.sites",
+                                    "icon": "fa fa-list-alt"
+                                }],
+                                "visibleToRoles": ["ui-realm-admin"]
+                            },
                             "sessions": {
                                 "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
                                 "name": "config.AppConfiguration.Navigation.links.sessions",
-                                "icon": "fa fa-users",
+                                "icon": "fa fa-users hidden-md",
                                 "visibleToRoles": ["ui-global-admin"]
                             }
                         }

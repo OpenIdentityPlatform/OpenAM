@@ -14,16 +14,16 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/global/AuthenticationConfigurationListView", [
+ define("org/forgerock/openam/ui/admin/views/global/ListAuthenticationView", [
      "jquery",
      "org/forgerock/openam/ui/admin/views/global/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/SMSGlobalService"
  ], function ($, createConfigurationListView, SMSGlobalService) {
 
-     var AuthenticationConfigurationListView = createConfigurationListView(
-         $.t("console.configuration.global.authentication.title"),
+     var ListAuthenticationView = createConfigurationListView(
+         $.t("config.AppConfiguration.Navigation.links.configure.authentication"),
          SMSGlobalService.authentication.getAll
      );
 
-     return new AuthenticationConfigurationListView();
+     return new ListAuthenticationView();
  });

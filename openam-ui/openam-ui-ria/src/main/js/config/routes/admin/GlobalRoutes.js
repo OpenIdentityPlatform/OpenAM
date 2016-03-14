@@ -16,31 +16,38 @@
 
 define("config/routes/admin/GlobalRoutes", [], function () {
     return {
-        configurationSystem: {
-            view: "org/forgerock/openam/ui/admin/views/global/SystemConfigurationListView",
-            url: /configuration\/system/,
-            pattern: "configuration/system",
+        listAuthenticationSettings: {
+            view: "org/forgerock/openam/ui/admin/views/global/ListAuthenticationView",
+            url: /configure\/authentication/,
+            pattern: "configure/authentication",
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        configurationAuthentication: {
-            view: "org/forgerock/openam/ui/admin/views/global/AuthenticationConfigurationListView",
-            url: /configuration\/authentication/,
-            pattern: "configuration/authentication",
+        editAuthenticationSettings: {
+            view: "org/forgerock/openam/ui/admin/views/global/EditConfigurationView",
+            url: /configure\/authentication\/([^\/]+)/,
+            pattern: "configure/authentication/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        configurationConsole: {
-            view: "org/forgerock/openam/ui/admin/views/global/ConsoleConfigurationListView",
-            url: /configuration\/console/,
-            pattern: "configuration/console",
+        listGlobalServices: {
+            view: "org/forgerock/openam/ui/admin/views/global/ListGlobalServicesView",
+            url: /configure\/global-services/,
+            pattern: "configure/global-services",
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        editGlobalAuthentication: {
-            view: "org/forgerock/openam/ui/admin/views/global/ConfigurationEditView",
-            url: /configuration\/authentication\/([^\/]+)/,
-            pattern: "configuration/authentication/?",
+        editGlobalServices: {
+            view: "org/forgerock/openam/ui/admin/views/global/EditConfigurationView",
+            url: /configure\/global-services\/([^\/]+)/,
+            pattern: "configure/global-services/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        editServerDefaults: {
+            view: "org/forgerock/openam/ui/admin/views/global/EditServerDefaultsView",
+            url: /configure\/server-defaults/,
+            pattern: "configure/server-defaults",
             role: "ui-global-admin",
             navGroup: "admin"
         }

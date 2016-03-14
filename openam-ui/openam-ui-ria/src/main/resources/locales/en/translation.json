@@ -98,7 +98,15 @@
                         "viewAll": "View all..."
                     },
                     "configure": {
-                        "authentication": "Authentication"
+                        "title": "Configure",
+                        "authentication": "Authentication",
+                        "server-defaults": "Server Defaults",
+                        "global-services": "Global Services"
+                    },
+                    "deployment": {
+                        "title" : "deployment",
+                        "servers" : "Servers",
+                        "sites" : "Sites"
                     },
                     "federation": "Federation",
                     "configuration": "Configuration",
@@ -895,19 +903,6 @@
                 "addNew": "New Script",
                 "grid": ["Name", "Script Type", "Language", "Description"],
                 "confirmDeleteText": "Are you sure you want to delete the selected scripts?"
-            }
-        },
-        "configuration" : {
-            "global" : {
-                "system" : {
-                    "title": "System"
-                },
-                "console" : {
-                    "title": "Console"
-                },
-                "authentication" : {
-                    "title" : "Authentication"
-                }
             }
         },
         "authorization": {

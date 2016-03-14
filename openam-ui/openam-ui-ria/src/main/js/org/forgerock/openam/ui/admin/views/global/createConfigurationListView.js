@@ -31,7 +31,7 @@
       */
      var createConfigurationListView = function (title, getItems) {
          return AbstractView.extend({
-             template: "templates/admin/views/global/ConfigurationListTemplate.html",
+             template: "templates/admin/views/global/ListConfigurationTemplate.html",
              render: function () {
                  var self = this;
                  self.data.title = title;

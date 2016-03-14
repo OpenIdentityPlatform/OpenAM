@@ -14,16 +14,16 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/global/ConsoleConfigurationListView", [
+ define("org/forgerock/openam/ui/admin/views/global/ListGlobalServicesView", [
      "jquery",
      "org/forgerock/openam/ui/admin/views/global/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/SMSGlobalService"
  ], function ($, createConfigurationListView, SMSGlobalService) {
 
-     var ConsoleConfigurationListView = createConfigurationListView(
-         $.t("console.configuration.global.console.title"),
+     var ListGlobalServicesView = createConfigurationListView(
+         $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
          SMSGlobalService.configuration.services.console.getAll
      );
 
-     return new ConsoleConfigurationListView();
+     return new ListGlobalServicesView();
  });
