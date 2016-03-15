@@ -11,11 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
-<<<<<<< 1ed6ad05a44275c9f5d7400dab2c00ee69162d83
  * Copyright 2016 ForgeRock AS.
-=======
- * Copyright 2015-2016 ForgeRock AS.
->>>>>>> AME-10084 added service layer for views
  */
 
 define("org/forgerock/openam/ui/admin/services/SitesService", [
