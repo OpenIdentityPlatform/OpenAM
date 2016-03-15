@@ -27,6 +27,9 @@ import java.util.Objects;
  */
 public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
 
+    /**
+     * Snapshot token config type.
+     */
     public static final String TYPE = "KEY_STORE_JWT";
 
     private String encryptionKeyPairAlias;
@@ -143,10 +146,10 @@ public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
         }
 
         KeyStoreJwtTokenConfig other = (KeyStoreJwtTokenConfig) obj;
-        return Objects.equals(encryptionKeyPairAlias, other.encryptionKeyPairAlias) &&
-                Objects.equals(signingSymmetricKey, other.signingSymmetricKey) &&
-                Objects.equals(signingAlgorithm, other.signingAlgorithm) &&
-                Objects.equals(tokenLifeTimeInSeconds, other.tokenLifeTimeInSeconds);
+        return Objects.equals(encryptionKeyPairAlias, other.encryptionKeyPairAlias)
+                && Objects.equals(signingSymmetricKey, other.signingSymmetricKey)
+                && Objects.equals(signingAlgorithm, other.signingAlgorithm)
+                && Objects.equals(tokenLifeTimeInSeconds, other.tokenLifeTimeInSeconds);
     }
 
 }

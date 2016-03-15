@@ -77,9 +77,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         }
 
         // Registration CREST services
-        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() {});
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() {});
-        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() {});
+        expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { });
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenPasswordConsoleConfig>>() { });
+        expose(new TypeLiteral<SelfServiceRequestHandler<ForgottenUsernameConsoleConfig>>() { });
         expose(UserUpdateService.class);
         expose(KbaResource.class);
         // Exposed to be accessible to custom progress stages
