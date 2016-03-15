@@ -278,18 +278,13 @@ public class SmsRouteTree implements RequestHandler {
         try {
             JsonValue result = handler.handleAction(context, subRequest).getOrThrowUninterruptibly().getJsonContent();
             for (JsonValue item : result.get(RestConstants.RESULT)) {
-                addItemWithSubPath(response, subPath, item);
+                response.add(item.getObject());
             }
         } catch (ResourceException e) {
             if (e.getCode() != NOT_FOUND) {
                 throw e;
             }
         }
-    }
-
-    private static void addItemWithSubPath(JsonValue response, ResourcePath subPath, JsonValue item) {
-        String id = subPath.child(item.get(ResourceResponse.FIELD_CONTENT_ID).asString()).toString();
-        response.add(item.put(ResourceResponse.FIELD_CONTENT_ID, id).getObject());
     }
 
     @Override
@@ -341,7 +336,7 @@ public class SmsRouteTree implements RequestHandler {
         }
 
         public boolean handleResource(ResourceResponse resource) {
-            addItemWithSubPath(response, subPath, resource.getContent());
+            response.add(resource.getContent());
             return true;
         }
     }
