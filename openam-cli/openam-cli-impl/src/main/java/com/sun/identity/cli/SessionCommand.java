@@ -24,7 +24,7 @@
  *
  * $Id: SessionCommand.java,v 1.9 2010/01/04 18:59:21 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -65,6 +65,7 @@ public class SessionCommand extends AuthenticatedCommand {
     private Session curSession;
     private SessionID curSessionID;
     private final SessionCache sessionCache;
+    private boolean displayPrompt = false;
 
     @Inject
     public SessionCommand(SessionCache sessionCache) {
@@ -103,7 +104,7 @@ public class SessionCommand extends AuthenticatedCommand {
             for (Iterator i= sList.iterator(); i.hasNext(); ) {
                 printSessionInformation(ouputWriter, (SessionData)i.next());
             }
-            if ((sList.size() > 1) && !isQuiet) {
+            if (displayPrompt && !isQuiet) {
                 promptForInvalidation(ouputWriter, sList);
             }
         } else {
@@ -305,6 +306,7 @@ public class SessionCommand extends AuthenticatedCommand {
                         if (idx == -1) {
                             list.add(0, sData);
                         } else {
+                            displayPrompt = true;
                             list.add(sData);
                         }
                     }
