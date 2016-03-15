@@ -33,7 +33,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
  */
 public class AccessToken extends JsonValue implements IntrospectableToken, Token {
 
-    private Map<String, Object> extraData = new HashMap<String, Object>();
+    protected Map<String, Object> extraData = new HashMap<String, Object>();
 
     /**
      * Constructs a new AccessToken backed with the data in the specified JsonValue.
@@ -416,5 +416,10 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
         if (!OAuth2Constants.Token.OAUTH_ACCESS_TOKEN.equals(tokenName)) {
             throw new InvalidGrantException("Token is not an access token: " + tokenId);
         }
+    }
+
+    @Override
+    public String toString() {
+        return getTokenId();
     }
 }

@@ -81,7 +81,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param tokenId The token id.
      */
-    protected final void setTokenId(final String tokenId) {
+    protected void setTokenId(final String tokenId) {
         setStringProperty(OAuth2Constants.CoreTokenParams.ID, tokenId);
     }
 
@@ -90,7 +90,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param resourceOwnerId The resource owner's id.
      */
-    protected final void setResourceOwnerId(final String resourceOwnerId) {
+    protected void setResourceOwnerId(final String resourceOwnerId) {
         setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
     }
 
@@ -99,7 +99,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param clientId The client's id.
      */
-    protected final void setClientId(final String clientId) {
+    protected void setClientId(final String clientId) {
         setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
     }
 
@@ -108,7 +108,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param redirectUri The redirect uri.
      */
-    protected final void setRedirectUri(final String redirectUri) {
+    protected void setRedirectUri(final String redirectUri) {
         setStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
     }
 
@@ -135,7 +135,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param tokenType The token type.
      */
-    protected final void setTokenType(final String tokenType) {
+    protected void setTokenType(final String tokenType) {
         setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
     }
 
@@ -144,7 +144,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param tokenName The token name.
      */
-    protected final void setTokenName(final String tokenName) {
+    protected void setTokenName(final String tokenName) {
         setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
     }
 
@@ -153,7 +153,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @param grantType The grant type.
      */
-    protected final void setGrantType(final String grantType) {
+    protected void setGrantType(final String grantType) {
         setStringProperty(OAuth2Constants.Params.GRANT_TYPE, grantType);
     }
 
@@ -161,7 +161,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      * Sets the auth modules used for authentication.
      * @param authModules A pipe-delimited string of auth module names.
      */
-    public final void setAuthModules(String authModules) {
+    public void setAuthModules(String authModules) {
         setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
     }
 
@@ -192,7 +192,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @return The client's id.
      */
-    public final String getClientId() {
+    public String getClientId() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID);
     }
 
@@ -201,7 +201,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @return The resource owner's id.
      */
-    public final String getResourceOwnerId() {
+    public String getResourceOwnerId() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
     }
 
@@ -210,21 +210,21 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @return The client's redirect uri.
      */
-    public final String getRedirectUri() {
+    public String getRedirectUri() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final String getTokenId() {
+    public String getTokenId() {
         return getStringProperty(OAuth2Constants.Params.ID);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final String getTokenName() {
+    public String getTokenName() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
     }
 
@@ -241,7 +241,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @return {@code true} if current time is greater than the expiry time.
      */
-    public final boolean isExpired() {
+    public boolean isExpired() {
         if (isNeverExpires()) {
             return false;
         }
@@ -282,7 +282,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      *
      * @return The token type.
      */
-    public final String getTokenType() {
+    public String getTokenType() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
     }
 
@@ -290,7 +290,7 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      * Gets the auth modules used for authentication.
      * @return A pipe-delimited string of auth module names.
      */
-    public final String getAuthModules() {
+    public String getAuthModules() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
     }
 

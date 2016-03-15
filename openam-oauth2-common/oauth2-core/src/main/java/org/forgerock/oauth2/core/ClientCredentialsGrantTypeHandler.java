@@ -87,7 +87,7 @@ public class ClientCredentialsGrantTypeHandler extends GrantTypeHandler {
             accessToken.addExtraData(SCOPE, Utils.joinScope(validatedScope));
         }
 
-        tokenStore.updateAccessToken(accessToken);
+        tokenStore.updateAccessToken(request, accessToken);
 
         return accessToken;
 

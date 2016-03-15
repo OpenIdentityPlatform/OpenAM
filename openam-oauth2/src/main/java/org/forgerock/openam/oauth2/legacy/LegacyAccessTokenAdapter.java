@@ -36,6 +36,16 @@ public class LegacyAccessTokenAdapter extends CoreToken {
     }
 
     @Override
+    public String getTokenName() {
+        return token.getTokenName();
+    }
+
+    @Override
+    public String getTokenID() {
+        return token.getTokenId();
+    }
+
+    @Override
     public Map<String, Object> convertToMap() {
         return token.toMap();
     }

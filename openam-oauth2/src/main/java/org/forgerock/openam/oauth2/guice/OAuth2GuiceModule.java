@@ -45,7 +45,44 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
-import org.forgerock.oauth2.core.*;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.oauth2.core.AccessTokenService;
+import org.forgerock.oauth2.core.AccessTokenServiceImpl;
+import org.forgerock.oauth2.core.AccessTokenVerifier;
+import org.forgerock.oauth2.core.AuthorizationCodeGrantTypeHandler;
+import org.forgerock.oauth2.core.AuthorizationCodeRequestValidator;
+import org.forgerock.oauth2.core.AuthorizationCodeRequestValidatorImpl;
+import org.forgerock.oauth2.core.AuthorizationService;
+import org.forgerock.oauth2.core.AuthorizationServiceImpl;
+import org.forgerock.oauth2.core.AuthorizeRequestValidator;
+import org.forgerock.oauth2.core.AuthorizeRequestValidatorImpl;
+import org.forgerock.oauth2.core.ClientAuthenticator;
+import org.forgerock.oauth2.core.ClientCredentialsGrantTypeHandler;
+import org.forgerock.oauth2.core.ClientCredentialsRequestValidator;
+import org.forgerock.oauth2.core.ClientCredentialsRequestValidatorImpl;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.DeviceCodeGrantTypeHandler;
+import org.forgerock.oauth2.core.DuplicateRequestParameterValidator;
+import org.forgerock.oauth2.core.GrantTypeHandler;
+import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.OAuth2TokenIntrospectionHandler;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
+import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
+import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
+import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
+import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
+import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
+import org.forgerock.oauth2.core.TokenInfoService;
+import org.forgerock.oauth2.core.TokenInfoServiceImpl;
+import org.forgerock.oauth2.core.TokenIntrospectionHandler;
+import org.forgerock.oauth2.core.TokenIntrospectionService;
+import org.forgerock.oauth2.core.TokenIntrospectionServiceImpl;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
@@ -74,6 +111,8 @@ import org.forgerock.openam.oauth2.OpenAMOAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
+import org.forgerock.openam.oauth2.StatefulTokenStore;
+import org.forgerock.openam.oauth2.StatelessTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
@@ -270,10 +309,16 @@ public class OAuth2GuiceModule extends AbstractModule {
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
-            ClientAuthenticationFailureFactory failureFactory) {
-        return new RealmAgnosticTokenStore(oauthTokenStore, providerSettingsFactory, oauth2UrisFactory,
-                clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
-                secureRandom, failureFactory);
+            ClientAuthenticationFailureFactory failureFactory, StatelessTokenStore statelessTokenStore,
+            JwtBuilderFactory jwtBuilder) {
+        StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
+                providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
+                cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+        StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
+                realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, clientRegistrationStore,
+                realmNormaliser, oauth2UrisFactory);
+        return new OpenAMTokenStore(providerSettingsFactory, realmAgnosticStatefulTokenStore,
+                realmAgnosticStatelessTokenStore);
     }
 
     @Inject
@@ -319,15 +364,31 @@ public class OAuth2GuiceModule extends AbstractModule {
                 jacksonRepresentationFactory);
     }
 
-    public static class RealmAgnosticTokenStore extends OpenAMTokenStore {
+    public static class RealmAgnosticStatefulTokenStore extends StatefulTokenStore {
 
-        public RealmAgnosticTokenStore(OAuthTokenStore tokenStore,
+        public RealmAgnosticStatefulTokenStore(OAuthTokenStore tokenStore,
                 OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
                 Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory) {
             super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser,
                     ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+        }
+
+        @Override
+        protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
+            //No need to validate the realm for the provided token.
+        }
+    }
+
+    public static class RealmAgnosticStatelessTokenStore extends StatelessTokenStore {
+
+        public RealmAgnosticStatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
+                OAuth2ProviderSettingsFactory providerSettingsFactory,
+                OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
+                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory) {
+            super(statefulTokenStore, jwtBuilder, providerSettingsFactory, clientRegistrationStore, realmNormaliser,
+                    oAuth2UrisFactory);
         }
 
         @Override

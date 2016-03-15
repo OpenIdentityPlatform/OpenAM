@@ -88,6 +88,16 @@ public enum Time implements DateTimeUtils.MillisProvider {
     }
 
     /**
+     * Get a {@code Date} with the specified time in milliseconds - this replaces {@code new Date(long)}.
+     * @param time The time in milliseconds.
+     * @return A date with the time since the epoch in milliseconds.
+     * @see Date#Date()
+     */
+    public static Date newDate(long time) {
+        return new Date(time);
+    }
+
+    /**
      * Get a {@code Calendar} with current time in milliseconds from the {@code TimeService} - this replaces
      * {@code Calendar.getInstance()}.
      * @return A date with the current time since the epoch in milliseconds.

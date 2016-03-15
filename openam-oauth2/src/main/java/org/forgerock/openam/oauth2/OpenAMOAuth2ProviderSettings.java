@@ -18,6 +18,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
 
@@ -168,6 +169,45 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private Set<String> getSettingStrings(String key) throws ServerException {
         try {
             return getSetting(realm, key);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public boolean isStatelessTokensEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, STATELESS_TOKENS_ENABLED);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public String getTokenSigningAlgorithm() throws ServerException {
+        try {
+            return getStringSetting(realm, "tokenSigningAlgorithm");
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public String getTokenHmacSharedSecret() throws ServerException {
+        try {
+            return getStringSetting(realm, "tokenSigningHmacSharedSecret");
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);

@@ -185,7 +185,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() - 10);
+        given(refreshToken.isExpired()).willReturn(true);
 
         //When
         accessTokenService.refreshToken(request);
@@ -286,7 +286,7 @@ public class AccessTokenServiceImplTest {
         given(providerSettings.issueRefreshTokensOnRefreshingToken()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
                 eq(request), isNull(String.class))).willReturn(newRefreshToken);
-        given(newRefreshToken.getTokenId()).willReturn(newRefreshTokenId);
+        given(newRefreshToken.toString()).willReturn(newRefreshTokenId);
 
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), anyString(), eq(request)))

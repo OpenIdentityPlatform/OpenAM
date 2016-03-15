@@ -88,7 +88,7 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
             accessToken.addExtraData(SCOPE, joinScope(authorizationScope));
         }
 
-        tokenStore.updateAccessToken(accessToken);
+        tokenStore.updateAccessToken(request, accessToken);
 
         return accessToken;
     }

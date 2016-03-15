@@ -114,8 +114,8 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         } catch (InvalidGrantException e) {
             //Then
             verify(requestValidator).validateRequest(request, clientRegistration);
-            verify(tokenInvalidator).invalidateTokens(anyString());
-            verify(tokenStore).deleteAuthorizationCode(anyString());
+            verify(tokenInvalidator).invalidateTokens(eq(request), anyString());
+            verify(tokenStore).deleteAuthorizationCode(eq(request), anyString());
         }
     }
 
@@ -229,7 +229,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         //Then
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
-        verify(tokenStore).updateAuthorizationCode(authorizationCode);
+        verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken).addExtraData(eq("refresh_token"), anyString());
         verify(accessToken).addExtraData(eq("nonce"), anyString());
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
@@ -270,7 +270,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         //Then
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
-        verify(tokenStore).updateAuthorizationCode(authorizationCode);
+        verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
         verify(accessToken).addExtraData(eq("nonce"), anyString());
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
@@ -310,7 +310,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         //Then
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
-        verify(tokenStore).updateAuthorizationCode(authorizationCode);
+        verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
         verify(accessToken).addExtraData(eq("nonce"), anyString());
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);

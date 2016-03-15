@@ -21,6 +21,7 @@ import java.security.KeyPair;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
 import freemarker.template.Template;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -41,6 +42,30 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
  * @since 12.0.0
  */
 public interface OAuth2ProviderSettings {
+
+    /**
+     * Determines whether access and refresh tokens should be stateless.
+     *
+     * @return {@code true} if access and refresh tokens are stateless.
+     * @throws ServerException If any internal server error occurs.
+     */
+    boolean isStatelessTokensEnabled() throws ServerException;
+
+    /**
+     * Gets the signing algorithm used when issuing stateless access and refresh tokens.
+     *
+     * @return The signing algorithm.
+     * @throws ServerException If any internal server error occurs.
+     */
+    String getTokenSigningAlgorithm() throws ServerException;
+
+    /**
+     * Gets the Base64 encoded shared secret used to sign stateless access and refresh tokens.
+     *
+     * @return The Base64 encoded shared secret.
+     * @throws ServerException If any internal server error occurs.
+     */
+    String getTokenHmacSharedSecret() throws ServerException;
 
     /**
      * Gets the response types allowed by the OAuth2 provider.

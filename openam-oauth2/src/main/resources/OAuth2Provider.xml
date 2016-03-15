@@ -30,6 +30,18 @@
                 resourceName="oauth-oidc">
 
             <Organization>
+                <AttributeSchema name="statelessTokensEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a099">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -202,6 +214,11 @@
                     <DefaultValues>
                         <Value>HS256</Value>
                         <Value>HS384</Value>
+                        <Value>HS512</Value>
+                        <Value>RS256</Value>
+                        <Value>ES256</Value>
+                        <Value>ES384</Value>
+                        <Value>ES512</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -234,7 +251,32 @@
                         <Value>3600</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+                <AttributeSchema name="tokenSigningAlgorithm"
+                                 type="single_choice"
+                                 listOrder="insertion"
+                                 syntax="string"
+                                 i18nKey="a113a">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceHS256">HS256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHS512">HS512</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceRS256">RS256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES256">ES256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES384">ES384</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES512">ES512</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>HS256</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="tokenSigningHmacSharedSecret"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a113b">
+                    <DefaultValues>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-keypair-name"
                                  type="single"
                                  syntax="string"

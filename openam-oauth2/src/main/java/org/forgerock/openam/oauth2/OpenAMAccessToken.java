@@ -387,4 +387,9 @@ public class OpenAMAccessToken extends AccessToken {
     protected void setStringProperty(String key, String value) {
         put(key, stringToSet(value));
     }
+
+    @Override
+    public String toString() {
+        return getTokenId();
+    }
 }

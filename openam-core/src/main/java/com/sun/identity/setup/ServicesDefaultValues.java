@@ -58,6 +58,7 @@ import com.sun.identity.sm.SMSSchema;
  */
 public class ServicesDefaultValues {
     public static final String RANDOM_SECURE = "@128_BIT_RANDOM_SECURE@";
+    public static final String RANDOM_SECURE_256 = "@256_BIT_RANDOM_SECURE@";
 
     private static ServicesDefaultValues instance = new ServicesDefaultValues();
     private static Set preappendSlash = new HashSet();
@@ -589,13 +590,18 @@ public class ServicesDefaultValues {
                     orig = orig.replaceAll("@" + key + "@", value);
                 }
             }
+        }
+        orig = replaceRandomSecureTags(orig, RANDOM_SECURE, 128);
+        orig = replaceRandomSecureTags(orig, RANDOM_SECURE_256, 256);
+        return orig;
+    }
 
-            // Each Secure Random tag should be a newly generated random.
-            while (orig.contains(RANDOM_SECURE)) {
-                byte[] bytes = new byte[16]; // 16 * 8 = 128 bits
-                secureRandom.nextBytes(bytes);
-                orig = orig.replace(RANDOM_SECURE, Base64.encode(bytes));
-            }
+    private static String replaceRandomSecureTags(String orig, String tag, int size) {
+        // Each Secure Random tag should be a newly generated random.
+        while (orig.contains(tag)) {
+            byte[] bytes = new byte[size / 8];
+            secureRandom.nextBytes(bytes);
+            orig = orig.replace(tag, Base64.encode(bytes));
         }
         return orig;
     }

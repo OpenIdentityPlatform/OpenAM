@@ -206,4 +206,9 @@ public class OpenAMRefreshToken extends RefreshToken {
     public String getAuditId() {
         return getStringProperty(AUDIT_TRACKING_ID);
     }
+
+    @Override
+    public String toString() {
+        return getTokenId();
+    }
 }

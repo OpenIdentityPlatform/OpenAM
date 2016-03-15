@@ -49,7 +49,7 @@ public class GrantTypeAccessTokenGenerator {
                 request);
 
         if (refreshToken != null) {
-            accessToken.addExtraData(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
+            accessToken.addExtraData(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.toString());
         }
 
         return accessToken;

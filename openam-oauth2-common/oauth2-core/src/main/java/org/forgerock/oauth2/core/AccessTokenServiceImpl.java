@@ -147,7 +147,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                     refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request,
                     validatedClaims);
 
-            tokenStore.deleteRefreshToken(refreshToken.getTokenId());
+            tokenStore.deleteRefreshToken(request, refreshToken.toString());
         }
 
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER, null,
@@ -156,7 +156,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 null, validatedClaims, request);
 
         if (newRefreshToken != null) {
-            accessToken.addExtraData(REFRESH_TOKEN, newRefreshToken.getTokenId());
+            accessToken.addExtraData(REFRESH_TOKEN, newRefreshToken.toString());
         }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);

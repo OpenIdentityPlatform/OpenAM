@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import java.util.Set;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -133,45 +134,69 @@ public interface TokenStore {
     /**
      * Updates an Authorization Code.
      *
+     * @param request The current request.
      * @param authorizationCode The authorization code.
+     * @throws ServerException If the authorization code could not be updated.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    void updateAuthorizationCode(AuthorizationCode authorizationCode);
+    void updateAuthorizationCode(OAuth2Request request, AuthorizationCode authorizationCode) throws NotFoundException,
+            ServerException;
 
     /**
      * Updates an Access Token.
      *
+     * @param request The current request.
      * @param accessToken The access token.
+     * @throws ServerException If the token could not be updated.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    void updateAccessToken(AccessToken accessToken);
+    void updateAccessToken(OAuth2Request request, AccessToken accessToken) throws NotFoundException, ServerException;
 
     /**
      * Deletes an Authorization Code from the OAuth2 Provider's store.
      *
+     * @param request The current request.
      * @param authorizationCode The authorization code.
+     * @throws ServerException If the authorization code could not be deleted.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    void deleteAuthorizationCode(String authorizationCode);
+    void deleteAuthorizationCode(OAuth2Request request, String authorizationCode) throws NotFoundException,
+            ServerException;
 
     /**
      * Queries the OAuth2 Provider's store for a specified token.
      *
+     * @param request The current request.
      * @param tokenId The token identifier.
      * @return A {@link JsonValue} containing the token.
+     * @throws InvalidRequestException If the tokens could not be queried.
+     * @throws ServerException If the tokens could not be queried.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    JsonValue queryForToken(String tokenId) throws InvalidRequestException;
+    JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException, NotFoundException,
+            ServerException;
 
     /**
      * Deletes an Access Token from the OAuth2 Provider's store.
      *
+     * @param request The current request.
      * @param accessTokenId The access token identifier.
+     * @throws ServerException If the token could not be deleted.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    void deleteAccessToken(String accessTokenId) throws ServerException;
+    void deleteAccessToken(OAuth2Request request, String accessTokenId) throws ServerException, NotFoundException;
 
     /**
      * Deletes a Refresh Token from the OAuth2 Provider's store.
      *
+     * @param request The current request.
      * @param refreshTokenId The refresh token identifier.
+     * @throws InvalidRequestException If the token could not be deleted.
+     * @throws ServerException If the token could not be deleted.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    void deleteRefreshToken(String refreshTokenId) throws InvalidRequestException;
+    void deleteRefreshToken(OAuth2Request request, String refreshTokenId) throws InvalidRequestException,
+            NotFoundException, ServerException;
 
     /**
      * Reads an Access Token from the OAuth2 Provider's store with the specified identifier.
@@ -179,7 +204,7 @@ public interface TokenStore {
      * @param request The current request.
      * @param tokenId The token identifier.
      * @return The Access Token.
-     * @throws InvalidGrantException If the read token is not an Access Token.
+     * @throws InvalidGrantException If the token is not an Access Token.
      * @throws ServerException       If the token could not be read by the server.
      * @throws NotFoundException     If the requested realm does not exist.
      */
@@ -192,7 +217,7 @@ public interface TokenStore {
      * @param request The current request.
      * @param tokenId The token identifier.
      * @return The Refresh Token.
-     * @throws InvalidGrantException If the read token is not a Refresh Token.
+     * @throws InvalidGrantException If the token is not a Refresh Token.
      * @throws ServerException       If the token could not be read by the server.
      * @throws NotFoundException     If the requested realm does not exist.
      */
@@ -220,8 +245,8 @@ public interface TokenStore {
      * @throws ServerException If there was an error in constructing the code.
      * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
      */
-    DeviceCode createDeviceCode(Set<String> scope, ResourceOwner resourceOwner, String clientId, String nonce, String responseType,
-            String state, String acrValues, String prompt, String uiLocales, String loginHint,
+    DeviceCode createDeviceCode(Set<String> scope, ResourceOwner resourceOwner, String clientId, String nonce,
+            String responseType, String state, String acrValues, String prompt, String uiLocales, String loginHint,
             Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException;
 

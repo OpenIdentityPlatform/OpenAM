@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
 import javax.inject.Inject;
@@ -50,9 +51,10 @@ public class TokenInvalidator {
      * @param tokenId The token identifier of the token to invalidate.
      */
     @SuppressWarnings("unchecked")
-    public void invalidateTokens(String tokenId) throws InvalidRequestException, ServerException {
+    public void invalidateTokens(OAuth2Request request, String tokenId) throws InvalidRequestException, ServerException,
+            NotFoundException {
 
-        JsonValue token = tokenStore.queryForToken(tokenId);
+        JsonValue token = tokenStore.queryForToken(request, tokenId);
 
         Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) token.getObject();
 
@@ -70,11 +72,11 @@ public class TokenInvalidator {
                     if (tokenNameSet.iterator().next().equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)
                             && refreshTokenSet != null && !refreshTokenSet.isEmpty()) {
                         refreshTokenID = refreshTokenSet.iterator().next();
-                        deleteToken(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
+                        deleteToken(request, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
                     }
                     //delete the access_token
-                    invalidateTokens(entryID);
-                    deleteToken(type, entryID);
+                    invalidateTokens(request, entryID);
+                    deleteToken(request, type, entryID);
                 }
             }
         }
@@ -86,13 +88,14 @@ public class TokenInvalidator {
      * @param type The type of token.
      * @param id The token's identifier.
      */
-    private void deleteToken(String type, String id) throws ServerException, InvalidRequestException {
+    private void deleteToken(OAuth2Request request, String type, String id) throws ServerException,
+            InvalidRequestException, NotFoundException {
         if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
-            tokenStore.deleteAccessToken(id);
+            tokenStore.deleteAccessToken(request, id);
         } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)) {
-            tokenStore.deleteRefreshToken(id);
+            tokenStore.deleteRefreshToken(request, id);
         } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)) {
-            tokenStore.deleteAuthorizationCode(id);
+            tokenStore.deleteAuthorizationCode(request, id);
         } else {
             //shouldn't ever happen
         }

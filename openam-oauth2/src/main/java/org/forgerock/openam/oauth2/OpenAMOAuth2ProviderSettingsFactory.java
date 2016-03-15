@@ -87,7 +87,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        OpenAMAccessToken accessToken = (OpenAMAccessToken) request.getToken(AccessToken.class);
+        AccessToken accessToken = request.getToken(AccessToken.class);
         String realm;
         if (accessToken != null) {
             realm = accessToken.getRealm();

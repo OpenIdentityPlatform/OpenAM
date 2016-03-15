@@ -62,9 +62,9 @@ import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class OpenAMTokenStoreTest {
+public class StatefulTokenStoreTest {
 
-    private OpenAMTokenStore openAMtokenStore;
+    private StatefulTokenStore openAMtokenStore;
 
     private OAuthTokenStore tokenStore;
     private OAuth2ProviderSettingsFactory providerSettingsFactory;
@@ -103,7 +103,7 @@ public class OpenAMTokenStoreTest {
         when(failureFactory.getException(anyString())).thenReturn(expectedResult);
         when(failureFactory.getException(any(OAuth2Request.class), anyString())).thenReturn(expectedResult);
 
-        openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
+        openAMtokenStore = new StatefulTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
                 clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
                 new SecureRandom(), failureFactory);
     }
@@ -196,7 +196,7 @@ public class OpenAMTokenStoreTest {
     @Test
     public void realmAgnosticTokenStoreShouldIgnoreRealmMismatch() throws Exception {
         //Given
-        OpenAMTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticTokenStore(tokenStore,
+        StatefulTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticStatefulTokenStore(tokenStore,
                 providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
                 cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory);
         JsonValue token = json(object(
@@ -252,7 +252,7 @@ public class OpenAMTokenStoreTest {
         assertThat(code.getTokenName()).isEqualTo("device_code");
         assertThat(code.getExpiryTime()).isCloseTo(currentTimeMillis() + 10000, offset(1000L));
         assertThat(code.getTokenId()).matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
-        assertThat(code.getUserCode()).matches("[" + OpenAMTokenStore.ALPHABET + "]{8}");
+        assertThat(code.getUserCode()).matches("[" + StatefulTokenStore.ALPHABET + "]{8}");
         assertThat(code.getRealm()).isEqualTo("MY_REALM");
     }
 

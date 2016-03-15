@@ -105,7 +105,7 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
                 refreshToken, null, validatedClaims, request);
 
         if (refreshToken != null) {
-            accessToken.addExtraData(REFRESH_TOKEN, refreshToken.getTokenId());
+            accessToken.addExtraData(REFRESH_TOKEN, refreshToken.toString());
         }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
@@ -114,7 +114,7 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
             accessToken.addExtraData(SCOPE, Utils.joinScope(validatedScope));
         }
 
-        tokenStore.updateAccessToken(accessToken);
+        tokenStore.updateAccessToken(request, accessToken);
 
         return accessToken;
     }
