@@ -8,6 +8,7 @@
         "main-authorize.js",
         "main-device.js",
         "main.js",
+        "config/**/*.js",
         "org/forgerock/openam/**/*.js"
     ],
     "plugins": [
