@@ -24,10 +24,7 @@
  *
  * $Id: DelegationManager.java,v 1.10 2008/06/25 05:43:24 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.delegation;
 
@@ -82,7 +79,7 @@ public final class DelegationManager {
     
     public static final Debug debug = Debug.getInstance(DELEGATION_DEBUG);
     
-    private static DelegationInterface pluginInstance = null;
+    private volatile static DelegationInterface pluginInstance = null;
     
     private static Set subjectIdTypes = new CaseInsensitiveHashSet();
     
@@ -430,9 +427,10 @@ public final class DelegationManager {
                     if (debug.messageEnabled()) {
                         debug.message("Plugin class name:" + className);
                     }
-                    pluginInstance = (DelegationInterface) Class.forName(
-                        className).newInstance();
-                    pluginInstance.initialize(privilegedToken, null);
+                    DelegationInterface instance = 
+                        (DelegationInterface) Class.forName(className).newInstance();
+                    instance.initialize(privilegedToken, null);
+                    pluginInstance = instance;
                     if (debug.messageEnabled()) {
                         debug.message("Successfully created "
                             + "a delegation plugin instance");
