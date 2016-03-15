@@ -1,0 +1,13 @@
+<div class="container">
+    {{> headers/_TitleWithSubAndIcon title=name type="console.sites.siteSettings" icon="list-alt"
+        buttons="templates/admin/views/realms/partials/_HeaderDeleteButton"}}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div data-service-form></div>
+        </div>
+        <div class="panel-footer clearfix">
+            {{> form/_JSONSchemaFooter}}
+        </div>
+    </div>
+</div>

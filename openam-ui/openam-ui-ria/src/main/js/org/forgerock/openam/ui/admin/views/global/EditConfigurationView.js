@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
 
 
     var EditConfigurationView = AbstractView.extend({
-        template: "templates/admin/views/global/ConfigurationEditTemplate.html",
+        template: "templates/admin/views/global/EditConfigurationTemplate.html",
         events: {
             "click [data-save]": "onSave",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"

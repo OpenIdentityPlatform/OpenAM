@@ -22,7 +22,10 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
-    "org/forgerock/commons/ui/common/util/UIUtils"
+    "org/forgerock/commons/ui/common/util/UIUtils",
+
+    "popoverclickaway", // depends on jquery and bootstrap
+    "selectize" // jquery dependencies
 ], ($, _, Backbone, JSONEditor, JSONSchema, JSONValues, JSONEditorTheme, UIUtils) => {
     function convertHelpBlocksToPopOvers (element) {
         const template = "templates/common/jsonSchema/editors/_HelpPopover.html";

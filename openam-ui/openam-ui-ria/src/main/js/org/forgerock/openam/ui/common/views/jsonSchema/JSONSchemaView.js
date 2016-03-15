@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
                     new JSONEditorView({
                         el: this.$el,
                         schema: this.options.schema,
-                        values: this.options.values
+                        values: this.options.values.pick(this.options.schema.keys())
                     }).render()
                 ];
             }

@@ -37,10 +37,17 @@ define("config/routes/admin/GlobalRoutes", [], function () {
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        editGlobalServices: {
+        editGlobalService: {
             view: "org/forgerock/openam/ui/admin/views/global/EditConfigurationView",
-            url: /configure\/global-services\/([^\/]+)/,
-            pattern: "configure/global-services/?",
+            url: /configure\/global-service\/([^\/]+)/,
+            pattern: "configure/global-service/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        editSite: {
+            view: "org/forgerock/openam/ui/admin/views/global/EditSiteView",
+            url: /configure\/site\/([^\/]+)/,
+            pattern: "configure/site/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },

@@ -15,13 +15,12 @@
  */
 
 define("org/forgerock/openam/ui/admin/services/SitesService", [
-    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues"
-], ($, _, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
 
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/`);
 
