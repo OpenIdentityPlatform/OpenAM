@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
             "change #serviceSelection": "onSelectService"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             this.data.realmPath = args[0];
 
             ServicesService.type.getCreatables(this.data.realmPath).then((creatableTypes) => {
@@ -60,11 +60,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
             });
         },
 
-        onSelectService: function (event) {
+        onSelectService (event) {
             this.selectService(event.target.value);
         },
 
-        selectService: function (service) {
+        selectService (service) {
             toggleCreate(this.$el, false);
             if (service && service !== this.data.type) {
                 this.data.type = service;
@@ -76,23 +76,17 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 ServicesService.instance.getInitialState(this.data.realmPath, this.data.type).then((response) => {
                     this.jsonSchemaView = new JSONSchemaView({
                         schema: response.schema,
-                                // .filterProperties({ required: true })
-                                // .filterPropertiesKeys(response.values.mapEmpty()),
-                        // values: response.values.pick(response.values.mapEmpty())
-                        //         // schema.properties = _.pick(this.raw.properties, _.matches(predicate));
-
-                        values: response.values
+                        values: response.values,
+                        onRendered: toggleCreate(this.$el, true)
                     });
                     $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
-
-                    toggleCreate(this.$el, true);
                 }, () => {
                     toggleCreate(this.$el, false);
                 });
             }
         },
 
-        onCreateClick: function () {
+        onCreateClick () {
             ServicesService.instance.create(this.data.realmPath, this.data.type, this.jsonSchemaView.values())
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
@@ -102,7 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 });
             }, (response) => {
                 Messages.addMessage({
-                    response: response,
+                    response,
                     type: Messages.TYPE_DANGER
                 });
             });

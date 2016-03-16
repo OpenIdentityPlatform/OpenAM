@@ -23,6 +23,19 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEditorView"
 ], ($, _, Backbone, JSONSchema, JSONValues, JSONEditorView, TogglableJSONEditorView) => {
+    /**
+     * There is no reliable method of knowing if the form rendered by the JSON Editor has finished being added to the
+     * DOM. We do however wish to signal when render is complete so views can perform actions (e.g. enabling buttons
+     * when the form is ready for input). The workaround is to add the callback to the browser event queue using
+     * setTimeout meaning his callback will be executed after the render cycle has complete.
+     * @param  {Function} callback Function to invoke after the timeout has expired
+     */
+    function invokeOnRenderedAfterTimeout (callback) {
+        if (callback) {
+            setTimeout(callback, 0);
+        }
+    }
+
     const JSONSchemaView = Backbone.View.extend({
         initialize (options) {
             if (!(options.schema instanceof JSONSchema)) {
@@ -64,6 +77,8 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
                     }).render()
                 ];
             }
+
+            invokeOnRenderedAfterTimeout(this.options.onRendered);
 
             return this;
         },
