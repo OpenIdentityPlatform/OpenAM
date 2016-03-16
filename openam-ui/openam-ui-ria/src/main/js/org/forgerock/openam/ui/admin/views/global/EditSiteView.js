@@ -37,9 +37,9 @@ define("org/forgerock/openam/ui/admin/views/global/EditSiteView", [
     function deleteInstance (id, etag) {
         SitesService.sites.remove(id, etag).then(() => {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-            // Router.routeTo("configurationSitesList", {
-            //     trigger: true
-            // });
+            Router.routeTo("listSites", {
+                trigger: true
+            });
         }, (response) => Messages.addMessage({
             response,
             type: Messages.TYPE_DANGER

@@ -31,6 +31,10 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
         events: {
             "click [data-edit-properties]" : "editProperties"
         },
+        partials: [
+            "partials/util/_Status.html"
+        ],
+
         editProperties: function (event) {
             event.preventDefault();
             var self = this;

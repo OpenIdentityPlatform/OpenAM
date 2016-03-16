@@ -11,12 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-define([
-    "./util/Constants",
-    "./util/RealmHelper",
-    "./services/SiteConfigurationService",
-    "./components/TemplateBasedView"
-]);
+define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
+    "backbone",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], (Backbone, UIUtils) => {
+
+    return Backbone.View.extend({
+
+        initialize (options) {
+            this.options = options;
+        },
+
+        render () {
+            UIUtils.fillTemplateWithData(
+                this.options.template,
+                this.options.data,
+                (html) => this.$el.html(html)
+            );
+        }
+    });
+
+});

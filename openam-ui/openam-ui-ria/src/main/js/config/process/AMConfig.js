@@ -91,10 +91,10 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
-            "org/forgerock/openam/ui/admin/views/realms/RealmsListView",
+            "org/forgerock/openam/ui/admin/views/realms/ListRealmsView",
             "org/forgerock/openam/ui/admin/services/SMSGlobalService"
         ],
-        processDescription: function (event, Router, CreateUpdateRealmDialog, RealmsListView, SMSGlobalService) {
+        processDescription: function (event, Router, CreateUpdateRealmDialog, ListRealmsView, SMSGlobalService) {
             Router.routeTo(Router.configuration.routes.realms, {
                 args: [],
                 trigger: true
@@ -109,7 +109,7 @@ define("config/process/AMConfig", [
                 CreateUpdateRealmDialog.show({
                     allRealmPaths : allRealmPaths,
                     callback : function () {
-                        RealmsListView.render();
+                        ListRealmsView.render();
                     }
                 });
             });
@@ -196,6 +196,15 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.sts(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription: function (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.serverSite();
         }
     }, {
         startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,

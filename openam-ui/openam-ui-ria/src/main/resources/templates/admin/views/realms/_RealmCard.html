@@ -1,0 +1,43 @@
+<div class="col-sm-6 col-md-3">
+    <div class="panel-default panel am-panel-card" data-realm-path="{{path}}">
+        <div class="btn-group card-menu">
+            <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-v fa-lg"></i>
+            </button>
+            <ul class="dropdown-menu pull-left" role="menu">
+                <li><a href="#" data-edit-realm><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
+                {{#if active}}
+                    <li><a href="#" data-toggle-realm><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
+                {{else}}
+                    <li><a href="#" data-toggle-realm><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
+                {{/if}}
+                <li class="divider"></li>
+                <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" data-delete-realm ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+            </ul>
+        </div>
+        <a href="{{routeTo 'realmDefault' path}}">
+            <div class="card-body card-body-with-menu">
+                <div class="card-icon-circle bg-primary">
+                    <i class="fa fa-cloud"></i>
+                </div>
+                <h3 class="card-name text-primary">{{name}}</h3>
+                <div class="card-subtext">
+                    <div class="realm-card-path">{{path}}</div>
+                    <div class="realm-card-aliases">
+                    {{#if aliases}}
+                        {{aliases.[0]}}
+                        {{#if aliases.[1]}}
+                            {{#each aliases}}
+                            {{#if @last}}<br><em>{{@index}} {{t 'common.form.more'}}</em>{{/if}}
+                            {{/each}}
+                        {{/if}}
+                    {{/if}}
+                </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                {{> util/_Status active=active }}
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                {{#each headers}}
+                    <th>{{this}}</th>
+                {{/each}}
+                <th class="fr-col-btn-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#each items}}
+            <tr>
+                <td class="wordwrap"><a href="{{routeTo 'realmDefault' path}}">{{name}}</a></td>
+                <td class="wordwrap">
+                    {{> util/_Status active=active }}
+                </td>
+                <td class="wordwrap">{{path}}</td>
+                <td>
+                    {{#each aliases}}
+                        {{this}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+                <td class="fr-col-btn-2">
+                    <div class="btn-group" data-realm-path="{{path}}">
+                        <button type="button" data-edit-realm class="btn btn-link" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
+                        <button type="button" data-delete-realm {{#unless canDelete}}disabled{{/unless}} class="btn btn-link"><i class="fa fa-close"></i></button>
+                    </div>
+                </td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</div>

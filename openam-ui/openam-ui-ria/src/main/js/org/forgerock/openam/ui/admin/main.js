@@ -67,7 +67,7 @@ define([
 
     "./views/realms/services/SubSchemaListView",
 
-    "./views/realms/RealmsListView",
+    "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
     "./views/realms/CreateUpdateRealmDialog",
 
@@ -76,5 +76,7 @@ define([
     "./views/global/EditConfigurationView",
     "./views/global/EditServerDefaultsView",
     "./views/global/ListAuthenticationView",
-    "./views/global/ListGlobalServicesView"
+    "./views/global/ListGlobalServicesView",
+
+    "./views/common/ToggleCardListView"
 ]);

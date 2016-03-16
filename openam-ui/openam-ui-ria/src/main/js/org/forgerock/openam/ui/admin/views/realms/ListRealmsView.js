@@ -14,24 +14,22 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
+define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/backgrid/Backgrid",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
-    "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/NavigationHelper",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService"
-], function ($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CreateUpdateRealmDialog, Form, FormHelper,
-             Messages, NavigationHelper, Router, SMSGlobalService) {
-    var RealmsView = AbstractView.extend({
-        template: "templates/admin/views/realms/RealmsListTemplate.html",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/common/components/TemplateBasedView",
+    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
+], ($, _, AbstractView, BootstrapDialog, CreateUpdateRealmDialog, Messages, NavigationHelper, Router, SMSGlobalService,
+    TemplateBasedView, ToggleCardListView) => {
+    var ListRealmsView = AbstractView.extend({
+        template: "templates/admin/views/realms/ListRealmsTemplate.html",
         editDetailsDialogTemplate: "templates/admin/views/realms/RealmPropertiesDialogTemplate.html",
         events: {
             "click [data-delete-realm]" : "deleteRealm",
@@ -40,20 +38,23 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             "click [data-toogle-realm]" : "toggleRealmActive"
         },
         partials: [
-            "partials/alerts/_Alert.html" // needed in CreateUpdateRealmDialog
+            "partials/alerts/_Alert.html", // needed in CreateUpdateRealmDialog
+            "partials/util/_Status.html",
+            "partials/util/_ButtonLink.html",
+            "templates/admin/views/realms/_RealmCard.html"
         ],
-        addRealm: function (event) {
+        addRealm (event) {
             event.preventDefault();
             var self = this;
 
             CreateUpdateRealmDialog.show({
                 allRealmPaths :  this.data.allRealmPaths,
-                callback : function () {
+                callback () {
                     self.render();
                 }
             });
         },
-        deleteRealm: function (event) {
+        deleteRealm (event) {
             event.preventDefault();
             var self = this,
                 realm = this.getRealmFromEvent(event),
@@ -103,7 +104,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             });
 
         },
-        editRealm: function (event) {
+        editRealm (event) {
             event.preventDefault();
             var realm = this.getRealmFromEvent(event),
                 self = this;
@@ -111,30 +112,26 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             CreateUpdateRealmDialog.show({
                 allRealmPaths :  this.data.allRealmPaths,
                 realmPath : realm.path,
-                callback : function () {
+                callback () {
                     self.render();
                 }
             });
         },
-        getActiveTabIndex: function () {
-            var tabIndex = this.$el.find(".tab-pane.active").index();
-            return tabIndex > 0 ? tabIndex : 0;
-        },
-        getRealmFromEvent: function (event) {
+        getRealmFromEvent (event) {
             var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
                 realm = _.find(this.data.realms, { path: path });
 
             return realm;
         },
-        getRealmFromList: function (path) {
+        getRealmFromList (path) {
             return _.find(this.data.realms, { path: path });
         },
-        performDeleteRealm: function (path) {
+        performDeleteRealm (path) {
             var self = this;
 
-            return SMSGlobalService.realms.remove(path).then(function () {
+            return SMSGlobalService.realms.remove(path).then(() => {
                 return self.render();
-            }, function (response) {
+            }, (response) => {
                 if (response && response.status === 409) {
                     Messages.addMessage({
                         message: $.t("console.realms.parentRealmCannotDeleted"),
@@ -148,15 +145,14 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 }
             });
         },
-        canRealmBeDeleted: function (realm) {
+        canRealmBeDeleted (realm) {
             return realm.path === "/" ? false : true;
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
 
-            SMSGlobalService.realms.all().then(function (data) {
-                var result = _.find(data.result, { name: "/" }),
-                    activeTabIndex = self.getActiveTabIndex();
+            SMSGlobalService.realms.all().then((data) => {
+                var result = _.find(data.result, { name: "/" });
 
                 if (result) {
                     result.name = $.t("console.common.topLevelRealm");
@@ -165,42 +161,72 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 self.data.allRealmPaths = [];
                 NavigationHelper.populateRealmsDropdown(data);
 
-                _.each(self.data.realms, function (realm) {
+                _.each(self.data.realms, (realm) => {
                     realm.canDelete = self.canRealmBeDeleted(realm);
                     self.data.allRealmPaths.push(realm.path);
                 });
 
-                self.parentRender(function () {
-                    this.$el.find(".tab-pane").eq(activeTabIndex).addClass("active");
-                    this.$el.find(".tab-toggles").eq(activeTabIndex).addClass("active");
+                self.parentRender(() => {
+
+                    const tableData = {
+                        "headers": [
+                            $.t("console.realms.table.0"), $.t("console.realms.table.1"),
+                            $.t("console.realms.table.2"), $.t("console.realms.table.3")
+                        ],
+                        "items" : self.data.realms
+                    };
+
+                    this.toggleView = new ToggleCardListView({
+                        el: "#toggleCardList",
+                        activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
+                        button: {
+                            btnclass: "btn-primary",
+                            href: "#"/*TODO: Add link to route once OPENAM-8465 has been merged*/,
+                            icon: "fa-plus",
+                            title: $.t("console.realms.newRealm")
+                        }
+                    });
+
+                    this.toggleView.render((toggleView) => {
+                        new TemplateBasedView({
+                            data: tableData,
+                            el: toggleView.getElementA(),
+                            template: "templates/admin/views/realms/RealmsCardsTemplate.html"
+                        }).render();
+                        new TemplateBasedView({
+                            data: tableData,
+                            el: toggleView.getElementB(),
+                            template: "templates/admin/views/realms/RealmsTableTemplate.html"
+                        }).render();
+                    });
 
                     if (callback) {
                         callback();
                     }
                 });
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        toggleRealmActive: function (event) {
+        toggleRealmActive (event) {
             event.preventDefault();
             var self = this,
                 realm = this.getRealmFromEvent(event);
 
             realm.active = !realm.active;
-            SMSGlobalService.realms.update(realm).then(null, function (response) {
+            SMSGlobalService.realms.update(realm).then(null, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
-            }).always(function () {
+            }).always(() => {
                 self.render();
             });
         }
     });
 
-    return new RealmsView();
+    return new ListRealmsView();
 });

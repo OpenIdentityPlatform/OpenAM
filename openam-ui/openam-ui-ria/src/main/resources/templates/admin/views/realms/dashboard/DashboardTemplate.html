@@ -4,19 +4,10 @@
     <a href="#" data-edit-properties class="btn btn-primary">{{t 'console.dashboard.realmProperties'}}</a>
 </div>
 
-
 <div class="page-description">
     <ul class="list-inline fr-list-inline-piped">
         <li>
-            {{#if realm.active}}
-            <span class="text-success">
-                <i class="fa fa-check-circle"></i> {{realm.status}}
-            </span>
-            {{else}}
-            <span class="text-warning">
-                <i class="fa fa-ban"></i> {{realm.status}}
-            </span>
-            {{/if}}
+            {{> util/_Status active=realm.active }}
         </li>
         {{#if realm.aliases}}
         <li class="text-muted">
@@ -29,14 +20,4 @@
     </ul>
 </div>
 
-<div class="page-description hidden">
-    <ul class="list-unstyled">
-        <li><span>{{t 'console.common.realmStatus'}}: </span><strong>{{realm.status}}</strong></li>
-        <li><span>{{t 'console.common.realmDnsAliases'}}: </span>
-            {{#each realm.aliases}}
-                <strong>{{this}}{{#unless @last}}, {{/unless}}</strong>
-            {{/each}}
-        </li>
-    </ul>
-</div>
 <div data-common-tasks-container id="commonTasks" class="panel panel-default"></div>

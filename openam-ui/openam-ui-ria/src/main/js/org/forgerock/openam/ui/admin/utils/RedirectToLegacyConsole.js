@@ -50,6 +50,10 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
         window.location.href = "/" + Constants.context + "/" + link + query + "realm=" + encodeURIComponent(realm);
     };
 
+    obj.serverSite = function () {
+        window.location.href = "/" + Constants.context + "/service/ServerSite";
+    };
+
     obj.realm = {
         dataStores    : redirector(14),
         privileges    : redirector(15),

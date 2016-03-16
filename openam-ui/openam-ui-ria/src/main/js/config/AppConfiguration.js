@@ -157,20 +157,7 @@ define("config/AppConfiguration", [
                                 }],
                                 "visibleToRoles": ["ui-realm-admin"]
                             },
-                            "federation": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
-                                "name": "config.AppConfiguration.Navigation.links.federation",
-                                "icon": "fa fa-building-o hidden-md",
-                                "visibleToRoles": ["ui-global-admin"]
-                            },
-                            "configuration": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,
-                                "name": "config.AppConfiguration.Navigation.links.configuration",
-                                "icon": "fa fa-cog",
-                                "visibleToRoles": ["ui-global-admin"]
-                            },
-                            //TODO: Remove the comments and delete the configuration object above.
-                            /*"configure": {
+                            "configure": {
                                 "url": "#configure",
                                 "name": "config.AppConfiguration.Navigation.links.configure.title",
                                 "icon": "fa fa-wrench hidden-md",
@@ -184,19 +171,20 @@ define("config/AppConfiguration", [
                                     "name": "config.AppConfiguration.Navigation.links.configure.global-services",
                                     "icon": "fa fa-globe"
                                 }, {
-                                    "url": "#configure/server-defaults",
+                                    "event": Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
                                     "name": "config.AppConfiguration.Navigation.links.configure.server-defaults",
                                     "icon": "fa fa-server"
                                 }],
                                 "visibleToRoles": ["ui-realm-admin"]
-                            },*/
+                            },
                             "deployment": {
                                 "url": "#deployment",
                                 "name": "config.AppConfiguration.Navigation.links.deployment.title",
                                 "icon": "fa fa-sitemap hidden-md",
                                 "dropdown" : true,
                                 "urls": [{
-                                    "url": "#deployment/servers",
+                                    "event": Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
+                                    //"url": "#deployment/servers", TODO: Implement servers and remove link to JATO
                                     "name": "config.AppConfiguration.Navigation.links.deployment.servers",
                                     "icon": "fa fa-server"
                                 }, {
@@ -205,6 +193,12 @@ define("config/AppConfiguration", [
                                     "icon": "fa fa-list-alt"
                                 }],
                                 "visibleToRoles": ["ui-realm-admin"]
+                            },
+                            "federation": {
+                                "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
+                                "name": "config.AppConfiguration.Navigation.links.federation",
+                                "icon": "fa fa-building-o hidden-md",
+                                "visibleToRoles": ["ui-global-admin"]
                             },
                             "sessions": {
                                 "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,

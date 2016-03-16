@@ -23,7 +23,7 @@ define("config/routes/admin/RealmsRoutes", function () {
         },
         routes = {
             "realms": {
-                view: "org/forgerock/openam/ui/admin/views/realms/RealmsListView",
+                view: "org/forgerock/openam/ui/admin/views/realms/ListRealmsView",
                 url: /^realms\/*$/,
                 pattern: "realms",
                 role: "ui-realm-admin",

@@ -44,17 +44,25 @@ define("config/routes/admin/GlobalRoutes", [], function () {
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        editSite: {
-            view: "org/forgerock/openam/ui/admin/views/global/EditSiteView",
-            url: /configure\/site\/([^\/]+)/,
-            pattern: "configure/site/?",
-            role: "ui-global-admin",
-            navGroup: "admin"
-        },
-        editServerDefaults: {
+        // TODO : Uncomment when view ready.
+        /*editServerDefaults: {
             view: "org/forgerock/openam/ui/admin/views/global/EditServerDefaultsView",
             url: /configure\/server-defaults/,
             pattern: "configure/server-defaults",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },*/
+        listSites: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/ListSitesView",
+            url: /deployment\/sites/,
+            pattern: "deployment/sites",
+            role: "ui-realm-admin",
+            navGroup: "admin"
+        },
+        editSite: {
+            view: "org/forgerock/openam/ui/admin/views/global/EditSiteView",
+            url: /deployment\/sites\/edit\/([^\/]+)/,
+            pattern: "deployment/sites/edit/?",
             role: "ui-global-admin",
             navGroup: "admin"
         }
