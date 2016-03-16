@@ -10,7 +10,7 @@
                         {{#if creatableTypes.[1]}}
                         <label class="control-label" for="serviceSelection">{{t "console.services.edit.chooseServiceType"}}</label>
                         <div class="">
-                            <select class="selectize form-control" id="serviceSelection">
+                            <select data-service-selection class="selectize form-control">
                                 <option disabled selected value="">{{t "console.services.edit.serviceTypes"}}</option>
                                 {{#each creatableTypes}}
                                 <option value="{{_id}}">{{name}}</option>

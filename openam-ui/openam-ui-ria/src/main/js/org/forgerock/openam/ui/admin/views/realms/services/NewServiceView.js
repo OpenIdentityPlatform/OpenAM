@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         ],
         events: {
             "click [data-create]": "onCreateClick",
-            "change #serviceSelection": "onSelectService"
+            "change [data-service-selection]": "onSelectService"
         },
 
         render (args, callback) {
@@ -51,7 +51,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
 
                 this.parentRender(() => {
                     if (this.data.creatableTypes.length > 1) {
-                        this.$el.find("#serviceSelection").selectize();
+                        const serviceSelection = this.$el.find("[data-service-selection]");
+                        serviceSelection.selectize({
+                            onInitialize () {
+                                this.$control_input.attr("id", "serviceSelection");
+                            }
+                        });
                     } else if (this.data.creatableTypes[0] && this.data.creatableTypes[0]._id) {
                         this.selectService(this.data.creatableTypes[0]._id);
                     }
