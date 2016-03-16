@@ -13,11 +13,10 @@
 *
 * Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.authentication.modules.push;
+package org.forgerock.openam.services.push;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.security.AdminTokenAction;
@@ -27,25 +26,44 @@ import com.sun.identity.sm.ServiceConfigManager;
 import java.security.AccessController;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.services.push.PushNotificationConstants;
-import org.forgerock.openam.services.push.PushNotificationDelegate;
-import org.forgerock.openam.services.push.PushNotificationDelegateFactory;
+import org.forgerock.guava.common.cache.Cache;
+import org.forgerock.guava.common.cache.CacheBuilder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.util.promise.PromiseImpl;
 
 /**
- * Guice bindings for the Push module.
+ * Guice module for OpenAM Push related classes.
  */
-@GuiceModule
-public class AuthenticatorPushGuiceModule extends AbstractModule {
+public class PushGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
         bind(Debug.class).annotatedWith(Names.named("frPush")).toInstance(Debug.getInstance("frPush"));
-        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegate>>() { })
-                .toInstance(new ConcurrentHashMap<String, PushNotificationDelegate>());
-        bind(new TypeLiteral<ConcurrentMap<String, PushNotificationDelegateFactory>>() { })
-                .toInstance(new ConcurrentHashMap<String, PushNotificationDelegateFactory>());
+    }
+
+    /**
+     * Generates a new Cache for the MessageDispatcher.
+     * @return a newly constructed Cache.
+     */
+    @Provides
+    public Cache<String, PromiseImpl<JsonValue, Exception>> getMessageDispatchCache() {
+        return CacheBuilder.newBuilder()
+                .concurrencyLevel(16)
+                .maximumSize(10000)
+                .expireAfterWrite(2, TimeUnit.MINUTES)
+                .build();
+    }
+
+    @Provides
+    ConcurrentMap<String, PushNotificationDelegate> getPushNotificationDelegateMap() {
+        return new ConcurrentHashMap<>();
+    }
+
+    @Provides
+    ConcurrentMap<String, PushNotificationDelegateFactory> getPushNotificationDelegateFactoryMap() {
+        return new ConcurrentHashMap<>();
     }
 
     @Provides
@@ -54,6 +72,4 @@ public class AuthenticatorPushGuiceModule extends AbstractModule {
         return new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 PushNotificationConstants.SERVICE_NAME, PushNotificationConstants.SERVICE_VERSION);
     }
-
-
 }

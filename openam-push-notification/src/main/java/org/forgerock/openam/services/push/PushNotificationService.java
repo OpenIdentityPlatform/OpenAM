@@ -220,11 +220,8 @@ public class PushNotificationService {
                 } else {
                     if (oldDelegate.isRequireNewDelegate(config)) {
                         pushRealmMap.remove(realm);
-                        try {
-                            start(realm, newDelegate);
-                        } finally {
-                            oldDelegate.close();
-                        }
+                        oldDelegate.close();
+                        start(realm, newDelegate);
                     } else {
                         oldDelegate.updateDelegate(config);
                     }

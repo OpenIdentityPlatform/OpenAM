@@ -22,4 +22,13 @@ Copyright 2016 ForgeRock AS.
 <ModuleProperties moduleName="AuthenticatorPush" version="1.0" >
     <Callbacks length="0" order="1" timeout="120" header="AuthenticatorPush">
     </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="AuthenticatorPush">
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Click Me!</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
 </ModuleProperties>

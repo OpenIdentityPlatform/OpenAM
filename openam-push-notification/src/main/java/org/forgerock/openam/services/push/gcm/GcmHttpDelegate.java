@@ -15,7 +15,10 @@
 */
 package org.forgerock.openam.services.push.gcm;
 
+import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Resources.*;
+import static org.forgerock.json.resource.Router.*;
 import static org.forgerock.openam.services.push.gcm.GcmConstants.*;
 
 import com.sun.identity.shared.debug.Debug;
@@ -26,36 +29,47 @@ import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.Router;
 import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationDelegate;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
+import org.forgerock.services.routing.RouteMatcher;
 
 /**
  * Delegate for communicating with GCM over HTTP.
  */
 public class GcmHttpDelegate implements PushNotificationDelegate {
 
+    private final static String ROUTE = "push/gcm/message";
+
+    private RouteMatcher<org.forgerock.json.resource.Request> routeMatcher;
+
     private final Debug debug;
 
     private final Client client;
-    private final HttpClientHandler handler;
+    private final Router router;
+    private final GcmMessageResource messageEndpoint;
 
     private PushNotificationServiceConfig config;
 
     /**
-     * Generates a new GCM HTTP Delegate, used to communicate over the internet with
-     * the GCM cloud service.
+     * Generates a new GCM HTTP Delegate, used to communicate over the Internet with
+     * the GCM service.
      *
-     * @param handler configures the HTTP client used to connect to the remote service.
+     * @param handler HttpClientHandler used to generate HTTP client for this delegate's outbound comms.
      * @param config Necessary to configure this delegate.
      * @param debug to write out debug messages.
+     * @param router to attach a newly generate GcmMessageEndpoint upon this delegate's initialization.
+     * @param messageEndpoint the endpoint to attach to the router upon init.
      */
-    public GcmHttpDelegate(HttpClientHandler handler, PushNotificationServiceConfig config, Debug debug) {
-        this.handler = handler;
+    public GcmHttpDelegate(HttpClientHandler handler, PushNotificationServiceConfig config, Debug debug,
+                           Router router, GcmMessageResource messageEndpoint) {
         this.client = new Client(handler);
         this.config = config;
         this.debug = debug;
+        this.router = router;
+        this.messageEndpoint = messageEndpoint;
     }
 
     @Override
@@ -77,7 +91,7 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public boolean isRequireNewDelegate(PushNotificationServiceConfig newConfig) {
-        return !config.equals(newConfig);
+        return false; //this impl. will never require resetting the endpoint
     }
 
     @Override
@@ -87,12 +101,12 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public void startServices() throws PushNotificationException {
-        //This section intentionally left blank.
+        routeMatcher = router.addRoute(EQUALS, uriTemplate(ROUTE), newAnnotatedRequestHandler(messageEndpoint));
     }
 
     @Override
     public void close() throws IOException {
-        handler.close();
+        router.removeRoute(routeMatcher);
     }
 
     private JsonValue convertToGcm(PushMessage message) {

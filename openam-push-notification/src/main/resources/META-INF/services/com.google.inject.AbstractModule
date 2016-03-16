@@ -13,4 +13,4 @@
 #
 # Copyright 2016 ForgeRock AS.
 #
-org.forgerock.openam.authentication.modules.push.AuthenticatorPushGuiceModule
+org.forgerock.openam.services.push.PushGuiceModule

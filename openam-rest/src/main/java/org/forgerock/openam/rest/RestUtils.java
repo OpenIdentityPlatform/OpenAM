@@ -42,6 +42,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.services.context.Context;
@@ -143,6 +144,23 @@ final public class RestUtils {
         return new NotSupportedException("Operation is not supported.").asPromise();
     }
 
+    /**
+     * Signals to the handler that the request was invalid for this endpoint.
+     */
+    public static <T> Promise<T, ResourceException> generateBadRequestException() {
+        return generateBadRequestException("Bad request.");
+    }
+
+    /**
+     * Signals to the handler that the request was invalid for this endpoint.
+     */
+    public static <T> Promise<T, ResourceException> generateBadRequestException(String msg) {
+        return new BadRequestException(msg).asPromise();
+    }
+
+    /**
+     * Signals to the handler that the requested resource was not found.
+     */
     public static <T> Promise<T, ResourceException> generateNotFoundException(Request request) {
         return new NotFoundException("Resource '" + request.getResourcePath() + "' not found").asPromise();
     }

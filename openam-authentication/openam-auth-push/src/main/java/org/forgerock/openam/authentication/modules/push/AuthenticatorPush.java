@@ -17,6 +17,7 @@ package org.forgerock.openam.authentication.modules.push;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
+import static org.forgerock.openam.services.push.PushMessage.MESSAGE_ID;
 
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -31,9 +32,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
+import org.forgerock.util.promise.Promise;
 
 /**
  * ForgeRock Authentication (Push) Authentication Module.
@@ -44,12 +48,15 @@ public class AuthenticatorPush extends AMLoginModule {
 
     private final PushNotificationService pushService =
             InjectorHolder.getInstance(PushNotificationService.class);
+    private final MessageDispatcher messageDispatcher =
+            InjectorHolder.getInstance(MessageDispatcher.class);
 
     //From config
     private String deviceId;
 
     //Internal state
     private String realm;
+    private Promise<JsonValue, Exception> promise;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -82,10 +89,17 @@ public class AuthenticatorPush extends AMLoginModule {
         switch (state) {
         case ISAuthConstants.LOGIN_START:
             if (sendMessage(getDeviceId())) {
-                return ISAuthConstants.LOGIN_SUCCEED;
+                return AWAIT_STATE;
             } else {
                 throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
             }
+        case AWAIT_STATE:
+            if (promise.isDone()) {
+                return ISAuthConstants.LOGIN_SUCCEED;
+            } else {
+                return AWAIT_STATE;
+            }
+
         default:
             throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
         }
@@ -97,6 +111,7 @@ public class AuthenticatorPush extends AMLoginModule {
                 field("message", "User logged in to realm \"" + realm + "\" using OpenAM")
         )));
         try {
+            promise = messageDispatcher.expect(message.getData().get(MESSAGE_ID).toString());
             pushService.send(message, realm);
             return true;
         } catch (PushNotificationException e) {

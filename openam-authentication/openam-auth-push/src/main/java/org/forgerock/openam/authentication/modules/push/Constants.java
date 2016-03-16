@@ -42,6 +42,6 @@ final class Constants {
      * STATES.
      */
 
-    /** State to display an error message to the end-user. */
-    public static final int STATE_ERROR = 2;
+    /** State to await message response from remote device. */
+    public static final int AWAIT_STATE = 2;
 }
