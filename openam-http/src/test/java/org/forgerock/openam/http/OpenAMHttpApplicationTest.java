@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.http;
@@ -26,7 +26,6 @@ import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
-import org.forgerock.http.HttpApplicationException;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -52,12 +51,6 @@ public class OpenAMHttpApplicationTest extends GuiceTestCase {
     @BeforeMethod
     public void setup() {
         httpApplication = InjectorHolder.getInstance(OpenAMHttpApplication.class);
-    }
-
-    @Test
-    public void startShouldReturnHttpHandler() throws HttpApplicationException {
-        //When/Then
-        assertThat(httpApplication.start()).isEqualTo(handler);
     }
 
     @Test
