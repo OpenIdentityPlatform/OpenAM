@@ -336,7 +336,7 @@ public class SmsRouteTree implements RequestHandler {
         }
 
         public boolean handleResource(ResourceResponse resource) {
-            response.add(resource.getContent());
+            response.add(resource.getContent().getObject());
             return true;
         }
     }
