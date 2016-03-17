@@ -92,6 +92,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 public class AuthUtils extends AuthClientUtils {
@@ -177,10 +178,9 @@ public class AuthUtils extends AuthClientUtils {
         SessionID sid,
         boolean isSessionUpgrade,
         boolean isBackPost) throws AuthException {
-        return getAuthContext(request,response,sid,
-            isSessionUpgrade,isBackPost,false);
+        return getAuthContext(request, response, sid, isSessionUpgrade, isBackPost, false, false);
     }
-    
+
     /**
      * Returns the authentication context for a request.
      *
@@ -190,6 +190,7 @@ public class AuthUtils extends AuthClientUtils {
      * @param isSessionUpgrade <code>true</code> if session upgrade.
      * @param isBackPost <code>true</code> if back posting.
      * @param isLogout <code>true</code> for logout.
+     * @param isRestAuth <code>true</code> if the request is coming from JSON REST/XUI.
      * @return authentication context.
      */
     public static AuthContextLocal getAuthContext(
@@ -198,7 +199,8 @@ public class AuthUtils extends AuthClientUtils {
         SessionID sid,
         boolean isSessionUpgrade,
         boolean isBackPost,
-        boolean isLogout) throws AuthException {
+        boolean isLogout,
+        boolean isRestAuth) throws AuthException {
         utilDebug.message("In AuthUtils:getAuthContext");
         Hashtable dataHash;
         AuthContextLocal authContext = null;
@@ -219,11 +221,15 @@ public class AuthUtils extends AuthClientUtils {
 
             if(!sid.isNull() && authContext == null && !isSessionUpgrade) {
                 String authCookieValue = getAuthCookieValue(request);
-                if ((authCookieValue != null) && (!authCookieValue.isEmpty())
-                        && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
+                SessionID sessionID = null;
+                if (StringUtils.isEmpty(authCookieValue) && isRestAuth) {
+                    sessionID = sid;
+                } else if (StringUtils.isNotEmpty(authCookieValue) && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
+                    sessionID = new SessionID(authCookieValue);
+                }
+                if (sessionID != null) {
                     String cookieURL = null;
                     try {
-                        SessionID sessionID = new SessionID(authCookieValue);
                         URL sessionServerURL = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sessionID);
                         cookieURL = sessionServerURL.getProtocol()
                             + "://" + sessionServerURL.getHost() + ":"
