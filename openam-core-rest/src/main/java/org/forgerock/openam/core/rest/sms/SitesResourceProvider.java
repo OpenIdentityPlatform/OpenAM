@@ -158,6 +158,9 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     private String validWriteOperation(JsonValue content, String id) throws BadRequestException {
+        if (!SiteConfiguration.validateUrl(content.get("url").asString())) {
+            throw new BadRequestException("Invalid URL");
+        }
         if (!Sets.intersection(content.keys(), asSet("servers", "id")).isEmpty()) {
             throw new BadRequestException("Only url, secondaryURLs and _id are valid in write");
         }
@@ -166,6 +169,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         } else if (content.isDefined("_id") && !id.equals(content.get("_id").asString())) {
             throw new BadRequestException("IDs do not match");
         }
+
         return id;
     }
 

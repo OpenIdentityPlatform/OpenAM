@@ -274,47 +274,28 @@ public class SiteConfiguration extends ConfigurationBase {
         ServiceConfig sc = getRootSiteConfig(ssoToken);
         
         if (sc != null) {
-            try {
-                FQDNUrl test = new FQDNUrl(siteURL.trim());
-                if ((!test.isFullyQualified()) ||
-                    (test.getPort().length() == 0) ||
-                    (test.getURI().length() == 0)) {
-                    String[] param = {siteURL};
-                    throw new ConfigurationException("invalid.site.url", param);
-                }
-            } catch (MalformedURLException ex) {
+            if (!validateUrl(siteURL)) {
                 String[] param = {siteURL};
                 throw new ConfigurationException("invalid.site.url", param);
             }
-            
+
             Set allURLs = getAllSiteURLs(ssoToken);
             if (allURLs.contains(siteURL)) {
                 String[] param = {siteURL};
-                throw new ConfigurationException("duplicated.site.url", param);                
+                throw new ConfigurationException("duplicated.site.url", param);
             }
-            
+
             if ((secondaryURLs != null) && !secondaryURLs.isEmpty()) {
                 for (Iterator i = secondaryURLs.iterator(); i.hasNext(); ) {
                     String url = (String)i.next();
                     if (allURLs.contains(url)) {
                         String[] param = {url};
-                        throw new ConfigurationException("duplicated.site.url", 
-                            param);                
+                        throw new ConfigurationException("duplicated.site.url",
+                            param);
                     }
-
-                    try {
-                        FQDNUrl test = new FQDNUrl(url);
-                        if ((!test.isFullyQualified()) ||
-                            (test.getPort().length() == 0) ||
-                                (test.getURI().length() == 0)) {
-                            String[] param = {url};
-                            throw new ConfigurationException(
-                                "invalid.site.secondary.url", param);
-                        }
-                    } catch (MalformedURLException ex) {
-                        String[] param = {url};
-                        throw new ConfigurationException(
-                            "invalid.site.secondary.url", param);
+                    if (!validateUrl(siteURL)) {
+                        String[] param = {siteURL};
+                        throw new ConfigurationException("invalid.site.url", param);
                     }
                 }
             }
@@ -339,6 +320,23 @@ public class SiteConfiguration extends ConfigurationBase {
             created = true;
         }
         return created;
+    }
+
+    public static boolean validateUrl(String siteURL) {
+        try {
+            FQDNUrl test = new FQDNUrl(siteURL.trim());
+            if (!test.isFullyQualified() ||
+                (test.getPort().length() == 0) ||
+                (test.getURI().length() == 0)) {
+                String[] param = {siteURL};
+                return false;
+            }
+        } catch (MalformedURLException ex) {
+            String[] param = {siteURL};
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -467,7 +465,12 @@ public class SiteConfiguration extends ConfigurationBase {
 
         Map existing = accessPoint.getAttributes();
         Set existingSet = (Set)existing.get(ATTR_PRIMARY_SITE_URL);
-        
+
+        if (!validateUrl(siteURL)) {
+            String[] param = {siteURL};
+            throw new ConfigurationException("invalid.site.url", param);
+        }
+
         if (!existingSet.contains(siteURL)) {
             Set allURLs = getAllSiteURLs(ssoToken);
             
@@ -545,20 +548,10 @@ public class SiteConfiguration extends ConfigurationBase {
         Collection secondaryURLs
     ) throws SMSException, SSOException, ConfigurationException {
         for (Iterator i = secondaryURLs.iterator(); i.hasNext(); ) {
-            String url = (String)i.next();
-            try {
-                FQDNUrl test = new FQDNUrl(url);
-                if ((!test.isFullyQualified()) ||
-                    (test.getPort().length() == 0) ||
-                    (test.getURI().length() == 0)) {
-                    String[] param = {url};
-                    throw new ConfigurationException(
-                        "invalid.site.secondary.url", param);
-                }
-            } catch (MalformedURLException ex) {
-                String[] param = {url};
-                throw new ConfigurationException(
-                    "invalid.site.secondary.url", param);
+            final String siteURL = (String) i.next();
+            if (!validateUrl(siteURL)) {
+                String[] param = {siteURL};
+                throw new ConfigurationException("invalid.site.url", param);
             }
         }
         
