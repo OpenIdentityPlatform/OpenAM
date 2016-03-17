@@ -24,6 +24,7 @@
  *
  * $Id: DelegationUtils.java,v 1.7 2008/07/06 05:48:31 arviranga Exp $
  *
+ * Copyright 2016 ForgeRock AS.
  */
 
 package com.sun.identity.delegation;
@@ -53,7 +54,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  */
 public class DelegationUtils {
 
-    static final Debug debug = DelegationManager.debug;
+    static final Debug debug = Debug.getInstance(DelegationManager.DELEGATION_DEBUG);
 
     static final String REALM_NAME_TAG = "REALM";
 
@@ -349,15 +350,7 @@ public class DelegationUtils {
      *        with the realm name <code>realm</code>
      */
     static String swapRealmTag(String realm, String value) {
-        int tagLen = REALM_NAME_TAG.length();
-        int idx = value.indexOf(REALM_NAME_TAG);
-        while (idx >= 0) {
-            String prefix = value.substring(0, idx);
-            String suffix = value.substring(idx + tagLen);
-            value = prefix + realm + suffix;
-            idx = value.indexOf(REALM_NAME_TAG);
-        }
-        return value;
+        return value.replace(REALM_NAME_TAG, realm);
     }
 
     /** 
