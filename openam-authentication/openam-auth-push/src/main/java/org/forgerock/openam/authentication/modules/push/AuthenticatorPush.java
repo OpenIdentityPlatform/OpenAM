@@ -17,11 +17,15 @@ package org.forgerock.openam.authentication.modules.push;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
-import static org.forgerock.openam.services.push.PushMessage.MESSAGE_ID;
+import static org.forgerock.openam.services.push.PushMessage.*;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -29,14 +33,17 @@ import java.security.Principal;
 import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -53,15 +60,19 @@ public class AuthenticatorPush extends AMLoginModule {
 
     //From config
     private String deviceId;
+    private Map<String, String> sharedState;
 
     //Internal state
     private String realm;
     private Promise<JsonValue, Exception> promise;
+    private String username;
+    private Principal principal;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         deviceId = CollectionHelper.getMapAttr(options, DEVICE_MESSAGING_ID);
         realm = DNMapper.orgNameToRealmName(getRequestOrg());
+        this.sharedState = sharedState;
 
         String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
 
@@ -74,36 +85,79 @@ public class AuthenticatorPush extends AMLoginModule {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public int process(final Callback[] realCallbacks, int state) throws LoginException {
+    public int process(final Callback[] callbacks, int state) throws LoginException {
 
         final HttpServletRequest request = getHttpServletRequest();
 
-        if (null == request) {
-            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        if (request == null) {
+            DEBUG.error("AuthenticatorPush :: process() : Request was null.");
+            throw failedAsLoginException();
         }
 
         switch (state) {
         case ISAuthConstants.LOGIN_START:
+            return loginStart();
+        case USERNAME_STATE:
+            return usernameState(callbacks);
+        case AWAIT_STATE:
+            return awaitState();
+        default:
+            DEBUG.error("AuthenticatorPush :: process() : Invalid state.");
+            throw failedAsLoginException();
+        }
+
+    }
+
+    private int loginStart() throws AuthLoginException {
+
+        if (username == null && sharedState != null) {
+            username = sharedState.get(getUserKey());
+        }
+
+        if (username == null) {
+            return USERNAME_STATE;
+        } else {
             if (sendMessage(getDeviceId())) {
                 return AWAIT_STATE;
             } else {
-                throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+                DEBUG.warning("AuthenticatorPush :: sendState() : Failed to send message.");
+                throw failedAsLoginException();
             }
-        case AWAIT_STATE:
-            if (promise.isDone()) {
-                return ISAuthConstants.LOGIN_SUCCEED;
-            } else {
-                return AWAIT_STATE;
-            }
+        }
+    }
 
-        default:
-            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+    private int awaitState() {
+        if (promise.isDone()) {
+            storeUsername(username);
+            return ISAuthConstants.LOGIN_SUCCEED;
+        } else {
+            return AWAIT_STATE;
+        }
+    }
+
+    private int usernameState(Callback[] callbacks) throws AuthLoginException {
+        Reject.ifNull(callbacks);
+        NameCallback nameCallback = (NameCallback) callbacks[0];
+        username = nameCallback.getName();
+
+        if (StringUtils.isBlank(username)) {
+            DEBUG.warning("AuthenticatorPush :: usernameState() : Username was blank.");
+            throw failedAsLoginException();
         }
 
+        AMIdentity id = IdUtils.getIdentity(username, realm);
+
+        try {
+            if (id != null && id.isExists() && id.isActive()) {
+                principal = new AuthenticatorPushPrincipal(username);
+                return ISAuthConstants.LOGIN_START;
+            }
+        } catch (IdRepoException | SSOException e) {
+            DEBUG.warning("AuthenticatorPush :: Failed to locate user {} ", username, e);
+        }
+
+        throw failedAsLoginException();
     }
 
     private boolean sendMessage(String deviceId) {
@@ -127,7 +181,11 @@ public class AuthenticatorPush extends AMLoginModule {
 
     @Override
     public Principal getPrincipal() {
-        return null;
+        return principal;
     }
 
+    private AuthLoginException failedAsLoginException() throws AuthLoginException {
+        setFailureID(username);
+        throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+    }
 }

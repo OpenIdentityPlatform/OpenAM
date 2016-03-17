@@ -2326,21 +2326,43 @@ public abstract class AMLoginModule implements LoginModule {
         sharedState = null;
         destroyModuleState();
     }
-    
+
     /**
-     * Stores user name password into shared state map
-     * this method should be called after successfull
-     * authentication by each individual modules.
+     * Stores user name into shared state map.
+     * This method should be called after successful authentication by each individual module
+     * if a username was supplied by that module.
      *
-     * @param user user name
-     * @param passwd user password
+     * @param username user name.
+     */
+    public void storeUsername(String username) {
+        if (isStore && sharedState != null) {
+            sharedState.put(getUserKey(), username);
+        }
+    }
+
+    /**
+     * Stores password into shared state map.
+     * This method may be called after successful authentication by each individual module.
+     *
+     * @param password user's password.
+     */
+    private void storePassword(String password) {
+        if (isStore && sharedState != null) {
+            sharedState.put(getPwdKey(), password);
+        }
+    }
+
+    /**
+     * Stores user name and password into shared state map.
+     * This method should be called after successful authentication by each individual module
+     * if both a username and a password were supplied in that module.
+     *
+     * @param user user name.
+     * @param passwd user password.
      */
     public void storeUsernamePasswd(String user, String passwd) {
-        // store only if store shared state is enabled
-        if (isStore && sharedState !=null) {
-            sharedState.put(ISAuthConstants.SHARED_STATE_USERNAME, user);
-            sharedState.put(ISAuthConstants.SHARED_STATE_PASSWORD, passwd);
-        }
+        storeUsername(user);
+        storePassword(passwd);
     }
     
     /**

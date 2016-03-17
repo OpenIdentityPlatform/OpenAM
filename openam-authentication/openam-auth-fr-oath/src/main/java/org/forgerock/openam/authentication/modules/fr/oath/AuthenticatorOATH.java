@@ -30,13 +30,11 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -139,6 +137,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
     private AuthenticatorOathService realmOathService;
     private AMIdentity id;
+    private String realm;
 
     private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
     private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
@@ -191,8 +190,8 @@ public class AuthenticatorOATH extends AMLoginModule {
         try {
             userName = (String) sharedState.get(getUserKey());
 
-            //gets skippable name from the realm's service and stores it
-            id = getIdentity();
+            realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            id = IdUtils.getIdentity(userName, realm);
             realmOathService = new AuthenticatorOathService(id.getRealm());
 
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
@@ -206,7 +205,7 @@ public class AuthenticatorOATH extends AMLoginModule {
             try {
                 this.minSecretKeyLength = CollectionHelper.getIntMapAttr(options, MIN_SECRET_KEY_LENGTH, 0, debug);
             } catch (NumberFormatException e) {
-                minSecretKeyLength = 0; //Default value has been deleted, set to 0
+                minSecretKeyLength = 0;
             }
 
             this.windowSize = CollectionHelper.getIntMapAttr(options, WINDOW_SIZE, 0, debug);
@@ -219,15 +218,14 @@ public class AuthenticatorOATH extends AMLoginModule {
             this.issuerName = CollectionHelper.getMapAttr(options, ISSUER_NAME);
 
             final String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
-            if (algorithm.equalsIgnoreCase("HOTP")) {
+            if ("HOTP".equalsIgnoreCase(algorithm)) {
                 this.algorithm = HOTP;
-            } else if (algorithm.equalsIgnoreCase("TOTP")) {
+            } else if ("TOTP".equalsIgnoreCase(algorithm)) {
                 this.algorithm = TOTP;
             } else {
                 this.algorithm = ERROR;
             }
 
-            //set authentication level
             if (authLevel != null) {
                 try {
                     setAuthLevel(Integer.parseInt(authLevel));
@@ -758,41 +756,6 @@ public class AuthenticatorOATH extends AMLoginModule {
         }
 
         return secretKey;
-    }
-
-    /**
-     * Gets the AMIdentity of a user with username equal to userName.
-     *
-     * @return The AMIdentity of user with username equal to userName.
-     */
-    private AMIdentity getIdentity() {
-        AMIdentity theID = null;
-        AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
-
-        IdSearchControl idsc = new IdSearchControl();
-        idsc.setRecursive(true);
-        idsc.setAllReturnAttributes(true);
-        // search for the identity
-        Set<AMIdentity> results = Collections.emptySet();
-        try {
-            idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
-            if (searchResults != null) {
-                results = searchResults.getSearchResults();
-            }
-            if (results.isEmpty()) {
-                debug.error("OATH.getIdentity : User " + userName + " is not found");
-            } else if (results.size() > 1) {
-                debug.error("OATH.getIdentity : More than one user found for the userName " + userName);
-            } else {
-                theID = results.iterator().next();
-            }
-        } catch (IdRepoException e) {
-            debug.error("OATH.getIdentity : Error searching Identities with username : " + userName, e);
-        } catch (SSOException e) {
-            debug.error("OATH.getIdentity : Module exception : ", e);
-        }
-        return theID;
     }
 
     /**

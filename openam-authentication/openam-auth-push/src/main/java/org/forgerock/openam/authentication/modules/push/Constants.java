@@ -42,6 +42,9 @@ final class Constants {
      * STATES.
      */
 
+
+    /** State to gather username if not already supplied. */
+    public static final int USERNAME_STATE = 2;
     /** State to await message response from remote device. */
-    public static final int AWAIT_STATE = 2;
+    public static final int AWAIT_STATE = 3;
 }

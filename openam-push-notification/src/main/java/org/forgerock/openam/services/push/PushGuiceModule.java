@@ -30,12 +30,14 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
 import org.forgerock.guava.common.cache.Cache;
 import org.forgerock.guava.common.cache.CacheBuilder;
+import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.JsonValue;
 import org.forgerock.util.promise.PromiseImpl;
 
 /**
  * Guice module for OpenAM Push related classes.
  */
+@GuiceModule
 public class PushGuiceModule extends AbstractModule {
 
     @Override
