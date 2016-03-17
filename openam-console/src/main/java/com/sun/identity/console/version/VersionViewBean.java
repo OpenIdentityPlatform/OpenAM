@@ -24,7 +24,7 @@
  *
  * $Id: VersionViewBean.java,v 1.1 2009/08/05 20:15:51 veiming Exp $
  *
- * Portions copyright 2015 ForgeRock AS.
+ * Portions copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.version;
@@ -57,24 +57,6 @@ public class VersionViewBean extends
             return "../console/blank.html";
         }
         return versionFile;
-    }
-
-    public static String validateProductImage(
-        HttpServletRequest request,
-        String productImage) {
-        if (productImage.length() == 0) {
-            return productImage;
-        }
-        if (!productImage.startsWith("../")) {
-            return "";
-        }
-
-        if (!ESAPI.validator().isValidInput("productImage", productImage, "HTTPURI", 1024, true)) {
-            debug.error("VersionViewBean.validateProductImage Parameters 'productImage' is not valid: " + productImage);
-            return "";
-        }
-
-        return productImage;
     }
 
 
