@@ -69,6 +69,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                 element = this.$el.find("#tabpanel").get(0);
 
             this.data.form = new Form(element, schema, this.data.formData.values);
+            this.$el.find("[data-header]").hide();
         },
         revert: function () {
             this.data.form.reset();
