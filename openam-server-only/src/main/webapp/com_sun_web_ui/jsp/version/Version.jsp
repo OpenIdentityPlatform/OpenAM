@@ -35,13 +35,23 @@
 
 <%@ page import="com.sun.web.ui.common.CCI18N" %>
 <%@ page import="com.sun.web.ui.common.CCSystem" %>
+<%@ page import="com.sun.identity.console.version.VersionViewBean" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@page import="com.sun.identity.console.version.VersionViewBean" %>
+<%@ page import="java.util.MissingResourceException" %>
+<%@ page import="java.util.ResourceBundle" %>
+
 
 <%
+
+   ResourceBundle resourceBundle;
+   try {
+        resourceBundle = ResourceBundle.getBundle("com.sun.web.ui.resources.Resources", request.getLocale());
+   } catch (MissingResourceException mr) {
+        resourceBundle = ResourceBundle.getBundle("com.sun.web.ui.resources.Resources");
+   }
+
+    String windowTitle = resourceBundle.getString("masthead.versionWindowTitle");
     // Get query parameters.
-    String windowTitle = (request.getParameter("windowTitle") != null)
-	? request.getParameter("windowTitle") : "";
     String productNameSrc = (request.getParameter("productNameSrc") != null)
 	? request.getParameter("productNameSrc") : "";
     String versionFile = (request.getParameter("versionFile") != null)
