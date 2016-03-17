@@ -20,45 +20,40 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, AbstractView, UIUtils) {
-    var PolicyActionsView = AbstractView.extend({
+], ($, _, AbstractView, UIUtils) => {
+    const PolicyActionsView = AbstractView.extend({
         element: "#actions",
         template: "templates/admin/views/realms/authorization/policies/PolicyActionsTemplate.html",
         noBaseTemplate: true,
         events: {
             "click [data-toggle-item]": "changePermission",
-            "change [data-select-item]": "selectAction",
-            "click [data-add-item]": "addAction",
+            "click [data-action-name]": "selectAction",
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },
 
-        render: function (data, callback) {
+        render (data, callback) {
             _.extend(this.data, data);
 
-            var availableActions = _.cloneDeep(data.options.availableActions),
-                selectedActions = [];
+            let availableActions = _.cloneDeep(data.options.availableActions);
+            const selectedActions = [];
 
-            _.each(data.entity.actionValues, function (value, key) {
+            _.each(data.entity.actionValues, (value, key) => {
                 availableActions = _.without(availableActions, _.find(availableActions, { action: key }));
-                selectedActions.push({ action: key, value: value });
+                selectedActions.push({ action: key, value });
             });
 
             this.data.availableActions = availableActions;
             this.data.selectedActions = selectedActions;
 
             this.parentRender(function () {
-                var d1 = $.Deferred(), d2 = $.Deferred();
+                const d1 = $.Deferred();
+                const d2 = $.Deferred();
 
-                this.renderAvailableActions(function () {
-                    d1.resolve();
-                });
+                this.renderAvailableActions(() => d1.resolve());
+                this.renderSelectedActions(() => d2.resolve());
 
-                this.renderSelectedActions(function () {
-                    d2.resolve();
-                });
-
-                $.when(d1, d2).done(function () {
+                $.when(d1, d2).done(() => {
                     if (callback) {
                         callback();
                     }
@@ -66,73 +61,65 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Policy
             });
         },
 
-        renderAvailableActions: function (callback) {
-            var self = this;
+        renderAvailableActions (callback) {
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/policies/PolicyAvailableActionsTemplate.html",
-                this.data,
-                function (tpl) {
-                    self.$el.find("#availableActions").html(tpl);
+                { "items": _.sortBy(this.data.availableActions, "action") },
+                (tpl) => {
+                    this.$el.find("#availableActions").html(tpl);
                     if (callback) {
                         callback();
                     }
                 });
         },
 
-        renderSelectedActions: function (callback) {
-            var self = this;
+        renderSelectedActions (callback) {
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
-                { "items": this.data.selectedActions },
-                function (tpl) {
-                    self.$el.find("#selectedActions").html(tpl);
-                    self.$el.find("button[data-add-item]").prop("disabled", true);
+                { "items": _.sortBy(this.data.selectedActions, "action") },
+                (tpl) => {
+                    this.$el.find("#selectedActions").html(tpl);
+                    this.$el.find("button[data-add-item]").prop("disabled", true);
                     if (callback) {
                         callback();
                     }
                 });
         },
 
-        selectAction: function () {
-            this.$el.find("button[data-add-item]").prop("disabled", false);
-        },
-
-        addAction: function (e) {
+        selectAction (e) {
             e.preventDefault();
 
-            var actionName = this.$el.find("select").val(),
-                action = _.find(this.data.options.availableActions, { action: actionName }),
-                cloned = _.clone(action);
+            const actionName = $(e.target).data("actionName");
+            const action = _.find(this.data.options.availableActions, { action: actionName });
+            const cloned = _.clone(action);
 
-            if (action) {
-                this.data.availableActions = _.without(this.data.availableActions,
-                    _.find(this.data.availableActions, { action: actionName })
-                );
-                this.renderAvailableActions();
-                this.data.selectedActions.push(cloned);
-                this.renderSelectedActions();
+            this.data.availableActions = _.without(this.data.availableActions,
+                _.find(this.data.availableActions, { action: actionName })
+            );
+            this.renderAvailableActions();
+            this.data.selectedActions.push(cloned);
+            this.renderSelectedActions();
 
-                this.data.entity.actionValues[action.action] = action.value;
-            }
+            this.data.entity.actionValues[action.action] = action.value;
         },
 
-        changePermission: function (e) {
-            var $target = $(e.target),
-                permitted = ($target.val() || $target.find("input").val()) === "true",
-                actionName = $target.closest("tr").find(".action-name").text().trim();
+        changePermission (e) {
+            const $target = $(e.target);
+            const permitted = ($target.val() || $target.find("input").val()) === "true";
+            const actionName = $target.closest("tr").find(".action-name").text().trim();
 
             _.find(this.data.selectedActions, { action: actionName }).value = permitted;
 
             this.data.entity.actionValues[actionName] = permitted;
         },
 
-        deleteItem: function (e) {
+        deleteItem (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
-            var $target = $(e.target),
-                actionName = $target.closest("tr").find(".action-name").text().trim(),
-                selectedAction = _.find(this.data.selectedActions, { action: actionName });
+            const $target = $(e.target);
+            const actionName = $target.closest("tr").find(".action-name").text().trim();
+            const selectedAction = _.find(this.data.selectedActions, { action: actionName });
 
             this.data.selectedActions = _.without(this.data.selectedActions, selectedAction);
             this.renderSelectedActions();

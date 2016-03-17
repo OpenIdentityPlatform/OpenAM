@@ -1,6 +1,12 @@
-<select class="form-control" data-select-item>
-    <option value="" disabled selected>{{t "console.authorization.policies.edit.selectAction"}}</option>
-    {{#each availableActions}}
-    <option value="{{action}}">{{action}}</option>
-    {{/each}}
-</select>
+<div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" {{#unless items}}disabled{{/unless}}
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{t "console.authorization.policies.edit.addAction"}} <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu">
+        {{#each items}}
+            <li><a data-action-name="{{action}}" href="#">{{action}}</a></li>
+        {{/each}}
+    </ul>
+</div>

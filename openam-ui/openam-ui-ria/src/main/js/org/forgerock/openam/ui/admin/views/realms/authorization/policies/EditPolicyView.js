@@ -37,11 +37,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "bootstrap-tabdrop",
     "selectize"
-], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
-             PoliciesService, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
-             SubjectResponseAttributesView, CustomResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView,
-             FormHelper) {
-    return AbstractView.extend({
+], ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
+    PoliciesService, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
+    SubjectResponseAttributesView, CustomResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView,
+    FormHelper) => AbstractView.extend({
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
@@ -52,7 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             "click [data-delete]": "onDeleteClick"
         },
 
-        getAllResponseAttributes: function () {
+        getAllResponseAttributes () {
             this.model.attributes.resourceAttributes = _.union(
                 this.staticAttrsView.getCombinedAttrs(),
                 SubjectResponseAttributesView.getAttrs(),
@@ -68,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             { name: "settings", attr: ["name", "description", "active"] }
         ],
 
-        render: function (args, callback) {
+        render (args, callback) {
             var policyName = args[2];
 
             if (callback) {
@@ -100,7 +99,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        renderPolicy: function () {
+        renderPolicy () {
             var self = this;
 
             this.data.entity = _.cloneDeep(this.model.attributes);
@@ -194,7 +193,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        buildResourceTypeSelection: function () {
+        buildResourceTypeSelection () {
             var self = this;
             this.$el.find("#resTypesSelection").selectize({
                 sortField: "name",
@@ -208,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             });
         },
 
-        getAvailableActionsForResourceType: function (resourceType) {
+        getAvailableActionsForResourceType (resourceType) {
             var availableActions = [];
             if (resourceType) {
                 _.each(resourceType.actions, function (val, key) {
@@ -218,7 +217,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             return availableActions;
         },
 
-        changeResourceType: function (value) {
+        changeResourceType (value) {
             this.data.entity.resourceTypeUuid = value;
 
             var resourceType = _.find(this.data.options.availableResourceTypes, { uuid: value });
@@ -237,7 +236,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        updateFields: function () {
+        updateFields () {
             var app = this.data.entity,
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
@@ -253,7 +252,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             });
         },
 
-        submitForm: function () {
+        submitForm () {
             var savePromise,
                 self = this,
                 activeTabIndex,
@@ -299,14 +298,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.policy") },
                 _.bind(this.deletePolicy, this));
         },
 
-        deletePolicy: function () {
+        deletePolicy () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
@@ -317,7 +316,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 },
                 onError = function (model, response) {
                     Messages.addMessage({
-                        response: response,
+                        response,
                         type: Messages.TYPE_DANGER
                     });
                 };
@@ -328,5 +327,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 wait: true
             });
         }
-    });
-});
+    })
+);
