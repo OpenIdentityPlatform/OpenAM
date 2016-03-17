@@ -30,6 +30,10 @@ define("org/forgerock/openam/ui/admin/views/global/EditSiteView", [
     "bootstrap-tabdrop"
 ], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, JSONSchemaView, FormHelper) => {
 
+    function toggleSave (el, enable) {
+        el.find("[data-save]").prop("disabled", !enable);
+    }
+
     function deleteInstance (id, etag) {
         SitesService.sites.remove(id, etag).then(() => {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
@@ -65,7 +69,8 @@ define("org/forgerock/openam/ui/admin/views/global/EditSiteView", [
                     }
                     this.jsonSchemaView = new JSONSchemaView({
                         schema: data.schema,
-                        values: data.values
+                        values: data.values,
+                        onRendered: () => toggleSave(this.$el, true)
                     });
                     $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
                     if (callback) { callback(); }

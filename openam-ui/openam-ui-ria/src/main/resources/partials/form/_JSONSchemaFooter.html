@@ -4,7 +4,7 @@
         <span>{{t "common.form.revert"}}</span>
     </button>
     {{/if}}
-    <button data-save class="btn btn-primary" type="button">
+    <button data-save {{#if saveDisabled}}disabled{{/if}} class="btn btn-primary" type="button">
         <span>{{t "common.form.saveChanges"}}</span>
     </button>
 </div>
