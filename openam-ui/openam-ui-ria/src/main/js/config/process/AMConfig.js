@@ -220,15 +220,28 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, Configuration, CookieHelper, SMSGlobalService, SessionValidator,
                                       MaxIdleTimeLeftStrategy, NavigationHelper) {
+            var queueName = "loginDialogAuthCallbacks",
+                authenticatedCallback,
+                token;
+
+            if (Configuration.globalData[queueName]) {
+                authenticatedCallback = Configuration.globalData[queueName].remove();
+            }
+
             if (Configuration.loggedUser.hasRole("ui-realm-admin")) {
                 SMSGlobalService.realms.all().then(NavigationHelper.populateRealmsDropdown);
             }
 
             if (Configuration.globalData.xuiUserSessionValidationEnabled &&
                 !Configuration.loggedUser.hasRole(["ui-realm-admin", "ui-global-admin"])) {
-                var token = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+                token = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
 
                 SessionValidator.start(token, MaxIdleTimeLeftStrategy);
+            }
+
+            while (authenticatedCallback) {
+                authenticatedCallback();
+                authenticatedCallback = Configuration.globalData[queueName].remove();
             }
         }
     }, {
@@ -242,40 +255,52 @@ define("config/process/AMConfig", [
         processDescription: function (event, Configuration, RouteTo) {
             var loggedIn = Configuration.loggedUser;
 
-            // Multiple rest calls that all return authz failures will cause this event to be called multiple times
-            if (Configuration.globalData.authorizationFailurePending !== undefined) {
-                return;
-            }
-            Configuration.globalData.authorizationFailurePending = true;
-
-            function sessionTimeout () {
-                if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
-                    /**
-                     * User may have sensative information on-screen so we exit them from the system when thier session
-                     * has expired with a message telling them as such
-                     */
-                    return RouteTo.sessionExpired();
-                } else {
-                    /**
-                     * Admins are more likely to have work in-progress so they are presented with a login dialog to give
-                     * them the opportunity to continue their work
-                     */
-                    return RouteTo.loginDialog();
-                }
-            }
-
             if (!loggedIn) {
                 // 401 no session
                 return RouteTo.logout();
-            } else if (_.get(event, "error.status") === 401) {
-                // 401 session timeout
-                return sessionTimeout();
             } else if (_.get(event, "fromRouter")) {
                 // 403 route change
                 return RouteTo.forbiddenPage();
             } else {
                 // 403 rest call
                 return RouteTo.forbiddenError();
+            }
+        }
+    }, {
+        startEvent: Constants.EVENT_SHOW_LOGIN_DIALOG,
+        description: "",
+        override: true,
+        dependencies: [
+            "LoginDialog",
+            "org/forgerock/commons/ui/common/main/Configuration",
+            "org/forgerock/commons/ui/common/util/Queue",
+            "org/forgerock/openam/ui/common/RouteTo"
+        ],
+        processDescription: function (event, LoginDialog, Configuration, Queue, RouteTo) {
+            var queueName = "loginDialogAuthCallbacks";
+            if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
+                /**
+                 * User may have sensative information on-screen so we exit them from the system when thier session
+                 * has expired with a message telling them as such
+                 */
+                return RouteTo.sessionExpired();
+            } else {
+                /**
+                 * Admins are more likely to have work in-progress so they are presented with a login dialog to give
+                 * them the opportunity to continue their work
+                 */
+
+                if (!Configuration.globalData[queueName]) {
+                    Configuration.globalData[queueName] = new Queue();
+                }
+
+                // only render the LoginDialog if it has an empty callback queue
+                if (!Configuration.globalData[queueName].peek()) {
+                    LoginDialog.render();
+                }
+                if (event.authenticatedCallback) {
+                    Configuration.globalData[queueName].add(event.authenticatedCallback);
+                }
             }
         }
     }];

@@ -35,15 +35,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
         data : {},
         actions: [],
         render: function () {
-            /**
-             * Due to the limitations of the router, when a session expiry takes place, the hash changes to the page the
-             * user intended to navigate to without that page actually rendering. This creates a mismatch between hash
-             * and rendered page. The router design does not allow for short-circuiting of the route change due to it's
-             * use of events so this #back is a workaround to ensure the page and hash are in sync when the session
-             * expiry dialog is mis-missed.
-             */
-            Backbone.history.history.back();
-
             Configuration.backgroundLogin = true;
             // The session cookie does not expire until the browser is closed. So if the server session expires and
             // the browser remains, the XUI will attempt to login sending the old cookie and the server will assume
