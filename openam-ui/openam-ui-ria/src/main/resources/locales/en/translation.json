@@ -718,8 +718,9 @@
             },
             "list" :{
                 "title" : "Sites",
-                "new" : "New Site",
-                "table" : ["Name", "URL", "Secondary URLs", "Assigned Servers"]
+                "new" : "Add Site",
+                "table" : ["Name", "URL", "Secondary URLs", "Assigned Servers"],
+                "empty" : "You do not have any configured sites"
             }
         },
         "authentication": {

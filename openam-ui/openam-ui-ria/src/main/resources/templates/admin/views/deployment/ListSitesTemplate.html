@@ -1,5 +1,12 @@
 <div class="container">
     {{> headers/_Title title="console.sites.list.title" }}
     <p class="page-description">TODO: AME-10134 Add some interesting copy here which is not too short but also not too long. It should match the other leading text by being at least one line long just like this here. It should match the other leading text by being at least one line long just like this here. </p>
-    <div id="toggleCardList"></div>
+    <div id="toggleCardList">
+        <div class="call-to-action-block panel hidden">
+            <h3>{{t 'console.sites.list.empty'}}</h3>
+            <a href="TODO: Add the link here" class="btn btn-primary">
+                <i class="fa fa-plus"></i> {{t 'console.sites.list.new'}}
+            </a>
+        </div>
+    </div>
 </div>

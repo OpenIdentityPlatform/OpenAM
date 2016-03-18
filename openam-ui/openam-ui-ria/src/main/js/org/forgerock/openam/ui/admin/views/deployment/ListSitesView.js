@@ -71,45 +71,22 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                 }).render();
             });
         },
+
+        showCallToAction () {
+            this.$el.find(".call-to-action-block").removeClass("hidden");
+        },
+
         render (args, callback) {
 
             SitesService.sites.getAll().then((data) => {
 
                 this.parentRender(() => {
 
-                    const tableData = {
-                        //TODO: i18n
-                        "headers": [
-                            $.t("console.sites.list.table.0"), $.t("console.sites.list.table.1"),
-                            $.t("console.sites.list.table.2"), $.t("console.sites.list.table.3")
-                        ],
-                        "items" : data
-                    };
-
-                    this.toggleView = new ToggleCardListView({
-                        el: "#toggleCardList",
-                        activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
-                        button: {
-                            href: "TODO: Add the link here",
-                            icon: "fa-plus",
-                            title: $.t("console.sites.list.new"),
-                            btnclass: "btn-primary"
-                        }
-                    });
-
-                    this.toggleView.render(function () {
-                        new TemplateBasedView({
-                            data: tableData,
-                            el: ToggleCardListView.VIEWA_ELEMENT,
-                            template: "templates/admin/views/deployment/SitesCardsTemplate.html"
-                        }).render();
-                        new TemplateBasedView({
-                            data: tableData,
-                            el: ToggleCardListView.VIEWB_ELEMENT,
-                            template: "templates/admin/views/deployment/SitesTableTemplate.html"
-                        }).render();
-                    });
+                    if (_.isEmpty(data)) {
+                        this.showCallToAction();
+                    } else {
                         this.renderToggleView(data);
+                    }
 
                     if (callback) {
                         callback();
