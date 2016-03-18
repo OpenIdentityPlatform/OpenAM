@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2016 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -86,6 +87,7 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[http/response/headers]=http_response_headers",
                     "[response/status]=response_status",
                     "[response/statusCode]=response_statuscode",
+                    "[response/detail]=response_detail",
                     "[response/elapsedTime]=response_elapsedtime",
                     "[response/elapsedTimeUnits]=response_elapsedtimeunits",
                     "[component]=component",

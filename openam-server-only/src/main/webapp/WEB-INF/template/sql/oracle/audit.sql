@@ -12,6 +12,7 @@
 -- information: "Portions copyright [year] [name of copyright owner]".
 --
 -- Copyright 2016 ForgeRock AS.
+-- Copyright 2016 Nomura Research Institute, Ltd.
 -- -----------------------------------------------------
 
 
@@ -43,6 +44,7 @@ CREATE TABLE am_auditaccess (
   http_response_headers CLOB NULL ,
   response_status VARCHAR2(10 CHAR) NULL ,
   response_statuscode VARCHAR2(255 CHAR) NULL ,
+  response_detail CLOB NULL ,
   response_elapsedtime VARCHAR2(255 CHAR) NULL ,
   response_elapsedtimeunits VARCHAR2(255 CHAR) NULL ,
   component VARCHAR2(50 CHAR) NULL ,

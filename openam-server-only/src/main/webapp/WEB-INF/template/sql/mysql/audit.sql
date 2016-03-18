@@ -94,6 +94,7 @@ CREATE  TABLE IF NOT EXISTS `audit`.`am_auditaccess` (
   `http_response_headers` MEDIUMTEXT NULL ,
   `response_status` VARCHAR(10) NULL ,
   `response_statuscode` VARCHAR(255) NULL ,
+  `response_detail` TEXT NULL ,
   `response_elapsedtime` VARCHAR(255) NULL ,
   `response_elapsedtimeunits` VARCHAR(255) NULL ,
   `component` VARCHAR(50) NULL ,
