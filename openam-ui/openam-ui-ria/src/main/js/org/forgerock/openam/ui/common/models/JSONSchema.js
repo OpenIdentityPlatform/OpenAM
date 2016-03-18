@@ -45,14 +45,14 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
     };
 
     JSONSchema.prototype.enableKey = function () {
-        const key = _.camelCase(this.raw.title) + "Enabled";
+        const key = `${_.camelCase(this.raw.title)}Enabled`;
         if (this.raw.properties[key]) {
             return key;
         }
     };
 
     JSONSchema.prototype.enableProperty = function () {
-        return !_.isUndefined(this.raw.properties[_.camelCase(this.raw.title) + "Enabled"]);
+        return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
     };
 
     JSONSchema.prototype.keys = function (sort) {
