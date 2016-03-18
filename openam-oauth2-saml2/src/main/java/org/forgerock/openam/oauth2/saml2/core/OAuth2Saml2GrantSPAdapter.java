@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -29,7 +29,7 @@ import com.sun.identity.saml2.protocol.Response;
 
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.encode.Base64;
+import org.forgerock.util.encode.Base64url;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
@@ -96,37 +97,31 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
 
         AssertionImpl assertion = (AssertionImpl) ssoResponse.getAssertion().get(0);
         StringBuilder sb = new StringBuilder();
-        try {
-            //post assertion to the OAuth 2 token endpoint using the saml2 grant.
-            sb.append("<form name=\"postForm\" action=\"");
-            sb.append(hostedEntityID);
-            if (hostedEntityID.endsWith("/")){
-                sb.append("oauth2/access_token");
-            } else {
-                sb.append("/oauth2/access_token");
-            }
-            sb.append("?realm=" + (StringUtils.isEmpty(realm) ? "/" : realm));
-            sb.append("\" method=\"post\">");
-            sb.append("<input type=\"hidden\" name=\"grant_type\" value=\"");
-            sb.append(OAuth2Constants.SAML20.GRANT_TYPE_URI);
-            sb.append("\">");
-            sb.append("<input type=\"hidden\" name=\"assertion\" value=\"");
-            sb.append(Base64.encode(assertion.toXMLString(false, false).getBytes("UTF-8")));
-            sb.append("\">");
-            sb.append("<input type=\"hidden\" name=\"client_id\" value=\"");
-            sb.append(hostedEntityID);
-            sb.append("\">");
-            sb.append("</form>");
-            sb.append("<script language=\"Javascript\">");
-            sb.append("document.postForm.submit();");
-            sb.append("</script>");
-            out.print(sb.toString());
-        } catch (UnsupportedEncodingException e) {
-            SAML2Utils.debug.error("OAuth2Saml2GrantSPAdapter.postSingleSignOnSuccess: Unsuppored Encoding Exception: "
-                    + e.getMessage());
-        } catch (IOException e){
-            SAML2Utils.debug.error("OAuth2Saml2GrantSPAdapter.postSingleSignOnSuccess: IOException: " + e.getMessage());
+        //post assertion to the OAuth 2 token endpoint using the saml2 grant.
+        sb.append("<form name=\"postForm\" action=\"");
+        sb.append(hostedEntityID);
+        if (hostedEntityID.endsWith("/")){
+            sb.append("oauth2/access_token");
+        } else {
+            sb.append("/oauth2/access_token");
         }
+        sb.append("?realm=" + (StringUtils.isEmpty(realm) ? "/" : realm));
+        sb.append("\" method=\"post\">");
+        sb.append("<input type=\"hidden\" name=\"grant_type\" value=\"");
+        sb.append(OAuth2Constants.SAML20.GRANT_TYPE_URI);
+        sb.append("\">");
+        sb.append("<input type=\"hidden\" name=\"assertion\" value=\"");
+        sb.append(Base64url.encode(assertion.toXMLString(false, false).getBytes(StandardCharsets.UTF_8)));
+        sb.append("\">");
+        sb.append("<input type=\"hidden\" name=\"client_id\" value=\"");
+        sb.append(hostedEntityID);
+        sb.append("\">");
+        sb.append("</form>");
+        sb.append("<script language=\"Javascript\">");
+        sb.append("document.postForm.submit();");
+        sb.append("</script>");
+        out.print(sb.toString());
+
         return true;
     }
 
