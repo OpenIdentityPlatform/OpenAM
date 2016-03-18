@@ -16,6 +16,11 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.openam.utils.Time.*;
+
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -47,8 +52,7 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.util.Reject;
-import org.forgerock.util.encode.Base64;
-import org.restlet.Request;
+import org.forgerock.util.encode.Base64url;
 import org.restlet.engine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +63,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
-import static org.forgerock.oauth2.core.Utils.*;
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * @since 12.0.0
@@ -96,7 +96,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         final String assertion = request.getParameter(OAuth2Constants.SAML20.ASSERTION);
         logger.trace("Assertion:\n" + assertion);
 
-        final byte[] decodedAssertion = Base64.decode(assertion.replace(" ", "+"));
+        final byte[] decodedAssertion = Base64url.decode(assertion);
         if (decodedAssertion == null) {
             logger.error("Decoding assertion failed\nassertion:" + assertion);
         }
