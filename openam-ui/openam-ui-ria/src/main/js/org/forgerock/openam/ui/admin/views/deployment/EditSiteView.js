@@ -82,11 +82,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/EditSiteView", [
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
             }, _.partial(deleteInstance, this.data.id, this.data.etag,
-                () => Router.routeTo(Router.configuration.routes.listSites, {
-                    trigger: true,
-                    args: []
-                })
-            ));
+                () => { Router.routeTo(Router.configuration.routes.listSites, { args: [], trigger: true }); })
+            );
         }
     });
 

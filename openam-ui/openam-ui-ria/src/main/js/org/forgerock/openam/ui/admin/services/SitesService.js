@@ -46,6 +46,13 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
         }
     });
 
+    const getTemplate = () =>
+        obj.serviceCall({
+            url: "sites?_action=template",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST"
+        });
+
     obj.sites = {
         getAll: () =>
             obj.serviceCall({
@@ -57,6 +64,13 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
                 schema: new JSONSchema(response[0]),
                 values: new JSONValues(response[1])
             })),
+        create: (data) =>
+            obj.serviceCall({
+                url: `sites?_action=create`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST",
+                data: JSON.stringify(_.omit(data, ["servers"]))
+            }),
         update: (id, data, etag) =>
             obj.serviceCall({
                 url: `sites/${id}`,
@@ -69,7 +83,12 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
                 url: `sites/${id}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
-            })
+            }),
+        getInitialState: () =>
+            Promise.all([getSchema(), getTemplate()]).then((response) => ({
+                schema: new JSONSchema(response[0]),
+                values: new JSONValues(response[1])
+            }))
     };
 
     return obj;

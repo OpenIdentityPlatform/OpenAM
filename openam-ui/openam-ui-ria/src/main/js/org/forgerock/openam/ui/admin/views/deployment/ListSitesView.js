@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                 el: "#toggleCardList",
                 activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
                 button: {
-                    href: "TODO: Add the link here",
+                    href: "#deployment/sites/new",
                     icon: "fa-plus",
                     title: $.t("console.sites.list.new"),
                     btnClass: "btn-primary"
