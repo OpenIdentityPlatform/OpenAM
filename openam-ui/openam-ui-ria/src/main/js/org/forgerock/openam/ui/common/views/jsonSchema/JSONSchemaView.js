@@ -36,6 +36,21 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
         }
     }
 
+    function toSchemaWithRequiredAndEmptyKeysSetOnDefaultProperties (schema, values) {
+        const emptyValueKeys = _.keys(values.toEmptyValues().raw);
+
+        if (_.isEmpty(emptyValueKeys)) {
+            if (schema.enableProperty()) {
+                return schema.pick(schema.enableKey());
+            } else {
+                return false;
+            }
+        } else {
+            return schema.toSchemaWithRequiredProperties()
+                         .toSchemaWithDefaultProperties(emptyValueKeys);
+        }
+    }
+
     const JSONSchemaView = Backbone.View.extend({
         initialize (options) {
             if (!(options.schema instanceof JSONSchema)) {
@@ -45,37 +60,49 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
                 throw new TypeError("[JSONSchemaView] \"values\" argument is not an instance of JSONValues.");
             }
 
-            this.options = options;
+            this.options = _.defaults(options, {
+                showOnlyRequiredAndEmpty: false
+            });
         },
         render () {
             if (this.options.schema.allPropertiesAreSchemas()) {
                 const schemas = this.options.schema.propertiesToSchemaArray();
 
-                this.views = _.map(this.options.schema.keys(true), (key) => {
-                    const args = {
-                        schema: schemas[key],
-                        values: new JSONValues(this.options.values.raw[key])
-                    };
+                this.views = _(this.options.schema.keys(true))
+                .map((key) => {
+                    let schema = schemas[key];
+                    const values = new JSONValues(this.options.values.raw[key]);
 
-                    let view;
-
-                    if (args.schema.enableProperty()) {
-                        view = new TogglableJSONEditorView(args);
-                    } else {
-                        view = new JSONEditorView(args);
+                    if (this.options.showOnlyRequiredAndEmpty) {
+                        schema = toSchemaWithRequiredAndEmptyKeysSetOnDefaultProperties(schema, values);
+                        if (!schema) { return; }
                     }
+
+                    const Editor = schema.enableProperty() ? TogglableJSONEditorView : JSONEditorView;
+                    const view = new Editor({ schema, values });
 
                     $(view.render().el).appendTo(this.$el);
                     return view;
-                });
+                })
+                .compact(this.views)
+                .value();
             } else {
-                this.views = [
-                    new JSONEditorView({
-                        el: this.$el,
-                        schema: this.options.schema,
-                        values: this.options.values.pick(this.options.schema.keys())
-                    }).render()
-                ];
+                let schema = this.options.schema;
+
+                if (this.options.showOnlyRequiredAndEmpty) {
+                    schema = toSchemaWithRequiredAndEmptyKeysSetOnDefaultProperties(this.options.schema,
+                                                                                    this.options.values);
+                }
+
+                if (schema) {
+                    this.views = [
+                        new JSONEditorView({
+                            el: this.$el,
+                            schema,
+                            values: this.options.values
+                        }).render()
+                    ];
+                }
             }
 
             invokeOnRenderedAfterTimeout(this.options.onRendered);

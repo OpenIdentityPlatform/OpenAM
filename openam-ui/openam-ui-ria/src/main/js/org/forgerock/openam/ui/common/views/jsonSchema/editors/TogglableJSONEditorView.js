@@ -47,10 +47,12 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
 
             this.$el.find("[data-title]").toggleClass("text-muted");
 
-            if (enabled) {
-                this.$el.find("[data-toggleable-json-editor]").slideDown(ANIMATION_DURATION_IN_MILLISECONDS);
-            } else {
-                this.$el.find("[data-toggleable-json-editor]").slideUp(ANIMATION_DURATION_IN_MILLISECONDS);
+            if (!this.options.schema.isEmpty()) {
+                if (enabled) {
+                    this.$el.find("[data-toggleable-json-editor]").slideDown(ANIMATION_DURATION_IN_MILLISECONDS);
+                } else {
+                    this.$el.find("[data-toggleable-json-editor]").slideUp(ANIMATION_DURATION_IN_MILLISECONDS);
+                }
             }
         },
         render () {

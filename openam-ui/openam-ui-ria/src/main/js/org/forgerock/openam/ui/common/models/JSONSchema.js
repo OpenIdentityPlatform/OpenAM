@@ -55,6 +55,10 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
     };
 
+    JSONSchema.prototype.isEmpty = function () {
+        return _.isEmpty(this.raw.properties);
+    };
+
     JSONSchema.prototype.keys = function (sort) {
         sort = typeof sort !== "undefined" ? sort : false;
 
@@ -88,6 +92,17 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
 
     JSONSchema.prototype.propertiesToSchemaArray = function () {
         return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
+    };
+
+    JSONSchema.prototype.toSchemaWithRequiredProperties = function () {
+        return this.pick(_.matches({ required: true }));
+    };
+
+    JSONSchema.prototype.toSchemaWithDefaultProperties = function (properties) {
+        const schema = _.cloneDeep(this.raw);
+        schema.defaultProperties = properties;
+
+        return new JSONSchema(schema);
     };
 
     return JSONSchema;

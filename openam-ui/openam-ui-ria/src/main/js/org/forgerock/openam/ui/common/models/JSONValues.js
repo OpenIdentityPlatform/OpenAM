@@ -29,20 +29,34 @@ define("org/forgerock/openam/ui/common/models/JSONValues", [
         return new JSONValues(_.omit(this.raw, predicate));
     };
 
-    // JSONValues.prototype.mapEmpty = function () {
-    //     const keys = _.pick(this.raw, (value) => {
-    //         if (_.isBoolean(value)) {
-    //             return false;
-    //         }
-    //         if (_.isNumber(value)) {
-    //             return value === 0;
-    //         }
-    //
-    //         return _.isEmpty(value);
-    //     });
-    //
-    //     return _.keys(keys);
-    // };
+    JSONValues.prototype.toEmptyValues = function () {
+        function isEmpty (value) {
+            if (_.isNumber(value)) {
+                return false;
+            } else if (_.isBoolean(value)) {
+                return false;
+            }
+
+            return _.isEmpty(value);
+        }
+
+        function getEmptyValues (object) {
+            const objectWithEmptyValues = {};
+
+            _.forIn(object, (value, key) => {
+                const isGroupOfValues = _.isObject(value) && !_.isEmpty(value) && !_.isArray(value);
+                if (isGroupOfValues) {
+                    objectWithEmptyValues[key] = getEmptyValues(value);
+                } else if (isEmpty(value)) {
+                    objectWithEmptyValues[key] = value;
+                }
+            });
+
+            return objectWithEmptyValues;
+        }
+
+        return new JSONValues(getEmptyValues(this.raw));
+    };
 
     return JSONValues;
 });
