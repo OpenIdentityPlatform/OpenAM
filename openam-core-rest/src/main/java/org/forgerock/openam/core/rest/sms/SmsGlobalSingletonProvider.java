@@ -100,8 +100,16 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) {
-        return converter.toJson(schema.getAttributeDefaults(), true);
+    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) throws
+            InternalServerErrorException {
+        final JsonValue value = converter.toJson(schema.getAttributeDefaults(), true);
+        try {
+            value.add("_type", getTypeValue(context).getObject());
+        } catch (SSOException | SMSException e) {
+            debug.error("Error reading type for " + config.getName(), e);
+            throw new InternalServerErrorException();
+        }
+        return value;
     }
 
 

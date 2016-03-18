@@ -246,7 +246,7 @@ public abstract class SmsResourceProvider {
         }
     }
 
-    private JsonValue getTypeValue(Context context) throws SSOException, SMSException {
+    protected JsonValue getTypeValue(Context context) throws SSOException, SMSException {
         String resourceId = schema.getResourceName();
         for (int i = subSchemaPath.size() - 1; i >= 0 && SmsRequestHandler.USE_PARENT_PATH.equals(resourceId); i--) {
             resourceId = subSchemaPath.get(i).getResourceName();
