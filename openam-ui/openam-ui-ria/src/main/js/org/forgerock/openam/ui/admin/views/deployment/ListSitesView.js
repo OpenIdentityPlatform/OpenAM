@@ -18,24 +18,34 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
-    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
-], ($, _, AbstractView, Messages, Router, SitesService, TemplateBasedView, ToggleCardListView) => {
+    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView",
+    "org/forgerock/openam/ui/admin/views/deployment/deleteInstance"
+], ($, _, AbstractView, FormHelper, Messages, SitesService, TemplateBasedView, ToggleCardListView, deleteInstance) => {
+
     const ListSitesView = AbstractView.extend({
         template: "templates/admin/views/deployment/ListSitesTemplate.html",
         events: {
-            "click [data-delete-item]" : "deleteItem"
+            "click [data-delete-item]" : "onDelete"
         },
         partials: [
             "partials/util/_ButtonLink.html",
             "templates/admin/views/deployment/_SiteCard.html"
         ],
-        deleteItem (event) {
+
+        onDelete (event) {
             event.preventDefault();
-            // TODO: Add Delete functionality
+            const id = $(event.currentTarget).data().deleteItem;
+            SitesService.sites.get(id).then((data) => {
+                FormHelper.showConfirmationBeforeDeleting({
+                    message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
+                }, _.partial(deleteInstance, data.values.raw._id, data.values.raw.etag, () => {
+                    this.render();
+                }));
+            });
         },
 
         renderToggleView (data) {

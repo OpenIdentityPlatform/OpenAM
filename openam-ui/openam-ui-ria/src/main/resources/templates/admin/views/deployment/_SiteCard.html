@@ -7,7 +7,7 @@
             <ul class="dropdown-menu pull-left" role="menu">
                 <li><a href="{{routeTo 'editSite' _id}}"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                 <li class="divider"></li>
-                <li><a href="#" data-delete-item ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+                <li><a href="#" data-delete-item="{{_id}}" ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
             </ul>
         </div>
         <a href="{{routeTo 'editSite' _id}}">

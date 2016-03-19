@@ -25,25 +25,15 @@ define("org/forgerock/openam/ui/admin/views/global/EditSiteView", [
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/admin/views/deployment/deleteInstance",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, JSONSchemaView, FormHelper) => {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, JSONSchemaView, FormHelper,
+    deleteInstance) => {
 
     function toggleSave (el, enable) {
         el.find("[data-save]").prop("disabled", !enable);
-    }
-
-    function deleteInstance (id, etag) {
-        SitesService.sites.remove(id, etag).then(() => {
-            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-            Router.routeTo("listSites", {
-                trigger: true
-            });
-        }, (response) => Messages.addMessage({
-            response,
-            type: Messages.TYPE_DANGER
-        }));
     }
 
     const EditSitesView = AbstractView.extend({
@@ -90,8 +80,15 @@ define("org/forgerock/openam/ui/admin/views/global/EditSiteView", [
         onDelete (e) {
             e.preventDefault();
             FormHelper.showConfirmationBeforeDeleting({
-                message: $.t("console.services.list.confirmDeleteSelected")
-            }, _.partial(deleteInstance, this.data.id, this.data.etag));
+                message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
+            }, _.partial(deleteInstance, this.data.id, this.data.etag,
+                () => {
+                    Router.routeTo(Router.configuration.routes.listSites, {
+                        trigger: true,
+                        args: []
+                    });
+                }
+            ));
         }
     });
 
