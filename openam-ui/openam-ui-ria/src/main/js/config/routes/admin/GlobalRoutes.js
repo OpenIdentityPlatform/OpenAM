@@ -60,7 +60,7 @@ define("config/routes/admin/GlobalRoutes", [], function () {
             navGroup: "admin"
         },
         editSite: {
-            view: "org/forgerock/openam/ui/admin/views/global/EditSiteView",
+            view: "org/forgerock/openam/ui/admin/views/deployment/EditSiteView",
             url: /deployment\/sites\/edit\/([^\/]+)/,
             pattern: "deployment/sites/edit/?",
             role: "ui-global-admin",

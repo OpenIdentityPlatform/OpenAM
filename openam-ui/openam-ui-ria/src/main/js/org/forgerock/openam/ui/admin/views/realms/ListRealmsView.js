@@ -170,8 +170,8 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
 
                     const tableData = {
                         "headers": [
-                            $.t("console.realms.table.0"), $.t("console.realms.table.1"),
-                            $.t("console.realms.table.2"), $.t("console.realms.table.3")
+                            $.t("console.realms.grid.header.0"), $.t("console.realms.grid.header.1"),
+                            $.t("console.realms.grid.header.2"), $.t("console.realms.grid.header.3")
                         ],
                         "items" : self.data.realms
                     };
@@ -180,8 +180,9 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                         el: "#toggleCardList",
                         activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
                         button: {
-                            btnclass: "btn-primary",
-                            href: "#"/*TODO: Add link to route once OPENAM-8465 has been merged*/,
+                            btnClass: "btn-primary",
+                            href: "#",
+                            dataAttr: "data-add-realm",
                             icon: "fa-plus",
                             title: $.t("console.realms.newRealm")
                         }
@@ -204,12 +205,12 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                         callback();
                     }
                 });
-            }, (response) => {
+            }, (response) =>
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response
-                });
-            });
+                })
+            );
         },
         toggleRealmActive (event) {
             event.preventDefault();
@@ -222,9 +223,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                     type: Messages.TYPE_DANGER,
                     response
                 });
-            }).always(() => {
-                self.render();
-            });
+            }).always(() => self.render());
         }
     });
 

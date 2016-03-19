@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                     href: "TODO: Add the link here",
                     icon: "fa-plus",
                     title: $.t("console.sites.list.new"),
-                    btnclass: "btn-primary"
+                    btnClass: "btn-primary"
                 }
             });
 
@@ -102,12 +102,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                         callback();
                     }
                 });
-            }, (response) => {
+            }, (response) =>
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response
-                });
-            });
+                })
+            );
         }
     });
 
