@@ -21,12 +21,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, EventManager, Constants,
-             SMSRealmService, Form, FormHelper) {
+], function ($, AbstractView, EventManager, Constants, SMSRealmService, Form, Messages) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -45,7 +44,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                 SMSRealmService.authentication.modules.schema(this.data.realmPath, this.data.type),
                 SMSRealmService.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
                 SMSRealmService.authentication.modules.types.get(this.data.realmPath, this.data.type)
-            ).done(function (schemaData, valuesData, moduleType) {
+            ).done((schemaData, valuesData, moduleType) => {
                 self.data.schema = schemaData;
                 self.data.values = valuesData;
                 self.data.typeDescription = moduleType.name;
@@ -62,16 +61,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                         callback();
                     }
                 });
-            }).fail(function () {
+            }).fail(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "notFoundError");
             });
         },
-        save: function (event) {
-            var promise = SMSRealmService.authentication.modules.update(this.data.realmPath,
-                                                                         this.data.name,
-                                                                         this.data.type,
-                                                                         this.data.form.data());
-            FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
+        save: function () {
+            SMSRealmService.authentication.modules
+            .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
+            .then(() => {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            }, (response) => {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
+            });
         },
         revert: function () {
             this.data.form.reset();

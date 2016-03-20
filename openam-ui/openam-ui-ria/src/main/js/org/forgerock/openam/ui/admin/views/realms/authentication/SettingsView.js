@@ -18,16 +18,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Form, FormHelper, Messages, SMSServiceUtils,
-             SMSRealmService) {
+], function ($, _, AbstractView, Constants, EventManager, Form, Messages, SMSServiceUtils, SMSRealmService) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
             this.data.realmLocation = args[0];
 
-            SMSRealmService.authentication.get(this.data.realmLocation).then(function (data) {
+            SMSRealmService.authentication.get(this.data.realmLocation).then((data) => {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                         callback();
                     }
                 });
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response: response
@@ -68,24 +68,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                 schema = SMSServiceUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
                 element = this.$el.find("#tabpanel").get(0);
 
-            this.data.form = new Form(element, schema, this.data.formData.values);
+            this.data.form = new Form(element, schema, this.data.formData.values[id]);
             this.$el.find("[data-header]").hide();
         },
         revert: function () {
             this.data.form.reset();
         },
-        save: function (event) {
-            var data = this.data.form.data(),
-                promise = SMSRealmService.authentication.update(this.data.realmLocation, data),
+        save: function () {
+            var formData = this.data.form.data(),
                 self = this;
 
-            promise.then(function () {
+            SMSRealmService.authentication.update(this.data.realmLocation, formData).then((data) => {
                 // update formData for correct re-render tab after saving
                 _.extend(self.data.formData.values, data);
-
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            }, (response) => {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response: response
+                });
             });
-            // animate save button
-            FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         }
     });
 
