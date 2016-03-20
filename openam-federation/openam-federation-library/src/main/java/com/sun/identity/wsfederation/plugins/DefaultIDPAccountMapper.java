@@ -24,10 +24,16 @@
  *
  * $Id: DefaultIDPAccountMapper.java,v 1.7 2009/10/28 23:58:59 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
-
-
 package com.sun.identity.wsfederation.plugins;
+
+import static org.forgerock.openam.utils.AttributeUtils.*;
+
+import java.util.Set;
+
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.saml.assertion.NameIdentifier;
@@ -37,15 +43,12 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
 
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
-
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class <code>DefaultIDPAccountMapper</code> is the default
@@ -98,20 +101,26 @@ public class DefaultIDPAccountMapper extends DefaultAccountMapper
                 realm, hostEntityID);
 
         String name2 = null;
-        String attrName = WSFederationMetaUtils.getAttribute(idpConfig,
-                WSFederationConstants.NAMEID_ATTRIBUTE);
-        if (attrName == null || attrName.length() == 0) {
-            attrName = WSFederationConstants.UID;
-        }
-        
         try {
-            Set attrValues = dsProvider.getAttribute(userID, attrName);
-            if ((attrValues != null) && (!attrValues.isEmpty())) {
-                name2 = (String)attrValues.iterator().next();
+            String attrName = WSFederationMetaUtils.getAttribute(idpConfig, WSFederationConstants.NAMEID_ATTRIBUTE);
+            if (StringUtils.isEmpty(attrName)) {
+                attrName = WSFederationConstants.UID;
+            }
+            if (isBinaryAttribute(attrName)) {
+                attrName = removeBinaryAttributeFlag(attrName);
+                byte[][] attributeValues = dsProvider.getBinaryAttribute(userID, attrName);
+                if (attributeValues != null && attributeValues.length > 0) {
+                    name2 = Base64.encode(attributeValues[0]);
+                }
             } else {
+                Set<String> attributeValues = dsProvider.getAttribute(userID, attrName);
+                if (CollectionUtils.isNotEmpty(attributeValues)) {
+                    name2 = attributeValues.iterator().next();
+                }
+            }
+            if (name2 == null) {
                 String [] args = { attrName, userID };
-                throw new WSFederationException(WSFederationConstants.BUNDLE_NAME,
-                    "missingNameAttribute",args);
+                throw new WSFederationException(WSFederationConstants.BUNDLE_NAME, "missingNameAttribute", args);
             }
         } catch (DataStoreProviderException dspe) {
             throw new WSFederationException(dspe);

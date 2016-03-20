@@ -24,9 +24,11 @@
  *
  * $Id: DefaultIDPAccountMapper.java,v 1.9 2008/11/10 22:57:02 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.plugins;
+
+import static org.forgerock.openam.utils.AttributeUtils.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,7 @@ import com.sun.identity.saml2.profile.IDPCache;
 import com.sun.identity.saml2.profile.IDPSession;
 import com.sun.identity.saml2.profile.IDPSSOUtil;
 import com.sun.identity.saml2.profile.NameIDandSPpair;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * This class <code>DefaultIDPAccountMapper</code> is the default implementation of the <code>IDPAccountMapper</code>
@@ -181,9 +184,17 @@ public class DefaultIDPAccountMapper extends DefaultAccountMapper implements IDP
         String attrName = formatAttrMap.get(nameIDFormat);
         if (attrName != null) {
             try {
-                Set<String> attrValues = dsProvider.getAttribute(userID, attrName);
-                if (attrValues != null && !attrValues.isEmpty()) {
-                    nameIDValue = attrValues.iterator().next();
+                if (isBinaryAttribute(attrName)) {
+                    attrName = removeBinaryAttributeFlag(attrName);
+                    byte[][] attributeValues = dsProvider.getBinaryAttribute(userID, attrName);
+                    if (attributeValues != null && attributeValues.length > 0) {
+                        nameIDValue = Base64.encode(attributeValues[0]);
+                    }
+                } else {
+                    Set<String> attrValues = dsProvider.getAttribute(userID, attrName);
+                    if (attrValues != null && !attrValues.isEmpty()) {
+                        nameIDValue = attrValues.iterator().next();
+                    }
                 }
             } catch (DataStoreProviderException dspe) {
                 if (debug.warningEnabled()) {
