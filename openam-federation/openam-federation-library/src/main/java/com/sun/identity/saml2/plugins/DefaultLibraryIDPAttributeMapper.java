@@ -23,13 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DefaultLibraryIDPAttributeMapper.java,v 1.3 2009/11/30 21:11:08 exu Exp $
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ *
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.plugins;
+
+import static org.forgerock.openam.utils.AttributeUtils.*;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,11 +43,12 @@ import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.util.encode.Base64;
+
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Attribute;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.util.encode.Base64;
 
 /**
  * This class <code>DefaultLibraryIDPAttributeMapper</code> implements the
@@ -106,9 +107,6 @@ import org.forgerock.util.encode.Base64;
  */
 public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper 
     implements IDPAttributeMapper {
-
-    private static final String STATIC_QUOTE = "\"";
-    private static final String BINARY_FLAG = ";binary";
 
     /**
      * Constructor
@@ -181,11 +179,11 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                     Set<String> stringAttributes = new HashSet<String>(configMap.size());
                     Set<String> binaryAttributes = new HashSet<String>(configMap.size());
                     for (String localAttribute : configMap.values()) {
-                        if (isStaticAttributeValue(localAttribute)) {
+                        if (isStaticAttribute(localAttribute)) {
                             // skip over, handled directly in next step
-                        } else if (isBinaryAttributeValue(localAttribute)) {
+                        } else if (isBinaryAttribute(localAttribute)) {
                             // add it to the list of attributes to treat as being binary
-                            binaryAttributes.add(removeBinaryFlag(localAttribute));
+                            binaryAttributes.add(removeBinaryAttributeFlag(localAttribute));
                         } else {
                             stringAttributes.add(localAttribute);
                         }
@@ -220,8 +218,8 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 }
 
                 Set<String> attributeValues = null;
-                if (isStaticAttributeValue(localAttribute)) {
-                    localAttribute = removeStaticFlag(localAttribute);
+                if (isStaticAttribute(localAttribute)) {
+                    localAttribute = removeStaticAttributeFlag(localAttribute);
                     // Remove the static flag before using it as the static value
                     attributeValues = CollectionUtils.asSet(localAttribute);
                     if (debug.messageEnabled()) {
@@ -231,9 +229,9 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                                 " for attribute named " + samlAttribute);
                     }
                 } else {
-                    if (isBinaryAttributeValue(localAttribute)) {
+                    if (isBinaryAttribute(localAttribute)) {
                         // Remove the flag as not used for lookup
-                        localAttribute = removeBinaryFlag(localAttribute);
+                        localAttribute = removeBinaryAttributeFlag(localAttribute);
                         attributeValues = getBinaryAttributeValues(samlAttribute, localAttribute, binaryValueMap);
                     } else {
                         if (stringValueMap != null && !stringValueMap.isEmpty()) {
@@ -384,23 +382,5 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
         }
 
         return result;
-    }
-
-    private boolean isStaticAttributeValue(String attribute) {
-        return attribute != null && attribute.startsWith(STATIC_QUOTE) && attribute.endsWith(STATIC_QUOTE);
-    }
-
-    private String removeStaticFlag(String attribute) {
-        return attribute.substring(STATIC_QUOTE.length(), attribute.length() - STATIC_QUOTE.length());
-    }
-
-    private boolean isBinaryAttributeValue(String attribute) {
-        return attribute != null && attribute.endsWith(BINARY_FLAG);
-    }
-
-    private String removeBinaryFlag(String attribute) {
-
-        int flagStart = attribute.lastIndexOf(BINARY_FLAG);
-        return attribute.substring(0, flagStart);
     }
 }
