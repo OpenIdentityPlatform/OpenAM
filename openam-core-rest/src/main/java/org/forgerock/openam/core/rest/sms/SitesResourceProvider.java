@@ -87,7 +87,10 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         switch (request.getAction()) {
             case RestConstants.TEMPLATE:
-                return newResultPromise(newActionResponse(json(object())));
+                return newResultPromise(newActionResponse(json(object(
+                        field(PRIMARY_URL, object()),
+                        field(SERVERS, array()),
+                        field(SECONDARY_URLS, array())))));
             case RestConstants.SCHEMA:
                 ResourceBundle i18n = ResourceBundle.getBundle("amConsole");
                 return newResultPromise(newActionResponse(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
