@@ -88,7 +88,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         switch (request.getAction()) {
             case RestConstants.TEMPLATE:
                 return newResultPromise(newActionResponse(json(object(
-                        field(PRIMARY_URL, object()),
+                        field(PRIMARY_URL, ""),
                         field(SERVERS, array()),
                         field(SECONDARY_URLS, array())))));
             case RestConstants.SCHEMA:
