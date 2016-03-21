@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -36,6 +36,7 @@ import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.common.SAMLUtilsCommon;
 import org.forgerock.openam.utils.AMKeyProvider;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -110,6 +111,11 @@ public class JKSKeyProvider implements KeyProvider {
      */
     public java.security.PrivateKey getPrivateKey (String certAlias) {
         return keyProvider.getPrivateKey(certAlias);
+    }
+
+    @Override
+    public SecretKey getSecretKey(String certAlias) {
+        return keyProvider.getSecretKey(certAlias);
     }
 
     /**

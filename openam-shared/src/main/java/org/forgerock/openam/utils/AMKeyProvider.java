@@ -15,7 +15,7 @@
  */
 
 /*
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -27,12 +27,14 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 
+import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.AccessController;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -295,6 +297,23 @@ public class AMKeyProvider implements KeyProvider {
             logger.error(e.getMessage());
         }
         return key;
+    }
+
+    @Override
+    public SecretKey getSecretKey(String certAlias) {
+        try {
+            Key key = ks.getKey(certAlias, privateKeyPass.toCharArray());
+
+            if (key instanceof SecretKey) {
+                return (SecretKey) key;
+            }
+
+            logger.error("Expected a key of type javax.crypto.SecretKey but got " + key.getClass().getName());
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+            logger.error("Unable to get the secret key for certificate alias " + certAlias, e);
+        }
+
+        return null;
     }
 
     /**

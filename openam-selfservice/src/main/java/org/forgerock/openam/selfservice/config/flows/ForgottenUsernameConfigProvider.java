@@ -16,9 +16,6 @@
 
 package org.forgerock.openam.selfservice.config.flows;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.Constants;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.openam.selfservice.KeyStoreJwtTokenConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
@@ -90,11 +87,9 @@ public final class ForgottenUsernameConfigProvider
             stages.add(new RetrieveUsernameConfig());
         }
 
-        String secret = SystemProperties.get(Constants.ENC_PWD_PROPERTY);
         KeyStoreJwtTokenConfig extendedJwtTokenConfig = new KeyStoreJwtTokenConfig()
                 .withEncryptionKeyPairAlias(config.getEncryptionKeyPairAlias())
-                .withSigningSymmetricKey(secret)
-                .withSigningAlgorithm(JwsAlgorithm.HS256.name())
+                .withSigningSecretKeyAlias(config.getSigningSecretKeyAlias())
                 .withTokenLifeTimeInSeconds(config.getTokenExpiry());
 
         return new ProcessInstanceConfig()

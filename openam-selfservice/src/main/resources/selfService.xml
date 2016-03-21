@@ -38,7 +38,16 @@
                                  resourceName="encryptionKeyPairAlias"
                                  i18nKey="encryption.key.pair.alias">
                     <DefaultValues>
-                        <Value>test</Value>
+                        <Value>selfserviceenctest</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="selfServiceSigningSecretKeyAlias"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="signingSecretKeyAlias"
+                                 i18nKey="signing.secret.key.alias">
+                    <DefaultValues>
+                        <Value>selfservicesigntest</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="selfServiceCaptchaSiteKey"

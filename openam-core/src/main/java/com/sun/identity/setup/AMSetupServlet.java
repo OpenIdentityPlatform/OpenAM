@@ -1596,6 +1596,7 @@ public class AMSetupServlet extends HttpServlet {
         writeContent(location + "/.keypass", pwd);
         writeContent(location + "/.storepass", pwd);
         copyCtxFile("/WEB-INF/template/keystore", "keystore.jks", location);
+        copyCtxFile("/WEB-INF/template/keystore", "keystore.jceks", location);
     }
 
     /**

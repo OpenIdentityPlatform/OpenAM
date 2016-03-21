@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -23,6 +23,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.crypto.SecretKey;
 import java.security.AccessController;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -30,14 +31,15 @@ import java.security.cert.X509Certificate;
 
 public class AMKeyProviderTest {
 
-    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks")
+    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jceks")
             .getFile());
-    private static final String KEY_STORE_TYPE = "JKS";
+    private static final String KEY_STORE_TYPE = "JCEKS";
     private static final String KEY_STORE_PASS = "testcase";
     private static final String DEFAULT_PRIVATE_KEY_PASS = "testcase";
     private static final String PRIVATE_KEY_PASS = "keypass";
     private static final String DEFAULT_PRIVATE_KEY_ALIAS = "defaultkey";
     private static final String PRIVATE_KEY_ALIAS = "privatekey";
+    private static final String SECRET_KEY_ALIAS = "secretkey";
 
     KeyProvider amKeyProvider;
 
@@ -107,4 +109,11 @@ public class AMKeyProviderTest {
         PrivateKey key = amKeyProvider.getPrivateKey(PRIVATE_KEY_ALIAS);
         Assert.assertNull(key);
     }
+
+    @Test
+    public void getSecretKeyUsingDefaultPassword() {
+        SecretKey key = amKeyProvider.getSecretKey(SECRET_KEY_ALIAS);
+        Assert.assertNotNull(key);
+    }
+
 }

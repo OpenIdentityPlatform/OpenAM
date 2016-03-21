@@ -27,6 +27,7 @@ import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandler;
 
+import javax.crypto.SecretKey;
 import javax.inject.Inject;
 import java.security.KeyPair;
 
@@ -37,8 +38,9 @@ import java.security.KeyPair;
  */
 final class JwtSnapshotTokenHandlerFactory implements SnapshotTokenHandlerFactory {
 
-    private static final JweAlgorithm DEFAULT_ENCRYPTION_ALOGIRTHM = JweAlgorithm.RSAES_PKCS1_V1_5;
+    private static final JweAlgorithm DEFAULT_ENCRYPTION_ALGORITHM = JweAlgorithm.RSAES_PKCS1_V1_5;
     private static final EncryptionMethod DEFAULT_ENCRYPTION_METHOD = EncryptionMethod.A128CBC_HS256;
+    private static final JwsAlgorithm DEFAULT_SIGNING_ALGORITHM = JwsAlgorithm.HS256;
 
     private final AMKeyProvider keyProvider;
 
@@ -64,21 +66,21 @@ final class JwtSnapshotTokenHandlerFactory implements SnapshotTokenHandlerFactor
                     + config.getEncryptionKeyPairAlias());
         }
 
-        SigningManager signingManager = new SigningManager();
-        byte[] secret = config.getSigningSymmetricKey().getBytes();
-        SigningHandler signingHandler = signingManager.newHmacSigningHandler(secret);
-        JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(config.getSigningAlgorithm());
+        SecretKey secretKey = keyProvider.getSecretKey(config.getSigningSecretKeyAlias());
 
-        if (jwsAlgorithm == null) {
-            throw new StageConfigException("Unsupported signing algorithm "
-                    + config.getSigningAlgorithm());
+        if (secretKey == null) {
+            throw new StageConfigException("Unable to retrieve key for certificate alias "
+                    + config.getSigningSecretKeyAlias());
         }
 
+        SigningManager signingManager = new SigningManager();
+        SigningHandler signingHandler = signingManager.newHmacSigningHandler(secretKey.getEncoded());
+
         return new JwtTokenHandler(
-                DEFAULT_ENCRYPTION_ALOGIRTHM,
+                DEFAULT_ENCRYPTION_ALGORITHM,
                 DEFAULT_ENCRYPTION_METHOD,
                 encryptionKeyPair,
-                jwsAlgorithm,
+                DEFAULT_SIGNING_ALGORITHM,
                 signingHandler,
                 config.getTokenLifeTimeInSeconds());
     }

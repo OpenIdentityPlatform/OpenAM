@@ -33,8 +33,7 @@ public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
     public static final String TYPE = "KEY_STORE_JWT";
 
     private String encryptionKeyPairAlias;
-    private String signingSymmetricKey;
-    private String signingAlgorithm;
+    private String signingSecretKeyAlias;
     private long tokenLifeTimeInSeconds;
 
     /**
@@ -60,46 +59,24 @@ public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
     }
 
     /**
-     * Get the signing symmetric key.
+     * Get the signing secret key alias.
      *
-     * @return the signing symmetric key
+     * @return the signing secret key alias
      */
-    public String getSigningSymmetricKey() {
-        return signingSymmetricKey;
+    public String getSigningSecretKeyAlias() {
+        return signingSecretKeyAlias;
     }
 
     /**
-     * Set the signing symmetric key.
+     * Set the signing secret key alias.
      *
-     * @param signingSymmetricKey
-     *         the signing symmetric key
+     * @param signingSecretKeyAlias
+     *         the signing secret key alias
      *
      * @return this instance
      */
-    public KeyStoreJwtTokenConfig withSigningSymmetricKey(String signingSymmetricKey) {
-        this.signingSymmetricKey = signingSymmetricKey;
-        return this;
-    }
-
-    /**
-     * Get the signing algorithm.
-     *
-     * @return the signing algorithm
-     */
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
-    }
-
-    /**
-     * Set the signing algorithm.
-     *
-     * @param signingAlgorithm
-     *         the signing algorithm
-     *
-     * @return this instance
-     */
-    public KeyStoreJwtTokenConfig withSigningAlgorithm(String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
+    public KeyStoreJwtTokenConfig withSigningSecretKeyAlias(String signingSecretKeyAlias) {
+        this.signingSecretKeyAlias = signingSecretKeyAlias;
         return this;
     }
 
@@ -132,7 +109,7 @@ public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(encryptionKeyPairAlias, signingSymmetricKey, signingAlgorithm, tokenLifeTimeInSeconds);
+        return Objects.hash(encryptionKeyPairAlias, signingSecretKeyAlias, tokenLifeTimeInSeconds);
     }
 
     @Override
@@ -147,8 +124,7 @@ public final class KeyStoreJwtTokenConfig implements SnapshotTokenConfig {
 
         KeyStoreJwtTokenConfig other = (KeyStoreJwtTokenConfig) obj;
         return Objects.equals(encryptionKeyPairAlias, other.encryptionKeyPairAlias)
-                && Objects.equals(signingSymmetricKey, other.signingSymmetricKey)
-                && Objects.equals(signingAlgorithm, other.signingAlgorithm)
+                && Objects.equals(signingSecretKeyAlias, other.signingSecretKeyAlias)
                 && Objects.equals(tokenLifeTimeInSeconds, other.tokenLifeTimeInSeconds);
     }
 
