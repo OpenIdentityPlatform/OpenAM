@@ -1,19 +1,27 @@
 <div class="container">
     {{> headers/_Title title=title }}
 
-    <p class="page-description">TODO: AME-10097 To configure individual authentication module settings click on the item in the list below. To configure individual authentication module settings click on the item in the list below. To configure individual authentication module settings click on the item in the list below. More text here explaining why we need these core attributes.</p>
+    <p class="page-description">{{t "console.configuration.authentication.description"}}</p>
 
     <div class="panel panel-default">
-        <div class="list-group">
-            <a href="{{routeTo 'editAuthenticationSettings' 'core'}}" class="list-group-item">{{t "console.configuration.global.authentication.coreAttributes"}}</a>
-        </div>
-    </div>
+        <div class="panel-body">
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "console.configuration.authentication.core.title"}}</h3>
+                <p class="panel-description">{{t "console.configuration.authentication.core.description"}}</p>
+                <div class="list-group">
+                    <a href="{{routeTo 'editAuthenticationSettings' 'core'}}" class="list-group-item">{{t "console.configuration.authentication.core.coreAttributes"}}</a>
+                </div>
+            </div>
 
-    <div class="panel panel-default">
-        <div class="list-group">
-            {{#each items}}
-            <a href="{{routeTo 'editAuthenticationSettings' this._id}}" class="list-group-item">{{name}}</a>
-            {{/each}}
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "console.configuration.authentication.modules.title"}}</h3>
+                <p class="panel-description">{{t "console.configuration.authentication.modules.description"}}</p>
+                <div class="list-group">
+                    {{#each items}}
+                    <a href="{{routeTo 'editAuthenticationSettings' this._id}}" class="list-group-item">{{name}}</a>
+                    {{/each}}
+                </div>
+            </div>
         </div>
     </div>
 </div>

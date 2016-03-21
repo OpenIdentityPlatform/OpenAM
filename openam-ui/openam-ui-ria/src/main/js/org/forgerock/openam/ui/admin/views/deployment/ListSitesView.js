@@ -85,11 +85,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
         },
 
         render (args, callback) {
-
             SitesService.sites.getAll().then((data) => {
-
                 this.parentRender(() => {
-
                     if (_.isEmpty(data)) {
                         this.showCallToAction();
                     } else {
@@ -100,12 +97,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                         callback();
                     }
                 });
-            }, (response) =>
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response
-                })
-            );
+                });
+            });
         }
     });
 

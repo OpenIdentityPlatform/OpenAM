@@ -1,35 +1,21 @@
 {{> headers/_Title title="console.authorization.resourceTypes.edit.title"
     helpLink="backstage.authz.resourceTypes"}}
 
-<div class="panel multiple-panels panel-content">
-    <div class="panel panel-default panel-collapse form-horizontal">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="no-caret">{{t "common.form.details"}}</a>
-            </h4>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="block clearfix">
+            <h3 class="block-header">{{t "common.form.details"}}</h3>
+            <div class="form-horizontal" id="resTypeSetting"></div>
         </div>
-        <div class="panel-body" id="resTypeSetting"></div>
-    </div>
 
-    <div class="panel panel-default panel-collapse">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyPatterns"}}</a>
-            </h4>
-        </div>
-        <div class="panel-body form-group">
+        <div class="block clearfix">
+            <h3 class="block-header">{{t "console.authorization.resourceTypes.edit.specifyPatterns"}}</h3>
             <p class="panel-description">{{t "console.authorization.resourceTypes.edit.patternsDescription"}}</p>
             <div class="form-inline" id="resTypePatterns"></div>
         </div>
-    </div>
 
-    <div class="panel panel-default panel-collapse">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="no-caret">{{t "console.authorization.resourceTypes.edit.specifyActions"}}</a>
-            </h4>
-        </div>
-        <div class="panel-body form-group">
+        <div class="block clearfix">
+            <h3 class="block-header">{{t "console.authorization.resourceTypes.edit.specifyActions"}}</h3>
             <p class="panel-description">{{t "console.authorization.resourceTypes.edit.actionsDescription"}}</p>
             <div class="form-inline" id="resTypeActions"></div>
         </div>
@@ -38,9 +24,7 @@
     <div class="panel-footer clearfix">
         <div class="pull-right">
             <a class="btn btn-default" href="{{routeTo 'realmsResourceTypes' realmPath}}">{{t "common.form.cancel"}}</a>
-            <button data-save class="btn btn-primary" type="button">
-                {{t "common.form.create"}}
-            </button>
+            <button data-save class="btn btn-primary" type="button">{{t "common.form.create"}}</button>
         </div>
     </div>
 </div>

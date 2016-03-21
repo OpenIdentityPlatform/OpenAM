@@ -926,9 +926,16 @@
             }
         },
         "configuration" : {
-            "global" : {
-                "authentication" : {
-                    "coreAttributes": "Core Attributes"
+            "authentication" : {
+                "description": "Configure default properties for global authentication functionality.",
+                "core": {
+                    "coreAttributes": "Core Attributes",
+                    "title": "Realm Authentication Defaults",
+                    "description": "Configure default authentication properties applied when creating new realms."
+                },
+                "modules": {
+                    "title": "Authentication Module Defaults",
+                    "description": "Configure default properties applied when creating new authentication modules."
                 }
             }
         },
