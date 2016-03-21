@@ -37,6 +37,7 @@ import java.text.MessageFormat;
 public final class XuiRedirectHelper {
 
     private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI/#{1}";
+    private static final String DEFAULT_REALM = "/";
 
     private XuiRedirectHelper() {
     }
@@ -50,6 +51,25 @@ public final class XuiRedirectHelper {
      */
     public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
         String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
+                .getRootURL(request);
+        String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
+        RequestContext rc = RequestManager.getRequestContext();
+        try {
+            rc.getResponse().sendRedirect(redirect);
+            throw new CompleteRequestException();
+        } catch (IOException e) {
+            //never thrown, empty catch
+        }
+    }
+
+    /**
+     * Redirects to the XUI to the specified hash.
+     *
+     * @param request Used to determine the OpenAM deployment URI.
+     * @param xuiHash The XUI location hash.
+     */
+    public static void redirectToXui(HttpServletRequest request, String xuiHash) {
+        String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(DEFAULT_REALM)
                 .getRootURL(request);
         String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
         RequestContext rc = RequestManager.getRequestContext();
