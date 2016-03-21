@@ -523,12 +523,6 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema
-                            name="com.forgerock.openam.oauth2provider.allowedSaml2Audience"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a758" />
-                    
                 </SubSchema>
                 <SubSchema name="WebAgent" inheritance="multiple">
                     <AttributeSchema

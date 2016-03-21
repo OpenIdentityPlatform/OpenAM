@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.saml2.common;
@@ -695,40 +695,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                         "missingSubjectConfirmationData"));
             }
 
-            String recipient = subjectConfData.getRecipient();
-            if (recipient == null || recipient.length() == 0) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "missing Recipient in Assertion.");
-                }
-                String[] data = {assertionID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.MISSING_RECIPIENT,
-                        data,
-                        null);
-                throw new SAML2Exception(bundle.getString("missingRecipient"));
-            }
-            boolean foundMatch = false;
-            Iterator acsIter = spDesc.getAssertionConsumerService().iterator();
-            while (acsIter.hasNext()) {
-                AssertionConsumerServiceElement acs =
-                        (AssertionConsumerServiceElement) acsIter.next();
-                if (recipient.equals(acs.getLocation())) {
-                    foundMatch = true;
-                    break;
-                }
-            }
-            if (!foundMatch) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "this sp is not the intended "
-                            + "recipient.");
-                }
-                String[] data = {assertionID, recipient};
-                LogUtil.error(Level.INFO,
-                        LogUtil.WRONG_RECIPIENT,
-                        data,
-                        null);
-                throw new SAML2Exception(bundle.getString("wrongRecipient"));
-            }
+            validateRecipient(spDesc, assertionID, subjectConfData);
 
             // in seconds
             int timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
@@ -815,6 +782,47 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
         retMap.put(SAML2Constants.IS_BEARER, Boolean.valueOf(hasBearer));
         return retMap;
+    }
+
+    /**
+     * Validates the Recipient value stored within the SubjectConfirmationData element based on the following rules:
+     * <ul>
+     *  <li>The value MUST not be null.</li>
+     *  <li>The value must correspond to one of the hosted SP's ACS endpoints.</li>
+     * </ul>
+     *
+     * @param spDesc The standard SAML metadata of the hosted SP.
+     * @param assertionID The ID of the assertion to be used when creating audit log entries.
+     * @param subjectConfData The {@link SubjectConfirmationData} element to validate.
+     * @throws SAML2Exception If there was a validation error.
+     */
+    public static void validateRecipient(SPSSODescriptorElement spDesc, String assertionID,
+            SubjectConfirmationData subjectConfData) throws SAML2Exception {
+        String recipient = subjectConfData.getRecipient();
+        if (StringUtils.isEmpty(recipient)) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.validateRecipient(): missing Recipient in Assertion.");
+            }
+            String[] data = {assertionID};
+            LogUtil.error(Level.INFO, LogUtil.MISSING_RECIPIENT, data, null);
+            throw new SAML2Exception(bundle.getString("missingRecipient"));
+        }
+        boolean foundMatch = false;
+        for (Object o : spDesc.getAssertionConsumerService()) {
+            AssertionConsumerServiceElement acs = (AssertionConsumerServiceElement) o;
+            if (recipient.equals(acs.getLocation())) {
+                foundMatch = true;
+                break;
+            }
+        }
+        if (!foundMatch) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.validateRecipient(): this sp is not the intended recipient.");
+            }
+            String[] data = {assertionID, recipient};
+            LogUtil.error(Level.INFO, LogUtil.WRONG_RECIPIENT, data, null);
+            throw new SAML2Exception(bundle.getString("wrongRecipient"));
+        }
     }
 
     private static void checkAudience(final Conditions conds,

@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -789,22 +788,5 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getAllowedSAML2Audience() {
-        try {
-            Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE);
-            if (CollectionUtils.isNotEmpty(set)) {
-                return set.iterator().next();
-            }
-        } catch (Exception e) {
-            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE, e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get " + OAuth2Constants.OAuth2Client.ALLOWED_SAML_AUDIENCE + " from repository");
-        }
-        return null;
     }
 }
