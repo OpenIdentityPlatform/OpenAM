@@ -1,7 +1,7 @@
 <%--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2011-2016 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -284,8 +284,14 @@
 
                             ServiceSchema ss = serviceSchemaList.get(schemaType);
                             String i18nFilename = ss.getI18NFileName();
-                            ResourceBundle bundle = ResourceBundle.getBundle(i18nFilename);
+                            ResourceBundle bundle = null;
 
+                            if (i18nFilename != null) {
+                               try {
+                                  bundle = ResourceBundle.getBundle(i18nFilename);
+                               } catch (MissingResourceException ex) {
+                               }
+                            }
                             if (ss != null) {
                                 Set<String> serviceAttributeNames = ss.getServiceAttributeNames();
 
@@ -313,12 +319,12 @@
                                     out.println("<div class='name'>" + s + "</div>");
                                     try {
                                         if (as.getI18NKey() != null)
-                                            out.println("<div class='description'>" + bundle.getString(as.getI18NKey()) + "</div>");
+                                            out.println("<div class='description'>" + (bundle!=null ? bundle.getString(as.getI18NKey()) : as.getName()) + "</div>");
                                     } catch (MissingResourceException mre) {
                                         out.println("<div class='descriptionMissing'>" + s + " (missing description)</div>");
                                     }
                                     try {
-                                        if (as.getI18NKey() != null)
+                                        if (bundle != null && as.getI18NKey() != null)
                                             out.println("<div class='help'>" + bundle.getString(as.getI18NKey().concat(".help")) + "</div>");
                                     } catch (MissingResourceException mre) {
                                     }
