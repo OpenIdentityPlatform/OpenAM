@@ -61,7 +61,8 @@ final class OpenAMHttpApplication implements HttpApplication {
                         .thenOnRuntimeException(new RuntimeExceptionHandler() {
                             @Override
                             public void handleRuntimeException(RuntimeException exception) {
-                                DEBUG.error("A runtime exception occurred during the CREST request handling", exception);
+                                DEBUG.error("A runtime exception occurred during the CREST request handling",
+                                        exception);
                             }
                         });
             }
