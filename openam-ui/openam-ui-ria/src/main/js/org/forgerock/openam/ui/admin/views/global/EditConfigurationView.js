@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
             SMSGlobalService.authentication.get(this.data.id).then((data) => {
                 this.data.schema = data.schema;
                 this.data.values = data.values;
-                this.data.name = "TODO: return of the name"; // data.name
+                this.data.name = data.values._type.name;
                 this.data.tabbed = this.data.schema.grouped;
 
                 this.parentRender(() => {
