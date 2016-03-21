@@ -167,7 +167,8 @@ define("config/AppConfiguration", [
                                     "name": "config.AppConfiguration.Navigation.links.configure.authentication",
                                     "icon": "fa fa-user"
                                 }, {
-                                    "url": "#configure/global-services",
+                                    "event": Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,
+                                    //"url": "#configure/global-services",
                                     "name": "config.AppConfiguration.Navigation.links.configure.global-services",
                                     "icon": "fa fa-globe"
                                 }, {

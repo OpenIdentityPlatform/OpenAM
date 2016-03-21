@@ -30,13 +30,23 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
     obj.global = {
         accessControl: function () { obj.global.redirectToTab(1); },
         federation   : function () { obj.global.redirectToTab(2); },
-        configuration: function () { obj.global.redirectToTab(4); },
         sessions     : function () { obj.global.redirectToTab(5); },
         redirectToTab: function (tabIndex) {
             obj.getJATOPageSession("/").done(function (session) {
                 if (session) {
                     window.location.href = "/" + Constants.context + "/task/Home?" +
                         "Home.tabCommon.TabHref=" + tabIndex +
+                        "&jato.pageSession=" + session + "&requester=XUI";
+                } else {
+                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                }
+            });
+        },
+        configuration: function () {
+            obj.getJATOPageSession("/").done(function (session) {
+                if (session) {
+                    window.location.href = "/" + Constants.context + "/service/SCConfigAuth?" +
+                        "SCConfigAuth.tabCommon.TabHref=445" +
                         "&jato.pageSession=" + session + "&requester=XUI";
                 } else {
                     window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";

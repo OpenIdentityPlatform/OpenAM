@@ -42,9 +42,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
             SitesService.sites.get(id).then((data) => {
                 FormHelper.showConfirmationBeforeDeleting({
                     message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
-                }, _.partial(deleteInstance, data.values.raw._id, data.values.raw.etag, () => {
-                    this.render();
-                }));
+                }, _.partial(deleteInstance, data.values.raw._id, data.values.raw.etag, () => this.render()));
             });
         },
 
