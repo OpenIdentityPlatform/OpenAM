@@ -260,6 +260,7 @@
                                 <include>org/forgerock/openam/services/cdm/**</include>
                                 <include>org/forgerock/openam/session/*</include>
                                 <include>org/forgerock/openam/security/whitelist/**</include>
+                                <include>org/forgerock/openam/sso/providers/stateless/*</include>
                                 <include>org/forgerock/openam/upgrade/UpgradeException*</include>
                                 <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
                                 <include>META-INF/services/org.forgerock.openam.entitlement.ConditionTypeRegistry</include>
