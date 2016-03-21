@@ -1180,7 +1180,19 @@ public class LoginViewBean extends AuthViewBeanBase {
             } else {
                 callbacks = AuthUtils.getRecdCallback(ac);
             }
-            
+
+            if (loginDebug.messageEnabled()) {
+                loginDebug.message(" length of callbacks : " + ((callbacks == null) ? 0 : callbacks.length));
+            }
+
+           if (callbacks == null) {
+               errorCode = AMAuthErrorCode.AUTH_TIMEOUT;
+               ErrorMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_MESSAGE);
+               errorTemplate = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_TEMPLATE);
+               clearCookie(ac);
+               return;
+           }
+
             indexType = AuthUtils.getIndexType(ac);
             
             // Assign user specified values
