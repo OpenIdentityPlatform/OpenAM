@@ -726,7 +726,8 @@
                 "empty" : "You do not have any configured sites"
             },
             "new": {
-                "title": "New Site"
+                "title": "New Site",
+                "nameValidationError": "Spaces are not allowed in the site's name"
             }
         },
         "authentication": {

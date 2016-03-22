@@ -8,8 +8,8 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label" for="siteId">{{t "common.form.name"}}</label>
                         <div class="col-sm-6">
-                            <input data-id type="text" id="siteId" class="form-control" required name="siteId"
-                                placeholder="{{t 'common.form.validation.required'}}">
+                            <input data-site-name type="text" id="siteId" class="form-control" required name="siteId"
+                                 placeholder="{{t 'common.form.validation.required'}}">
                         </div>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
         <div class="panel-footer clearfix">
             <div class="pull-right">
                 <a class="btn btn-default" href="{{routeTo 'listSites'}}">{{t "common.form.cancel"}}</a>
-                <button data-create class="btn btn-primary" type="button">{{t "common.form.create"}}</button>
+                <button data-create class="btn btn-primary" type="button" disabled>{{t "common.form.create"}}</button>
             </div>
         </div>
     </div>

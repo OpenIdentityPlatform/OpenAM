@@ -27,7 +27,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/NewSiteView", [
     const NewSiteView = AbstractView.extend({
         template: "templates/admin/views/deployment/NewSiteTemplate.html",
         events: {
-            "click [data-create]": "onCreate"
+            "click [data-create]": "onCreate",
+            "keyup  [data-site-name]": "onValidateProps"
         },
 
         render (args, callback) {
@@ -43,13 +44,25 @@ define("org/forgerock/openam/ui/admin/views/deployment/NewSiteView", [
 
         onCreate () {
             const values = this.jsonSchemaView.values();
-            const siteId = this.$el.find("[data-id]").val();
+            const siteId = this.$el.find("[data-site-name]").val();
             values["_id"] = siteId;
 
             SitesService.sites.create(values)
                 .then(() => { Router.routeTo(Router.configuration.routes.listSites, { args: [], trigger: true }); },
                 (response) => { Messages.addMessage({ response, type: Messages.TYPE_DANGER }); }
             );
+        },
+
+        onValidateProps (event) {
+            let siteId = $(event.currentTarget).val();
+            if (siteId.indexOf(" ") !== -1) {
+                siteId = false;
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    message: $.t("console.sites.new.nameValidationError")
+                });
+            }
+            this.$el.find("[data-create]").prop("disabled", !siteId);
         }
     });
 
