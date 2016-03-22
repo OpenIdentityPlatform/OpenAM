@@ -335,7 +335,7 @@ public abstract class SmsResourceProvider {
                     result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
 
                     result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                            getConsoleString(consoleI18n, sectionLabel));
+                            getTitle(consoleI18n, schemaI18n, sectionLabel));
                     result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
@@ -349,6 +349,15 @@ public abstract class SmsResourceProvider {
                 addExampleValue(result, path, attribute, attributePath);
             }
         }
+    }
+
+    private String getTitle(ResourceBundle consoleI18n, ResourceBundle schemaI18n, String title) {
+        String result = getConsoleString(consoleI18n, title);
+        if (result.equals("")) {
+            result = getConsoleString(schemaI18n, title);
+        }
+
+        return result;
     }
 
     private List<String> getSections(Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
