@@ -391,6 +391,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
         tokenInfo.put(getResourceString(EXPIRE_TIME),
                 (getExpiryTime() - currentTimeMillis())/1000);
         tokenInfo.put(getResourceString(SCOPE), getScope());
+        tokenInfo.put(getResourceString(CLIENT_ID), getClientId());
         tokenInfo.put(getResourceString(OAuth2Constants.Params.GRANT_TYPE), getGrantType());
         return tokenInfo;
     }
