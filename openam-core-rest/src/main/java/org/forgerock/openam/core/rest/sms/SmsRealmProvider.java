@@ -26,6 +26,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
@@ -336,8 +337,9 @@ public class SmsRealmProvider implements RequestHandler {
 
             //To determine whether the realm to delete exists we have to check if the request.getResourcePath() is empty or not.
             //It gets emptied if the realm was found.
-            if (!Strings.isNullOrEmpty(request.getResourcePath())){
-                throw new SMSException(SMSException.STATUS_ABORT, SMS_REALM_NAME_NOT_FOUND);
+            String realmName = request.getResourcePath();
+            if (!Strings.isNullOrEmpty(realmName)){
+                throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME, SMS_REALM_NAME_NOT_FOUND, new String[]{realmName});
             }
 
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
