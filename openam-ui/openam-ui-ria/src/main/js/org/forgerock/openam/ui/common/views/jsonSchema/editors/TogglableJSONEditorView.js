@@ -45,7 +45,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
 
             this.options.enablePropertyValue = enabled;
 
-            this.$el.find("[data-title]").toggleClass("text-muted");
+            this.$el.find(".block-header").toggleClass("block-header-inactive");
 
             if (!this.options.schema.isEmpty()) {
                 if (enabled) {

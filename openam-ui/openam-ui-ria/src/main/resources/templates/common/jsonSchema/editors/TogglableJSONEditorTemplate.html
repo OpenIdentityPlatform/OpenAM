@@ -1,17 +1,20 @@
 <form class="form-inline">
-    <div class="form-group checkbox checkbox-slider-md checkbox-slider--b checkbox-slider-primary">
-        <label>
-            <input data-json-editor-toggle type="checkbox" {{#if enablePropertyValue}}checked{{/if}}>
-            <span></span>
-        </label>
-    </div>
+    <h3 class="block-header {{#unless enablePropertyValue}}block-header-inactive{{/unless}}">
+        {{schema.raw.title}}
 
-    <div class="radio-inline">
-        <h4 data-title class="{{#unless enablePropertyValue}}text-muted{{/unless}}"> {{schema.raw.title}}</h4>
-        {{#if schema.raw.description}}
-            <span class="text-muted">schema.raw.description</span>
-        {{/if}}
-    </div>
+        <div class="radio-inline pull-right">
+            <div class="form-group checkbox checkbox-slider checkbox-slider--b checkbox-slider-primary">
+                <label>
+                    <input data-json-editor-toggle type="checkbox" {{#if enablePropertyValue}}checked{{/if}}>
+                    <span></span>
+                </label>
+            </div>
+        </div>
+    </h3>
+
+    {{#if schema.raw.description}}
+        <span class="text-muted">schema.raw.description</span>
+    {{/if}}
 </form>
 
 <div data-toggleable-json-editor/>
