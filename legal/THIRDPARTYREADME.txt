@@ -50,8 +50,8 @@ Copyright: Copyright 2002-2013 The Apache Software Foundation,
 Version: commons-collections-3.2.2.jar
 Copyright: Copyright 2001-2015 The Apache Software Foundation
 
-Version: commons-fileupload-1.2.2.jar
-Copyright: Copyright 2002-2013 The Apache Software Foundation
+Version: commons-fileupload-1.3.1.jar
+Copyright: Copyright 2002-2014 The Apache Software Foundation
 
 Version: commons-io-2.3.jar
 Copyright: Copyright 2002-2012 The Apache Software Foundation
