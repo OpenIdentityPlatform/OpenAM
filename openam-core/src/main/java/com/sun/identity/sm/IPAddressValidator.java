@@ -26,13 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
 package com.sun.identity.sm;
 
-import org.forgerock.openam.utils.ValidateIPaddress;
-
-import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 /**
  * The class <code>IPAddressValidator</code> is used to check if the IP
@@ -41,23 +41,14 @@ import java.util.StringTokenizer;
 public class IPAddressValidator implements ServiceAttributeValidator {
 
     /**
-     * Default Constructor.
-     */
-    public IPAddressValidator() {
-    }
-
-    /**
      * Validates a set of string IP address.
      * 
-     * @param values
-     *            the set of IP address to validate
+     * @param values the set of IP address to validate
      * @return true if all of the IP addresses are valid; false otherwise
      */
-    public boolean validate(Set values) {
+    public boolean validate(Set<String> values) {
 
-        Iterator it = values.iterator();
-        while (it.hasNext()) {
-            String value = (String) it.next();
+        for (String value : values) {
             if (!validate(value)) {
                 return false;
             }
@@ -68,8 +59,7 @@ public class IPAddressValidator implements ServiceAttributeValidator {
     /**
      * Validates an IP address.
      * 
-     * @param value
-     *            the IP address to validate
+     * @param value the IP address to validate
      * @return true if the IP address is valid; false otherwise
      */
     public boolean validate(String value) {

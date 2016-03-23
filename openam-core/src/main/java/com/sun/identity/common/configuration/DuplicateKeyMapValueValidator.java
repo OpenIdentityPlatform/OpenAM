@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
@@ -20,6 +20,7 @@ import com.sun.identity.sm.ServiceAttributeValidator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Validates map value properties in Agent Properties. e.g.
@@ -57,25 +58,21 @@ public class DuplicateKeyMapValueValidator implements ServiceAttributeValidator 
     
     private static final Pattern pattern = Pattern.compile(regularExpression);
 
-    public DuplicateKeyMapValueValidator() {
-    }
-
     /**
      * Returns <code>true</code> if values are of map type format.
      * 
      * @param values contains the set of values to be validated
      * @return <code>true</code> if values are of map type format
      */
-    
     @Override
-    public boolean validate(Set values) {
-        boolean valid = true; //blank or emtpy values set are valid
-        if ((values != null) && !values.isEmpty()) {
-            for (Object val : values) {
-                final String str = ((String)val).trim();
-                if (str.length() > 0) {
-                    final Matcher m = pattern.matcher(str);
-                    valid = m.matches();
+    public boolean validate(Set<String> values) {
+        boolean valid = true; //blank or empty values set are valid
+        if (!CollectionUtils.isEmpty(values)) {
+            for (String val : values) {
+                final String trimmed = val.trim();
+                if (trimmed.length() > 0) {
+                    Matcher matcher = pattern.matcher(trimmed);
+                    valid = matcher.matches();
                 }
             }
         }

@@ -26,14 +26,17 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
 package com.sun.identity.common.configuration;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Validates list value in Agent Properties. e.g.
@@ -62,11 +65,7 @@ import java.util.regex.Pattern;
  */
 public class ListValueValidator implements ServiceAttributeValidator {
 
-    private static final Pattern pattern = 
-          Pattern.compile("(\\s*\\[\\s*\\d++\\s*\\]\\s*=.*)");
-            
-    public ListValueValidator() {
-    }
+    private static final Pattern pattern = Pattern.compile("(\\s*\\[\\s*\\d++\\s*\\]\\s*=.*)");
 
     /**
      * Returns <code>true</code> if values are of list typed.
@@ -74,22 +73,27 @@ public class ListValueValidator implements ServiceAttributeValidator {
      * @param values the set of values to be validated
      * @return <code>true</code> if values are of list format type.
      */
-    public boolean validate(Set values) {
-        boolean valid = true; //blank or emtpy values set are valid
-     
-        //since a Set is used and set can not have duplicates I dont 
-        //need to test for duplicates of *whole* value
-        if ((values != null) && !values.isEmpty()) {
-            for (Iterator i = values.iterator(); (i.hasNext() && valid);) {
-                String str = ((String)i.next()).trim();
-                if (str.length() > 0) {
-                    Matcher m = pattern.matcher(str);
+    public boolean validate(Set<String> values) {
+        boolean valid = true; //blank or empty values set are valid
+
+        if (!CollectionUtils.isEmpty(values)) {
+            for (String value : values) {
+
+                if (!valid) {
+                    break;
+                }
+
+                if (value.length() > 0) {
+                    Matcher m = pattern.matcher(value);
                     valid = m.matches();
                 }
             }
+
         }
-        if (valid) 
+        if (valid) {
             valid = checkForValidIntegerKeyInValue(values);
+        }
+
         return valid;
     }
     
@@ -107,26 +111,36 @@ public class ListValueValidator implements ServiceAttributeValidator {
      *
      * @return true if set is good and contains no duplicate keys
      */
-    private boolean checkForValidIntegerKeyInValue(Set values) {
-        boolean valid  = true;
-        HashSet keySet = new HashSet();
+    private boolean checkForValidIntegerKeyInValue(Set<String> values) {
+        boolean valid = true;
+        HashSet<String> keySet = new HashSet<>();
         int indexNumber = -1;
         
-        if ((values != null) && !values.isEmpty()) {
-            for (Iterator i = values.iterator(); (i.hasNext() && valid);) {
-                String str = ((String)i.next()).trim();             
-                if (str.length() > 0) {
+        if (!CollectionUtils.isEmpty(values)) {
+
+            for (String val : values) {
+
+                if (!valid) {
+                    break;
+                }
+
+                if (val.length() > 0) {
                     //extract key from whole value
-                    int startIndex = str.indexOf("[");
-                    int endIndex =   str.indexOf("]");
-                    str=str.substring(startIndex+1, endIndex).trim();
+                    int startIndex = val.indexOf("[");
+                    int endIndex =   val.indexOf("]");
+                    val = val.substring(startIndex+1, endIndex).trim();
                     try {
-                        indexNumber = Integer.parseInt(str);
+                        indexNumber = Integer.parseInt(val);
                     } catch (NumberFormatException nfe) {
-                        valid =false;
+                        valid = false;
                     }
-                    if (indexNumber <0 ) valid=false;
-                    if (keySet.add(str) == false) valid=false;
+                    if (indexNumber <0 ) {
+                        valid = false;
+                    }
+
+                    if (!keySet.add(val)) {
+                        valid = false;
+                    }
                 }
             }
         }

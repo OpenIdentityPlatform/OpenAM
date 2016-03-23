@@ -26,13 +26,16 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
 package com.sun.identity.common.configuration;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Validates Global Map property value in Agent Properties.
@@ -51,7 +54,7 @@ import java.util.regex.Pattern;
  *     -can not have space inside characters of r.h.s, like "= some space"
  *
  * This validator accepts all the values accepted by MapValueValidator and 
- * addtionally accepts global format style values.
+ * additionally accepts global format style values.
  *
  * See the MapValueValidator.java class for non global map 
  * regular expressions and examples of acceptable values.
@@ -60,24 +63,16 @@ public class GlobalMapValueValidator implements ServiceAttributeValidator {
 
     //global format is no whitespace in between characters
     // and no brackets allowed
-    private static final String globalRegularExpression = 
-            "(\\s*[\\S&&[^\\[]&&[^\\]]]+\\s*)";
+    private static final String globalRegularExpression = "(\\s*[\\S&&[^\\[]&&[^\\]]]+\\s*)";
      
     private static final String appSpecificRegularExpression = 
-            MapValueValidator.KEY_WITH_NO_BRACKETS    
-            + "|" 
-            + MapValueValidator.DEFAULT_NO_KEY_JUST_BRACKETS;
+            MapValueValidator.KEY_WITH_NO_BRACKETS + "|" + MapValueValidator.DEFAULT_NO_KEY_JUST_BRACKETS;
             
-    private static final String regularExpression =  
+    private static final String regularExpression =
             "(" + appSpecificRegularExpression + "|" + globalRegularExpression + ")";
-    
 
     private static final Pattern pattern = Pattern.compile(regularExpression);
-    private static final Pattern globalPattern = 
-                                 Pattern.compile(globalRegularExpression);   
-    
-    public GlobalMapValueValidator() {
-    }
+    private static final Pattern globalPattern = Pattern.compile(globalRegularExpression);
 
     /**
      * Returns <code>true</code> if values are of global map format.
@@ -85,36 +80,41 @@ public class GlobalMapValueValidator implements ServiceAttributeValidator {
      * @param values the set of values to be validated
      * @return <code>true</code> if values are of global map format.
      */
-     public boolean validate(Set values) {
+     public boolean validate(Set<String> values) {
         boolean valid = true;
         boolean globalFound = false; //can only have zero or one global value
 
-        if ((values != null) && !values.isEmpty()) {
-            for (Iterator i = values.iterator(); (i.hasNext() && valid);) {
-                String str = (String)i.next();
-                if (str!=null) {
-                    str = str.trim();
-                    Matcher m = pattern.matcher(str);
-                    valid = m.matches();
+        if (!CollectionUtils.isEmpty(values)) {
 
-                    //now test for duplicate global value
-                    Matcher globalMatcher = globalPattern.matcher(str);
-                    boolean globalMatch = globalMatcher.matches();
+            for (String val : values) {
 
-                     //if value matches global and previously found one too
-                    if (globalFound && globalMatch && valid) {
-                        valid = false; //more than one global value so invalid
-                    } else if (globalMatch && valid) {
-                        globalFound = true; //found first global
-                    }                   
+                if (!valid) {
+                    break;
+                }
+
+                String trimmed = val.trim();
+                Matcher matcher = pattern.matcher(trimmed);
+                valid = matcher.matches();
+
+                //now test for duplicate global value
+                Matcher globalMatcher = globalPattern.matcher(trimmed);
+                boolean globalMatch = globalMatcher.matches();
+
+                //if value matches global and previously found one too
+                if (globalFound && globalMatch && valid) {
+                    valid = false; //more than one global value so invalid
+                } else if (globalMatch && valid) {
+                    globalFound = true; //found first global
                 }
             }
         } else {
-            valid = false; //empty set not valid
+            valid = false;
         }
         
-        if (valid) 
+        if (valid) {
             valid = MapDuplicateKeyChecker.checkForNoDuplicateKeyInValue(values);
+        }
+
         return valid;
     }
 }

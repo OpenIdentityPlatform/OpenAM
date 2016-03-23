@@ -36,9 +36,9 @@ public class EndpointValidator implements ServiceAttributeValidator {
     }
 
     @Override
-    public boolean validate(Set values) {
+    public boolean validate(Set<String> values) {
 
-        for (String value : (Set<String>) values) {
+        for (String value : values) {
 
             Set<String> underTest = Collections.singleton(value);
 
