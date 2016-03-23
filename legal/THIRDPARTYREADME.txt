@@ -371,7 +371,7 @@ Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 Version: woodstox-core-asl-4.4.1.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: wss4j-1.6.18.jar
+Version: wss4j-1.6.19.jar
 Copyright: Copyright 2004-2015 The Apache Software Foundation
 
 Version: joda-time-2.7.jar
