@@ -223,13 +223,13 @@ public final class LDAPUtils {
         Boolean ssl = ldapurl.isSSL();
         int heartBeatTimeout =
                 SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
-
         if (ssl != null && ssl.booleanValue()) {
+            String defaultProtocolVersion = SystemPropertiesManager.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
                 //needs to be established.
                 ldapOptions = Options.copyOf(ldapOptions).set(LDAPConnectionFactory.SSL_CONTEXT,
-                        new SSLContextBuilder().getSSLContext());
+                         new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
             } catch (GeneralSecurityException gse) {
                 DEBUG.error("An error occurred while creating SSLContext", gse);
             }

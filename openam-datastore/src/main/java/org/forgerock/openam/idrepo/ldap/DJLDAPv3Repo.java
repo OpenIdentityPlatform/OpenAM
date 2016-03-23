@@ -225,7 +225,6 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         useStartTLS = LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode);
         isSecure = LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) || useStartTLS;
         protocolVersion = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_SECURE_PROTOCOL_VERSION, "TLSv1");
-
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
 
@@ -2180,7 +2179,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         //order in the configuration.
         LDAPURL[] servers = ldapServers.toArray(new LDAPURL[ldapServers.size()]);
         Arrays.sort(servers);
-        String psIdKey = Arrays.toString(servers) + secureProtocolVersion + psearchBase + pfilter + scope + userSearchAttr;
+        String psIdKey = Arrays.toString(servers) + secureProtocolVersion + psearchBase + pfilter + scope +
+                userSearchAttr;
         return psIdKey;
     }
 
