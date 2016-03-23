@@ -47,8 +47,8 @@ Version: commons-codec-1.6.jar
 Copyright: Copyright 2002-2013 The Apache Software Foundation,
            Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org)
 
-Version: commons-collections-3.2.1.jar
-Copyright: Copyright 2001-2008 The Apache Software Foundation
+Version: commons-collections-3.2.2.jar
+Copyright: Copyright 2001-2015 The Apache Software Foundation
 
 Version: commons-fileupload-1.2.2.jar
 Copyright: Copyright 2002-2013 The Apache Software Foundation
