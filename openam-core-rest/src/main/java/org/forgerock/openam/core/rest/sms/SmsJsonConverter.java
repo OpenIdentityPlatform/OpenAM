@@ -413,7 +413,7 @@ public class SmsJsonConverter {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resource);
             NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate("//consoleconfig/servicesconfig/consoleservice/@realmEnableHideAttrName", doc, XPathConstants.NODESET);
             String rawList = nodes.item(0).getNodeValue();
-            hiddenAttributeNames = new ArrayList<String>(Arrays.asList(rawList.split(" ")));
+            hiddenAttributeNames = new ArrayList<>(Arrays.asList(rawList.split(",")));
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
