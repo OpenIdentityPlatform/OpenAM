@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
 
             this.toggleView = new ToggleCardListView({
                 el: "#toggleCardList",
-                activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
+                activeView: this.toggleView ? this.toggleView.getActiveView() : ToggleCardListView.DEFAULT_VIEW,
                 button: {
                     href: "#deployment/sites/new",
                     icon: "fa-plus",

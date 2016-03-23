@@ -52,6 +52,8 @@ define("org/forgerock/openam/ui/admin/views/common/ToggleCardListView", [
                 }
             );
         }
+    }, {
+        DEFAULT_VIEW: 0
     });
 
 });

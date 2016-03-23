@@ -149,7 +149,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
 
                     this.toggleView = new ToggleCardListView({
                         el: "#toggleCardList",
-                        activeView: this.toggleView ? this.toggleView.getActiveView() : 0,
+                        activeView: this.toggleView ? this.toggleView.getActiveView() : ToggleCardListView.DEFAULT_VIEW,
                         button: {
                             btnClass: "btn-primary",
                             href: "#realms/new",
