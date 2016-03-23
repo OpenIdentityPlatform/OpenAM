@@ -91,7 +91,7 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public boolean isRequireNewDelegate(PushNotificationServiceConfig newConfig) {
-        return false; //this impl. will never require resetting the endpoint
+        return !newConfig.equals(config);
     }
 
     @Override
