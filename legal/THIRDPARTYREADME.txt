@@ -174,14 +174,14 @@ Copyright: Copyright 2003-2010 The Apache Software Foundation
 Version: google-http-client-1.19.0.jar
 Copyright: Copyright (c) 2011 Google Inc.
 
-Version: groovy-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-json-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-json-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-jsr223-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-jsr223-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
 Version: guice-3.0-no_aop.jar
 Copyright: Copyright 2009 Google Inc
