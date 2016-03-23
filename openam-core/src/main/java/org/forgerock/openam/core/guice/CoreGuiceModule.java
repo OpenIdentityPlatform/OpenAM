@@ -17,6 +17,21 @@
 
 package org.forgerock.openam.core.guice;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +51,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SecureRandomManager;
+import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
@@ -46,6 +62,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -69,26 +86,17 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.ConfigAuditorFactory;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BloomFilterBlacklist;
+import org.forgerock.openam.blacklist.CTSBlacklist;
+import org.forgerock.openam.blacklist.CachingBlacklist;
+import org.forgerock.openam.blacklist.NoOpBlacklist;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -115,11 +123,7 @@ import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.SessionURL;
-import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
-import org.forgerock.openam.session.blacklist.CTSSessionBlacklist;
-import org.forgerock.openam.session.blacklist.CachingSessionBlacklist;
-import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
+import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
@@ -131,6 +135,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction.SuperUserDelegate;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
@@ -550,24 +555,34 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
     @Provides @Singleton @Inject
-    public static SessionBlacklist getSessionBlacklist(final CTSSessionBlacklist ctsBlacklist,
-                                                       final SessionServiceConfig serviceConfig) {
+    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts,
+            @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduler,
+            ThreadMonitor threadMonitor, WebtopNamingQuery serverConfig, SessionServiceConfig serviceConfig) {
+        long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
+        long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
+        return new CTSBlacklist<>(cts, TokenType.SESSION_BLACKLIST, scheduler, threadMonitor, serverConfig,
+                purgeDelayMs, pollIntervalMs);
+    }
+
+    @Provides @Singleton @Inject
+    public static Blacklist<Session> getSessionBlacklist(final CTSBlacklist<Session> ctsBlacklist,
+            final SessionServiceConfig serviceConfig) {
 
         if (!serviceConfig.isSessionBlacklistingEnabled()) {
-            return NoOpSessionBlacklist.INSTANCE;
+            return new NoOpBlacklist<>();
         }
 
         final long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         final int cacheSize = serviceConfig.getSessionBlacklistCacheSize();
         final long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
 
-        SessionBlacklist blacklist = ctsBlacklist;
+        Blacklist<Session> blacklist = ctsBlacklist;
         if (cacheSize > 0) {
-            blacklist = new CachingSessionBlacklist(blacklist, cacheSize, purgeDelayMs);
+            blacklist = new CachingBlacklist<>(blacklist, cacheSize, purgeDelayMs);
         }
 
         if (pollIntervalMs > 0) {
-            blacklist = new BloomFilterSessionBlacklist(blacklist, serviceConfig);
+            blacklist = new BloomFilterBlacklist<>(blacklist, purgeDelayMs);
         }
 
         return blacklist;

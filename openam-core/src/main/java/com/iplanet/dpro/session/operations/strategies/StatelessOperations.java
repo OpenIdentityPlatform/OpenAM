@@ -29,7 +29,8 @@ import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 
@@ -44,7 +45,7 @@ public class StatelessOperations implements SessionOperations {
     private final SessionOperations localOperations;
     private final SessionService sessionService;
     private final StatelessSessionFactory statelessSessionFactory;
-    private final SessionBlacklist sessionBlacklist;
+    private final Blacklist<Session> sessionBlacklist;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
 
@@ -52,7 +53,7 @@ public class StatelessOperations implements SessionOperations {
     public StatelessOperations(final LocalOperations localOperations,
                                final SessionService sessionService,
                                final StatelessSessionFactory statelessSessionFactory,
-                               final SessionBlacklist sessionBlacklist,
+                               final Blacklist<Session> sessionBlacklist,
                                final SessionLogging sessionLogging,
                                final SessionAuditor sessionAuditor) {
         this.localOperations = localOperations;
@@ -83,7 +84,11 @@ public class StatelessOperations implements SessionOperations {
                 sessionAuditor.auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT);
             }
         }
-        sessionBlacklist.blacklist(session);
+        try {
+            sessionBlacklist.blacklist(session);
+        } catch (BlacklistException e) {
+            throw new SessionException(e);
+        }
     }
 
     @Override
@@ -98,7 +103,11 @@ public class StatelessOperations implements SessionOperations {
             }
         }
 
-        sessionBlacklist.blacklist(session);
+        try {
+            sessionBlacklist.blacklist(session);
+        } catch (BlacklistException e) {
+            throw new SessionException(e);
+        }
     }
 
     @Override

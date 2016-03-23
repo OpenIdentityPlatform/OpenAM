@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.blacklist;
+package org.forgerock.openam.blacklist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -23,7 +23,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
 import org.forgerock.bloomfilter.BloomFilter;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -31,46 +30,39 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.TimeUnit;
-
-public class BloomFilterSessionBlacklistTest {
-    private static final long PURGE_DELAY = 1000l;
+public class BloomFilterBlacklistTest {
+    private static final long PURGE_DELAY = 1000L;
 
     @Mock
-    private SessionBlacklist mockDelegate;
+    private Blacklist<Blacklistable> mockDelegate;
 
     @Mock
-    private BloomFilter<BloomFilterSessionBlacklist.SessionBlacklistEntry> mockBloomFilter;
-
-    @Mock
-    private SessionServiceConfig mockServiceConfig;
+    private BloomFilter<BloomFilterBlacklist.BlacklistEntry> mockBloomFilter;
 
     @Mock
     private Session mockSession;
 
-    private BloomFilterSessionBlacklist testBlacklist;
+    private BloomFilterBlacklist<Blacklistable> testBlacklist;
 
     @BeforeMethod
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        testBlacklist = new BloomFilterSessionBlacklist(mockDelegate, mockServiceConfig, mockBloomFilter);
-
-        given(mockServiceConfig.getSessionBlacklistPurgeDelay(any(TimeUnit.class))).willReturn(PURGE_DELAY);
+        testBlacklist = new BloomFilterBlacklist<>(mockDelegate, PURGE_DELAY, mockBloomFilter);
     }
 
     @Test
     public void shouldSubscribeForUpdatesFromOtherServers() {
-        verify(mockDelegate).subscribe(any(SessionBlacklist.Listener.class));
+        verify(mockDelegate).subscribe(any(Blacklist.Listener.class));
     }
 
     @Test
     public void shouldAddNotifiedBlacklistedSessionsToTheBloomFilter() {
         // Given
-        ArgumentCaptor<SessionBlacklist.Listener> listenerArgumentCaptor
-                = ArgumentCaptor.forClass(SessionBlacklist.Listener.class);
+        ArgumentCaptor<Blacklist.Listener> listenerArgumentCaptor
+                = ArgumentCaptor.forClass(Blacklist.Listener.class);
         willDoNothing().given(mockDelegate).subscribe(listenerArgumentCaptor.capture());
-        testBlacklist = new BloomFilterSessionBlacklist(mockDelegate, mockServiceConfig, mockBloomFilter);
-        SessionBlacklist.Listener listener = listenerArgumentCaptor.getValue();
+        testBlacklist = new BloomFilterBlacklist<>(mockDelegate, PURGE_DELAY, mockBloomFilter);
+        Blacklist.Listener listener = listenerArgumentCaptor.getValue();
         String id = "testSession";
         long expiryTime = 1234l;
 
@@ -78,7 +70,7 @@ public class BloomFilterSessionBlacklistTest {
         listener.onBlacklisted(id, expiryTime);
 
         // Then
-        verify(mockBloomFilter).add(new BloomFilterSessionBlacklist.SessionBlacklistEntry(id, expiryTime));
+        verify(mockBloomFilter).add(new BloomFilterBlacklist.BlacklistEntry(id, expiryTime));
     }
 
     @Test
@@ -93,8 +85,8 @@ public class BloomFilterSessionBlacklistTest {
         String id = "testSession";
         long expiryTime = 1234l;
         given(mockSession.getStableStorageID()).willReturn(id);
-        given(mockSession.getBlacklistExpiryTime(PURGE_DELAY)).willReturn(expiryTime);
-        given(mockBloomFilter.mightContain(new BloomFilterSessionBlacklist.SessionBlacklistEntry(id, expiryTime)))
+        given(mockSession.getBlacklistExpiryTime()).willReturn(expiryTime);
+        given(mockBloomFilter.mightContain(new BloomFilterBlacklist.BlacklistEntry(id, expiryTime)))
                 .willReturn(false);
 
         // When
@@ -109,10 +101,10 @@ public class BloomFilterSessionBlacklistTest {
     public void shouldCheckDelegateIfSessionIsInBloomFilter() throws Exception {
         // Given
         String id = "testSession";
-        long expiryTime = 1234l;
+        long expiryTime = 1234L;
         given(mockSession.getStableStorageID()).willReturn(id);
-        given(mockSession.getBlacklistExpiryTime(PURGE_DELAY)).willReturn(expiryTime);
-        given(mockBloomFilter.mightContain(new BloomFilterSessionBlacklist.SessionBlacklistEntry(id, expiryTime)))
+        given(mockSession.getBlacklistExpiryTime()).willReturn(expiryTime);
+        given(mockBloomFilter.mightContain(new BloomFilterBlacklist.BlacklistEntry(id, expiryTime + PURGE_DELAY)))
                 .willReturn(true);
         given(mockDelegate.isBlacklisted(mockSession)).willReturn(true);
 
@@ -127,7 +119,7 @@ public class BloomFilterSessionBlacklistTest {
     @Test
     public void shouldDelegateSubscriptions() {
         // Given
-        SessionBlacklist.Listener listener = mock(SessionBlacklist.Listener.class);
+        Blacklist.Listener listener = mock(Blacklist.Listener.class);
         // When
         testBlacklist.subscribe(listener);
         // Then

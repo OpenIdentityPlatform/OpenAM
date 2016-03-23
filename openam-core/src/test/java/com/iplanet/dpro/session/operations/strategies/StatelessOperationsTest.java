@@ -32,7 +32,7 @@ import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
+import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
@@ -53,7 +53,7 @@ public class StatelessOperationsTest {
     private StatelessSessionFactory mockSessionFactory;
 
     @Mock
-    private SessionBlacklist mockSessionBlacklist;
+    private Blacklist<Session> mockSessionBlacklist;
 
     @Mock
     private StatelessSession mockSession;

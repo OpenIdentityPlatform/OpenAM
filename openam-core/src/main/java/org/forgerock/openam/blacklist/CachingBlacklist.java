@@ -11,67 +11,66 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.blacklist;
+package org.forgerock.openam.blacklist;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
+import java.util.Collections;
+import java.util.Map;
+
 import org.forgerock.openam.utils.collections.LeastRecentlyUsed;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.time.TimeService;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
  * Caches elements on a least-recently used (LRU) basis.
+ *
+ * @param <T> The blacklist type.
  */
-public final class CachingSessionBlacklist implements SessionBlacklist {
+public final class CachingBlacklist<T extends Blacklistable> implements Blacklist<T> {
 
-    private final SessionBlacklist delegate;
+    private final Blacklist<T> delegate;
     private final Map<String, Long> cache;
     private final long purgeDelayMs;
 
     @VisibleForTesting
-    CachingSessionBlacklist(final SessionBlacklist delegate, final int maxSize, final long purgeDelayMs,
-                            final TimeService clock) {
+    CachingBlacklist(Blacklist<T> delegate, int maxSize, long purgeDelayMs, final TimeService clock) {
         Reject.ifNull(delegate);
         Reject.ifFalse(maxSize > 0, "maxSize must be > 0");
         this.delegate = delegate;
         this.purgeDelayMs = purgeDelayMs;
         this.cache = Collections.synchronizedMap(new LeastRecentlyUsed<String, Long>(maxSize) {
             @Override
-            protected boolean removeEldestEntry(final Map.Entry<String, Long> eldestEntry) {
+            protected boolean removeEldestEntry(Map.Entry<String, Long> eldestEntry) {
                 return eldestEntry.getValue() < clock.now() || super.removeEldestEntry(eldestEntry);
             }
         });
     }
 
     /**
-     * Constructs the caching session blacklist with the given delegate blacklist and maximum cache size.
+     * Constructs the caching entry blacklist with the given delegate blacklist and maximum cache size.
      *
      * @param delegate the delegate to defer cache misses to.
      * @param maxSize the maximum size of the LRU cache to maintain.
      * @param purgeDelayMs the additional delay before purging elements from the cache.
      */
-    public CachingSessionBlacklist(final SessionBlacklist delegate, final int maxSize, final long purgeDelayMs) {
+    public CachingBlacklist(Blacklist<T> delegate, int maxSize, long purgeDelayMs) {
         this(delegate, maxSize, purgeDelayMs, TimeService.SYSTEM);
     }
 
     @Override
-    public void blacklist(final Session session) throws SessionException {
-        if (cache.put(session.getStableStorageID(), session.getBlacklistExpiryTime(purgeDelayMs)) == null) {
-            // Only blacklist sessions that are not already in the cache.
-            delegate.blacklist(session);
+    public void blacklist(T entry) throws BlacklistException {
+        if (cache.put(entry.getStableStorageID(), entry.getBlacklistExpiryTime() + purgeDelayMs) == null) {
+            // Only blacklist entries that are not already in the cache.
+            delegate.blacklist(entry);
         }
     }
 
     @Override
-    public boolean isBlacklisted(final Session session) throws SessionException {
-        final String key = session.getStableStorageID();
+    public boolean isBlacklisted(T entry) throws BlacklistException {
+        final String key = entry.getStableStorageID();
 
         if (cache.containsKey(key)) {
             // Cache hit
@@ -79,19 +78,17 @@ public final class CachingSessionBlacklist implements SessionBlacklist {
         }
 
         // Cache miss
-        boolean isBlacklisted = delegate.isBlacklisted(session);
+        boolean isBlacklisted = delegate.isBlacklisted(entry);
         if (isBlacklisted) {
             // Only cache entries that have been blacklisted, as we should always re-check otherwise
-            cache.put(key, session.getBlacklistExpiryTime(purgeDelayMs));
+            cache.put(key, entry.getBlacklistExpiryTime() + purgeDelayMs);
         }
         return isBlacklisted;
     }
 
     @Override
-    public void subscribe(final Listener listener) {
+    public void subscribe(Listener listener) {
         // Pass straight through to delegate
         delegate.subscribe(listener);
     }
-
-
 }

@@ -27,12 +27,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import com.iplanet.dpro.session.Session;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.*;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -41,6 +41,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOProvider;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
 
 /**
  * A provider for explicitly stateless SSO tokens. Exists as a service listener to ensure
@@ -51,7 +53,7 @@ import com.sun.identity.shared.debug.Debug;
 public class StatelessSSOProvider implements SSOProvider, ServiceListener {
 
     private final StatelessSessionFactory statelessSessionFactory;
-    private final SessionBlacklist sessionBlacklist;
+    private final Blacklist<Session> sessionBlacklist;
     private final StatelessAdminRestriction restriction;
     private final Debug debug;
     private final ConcurrentHashMap<String, Boolean> statelessEnabledMap = new ConcurrentHashMap<>();
@@ -61,7 +63,7 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
      */
     @Inject
     public StatelessSSOProvider(StatelessSessionFactory statelessSessionFactory,
-                                SessionBlacklist sessionBlacklist,
+                                Blacklist<Session> sessionBlacklist,
                                 StatelessAdminRestriction restriction,
                                 @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
         this.statelessSessionFactory = statelessSessionFactory;
@@ -169,7 +171,7 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
         try {
             return isStatelessEnabled(token.getProperty(com.sun.identity.shared.Constants.ORGANIZATION)) &&
                     statelessSSOToken.isValid(refresh) && !sessionBlacklist.isBlacklisted(session);
-        } catch (SessionException | SMSException | SSOException e) {
+        } catch (BlacklistException | SMSException | SSOException e) {
             debug.error("Unable to check session blacklist: {}", e);
             return false;
         }

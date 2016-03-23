@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.blacklist;
+package org.forgerock.openam.blacklist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -27,7 +27,7 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CachingSessionBlacklistTest {
+public class CachingBlacklistTest {
     private static final String SID = "session1";
     private static final int CACHE_SIZE = 2;
 
@@ -35,17 +35,17 @@ public class CachingSessionBlacklistTest {
     private TimeService mockClock;
 
     @Mock
-    private SessionBlacklist mockDelegate;
+    private Blacklist<Blacklistable> mockDelegate;
 
     @Mock
     private Session mockSession;
 
-    private CachingSessionBlacklist testBlacklist;
+    private CachingBlacklist<Blacklistable> testBlacklist;
 
     @BeforeMethod
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        testBlacklist = new CachingSessionBlacklist(mockDelegate, CACHE_SIZE, 0, mockClock);
+        testBlacklist = new CachingBlacklist<>(mockDelegate, CACHE_SIZE, 0, mockClock);
 
         given(mockSession.getStableStorageID()).willReturn(SID);
     }

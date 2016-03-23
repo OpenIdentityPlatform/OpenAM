@@ -11,39 +11,36 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.blacklist;
+package org.forgerock.openam.blacklist;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * A {@link SessionBlacklist} implementation that ignores all elements. This is used when blacklisting is disabled as
+ * A {@link Blacklist} implementation that ignores all elements. This is used when blacklisting is disabled as
  * a "Null Object Pattern".
  *
+ * @param <T> The blacklist type.
  * @since 13.0.0
  */
-public enum NoOpSessionBlacklist implements SessionBlacklist {
-    INSTANCE;
+public class NoOpBlacklist<T extends Blacklistable> implements Blacklist<T> {
 
-    private static final Debug DEBUG = Debug.getInstance(SessionConstants.SESSION_DEBUG);
+    private static final Debug DEBUG = Debug.getInstance("blacklist");
 
     @Override
-    public void blacklist(final Session session) throws SessionException {
+    public void blacklist(T entry) throws BlacklistException {
         // Ignore
     }
 
     @Override
-    public boolean isBlacklisted(final Session session) throws SessionException {
+    public boolean isBlacklisted(T entry) throws BlacklistException {
         return false;
     }
 
     @Override
-    public void subscribe(final Listener listener) {
-        DEBUG.message("NoOpSessionBlacklist: Ignoring session blacklist listener {} - blacklisting disabled", listener);
+    public void subscribe(Listener listener) {
+        DEBUG.message("NoOpBlacklist: Ignoring entry blacklist listener {} - blacklisting disabled", listener);
     }
 }

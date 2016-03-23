@@ -56,6 +56,9 @@ import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.blacklist.Blacklistable;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
@@ -113,7 +116,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @see com.iplanet.dpro.session.SessionListener
  */
 
-public class Session extends GeneralTaskRunnable {
+public class Session extends GeneralTaskRunnable implements Blacklistable {
 
     /**
      * Defines the type of Session that has been created. Where 0 for User
@@ -604,13 +607,17 @@ public class Session extends GeneralTaskRunnable {
      * The time (in milliseconds from the UTC epoch) until this session can be removed from a session blacklist. This
      * is guaranteed to be some time after the session has expired.
      *
-     * @param purgeDelayMs the additional delay (in milliseconds) before purging the session.
-     * @return the at which the session expires (if it has not already) plus the purge delay.
-     * @throws SessionException if the session has already expired or an error occurs.
+     * @return the at which the session expires (if it has not already) plus a purge delay.
+     * @throws BlacklistException if the session has already expired or an error occurs.
      */
-    public long getBlacklistExpiryTime(long purgeDelayMs) throws SessionException {
-        refreshSessionIfStale();
-        return sessionExpiryTime + purgeDelayMs;
+    @Override
+    public long getBlacklistExpiryTime() throws BlacklistException {
+        try {
+            refreshSessionIfStale();
+            return sessionExpiryTime;
+        } catch (SessionException e) {
+            throw new BlacklistException(e);
+        }
     }
 
     /**
@@ -1338,6 +1345,7 @@ public class Session extends GeneralTaskRunnable {
      *
      * @return a unique stable storage id.
      */
+    @Override
     public String getStableStorageID() {
         return sessionID.getExtension().getStorageKey();
     }

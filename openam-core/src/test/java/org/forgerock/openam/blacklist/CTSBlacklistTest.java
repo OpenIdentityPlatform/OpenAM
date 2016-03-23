@@ -11,22 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.blacklist;
+package org.forgerock.openam.blacklist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.services.naming.WebtopNamingQuery;
+import org.assertj.core.api.ThrowableAssert;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -38,10 +40,10 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.ScheduledExecutorService;
-
-public class CTSSessionBlacklistTest {
+public class CTSBlacklistTest {
     private static final String SID = "session123";
+    private static final long PURGE_DELAY = 1000L;
+    private static final long POLL_INTERVAL = 1000L;
 
     @Mock
     private CTSPersistentStore mockCts;
@@ -56,19 +58,19 @@ public class CTSSessionBlacklistTest {
     private ScheduledExecutorService mockScheduler;
 
     @Mock
-    private SessionServerConfig mockServerConfig;
+    private WebtopNamingQuery mockServerConfig;
 
     @Mock
     private SessionServiceConfig mockServiceConfig;
 
-    private CTSSessionBlacklist testBlacklist;
+    private CTSBlacklist<Blacklistable> testBlacklist;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        given(mockServerConfig.getLocalServerID()).willReturn("testServer1");
-        testBlacklist = new CTSSessionBlacklist(mockCts, mockScheduler, mockThreadMonitor, mockServerConfig,
-                mockServiceConfig);
+        given(mockServerConfig.getAMServerID()).willReturn("testServer1");
+        testBlacklist = new CTSBlacklist<>(mockCts, TokenType.SESSION_BLACKLIST, mockScheduler, mockThreadMonitor,
+                mockServerConfig, PURGE_DELAY, POLL_INTERVAL);
 
         given(mockSession.getStableStorageID()).willReturn(SID);
     }
@@ -97,21 +99,26 @@ public class CTSSessionBlacklistTest {
         assertThat(result).isFalse();
     }
 
-    @Test(expectedExceptions = SessionException.class)
+    @Test
     public void shouldConvertCtsReadExceptions() throws Exception {
         // Given
         given(mockCts.read(SID)).willThrow(new CoreTokenException("test"));
 
-        // When
-        testBlacklist.isBlacklisted(mockSession);
-
-        // Then - exception
+        // When/Then
+        assertThatThrownBy(
+                new ThrowableAssert.ThrowingCallable() {
+                    @Override
+                    public void call() throws Throwable {
+                        testBlacklist.isBlacklisted(mockSession);
+                    }
+                })
+                .isInstanceOf(BlacklistException.class);
     }
 
     @Test
     public void shouldStoreBlacklistedSessionsInCts() throws Exception {
         // Given
-        given(mockSession.getBlacklistExpiryTime(anyLong())).willReturn(1234l);
+        given(mockSession.getBlacklistExpiryTime()).willReturn(1234L);
 
         // When
         testBlacklist.blacklist(mockSession);
@@ -121,29 +128,39 @@ public class CTSSessionBlacklistTest {
         verify(mockCts).create(storedToken.capture());
         assertThat(storedToken.getValue().getTokenId()).isEqualTo(SID);
         assertThat(storedToken.getValue().getType()).isEqualTo(TokenType.SESSION_BLACKLIST);
-        assertThat(storedToken.getValue().getExpiryTimestamp().getTimeInMillis()).isEqualTo(1234l);
+        assertThat(storedToken.getValue().getExpiryTimestamp().getTimeInMillis()).isEqualTo(1234L + PURGE_DELAY);
     }
 
-    @Test(expectedExceptions = SessionException.class)
+    @Test
     public void shouldPropagateSessionExceptions() throws Exception {
         // Given
-        given(mockSession.getBlacklistExpiryTime(anyLong())).willThrow(new SessionException("test"));
+        given(mockSession.getBlacklistExpiryTime()).willThrow(new BlacklistException("test"));
 
-        // When
-        testBlacklist.blacklist(mockSession);
-
-        // Then - exception
+        // When/Then
+        assertThatThrownBy(
+                new ThrowableAssert.ThrowingCallable() {
+                    @Override
+                    public void call() throws Throwable {
+                        testBlacklist.blacklist(mockSession);
+                    }
+                })
+                .isInstanceOf(BlacklistException.class);
     }
 
-    @Test(expectedExceptions = SessionException.class)
+    @Test
     public void shouldConvertCtsExceptions() throws Exception {
         // Given
-        given(mockSession.getTimeLeft()).willReturn(3l);
+        given(mockSession.getTimeLeft()).willReturn(3L);
         willThrow(new CoreTokenException("test")).given(mockCts).create(any(Token.class));
 
-        // When
-        testBlacklist.blacklist(mockSession);
-
-        // Then - exception
+        // When/Then
+        assertThatThrownBy(
+                new ThrowableAssert.ThrowingCallable() {
+                    @Override
+                    public void call() throws Throwable {
+                        testBlacklist.blacklist(mockSession);
+                    }
+                })
+                .isInstanceOf(BlacklistException.class);
     }
 }
