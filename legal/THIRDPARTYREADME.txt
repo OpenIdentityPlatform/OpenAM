@@ -68,43 +68,43 @@ Copyright: Copyright 2001-2007 The Apache Software Foundation
 Version: commons-logging-api-1.1.jar
 Copyright: Copyright 2001-2007 The Apache Software Foundation
 
-Version: cxf-api-2.7.17.jar
+Version: cxf-api-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-soap-2.7.17.jar
+Version: cxf-rt-bindings-soap-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-xml-2.7.17.jar
+Version: cxf-rt-bindings-xml-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-core-2.7.17.jar
+Version: cxf-rt-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-databinding-jaxb-2.7.17.jar
+Version: cxf-rt-databinding-jaxb-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-jaxws-2.7.17.jar
+Version: cxf-rt-frontend-jaxws-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-simple-2.7.17.jar
+Version: cxf-rt-frontend-simple-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-2.7.17.jar
+Version: cxf-rt-transports-http-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-jetty-2.7.17.jar
+Version: cxf-rt-transports-http-jetty-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-addr-2.7.17.jar
+Version: cxf-rt-ws-addr-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-policy-2.7.17.jar
+Version: cxf-rt-ws-policy-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-security-2.7.17.jar
+Version: cxf-rt-ws-security-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-services-sts-core-2.7.17.jar
+Version: cxf-services-sts-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
 Version: ehcache-core-2.5.1.jar

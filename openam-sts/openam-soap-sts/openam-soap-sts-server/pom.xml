@@ -45,7 +45,7 @@
     </build>
 
     <properties>
-        <cxf.version>2.7.17</cxf.version>
+        <cxf.version>2.7.18</cxf.version>
     </properties>
 
     <dependencies>
