@@ -34,6 +34,7 @@ package com.sun.identity.authentication.spi;
 
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
 import static org.forgerock.openam.utils.StringUtils.*;
+import static com.sun.identity.authentication.util.ISAuthConstants.*;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
@@ -73,7 +74,9 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.ldap.LDAPUtils;
 
 import javax.security.auth.Subject;
@@ -464,6 +467,11 @@ public abstract class AMLoginModule implements LoginModule {
                 rc.getStatusParameter(),
                 rc.getRedirectBackUrlCookieName());
                 extCallbacks.add(copy[i]);
+            } else if (original[i] instanceof PollingWaitCallback) {
+                PollingWaitCallback pollingWaitCallback = (PollingWaitCallback) original[i];
+                copy[i] = PollingWaitCallback.makeCallback().asCopyOf(pollingWaitCallback).build();
+                extCallbacks.add(copy[i]);
+
             } else {
                 debug.error("unknown callback " + original[i]);
             }
@@ -727,13 +735,12 @@ public abstract class AMLoginModule implements LoginModule {
 
         // in internal, first Callback is always PagePropertiesCallback
         if ((infoText != null) && (infoText.length() != 0)) {
-            PagePropertiesCallback pc =
+            PagePropertiesCallback pagePropertiesCallback =
             (PagePropertiesCallback)((Callback[]) internal.get(state - 1))[0];
 
-            // substitute string
-            List<String> infoTexts = pc.getInfoText();
+            List<String> infoTexts = pagePropertiesCallback.getInfoText();
             infoTexts.set(callback, infoText);
-            pc.setInfoText(infoTexts);
+            pagePropertiesCallback.setInfoText(infoTexts);
         }     
     }
     
@@ -1096,15 +1103,10 @@ public abstract class AMLoginModule implements LoginModule {
     public final boolean login() throws AuthLoginException {
         if (moduleHasDone()) {
             debug.message("This module has already done.");
-            if (currentState == ISAuthConstants.LOGIN_SUCCEED) {
-                return true;
-            } else {
-                return false;
-            }
+            return ISAuthConstants.LOGIN_SUCCEED == currentState;
         } else {
             if (debug.messageEnabled()) {
-                debug.message("This module is not done yet. CurrentState: "
-                + currentState);
+                debug.message("This module is not done yet. CurrentState: {}", currentState);
             }
         }
         
@@ -1118,24 +1120,23 @@ public abstract class AMLoginModule implements LoginModule {
         if (noCallbacks) {
             currentState =  wrapProcess(EMPTY_CALLBACK, 1);
             // check login status
-            if (currentState == ISAuthConstants.LOGIN_SUCCEED) {
-                setSuccessModuleName(moduleName);
-                succeeded = true;
-                nullifyUsedVars();
-                return true;
-            } else if (currentState == ISAuthConstants.LOGIN_IGNORE) {
-                // index = 0;
-                setFailureModuleName(moduleName);
-                succeeded = false;
-                destroyModuleState();
-                principal = null;
-                return false;
-            } else {
-                setFailureModuleName(moduleName);
-                succeeded = false;
-                cleanup();
-                throw new AuthLoginException(bundleName, "invalidCode",
-                new Object[]{new Integer(currentState)});
+            switch (currentState) {
+                case LOGIN_SUCCEED:
+                    setSuccessModuleName(moduleName);
+                    succeeded = true;
+                    nullifyUsedVars();
+                    return true;
+                case LOGIN_IGNORE:
+                    setFailureModuleName(moduleName);
+                    succeeded = false;
+                    destroyModuleState();
+                    principal = null;
+                    return false;
+                default:
+                    setFailureModuleName(moduleName);
+                    succeeded = false;
+                    cleanup();
+                    throw new AuthLoginException(bundleName, "invalidCode", new Object[]{new Integer(currentState)});
             }
         }
         
@@ -2823,7 +2824,7 @@ public abstract class AMLoginModule implements LoginModule {
         if (indexType != null) {
             entryDetail.addInfo(AUTH_INDEX, indexType.toString());
         }
-        entryDetail.addInfo(AUTH_LEVEL, String.valueOf(getAuthLevel()));
+        entryDetail.addInfo(AuditConstants.EntriesInfoFieldKey.AUTH_LEVEL, String.valueOf(getAuthLevel()));
         entryDetail.addInfo(MODULE_CLASS, moduleClass);
 
         return entryDetail;

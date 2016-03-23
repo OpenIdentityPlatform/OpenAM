@@ -296,7 +296,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             _.each(reqs.callbacks, function (element) {
 
                 var redirectForm,
-                    redirectCallback;
+                    redirectCallback,
+                    waitTime;
 
                 if (element.type === "RedirectCallback") {
 
@@ -317,9 +318,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     } else {
                         window.location.replace(redirectCallback.redirectUrl);
                     }
-                }
+                } else if (element.type === "ConfirmationCallback") {
+                    implicitConfirmation = false;
+                } else if (element.type === "PollingWaitCallback") {
+                    waitTime = _.find(element.output, { object: { name: "waitTime" } }).object.value;
 
-                if (element.type === "ConfirmationCallback") {
+                    window.setTimeout(function () {
+                        EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {});
+                    }, waitTime);
                     implicitConfirmation = false;
                 }
 
@@ -500,6 +506,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 break;
             case "HiddenValueCallback": result += renderPartial("HiddenValue"); break;
             case "RedirectCallback": result += renderPartial("Redirect"); break;
+            case "PollingWaitCallback": result += renderPartial("PollingWait"); break;
             default: result += renderPartial("Default"); break;
         }
 

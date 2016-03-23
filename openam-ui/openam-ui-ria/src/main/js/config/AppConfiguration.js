@@ -88,7 +88,8 @@ define("config/AppConfiguration", [
                     "partials/login/_SelfService.html",
                     "partials/login/_SocialAuthn.html",
                     "partials/login/_TextInput.html",
-                    "partials/login/_TextOutput.html"
+                    "partials/login/_TextOutput.html",
+                    "partials/login/_PollingWait.html"
                 ]
             }
         }, {

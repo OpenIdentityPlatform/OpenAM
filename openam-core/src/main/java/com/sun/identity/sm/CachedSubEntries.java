@@ -190,7 +190,7 @@ public class CachedSubEntries {
 
     protected void update() {
         if (debug.messageEnabled()) {
-            debug.message("CachedSubEntries::update called for dn: " 
+            debug.message("CachedSubEntries::update called for dn: "
                 + cachedEntry.getDN());
         }
         // Clear the cache, will be updated in the next lookup

@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-16 ForgeRock AS
 -->
 
 
@@ -49,7 +49,7 @@
 <!ATTLIST       ModuleProperties
         version               NMTOKEN         "1.0"
         moduleName            CDATA           #REQUIRED
->
+        >
 
 <!-- Callbacks element is used to request module requirements based on
     module properties. The authentication module constructs the
@@ -63,10 +63,10 @@
     attributes for the UI customization. Attribute "error" defines the 'error
     state' i.e. whether authentication framework/module needs to terminate the
     authentication process (in case it is 'true'). -->
-<!ELEMENT       Callbacks       ( NameCallback | PasswordCallback |
-                                ChoiceCallback | ConfirmationCallback |
-				                HttpCallback | RedirectCallback |
-                                TextOutputCallback )* >
+<!ELEMENT       Callbacks       ( NameCallback | HiddenValueCallback | PasswordCallback |
+        ChoiceCallback | ConfirmationCallback |
+        HttpCallback | RedirectCallback |
+        TextOutputCallback | PollingWaitCallback)* >
 <!ATTLIST       Callbacks
         length          NMTOKEN                 #REQUIRED
         order           NMTOKEN                 #REQUIRED
@@ -75,7 +75,7 @@
         image           CDATA                   ""
         header          CDATA                   "Authentication"
         error           ( true | false )        "false"
->
+        >
 
 <!-- NameCallback element is used to obtain user name or any data which
     can be entered by the user. The element Prompt will be used by the module
@@ -88,7 +88,19 @@
         isRequired      ( true | false )        "false"
         attribute       CDATA                   ""
         infoText        CDATA                   ""
->
+        >
+
+<!-- HiddenValueCallback element is used to hold any data required in a hidden
+    element. The Id will be the id of the element as it is produced on the page.
+    The attribute "isRequired" tells authentication UI whether the element
+    corresponding to this callback is a required field or not and attribute
+    "attribute" is the corresponding LDAP attribute for this callback value. -->
+<!ELEMENT       HiddenValueCallback    ( Id ) >
+<!ATTLIST       HiddenValueCallback
+        isRequired      ( true | false )        "false"
+        attribute       CDATA                   ""
+        infoText        CDATA                   ""
+        >
 
 <!-- PasswordCallback element is used to obtain the password from
     the user. The module sets the Prompt element along with the attribute
@@ -102,7 +114,7 @@
         isRequired      ( true | false )        "false"
         attribute       CDATA                   ""
         infoText        CDATA                   ""
->
+        >
 
 <!-- ChoiceCallback element is used by the authentication module
     to request the user to choose from the choice values where
@@ -118,7 +130,7 @@
         isRequired                   ( true | false )      "false"
         attribute                    CDATA                 ""
         infoText        CDATA                   ""
->
+        >
 
 <!-- ConfirmationCallback element is used by the module to
     send 'button' information (for multiple buttons) such as the 'button text'
@@ -138,11 +150,11 @@
 <!-- RedirectCallback element is used by the authentication module when
      redirect to a particulat URL is required with specific redirect data. -->
 <!ELEMENT	RedirectCallback	( RedirectUrl | RedirectData* |
-                                          RedirectStatusParam |
-                                          RedirectBackUrlCookie ) >
+        RedirectStatusParam |
+        RedirectBackUrlCookie ) >
 <!ATTLIST       RedirectCallback
         method      ( get | post )        "get"
->
+        >
 
 <!-- RedirectUrl element is used in RedirectCallback. -->
 <!ELEMENT	RedirectUrl	( #PCDATA ) >
@@ -165,6 +177,10 @@
     client to display the prompt. -->
 <!ELEMENT       Prompt          ( #PCDATA ) >
 
+<!-- Prompt element will be used by the module to request the
+client to display the prompt. -->
+<!ELEMENT       Id          ( #PCDATA ) >
+
 <!-- ChoiceValues element provides a list of choice values. -->
 <!ELEMENT       ChoiceValues    ( ChoiceValue+ ) >
 
@@ -174,7 +190,7 @@
 <!ELEMENT       ChoiceValue     ( Value ) >
 <!ATTLIST       ChoiceValue
         isDefault       ( true | false )      "false"
->
+        >
 
 <!--OptionValues element provides a list/array of 'button' text information
     to be rendered on the UI page. -->
@@ -202,4 +218,8 @@
      set -->
 <!ELEMENT        TextOutputCallback         ( #PCDATA ) >
 <!ATTLIST        TextOutputCallback
-        messageType    ( error | information | warning )     "information" >
+        messageType    ( error | information | warning | script )     "information" >
+
+<!ELEMENT   PollingWaitCallback   (   #PCDATA ) >
+<!ATTLIST   PollingWaitCallback
+        waitTime         CDATA                   "60">

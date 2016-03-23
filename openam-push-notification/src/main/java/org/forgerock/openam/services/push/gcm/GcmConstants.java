@@ -35,6 +35,8 @@ final class GcmConstants {
     public static final String TO = "to";
     /** Key to the content of the message. */
     public static final String DATA = "data";
+    /** Key to the priority of the message. */
+    public static final String PRIORITY = "priority";
 
     /**
      * HTTP.
@@ -48,6 +50,8 @@ final class GcmConstants {
     public static final String HTTP_CONTENT_TYPE_HEADER = "Content-Type";
     /** Content of the messages. */
     public static final String HTTP_CONTENT_TYPE = "application/json";
+    /** The priority to use for the message. */
+    public static final String HIGH_PRIORITY = "high";
     /** Prefix to auth header value. */
     public static final String HTTP_AUTH_KEY = "key=";
 }

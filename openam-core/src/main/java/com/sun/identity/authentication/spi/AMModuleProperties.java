@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-14 ForgeRock AS
+ * Portions Copyrighted 2011-16 ForgeRock AS
  */
 
 package com.sun.identity.authentication.spi;
@@ -54,6 +54,9 @@ import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
+
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -122,36 +125,34 @@ class AMModuleProperties {
      * @return <code>List</code> of module property
      * @exception AuthLoginException if fails to get properties from the file.
      */
-    public static List getModuleProperties(String fileName)
-            throws AuthLoginException {
-        List list = (List) moduleProps.get(fileName);
-        List pageAttr;
-        if (list != null) {
-           return list;
+    public static List getModuleProperties(String fileName) throws AuthLoginException {
+        List propertiesList = (List) moduleProps.get(fileName);
+
+        if (propertiesList != null) {
+           return propertiesList;
         }
 
-        ServletContext servletContext = 
-                        AuthD.getAuth().getServletContext();
+        ServletContext servletContext = AuthD.getAuth().getServletContext();
         InputStream resStream = null;
         try {
             if (servletContext != null) {
                 resStream = servletContext.getResourceAsStream(fileName);
-            };
+            }
+
             if (resStream == null) {
-                resStream = Thread.currentThread().getContextClassLoader()
-		  .getResourceAsStream(fileName.substring(1));
                 // remove leading '/' from fileName
+                resStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName.substring(1));
             } 
             // file might be empty for modules like Cert,Anonymous etc.
-            if (resStream !=null && resStream.read() == -1) {
+            if (resStream != null && resStream.read() == -1) {
                 if (debug.messageEnabled()) {
                     debug.message(fileName + " is empty");
                 }
-                list = new ArrayList();
+                propertiesList = new ArrayList();
                 synchronized(moduleProps) {
-                    moduleProps.put(fileName, list);
+                    moduleProps.put(fileName, propertiesList);
                 }
-                return list;
+                return propertiesList;
             }
         } catch (Exception e) {
             debug.message("getModuleProperties: Error: " ,e);
@@ -165,13 +166,13 @@ class AMModuleProperties {
 
         AMModuleProperties prop = new AMModuleProperties(fileName,
                                             servletContext);
-        list = prop.getCallbacks();
-        if (list != null && !list.isEmpty()) {
+        propertiesList = prop.getCallbacks();
+        if (CollectionUtils.isEmpty(propertiesList)) {
            synchronized(moduleProps) {
-                moduleProps.put(fileName, list);
+                moduleProps.put(fileName, propertiesList);
            }
         }
-        return list;
+        return propertiesList;
     }
     
     //walk the DOM tree and create the callback array
@@ -202,8 +203,7 @@ class AMModuleProperties {
                     String header = getAttribute(node, "header");
                     boolean error = Boolean.valueOf(
                         getAttribute(node, "error")).booleanValue();
-                    int size = Integer.parseInt(getAttribute(node, "length"))
-                        + 1;
+                    int size = Integer.parseInt(getAttribute(node, "length")) + 1;
                     int t=0;
                     if (timeout!=null) {
                         t = Integer.parseInt(timeout);
@@ -442,16 +442,19 @@ class AMModuleProperties {
 
                         p++;
                 } else if (nodeName.equals("LanguageCallback")) {
-                        for (sub=node.getFirstChild(); sub!=null;
-                            sub=sub.getNextSibling()
-                        ) {
-                            if (sub.getNodeName().equals("ChoiceValue")) {
-                                String isdefault = getAttribute(
+                    for (sub = node.getFirstChild(); sub != null; sub = sub.getNextSibling()) {
+                        if (sub.getNodeName().equals("ChoiceValue")) {
+                            String isdefault = getAttribute(
                                     sub, "isDefault");
-                            }
                         }
-                        callbacks[p] = new LanguageCallback();
-                        p++;
+                    }
+                    callbacks[p] = new LanguageCallback();
+                    p++;
+                } else if (PollingWaitCallback.NODE_NAME.equals(nodeName)) {
+                    callbacks[p++] = PollingWaitCallback.makeCallback()
+                            .withWaitTime(getAttribute(node, "waitTime"))
+                            .build();
+
 		} else if (nodeName.equals(AuthXMLTags.HTTP_CALLBACK)) {
 			String header = null;
 			String negotiation = null;
@@ -516,9 +519,7 @@ class AMModuleProperties {
                             debug.message("redirectData : " + redirectData);
                             debug.message("method : " + method);
                         }
-			callbacks[p]= 
-                            new RedirectCallback(redirectUrl,redirectData,
-                                method);			
+			callbacks[p]= new RedirectCallback(redirectUrl, redirectData, method);
 			p++;
 		}
 

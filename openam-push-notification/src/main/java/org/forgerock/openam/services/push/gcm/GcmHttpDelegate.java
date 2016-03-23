@@ -112,6 +112,14 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
     private JsonValue convertToGcm(PushMessage message) {
         JsonValue toSend = json(object(field(TO, message.getRecipient())));
 
+        /*
+         * High priority on this message ensures that the notification is delivered to the handset even
+         * when it is in a dozing state. This allows a timely response to the response, which is critical
+         * for authentication usage.
+         * {@link https://developers.google.com/cloud-messaging/concept-options#setting-the-priority-of-a-message}
+         */
+        toSend.put(PRIORITY, HIGH_PRIORITY);
+
         if (message.getData().size() > 0) {
             toSend.put(DATA, message.getData().getObject());
         }

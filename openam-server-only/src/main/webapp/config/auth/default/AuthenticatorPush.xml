@@ -30,13 +30,24 @@
         </NameCallback>
     </Callbacks>
     <!-- AWAIT_STATE -->
-    <Callbacks length="1" order="3" timeout="120" header="ForgeRock Authenticator (Push)">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>Click Me!</Value>
-                </OptionValue>
-            </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="2" order="3" timeout="9999" header="Authenticator Push">
+        <TextOutputCallback>Please Wait for Response From Device</TextOutputCallback>
+        <PollingWaitCallback waitTime="6000"/>
+        <!-- TODO: VS3 - ADD REGISTER DEVICE OPTION ANBD PROBABLY A CANCEL OPTION -->
+        <!--<ConfirmationCallback>-->
+            <!--<OptionValues>-->
+                <!--<OptionValue>-->
+                    <!--<Value>Register Devcie</Value>-->
+                <!--</OptionValue>-->
+                <!--<OptionValue>-->
+                    <!--<Value>Cancel</Value>-->
+                <!--</OptionValue>-->
+            <!--</OptionValues>-->
+        <!--</ConfirmationCallback>-->
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="Authenticator Push" error="true">
+        <NameCallback>
+            <Prompt>#THE DUMMY WILL NEVER BE SHOWN#</Prompt>
+        </NameCallback>
     </Callbacks>
 </ModuleProperties>

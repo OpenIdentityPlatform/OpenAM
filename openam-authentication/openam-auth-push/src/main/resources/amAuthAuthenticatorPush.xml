@@ -55,6 +55,16 @@
                         <Value />
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-push-mmessage-response-timeout"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a602"
+                                 resourceName="timeoutInMilliSecconds">
+                    <DefaultValues>
+                        <Value>120000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="forgerock-am-auth-push-auth-level"
@@ -75,6 +85,16 @@
                                      resourceName="deviceId">
                         <DefaultValues>
                             <Value />
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-push-mmessage-response-timeout"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a602"
+                                     resourceName="timeoutInMilliSecconds">
+                        <DefaultValues>
+                            <Value>120000</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
