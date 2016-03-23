@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/global/EditConfigurationBacklink", [
+define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationBacklink", [
     "jquery",
     "lodash",
     "backbone",

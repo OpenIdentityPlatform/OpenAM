@@ -14,13 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/global/EditServerDefaultsView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], (AbstractView) => {
+ define("org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView", [
+     "jquery",
+     "org/forgerock/openam/ui/admin/views/configuration/global/createConfigurationListView",
+     "org/forgerock/openam/ui/admin/services/SMSGlobalService"
+ ], ($, createConfigurationListView, SMSGlobalService) => {
 
-    const EditServerDefaultsView = AbstractView.extend({
-        // TODO
-    });
+     const ListGlobalServicesView = createConfigurationListView(
+         $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
+         SMSGlobalService.configuration.services.console.getAll,
+         "templates/admin/views/configuration/global/ListConfigurationTemplate.html"
+     );
 
-    return new EditServerDefaultsView();
-});
+     return new ListGlobalServicesView();
+ });

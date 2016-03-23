@@ -72,12 +72,12 @@ define([
     "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
 
-    "./views/global/createConfigurationListView",
-    "./views/global/createConfigurationBacklink",
-    "./views/global/EditConfigurationView",
-    "./views/global/EditServerDefaultsView",
-    "./views/global/ListAuthenticationView",
-    "./views/global/ListGlobalServicesView",
+    "./views/configuration/createConfigurationListView",
+    "./views/configuration/createConfigurationBacklink",
+    "./views/configuration/EditConfigurationView",
+    "./views/configuration/server/EditServerDefaultsView",
+    "./views/configuration/authentication/ListAuthenticationView",
+    "./views/configuration/global/ListGlobalServicesView",
 
     "./views/common/ToggleCardListView"
 ]);

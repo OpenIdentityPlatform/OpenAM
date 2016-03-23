@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/NewSiteView", [
+define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
     "jquery",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/NewSiteView", [
 ], ($, Messages, AbstractView, Router, SitesService, JSONSchemaView) => {
 
     const NewSiteView = AbstractView.extend({
-        template: "templates/admin/views/deployment/NewSiteTemplate.html",
+        template: "templates/admin/views/deployment/sites/NewSiteTemplate.html",
         events: {
             "click [data-create]": "onCreate",
             "keyup  [data-site-name]": "onValidateProps"

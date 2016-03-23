@@ -14,17 +14,20 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/global/ListAuthenticationView", [
-     "jquery",
-     "org/forgerock/openam/ui/admin/views/global/createConfigurationListView",
-     "org/forgerock/openam/ui/admin/services/SMSGlobalService"
- ], ($, createConfigurationListView, SMSGlobalService) => {
+ /**
+  * @module org/forgerock/openam/ui/admin/views/deployment/deleteInstance
+  */
+ define("org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance", [
+     "org/forgerock/commons/ui/common/components/Messages",
+     "org/forgerock/openam/ui/admin/services/SitesService"
+ ], (Messages, SitesService) => {
 
-     const ListAuthenticationView = createConfigurationListView(
-         $.t("config.AppConfiguration.Navigation.links.configure.authentication"),
-         SMSGlobalService.authentication.getAll,
-         "templates/admin/views/global/authentication/ListAuthenticationConfigurationTemplate.html"
-     );
-
-     return new ListAuthenticationView();
+     return (id, etag, callback) => {
+         SitesService.sites.remove(id, etag).then(() => {
+             callback();
+         }, (response) => Messages.addMessage({
+             response,
+             type: Messages.TYPE_DANGER
+         }));
+     };
  });

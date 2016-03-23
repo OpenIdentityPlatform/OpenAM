@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/EditSiteView", [
+define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/EditSiteView", [
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/views/deployment/deleteInstance",
+    "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance",
 
     // jquery dependencies
     "bootstrap-tabdrop"
@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/EditSiteView", [
     }
 
     const EditSitesView = AbstractView.extend({
-        template: "templates/admin/views/deployment/EditSiteTemplate.html",
+        template: "templates/admin/views/deployment/sites/EditSiteTemplate.html",
         partials: [
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],

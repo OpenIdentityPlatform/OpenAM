@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
+define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/admin/views/global/EditConfigurationBacklink",
+    "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationBacklink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
 
 
     var EditConfigurationView = AbstractView.extend({
-        template: "templates/admin/views/global/EditConfigurationTemplate.html",
+        template: "templates/admin/views/configuration/EditConfigurationTemplate.html",
         events: {
             "click [data-save]": "onSave",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"

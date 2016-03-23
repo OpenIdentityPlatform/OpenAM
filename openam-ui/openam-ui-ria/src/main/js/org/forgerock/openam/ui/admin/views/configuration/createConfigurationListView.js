@@ -15,9 +15,9 @@
  */
 
  /**
-  * @module org/forgerock/openam/ui/admin/views/global/createConfigurationListView
+  * @module org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView
   */
- define("org/forgerock/openam/ui/admin/views/global/createConfigurationListView", [
+ define("org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView", [
      "org/forgerock/commons/ui/common/main/AbstractView"
  ], (AbstractView) => {
 

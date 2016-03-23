@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
+define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -23,17 +23,17 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView",
-    "org/forgerock/openam/ui/admin/views/deployment/deleteInstance"
+    "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance"
 ], ($, _, AbstractView, FormHelper, Messages, SitesService, TemplateBasedView, ToggleCardListView, deleteInstance) => {
 
     const ListSitesView = AbstractView.extend({
-        template: "templates/admin/views/deployment/ListSitesTemplate.html",
+        template: "templates/admin/views/deployment/sites/ListSitesTemplate.html",
         events: {
             "click [data-delete-item]" : "onDelete"
         },
         partials: [
             "partials/util/_ButtonLink.html",
-            "templates/admin/views/deployment/_SiteCard.html"
+            "templates/admin/views/deployment/sites/_SiteCard.html"
         ],
 
         onDelete (event) {
@@ -70,12 +70,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/ListSitesView", [
                 new TemplateBasedView({
                     data: tableData,
                     el: toggleView.getElementA(),
-                    template: "templates/admin/views/deployment/SitesCardsTemplate.html"
+                    template: "templates/admin/views/deployment/sites/SitesCardsTemplate.html"
                 }).render();
                 new TemplateBasedView({
                     data: tableData,
                     el: toggleView.getElementB(),
-                    template: "templates/admin/views/deployment/SitesTableTemplate.html"
+                    template: "templates/admin/views/deployment/sites/SitesTableTemplate.html"
                 }).render();
             });
         },
