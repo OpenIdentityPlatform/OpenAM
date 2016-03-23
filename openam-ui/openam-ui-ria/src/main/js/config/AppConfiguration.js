@@ -191,7 +191,7 @@ define("config/AppConfiguration", [
                                 }, {
                                     "url": "#deployment/sites",
                                     "name": "config.AppConfiguration.Navigation.links.deployment.sites",
-                                    "icon": "fa fa-list-alt"
+                                    "icon": "fa fa-bookmark-o"
                                 }],
                                 "visibleToRoles": ["ui-realm-admin"]
                             },

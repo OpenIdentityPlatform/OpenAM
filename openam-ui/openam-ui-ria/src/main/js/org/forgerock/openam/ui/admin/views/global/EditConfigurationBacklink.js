@@ -22,13 +22,6 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationBacklink", [
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], ($, _, Backbone, URIUtils, UIUtils) => {
 
-    const iconMap = {
-        "console-settings": "fa-cogs",
-        "global-settings": "fa-globe",
-        "server-settings": "fa-server",
-        "authentication": "fa-user"
-    };
-
     function getBaseURI (allFragments) {
         return _.take(allFragments, 2).join("/");
     }
@@ -40,12 +33,11 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationBacklink", [
             const pageFragment = allFragments[1];
             const data = {
                 "title": $.t(`config.AppConfiguration.Navigation.links.configure.${pageFragment}`),
-                "icon": iconMap[pageFragment],
                 "hash": `#${getBaseURI(allFragments)}`
             };
 
             UIUtils.fillTemplateWithData(
-                "templates/admin/views/global/BackLink.html",
+                "templates/admin/views/common/BackLink.html",
                 data,
                 (html) => {
                     this.$el.html(html);

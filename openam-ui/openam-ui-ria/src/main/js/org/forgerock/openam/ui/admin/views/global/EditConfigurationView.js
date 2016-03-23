@@ -58,8 +58,7 @@ define("org/forgerock/openam/ui/admin/views/global/EditConfigurationView", [
                             this.data.values
                         );
                     }
-                    const backlink = new EditConfigurationBacklink({ el:"#backlink" });
-                    backlink.render();
+                    new EditConfigurationBacklink({ el:"#backlink" }).render();
                     if (callback) { callback(); }
                 });
             });

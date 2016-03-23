@@ -56,8 +56,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
 
             this.data.realmPath = args[0];
             this.data.realmName = shortenRealmName(this.data.realmPath);
-
-            this.data.crumbs = createRealmsBreadcrumbs();
+            this.data.crumbs = createRealmsBreadcrumbs(this.route.pattern);
 
             this.realmExists(this.data.realmPath).then(function () {
                 TreeNavigation.prototype.render.call(self, args, callback);

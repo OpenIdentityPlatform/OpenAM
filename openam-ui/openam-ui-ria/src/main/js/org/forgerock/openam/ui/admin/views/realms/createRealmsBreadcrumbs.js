@@ -28,24 +28,28 @@ define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
         return _.take(allFragments, 2).join("/");
     }
 
+    function getLastFragmentPattern (pattern) {
+        return _.last(pattern.split("/"));
+    }
+
     function getPathFragments (allFragments) {
         return _.drop(allFragments, 2);
     }
 
     function getTitle (fragment, index) {
-        const title = index === 0 ? $.t("console.common.navigation." + fragment) : fragment;
+        const title = index === 0 ? $.t(`console.common.navigation.${fragment}`) : fragment;
         return decodeURIComponent(title);
     }
 
     function createPath (allFragments, index, base) {
-        return "#" + base + "/" + _.take(allFragments, index + 1).join("/");
+        return `#${base}/${_.take(allFragments, index + 1).join("/")}`;
     }
 
-    function shiftStartPosition (fragmentPaths) {
-        return _.last(fragmentPaths) === "new" ? 1 : 0;
+    function shiftStartPosition (fragmentPaths, lastFragmentPattern) {
+        return lastFragmentPattern === "?" ? 0 : 1;
     }
 
-    return () => {
+    return (pattern) => {
 
         /* Under Realms all routes will follow a repeating pattern of -
          * COLLECTION, ACTION, INSTANCE, COLLECTION, ACTION, INSTANCE etc. Some examples of this might be
@@ -66,30 +70,24 @@ define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
         const FIRST_CRUMB = 0;
         const LAST_CRUMB = fragmentPaths.length - 1;
         const breadcrumbs = [];
+        const lastFragmentPattern = getLastFragmentPattern(pattern);
 
         /* We work this out in reverse because while the beginings of the routes vary, they all end in either an
          * INSTANCE or the NEW-action. So the reversed pattern we look for becomes:
          * INSTANCE, ACTION, COLLECTION, INSTANCE, ACTION, COLLECTION...
          * NEW, COLLECTION, INSTANCE, ACTION, COLLECTION...
          * */
-        let count = shiftStartPosition(fragmentPaths);
+        let count = shiftStartPosition(fragmentPaths, lastFragmentPattern);
         _.forEachRight(fragmentPaths, (crumb, index) => {
             const title = getTitle(crumb, index);
             const path = createPath(fragmentPaths, index, base);
 
             if (index === LAST_CRUMB) {
-                breadcrumbs.unshift({
-                    "title": title
-                });
+                breadcrumbs.unshift({ title });
             } else if (fragmentTypes[count] === "INSTANCE" || index === FIRST_CRUMB) {
-                breadcrumbs.unshift({
-                    "title": title,
-                    "path": path
-                });
+                breadcrumbs.unshift({ title, path });
             } else if (fragmentTypes[count] === "COLLECTION") {
-                breadcrumbs.unshift({
-                    "title": title
-                });
+                breadcrumbs.unshift({ title });
             }
             count = count < fragmentTypes.length - 1 ? count + 1 : 0;
 
