@@ -316,13 +316,14 @@ public class SmsJsonConverter {
                 continue;
             }
 
+            if (shouldBeIgnored(attributeName)) {
+                continue;
+            }
+
             if(shouldNotBeUpdated(attributeName)) {
                 throw new BadRequestException("Invalid attribute, '" + attributeName + "', specified");
             }
 
-            if (shouldBeIgnored(attributeName)) {
-                continue;
-            }
 
             final Object attributeValue = translatedAttributeValuePairs.get(attributeName);
             Set<String> value = new HashSet<>();
@@ -360,8 +361,8 @@ public class SmsJsonConverter {
 
     private boolean shouldBeIgnored(String attributeName) {
         final AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
-        return attributeSchema == null || StringUtils.isBlank(attributeSchema.getI18NKey()) || hiddenAttributeNames.contains
-                (attributeName);
+        return attributeSchema == null || StringUtils.isBlank(attributeSchema.getI18NKey()) || attributeName.equals
+                ("_type");
     }
 
     private boolean shouldNotBeUpdated(String attributeName) {
