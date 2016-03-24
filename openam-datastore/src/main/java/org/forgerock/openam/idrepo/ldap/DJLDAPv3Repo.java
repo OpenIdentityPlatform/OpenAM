@@ -2196,6 +2196,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             } else {
                 value.add(activeValue);
             }
+            attributes.remove(DEFAULT_USER_STATUS_ATTR);
             attributes.put(userStatusAttr, value);
         }
     }
