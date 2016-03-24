@@ -15,16 +15,26 @@
  */
 package org.forgerock.openam.utils;
 
-public class AttributeUtils {
+/**
+ * A utility class to simplify dealing with attributes flagged as static or binary.
+ */
+public final class AttributeUtils {
 
+    /**
+     * Used when defining a static attribute, the attribute should be enclosed by this flag.
+     */
     public static final String STATIC_QUOTE = "\"";
+
+    /**
+     *  Used when defining a binary attribute, this flag should be appended to the attribute.
+     */
     public static final String BINARY_FLAG = ";binary";
 
     private AttributeUtils() {
     }
 
     /**
-     * For the given attributeName, return true if it is flagged as a static attribute
+     * For the given attributeName, return true if it is flagged as a static attribute.
      * @param attributeName The attributeName to check for the static flag
      * @return true if the attributeName is flagged as a static attribute
      */
@@ -46,7 +56,7 @@ public class AttributeUtils {
     }
 
     /**
-     * For the given attributeName, return true if it is flagged as a binary attribute
+     * For the given attributeName, return true if it is flagged as a binary attribute.
      * @param attributeName The attributeName to check for the binary flag
      * @return true if the attributeName is flagged as a binary attribute
      */

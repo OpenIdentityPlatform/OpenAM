@@ -19,11 +19,15 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
 
+/**
+ * Unit test for {@link AttributeUtils}.
+ */
 public class AttributeUtilsTest {
 
-    public static String ATTRIBUTE_NAME = "attributeName";
-    public static String BINARY_ATTRIBUTE_NAME = ATTRIBUTE_NAME + AttributeUtils.BINARY_FLAG;
-    public static String STATIC_ATTRIBUTE_NAME = AttributeUtils.STATIC_QUOTE + ATTRIBUTE_NAME + AttributeUtils.STATIC_QUOTE;
+    public static final String ATTRIBUTE_NAME = "attributeName";
+    public static final String BINARY_ATTRIBUTE_NAME = ATTRIBUTE_NAME + AttributeUtils.BINARY_FLAG;
+    public static final String STATIC_ATTRIBUTE_NAME =
+            AttributeUtils.STATIC_QUOTE + ATTRIBUTE_NAME + AttributeUtils.STATIC_QUOTE;
 
     @Test
     public void testIsBinaryAttribute() throws Exception {
