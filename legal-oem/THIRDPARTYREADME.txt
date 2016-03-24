@@ -47,11 +47,11 @@ Version: commons-codec-1.6.jar
 Copyright: Copyright 2002-2013 The Apache Software Foundation,
            Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org)
 
-Version: commons-collections-3.2.1.jar
-Copyright: Copyright 2001-2008 The Apache Software Foundation
+Version: commons-collections-3.2.2.jar
+Copyright: Copyright 2001-2015 The Apache Software Foundation
 
-Version: commons-fileupload-1.2.2.jar
-Copyright: Copyright 2002-2013 The Apache Software Foundation
+Version: commons-fileupload-1.3.1.jar
+Copyright: Copyright 2002-2014 The Apache Software Foundation
 
 Version: commons-io-2.3.jar
 Copyright: Copyright 2002-2012 The Apache Software Foundation
@@ -68,43 +68,43 @@ Copyright: Copyright 2001-2007 The Apache Software Foundation
 Version: commons-logging-api-1.1.jar
 Copyright: Copyright 2001-2007 The Apache Software Foundation
 
-Version: cxf-api-2.7.17.jar
+Version: cxf-api-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-soap-2.7.17.jar
+Version: cxf-rt-bindings-soap-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-xml-2.7.17.jar
+Version: cxf-rt-bindings-xml-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-core-2.7.17.jar
+Version: cxf-rt-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-databinding-jaxb-2.7.17.jar
+Version: cxf-rt-databinding-jaxb-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-jaxws-2.7.17.jar
+Version: cxf-rt-frontend-jaxws-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-simple-2.7.17.jar
+Version: cxf-rt-frontend-simple-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-2.7.17.jar
+Version: cxf-rt-transports-http-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-jetty-2.7.17.jar
+Version: cxf-rt-transports-http-jetty-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-addr-2.7.17.jar
+Version: cxf-rt-ws-addr-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-policy-2.7.17.jar
+Version: cxf-rt-ws-policy-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-security-2.7.17.jar
+Version: cxf-rt-ws-security-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-services-sts-core-2.7.17.jar
+Version: cxf-services-sts-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
 Version: ehcache-core-2.5.1.jar
@@ -174,14 +174,14 @@ Copyright: Copyright 2003-2010 The Apache Software Foundation
 Version: google-http-client-1.19.0.jar
 Copyright: Copyright (c) 2011 Google Inc.
 
-Version: groovy-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-json-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-json-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-jsr223-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-jsr223-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
 Version: guice-3.0-no_aop.jar
 Copyright: Copyright 2009 Google Inc
@@ -371,8 +371,11 @@ Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 Version: woodstox-core-asl-4.4.1.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: wss4j-1.6.18.jar
+Version: wss4j-1.6.19.jar
 Copyright: Copyright 2004-2015 The Apache Software Foundation
+
+Version: joda-time-2.7.jar
+Copyright 2001-2016 Stephen Colebourne
 
 ==================
 Full license text:
