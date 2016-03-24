@@ -140,6 +140,7 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(SCOPE, scope)
                 .claim(CLAIMS, claims)
                 .claim(REALM, realm)
+                .claim(GRANT_TYPE, grantType)
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
