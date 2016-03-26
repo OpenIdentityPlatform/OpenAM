@@ -98,10 +98,9 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         return this.pick(_.matches({ required: true }));
     };
 
-    JSONSchema.prototype.toSchemaWithDefaultProperties = function (properties) {
+    JSONSchema.prototype.toSchemaWithDefaultProperties = function (emptyKeys) {
         const schema = _.cloneDeep(this.raw);
-        schema.defaultProperties = properties;
-
+        schema.defaultProperties = _(schema.properties).pick(emptyKeys).keys().value();
         return new JSONSchema(schema);
     };
 

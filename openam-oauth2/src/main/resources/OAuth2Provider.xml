@@ -90,6 +90,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a103b">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-scope-implementation-class"
@@ -149,6 +150,7 @@
                                  syntax="string"
                                  resourceName="savedConsentAttribute"
                                  i18nKey="a107">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -177,6 +179,7 @@
                         syntax="string"
                         resourceName="jkwsURI"
                         i18nKey="a109">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -196,6 +199,10 @@
                         syntax="string"
                         resourceName="supportedIDTokenSigningAlgorithms"
                         i18nKey="a111">
+                    <DefaultValues>
+                        <Value>HS256</Value>
+                        <Value>HS384</Value>
+                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -204,6 +211,7 @@
                         syntax="string"
                         resourceName="supportedClaims"
                         i18nKey="a112">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -212,6 +220,7 @@
                         syntax="string"
                         resourceName="defaultScopes"
                         i18nKey="a122">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-jwt-token-lifetime"
@@ -220,6 +229,7 @@
                                  validator="RequiredValueValidator"
                                  resourceName="jwtTokenLifetime"
                                  i18nKey="a113">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>3600</Value>
                     </DefaultValues>
@@ -231,6 +241,7 @@
                                  validator="RequiredValueValidator"
                                  resourceName="keypairName"
                                  i18nKey="a114">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>test</Value>
                     </DefaultValues>
@@ -255,6 +266,7 @@
                                  syntax="string"
                                  resourceName="hashSalt"
                                  i18nKey="a124">
+                    <IsOptional/>
                     <ExampleValue>
                         <Value>changeme</Value>
                     </ExampleValue>
@@ -318,6 +330,7 @@
                                  validator="MapValueValidator"
                                  resourceName="loaMapping"
                                  i18nKey="a117">
+                    <IsOptional/>
                     <ChoiceValues>
                         <ChoiceValuesClassName
                         className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
@@ -329,6 +342,7 @@
                                  syntax="string"
                                  resourceName="defaultACR"
                                  i18nKey="a118">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-amr-mappings"
@@ -338,6 +352,7 @@
                                  validator="MapValueValidator"
                                  resourceName="amrMappings"
                                  i18nKey="a119">
+                    <IsOptional/>
                     <ChoiceValues>
                         <ChoiceValuesClassName
                         className="com.sun.identity.authentication.service.AllConfiguredModuleInstances"/>
@@ -350,6 +365,7 @@
                         syntax="string"
                         resourceName="modifiedTimestampAttribute"
                         i18nKey="a120">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -358,6 +374,7 @@
                         syntax="string"
                         resourceName="createdTimestampAttribute"
                         i18nKey="a121">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="alwaysAddClaimsToToken"
@@ -374,9 +391,11 @@
                 </AttributeSchema>
 
                 <AttributeSchema name="verificationUrl" type="single" syntax="string" i18nKey="a127">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="completionUrl" type="single" syntax="string" i18nKey="a128">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="deviceCodeLifetime" type="single" i18nKey="a129"
