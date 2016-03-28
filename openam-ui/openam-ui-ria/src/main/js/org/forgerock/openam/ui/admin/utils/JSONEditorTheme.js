@@ -334,7 +334,6 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
 
                 getModal: function () {
                     var el = document.createElement("div");
-                    el.style.display = "block";
                     el.className = "form-group";
                     return el;
                 }

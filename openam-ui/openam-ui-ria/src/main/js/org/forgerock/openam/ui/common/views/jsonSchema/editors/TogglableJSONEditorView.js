@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView"
 ], ($, _, Backbone, JSONSchema, JSONValues, UIUtils, JSONEditorView) => {
     const TogglableJSONEditorView = Backbone.View.extend({
-        className: "block",
+        className: "jsoneditor-block",
         initialize (options) {
             if (!(options.schema instanceof JSONSchema)) {
                 throw new TypeError("[TogglableJSONEditorView] \"schema\" argument is not an instance of JSONSchema.");
@@ -59,6 +59,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
             const template = "templates/common/jsonSchema/editors/TogglableJSONEditorTemplate.html";
             UIUtils.compileTemplate(template, this.options).then((html) => {
                 this.$el.html(html);
+
                 this.$el.find("[data-json-editor-toggle]").change(_.bind(this.onEnabledChange, this));
 
                 this.jsonEditor = new JSONEditorView({
@@ -68,7 +69,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
                     values: this.options.values
                 });
 
-                if (!this.options.enabled) {
+                if (!this.options.enablePropertyValue) {
                     this.$el.find("[data-toggleable-json-editor]").hide();
                 }
                 this.jsonEditor.render();

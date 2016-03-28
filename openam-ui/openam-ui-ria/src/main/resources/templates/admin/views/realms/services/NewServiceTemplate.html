@@ -4,36 +4,31 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="clearfix">
-                <div class="col-sm-12 col-sm-offset-0">
+                <div class="form-group">
+                    {{#if creatableTypes.[1]}}
+                    <label class="control-label" for="serviceSelection">{{t "console.services.edit.chooseServiceType"}}</label>
+                    <select data-service-selection class="selectize form-control">
+                        <option disabled selected value="">{{t "console.services.edit.serviceTypes"}}</option>
+                        {{#each creatableTypes}}
+                        <option value="{{_id}}">{{name}}</option>
+                        {{/each}}
+                    </select>
 
-                    <div class="form-group">
-                        {{#if creatableTypes.[1]}}
-                        <label class="control-label" for="serviceSelection">{{t "console.services.edit.chooseServiceType"}}</label>
+                    {{else}}
+                        {{#if creatableTypes.[0]}}
+                        <label class=" control-label" for="serviceSelection">{{t "common.form.type"}}</label>
                         <div class="">
-                            <select data-service-selection class="selectize form-control">
-                                <option disabled selected value="">{{t "console.services.edit.serviceTypes"}}</option>
-                                {{#each creatableTypes}}
-                                <option value="{{_id}}">{{name}}</option>
-                                {{/each}}
-                            </select>
+                            <input type="text" id="serviceSelection" class="form-control" value="{{creatableTypes.[0].name}}" readonly="true" >
                         </div>
-                        {{else}}
-                            {{#if creatableTypes.[0]}}
-                            <label class=" control-label" for="serviceSelection">{{t "common.form.type"}}</label>
-                            <div class="">
-                                <input type="text" id="serviceSelection" class="form-control" value="{{creatableTypes.[0].name}}" readonly="true" >
-                            </div>
-                            {{/if}}
                         {{/if}}
-                    </div>
+                    {{/if}}
                 </div>
+
             </div>
 
             {{#if creatableTypes.[0]}}
                 <div class="clearfix">
-                    <div class="col-sm-12 col-sm-offset-0">
-                        <div data-service-form></div>
-                    </div>
+                    <form data-service-form></form>
                 </div>
             {{else}}
                 {{> alerts/_Alert text="console.services.edit.unavaliableAlert" type="info"}}

@@ -192,7 +192,10 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     return $.when(
                         getServiceSubSchema(realm, serviceType, subSchemaType),
                         getTemplate(serviceType, subSchemaType)
-                    ).then((subSchema, values) => ({ subSchema, values: values[0] }));
+                    ).then((subSchema, values) => ({
+                        schema: new JSONSchema(subSchema),
+                        values: new JSONValues(values[0])
+                    }));
                 },
 
                 remove (realm, serviceType, subSchemaType, subSchemaInstance) {

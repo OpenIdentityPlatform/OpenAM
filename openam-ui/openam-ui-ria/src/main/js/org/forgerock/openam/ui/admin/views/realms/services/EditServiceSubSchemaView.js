@@ -131,6 +131,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
                 element = this.$el.find("#tabpanel").empty().get(0);
 
             this.form = new Form(element, schema, this.data.values);
+            this.$el.find("[data-header]").parent().hide();
         }
     });
 });

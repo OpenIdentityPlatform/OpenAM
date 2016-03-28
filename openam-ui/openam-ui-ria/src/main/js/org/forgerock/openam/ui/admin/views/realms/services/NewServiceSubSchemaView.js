@@ -24,10 +24,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService) =>
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, JSONSchemaView) =>
 
     AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
@@ -35,28 +36,29 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
             "click [data-save]": "onSave"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             this.data.realmPath = args[0];
             this.data.serviceInstance = args[1];
             this.data.subSchemaType = args[2];
 
-            this.parentRender(function () {
+            this.parentRender(() => {
                 ServicesService.type.subSchema.instance.getInitialState(
                     this.data.realmPath, this.data.serviceInstance, this.data.subSchemaType
-                ).then((initialState) => {
-                    this.form = new Form(
-                        this.$el.find("[data-service-form]")[0],
-                        initialState.subSchema,
-                        initialState.values
-                    );
+                ).then((response) => {
+                    this.jsonSchemaView = new JSONSchemaView({
+                        schema: response.schema,
+                        values: response.values,
+                        showOnlyRequiredAndEmpty: false
+                    });
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
 
                     if (callback) { callback(); }
                 });
             });
         },
 
-        onSave: function () {
-            const formData = this.form.data();
+        onSave () {
+            const formData = this.jsonSchemaView.values();
             const subSchemaInstanceId = this.$el.find("[data-name]").val();
 
             formData["_id"] = subSchemaInstanceId;
@@ -77,7 +79,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
                 });
             }, (response) => {
                 Messages.addMessage({
-                    response: response,
+                    response,
                     type: Messages.TYPE_DANGER
                 });
             });
