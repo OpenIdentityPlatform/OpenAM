@@ -265,7 +265,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>0.0.27</version>
+                <version>0.0.28</version>
                 <configuration>
                     <installDirectory>${node.install.directory}</installDirectory>
                 </configuration>
@@ -279,6 +279,7 @@
                         <configuration>
                             <nodeVersion>v4.3.2</nodeVersion>
                             <npmVersion>3.8.0</npmVersion>
+                            <downloadRoot>http://maven.forgerock.org/repo/forgerock-ui-third-party-virtual/</downloadRoot>
                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
                         </configuration>
                     </execution>
@@ -290,6 +291,9 @@
                         <phase>initialize</phase>
                         <configuration>
                             <arguments>install</arguments>
+                            <environmentVariables>
+                                <PHANTOMJS_CDNURL>http://maven.forgerock.org/repo/forgerock-ui-third-party-virtual</PHANTOMJS_CDNURL>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
