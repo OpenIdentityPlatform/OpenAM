@@ -723,7 +723,8 @@
                 "title" : "Sites",
                 "new" : "Add a Site",
                 "table" : ["Name", "URL", "Secondary URLs", "Assigned Servers"],
-                "empty" : "You do not have any configured sites"
+                "empty" : "No sites found",
+                "description": "Create Sites to contain a pool of servers that can respond to client requests in a highly-available fashion."
             },
             "new": {
                 "title": "New Site",
