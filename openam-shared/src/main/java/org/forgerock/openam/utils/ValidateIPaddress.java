@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -72,7 +72,7 @@ public final class ValidateIPaddress {
     /**
      * Determines if IP address is IP version 6.
      * @param ipAddress is the IP address that is being verified
-     * @return true if IP address is IPv6, false if it is not IPv6
+     * @return true if IP address is IPv4, false if it is not IPv4
      */
     public static boolean isIPv6(String ipAddress) {
         if (ipAddress == null || ipAddress.isEmpty()) {

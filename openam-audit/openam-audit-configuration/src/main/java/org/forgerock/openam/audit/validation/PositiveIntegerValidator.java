@@ -35,12 +35,12 @@ public class PositiveIntegerValidator implements ServiceAttributeValidator {
      * false otherwise.
      */
     @Override
-    public boolean validate(Set<String> values) {
+    public boolean validate(Set values) {
         if (values.isEmpty()) {
             return false;
         }
 
-        for (String value : values) {
+        for (String value : (Set<String>) values) {
             int intValue;
             try {
                 intValue = Integer.parseInt(value);

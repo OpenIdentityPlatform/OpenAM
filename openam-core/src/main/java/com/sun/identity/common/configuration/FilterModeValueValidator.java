@@ -26,17 +26,13 @@
  *
  */
 
-/**
- * Portions Copyrighted 2016 ForgeRock AS.
- */
-
 package com.sun.identity.common.configuration;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Validates Filter Mode property value in Agent Properties. e.g.
@@ -93,6 +89,9 @@ public class FilterModeValueValidator implements ServiceAttributeValidator {
     private static final Pattern pattern = Pattern.compile(regularExpression);
     private static final Pattern globalPattern = 
                                  Pattern.compile(globalRegularExpression);   
+    
+    public FilterModeValueValidator() {
+    }
 
     /**
      * Returns <code>true</code> if values are of filter mode type.
@@ -100,35 +99,32 @@ public class FilterModeValueValidator implements ServiceAttributeValidator {
      * @param values the set of values to be validated
      * @return <code>true</code> if values are of filter mode type.
      */
-     public boolean validate(Set<String> values) {
+     public boolean validate(Set values) {
         boolean valid = true;
         boolean globalFound = false; //can only have zero or one global value
 
-        if (CollectionUtils.isNotEmpty(values)) {
-            for (String val : values) {
+        if ((values != null) && !values.isEmpty()) {
+            for (Iterator i = values.iterator(); (i.hasNext() && valid);) {
+                String str = (String)i.next();
+                if (str!=null) {
+                    str = str.trim();
+                    Matcher m = pattern.matcher(str);
+                    valid = m.matches();
 
-                if (!valid) {
-                    break;
-                }
+                    //now test for duplicate global value
+                    Matcher globalMatcher = globalPattern.matcher(str);
+                    boolean globalMatch = globalMatcher.matches();
 
-                String trimmed = val.trim();
-
-                Matcher matcher = pattern.matcher(trimmed);
-                valid = matcher.matches();
-
-                //now test for duplicate global value
-                Matcher globalMatcher = globalPattern.matcher(trimmed);
-                boolean globalMatch = globalMatcher.matches();
-
-                //if value matches global and previously found one too
-                if (globalFound && globalMatch && valid) {
-                    valid = false; //more than one global value so invalid
-                } else if (globalMatch && valid) {
-                    globalFound = true; //found first global
+                     //if value matches global and previously found one too
+                    if (globalFound && globalMatch && valid) {
+                        valid = false; //more than one global value so invalid
+                    } else if (globalMatch && valid) {
+                        globalFound = true; //found first global
+                    }                   
                 }
             }
         } else {
-            valid = false;
+            valid = false; //empty set not valid
         }
         
         if (valid) 

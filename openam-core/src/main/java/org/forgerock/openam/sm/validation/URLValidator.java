@@ -27,14 +27,14 @@ import java.util.Set;
 public class URLValidator implements ServiceAttributeValidator {
 
     @Override
-    public boolean validate(Set<String> values) {
+    public boolean validate(Set values) {
 
         if (values.isEmpty()) {
             return false;
         }
 
         try {
-            for (String value : values) {
+            for (String value : (Set<String>) values) {
                 new URL(value);
             }
         } catch (MalformedURLException e) {

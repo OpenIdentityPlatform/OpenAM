@@ -26,35 +26,37 @@
  *
  */
 
-/**
- * Portions Copyrighted 2011-2016 ForgeRock AS.
- */
 package com.sun.identity.sm;
 
+import java.util.Iterator;
 import java.util.Set;
-import org.forgerock.openam.utils.StringUtils;
 
 /**
  * This validator checks if Set is empty or not.
  */
 public class RequiredValueValidator implements ServiceAttributeValidator {
+    public RequiredValueValidator() {
+    }
 
     /**
      * Returns true if values is not empty and does not contain empty string.
      * 
-     * @param values the set of values to be validated
+     * @param values
+     *            the set of values to be validated
      * @return true if values is not empty and does not contain empty string.
      */
-    public boolean validate(Set<String> values) {
-
-        if (values.size() > 0) {
-            for (String value : values) {
-                if (!StringUtils.isNotEmpty(value)) {
-                    return false;
-                }
+    public boolean validate(Set values) {
+        boolean valid = (values.size() > 0);
+        if (valid) {
+            valid = false;
+            for (Iterator i = values.iterator(); (i.hasNext() && !valid);) {
+                String str = (String) i.next();
+                /*
+                 * 20050502 Dennis Seah Note: valid even if str is " "
+                 */
+                valid = (str != null) && (str.length() > 0);
             }
-            return true;
         }
-        return false;
+        return valid;
     }
 }

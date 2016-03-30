@@ -41,12 +41,12 @@ public class HostnameValidator implements ServiceAttributeValidator {
      * false otherwise.
      */
     @Override
-    public boolean validate(Set<String> values) {
+    public boolean validate(Set values) {
         if (values.isEmpty()) {
             return false;
         }
 
-        for (String value : values) {
+        for (String value : (Set<String>) values) {
             Matcher matcher = VALID_HOSTNAME_CHARACTERS.matcher(value);
             if (!matcher.matches()) {
                 return false;

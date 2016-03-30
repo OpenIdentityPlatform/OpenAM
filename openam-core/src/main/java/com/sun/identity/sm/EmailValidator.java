@@ -26,12 +26,9 @@
  *
  */
 
-/**
- * Portions Copyrighted 2016 ForgeRock AS.
- */
-
 package com.sun.identity.sm;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -45,15 +42,23 @@ import java.util.Vector;
 public class EmailValidator implements ServiceAttributeValidator {
 
     /**
+     * Default Constructor.
+     */
+    public EmailValidator() {
+    }
+
+    /**
      * Validates a set of email address.
      * 
      * @param values
      *            the set of string email address to validate
      * @return true if all of the email addresses are valid; false otherwise
      */
-    public boolean validate(Set<String> values) {
+    public boolean validate(Set values) {
 
-        for (String value : values) {
+        Iterator it = values.iterator();
+        while (it.hasNext()) {
+            String value = (String) it.next();
             if (!validate(value)) {
                 return false;
             }
@@ -79,7 +84,11 @@ public class EmailValidator implements ServiceAttributeValidator {
         String name = value.substring(0, index);
         String domain = value.substring(index + 1, value.length());
 
-        return validateName(name) && validateDomain(domain);
+        if (validateName(name) && validateDomain(domain)) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -126,10 +135,7 @@ public class EmailValidator implements ServiceAttributeValidator {
     private boolean validateDomain(String domain) {
 
         StringTokenizer tok = new StringTokenizer(domain, ".");
-
-        int number = domain.length() - domain.replace(".", "").length() + 1;
-
-        if (tok.countTokens() != number) {
+        if (tok.countTokens() <= 1) {
             return false;
         }
 

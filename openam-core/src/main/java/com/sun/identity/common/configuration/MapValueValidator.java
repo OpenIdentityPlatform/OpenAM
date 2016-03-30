@@ -26,16 +26,16 @@
  *
  */
 
-/**
- * Portions Copyrighted 2011-2016 ForgeRock AS.
+/*
+ * Portions Copyrighted [2011] [ForgeRock AS]
  */
 package com.sun.identity.common.configuration;
 
 import com.sun.identity.sm.ServiceAttributeValidator;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Validates map value properties in Agent Properties. e.g.
@@ -82,13 +82,19 @@ public class MapValueValidator implements ServiceAttributeValidator {
      */
     
     //also used by GlobalMapValueValidator so package scoped
-    static final String KEY_WITH_NO_BRACKETS = "(\\s*\\[\\s*[[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*\\s*\\]\\s*=.*)";
+    static final String KEY_WITH_NO_BRACKETS =  
+            "(\\s*\\[\\s*[[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*\\s*\\]\\s*=.*)";
     //also used by GlobalMapValueValidator  so package scoped
-    static final String DEFAULT_NO_KEY_JUST_BRACKETS = "(\\s*\\[\\s*\\]\\s*=\\s*)";
+    static final String DEFAULT_NO_KEY_JUST_BRACKETS =  
+            "(\\s*\\[\\s*\\]\\s*=\\s*)";
      
-    private static final String regularExpression = KEY_WITH_NO_BRACKETS + "|" + DEFAULT_NO_KEY_JUST_BRACKETS;
+    private static final String regularExpression = KEY_WITH_NO_BRACKETS 
+                                    + "|" + DEFAULT_NO_KEY_JUST_BRACKETS;
     
     private static final Pattern pattern = Pattern.compile(regularExpression);
+
+    public MapValueValidator() {
+    }
 
     /**
      * Returns <code>true</code> if values are of map type format.
@@ -96,28 +102,22 @@ public class MapValueValidator implements ServiceAttributeValidator {
      * @param values contains the set of values to be validated
      * @return <code>true</code> if values are of map type format.
      */
-    public boolean validate(Set<String> values) {
-        boolean valid = true; //blank or empty values set are valid
-
-        if (!CollectionUtils.isEmpty(values)) {
-            for (String value : values) {
-
-                if (!valid) {
-                    break;
-                }
-
-                if (value.length() > 0) {
-                    Matcher m = pattern.matcher(value);
+    public boolean validate(Set values) {
+        boolean valid = true; //blank or emtpy values set are valid
+     
+        //since a Set is used and set can not have duplicate entries 
+        //we dont need to test for duplicates of *whole* value
+        if ((values != null) && !values.isEmpty()) {
+            for (Iterator i = values.iterator(); (i.hasNext() && valid);) {
+                String str = ((String)i.next()).trim();
+                if (str.length() > 0) {
+                    Matcher m = pattern.matcher(str);
                     valid = m.matches();
                 }
             }
-
         }
-
-        if (valid) {
+        if (valid) 
             valid = MapDuplicateKeyChecker.checkForNoDuplicateKeyInValue(values);
-        }
-
         return valid;
     }
     

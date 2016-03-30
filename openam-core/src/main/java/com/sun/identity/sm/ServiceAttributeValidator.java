@@ -26,10 +26,6 @@
  *
  */
 
-/**
- * Portions Copyrighted 2016 ForgeRock AS.
- */
-
 package com.sun.identity.sm;
 
 import java.util.Set;
@@ -62,6 +58,6 @@ public interface ServiceAttributeValidator {
      *            the <code>Set</code> of attribute values to validate
      * @return true if validates successfully; false otherwise
      */
-    boolean validate(Set<String> values);
+    public boolean validate(Set values);
 
 }
