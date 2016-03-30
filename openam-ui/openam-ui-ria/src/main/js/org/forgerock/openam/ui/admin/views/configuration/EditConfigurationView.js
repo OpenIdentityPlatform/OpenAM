@@ -31,15 +31,14 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView"
 ], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService,
     EditConfigurationBacklink) => {
 
-
-    var EditConfigurationView = AbstractView.extend({
+    const EditConfigurationView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditConfigurationTemplate.html",
         events: {
             "click [data-save]": "onSave",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             this.data.id = args[0];
             SMSGlobalService.authentication.get(this.data.id).then((data) => {
                 this.data.schema = data.schema;
@@ -64,24 +63,25 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView"
             });
         },
 
-        onSave: function () {
+        onSave () {
             SMSGlobalService.authentication.update(this.data.id, this.form.data())
                 .then((data) => {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     this.data.values = data;
                 }, (response) => {
                     Messages.addMessage({
-                        response: response,
+                        response,
                         type: Messages.TYPE_DANGER
                     });
                 });
         },
 
-        renderTab: function (event) {
+        renderTab (event) {
             const tabId = $(event.target).data("tabId");
             const schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema;
             const element = this.$el.find("#tabpanel").empty().get(0);
             this.form = new Form(element, schema, this.data.values[tabId]);
+            this.$el.find("[data-header]").parent().hide();
         }
     });
 
