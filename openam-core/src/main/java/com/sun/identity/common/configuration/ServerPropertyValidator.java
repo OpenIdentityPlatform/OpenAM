@@ -57,21 +57,21 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
     private static Set<String> mapKeys = new HashSet<>();
     private static Set<String> integerKeys = new HashSet<>();
     private static Set<String> floatKeys = new HashSet<>();
-    
+
     private static final String MAP = "map";
     private static final String INTEGER = "integer";
     private static final String FLOAT = "float";
-    
+
     static {
         initialize();
     }
-    
+
     private static void initialize() {
         ResourceBundle rb = ResourceBundle.getBundle("validserverconfig");
-        for (Enumeration<String> e = rb.getKeys(); e.hasMoreElements(); ) {
-            String key = e.nextElement();
+        for (Enumeration<String> keys = rb.getKeys(); keys.hasMoreElements(); ) {
+            String key = keys.nextElement();
             String value = rb.getString(key);
-            
+
             if (key.endsWith(".*")) {
                 arrayKeys.add(key.substring(0, key.length() -1));
             } else if (value.equals(MAP)) {
@@ -94,12 +94,12 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
             }
         }
     }
-    
+
     /**
      * Validates a set of server configuration properties.
      *
      * @param properties Set of String of this format name=value.
-     */    
+     */
     public boolean validate(Set<String> properties)  {
         try {
             validateProperty(properties);
@@ -108,7 +108,7 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
             return false;
         }
     }
-        
+
     /**
      * Validates a set of server configuration properties.
      *
@@ -119,7 +119,6 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
     public static void validateProperty(Set<String> properties)
         throws UnknownPropertyNameException, ConfigurationException {
         try {
-            //getProperties returns a Properties object which extends HashTable<Obj, Obj>. Yey generics.
             Map propertiesAsMap = ServerConfiguration.getProperties(properties);
             validate(propertiesAsMap);
         } catch (IOException ex) {
@@ -136,47 +135,45 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
      *         proper format.
      */
     public static void validate(Map<String, String> properties) throws UnknownPropertyNameException, ConfigurationException {
-        Set<String> unknownProperyNames = new HashSet<>();
+        Set<String> unknownPropertyNames = new HashSet<>();
 
         for (final String key : properties.keySet()) {
             String value = properties.get(key);
 
             if ((value.length() > 0) && (!value.contains("%"))) {
                 try {
-                    validateMap(key);
-                    validateNumber(key, value);
-                    validate(key, value);
+                    //we only want to run the specific one(s) of these required, hence ORing here
+                    boolean valid = validateMap(key) || validateNumber(key, value) || validate(key, value);
                 } catch (UnknownPropertyNameException e) {
                     debug.error("Invalid server property {}", key, e);
-                    unknownProperyNames.add(key);
+                    unknownPropertyNames.add(key);
                 }
             }
         }
 
-        if (!unknownProperyNames.isEmpty()) {
+        if (!unknownPropertyNames.isEmpty()) {
             throw new UnknownPropertyNameException("unknown.properties",
-                    new String[]{StringUtils.join(unknownProperyNames, ", ")});
+                    new String[]{ StringUtils.join(unknownPropertyNames, ", ") });
         }
     }
-    
+
     private static boolean validateMap(String key)
         throws UnknownPropertyNameException, ConfigurationException {
-        
+
         boolean validated = false;
         if (key.endsWith("]")) {
             int startBracket = key.indexOf('[');
             if (startBracket == -1) {
                 String[] param = {key};
-                throw new ConfigurationException(
-                    "invalid.map.property", param);
+                throw new ConfigurationException("invalid.map.property", param);
             }
-            
+
             String k = key.substring(0, startBracket);
             if (!mapKeys.contains(k) && !arrayKeys.contains(k)) {
                 String[] param = {key};
                 throw new UnknownPropertyNameException("unknown.property", param);
             }
-            
+
             if (arrayKeys.contains(k)) {
                 int endBracket = key.indexOf('[');
                 String ind = key.substring(startBracket+1, endBracket);
@@ -191,8 +188,8 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
         }
         return validated;
     }
-    
-    private static boolean validateNumber(String key, String value) 
+
+    private static boolean validateNumber(String key, String value)
         throws UnknownPropertyNameException, ConfigurationException {
         boolean validated = false;
         if (floatKeys.contains(key)) {
@@ -221,7 +218,7 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
             String[] param = {key};
             throw new UnknownPropertyNameException("unknown.property", param);
         }
-        
+
         if (value.length() > 0) {
             List possibleValues = (List) keyToPossibleValues.get(key);
             if (!possibleValues.isEmpty()) {
@@ -242,7 +239,7 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
      */
     public static String getTrueValue(String propertyKey) {
         List list = (List) keyToPossibleValues.get(propertyKey);
-        return (String)list.get(0);
+        return (String) list.get(0);
     }
 
     /**
@@ -253,6 +250,6 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
      */
     public static String getFalseValue(String propertyKey) {
         List list = (List) keyToPossibleValues.get(propertyKey);
-        return (String)list.get(1);
+        return (String) list.get(1);
     }
 }
