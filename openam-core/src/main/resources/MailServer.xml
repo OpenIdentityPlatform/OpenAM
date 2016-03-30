@@ -50,9 +50,9 @@
                                  syntax="string"
                                  resourceName="hostname"
                                  i18nKey="a101">
-                    <DefaultValues>
-                        <Value>smtp.gmail.com</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>smtp.example.com</Value>
+                    </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPHostPort"
                                  type="single"
@@ -69,7 +69,7 @@
                                  resourceName="username"
                                  i18nKey="a103">
                     <ExampleValue>
-                        <Value>forgerocksmtp</Value>
+                        <Value>username</Value>
                     </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPUserPassword"
@@ -97,7 +97,7 @@
                                  resourceName="from"
                                  i18nKey="a106">
                     <ExampleValue>
-                        <Value>no-reply@openam.example.org</Value>
+                        <Value>no-reply@example.com</Value>
                     </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="openamEmailAttribute"
@@ -114,12 +114,14 @@
                                  syntax="string"
                                  resourceName="subject"
                                  i18nKey="a108">
+                    <IsOptional/>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPMessage"
                                  type="single"
                                  syntax="string"
                                  resourceName="message"
                                  i18nKey="a109">
+                    <IsOptional/>
                 </AttributeSchema>
             </Organization>
         </Schema>
