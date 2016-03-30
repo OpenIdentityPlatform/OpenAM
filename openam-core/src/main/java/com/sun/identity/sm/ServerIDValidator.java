@@ -26,23 +26,21 @@
  *
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import java.security.AccessController;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import java.security.AccessController;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * The class <code>ServerIDValidator</code> is used to validate the correct
@@ -52,20 +50,13 @@ import com.sun.identity.security.AdminTokenAction;
  */
 public class ServerIDValidator implements ServiceAttributeValidator {
 
-    private static final String PLATFORM_SITE_LIST = 
-        "iplanet-am-platform-site-list";
+    private static final String PLATFORM_SITE_LIST = "iplanet-am-platform-site-list";
 
     private static Debug debug = Debug.getInstance("amSession");
 
-    private Set siteIdSet = new HashSet();
+    private Set<String> siteIdSet = new HashSet<>();
 
-    private Set siteAddrSet = new HashSet();
-
-    /**
-     * Default Constructor.
-     */
-    public ServerIDValidator() {
-    }
+    private Set<String> siteAddrSet = new HashSet<>();
 
     /**
      * Validates the values for the attribute iplanet-am-platform-server-list.
@@ -74,18 +65,16 @@ public class ServerIDValidator implements ServiceAttributeValidator {
      *            the set of values to be validated
      * @return true if all of the values are valid; false otherwise
      */
-    public boolean validate(Set values) {
+    public boolean validate(Set<String> values) {
         if (values.isEmpty()) {
             return true;
         }
 
-        Set idSet = new HashSet();
-        Set urlSet = new HashSet();
-        Iterator it = values.iterator();
-        boolean siteLookup = false;
+        Set<String> idSet = new HashSet<>();
+        Set<String> urlSet = new HashSet<>();
+        boolean siteLookup;
         siteLookup = getSiteDetails();
-        while (it.hasNext()) {
-            String value = (String) it.next();
+        for(String value : values) {
             StringTokenizer tok = new StringTokenizer(value, "|");
             String url = tok.nextToken();
             StringBuilder buff = new StringBuilder();
@@ -110,7 +99,7 @@ public class ServerIDValidator implements ServiceAttributeValidator {
                             return false;
                         }
                         if (siteLookup) {
-                            if (validateID(lbid) == false) {
+                            if (!validateID(lbid)) {
                                 return false;
                             }
                         } else {
@@ -158,13 +147,8 @@ public class ServerIDValidator implements ServiceAttributeValidator {
      * @return true if serverID exits in Site list, false otherwise
      */
     private boolean validateID(String sId) {
-        if (siteIdSet.isEmpty()) {
-            return false;
-        }
-        if (!siteIdSet.contains(sId)) {
-            return false;
-        }
-        return true;
+        return !siteIdSet.isEmpty() && siteIdSet.contains(sId);
+
     }
 
     /**
@@ -177,27 +161,21 @@ public class ServerIDValidator implements ServiceAttributeValidator {
             return true;
         }
         try {
-            SSOToken stoken = (SSOToken) AccessController
-                    .doPrivileged(AdminTokenAction.getInstance());
+            SSOToken stoken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             ServiceSchemaManager ssm = new ServiceSchemaManager(
                     ISAuthConstants.PLATFORM_SERVICE_NAME, stoken);
-            if (ssm != null) {
-                ServiceSchema ss = ssm.getGlobalSchema();
-                if (ss != null) {
-                    Map attrs = ss.getAttributeDefaults();
-                    Set siteList = (Set) attrs.get(PLATFORM_SITE_LIST);
-                    if (siteList != null && !siteList.isEmpty()) {
-                        Iterator siteIterator = siteList.iterator();
-                        while (siteIterator.hasNext()) {
-                            String siteVal = (String) siteIterator.next();
-                            if (siteVal != null) {
-                                StringTokenizer tk = new StringTokenizer(
-                                        siteVal, "|");
-                                String siteUrl = tk.nextToken();
-                                String siteID = tk.nextToken();
-                                siteAddrSet.add(siteUrl);
-                                siteIdSet.add(siteID);
-                            }
+            ServiceSchema ss = ssm.getGlobalSchema();
+            if (ss != null) {
+                Map<String, Set<String>> attrs = ss.getAttributeDefaults();
+                Set<String> siteList = attrs.get(PLATFORM_SITE_LIST);
+                if (siteList != null && !siteList.isEmpty()) {
+                    for (String siteVal : siteList) {
+                        if (siteVal != null) {
+                            StringTokenizer tk = new StringTokenizer(siteVal, "|");
+                            String siteUrl = tk.nextToken();
+                            String siteID = tk.nextToken();
+                            siteAddrSet.add(siteUrl);
+                            siteIdSet.add(siteID);
                         }
                     }
                 }

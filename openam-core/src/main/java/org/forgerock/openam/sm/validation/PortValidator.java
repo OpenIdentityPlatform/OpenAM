@@ -35,18 +35,19 @@ public class PortValidator implements ServiceAttributeValidator {
      * false otherwise.
      */
     @Override
-    public boolean validate(Set values) {
+    public boolean validate(Set<String> values) {
         if (values.isEmpty()) {
             return false;
         }
 
-        for (String value : (Set<String>) values) {
+        for (String value : values) {
             int intValue;
             try {
                 intValue = Integer.parseInt(value);
             } catch (NumberFormatException nfe) {
                 return false;
             }
+            //0 is technically valid, but does not exist and is not supported by us
             if (intValue <= 0 || intValue > 65535) {
                 return false;
             }

@@ -11,16 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  *
- * Tests (only) copied from IPv6 address validation Regular Expressions by Rich Brown <richard.e.brown@dartware.com>
+ */
+
+/**
+ * Portions Copyright 2015 Rich Brown <richard.e.brown@dartware.com>
+ *  - Tests copied from IPv6 address validation Regular Expressions.
  */
 package org.forgerock.openam.utils;
 
+import static org.testng.Assert.*;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
 
 /**
  * @since 13.0.0.
@@ -187,7 +191,7 @@ public class ValidateIPAddressTest {
             { true,  "::ffff:12.34.56.78" },
             { false, "::ffff:2.3.4" },
             { false, "::ffff:257.1.2.3" },
-            { false, "1.2.3.4" },
+            { true, "1.2.3.4" },
 
             { false, "1.2.3.4:1111:2222:3333:4444::5555" },
             { false, "1.2.3.4:1111:2222:3333::5555" },
@@ -416,7 +420,6 @@ public class ValidateIPAddressTest {
             { false, "1111:2222:3333:1.2.3.4" },
             { false, "1111:2222:1.2.3.4" },
             { false, "1111:1.2.3.4" },
-            { false, "1.2.3.4" },
 
             { false, "11112222:3333:4444:5555:6666:1.2.3.4" },
             { false, "1111:22223333:4444:5555:6666:1.2.3.4" },
@@ -576,7 +579,7 @@ public class ValidateIPAddressTest {
     @Test(dataProvider = "addresses")
     public void testWildcardInProtocol(boolean expected, String address) {
 
-        boolean result = ValidateIPaddress.isIPv6(address);
+        boolean result = ValidateIPaddress.isValidIP(address);
 
         assertEquals(result, expected);
     }
