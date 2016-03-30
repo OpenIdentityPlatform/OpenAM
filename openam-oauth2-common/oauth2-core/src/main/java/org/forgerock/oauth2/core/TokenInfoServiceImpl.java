@@ -76,7 +76,7 @@ public class TokenInfoServiceImpl implements TokenInfoService {
 
         if (!headerToken.isValid() && !queryToken.isValid()) {
             logger.error("Access Token not valid");
-            throw new InvalidRequestException("Access Token not valid");
+            throw new InvalidTokenException();
         } else if (headerToken.isValid() && queryToken.isValid()) {
             logger.error("Access Token provided in both query and header in request");
             throw new InvalidRequestException("Access Token cannot be provided in both query and header");
