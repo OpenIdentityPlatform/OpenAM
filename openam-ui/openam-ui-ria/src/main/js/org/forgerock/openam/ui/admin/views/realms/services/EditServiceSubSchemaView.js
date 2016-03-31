@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper) {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper) => {
 
     function deleteInstance () {
         var self = this;
@@ -38,16 +38,16 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             this.data.serviceType,
             this.data.subSchemaType,
             this.data.id
-        ).then(function () {
+        ).then(() => {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
 
             Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
                 args: _.map([self.data.realmPath, self.data.serviceType], encodeURIComponent),
                 trigger: true
             });
-        }, function (model, response) {
+        }, (model, response) => {
             Messages.addMessage({
-                response: response,
+                response,
                 type: Messages.TYPE_DANGER
             });
         });
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             this.data.realmPath = args[0];
             this.data.serviceType = args[1];
             this.data.subSchemaType = args[2];
@@ -77,12 +77,11 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
                 this.data.serviceType,
                 this.data.subSchemaType,
                 this.data.id
-            ).then(function (data) {
+            ).then((data) => {
                 self.data.schema = data.schema;
                 self.data.values = data.values;
 
-                self.parentRender(function () {
-
+                self.parentRender(() => {
                     if (self.data.schema.grouped) {
                         self.$el.find("ul.nav a:first").tab("show");
                         self.$el.find(".tab-menu .nav-tabs").tabdrop();
@@ -98,7 +97,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             });
         },
 
-        onSave: function () {
+        onSave () {
             var self = this;
             ServicesService.type.subSchema.instance.update(
                 this.data.realmPath,
@@ -106,18 +105,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
                 this.data.subSchemaType,
                 this.data.id,
                 this.form.data()
-            ).then(function (data) {
+            ).then((data) => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 self.data.values = data;
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
-                    response: response,
+                    response,
                     type: Messages.TYPE_DANGER
                 });
             });
         },
 
-        onDelete: function (e) {
+        onDelete (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
@@ -125,12 +124,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             }, _.bind(deleteInstance, this, e));
         },
 
-        renderTab: function (event) {
-            var tabId = $(event.target).data("tabId"),
-                schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema,
-                element = this.$el.find("#tabpanel").empty().get(0);
+        renderTab (event) {
+            const tabId = $(event.target).data("tabId");
+            const schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema;
+            const element = this.$el.find("#tabpanel").empty().get(0);
 
-            this.form = new Form(element, schema, this.data.values);
+            this.form = new Form(element, schema, this.data.values[tabId]);
             this.$el.find("[data-header]").parent().hide();
         }
     });
