@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
                     this.jsonSchemaView = new JSONSchemaView({
                         schema: response.schema,
                         values: response.values,
-                        showOnlyRequiredAndEmpty: false
+                        showOnlyRequiredAndEmpty: true
                     });
                     $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
 

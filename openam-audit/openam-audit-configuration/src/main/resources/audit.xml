@@ -36,6 +36,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                    <IsOptional/>
                     <DefaultValues>
                         <DefaultValuesClassName
                                 className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
@@ -84,9 +85,12 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationFilePrefix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFilePrefix"/>
+                                     i18nKey="audit.handlers.file.rotationFilePrefix">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="rotationFileSuffix" type="single"
                                      i18nKey="audit.handlers.file.rotationFileSuffix">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>-yyyy.MM.dd-HH.mm.ss</Value>
                         </DefaultValues>
@@ -149,14 +153,18 @@
                     </AttributeSchema>
                     <AttributeSchema name="securityFilename" type="single"
                                      i18nKey="audit.handlers.csv.security.filename">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityPassword" type="single" syntax="password"
-                                     i18nKey="audit.handlers.csv.security.password"/>
+                                     i18nKey="audit.handlers.csv.security.password">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="securitySignatureInterval" type="single"
                                      i18nKey="audit.handlers.csv.security.signatureInterval">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>900</Value>
                         </DefaultValues>
@@ -459,6 +467,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                    <IsOptional/>
                     <DefaultValues>
                         <DefaultValuesClassName
                                 className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
@@ -507,9 +516,12 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationFilePrefix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFilePrefix"/>
+                                     i18nKey="audit.handlers.file.rotationFilePrefix">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="rotationFileSuffix" type="single"
                                      i18nKey="audit.handlers.file.rotationFileSuffix">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>-yyyy.MM.dd-HH.mm.ss</Value>
                         </DefaultValues>
@@ -572,14 +584,18 @@
                     </AttributeSchema>
                     <AttributeSchema name="securityFilename" type="single"
                                      i18nKey="audit.handlers.csv.security.filename">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityPassword" type="single" syntax="password"
-                                     i18nKey="audit.handlers.csv.security.password"/>
+                                     i18nKey="audit.handlers.csv.security.password">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="securitySignatureInterval" type="single"
                                      i18nKey="audit.handlers.csv.security.signatureInterval">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>900</Value>
                         </DefaultValues>
