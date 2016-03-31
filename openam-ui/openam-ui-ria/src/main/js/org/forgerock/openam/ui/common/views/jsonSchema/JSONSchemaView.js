@@ -40,14 +40,16 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView", [
         const emptyValueKeys = _.keys(values.toEmptyValues().raw);
 
         if (_.isEmpty(emptyValueKeys)) {
-            if (schema.enableProperty()) {
-                return schema.pick(schema.enableKey());
-            } else {
-                return false;
-            }
+            return schema.enableProperty() ? schema.getEnableProperty() : false;
         } else {
-            return schema.toSchemaWithRequiredProperties()
-                         .toSchemaWithDefaultProperties(emptyValueKeys);
+            const schemaWithRequiredEmptyFields = schema.toSchemaWithRequiredProperties()
+                .toSchemaWithDefaultProperties(emptyValueKeys);
+
+            if (schemaWithRequiredEmptyFields.raw.defaultProperties.length) {
+                return schemaWithRequiredEmptyFields;
+            } else {
+                return schema.enableProperty() ? schema.getEnableProperty() : false;
+            }
         }
     }
 

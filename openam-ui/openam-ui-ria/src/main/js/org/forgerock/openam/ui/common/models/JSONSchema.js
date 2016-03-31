@@ -55,6 +55,10 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
     };
 
+    JSONSchema.prototype.getEnableProperty = function () {
+        return this.pick(this.enableKey());
+    };
+
     JSONSchema.prototype.isEmpty = function () {
         return _.isEmpty(this.raw.properties);
     };

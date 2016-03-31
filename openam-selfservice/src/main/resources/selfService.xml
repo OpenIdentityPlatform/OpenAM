@@ -41,6 +41,7 @@
                         <Value>selfserviceenctest</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceSigningSecretKeyAlias"
                                  type="single"
                                  syntax="string"
@@ -50,32 +51,40 @@
                         <Value>selfservicesigntest</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceCaptchaSiteKey"
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSiteKey"
                                  i18nKey="captcha.site.key">
+                    <IsOptional/>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceCaptchaSecretKey"
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSecretKey"
                                  i18nKey="captcha.secret.key">
+                    <IsOptional/>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceCaptchaVerificationUrl"
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaVerificationUrl"
                                  i18nKey="captcha.verification.url">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>https://www.google.com/recaptcha/api/siteverify</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceKBAQuestions"
                                  type="list"
                                  syntax="string"
                                  resourceName="kbaQuestions"
                                  i18nKey="kba.questions">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>1|en|What is the name of your favourite restaurant?</Value>
                         <Value>2|en|What was the model of your first car?</Value>
@@ -83,29 +92,35 @@
                         <Value>4|en|What is your mother's maiden name?</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceMinimumAnswersToDefine"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="30"
                                  resourceName="minimumAnswersToDefine"
                                  i18nKey="minimum.answers.to.define">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceMinimumAnswersToVerify"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="50"
                                  resourceName="minimumAnswersToVerify"
                                  i18nKey="minimum.answers.to.verify">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceValidQueryAttributes"
                                  type="list"
                                  syntax="string"
                                  resourceName="validQueryAttributes"
                                  i18nKey="valid.query.attributes">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>uid</Value>
                         <Value>sn</Value>
@@ -129,11 +144,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationCaptchaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationCaptchaEnabled"
                                  i18nKey="user.registration.captcha.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -142,11 +159,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationEmailVerificationEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationEmailVerificationEnabled"
                                  i18nKey="user.registration.email.verification.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -155,11 +174,13 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationKbaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationKbaEnabled"
                                  i18nKey="user.registration.kba.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -168,38 +189,46 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="userRegistrationTokenTTL"
                                  i18nKey="user.registration.token.ttl">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationEmailSubject"
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationEmailSubject"
                                  i18nKey="user.registration.email.subject">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|Registration email</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationEmailBody"
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationEmailBody"
                                  i18nKey="user.registration.email.body">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to register.&lt;/h2&gt;</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationValidUserAttributes"
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationValidUserAttributes"
                                  i18nKey="user.registration.valid.user.attributes">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>mail</Value>
                         <Value>inetUserStatus</Value>
@@ -226,11 +255,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordCaptchaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordCaptchaEnabled"
                                  i18nKey="forgotten.password.captcha.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -239,11 +270,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordEmailVerificationEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordEmailVerificationEnabled"
                                  i18nKey="forgotten.password.email.verification.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -252,11 +285,13 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordKbaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordKbaEnabled"
                                  i18nKey="forgotten.password.kba.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -265,29 +300,35 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="forgottenPasswordTokenTTL"
                                  i18nKey="forgotten.password.token.ttl">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordEmailSubject"
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenPasswordEmailSubject"
                                  i18nKey="forgotten.password.email.subject">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|Forgotten password email</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordEmailBody"
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenPasswordEmailBody"
                                  i18nKey="forgotten.password.email.body">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to reset your password.&lt;/h2&gt;</Value>
                     </DefaultValues>
@@ -308,11 +349,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameCaptchaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameCaptchaEnabled"
                                  i18nKey="forgotten.username.captcha.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -321,11 +364,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameKbaEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameKbaEnabled"
                                  i18nKey="forgotten.username.kba.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -334,11 +379,13 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameEmailUsernameEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameEmailUsernameEnabled"
                                  i18nKey="forgotten.username.email.username.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -347,11 +394,13 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameShowUsernameEnabled"
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameShowUsernameEnabled"
                                  i18nKey="forgotten.username.show.username.enabled">
+                    <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -360,20 +409,24 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="forgottenUsernameTokenTTL"
                                  i18nKey="forgotten.username.token.ttl">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameEmailSubject"
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenUsernameEmailSubject"
                                  i18nKey="forgotten.username.email.subject">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|Forgotten username email</Value>
                     </DefaultValues>
@@ -384,6 +437,7 @@
                                  syntax="string"
                                  resourceName="forgottenUsernameEmailBody"
                                  i18nKey="forgotten.username.email.body">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Your username is &lt;span style=&quot;color:blue&quot;&gt;%username%&lt;/span&gt;.&lt;/h2&gt;</Value>
                     </DefaultValues>
@@ -396,6 +450,7 @@
                                  syntax="string"
                                  resourceName="profileProtectedUserAttributes"
                                  i18nKey="profile.protected.user.attributes">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <!-- Advanced configuration -->
@@ -405,42 +460,51 @@
                                  syntax="url"
                                  resourceName="userRegistrationConfirmationUrl"
                                  i18nKey="user.registration.confirmation.url">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordConfirmationUrl"
                                  type="single"
                                  syntax="url"
                                  resourceName="forgottenPasswordConfirmationUrl"
                                  i18nKey="forgotten.password.confirmation.url">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceUserRegistrationServiceConfigClass"
                                  type="single"
                                  syntax="string"
                                  resourceName="userRegistrationServiceConfigClass"
                                  i18nKey="user.registration.service.config.class">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.UserRegistrationConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenPasswordServiceConfigClass"
                                  type="single"
                                  syntax="string"
                                  resourceName="forgottenPasswordServiceConfigClass"
                                  i18nKey="forgotten.password.service.config.class">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConfigProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="selfServiceForgottenUsernameServiceConfigClass"
                                  type="single"
                                  syntax="string"
                                  resourceName="forgottenUsernameServiceConfigClass"
                                  i18nKey="forgotten.username.service.config.class">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConfigProvider</Value>
                     </DefaultValues>
