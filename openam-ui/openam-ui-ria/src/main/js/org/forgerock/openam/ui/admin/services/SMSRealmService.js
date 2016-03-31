@@ -14,6 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+/**
+ * @module org/forgerock/openam/ui/admin/services/SMSRealmService
+ */
 define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
     "jquery",
     "lodash",
@@ -22,41 +25,21 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) {
-    /**
-     * @exports org/forgerock/openam/ui/admin/services/SMSRealmService
-     */
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
-        scopedByRealm = function (realm, path) {
-            var encodedRealm = "";
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
+    const obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
 
-            if (realm !== "/") {
-                encodedRealm = RealmHelper.encodeRealm(realm);
-            }
+    function scopedByRealm (realm, path) {
+        var encodedRealm = "";
 
-            return encodedRealm + "/realm-config/" + path;
-        };
+        if (realm !== "/") {
+            encodedRealm = RealmHelper.encodeRealm(realm);
+        }
+        return encodedRealm + "/realm-config/" + path;
+    }
 
     obj.authentication = {
         get: function (realm) {
-            var url = scopedByRealm(realm, "authentication");
-
-            return $.when(
-                obj.serviceCall({
-                    url: url + "?_action=schema",
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "POST"
-                }),
-                obj.serviceCall({
-                    url: url,
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                })
-            ).then(function (schemaData, valuesData) {
-                return {
-                    schema: SMSServiceUtils.sanitizeSchema(schemaData[0]),
-                    values: valuesData[0]
-                };
-            });
+            return SMSServiceUtils.schemaWithValues(obj, scopedByRealm(realm, "authentication"));
         },
         update: function (realm, data) {
             return obj.serviceCall({

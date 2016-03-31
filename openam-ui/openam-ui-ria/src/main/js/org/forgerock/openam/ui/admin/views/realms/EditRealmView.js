@@ -24,6 +24,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
@@ -34,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "popoverclickaway",
     "selectize"
 ], function ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, SMSGlobalService,
-             FormHelper, JSONSchema, JSONValues, JSONSchemaView, Promise) {
+             SMSRealmService, FormHelper, JSONSchema, JSONValues, JSONSchemaView, Promise) {
 
     function setAutofocus () {
         $("[data-realm-form] input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
@@ -85,7 +86,8 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         },
 
         render: function (args, callback) {
-            let promise;
+            let realmPromise;
+            let authenticationPromise;
             let allRealmsPromise = SMSGlobalService.realms.all();
 
             if (args[0]) {
@@ -98,22 +100,29 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             }
 
             if (this.data.newEntity) {
-                promise = SMSGlobalService.realms.schema();
+                realmPromise = SMSGlobalService.realms.schema();
+                authenticationPromise = SMSGlobalService.authentication.schema();
             } else {
-                promise = SMSGlobalService.realms.get(this.data.realmPath);
+                realmPromise = SMSGlobalService.realms.get(this.data.realmPath);
+                authenticationPromise = SMSRealmService.authentication.get(this.data.realmPath);
             }
 
             this.parentRender(function () {
-                Promise.all([promise, allRealmsPromise]).then((results) => {
+                Promise.all([realmPromise, allRealmsPromise, authenticationPromise]).then((results) => {
                     let data = results[0];
                     let element = this.$el.find("[data-realm-form]");
                     let allRealmPaths = [];
+                    let statelessSessionsEnabled = _.get(results[2],
+                        "schema.properties.general.properties.statelessSessionsEnabled");
 
                     _.each(results[1][0].result, (realm) => {
                         if (realm.path) {
                             allRealmPaths.push(realm.path);
                         }
                     });
+
+                    data.schema.properties.statelessSessionsEnabled = _.omit(statelessSessionsEnabled, "propertyOrder");
+                    data.values.statelessSessionsEnabled = _.get(results[2], "values.general.statelessSessionsEnabled");
 
                     if (this.data.newEntity) {
                         // Only create dropdowns if the field is editable
@@ -177,26 +186,29 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             event.preventDefault();
             this.toggleSubmitButton(false);
 
-            let promise = this.data.newEntity ? SMSGlobalService.realms.create(this.jsonSchemaView.values())
-                            : SMSGlobalService.realms.update(this.jsonSchemaView.values());
+            const failCallback = (response) => { Messages.addMessage({ type: Messages.TYPE_DANGER, response }); };
+            let values = this.jsonSchemaView.values();
+            let savePromise = this.data.newEntity ? SMSGlobalService.realms.create(values)
+                            : SMSGlobalService.realms.update(values);
 
-            promise.then((realm) => {
-                if (this.data.newEntity) {
-                    this.data.newEntity = false;
-                    let realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
-                    Router.routeTo(Router.configuration.routes.realmDefault, {
-                        args: [encodeURIComponent(realmPath)],
-                        trigger: true
-                    });
-                } else {
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                }
-            }, (response) => {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: response
-                });
-            }).always(() => {
+            savePromise.then((realm) => {
+                let realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
+
+                SMSRealmService.authentication.update(realmPath, {
+                    statelessSessionsEnabled: values.statelessSessionsEnabled
+                }).then(() => {
+                    if (this.data.newEntity) {
+                        this.data.newEntity = false;
+                        Router.routeTo(Router.configuration.routes.realmDefault, {
+                            args: [encodeURIComponent(realmPath)],
+                            trigger: true
+                        });
+                    } else {
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                    }
+
+                }, failCallback);
+            }, failCallback).always(() => {
                 this.toggleSubmitButton(true);
             });
         },

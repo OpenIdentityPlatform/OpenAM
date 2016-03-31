@@ -14,13 +14,14 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+/**
+ * @module org/forgerock/openam/ui/admin/services/SMSServiceUtils
+ */
 define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
-    "lodash"
-], function (_) {
-    /**
-     * @exports org/forgerock/openam/ui/admin/services/SMSServiceUtils
-     */
-    var obj = {};
+    "lodash",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, Promise) => {
+    const obj = {};
 
     /**
      * Adds a type attribute of <code>object</code> if not present
@@ -150,6 +151,45 @@ define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
         return function (data) {
             data.result = _.sortBy(data.result, attribute);
         };
+    };
+
+    obj.schemaWithDefaults = (delegate, url) => {
+        return Promise.all([
+            delegate.serviceCall({
+                url: `${url}?_action=schema`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }),
+            delegate.serviceCall({
+                url: `${url}?_action=template`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            })
+        ]).then(function (results) {
+            return {
+                schema: obj.sanitizeSchema(results[0][0]),
+                values: results[1][0]
+            };
+        });
+    };
+
+    obj.schemaWithValues = function (delegate, url) {
+        return Promise.all([
+            delegate.serviceCall({
+                url: `${url}?_action=schema`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }),
+            delegate.serviceCall({
+                url,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+            })
+        ]).then(function (results) {
+            return {
+                schema: obj.sanitizeSchema(results[0][0]),
+                values: results[1][0]
+            };
+        });
     };
 
     return obj;

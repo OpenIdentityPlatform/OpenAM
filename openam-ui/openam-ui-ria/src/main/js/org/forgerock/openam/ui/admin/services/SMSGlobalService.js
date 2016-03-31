@@ -28,46 +28,6 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
 ], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/`);
 
-    function schemaWithValues (url) {
-        return Promise.all([
-            obj.serviceCall({
-                url: `${url}?_action=schema`,
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            }),
-            obj.serviceCall({
-                url,
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            })
-        ]).then(function (results) {
-            return {
-                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
-                values: results[1][0]
-            };
-        });
-    }
-
-    function schemaWithDefaults (url) {
-        return Promise.all([
-            obj.serviceCall({
-                url: `${url}?_action=schema`,
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            }),
-            obj.serviceCall({
-                url: `${url}?_action=template`,
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "POST"
-            })
-
-        ]).then(function (results) {
-            return {
-                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
-                values: results[1][0]
-            };
-        });
-    }
-
     function getRealmPath (realm) {
         if (realm.parentPath === "/") {
             return realm.parentPath + realm.name;
@@ -88,21 +48,10 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
         },
         get (id) {
             const url = id === "core" ? "authentication" : `authentication/modules/${id}`;
-
-            return Promise.all([
-                obj.serviceCall({
-                    url: `${url}?_action=schema`,
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "POST"
-                }),
-                obj.serviceCall({
-                    url,
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                })
-            ]).then((results) => ({
-                schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
-                values: results[1][0]
-            }));
+            return SMSServiceUtils.schemaWithValues(obj, url);
+        },
+        schema () {
+            return SMSServiceUtils.schemaWithDefaults(obj, "authentication");
         },
         update (id, data) {
             return obj.serviceCall({
@@ -153,7 +102,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            return schemaWithValues("realms" + RealmHelper.encodeRealm(path));
+            return SMSServiceUtils.schemaWithValues(obj, "realms" + RealmHelper.encodeRealm(path));
         },
 
         /**
@@ -161,7 +110,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return schemaWithDefaults("realms");
+            return SMSServiceUtils.schemaWithDefaults(obj, "realms");
         },
 
         /**
