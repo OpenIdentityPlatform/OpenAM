@@ -1,0 +1,118 @@
+<div id="menu" class="menubar"></div>
+
+<div class="subnav-container">
+    <div class="container">
+        <div class="row">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header col-sm-3 col-md-3 col-lg-2">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#breadcrumbNavBar" aria-expanded="false" aria-controls="navbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                    <div class="ellipsis">
+                        <strong>
+                            <i class="fa fa-server"></i> <a href="{{routeTo 'editServerDefaultsGeneral'}}">{{t "console.common.navigation.server-defaults"}}</a>
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="ellipsis col-sm-9 col-md-9 col-lg-10 hidden-xs">
+                    {{> breadcrumb/_Breadcrumb crumbs=crumbs }}
+                </div>
+
+                <div id="breadcrumbNavBar" class="navbar-collapse collapse">
+                    <nav class="sidenav visible-xs-block">
+                        <ol class="list-unstyled">
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsGeneral'}}" class="text-primary">
+                                    <i class="fa fa-cog"></i>{{t "console.common.navigation.general"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsSecurity'}}" class="text-primary">
+                                    <i class="fa fa-lock"></i>{{t "console.common.navigation.security"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsSession'}}" class="text-primary">
+                                    <i class="fa fa-key"></i>{{t "console.common.navigation.session"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsSdk'}}" class="text-primary">
+                                    <i class="fa fa-th"></i>{{t "console.common.navigation.sdk"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsCts'}}" class="text-primary">
+                                    <i class="fa fa-database"></i>{{t "console.common.navigation.cts"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsUma'}}" class="text-primary">
+                                    <i class="fa fa-check-circle-o"></i>{{t "console.common.navigation.uma"}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{routeTo 'editServerDefaultsAdvanced'}}" class="text-primary">
+                                    <i class="fa fa-cog"></i>{{t "console.common.navigation.advanced"}}
+                                </a>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<div class="container tree-view-container">
+    <div class="row">
+        <div class="col-sm-3 col-md-3 col-lg-2 hidden-xs">
+            <nav class="sidenav">
+                <ol class="list-unstyled">
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsGeneral'}}" class="text-primary">
+                            <i class="fa fa-cog"></i>{{t "console.common.navigation.general" "general"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsSecurity'}}" class="text-primary">
+                            <i class="fa fa-lock"></i>{{t "console.common.navigation.security" "security"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsSession'}}" class="text-primary">
+                            <i class="fa fa-key"></i>{{t "console.common.navigation.session"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsSdk'}}" class="text-primary">
+                            <i class="fa fa-th"></i>{{t "console.common.navigation.sdk"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsCts'}}" class="text-primary">
+                            <i class="fa fa-database"></i>{{t "console.common.navigation.cts"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsUma'}}" class="text-primary">
+                            <i class="fa fa-check-circle-o"></i>{{t "console.common.navigation.uma"}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{routeTo 'editServerDefaultsAdvanced'}}" class="text-primary">
+                            <i class="fa fa-cog"></i>{{t "console.common.navigation.advanced"}}
+                        </a>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <div id="sidePageContent" class="col-sm-9 col-md-9 col-lg-10"></div>
+    </div>
+</div>

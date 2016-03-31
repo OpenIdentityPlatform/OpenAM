@@ -172,7 +172,7 @@ define("config/AppConfiguration", [
                                     "name": "config.AppConfiguration.Navigation.links.configure.global-services",
                                     "icon": "fa fa-globe"
                                 }, {
-                                    "event": Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
+                                    "url": "#configure/server-defaults/general",
                                     "name": "config.AppConfiguration.Navigation.links.configure.server-defaults",
                                     "icon": "fa fa-server"
                                 }],

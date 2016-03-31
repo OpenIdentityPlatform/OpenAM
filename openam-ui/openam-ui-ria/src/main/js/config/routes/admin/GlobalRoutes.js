@@ -14,62 +14,74 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("config/routes/admin/GlobalRoutes", [], () => ({
-    listAuthenticationSettings: {
-        view: "org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView",
-        url: /configure\/authentication/,
-        pattern: "configure/authentication",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },
-    editAuthenticationSettings: {
-        view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
-        url: /configure\/authentication\/([^\/]+)/,
-        pattern: "configure/authentication/?",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },
-    listGlobalServices: {
-        view: "org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView",
-        url: /configure\/global-services/,
-        pattern: "configure/global-services",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },
-    editGlobalService: {
-        view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
-        url: /configure\/global-service\/([^\/]+)/,
-        pattern: "configure/global-service/?",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },
-    // TODO : Uncomment when view ready.
-    /*editServerDefaults: {
-        view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsView",
-        url: /configure\/server-defaults/,
-        pattern: "configure/server-defaults",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },*/
-    listSites: {
-        view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
-        url: /deployment\/sites/,
-        pattern: "deployment/sites",
-        role: "ui-realm-admin",
-        navGroup: "admin"
-    },
-    editSite: {
-        view: "org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView",
-        url: /deployment\/sites\/edit\/([^\/]+)/,
-        pattern: "deployment/sites/edit/?",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    },
-    newSite: {
-        view: "org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView",
-        url: /deployment\/sites\/new/,
-        pattern: "deployment/sites/new",
-        role: "ui-global-admin",
-        navGroup: "admin"
-    }
-}));
+define("config/routes/admin/GlobalRoutes", [
+    "lodash"
+], (_) => {
+    const routes = {
+        listAuthenticationSettings: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView",
+            url: /configure\/authentication/,
+            pattern: "configure/authentication",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        editAuthenticationSettings: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
+            url: /configure\/authentication\/([^\/]+)/,
+            pattern: "configure/authentication/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        listGlobalServices: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView",
+            url: /configure\/global-services/,
+            pattern: "configure/global-services",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        editGlobalService: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
+            url: /configure\/global-service\/([^\/]+)/,
+            pattern: "configure/global-service/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        listSites: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
+            url: /deployment\/sites/,
+            pattern: "deployment/sites",
+            role: "ui-realm-admin",
+            navGroup: "admin"
+        },
+        editSite: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView",
+            url: /deployment\/sites\/edit\/([^\/]+)/,
+            pattern: "deployment/sites/edit/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        },
+        newSite: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView",
+            url: /deployment\/sites\/new/,
+            pattern: "deployment/sites/new",
+            role: "ui-global-admin",
+            navGroup: "admin"
+        }
+    };
+
+    // Add routes for "Server Defaults" tree navigation
+    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (id) => {
+        routes[`editServerDefaults${_.capitalize(id)}`] = {
+            view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
+            page: "org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView",
+            url: new RegExp(`configure/server-defaults/${id}`),
+            pattern: `configure/server-defaults/${id}`,
+            role: "ui-global-admin",
+            navGroup: "admin",
+            defaults: [id],
+            forceUpdate: true
+        };
+    });
+
+    return routes;
+});

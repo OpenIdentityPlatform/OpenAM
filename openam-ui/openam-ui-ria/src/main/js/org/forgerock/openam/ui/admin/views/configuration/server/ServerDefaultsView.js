@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,13 +14,12 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsView", [
+define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], (AbstractView) => {
-
-    const EditServerDefaultsView = AbstractView.extend({
-        // TODO
+    return AbstractView.extend({
+        render (args) {
+            console.log(args);
+        }
     });
-
-    return new EditServerDefaultsView();
 });

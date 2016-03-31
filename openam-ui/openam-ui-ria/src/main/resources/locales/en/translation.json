@@ -702,8 +702,15 @@
                 "authentication-chains": "Authentication - Chains",
                 "authentication-modules": "Authentication - Modules",
                 "authorization-policySets": "Authorization - Policy Sets",
-                "authorization-resourceTypes": "Authorization - Resource Types"
-
+                "authorization-resourceTypes": "Authorization - Resource Types",
+                "general": "General",
+                "security": "Security",
+                "session": "Session",
+                "sdk": "SDK",
+                "cts": "CTS",
+                "uma": "UMA",
+                "advanced": "Advanced",
+                "server-defaults": "Server Defaults"
             },
             "description": "Description",
             "type": "Type",
