@@ -150,7 +150,7 @@ public class AMCertStore {
         ConnectionEntryReader results = null;
 
         try {
-            results = ldc.search(LDAPRequests.newSearchRequest(storeParam.getStartLoc(), SearchScope.SUBORDINATES,
+            results = ldc.search(LDAPRequests.newSearchRequest(storeParam.getStartLoc(), SearchScope.WHOLE_SUBTREE,
                     storeParam.getSearchFilter(), attributes));
                                                  
             /*
@@ -185,7 +185,7 @@ public class AMCertStore {
          */
         try {
             return ldc.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(storeParam.getStartLoc(),
-                    SearchScope.SUBORDINATES, storeParam.getSearchFilter(), attributes));
+                    SearchScope.WHOLE_SUBTREE, storeParam.getSearchFilter(), attributes));
         } catch (Exception e) {
             debug.error("AMCertStore.getLdapEntry : Error in getting Cached CRL");
             return null;
