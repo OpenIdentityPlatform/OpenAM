@@ -38,12 +38,12 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
              SMSRealmService, FormHelper, JSONSchema, JSONValues, FlatJSONSchemaView, Promise) {
 
     function setAutofocus () {
-        $("[data-realm-form] input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
+        $("input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
     }
 
     function checkPattern (string) {
-        // "Characters $, &, +, comma, /, :, ;, =, ?, @, space, #, %% are not allowed in a realm's name"
-        const specialChars = " @#$%&+?:;,/=";
+        // "Characters $, &, +, \, ", comma, /, :, ;, =, ?, @, space, #, %, <, > are not allowed in a realm's name."
+        const specialChars = " @#$%&+?:;,/=\\<>\"";
         for (let i = 0; i < specialChars.length; i++) {
             if (string.indexOf(specialChars[i]) > -1) {
                 return true;
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
     function validateRealmName () {
         let valid = false;
-        let realmName = _.trim($("[data-realm-form] input[name=\"root[name]\"]").val());
+        let realmName = $("input[name=\"root[name]\"]").val();
         let alert = "";
 
         if (realmName.length > 0) {
@@ -128,7 +128,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                         // Only create dropdowns if the field is editable
                         data.schema.properties.parentPath["enum"] = allRealmPaths;
                         data.schema.properties.parentPath.options = { "enum_titles": allRealmPaths };
-                        data.schema.properties.name.pattern = "^[^$&+,/:;=?@\ #%]+$";
+                        data.schema.properties.name.pattern = "^[^\ @#$%&+?:;,/=\\<>\"]+$";
                     } else {
                         // Once created, it should not be possible to edit a realm's name or who it's parent is.
                         data.schema.properties.name.readonly = true;
