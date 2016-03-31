@@ -15,11 +15,54 @@
  */
 
 define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], (AbstractView) => {
+    "jquery",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/services/ServersService",
+    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
+
+    // jquery dependencies
+    "bootstrap-tabdrop"
+], ($, Messages, AbstractView, EventManager, Constants, Form, ServersService, JSONSchemaView) => {
+
+    function toggleSave (el, enable) {
+        el.find("[data-save]").prop("disabled", !enable);
+    }
+
     return AbstractView.extend({
-        render (args) {
-            console.log(args);
+        template: "templates/admin/views/configuration/server/EditServerDefaultsTemplate.html",
+        events: {
+            "click [data-save]": "onSave",
+            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
+        },
+
+        render (args, callback) {
+            const sectionId = args[0];
+
+            this.data.title = $.t(`console.common.navigation.${sectionId}`);
+
+            ServersService.servers.defaults.get(sectionId).then((data) => {
+                this.parentRender(() => {
+                    if (this.jsonSchemaView) {
+                        this.jsonSchemaView.remove();
+                    }
+                    this.jsonSchemaView = new JSONSchemaView({
+                        schema: data.schema,
+                        values: data.values,
+                        onRendered: () => toggleSave(this.$el, true)
+                    });
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-json-form]"));
+                    if (callback) { callback(); }
+                });
+            }, (response) => {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response
+                });
+            });
         }
     });
 });
