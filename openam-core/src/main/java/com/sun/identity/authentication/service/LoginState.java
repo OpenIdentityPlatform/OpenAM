@@ -1848,7 +1848,7 @@ public class LoginState {
      * @throws SSOException
      */
     public SSOToken getSSOToken() throws SSOException {
-        if (!stateless && (session == null || session.getState() == INACTIVE)) {
+        if (isNoSession() || (!stateless && (session == null || session.getState() == INACTIVE))) {
             return null;
         }
 
