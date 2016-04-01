@@ -45,10 +45,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         // self-service links should be shown only on the first stage of the username/password stages
         this.data.showForgotPassword = firstUserNamePassStage && Configuration.globalData.forgotPassword === "true";
         this.data.showForgotUserName = firstUserNamePassStage && Configuration.globalData.forgotUsername === "true";
+        this.data.showForgotten = this.data.showForgotPassword || this.data.showForgotUserName;
         this.data.showSelfRegistration = firstUserNamePassStage && Configuration.globalData.selfRegistration === "true";
         this.data.showRememberLogin = firstUserNamePassStage;
         // socialImplementations links should be shown only on the first stage of the username/password stages
-        // and didn't show at upgrade session page
+        // and should not show on the upgrade session page
         this.data.showSocialLogin = firstUserNamePassStage && !Configuration.loggedUser &&
                                         !_.isEmpty(Configuration.globalData.socialImplementations);
 
@@ -283,8 +284,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
 
         renderForm: function (reqs, urlParams) {
-            var cleaned = _.clone(reqs),
-                implicitConfirmation = true,
+            var requirements = _.clone(reqs),
                 promise = $.Deferred(),
                 usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
                 template,
@@ -292,7 +292,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
 
-            cleaned.callbacks = [];
+            requirements.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 
                 var redirectForm,
@@ -318,33 +318,33 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     } else {
                         window.location.replace(redirectCallback.redirectUrl);
                     }
-                } else if (element.type === "ConfirmationCallback") {
-                    implicitConfirmation = false;
                 } else if (element.type === "PollingWaitCallback") {
                     waitTime = _.find(element.output, { object: { name: "waitTime" } }).object.value;
 
                     window.setTimeout(function () {
                         EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {});
                     }, waitTime);
-                    implicitConfirmation = false;
                 }
 
-                cleaned.callbacks.push({
+                requirements.callbacks.push({
                     input: {
-                        index: cleaned.callbacks.length,
+                        index: requirements.callbacks.length,
                         name: element.input ? element.input[0].name : null,
                         value: element.input ? element.input[0].value : null
                     },
                     output: element.output,
-                    type: element.type,
-                    isSubmit: element.type === "ConfirmationCallback"
+                    type: element.type
                 });
             });
 
-            if (implicitConfirmation) {
-                cleaned.callbacks.push({
+            const confirmationRequired = _.find(reqs.callbacks, (callback) =>
+                callback.type === "ConfirmationCallback" || callback.type === "PollingWaitCallback"
+            );
+
+            if (confirmationRequired === undefined) {
+                requirements.callbacks.push({
                     "input": {
-                        index: cleaned.callbacks.length,
+                        index: requirements.callbacks.length,
                         name: "loginButton",
                         value: 0
                     },
@@ -352,13 +352,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         name: "options",
                         value: [$.t("common.user.login")]
                     }],
-                    type: "ConfirmationCallback",
-                    isSubmit: true
+                    type: "ConfirmationCallback"
                 });
             }
 
             this.reqs = reqs;
-            this.data.reqs = cleaned;
+            this.data.reqs = requirements;
 
             // Is there an attempt at autologin happening?
             // if yes then don't render the form until it fails one time

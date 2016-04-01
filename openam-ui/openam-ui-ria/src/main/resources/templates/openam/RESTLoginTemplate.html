@@ -9,11 +9,11 @@
     <form action="" method="post" class="form login col-sm-6 col-sm-offset-3" autocomplete="off" data-stage="{{reqs.stage}}">
         <fieldset class="row">
             {{#each reqs.callbacks}}
-                {{#if isSubmit}}
-                    {{#if ../../showRememberLogin}}
+                {{#equals type "ConfirmationCallback"}}
+                    {{#if ../showRememberLogin}}
                         {{> login/_RememberLogin }}
                     {{/if}}
-                {{/if}}
+                {{/equals}}
 
                 <div class="form-group">
                     {{callbackRender}}

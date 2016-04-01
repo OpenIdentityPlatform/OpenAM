@@ -1,3 +1,4 @@
+{{#if showForgotten}}
 <nav class="text-center clearfix remember-forgot" role="navigation">
     <ul>
         {{#if showForgotUserName}}
@@ -9,10 +10,11 @@
         {{/if}}
     </ul>
 </nav>
+{{/if}}
 
 {{#if showSelfRegistration}}
-    <div class="toggle-login-register">
-        <hr>
-        {{t "templates.login.newHere" }} <a href="{{decorateWithRealm (urlTo 'selfRegistration')}}">{{t "templates.login.createAccount" }}</a>
-    </div>
+<div class="toggle-login-register">
+    <hr>
+    {{t "templates.login.newHere" }} <a href="{{decorateWithRealm (urlTo 'selfRegistration')}}">{{t "templates.login.createAccount" }}</a>
+</div>
 {{/if}}
