@@ -367,13 +367,23 @@ public class SmsRouteTree implements RequestHandler {
         }
     };
 
+    public static final String HIDDEN_SERVICE = "sunIdentityFilteredRoleService";
     private static final ChildTypePredicate NOT_CREATED_SINGLETONS =
             new ChildTypePredicate() {
                 @Override
                 public boolean apply(JsonValue type, Context context, RequestHandler handler) throws ResourceException {
                     if (!type.get("collection").asBoolean()) {
+                        if (type.get("name").asString().equals(HIDDEN_SERVICE)) {
+                            return false;
+                        }
                         try {
-                            handler.handleRead(context, newReadRequest(empty())).getOrThrowUninterruptibly();
+                            final ResourceResponse response = handler.handleRead(context,
+                                    newReadRequest(empty())).getOrThrowUninterruptibly();
+
+                            final JsonValue dynamicAttribute = response.getContent().get("dynamic");
+                            if (dynamicAttribute.isNotNull()) {
+                                return dynamicAttribute.asMap().isEmpty();
+                            }
                             return false;
                         } catch (ResourceException e) {
                             if (e.getCode() == NOT_FOUND) {

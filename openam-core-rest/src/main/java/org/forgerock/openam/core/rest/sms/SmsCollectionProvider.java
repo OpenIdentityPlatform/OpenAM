@@ -127,7 +127,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                             JsonValue result = null;
                             try {
                                 result = getJsonValue(realm, created, context, authModuleResourceName,
-                                        autoCreatedAuthModule);
+                                        autoCreatedAuthModule, true);
                             } catch (InternalServerErrorException e) {
                                 debug.warning("Error creating JsonValue", e);
                             }
@@ -199,7 +199,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfig item = checkedInstanceSubConfig(context, resourceId, config);
 
             JsonValue result = getJsonValue(realmFor(context), item, context, authModuleResourceName,
-                    autoCreatedAuthModule);
+                    autoCreatedAuthModule, true);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on read", e);
@@ -229,7 +229,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfig node = checkedInstanceSubConfig(context, resourceId, config);
 
             node.setAttributes(attrs);
-            JsonValue result = getJsonValue(realm, node, context, authModuleResourceName, autoCreatedAuthModule);
+            JsonValue result = getJsonValue(realm, node, context, authModuleResourceName, autoCreatedAuthModule, true);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on update", e);
@@ -300,7 +300,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
 
     private void handleServiceConfig(QueryResourceHandler handler, String realm, String configName, ServiceConfig
             subConfig, Context context) throws InternalServerErrorException {
-        JsonValue value = getJsonValue(realm, subConfig, context, authModuleResourceName, autoCreatedAuthModule);
+        JsonValue value = getJsonValue(realm, subConfig, context, authModuleResourceName, autoCreatedAuthModule, false);
         handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
     }
 

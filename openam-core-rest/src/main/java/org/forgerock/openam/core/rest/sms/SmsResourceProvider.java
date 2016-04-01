@@ -228,13 +228,17 @@ public abstract class SmsResourceProvider {
 
     @Action
     public Promise<ActionResponse, ResourceException> schema(Context context) {
-        return newActionResponse(createSchema(context)).asPromise();
+        return newActionResponse(createSchema(context, false)).asPromise();
     }
 
     @Action
     public Promise<ActionResponse, ResourceException> template() {
         //when retrieving the template we don't want to validate the attributes
-        return newActionResponse(converter.toJson(schema.getAttributeDefaults(), false)).asPromise();
+        return newActionResponse(createTemplate()).asPromise();
+    }
+
+    protected JsonValue createTemplate() {
+        return converter.toJson(schema.getAttributeDefaults(), false);
     }
 
     @Action
@@ -274,9 +278,9 @@ public abstract class SmsResourceProvider {
         return i18nName;
     }
 
-    protected JsonValue createSchema(Context context) {
+    protected JsonValue createSchema(Context context, boolean dynamic) {
         JsonValue result = json(object(field("type", "object")));
-        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
+        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context, dynamic);
         return result;
     }
 
@@ -286,7 +290,7 @@ public abstract class SmsResourceProvider {
      */
     protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) throws
             InternalServerErrorException {
-        return getJsonValue(realm, config, context, null, false);
+        return getJsonValue(realm, config, context, null, false, true);
     }
 
     /**
@@ -294,11 +298,12 @@ public abstract class SmsResourceProvider {
      * property for the name of the config.
      */
     protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context, String authModuleResourceName,
-                                     boolean autoCreatedAuthModule) throws InternalServerErrorException {
+                                     boolean autoCreatedAuthModule, boolean validate) throws
+            InternalServerErrorException {
         if (config == null) {
             return json(object());
         } else {
-            JsonValue value = converter.toJson(realm, config.getAttributes(), true);
+            JsonValue value = converter.toJson(realm, config.getAttributes(), validate);
 
             String id = config.getName();
             if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
@@ -315,7 +320,8 @@ public abstract class SmsResourceProvider {
         }
     }
 
-    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
+    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context, boolean
+            dynamic) {
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
         ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
         String serviceType = schemas.getServiceType().getType();
@@ -328,16 +334,24 @@ public abstract class SmsResourceProvider {
             String i18NKey = attribute.getI18NKey();
             if (i18NKey != null && i18NKey.length() > 0) {
                 String attributePath = attribute.getResourceName();
-                if (!sections.isEmpty()) {
-                    String section = attributeSectionMap.get(attribute.getName());
-                    String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
+                if (!sections.isEmpty() || dynamic) {
+                    String section;
+                    String sectionLabel;
+                    final String title;
+                    if (!sections.isEmpty()) {
+                        section = attributeSectionMap.get(attribute.getName());
+                        sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
+                        title = getTitle(consoleI18n, schemaI18n, sectionLabel);
+                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
+                                "z" + sectionFormat.format(sections.indexOf(section)));
+                    } else {
+                        section = "dynamic";
+                        title = "Dynamic";
+                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER), "0");
+                    }
                     attributePath = section + "/" + PROPERTIES + "/" + attributePath;
                     result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
-
-                    result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                            getTitle(consoleI18n, schemaI18n, sectionLabel));
-                    result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
-                            "z" + sectionFormat.format(sections.indexOf(section)));
+                    result.putPermissive(new JsonPointer(path + section + "/" + TITLE), title);
                 }
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString(i18NKey));
 
@@ -442,6 +456,7 @@ public abstract class SmsResourceProvider {
             addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
                     context);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
+            type = STRING_TYPE;
             addEnumChoices(result.get(new JsonPointer(pointer)), attribute, schemaI18n, consoleI18n, context);
         } else {
             type = getTypeFromSyntax(syntax);
