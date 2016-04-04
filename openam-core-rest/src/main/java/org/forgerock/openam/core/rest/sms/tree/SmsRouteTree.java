@@ -82,6 +82,7 @@ public class SmsRouteTree implements RequestHandler {
     private final Filter filter;
     private final Map<String, RequestHandler> handlers = new LinkedHashMap<>();
     private final String uriTemplate;
+    private final Set<String> hiddenFromUI = new HashSet<>();
 
     /**
      * Creates a {@code SmsRouteTree} instance.
@@ -133,6 +134,14 @@ public class SmsRouteTree implements RequestHandler {
         } else {
             return null;
         }
+    }
+
+    public final Route addRoute(RoutingMode mode, String uriTemplate, RequestHandler handler, boolean hideFromUi) {
+        if (hideFromUi) {
+            this.hiddenFromUI.add(uriTemplate);
+        }
+
+        return addRoute(false, mode, uriTemplate, handler);
     }
 
     /**
@@ -188,6 +197,8 @@ public class SmsRouteTree implements RequestHandler {
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         String remainingUri = context.asContext(UriRouterContext.class).getRemainingUri();
         String action = request.getAction();
+        boolean forUI = Boolean.parseBoolean(request.getAdditionalParameter(FOR_UI));
+
         if (NEXT_DESCENDENTS.equals(action) && remainingUri.isEmpty()) {
             JsonValue result = json(object(field("result", array())));
             for (Map.Entry<String, RequestHandler> subRoute : handlers.entrySet()) {
@@ -203,13 +214,13 @@ public class SmsRouteTree implements RequestHandler {
             return newActionResponse(result).asPromise();
         } else if (GET_ALL_TYPES.equals(action) && remainingUri.isEmpty()) {
             try {
-                return readTypes(context, ALL_CHILD_TYPES);
+                return readTypes(context, ALL_CHILD_TYPES, false);
             } catch (ResourceException e) {
                 return e.asPromise();
             }
         } else if (GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
             try {
-                return readTypes(context, NOT_CREATED_SINGLETONS);
+                return readTypes(context, NOT_CREATED_SINGLETONS, forUI);
             } catch (ResourceException e) {
                 return e.asPromise();
             }
@@ -218,7 +229,8 @@ public class SmsRouteTree implements RequestHandler {
         }
     }
 
-    private Promise<ActionResponse, ResourceException> readTypes(Context context, ChildTypePredicate includeType)
+    private Promise<ActionResponse, ResourceException> readTypes(Context context, ChildTypePredicate includeType,
+                                                                 boolean forUI)
             throws ResourceException {
         JsonValue result = json(array());
         for (Map.Entry<String, RequestHandler> subRoute : handlers.entrySet()) {
@@ -229,7 +241,8 @@ public class SmsRouteTree implements RequestHandler {
                             .getOrThrowUninterruptibly();
 
                     JsonValue jsonContent = response.getJsonContent();
-                    if (includeType.apply(jsonContent, context, subRoute.getValue())) {
+                    if (includeType.apply(jsonContent, context, subRoute.getValue()) && (!hiddenFromUI
+                            .contains(subRoute.getKey()) || !forUI)) {
                         result.add(jsonContent.getObject());
                     }
                 } catch (ResourceException e) {

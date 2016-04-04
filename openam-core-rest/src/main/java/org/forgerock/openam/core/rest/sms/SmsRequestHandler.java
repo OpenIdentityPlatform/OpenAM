@@ -579,7 +579,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             }
         }
         SmsRouteTree tree = routeTree == null ? this.routeTree.handles(schema.getServiceName()) : routeTree;
-        SmsRouteTree.Route route = tree.addRoute(mode, path, handler);
+        SmsRouteTree.Route route = tree.addRoute(mode, path, handler, schema.isHiddenInConfigUI());
         serviceRoutes.put(tree, asSet(route.matcher));
         return route.tree;
     }

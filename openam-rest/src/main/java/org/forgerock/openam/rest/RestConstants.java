@@ -35,6 +35,8 @@ public final class RestConstants {
     public static final String GET_CREATABLE_TYPES = "getCreatableTypes";
     /** The action ID to return all created instances. */
     public static final String NEXT_DESCENDENTS = "nextdescendents";
+    /** The URL parameter to filter out services that can't be created via the XUI */
+    public static final String FOR_UI = "forUI";
 
     /** The name field constant. **/
     public final static String NAME = "name";

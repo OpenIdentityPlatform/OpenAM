@@ -205,7 +205,8 @@
             </Global>
             <Organization>
                 <SubSchema name="scriptConfigurations">
-                    <SubSchema name="scriptConfiguration" inheritance="multiple" resourceName="scripts">
+                    <SubSchema name="scriptConfiguration" inheritance="multiple" resourceName="scripts"
+                               hideConfigUI="yes">
                         <AttributeSchema name="name" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="description" type="single" syntax="string" i18nKey="no-i18n"/>
                         <AttributeSchema name="script" type="single" syntax="script" i18nKey="no-i18n"/>
