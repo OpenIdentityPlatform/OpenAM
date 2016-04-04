@@ -1,0 +1,22 @@
+<li>
+    <a class="text-primary"
+        {{#if children}}
+            data-toggle="collapse"
+            aria-expanded="false"
+            href="#{{href}}{{identifier}}"
+            aria-controls="{{href}}{{identifier}}"
+        {{else}}
+            {{#if href}}href="{{href}}"{{/if}}
+            {{#if event}}data-event="{{event}}"{{/if}}
+        {{/if}}
+    >
+        <i class="fa fa-fw {{icon}}"></i>{{t title}}
+    </a>
+    {{#if children}}
+        <ol class="collapse list-unstyled sidenav-submenu" id="{{href}}{{identifier}}">
+        {{#each children}}
+            {{> templates/admin/views/common/navigation/_TreeNavigationLeaf identifier=identifier}}
+        {{/each}}
+        </ol>
+    {{/if}}
+</li>

@@ -16,16 +16,49 @@
 
 define("org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView", [
     "org/forgerock/openam/ui/common/components/TreeNavigation",
-    "org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs"
-], (TreeNavigation, createRealmsBreadcrumbs) => {
+    "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
+    "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation"
+], (TreeNavigation, createBreadcrumbs, createTreeNavigation) => {
+
+    const navData = [{
+        title: "console.common.navigation.general",
+        icon: "fa-cog",
+        route: "editServerDefaultsGeneral"
+    }, {
+        title: "console.common.navigation.security",
+        icon: "fa-lock",
+        route: "editServerDefaultsSecurity"
+    }, {
+        title: "console.common.navigation.session",
+        icon: "fa-key",
+        route: "editServerDefaultsSession"
+    }, {
+        title: "console.common.navigation.sdk",
+        icon: "fa-th",
+        route: "editServerDefaultsSdk"
+    }, {
+        title: "console.common.navigation.cts",
+        icon: "fa-database",
+        route: "editServerDefaultsCts"
+    }, {
+        title: "console.common.navigation.uma",
+        icon: "fa-check-circle-o",
+        route: "editServerDefaultsUma"
+    }, {
+        title: "console.common.navigation.advanced",
+        icon: "fa-cogs",
+        route: "editServerDefaultsAdvanced"
+    }];
+
     const EditServerDefaultsTreeNavigationView = TreeNavigation.extend({
         template: "templates/admin/views/configuration/server/EditServerDefaultsTreeNavigationTemplate.html",
         partials: [
-            "partials/breadcrumb/_Breadcrumb.html"
+            "partials/breadcrumb/_Breadcrumb.html",
+            "templates/admin/views/common/navigation/_TreeNavigationLeaf.html"
         ],
         render (args, callback) {
-            this.data.crumbs = createRealmsBreadcrumbs(this.route.pattern);
-
+            this.data.crumbs = createBreadcrumbs(this.route.pattern);
+            this.data.treeNavigation = createTreeNavigation(navData);
             TreeNavigation.prototype.render.call(this, args, callback);
         }
     });

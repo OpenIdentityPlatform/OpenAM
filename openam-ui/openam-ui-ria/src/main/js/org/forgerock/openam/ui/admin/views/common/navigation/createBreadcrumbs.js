@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
+define("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/util/URIUtils"
@@ -49,7 +49,15 @@ define("org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs", [
         return lastFragmentPattern === "?" ? 0 : 1;
     }
 
+    function throwOnNoPattern (pattern) {
+        if (!pattern) {
+            throw new Error("[createBreadcrumbs] No \"pattern\" found.");
+        }
+    }
+
     return (pattern) => {
+
+        throwOnNoPattern(pattern);
 
         /* Under Realms all routes will follow a repeating pattern of -
          * COLLECTION, ACTION, INSTANCE, COLLECTION, ACTION, INSTANCE etc. Some examples of this might be

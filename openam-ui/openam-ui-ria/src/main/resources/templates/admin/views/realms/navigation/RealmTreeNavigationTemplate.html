@@ -12,9 +12,7 @@
                     </button>
 
                     <div class="ellipsis">
-                        <strong>
-                            <i class="fa fa-server"></i> <a href="{{routeTo 'editServerDefaultsGeneral'}}">{{t "console.common.navigation.server-defaults"}}</a>
-                        </strong>
+                        <strong><i class="fa fa-cloud"></i> <a href="{{routeTo 'realmsDashboard' realmPath}}">{{realmName}}</a></strong>
                     </div>
                 </div>
 
@@ -26,7 +24,7 @@
                     <nav class="sidenav visible-xs-block">
                         <ol class="list-unstyled">
                             {{#each this.treeNavigation}}
-                                {{> templates/admin/views/common/navigation/_TreeNavigationLeaf identifier="side"}}
+                                {{> templates/admin/views/common/navigation/_TreeNavigationLeaf identifier="top"}}
                             {{/each}}
                         </ol>
                     </nav>
@@ -43,7 +41,7 @@
             <nav class="sidenav">
                 <ol class="list-unstyled">
                     {{#each this.treeNavigation}}
-                        {{> templates/admin/views/common/navigation/_TreeNavigationLeaf identifier="top"}}
+                        {{> templates/admin/views/common/navigation/_TreeNavigationLeaf identifier="side"}}
                     {{/each}}
                 </ol>
             </nav>

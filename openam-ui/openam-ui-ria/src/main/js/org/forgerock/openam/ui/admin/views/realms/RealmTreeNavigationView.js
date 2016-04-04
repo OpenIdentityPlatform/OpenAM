@@ -22,8 +22,72 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
-    "org/forgerock/openam/ui/admin/views/realms/createRealmsBreadcrumbs"
-], ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation, createRealmsBreadcrumbs) => {
+    "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
+    "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation"
+], ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation, createBreadcrumbs,
+    createTreeNavigation) => {
+
+    const navData = [{
+        title: "console.common.navigation.dashboard",
+        icon: "fa-dashboard",
+        route: "realmsDashboard"
+    }, {
+        title: "console.common.navigation.authentication",
+        icon: "fa-user",
+        children: [{
+            title: "console.common.navigation.settings",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationSettings"
+        }, {
+            title: "console.common.navigation.chains",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationChains"
+        }, {
+            title: "console.common.navigation.modules",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationModules"
+        }]
+    }, {
+        title: "console.common.navigation.services",
+        icon:"fa-plug",
+        route:"realmsServices"
+    }, {
+        title: "console.common.navigation.dataStores",
+        icon: "fa-database",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_DATASTORES"
+    }, {
+        title: "console.common.navigation.privileges",
+        icon: "fa-check-square-o",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_PRIVILEGES"
+    }, {
+        title: "console.common.navigation.authorization",
+        icon: "fa-key",
+        children: [{
+            title: "console.common.navigation.policySets",
+            icon: "fa-angle-right",
+            route: "realmsPolicySets"
+        }, {
+            title: "console.common.navigation.resourceTypes",
+            icon: "fa-angle-right",
+            route: "realmsResourceTypes"
+        }]
+    }, {
+        title: "console.common.navigation.subjects",
+        icon: "fa-users",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_SUBJECTS"
+    }, {
+        title: "console.common.navigation.agents",
+        icon: "fa-male",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
+    }, {
+        title: "console.common.navigation.sts",
+        icon: "fa-ticket",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_STS"
+    }, {
+        title: "console.common.navigation.scripts",
+        icon: "fa-code",
+        route: "realmsScripts"
+    }];
 
     function shortenRealmName (realmPath) {
         let realmName;
@@ -39,28 +103,28 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
         events: {
             "click [data-event]": "sendEvent"
         },
-        template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
+        template: "templates/admin/views/realms/navigation/RealmTreeNavigationTemplate.html",
         partials: [
-            "partials/breadcrumb/_Breadcrumb.html"
+            "partials/breadcrumb/_Breadcrumb.html",
+            "templates/admin/views/common/navigation/_TreeNavigationLeaf.html"
         ],
-        sendEvent: function (e) {
+        sendEvent (e) {
             e.preventDefault();
             EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
         },
 
-        realmExists: function (path) {
+        realmExists (path) {
             return SMSGlobalService.realms.get(path);
         },
-        render: function (args, callback) {
-            var self = this;
-
+        render (args, callback) {
             this.data.realmPath = args[0];
             this.data.realmName = shortenRealmName(this.data.realmPath);
-            this.data.crumbs = createRealmsBreadcrumbs(this.route.pattern);
+            this.data.crumbs = createBreadcrumbs(this.route.pattern);
+            this.data.treeNavigation = createTreeNavigation(navData, [encodeURIComponent(this.data.realmPath)]);
 
-            this.realmExists(this.data.realmPath).then(function () {
-                TreeNavigation.prototype.render.call(self, args, callback);
-            }, function (xhr) {
+            this.realmExists(this.data.realmPath).then(() => {
+                TreeNavigation.prototype.render.call(this, args, callback);
+            }, (xhr) => {
                 /**
                  * If a non-existant realm was specified, return to realms list
                  */
