@@ -104,39 +104,40 @@ public class AuthenticatorPush extends AMLoginModule {
         }
 
         switch (state) {
-            case ISAuthConstants.LOGIN_START:
-                return loginStart();
-            case USERNAME_STATE:
-                return usernameState(callbacks);
-            case STATE_WAIT:
-                return awaitState();
-            default:
-                DEBUG.error("AuthenticatorPush :: process() : Invalid state.");
-                throw failedAsLoginException();
+        case ISAuthConstants.LOGIN_START:
+            return loginStart();
+        case USERNAME_STATE:
+            return usernameState(callbacks);
+        case STATE_WAIT:
+            return awaitState();
+        default:
+            DEBUG.error("AuthenticatorPush :: process() : Invalid state.");
+            throw failedAsLoginException();
         }
     }
 
     private int awaitState() throws AuthLoginException {
+
         switch (pollingWaitAssistant.getPollingWaitState()) {
-            case TOO_EARLY:
-                return STATE_WAIT;
-            case NOT_STARTED:
-            case WAITING:
-                setPollbackTimePeriod(pollingWaitAssistant.getWaitPeriod());
-                pollingWaitAssistant.resetWait();
-                return STATE_WAIT;
-            case COMPLETE:
-                storeUsername(username);
-                return ISAuthConstants.LOGIN_SUCCEED;
-            case TIMEOUT:
-                DEBUG.warning("AuthenticatorPush :: timeout value exceeded while waiting for response.");
-                throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
-            case SPAMMED:
-                DEBUG.warning("AuthenticatorPush :: too many requests sent to Auth module.  "
-                        + "Client should obey wait time.");
-                throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
-            default:
-                throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        case TOO_EARLY:
+            return STATE_WAIT;
+        case NOT_STARTED:
+        case WAITING:
+            setPollbackTimePeriod(pollingWaitAssistant.getWaitPeriod());
+            pollingWaitAssistant.resetWait();
+            return STATE_WAIT;
+        case COMPLETE:
+            storeUsername(username);
+            return ISAuthConstants.LOGIN_SUCCEED;
+        case TIMEOUT:
+            DEBUG.warning("AuthenticatorPush :: timeout value exceeded while waiting for response.");
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        case SPAMMED:
+            DEBUG.warning("AuthenticatorPush :: too many requests sent to Auth module.  "
+                    + "Client should obey wait time.");
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        default:
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
         }
     }
 

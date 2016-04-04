@@ -49,7 +49,7 @@ final class Constants {
     /** State to display an error message to the end-user. */
     public static final int STATE_ERROR = 4;
 
-    /** The Position of the Polling callback in the callbacks step in the xml for this module */
+    /** The Position of the Polling callback in the callbacks step in the xml for this module. */
     public static final int POLLING_CALLBACK_POSITION = 1;
 
 }
