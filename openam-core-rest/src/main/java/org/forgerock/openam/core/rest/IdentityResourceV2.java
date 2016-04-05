@@ -678,7 +678,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         } else if (action.equalsIgnoreCase("forgotPassword")) {
             return generateNewPasswordEmail(context, request, realm, restSecurity);
         } else if (action.equalsIgnoreCase("forgotPasswordReset")) {
-            return anonymousUpdate(context, request, realm);
+            return identityResourceV1.anonymousUpdate(context, request, realm);
         } else if (action.equalsIgnoreCase("validateGoto")) {
             return validateGoto(context, request);
         } else { // for now this is the only case coming in, so fail if otherwise
@@ -857,80 +857,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         }
 
         throw new BadRequestException("Username or email not provided in request");
-    }
-
-    /**
-     * Perform an anonymous update of a user's password using the provided token.
-     *
-     * The token must match a token placed in the CTS in order for the request
-     * to proceed.
-     *
-     * @param context Non null
-     * @param request Non null
-     * @param realm Non null
-     */
-    private Promise<ActionResponse, ResourceException> anonymousUpdate(final Context context,
-            final ActionRequest request, final String realm) {
-        final String tokenID;
-        String confirmationId;
-        String username;
-        String nwpassword;
-        final JsonValue jVal = request.getContent();
-
-        try{
-            tokenID = jVal.get(TOKEN_ID).asString();
-            jVal.remove(TOKEN_ID);
-            confirmationId = jVal.get(CONFIRMATION_ID).asString();
-            jVal.remove(CONFIRMATION_ID);
-            username = jVal.get(USERNAME).asString();
-            nwpassword =  jVal.get("userpassword").asString();
-
-            if(username == null || username.isEmpty()){
-                throw new BadRequestException("username not provided");
-            }
-            if(nwpassword == null || username.isEmpty()) {
-                throw new BadRequestException("new password not provided");
-            }
-
-            validateToken(tokenID, realm, username, confirmationId);
-
-            // update Identity
-            SSOToken admin = RestUtils.getToken();
-
-            // Update instance with new password value
-            return updateInstance(admin, jVal, realm)
-                    .thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
-                        @Override
-                        public Promise<ActionResponse, ResourceException> apply(ActionResponse response) {
-                            // Only remove the token if the update was successful, errors will be set in the handler.
-                            try {
-                                // Even though the generated token will eventually timeout, delete it after a successful read
-                                // so that the reset password request cannot be made again using the same token.
-                                CTSHolder.getCTS().deleteAsync(tokenID);
-                            } catch (DeleteFailedException e) {
-                                // Catch this rather than letting it stop the process as it is possible that between successfully
-                                // reading and deleting, the token has expired.
-                                if (debug.messageEnabled()) {
-                                    debug.message("Deleting token " + tokenID + " after a successful " +
-                                            "read failed due to " + e.getMessage(), e);
-                                }
-                            } catch (CoreTokenException cte) { // For any unexpected CTS error
-                                debug.error("Error performing anonymousUpdate", cte);
-                                return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
-                            }
-                            return newResultPromise(response);
-                        }
-                    });
-        } catch (BadRequestException bre) { // For any malformed request.
-            debug.warning("Bad request received for anonymousUpdate ", bre);
-            return bre.asPromise();
-        } catch (ResourceException re) {
-            debug.warning("Error performing anonymousUpdate", re);
-            return re.asPromise();
-        } catch (CoreTokenException cte) { // For any unexpected CTS error
-            debug.error("Error performing anonymousUpdate", cte);
-            return new InternalServerErrorException(cte).asPromise();
-        }
     }
 
     /**

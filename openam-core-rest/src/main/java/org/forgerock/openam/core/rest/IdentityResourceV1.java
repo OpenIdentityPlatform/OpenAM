@@ -16,6 +16,7 @@
 package org.forgerock.openam.core.rest;
 
 import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
@@ -142,6 +143,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
     public static final String OLD_PASSWORD = "olduserpassword";
+    private static final String USER_PASSWORD = "userpassword";
 
     private final RestSecurityProvider restSecurityProvider;
     private final Set<UiRolePredicate> uiRolePredicates;
@@ -798,26 +800,24 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param request Non null
      * @param realm Non null
      */
-    private Promise<ActionResponse, ResourceException> anonymousUpdate(final Context context,
+    protected Promise<ActionResponse, ResourceException> anonymousUpdate(final Context context,
             final ActionRequest request, final String realm) {
         final String tokenID;
         String confirmationId;
         String username;
-        String nwpassword;
+        String newPassword;
         final JsonValue jVal = request.getContent();
 
         try{
             tokenID = jVal.get(TOKEN_ID).asString();
-            jVal.remove(TOKEN_ID);
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
-            jVal.remove(CONFIRMATION_ID);
             username = jVal.get(USERNAME).asString();
-            nwpassword =  jVal.get("userpassword").asString();
+            newPassword =  jVal.get(USER_PASSWORD).asString();
 
             if(username == null || username.isEmpty()){
                 throw new BadRequestException("username not provided");
             }
-            if(nwpassword == null || username.isEmpty()) {
+            if (StringUtils.isEmpty(newPassword)) {
                 throw new BadRequestException("new password not provided");
             }
 
@@ -827,8 +827,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             SSOToken admin = RestUtils.getToken();
 
             // Update instance with new password value
-            return updateInstance(admin, jVal, realm)
-                    .thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
+            return updateInstance(admin, json(object(field(USERNAME, username), field(USER_PASSWORD, newPassword))),
+                    realm).thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
                         @Override
                         public Promise<ActionResponse, ResourceException> apply(ActionResponse response) {
                             // Only remove the token if the update was successful, errors will be set in the handler.
