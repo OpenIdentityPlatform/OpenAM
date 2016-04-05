@@ -35,6 +35,8 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.PermanentException;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
@@ -256,11 +258,16 @@ public class SitesResourceProvider implements CollectionResourceProvider {
             SSOToken token = getSsoToken(context);
             ResourceResponse site = getSite(token, id);
             return newResultPromise(site);
-        } catch (SMSException | SSOException | ConfigurationException e) {
+        } catch (SMSException e) {
+            debug.error("Error reading SMS", id, e);
+            return new InternalServerErrorException("Error reading SMS", e).asPromise();
+        } catch (SSOException e) {
+            return new PermanentException(401, "Invalid ssoToken", e).asPromise();
+        } catch (ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            return new InternalServerErrorException("Could not read site").asPromise();
+            return new InternalServerErrorException("Error reading configuration for site: " + id).asPromise();
         } catch (NotFoundException e) {
-            return e.asPromise();
+            return new NotFoundException("Cannot find site: " + id).asPromise();
         }
     }
 
