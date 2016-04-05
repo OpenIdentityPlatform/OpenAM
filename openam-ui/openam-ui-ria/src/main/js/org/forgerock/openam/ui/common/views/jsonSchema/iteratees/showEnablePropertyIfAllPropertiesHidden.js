@@ -14,20 +14,21 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
-    "backbone",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], (Backbone, UIUtils) => {
-    return Backbone.View.extend({
-        initialize (options) {
-            this.options = options;
-        },
-        render () {
-            UIUtils.fillTemplateWithData(
-                this.options.template,
-                this.options.data,
-                (html) => this.$el.html(html)
-            );
-        }
-    });
+ /**
+  * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/showEnablePropertyIfAllPropertiesHidden
+  */
+define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/showEnablePropertyIfAllPropertiesHidden", [
+    "lodash"
+], (_) => (schemaValuePair) => {
+    const allPropertiesHidden = _.isEmpty(schemaValuePair.schema.raw.defaultProperties);
+
+    if (allPropertiesHidden && schemaValuePair.schema.hasEnableProperty()) {
+        return _.extend(schemaValuePair, {
+            schema: schemaValuePair.schema
+                .getEnableProperty()
+                .setDefaultProperties([schemaValuePair.schema.enableKey()])
+        });
+    }
+
+    return schemaValuePair;
 });

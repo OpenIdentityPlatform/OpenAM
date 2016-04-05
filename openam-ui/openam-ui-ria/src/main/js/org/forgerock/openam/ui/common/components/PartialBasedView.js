@@ -14,20 +14,21 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
+define("org/forgerock/openam/ui/common/components/PartialBasedView", [
     "backbone",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], (Backbone, UIUtils) => {
-    return Backbone.View.extend({
-        initialize (options) {
-            this.options = options;
-        },
-        render () {
-            UIUtils.fillTemplateWithData(
-                this.options.template,
-                this.options.data,
-                (html) => this.$el.html(html)
-            );
+    "handlebars",
+    "lodash"
+], (Backbone, Handlebars, _) => Backbone.View.extend({
+    initialize (options) {
+        if (!_.isString(options.partial)) {
+            throw new TypeError("[PartialBasedView] \"partial\" argument is not a String.");
         }
-    });
-});
+
+        this.options = options;
+    },
+    render () {
+        const template = `{{> ${this.options.partial}}}`;
+        const html = Handlebars.compile(template)(this.options.data);
+        this.$el.html(html);
+    }
+}));

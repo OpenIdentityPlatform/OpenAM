@@ -22,7 +22,6 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues) => {
-
     const obj = new AbstractDelegate(
         `${Constants.host}/${Constants.context}/json/global-config/servers/server-default/properties/`);
 
@@ -32,23 +31,20 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
     const getSchema = (id) => obj.serviceCall({
         url: `${id}?_action=schema`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-        type: "POST",
-        success: (data) => mockData(data)
-    });
+        type: "POST"
+    }).then((response) => new JSONSchema(mockData(response)));
 
     const getValues = (id) => obj.serviceCall({
         url: `${id}`,
-        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-        success: (data) => data
-    });
+        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+    }).then((response) => new JSONValues(response));
 
     obj.servers = {
         defaults: {
-            get: (sectionId) =>
-                Promise.all([getSchema(sectionId), getValues(sectionId)]).then((response) => ({
-                    schema: new JSONSchema(response[0]),
-                    values: new JSONValues(response[1])
-                }))
+            get: (sectionId) => Promise.all([getSchema(sectionId), getValues(sectionId)]).then((response) => ({
+                schema: response[0],
+                values: response[1]
+            }))
         }
     };
 

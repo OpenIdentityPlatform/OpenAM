@@ -14,6 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+ /**
+ * @deprecated
+ */
 define("org/forgerock/openam/ui/admin/models/Form", [
     "jquery",
     "underscore",
@@ -23,6 +26,8 @@ define("org/forgerock/openam/ui/admin/models/Form", [
     "selectize" // jquery dependencies
 ], function ($, _, JSONEditor, JSONEditorTheme) {
     var obj = function Form (element, schema, values) {
+        console.warn("[Form] \"Form\" is deprecated. Use a FlatJSONSchemaView or GroupedJSONSchemaView instead.");
+
         this.element = element;
         this.schema = schema;
         this.values = values;

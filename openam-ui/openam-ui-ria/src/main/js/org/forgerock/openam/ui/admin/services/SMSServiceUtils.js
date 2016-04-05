@@ -115,8 +115,10 @@ define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
      * Sanitizes JSON Schemas.
      * @param  {Object} schema Schema to sanitize
      * @returns {Object}       Sanitized schema
+     * @deprecated
      */
     obj.sanitizeSchema = function (schema) {
+        console.warn("[SMSServiceUtils] \"#sanitizeSchema\" is deprecated. Use JSONSchema model instead.");
         var transformedSchema = _.cloneDeep(schema);
 
         /**

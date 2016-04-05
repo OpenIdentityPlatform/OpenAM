@@ -24,11 +24,13 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
-    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, JSONSchemaView) => {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FlatJSONSchemaView,
+    GroupedJSONSchemaView) => {
     function toggleCreate (el, enable) {
         el.find("[data-create]").prop("disabled", !enable);
     }
@@ -79,12 +81,19 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 }
 
                 ServicesService.instance.getInitialState(this.data.realmPath, this.data.type).then((response) => {
-                    this.jsonSchemaView = new JSONSchemaView({
+                    const options = {
                         schema: response.schema,
                         values: response.values,
                         showOnlyRequiredAndEmpty: true,
                         onRendered: () => toggleCreate(this.$el, true)
-                    });
+                    };
+
+                    if (response.schema.isCollection()) {
+                        this.jsonSchemaView = new GroupedJSONSchemaView(options);
+                    } else {
+                        this.jsonSchemaView = new FlatJSONSchemaView(options);
+                    }
+
                     $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
                 }, () => {
                     toggleCreate(this.$el, false);

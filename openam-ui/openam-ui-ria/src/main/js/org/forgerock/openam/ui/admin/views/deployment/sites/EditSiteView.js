@@ -23,13 +23,13 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SitesService",
-    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, JSONSchemaView, FormHelper,
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, FlatJSONSchemaView, FormHelper,
     deleteInstance) => {
 
     function toggleSave (el, enable) {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
             "click [data-delete]": "onDelete"
         },
 
-        render (args, callback) {
+        render (args) {
             this.data.id = args[0];
 
             SitesService.sites.get(this.data.id).then((data) => {
@@ -57,13 +57,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
                     if (this.jsonSchemaView) {
                         this.jsonSchemaView.remove();
                     }
-                    this.jsonSchemaView = new JSONSchemaView({
+                    this.jsonSchemaView = new FlatJSONSchemaView({
                         schema: data.schema,
                         values: data.values,
                         onRendered: () => toggleSave(this.$el, true)
                     });
                     $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
-                    if (callback) { callback(); }
                 });
             });
         },

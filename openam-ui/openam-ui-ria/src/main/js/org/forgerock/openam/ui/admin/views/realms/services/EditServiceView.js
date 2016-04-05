@@ -22,15 +22,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView",
-
-    // jquery dependencies
-    "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, FormHelper,
-    SubschemaListView) => {
+    "org/forgerock/openam/ui/common/components/PartialBasedView",
+    "org/forgerock/openam/ui/common/components/TabComponent",
+    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FormHelper,
+    SubSchemaListView, PartialBasedView, TabComponent, JSONSchema, JSONValues, FlatJSONSchemaView) => {
+    const PSEUDO_TAB = { id: _.uniqueId("pseudo_tab_"), title: $.t("console.common.configuration") };
+    const SUBSCHEMA_TAB = { id: "subschema", title: $.t("console.services.edit.secondaryConfigurations") };
 
     function deleteService () {
         ServicesService.instance.remove(this.data.realmPath, this.data.type).then(() => {
@@ -42,86 +45,127 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             });
         }, (model, response) => {
             Messages.addMessage({
-                response: response,
+                response,
                 type: Messages.TYPE_DANGER
             });
         });
+    }
+    function createTabs (schema, subSchemaTypes) {
+        let tabs = [];
+        const hasSubSchema = subSchemaTypes.length > 0;
+
+        if (schema.isCollection()) {
+            tabs = tabs.concat(_(schema.raw.properties)
+                .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
+                .sortBy("order")
+                .value());
+
+        } else {
+            tabs.push(PSEUDO_TAB);
+        }
+
+        if (hasSubSchema) {
+            tabs.push(SUBSCHEMA_TAB);
+        }
+
+        return tabs;
     }
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/EditServiceTemplate.html",
         partials: [
+            "partials/form/_JSONSchemaFooter.html",
             "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
         ],
         events: {
             "click [data-save]": "onSave",
-            "click [data-delete]": "onDelete",
-            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
+            "click [data-delete]": "onDelete"
         },
-
-        render: function (args, callback) {
+        createTabComponent (tabs) {
+            return new TabComponent({
+                tabs,
+                createTabBody: (id) => {
+                    if (id === SUBSCHEMA_TAB.id) {
+                        return new SubSchemaListView({
+                            realmPath: this.data.realmPath,
+                            type: this.data.type
+                        });
+                    } else if (id === PSEUDO_TAB.id) {
+                        return new FlatJSONSchemaView({
+                            schema: this.data.schema,
+                            values: this.data.values
+                        });
+                    } else {
+                        return new FlatJSONSchemaView({
+                            schema: new JSONSchema(this.data.schema.raw.properties[id]),
+                            values: new JSONValues(this.data.values.raw[id])
+                        });
+                    }
+                },
+                createTabFooter: (id) => {
+                    if (id !== SUBSCHEMA_TAB.id) {
+                        return new PartialBasedView({ partial: "form/_JSONSchemaFooter" });
+                    }
+                }
+            });
+        },
+        getJSONSchemaView () {
+            return this.subview instanceof TabComponent ? this.subview.getTabBody() : this.subview;
+        },
+        render (args) {
             this.data.realmPath = args[0];
             this.data.type = args[1];
 
-            ServicesService.instance.get(this.data.realmPath, this.data.type).then((data) => {
-                this.data.schema = data.schema;
-                this.data.values = data.values;
-                this.data.name = data.name;
-                this.data.subSchemaPresent = data.subSchemaTypes.length;
-                this.data.tabbed = this.data.schema.grouped || this.data.subSchemaPresent;
+            ServicesService.instance.get(this.data.realmPath, this.data.type).then((response) => {
+                this.data.schema = response.schema;
+                this.data.values = response.values;
+                this.data.name = response.name;
 
-                this.parentRender(function () {
-                    if (this.data.tabbed) {
-                        this.$el.find("ul.nav a:first").tab("show");
-                        this.$el.find(".tab-menu .nav-tabs").tabdrop();
+                const tabs = createTabs(response.schema, response.subSchemaTypes);
+                const hasTabs = tabs.length > 1;
+                this.data.hasTabs = hasTabs;
 
-                        if (this.data.subSchemaPresent) {
-                            SubschemaListView.element = this.$el.find("#tabpanel");
-                        }
+                this.parentRender(() => {
+                    if (hasTabs) {
+                        this.subview = this.createTabComponent(tabs);
                     } else {
-                        this.form = new Form(
-                            this.$el.find("#tabpanel")[0],
-                            this.data.schema,
-                            this.data.values
-                        );
+                        this.subview = new FlatJSONSchemaView({
+                            schema: response.schema,
+                            values: response.values
+                        });
                     }
-                    if (callback) { callback(); }
+
+                    this.subview.setElement("[data-service-form]");
+                    this.subview.render();
                 });
             });
         },
-
-        onSave: function () {
-            ServicesService.instance.update(this.data.realmPath, this.data.type, this.form.data())
-                .then((data) => {
+        getCurrentValues () {
+            if (this.data.schema.isCollection()) {
+                return this.data.values.extend({
+                    [this.subview.getTabId()]: this.getJSONSchemaView().values()
+                }).raw;
+            } else {
+                return this.getJSONSchemaView().values();
+            }
+        },
+        onSave () {
+            ServicesService.instance.update(this.data.realmPath, this.data.type, this.getCurrentValues())
+                .then(() => {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                    this.data.values = data;
                 }, (response) => {
                     Messages.addMessage({
-                        response: response,
+                        response,
                         type: Messages.TYPE_DANGER
                     });
                 });
         },
-
-        onDelete: function (e) {
+        onDelete (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.services.list.confirmDeleteSelected")
             }, _.bind(deleteService, this, e));
-        },
-
-        renderTab: function (event) {
-            const tabId = $(event.target).data("tabId");
-            const schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema;
-            const element = this.$el.find("#tabpanel").empty().get(0);
-
-            if (tabId === "subschema") {
-                SubschemaListView.render(this.data);
-            } else {
-                this.form = new Form(element, schema, this.data.values[tabId]);
-                this.$el.find("[data-header]").parent().hide();
-            }
         }
     });
 });

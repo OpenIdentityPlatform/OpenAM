@@ -22,21 +22,16 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
-    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
-
-    // jquery dependencies
-    "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, ServicesService, JSONSchemaView) =>
-
-    AbstractView.extend({
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView"
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FlatJSONSchemaView,
+    GroupedJSONSchemaView) => AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
         events: {
             "click [data-save]": "onSave"
         },
-
-        render (args, callback) {
+        render (args) {
             this.data.realmPath = args[0];
             this.data.serviceInstance = args[1];
             this.data.subSchemaType = args[2];
@@ -45,18 +40,22 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
                 ServicesService.type.subSchema.instance.getInitialState(
                     this.data.realmPath, this.data.serviceInstance, this.data.subSchemaType
                 ).then((response) => {
-                    this.jsonSchemaView = new JSONSchemaView({
+                    const options = {
                         schema: response.schema,
                         values: response.values,
                         showOnlyRequiredAndEmpty: true
-                    });
-                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
+                    };
 
-                    if (callback) { callback(); }
+                    if (response.schema.isCollection()) {
+                        this.jsonSchemaView = new GroupedJSONSchemaView(options);
+                    } else {
+                        this.jsonSchemaView = new FlatJSONSchemaView(options);
+                    }
+
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
                 });
             });
         },
-
         onSave () {
             const formData = this.jsonSchemaView.values();
             const subSchemaInstanceId = this.$el.find("[data-name]").val();

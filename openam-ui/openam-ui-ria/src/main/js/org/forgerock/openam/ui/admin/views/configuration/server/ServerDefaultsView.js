@@ -16,46 +16,55 @@
 
 define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/ServersService",
-    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
-
-    // jquery dependencies
-    "bootstrap-tabdrop"
-], ($, Messages, AbstractView, EventManager, Constants, Form, ServersService, JSONSchemaView) => {
-
-    function toggleSave (el, enable) {
-        el.find("[data-save]").prop("disabled", !enable);
+    "org/forgerock/openam/ui/common/components/PartialBasedView",
+    "org/forgerock/openam/ui/common/components/TabComponent",
+    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
+], ($, _, Messages, AbstractView, ServersService, PartialBasedView, TabComponent, JSONSchema, JSONValues,
+    FlatJSONSchemaView) => {
+    function createTabs (schema) {
+        return _(schema.raw.properties)
+            .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
+            .sortBy("order")
+            .value();
     }
 
     return AbstractView.extend({
         template: "templates/admin/views/configuration/server/EditServerDefaultsTemplate.html",
         events: {
-            "click [data-save]": "onSave",
-            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
+            "click [data-save]": "onSave"
         },
-
-        render (args, callback) {
+        getJSONSchemaView () {
+            return this.subview.getTabBody();
+        },
+        render (args) {
             const sectionId = args[0];
 
             this.data.title = $.t(`console.common.navigation.${sectionId}`);
 
-            ServersService.servers.defaults.get(sectionId).then((data) => {
+            ServersService.servers.defaults.get(sectionId).then((response) => {
+                this.data.schema = response.schema;
+                this.data.values = response.values;
+
                 this.parentRender(() => {
-                    if (this.jsonSchemaView) {
-                        this.jsonSchemaView.remove();
-                    }
-                    this.jsonSchemaView = new JSONSchemaView({
-                        schema: data.schema,
-                        values: data.values,
-                        onRendered: () => toggleSave(this.$el, true)
+                    const tabs = createTabs(response.schema);
+
+                    this.subview = new TabComponent({
+                        tabs,
+                        createTabBody: (id) => new FlatJSONSchemaView({
+                            schema: new JSONSchema(this.data.schema.raw.properties[id]),
+                            values: new JSONValues(this.data.values.raw[id])
+                        }),
+                        createTabFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                     });
-                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-json-form]"));
-                    if (callback) { callback(); }
+
+                    this.subview.setElement("[data-json-form]");
+                    this.subview.render();
                 });
             }, (response) => {
                 Messages.addMessage({
@@ -63,6 +72,9 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                     response
                 });
             });
+        },
+        onSave () {
+            // TODO:
         }
     });
 });

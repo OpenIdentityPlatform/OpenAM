@@ -17,62 +17,65 @@
 define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", [
     "jquery",
     "lodash",
+    "backbone",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FormHelper) => {
-
-    function renderView () {
-        return Promise.all([
-            ServicesService.type.subSchema.instance.getAll(this.data.realmPath, this.data.type),
-            ServicesService.type.subSchema.type.getCreatables(this.data.realmPath, this.data.type)
-        ]).then((data) => {
-            this.data.instances = data[0];
-            this.data.creatables = data[1];
-
-            this.parentRender();
-        });
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], ($, _, Backbone, Messages, EventManager, Router, Constants, ServicesService, FormHelper, UIUtils) => {
+    function deleteSubSchema (realmPath, type, subSchemaType, subSchemaInstance) {
+        return ServicesService.type.subSchema.instance.remove(realmPath, type, subSchemaType, subSchemaInstance);
     }
 
-    function deleteSubSchema (subSchemaType, subSchemaInstance) {
-        ServicesService.type.subSchema.instance.remove(
-            this.data.realmPath,
-            this.data.type,
-            subSchemaType,
-            subSchemaInstance
-        ).then(() => {
-            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-            renderView.call(this);
-        }, (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER }));
-    }
-
-    const SubschemaListView = AbstractView.extend({
+    const SubschemaListView = Backbone.View.extend({
         template: "templates/admin/views/realms/services/SubSchemaListTemplate.html",
         events: {
             "click [data-subschema-delete]" : "onDelete"
         },
-
-        render (data) {
-            _.extend(this.data, data);
-            renderView.call(this);
+        initialize (options) {
+            this.options = options;
         },
+        render () {
+            Promise.all([
+                ServicesService.type.subSchema.instance.getAll(this.options.realmPath, this.options.type),
+                ServicesService.type.subSchema.type.getCreatables(this.options.realmPath, this.options.type)
+            ]).then((response) => {
+                const data = _.merge({}, this.options, {
+                    instances: response[0],
+                    creatables:response[1]
+                });
 
-        onDelete (e) {
-            e.preventDefault();
+                UIUtils.fillTemplateWithData(this.template, data, (html) => {
+                    this.$el.html(html);
+                });
+            });
 
-            const target = $(e.currentTarget);
+            return this;
+        },
+        onDelete (event) {
+            event.preventDefault();
+
+            const target = $(event.currentTarget);
             const subSchemaInstance = target.closest("tr").data("subschemaId");
             const subSchemaType = target.closest("tr").data("subschemaType");
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.services.subSchema.confirmDeleteSelected")
-            }, _.bind(deleteSubSchema, this, subSchemaType, subSchemaInstance));
+            }, () => {
+                deleteSubSchema(this.options.realmPath,
+                                this.options.type,
+                                subSchemaType,
+                                subSchemaInstance)
+                .then(() => {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                    this.render();
+                }, (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER }));
+            });
         }
     });
 
-    return new SubschemaListView();
+    return SubschemaListView;
 });

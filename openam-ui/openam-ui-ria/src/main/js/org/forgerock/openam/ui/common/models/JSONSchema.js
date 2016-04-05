@@ -40,7 +40,12 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         this.raw = Object.freeze(schema);
     }
 
-    JSONSchema.prototype.allPropertiesAreSchemas = function () {
+    /**
+     * Whether this schema objects' properties are all schemas in their own right.
+     * If true, this object is a simply a container for other schemas.
+     * @returns {Boolean} Whether this object is a collection
+     */
+    JSONSchema.prototype.isCollection = function () {
         return _.every(this.raw.properties, (property) => property.type === "object");
     };
 
@@ -51,7 +56,7 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         }
     };
 
-    JSONSchema.prototype.enableProperty = function () {
+    JSONSchema.prototype.hasEnableProperty = function () {
         return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
     };
 
@@ -94,17 +99,18 @@ define("org/forgerock/openam/ui/common/models/JSONSchema", [
         return new JSONSchema(schema);
     };
 
-    JSONSchema.prototype.propertiesToSchemaArray = function () {
+    JSONSchema.prototype.getPropertiesAsSchemas = function () {
         return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
     };
 
-    JSONSchema.prototype.toSchemaWithRequiredProperties = function () {
-        return this.pick(_.matches({ required: true }));
+    JSONSchema.prototype.getRequiredPropertyKeys = function () {
+        return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
     };
 
-    JSONSchema.prototype.toSchemaWithDefaultProperties = function (emptyKeys) {
+    JSONSchema.prototype.setDefaultProperties = function (keys) {
         const schema = _.cloneDeep(this.raw);
-        schema.defaultProperties = _(schema.properties).pick(emptyKeys).keys().value();
+        schema.defaultProperties = keys;
+
         return new JSONSchema(schema);
     };
 

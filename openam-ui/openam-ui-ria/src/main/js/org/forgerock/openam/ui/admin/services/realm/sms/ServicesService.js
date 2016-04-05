@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             url: scopedByRealm(realm, `services/${type}?_action=schema`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
-        });
+        }).then((response) => new JSONSchema(response));
     };
     const getServiceSubSchema = function (realm, serviceType, subSchemaType) {
         return obj.serviceCall({
@@ -86,11 +86,11 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             }
 
             return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
-                .then((data) => ({
-                    schema: SMSServiceUtils.sanitizeSchema(data[0][0]),
-                    values: data[1][0],
-                    name:  data[2],
-                    subSchemaTypes: data[3][0].result
+                .then((response) => ({
+                    schema: response[0],
+                    values: new JSONValues(response[1][0]),
+                    name:  response[2],
+                    subSchemaTypes: response[3][0].result
                 }));
         },
         getInitialState (realm, type) {
@@ -99,12 +99,12 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                     url: scopedByRealm(realm, `services/${type}?_action=template`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
-                });
+                }).then((response) => new JSONValues(response));
             }
 
             return Promise.all([getServiceSchema(realm, type), getTemplate()]).then((response) => ({
-                schema: new JSONSchema(response[0][0]),
-                values: new JSONValues(response[1][0])
+                schema: response[0],
+                values: response[1]
             }));
         },
         remove (realm, types) {
@@ -128,7 +128,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
-            });
+            }).then((response) => new JSONValues(response));
         },
         create (realm, type, data) {
             return obj.serviceCall({

@@ -28,14 +28,14 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
-    "org/forgerock/openam/ui/common/views/jsonSchema/JSONSchemaView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/common/util/Promise",
 
     "bootstrap-tabdrop",
     "popoverclickaway",
     "selectize"
 ], function ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, SMSGlobalService,
-             SMSRealmService, FormHelper, JSONSchema, JSONValues, JSONSchemaView, Promise) {
+             SMSRealmService, FormHelper, JSONSchema, JSONValues, FlatJSONSchemaView, Promise) {
 
     function setAutofocus () {
         $("[data-realm-form] input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
@@ -141,7 +141,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                         this.jsonSchemaView.remove();
                     }
 
-                    this.jsonSchemaView = new JSONSchemaView({
+                    this.jsonSchemaView = new FlatJSONSchemaView({
                         values: new JSONValues(data.values),
                         schema: new JSONSchema(data.schema)
                     });
@@ -176,8 +176,8 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         },
 
         onDataChange: function () {
-            if (this.jsonSchemaView.views.length && this.jsonSchemaView.views[0].jsonEditor) {
-                this.jsonSchemaView.views[0].jsonEditor.options["show_errors"] = "never";
+            if (this.jsonSchemaView.subview.jsonEditor) {
+                this.jsonSchemaView.subview.jsonEditor.options["show_errors"] = "never";
             }
             this.toggleSubmitButton(validateRealmName());
         },

@@ -14,20 +14,13 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
-    "backbone",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], (Backbone, UIUtils) => {
-    return Backbone.View.extend({
-        initialize (options) {
-            this.options = options;
-        },
-        render () {
-            UIUtils.fillTemplateWithData(
-                this.options.template,
-                this.options.data,
-                (html) => this.$el.html(html)
-            );
-        }
-    });
+ /**
+  * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/createJSONEditorView
+  */
+define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/createJSONEditorView", [
+    "org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
+    "org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEditorView"
+], (JSONEditorView, TogglableJSONEditorView) => (schemaValuePair) => {
+    const Editor = schemaValuePair.schema.hasEnableProperty() ? TogglableJSONEditorView : JSONEditorView;
+    return new Editor(schemaValuePair);
 });

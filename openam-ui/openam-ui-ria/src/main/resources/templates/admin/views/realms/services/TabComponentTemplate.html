@@ -1,0 +1,16 @@
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        {{#each tabs}}
+            <li>
+                <a href="#" data-tab-id="{{this.id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+
+<div class="panel panel-default fr-panel-tab">
+    <div class="panel-body">
+        <div data-tab-panel role="tabpanel"></div>
+    </div>
+    <div data-tab-footer class="panel-footer clearfix"></div>
+</div>

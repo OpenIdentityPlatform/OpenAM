@@ -1,30 +1,15 @@
 {{> headers/_TitleWithSubAndIcon title=name type="console.services.edit.title" icon="plug"
     buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
 
-{{#if tabbed}}
-<div class="tab-menu">
-    <ul class="nav nav-tabs" role="tablist">
-        {{#if schema.grouped}}
-            {{#each schema.orderedProperties}}
-            <li><a href="#" data-tab-id="{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
-            {{/each}}
-        {{else}}
-            <li><a href="#" data-tab-id="schema" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.services.edit.settings"}}</a></li>
-        {{/if}}
-        {{#if subSchemaPresent}}
-            <li><a href="#" data-tab-id="subschema" role="tab" data-toggle="tab" aria-expanded="false">{{t "console.services.edit.secondaryConfigurations"}}</a></li>
-        {{/if}}
-    </ul>
-</div>
-{{/if}}
-
-<div class="panel panel-default {{#if tabbed}}fr-panel-tab{{/if}}">
-    <div class="panel-body tab-content">
-        <div role="tabpanel" class="tab-pane active" id="tabpanel">
-            <div data-service-form></div>
+{{#if hasTabs}}
+    <form data-service-form></form>
+{{else}}
+    <div class="panel panel-default">
+        <div class="panel-body ">
+            <form data-service-form></form>
+        </div>
+        <div class="panel-footer clearfix">
+            {{> form/_JSONSchemaFooter}}
         </div>
     </div>
-    <div class="panel-footer clearfix">
-        {{> form/_JSONSchemaFooter}}
-    </div>
-</div>
+{{/if}}

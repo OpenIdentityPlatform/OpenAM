@@ -21,6 +21,10 @@ define("org/forgerock/openam/ui/common/models/JSONValues", [
         this.raw = Object.freeze(values);
     }
 
+    JSONValues.prototype.extend = function (object) {
+        return new JSONValues(_.extend({}, this.raw, object));
+    };
+
     JSONValues.prototype.pick = function (predicate) {
         return new JSONValues(_.pick(this.raw, predicate));
     };
@@ -29,7 +33,7 @@ define("org/forgerock/openam/ui/common/models/JSONValues", [
         return new JSONValues(_.omit(this.raw, predicate));
     };
 
-    JSONValues.prototype.toEmptyValues = function () {
+    JSONValues.prototype.getEmptyValueKeys = function () {
         function isEmpty (value) {
             if (_.isNumber(value)) {
                 return false;
@@ -40,22 +44,15 @@ define("org/forgerock/openam/ui/common/models/JSONValues", [
             return _.isEmpty(value);
         }
 
-        function getEmptyValues (object) {
-            const objectWithEmptyValues = {};
+        const keys = [];
 
-            _.forIn(object, (value, key) => {
-                const isGroupOfValues = _.isObject(value) && !_.isEmpty(value) && !_.isArray(value);
-                if (isGroupOfValues) {
-                    objectWithEmptyValues[key] = getEmptyValues(value);
-                } else if (isEmpty(value)) {
-                    objectWithEmptyValues[key] = value;
-                }
-            });
+        _.forIn(this.raw, (value, key) => {
+            if (isEmpty(value)) {
+                keys.push(key);
+            }
+        });
 
-            return objectWithEmptyValues;
-        }
-
-        return new JSONValues(getEmptyValues(this.raw));
+        return keys;
     };
 
     return JSONValues;
