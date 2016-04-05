@@ -30,6 +30,7 @@
 package com.sun.identity.idm.common;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+import static org.forgerock.openam.ldap.LDAPConstants.*;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.SystemProperties;
@@ -330,11 +331,15 @@ public class IdRepoUtils {
         throws Exception {
         Options options = Options.defaultOptions()
                 .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.MILLISECONDS));
-
-        if (CollectionHelper.getBooleanMapAttr(attrValues, "sun-idrepo-ldapv3-config-ssl-enabled", false)) {
+        String connectionMode = CollectionHelper.getMapAttr(attrValues, LDAP_CONNECTION_MODE);
+        if (LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) ||
+                LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode)){
             String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
             options = options.set(SSL_CONTEXT,
                     new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
+          if (LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode)) {
+              options = options.set(SSL_USE_STARTTLS, true);
+          }
         }
 
         Set<LDAPURL> ldapUrls = getLDAPUrls(attrValues);
