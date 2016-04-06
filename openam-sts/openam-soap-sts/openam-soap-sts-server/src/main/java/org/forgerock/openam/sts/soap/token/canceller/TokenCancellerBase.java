@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.canceller;
@@ -66,11 +66,10 @@ abstract class TokenCancellerBase implements TokenCanceller {
             cancelTarget.setState(ReceivedToken.STATE.CANCELLED);
             return response;
         } catch (TokenCancellationException e) {
-            throw new STSException("Exception caught validating issued token: " + e.getMessage(), e);
-        } finally {
             if (tokenServiceConsumptionToken != null) {
                 invalidateTokenGenerationServiceConsumptionToken(tokenServiceConsumptionToken);
             }
+            throw new STSException("Exception caught validating issued token: " + e.getMessage(), e);
         }
     }
 

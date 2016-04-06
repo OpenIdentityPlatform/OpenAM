@@ -32,6 +32,7 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.slf4j.Logger;
 
@@ -73,36 +74,33 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
      */
     @Override
     public void tryPublish(String topic, AuditEvent auditEvent) {
+        String sessionId = null;
         try {
+            sessionId = soapSTSAccessTokenProvider.getAccessToken();
+            Map<String, String> headerMap = new HashMap<>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, openamAuditServiceVersion);
+            headerMap.put(AMSTSConstants.COOKIE, createAMSessionCookie(sessionId));
 
-            String sessionId = null;
-            try {
-                sessionId = soapSTSAccessTokenProvider.getAccessToken();
-                Map<String, String> headerMap = new HashMap<>();
-                headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-                headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, openamAuditServiceVersion);
-                headerMap.put(AMSTSConstants.COOKIE, createAMSessionCookie(sessionId));
+            HttpURLConnectionWrapper.ConnectionResult connectionResult = httpURLConnectionWrapperFactory
+                    .httpURLConnectionWrapper(buildAuditAccessUrl())
+                    .withoutAuditTransactionIdHeader()
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.GET)
+                    .setRequestPayload(auditEvent.getValue().toString())
+                    .makeInvocation();
 
-                HttpURLConnectionWrapper.ConnectionResult connectionResult = httpURLConnectionWrapperFactory
-                        .httpURLConnectionWrapper(buildAuditAccessUrl())
-                        .withoutAuditTransactionIdHeader()
-                        .setRequestHeaders(headerMap)
-                        .setRequestMethod(AMSTSConstants.GET)
-                        .setRequestPayload(auditEvent.getValue().toString())
-                        .makeInvocation();
-
-                if (connectionResult.getStatusCode() != HTTP_CREATED) {
-                    logger.error("Failed to record audit event: [status code {}] {}",
-                            connectionResult.getStatusCode(),
-                            connectionResult.getResult());
-                }
-            } finally {
-                if (sessionId != null) {
-                    soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
-                }
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode != HTTP_CREATED) {
+                logger.error("Failed to record audit event: [status code {}] {}",
+                        connectionResult.getStatusCode(),
+                        connectionResult.getResult());
+                throw new STSPublishException(responseCode, "Failed to record audit event: " + connectionResult.getResult());
             }
-
         } catch (Exception e) {
+            if (sessionId != null) {
+                soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
+            }
             logger.error("Failed to publish audit event: {}", e.getMessage(), e);
         }
     }

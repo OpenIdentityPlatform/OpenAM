@@ -228,10 +228,19 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
     private String getAssertion(ValidationInvocationContext validationInvocationContext, String authNContextClassRef,
                                 Set<String> authenticationMethodReferences, long authTimeInSeconds,
                                 String nonce) throws TokenCreationException {
-        return tokenServiceConsumer.getOpenIdConnectToken(
-                threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
-                stsInstanceId, realm, authNContextClassRef, authenticationMethodReferences,
-                authTimeInSeconds, nonce, getTokenGenerationServiceConsumptionToken());
+        String consumptionToken = null;
+        try {
+            consumptionToken = getTokenGenerationServiceConsumptionToken();
+            return tokenServiceConsumer.getOpenIdConnectToken(
+                    threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
+                    stsInstanceId, realm, authNContextClassRef, authenticationMethodReferences,
+                    authTimeInSeconds, nonce, consumptionToken);
+        } catch (TokenCreationException e) {
+            if (consumptionToken != null) {
+                invalidateTokenGenerationServiceConsumptionToken(consumptionToken);
+            }
+            throw new AMSTSRuntimeException(e.getCode(), e.getMessage(), e);
+        }
     }
 
     /*
