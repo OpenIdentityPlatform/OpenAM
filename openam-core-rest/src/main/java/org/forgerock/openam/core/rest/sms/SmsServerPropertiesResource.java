@@ -548,15 +548,20 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     attributeNamesForTab = getDefaultValueNames(tabName);
                 }
 
+                Map<String, String> attributeNamesToSections = getAttributeNamesToSections(tabName);
+
                 for (String attributeName : attributeNamesForTab) {
                     final String defaultAttribute = (String) defaultAttributes.get(attributeName);
-                    if (defaultAttribute != null && !isServerDefault) {
-                        defaultSection.put(attributeName, (String) defaultAttributes.get(attributeName));
+                    final String sectionName = attributeNamesToSections.get(attributeName);
+
+                    if (defaultAttribute != null) {
+                        defaultSection.put(sectionName + "/" + attributeName, (String) defaultAttributes.get(attributeName));
                     }
 
                     final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
                     if (serverSpecificAttribute != null) {
-                        result.add(attributeName, serverSpecificAttribute);
+                        result.putPermissive(new JsonPointer(sectionName + "/" + attributeName),
+                                serverSpecificAttribute);
                     }
                 }
             }
@@ -569,6 +574,20 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         }
 
         return new BadRequestException("Error reading properties file for " + tabName).asPromise();
+    }
+
+    private Map<String, String> getAttributeNamesToSections(String tabName) throws IOException, SAXException,
+            ParserConfigurationException, XPathExpressionException {
+        Map<String, String> attributeNameToSectionName = new HashMap<>();
+        Document propertySheet = getPropertySheet(tabName);
+        List<String> sectionNames = getSectionNames(propertySheet);
+        for (String sectionName : sectionNames) {
+            for (String attributeName : getAttributeNamesForSection(sectionName, propertySheet)) {
+                attributeNameToSectionName.put(attributeName, sectionName);
+            }
+        }
+
+        return attributeNameToSectionName;
     }
 
     private String getServerConfigXml(ServiceConfig serverConfig) {
