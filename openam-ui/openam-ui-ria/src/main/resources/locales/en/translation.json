@@ -324,6 +324,10 @@
             "startTypingToSearch": "Start typing to search",
             "passwordPlaceholder": "••••••••••••",
             "redirecting": "Redirecting...",
+            "propertyName": "Property Name",
+            "propertyValue": "Property Value",
+            "addName": "Add a name",
+            "addValue": "Add a value",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",

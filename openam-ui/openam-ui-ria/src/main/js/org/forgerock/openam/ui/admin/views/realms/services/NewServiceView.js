@@ -103,7 +103,6 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         onCreateClick () {
             ServicesService.instance.create(this.data.realmPath, this.data.type, this.jsonSchemaView.values())
             .then(() => {
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
                     args: _.map([this.data.realmPath, this.data.type], encodeURIComponent),
                     trigger: true

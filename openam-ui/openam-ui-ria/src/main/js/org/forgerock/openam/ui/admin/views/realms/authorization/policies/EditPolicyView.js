@@ -53,7 +53,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
         getAllResponseAttributes () {
             this.model.attributes.resourceAttributes = _.union(
-                this.staticAttrsView.getCombinedAttrs(),
+                this.staticAttrsView.getGroupedData(),
                 SubjectResponseAttributesView.getAttrs(),
                 CustomResponseAttributesView.getAttrs());
         },
@@ -68,7 +68,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
         ],
 
         render (args, callback) {
-            var policyName = args[2];
+            const policyName = args[2];
 
             if (callback) {
                 this.renderCallback = callback;
@@ -120,76 +120,69 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             if (self.newEntity) {
                 $.when(this.policySetModelPromise, this.resourceTypesPromise).done(
-                    function (policySetModel, resourceTypes) {
-                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
-                            return _.contains(policySetModel[0].resourceTypeUuids, item.uuid);
-                        });
-
-                        self.parentRender(function () {
-                            self.buildResourceTypeSelection();
-                        });
+                    (policySetModel, resourceTypes) => {
+                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
+                            (item) => _.contains(policySetModel[0].resourceTypeUuids, item.uuid));
+                        self.parentRender(() => { self.buildResourceTypeSelection(); });
                     });
             } else {
-                $.when(this.policySetModelPromise, this.allSubjectsPromise, this.allEnvironmentsPromise,
-                        this.allUserAttributesPromise, this.resourceTypesPromise)
-                    .done(function (policySetModel, allSubjects, allEnvironments, allUserAttributes, resourceTypes) {
-                        var resourceType,
-                            policySet = policySetModel[0];
+                $.when(
+                    this.policySetModelPromise,
+                    this.allSubjectsPromise,
+                    this.allEnvironmentsPromise,
+                    this.allUserAttributesPromise,
+                    this.resourceTypesPromise
+                ).done((policySetModel, allSubjects, allEnvironments, allUserAttributes, resourceTypes) => {
+                    let resourceType;
+                    const policySet = policySetModel[0];
 
-                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
-                            return _.contains(policySet.resourceTypeUuids, item.uuid);
-                        });
+                    self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
+                        (item) => _.contains(policySet.resourceTypeUuids, item.uuid));
 
-                        self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
-                        self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
-                        self.customAttributes = _.difference(self.model.attributes.resourceAttributes,
-                            self.staticAttributes, self.userAttributes);
-                        self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
+                    self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
+                    self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
+                    self.customAttributes = _.difference(self.model.attributes.resourceAttributes,
+                        self.staticAttributes, self.userAttributes);
+                    self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
-                        self.data.options.availableEnvironments =
-                            _.findByValues(allEnvironments[0].result, "title", policySet.conditions);
-                        self.data.options.availableSubjects =
-                            _.findByValues(allSubjects[0].result, "title", policySet.subjects);
+                    self.data.options.availableEnvironments =
+                        _.findByValues(allEnvironments[0].result, "title", policySet.conditions);
+                    self.data.options.availableSubjects =
+                        _.findByValues(allSubjects[0].result, "title", policySet.subjects);
 
-                        resourceType = _.find(self.data.options.availableResourceTypes, {
-                            uuid: self.model.attributes.resourceTypeUuid
-                        });
-
-                        self.data.options.availableActions = self.getAvailableActionsForResourceType(resourceType);
-                        self.data.options.availablePatterns = resourceType.patterns;
-
-                        self.parentRender(function () {
-                            var promises = [],
-                                resolve = function () {
-                                    return (promises[promises.length] = $.Deferred()).resolve;
-                                };
-
-                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
-                            self.buildResourceTypeSelection();
-
-                            ManageSubjectsView.render(self.data, resolve());
-                            ManageEnvironmentsView.render(self.data, resolve());
-
-                            PolicyActionsView.render(self.data, resolve());
-                            CreatedResourcesView.render(self.data, resolve());
-
-                            self.staticAttrsView = new StaticResponseAttributesView();
-                            self.staticAttrsView.render(self.data.entity, self.staticAttributes, "#staticAttrs",
-                                resolve());
-
-                            SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes],
-                                resolve());
-                            CustomResponseAttributesView.render(self.customAttributes, resolve());
-
-                            $.when.apply($, promises).done(function () {
-                                FormHelper.setActiveTab(self);
-
-                                if (self.renderCallback) {
-                                    self.renderCallback();
-                                }
-                            });
-                        });
+                    resourceType = _.find(self.data.options.availableResourceTypes, {
+                        uuid: self.model.attributes.resourceTypeUuid
                     });
+
+                    self.data.options.availableActions = self.getAvailableActionsForResourceType(resourceType);
+                    self.data.options.availablePatterns = resourceType.patterns;
+
+                    self.parentRender(() => {
+                        self.$el.find(".tab-menu .nav-tabs").tabdrop();
+                        self.buildResourceTypeSelection();
+
+                        ManageSubjectsView.render(self.data);
+                        ManageEnvironmentsView.render(self.data);
+
+                        PolicyActionsView.render(self.data);
+                        CreatedResourcesView.render(self.data);
+
+                        self.staticAttrsView = new StaticResponseAttributesView({
+                            staticAttributes: self.staticAttributes,
+                            el: "[data-static-attributes]"
+                        });
+                        self.staticAttrsView.render();
+
+                        SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes]);
+                        CustomResponseAttributesView.render(self.customAttributes);
+
+                        FormHelper.setActiveTab(self);
+
+                        if (self.renderCallback) {
+                            self.renderCallback();
+                        }
+                    });
+                });
             }
         },
 
