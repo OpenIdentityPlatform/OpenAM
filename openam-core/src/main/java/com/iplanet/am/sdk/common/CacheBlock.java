@@ -1,19 +1,19 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * <p/>
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
- *
+ * <p/>
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
  * compliance with the License.
- *
+ * <p/>
  * You can obtain a copy of the License at
  * https://opensso.dev.java.net/public/CDDLv1.0.html or
  * opensso/legal/CDDLv1.0.txt
  * See the License for the specific language governing
  * permission and limitations under the License.
- *
+ * <p/>
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
  * at opensso/legal/CDDLv1.0.txt.
@@ -21,9 +21,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * <p/>
  * $Id: CacheBlock.java,v 1.4 2008/06/25 05:41:23 qcheng Exp $
- *
+ * <p/>
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.common;
@@ -75,55 +76,15 @@ public class CacheBlock extends CacheBlockBase {
 
     protected static long ENTRY_DEFAULT_EXPIRE_TIME;
 
-    private Debug debug = Debug.getInstance("amProfile_ldap");
+    private static final Debug DEBUG = Debug.getInstance("amProfile_ldap");
 
     static {
-        initializeExpirationParms();
-    }
-
-    private static void initializeExpirationParms() {
-        setEntryExpirationEnabledFlag();
+        ENTRY_EXPIRATION_ENABLED_FLAG = SystemProperties.getAsBoolean(ENTRY_EXPIRATION_ENABLED_KEY, false);
         if (ENTRY_EXPIRATION_ENABLED_FLAG) {
-            // Read the expiration times for user and non user entries
-            setUserEntryExpirationTime();
-            setDefaultEntryExpirationTime();
+            // Read the expiration times for user and non user entries, convert to milliseconds
+            ENTRY_USER_EXPIRE_TIME = SystemProperties.getAsInt(ENTRY_USER_EXPIRE_TIME_KEY, 15) * 60000;
+            ENTRY_DEFAULT_EXPIRE_TIME = SystemProperties.getAsInt(ENTRY_DEFAULT_EXPIRE_TIME_KEY, 30) * 60000;
         }
-    }
-
-    private static void setEntryExpirationEnabledFlag() {
-        String userEntryExpireTimeStr = SystemProperties.get(
-                ENTRY_EXPIRATION_ENABLED_KEY, "false");
-        ENTRY_EXPIRATION_ENABLED_FLAG = Boolean.valueOf(userEntryExpireTimeStr)
-                .booleanValue();
-    }
-
-    private static void setUserEntryExpirationTime() {
-        ENTRY_USER_EXPIRE_TIME = getPropertyIntValue(
-                ENTRY_USER_EXPIRE_TIME_KEY, 15) * 60000; // Convert to
-                                                            // milliseconds
-    }
-
-    private static void setDefaultEntryExpirationTime() {
-        ENTRY_DEFAULT_EXPIRE_TIME = getPropertyIntValue(
-                ENTRY_DEFAULT_EXPIRE_TIME_KEY, 30) * 60000; // Convert to
-                                                            // milli-scds
-    }
-
-    private static int getPropertyIntValue(String key, int defaultValue) {
-        int value = defaultValue;
-        String valueStr = SystemProperties.get(key);
-        if (valueStr != null && valueStr.trim().length() > 0) {
-            try {
-                value = Integer.parseInt(valueStr);
-            } catch (NumberFormatException e) {
-                value = defaultValue;
-            }
-        }
-        return value;
-    }
-
-    public Debug getDebug() {
-        return debug;
     }
 
     public boolean isEntryExpirationEnabled() {
@@ -136,6 +97,10 @@ public class CacheBlock extends CacheBlockBase {
 
     public long getDefaultEntryExpirationTime() {
         return ENTRY_DEFAULT_EXPIRE_TIME;
+    }
+
+    public Debug getDebug() {
+        return DEBUG;
     }
 
     public CacheBlock(String entryDN, boolean validEntry) {

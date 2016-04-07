@@ -102,14 +102,6 @@ public abstract class CacheBlockBase {
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public abstract Debug getDebug();
-
-    public abstract boolean isEntryExpirationEnabled();
-
-    public abstract long getUserEntryExpirationTime();
-
-    public abstract long getDefaultEntryExpirationTime();
-
     public CacheBlockBase(String entryDN, boolean validEntry) {
         if (validEntry) {
             cacheEntries = new AMHashMap();
@@ -127,6 +119,14 @@ public abstract class CacheBlockBase {
         this(entryDN, validEntry);
         this.organizationDN = orgDN;
     }
+
+    public abstract boolean isEntryExpirationEnabled();
+
+    public abstract long getUserEntryExpirationTime();
+
+    public abstract long getDefaultEntryExpirationTime();
+
+    public abstract Debug getDebug();
 
     public void setExists(boolean exists) {
         writeLock.lock();
@@ -211,56 +211,70 @@ public abstract class CacheBlockBase {
         return isValidEntry;
     }
 
+    /**
+     * <p>If cache expiry has been enabled then this will return true if the cache has expired.</p>
+     * <b>Note:</b> This call must be made outside of a readLock because if the cache has expired then a writeLock
+     * is required as part of calling {@link CacheBlockBase#clear()} which would result in a deadlock, a readLock
+     * cannot be upgraded to a writeLock.
+     * @return true if cache expiry is enabled and the cache has expired
+     */
     public boolean hasExpiredAndUpdated() {
-        // We need to have the isExpired variable to make sure
-        // the notifications are sent only once.
-        if (isEntryExpirationEnabled() && !isExpired) { // Happens only if
-                                                        // enabled
-            long expirationTime = 0;
-            switch (objectType) {
-            case AMObject.USER:
-                expirationTime = getUserEntryExpirationTime();
-                break;
-            default:
-                expirationTime = getDefaultEntryExpirationTime();
-                break;
-            }
-            long elapsedTime = currentTimeMillis() - lastModifiedTime;
-            if (elapsedTime >= expirationTime) { // Expired
-                // Send notifications first to the SDK listeners
-                isExpired = true;
-                clear();
-                if (getDebug().messageEnabled()) {
-                    getDebug().message(
-                            "CacheBlock.hasExpiredAndUpdated(): "
-                                    + "Entry with DN " + entryDN + " expired.");
+
+        writeLock.lock();
+        try {
+            // We need to have the isExpired variable to make sure
+            // the notifications are sent only once.
+            if (isEntryExpirationEnabled() && !isExpired) { // Happens only if enabled
+                long expirationTime = 0;
+                switch (objectType) {
+                    case AMObject.USER:
+                        expirationTime = getUserEntryExpirationTime();
+                        break;
+                    default:
+                        expirationTime = getDefaultEntryExpirationTime();
+                        break;
                 }
-                // FIXME: AMObjectImpl.sendExpiryEvent(entryDN, sourceType);
-                // TODO: Add object notification mechanism
+                long elapsedTime = currentTimeMillis() - lastModifiedTime;
+                if (elapsedTime >= expirationTime) { // Expired
+                    // Send notifications first to the SDK listeners
+                    isExpired = true;
+                    clear();
+                    if (getDebug().messageEnabled()) {
+                        getDebug().message(
+                                "CacheBlock.hasExpiredAndUpdated(): "
+                                        + "Entry with DN " + entryDN + " expired.");
+                    }
+                    // FIXME: AMObjectImpl.sendExpiryEvent(entryDN, sourceType);
+                    // TODO: Add object notification mechanism
+                }
             }
+            return isExpired;
+        } finally {
+            writeLock.unlock();
         }
-        return isExpired;
     }
 
     public boolean hasCache(String principalDN) {
+        boolean hasExpired = hasExpiredAndUpdated();
         readLock.lock();
         try {
             CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            return (ce != null && !hasExpiredAndUpdated());
+            return (ce != null && !hasExpired);
         } finally {
             readLock.unlock();
         }
     }
 
     public boolean hasCompleteSet(String principalDN) {
+        boolean hasExpired = hasExpiredAndUpdated();
         readLock.lock();
         try {
             CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            boolean completeSet = false;
-            if (ce != null && !hasExpiredAndUpdated()) {
-                completeSet = ce.isCompleteSet();
+            if (ce != null && !hasExpired) {
+                return ce.isCompleteSet();
+            } else {
+                return false;
             }
-            return completeSet;
         } finally {
             readLock.unlock();
         }
@@ -271,13 +285,13 @@ public abstract class CacheBlockBase {
     }
 
     public Map getAttributes(String principalDN, Set attrNames, boolean byteValues) {
+        boolean hasExpired = hasExpiredAndUpdated();
         Map attributes = new AMHashMap(byteValues);
-
         readLock.lock();
         try {
             // Get the cache entry for the principal
             CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            if (ce != null && !hasExpiredAndUpdated()) {
+            if (ce != null && !hasExpired) {
                 // Get the names of attributes that this principal can access
                 Set accessibleAttrs = null;
                 if (attrNames == null) {
@@ -311,10 +325,10 @@ public abstract class CacheBlockBase {
                 Set inAccessibleAttrs = ce.getInaccessibleAttrNames(attrNames);
                 ((AMHashMap) attributes).addEmptyValues(inAccessibleAttrs);
             }
-            return attributes;
         } finally {
             readLock.unlock();
         }
+        return attributes;
     }
 
     public void putAttributes(String principalDN, Map attributes,
@@ -363,7 +377,7 @@ public abstract class CacheBlockBase {
             try {
                 stringAttributes.removeKeys(attrNames);
                 byteAttributes.removeKeys(attrNames);
-                // Remove them from the list of readble attributes of each principal
+                // Remove them from the list of readable attributes of each principal
                 Iterator itr = cacheEntries.keySet().iterator();
                 while (itr.hasNext()) {
                     String principalDN = (String) itr.next();
