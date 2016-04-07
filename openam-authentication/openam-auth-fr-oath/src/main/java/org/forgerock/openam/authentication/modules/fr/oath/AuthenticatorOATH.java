@@ -186,9 +186,18 @@ public class AuthenticatorOATH extends AMLoginModule {
             debug.message("OATH::init");
         }
 
+        userName = (String) sharedState.get(getUserKey());
+        try {
+            checkForSessionAndGetUsernameAndUUID();
+        } catch (AuthLoginException | SSOException e) {
+            if (debug.messageEnabled()) {
+                debug.message("AuthenticatorOATH :: init() : Unable to get userName ", e);
+            }
+            return;
+        }
+
         //get username from previous authentication
         try {
-            userName = (String) sharedState.get(getUserKey());
 
             realm = DNMapper.orgNameToRealmName(getRequestOrg());
             id = IdUtils.getIdentity(userName, realm);
@@ -255,8 +264,9 @@ public class AuthenticatorOATH extends AMLoginModule {
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         try {
-            checkForSessionAndGetUsernameAndUUID();
-
+            if (StringUtils.isEmpty(userName)) {
+                throw new AuthLoginException("amAuth", "noUserName", null);
+            }
             final OathDeviceSettings settings = getOathDeviceSettings(id.getName(), id.getRealm());
 
             try {
@@ -349,7 +359,6 @@ public class AuthenticatorOATH extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("OATH.process() : Username from SSOToken : " + userName);
             }
-
             if (StringUtils.isEmpty(userName)) {
                 throw new AuthLoginException("amAuth", "noUserName", null);
             }
