@@ -3,6 +3,7 @@
     "extends": [
         "forgerock"
     ],
+    "parser": "babel-eslint",
     "env": {
         "amd": true,
         "browser": true
@@ -10,10 +11,13 @@
     "ecmaFeatures": {
         arrowFunctions: true,
         blockBindings: true,
+        defaultParams: true,
+        destructuring: true,
         objectLiteralComputedProperties: true,
         objectLiteralDuplicateProperties: true,
         objectLiteralShorthandMethods: true,
         objectLiteralShorthandProperties: true,
+        spread: true,
         templateStrings: true
     },
     "rules": {
@@ -461,6 +465,8 @@
         "prefer-const": 1,
         "prefer-template": 1,
         "object-shorthand": 1,
+        "prefer-spread": 1,
+        "no-empty-pattern": 1,
 
         /*
          * --------------------------------------------------------------------------------

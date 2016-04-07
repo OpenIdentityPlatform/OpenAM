@@ -10,11 +10,15 @@
     "test": "grunt karma:dev"
   },
   "devDependencies": {
+    "babel-eslint": "6.0.2",
     "babel-plugin-check-es2015-constants": "6.7.2",
     "babel-plugin-transform-es2015-arrow-functions": "6.5.2",
     "babel-plugin-transform-es2015-block-scoping": "6.7.1",
-    "babel-plugin-transform-es2015-template-literals": "6.6.5",
+    "babel-plugin-transform-es2015-destructuring": "6.6.5",
+    "babel-plugin-transform-es2015-parameters": "6.7.0",
     "babel-plugin-transform-es2015-shorthand-properties": "6.5.0",
+    "babel-plugin-transform-es2015-spread": "6.6.5",
+    "babel-plugin-transform-es2015-template-literals": "6.6.5",
     "chai": "3.5.0",
     "cross-env": "1.0.7",
     "eslint": "1.10.3",

@@ -62,14 +62,13 @@ Grunt will then start watching the source and sync any changed files over to you
 * ✅Phase 0 - Babel support (no-op)
 * ✅Phase 1 - Arrow functions, `const` and `let`
 * ✅Phase 2 - Enhanced object literals, template literals, tagged template literals
+* ✅Phase 3 - Destructuring, spread and rest
 
 ES6 is supported via [Babel](https://babeljs.io) transpiling. The following files and directories are transpiled:
 * `main-authorize.js`
 * `main-device.js`
 * `main.js`
 * `org/forgerock/openam/**/*`
-
-n.b. `config` is ***NOT*** transpiled due to inter-mixing of commons modules into this directory.
 
 Ensure you have `Enable JavaScript source maps` enabled in Chrome or your preferred browser so see the original source before it was transpiled.
 
