@@ -316,31 +316,44 @@ public abstract class SmsResourceProvider {
     }
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
-        Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
+        if (schemas.getServiceType().equals(SchemaType.DYNAMIC)) {
+            path = path.concat("dynamic/");
+            if (result.get(new JsonPointer(path)) != null) {
+                return;
+            }
+
+            result.putPermissive(new JsonPointer(path + TYPE), OBJECT_TYPE);
+            result.putPermissive(new JsonPointer(path + TITLE), "Dynamic");
+            result.putPermissive(new JsonPointer(path + PROPERTY_ORDER), 0);
+            path = path.concat("properties/");
+        }
+
+        Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
         ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
         String serviceType = schemas.getServiceType().getType();
         List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
 
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName(), getLocale(context));
+        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), getLocale(context));
         NumberFormat sectionFormat = new DecimalFormat("00");
 
-        for (AttributeSchema attribute : schema.getAttributeSchemas()) {
+        for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
             if (i18NKey != null && i18NKey.length() > 0) {
                 String attributePath = attribute.getResourceName();
                 if (!sections.isEmpty()) {
                     String section = attributeSectionMap.get(attribute.getName());
-                    String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
-                    attributePath = section + "/" + PROPERTIES + "/" + attributePath;
-                    result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
-
-                    result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                            getTitle(consoleI18n, schemaI18n, sectionLabel));
-                    result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
-                            "z" + sectionFormat.format(sections.indexOf(section)));
+                    if (section != null) {
+                        String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
+                        attributePath = section + "/" + PROPERTIES + "/" + attributePath;
+                        result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
+                        result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
+                                getTitle(consoleI18n, schemaI18n, sectionLabel));
+                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
+                                "z" + sectionFormat.format(sections.indexOf(section)));
+                    }
                 }
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString(i18NKey));
-
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString
+                        (i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
                         getSchemaDescription(schemaI18n, i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), i18NKey);

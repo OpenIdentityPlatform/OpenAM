@@ -255,7 +255,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
-            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
+            addAttributeSchema(result, "/properties/", dynamicSchema, context);
         }
         return result;
     }
