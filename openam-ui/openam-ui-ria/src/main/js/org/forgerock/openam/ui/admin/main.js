@@ -19,6 +19,7 @@ define([
     "./services/SMSGlobalService",
     "./services/SMSRealmService",
     "./services/SitesService",
+    "./services/ServersService",
 
     "./models/Form",
     "./models/FormCollection",

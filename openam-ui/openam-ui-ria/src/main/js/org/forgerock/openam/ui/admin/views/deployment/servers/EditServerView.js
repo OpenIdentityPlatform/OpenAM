@@ -14,19 +14,15 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- /**
-  * @module org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance
-  */
- define("org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance", [
-     "org/forgerock/commons/ui/common/components/Messages",
-     "org/forgerock/openam/ui/admin/services/SitesService"
- ], (Messages, SitesService) => (id, etag, callback) => {
-     SitesService.sites.remove(id, etag).then(() => {
-         callback();
-     }, (response) => {
-         Messages.addMessage({
-             response,
-             type: Messages.TYPE_DANGER
-         });
-     });
- });
+define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView", [
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], (AbstractView) => {
+
+    const EditServerView = AbstractView.extend({
+        render () {
+            this.parentRender();
+        }
+    });
+
+    return new EditServerView();
+});

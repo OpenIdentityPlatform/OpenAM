@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
 
             this.data.title = $.t(`console.common.navigation.${sectionId}`);
 
-            ServersService.servers.defaults.get(sectionId).then((response) => {
+            ServersService.servers.getDefaults(sectionId).then((response) => {
                 this.data.schema = response.schema;
                 this.data.values = response.values;
 

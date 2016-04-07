@@ -18,8 +18,7 @@
             text-align: center;
         }
 
-        &.fr-col-btn-1,
-        &.fr-col-btn-2 {
+        &[class^='fr-col-btn-'], &[class*=' fr-col-btn-'] {
             text-align: center;
 
             .btn-link {
@@ -37,6 +36,11 @@
         &.fr-col-btn-2 {
             width: 62px;
             min-width: 62px;
+        }
+
+        &.fr-col-btn-3 {
+            width: 88px;
+            min-width: 88px;
         }
     }
 

@@ -66,6 +66,20 @@ define("config/routes/admin/GlobalRoutes", [
             pattern: "deployment/sites/new",
             role: "ui-global-admin",
             navGroup: "admin"
+        },
+        listServers: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
+            url: /deployment\/servers/,
+            pattern: "deployment/servers",
+            role: "ui-realm-admin",
+            navGroup: "admin"
+        },
+        editServer: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",
+            url: /deployment\/servers\/edit\/([^\/]+)/,
+            pattern: "deployment/servers/edit/?",
+            role: "ui-global-admin",
+            navGroup: "admin"
         }
     };
 

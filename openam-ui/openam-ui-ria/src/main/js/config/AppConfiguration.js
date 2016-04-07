@@ -185,8 +185,7 @@ define("config/AppConfiguration", [
                                 "icon": "fa fa-sitemap hidden-md",
                                 "dropdown" : true,
                                 "urls": [{
-                                    "event": Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
-                                    //"url": "#deployment/servers", TODO: Implement servers and remove link to JATO
+                                    "url": "#deployment/servers",
                                     "name": "config.AppConfiguration.Navigation.links.deployment.servers",
                                     "icon": "fa fa-server"
                                 }, {

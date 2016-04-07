@@ -1,0 +1,26 @@
+<div class="col-sm-6 col-md-4">
+    <div class="panel-default panel am-panel-card" data-realm-path="{{path}}">
+        <div class="btn-group card-menu">
+            <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-v fa-lg"></i>
+            </button>
+            <ul class="dropdown-menu pull-left" role="menu">
+                <li><a href="TODO: AME-10277"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
+                <li><a href="TODO: AME-9683"><i class="fa fa-clone"></i> {{t "console.servers.list.clone"}}</a></li>
+                <li class="divider"></li>
+                <li><a href="#" data-delete-item="{{_id}}" ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+            </ul>
+        </div>
+        <a href="TODO: AME-10277">
+            <div class="card-body card-body-with-menu">
+                <div class="card-icon-circle bg-primary">
+                    <i class="fa fa-server"></i>
+                </div>
+                <h3 class="card-name text-primary">{{_type.name}}</h3>
+                <div class="card-subtext">
+                    <div class="ellipsis">{{{_id}}}</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

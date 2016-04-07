@@ -22,30 +22,41 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues) => {
-    const obj = new AbstractDelegate(
-        `${Constants.host}/${Constants.context}/json/global-config/servers/server-default/properties/`);
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/servers`);
+    const DEFAULT_SERVER = "server-default";
 
     // TODO: remove when AME-10196 is fixed
     const mockData = (data) => _.extend(data, { type: "object" });
 
-    const getSchema = (id) => obj.serviceCall({
-        url: `${id}?_action=schema`,
+    const getSchema = (server, section) => obj.serviceCall({
+        url: `/${server}/properties/${section}?_action=schema`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST"
     }).then((response) => new JSONSchema(mockData(response)));
 
-    const getValues = (id) => obj.serviceCall({
-        url: `${id}`,
+    const getValues = (server, section) => obj.serviceCall({
+        url: `/${server}/properties/${section}`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
     }).then((response) => new JSONValues(response));
 
     obj.servers = {
-        defaults: {
-            get: (sectionId) => Promise.all([getSchema(sectionId), getValues(sectionId)]).then((response) => ({
-                schema: response[0],
-                values: response[1]
-            }))
-        }
+        get: (server, section) => Promise.all([
+            getSchema(server, section),
+            getValues(server, section)
+        ]).then((response) => ({
+            schema: response[0],
+            values: response[1]
+        })),
+        getDefaults: (section) => obj.servers.get(DEFAULT_SERVER, section),
+        getAll: () => obj.serviceCall({
+            url: `?_queryFilter=true`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        }).then((response) => _.reject(response.result, { "_id" : "server-default" })),
+        remove: (id) => obj.serviceCall({
+            url: `/${id}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "DELETE"
+        })
     };
 
     return obj;

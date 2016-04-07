@@ -14,45 +14,47 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
+define("org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/services/SitesService",
+    "org/forgerock/openam/ui/admin/services/ServersService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
-    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView",
-    "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance"
-], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, SitesService, TemplateBasedView, ToggleCardListView,
-    deleteInstance) => {
+    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
 
-    const ListSitesView = AbstractView.extend({
-        template: "templates/admin/views/deployment/sites/ListSitesTemplate.html",
+], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, ServersService, TemplateBasedView,
+    ToggleCardListView) => {
+
+    const ListServersView = AbstractView.extend({
+        template: "templates/admin/views/deployment/servers/ListServersTemplate.html",
         events: {
             "click [data-delete-item]" : "onDelete"
         },
         partials: [
             "partials/util/_ButtonLink.html",
-            "templates/admin/views/deployment/sites/_SiteCard.html"
+            "templates/admin/views/deployment/servers/_ServerCard.html"
         ],
 
         onDelete (event) {
             event.preventDefault();
             const id = $(event.currentTarget).data().deleteItem;
-            SitesService.sites.get(id).then((data) => {
-                showConfirmationBeforeDeleting({
-                    message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
-                }, _.partial(deleteInstance, data.values.raw._id, data.values.raw.etag, () => this.render()));
+            showConfirmationBeforeDeleting({
+                message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
+            },
+            () => {
+                ServersService.servers.remove(id).then(() => {
+                    this.render();
+                }, (response) => {
+                    Messages.addMessage({ response, type: Messages.TYPE_DANGER });
+                });
             });
         },
 
         renderToggleView (data) {
             const tableData = {
-                "headers": [
-                    $.t("console.sites.list.table.0"), $.t("console.sites.list.table.1"),
-                    $.t("console.sites.list.table.2"), $.t("console.sites.list.table.3")
-                ],
+                "headers": [$.t("console.servers.list.table.0"), $.t("console.servers.list.table.1")],
                 "items" : data
             };
 
@@ -60,9 +62,9 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
                 el: "#toggleCardList",
                 activeView: this.toggleView ? this.toggleView.getActiveView() : ToggleCardListView.DEFAULT_VIEW,
                 button: {
-                    href: "#deployment/sites/new",
+                    href: "#deployment/servers/new",
                     icon: "fa-plus",
-                    title: $.t("console.sites.list.new"),
+                    title: $.t("console.servers.list.new"),
                     btnClass: "btn-primary"
                 }
             });
@@ -71,12 +73,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
                 new TemplateBasedView({
                     data: tableData,
                     el: toggleView.getElementA(),
-                    template: "templates/admin/views/deployment/sites/SitesCardsTemplate.html"
+                    template: "templates/admin/views/deployment/servers/ServersCardsTemplate.html"
                 }).render();
                 new TemplateBasedView({
                     data: tableData,
                     el: toggleView.getElementB(),
-                    template: "templates/admin/views/deployment/sites/SitesTableTemplate.html"
+                    template: "templates/admin/views/deployment/servers/ServersTableTemplate.html"
                 }).render();
             });
         },
@@ -86,7 +88,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
         },
 
         render (args, callback) {
-            SitesService.sites.getAll().then((data) => {
+            ServersService.servers.getAll().then((data) => {
                 this.parentRender(() => {
                     if (_.isEmpty(data)) {
                         this.showCallToAction();
@@ -107,5 +109,5 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
         }
     });
 
-    return new ListSitesView();
+    return new ListServersView();
 });

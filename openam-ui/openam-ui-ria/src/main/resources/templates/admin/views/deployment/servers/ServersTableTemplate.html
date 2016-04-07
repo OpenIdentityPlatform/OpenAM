@@ -1,0 +1,27 @@
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                {{#each headers}}
+                    <th>{{this}}</th>
+                {{/each}}
+                <th class="fr-col-btn-3"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#each items}}
+            <tr>
+                <td class="wordwrap"><a href="{{routeTo 'editServer' _id}}" title="{{t 'common.form.edit'}}">{{{_id}}}</a></td>
+                <td class="wordwrap">{{siteName}}</td>
+                <td class="fr-col-btn-3">
+                    <div class="btn-group">
+                        <a href="{{routeTo 'editServer' _id}}" class="btn btn-link" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
+                        <button type="button" data-copy-item="TODO: AME-9683" class="btn btn-link" title="{{t 'console.servers.list.clone'}}"><i class="fa fa-clone"></i></button>
+                        <button type="button" data-delete-item="{{_id}}" class="btn btn-link" title="{{t 'common.form.delete'}}"><i class="fa fa-close"></i></button>
+                    </div>
+                </td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</div>

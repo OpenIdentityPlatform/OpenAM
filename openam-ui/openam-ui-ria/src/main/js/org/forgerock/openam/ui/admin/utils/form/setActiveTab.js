@@ -15,18 +15,18 @@
  */
 
  /**
-  * @module org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance
+  * @module org/forgerock/openam/ui/admin/utils/form/setActiveTab
   */
- define("org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance", [
-     "org/forgerock/commons/ui/common/components/Messages",
-     "org/forgerock/openam/ui/admin/services/SitesService"
- ], (Messages, SitesService) => (id, etag, callback) => {
-     SitesService.sites.remove(id, etag).then(() => {
-         callback();
-     }, (response) => {
-         Messages.addMessage({
-             response,
-             type: Messages.TYPE_DANGER
-         });
-     });
- });
+ define("org/forgerock/openam/ui/admin/utils/form/setActiveTab", [
+ ], () =>
+     /**
+      * Sets active tab whose ID indicated in the variable view.activeTabId.
+      * @param  {Object} view Backbone view with tabs
+      * @param  {string} view.activeTabId ID tab which you want to make active
+      */
+     (view) => {
+         if (view && view.activeTabId) {
+             view.$el.find(`.nav-tabs a[href="${view.activeTabId}"]`).tab("show");
+         }
+     }
+);
