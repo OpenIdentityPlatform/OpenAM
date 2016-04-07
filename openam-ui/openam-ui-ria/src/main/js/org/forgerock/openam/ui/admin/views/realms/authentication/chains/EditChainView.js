@@ -277,9 +277,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 invalid = true;
                 this.$el.find("#sortableAuthChain").addClass("hidden");
                 this.$el.find("#lowerAuthChainsLegend").addClass("hidden");
+                this.$el.find(".btn-toolbar").addClass("hidden");
                 this.$el.find(".call-to-action-block").removeClass("hidden");
-
-
             } else {
                 this.$el.find(".call-to-action-block").addClass("hidden");
                 firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
@@ -294,6 +293,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
                 this.$el.find("#sortableAuthChain").removeClass("hidden");
                 this.$el.find("#lowerAuthChainsLegend").removeClass("hidden");
+                this.$el.find(".btn-toolbar").removeClass("hidden");
             }
 
             this.$el.find("#alertContainer").html(alert);

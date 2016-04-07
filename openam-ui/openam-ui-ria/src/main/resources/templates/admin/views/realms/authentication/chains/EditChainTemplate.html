@@ -17,45 +17,43 @@
         <div role="tabpanel" class="tab-pane active" id="chains">
 
             <div class="panel-body">
-                <button type="button" class="btn btn-primary" data-add-new-module>
-                    <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
-                </button>
-                <div class="pull-right text-valign-middle auth-chains-legend">
-                    {{t 'console.authentication.editChains.legend.0'}}
-                    <span class="badge badge-success"><i class="fa fa-flag"></i></span>
-                    {{t 'console.authentication.editChains.legend.1'}}
-                    <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
-                    {{t 'console.authentication.editChains.legend.2'}}
+                <div class="btn-toolbar hidden">
+                    <button type="button" class="btn btn-primary" data-add-new-module>
+                        <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
+                    </button>
+                    <div class="pull-right text-valign-middle auth-chains-legend">
+                        {{t 'console.authentication.editChains.legend.0'}}
+                        <span class="badge badge-success"><i class="fa fa-flag"></i></span>
+                        {{t 'console.authentication.editChains.legend.1'}}
+                        <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
+                        {{t 'console.authentication.editChains.legend.2'}}
+                    </div>
                 </div>
-            </div>
 
-            <div class="panel-footer">
-                <div class="panel-body">
-                    <div id="sortableContainer">
-                        <ol id="sortableAuthChain" class="list-unstyled hidden"></ol>
-                    </div>
-                    <div class="call-to-action-block hidden">
-                        <h3>{{t 'console.authentication.editChains.callToAction'}}</h3>
-                        <button type="button" class="btn btn-primary" data-add-new-module>
-                            <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
-                        </button>
-                    </div>
+                <div id="sortableContainer">
+                    <ol id="sortableAuthChain" class="list-unstyled hidden"></ol>
+                </div>
+                <div class="call-to-action-block hidden">
+                    <h3>{{t 'console.authentication.editChains.callToAction'}}</h3>
+                    <button type="button" class="btn btn-primary" data-add-new-module>
+                        <i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}
+                    </button>
+                </div>
 
-                    <div id="lowerAuthChainsLegend" class="hidden">
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="text-center auth-chains-legend">
-                                    {{t 'console.authentication.editChains.legend.0'}}
-                                    <span class="badge badge-success"><i class="fa fa-flag"></i></span>
-                                    {{t 'console.authentication.editChains.legend.1'}}
-                                    <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
-                                    {{t 'console.authentication.editChains.legend.2'}}
-                                </div>
+                <div id="lowerAuthChainsLegend" class="hidden">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="text-center auth-chains-legend">
+                                {{t 'console.authentication.editChains.legend.0'}}
+                                <span class="badge badge-success"><i class="fa fa-flag"></i></span>
+                                {{t 'console.authentication.editChains.legend.1'}}
+                                <span class="badge badge-danger"><i class="fa fa-flag"></i> </span>
+                                {{t 'console.authentication.editChains.legend.2'}}
                             </div>
                         </div>
                     </div>
-                    <div id="alertContainer"></div>
                 </div>
+                <div id="alertContainer"></div>
             </div>
 
             <div class="panel-footer clearfix">
