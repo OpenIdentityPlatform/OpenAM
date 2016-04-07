@@ -129,10 +129,10 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue createSchema(Context context, boolean dynamic) {
-        JsonValue result = super.createSchema(context, dynamic);
+    protected JsonValue createSchema(Context context) {
+        JsonValue result = super.createSchema(context);
         if (organizationSchema != null) {
-            addAttributeSchema(result, "/properties/defaults/", organizationSchema, context, false);
+            addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
         }
         return result;
     }

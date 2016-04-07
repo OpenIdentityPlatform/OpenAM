@@ -203,8 +203,6 @@ public class SmsJsonConverter {
                 if (isASingleValue(type)) {
                     if (!object.isEmpty()) {
                         jsonAttributeValue = attributeSchemaConverter.toJson(object.iterator().next());
-                    } else {
-                        jsonAttributeValue = "";
                     }
                 } else if (containsMultipleValues(type)) {
                     if (isAMap(attributeSchema.getUIType())) {

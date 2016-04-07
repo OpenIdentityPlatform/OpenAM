@@ -20,11 +20,12 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentityRepository;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -32,9 +33,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -43,7 +50,7 @@ import org.forgerock.json.resource.annotations.Delete;
 import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -146,14 +153,10 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     @Update
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
-        return handleUpdate(serverContext, updateRequest.getContent());
-    }
-
-    private Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext, JsonValue content) {
         String resourceId = resourceId();
         if (dynamicSchema != null) {
             try {
-                updateDynamicAttributes(serverContext, content);
+                updateDynamicAttributes(serverContext, updateRequest.getContent());
             } catch (SMSException e) {
                 debug.warning("::SmsCollectionProvider:: SMSException on create", e);
                 return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
@@ -170,7 +173,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             String realm = realmFor(serverContext);
-            saveConfigAttributes(config, convertFromJson(content, realm));
+            saveConfigAttributes(config, convertFromJson(updateRequest.getContent(), realm));
             JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
@@ -227,11 +230,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             if (subSchemaPath.isEmpty()) {
                 if (type == SchemaType.GLOBAL) {
                     config = scm.createGlobalConfig(attrs);
-                } else if (dynamicSchema != null) {
-                    final SSOToken ssoToken = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
-                    AMIdentityRepository repo = new AMIdentityRepository(realm, ssoToken);
-                    repo.getRealmIdentity().assignService(serviceName, attrs);
-                    config = null;
                 } else {
                     config = scm.createOrganizationConfig(realm, attrs);
                 }
@@ -240,13 +238,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
-            final JsonValue jsonValue;
-            if (config != null) {
-                jsonValue = getJsonValue(realm, config, serverContext);
-            } else {
-                jsonValue = json(object());
-            }
-            JsonValue result = withExtraAttributes(realm, jsonValue);
+            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -256,27 +248,14 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
-        } catch (IdRepoException e) {
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         }
     }
 
     @Override
-    protected JsonValue createSchema(Context context, boolean dynamic) {
-        JsonValue result;
+    protected JsonValue createSchema(Context context) {
+        JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
-            result = super.createSchema(context, true);
-        } else {
-            result = super.createSchema(context, false);
-        }
-        return result;
-    }
-
-    @Override
-    protected JsonValue createTemplate() {
-        JsonValue result = super.createTemplate();
-        if (dynamicSchema != null) {
-            return json(object(field("dynamic", result.getObject())));
+            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
         }
         return result;
     }
