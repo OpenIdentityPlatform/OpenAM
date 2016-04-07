@@ -28,11 +28,11 @@
  /* ENF should come to toolbar.less from common */
 
  /* Candidate for Commons */
-#wrapper{
+#wrapper {
     padding-bottom: 50px;
 }
 
-.float-right{
+.float-right {
     float:right;
 }
 
@@ -57,7 +57,7 @@
 
 /* END of Candidate for Commons */
 
-.remember-forgot{
+.remember-forgot {
     padding: 0 0 0;
     .pull-right, .pull-left, .checkbox {
         margin-top: 0;
@@ -78,7 +78,7 @@
     }
 }
 
-#dialogs .validationRules{
+#dialogs .validationRules {
     margin-left: 0;
 }
 
@@ -93,6 +93,14 @@
     .container {
         width: auto;
     }
+}
+
+/*
+ * Enable point events as they are disabled in Bootstrap 3.3+
+ * @see https://github.com/twbs/bootstrap/pull/14104
+*/
+.enable-pointer .form-control-feedback {
+    pointer-events: auto;
 }
 
 /* XUI Overrides */

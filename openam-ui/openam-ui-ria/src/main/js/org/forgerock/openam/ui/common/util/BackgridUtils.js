@@ -219,7 +219,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     });
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
-        className: "filter-header-cell",
+        className: "filter-header-cell enable-pointer",
         render: function () {
             var filter = new Backgrid.Extension.ThemeableServerSideFilter({
                 name: this.column.get("name"),
