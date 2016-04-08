@@ -52,7 +52,6 @@ import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.html.CCButton;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +61,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
-
 
 /**
  * Servers and Sites Management main page.
