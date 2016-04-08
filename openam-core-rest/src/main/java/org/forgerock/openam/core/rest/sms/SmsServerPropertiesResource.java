@@ -16,34 +16,6 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import java.util.Iterator;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -54,8 +26,29 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.xml.bind.StringInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -70,11 +63,18 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 /**
  * A service to allow the modification of server properties
@@ -97,6 +97,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     //this list is to enable us to distinguish which attributes are in the "advanced" tab
     private static List<String> allAttributeNamesInNamedTabs = new ArrayList<>();
     private final Debug logger;
+    private final Properties syntaxProperties;
     private DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
     private DocumentBuilder dBuilder;
 
@@ -113,8 +114,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties, @Named
             ("ServerAttributeTitles") Properties titleProperties, @Named("frRest") Debug logger) {
         this.logger = logger;
-        defaultSchema = getSchema(syntaxProperties, titleProperties, true);
-        nonDefaultSchema = getSchema(syntaxProperties, titleProperties, false);
+        this.syntaxProperties = syntaxProperties;
+        defaultSchema = getSchema(titleProperties, true);
+        nonDefaultSchema = getSchema(titleProperties, false);
         directoryConfigSchema = getDirectorySchema(titleProperties, logger);
     }
 
@@ -171,44 +173,38 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return null;
     }
 
-    private JsonValue getSchema(Properties syntaxProperties, Properties titleProperties, boolean isDefault) {
+    private JsonValue getSchema(Properties titleProperties, boolean isDefault) {
         JsonValue template = json(object());
         for (String tabName : getTabNames()) {
             try {
                 Document propertySheet = getPropertySheet(tabName);
-                Map<String, Set<String>> options = getOptions(propertySheet, tabName);
+                Map<String, List<String>> options = getOptions(propertySheet, tabName);
+                Map<String, List<String>> optionLabels = getOptionLabels(propertySheet, tabName, titleProperties);
                 List<String> sectionNames = getSectionNames(propertySheet);
                 Set<String> optionalAttributes = getOptionalAttributes(propertySheet, tabName);
 
+                template.putPermissive(new JsonPointer("/properties/" + tabName + "/type"), "object");
                 int sectionOrder = 0;
                 for (String sectionName : sectionNames) {
-
-                    final String sectionPath = "/properties/" + tabName + "/" + sectionName;
+                    final String sectionPath = "/properties/" + tabName + "/properties/" + sectionName;
                     template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
-
+                    template.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
                     template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
 
                     int attributeOrder = 0;
-                    for (String attributeName : getAttributeNamesForSection(sectionName, propertySheet)) {
-                        final String title = titleProperties.getProperty(attributeName);
-                        String property = syntaxProperties.getProperty(attributeName);
-                        if (property == null) {
-                            property = "";
-                        }
-                        final String type = syntaxRawToReal.get(property);
-                        final Set<String> attributeOptions = getAttributeOptions(options, attributeName, type);
-                        final boolean isOptional;
 
-                        if (isDefault) {
-                            isOptional = optionalAttributes.contains(attributeName);
-                        } else {
-                            isOptional = true;
-                        }
+                    for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels)) {
+                        final String title = label.getDisplayValue();
+                        final String type = label.getType();
+                        final String attributeName = label.getLabelFor();
+                        final List<String> attributeOptions = label.getOptions();
+                        final List<String> attributeOptionLabels = label.getOptionLabels();
+                        final boolean isOptional = isDefault ? optionalAttributes.contains(attributeName) : true;
 
-                        final String path = sectionPath + "/" + attributeName;
-
+                        final String path = sectionPath + "/properties/" + attributeName;
                         if (attributeOptions != null && !attributeOptions.isEmpty()) {
-                            template.putPermissive(new JsonPointer(path + "/type/enum"), attributeOptions);
+                            template.putPermissive(new JsonPointer(path + "/enum"), attributeOptions);
+                            template.putPermissive(new JsonPointer(path + "/options/enum_titles"), attributeOptionLabels);
                         } else {
                             template.putPermissive(new JsonPointer(path + "/type"), type);
                         }
@@ -229,12 +225,27 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return template;
     }
 
-    private Set<String> getAttributeOptions(Map<String, Set<String>> options, String attributeName, String syntax) {
-        Set<String> attributeOptions;
+    private List<String> getAttributeOptions(Map<String, List<String>> options, String attributeName, String syntax) {
+        List<String> attributeOptions;
         if (syntax != null && syntax.equals("on,off")) {
-            final HashSet<String> onOffOptions = new HashSet<>();
+            final List<String> onOffOptions = new ArrayList<>();
             onOffOptions.add("on");
             onOffOptions.add("off");
+            attributeOptions = onOffOptions;
+        } else {
+            attributeOptions = options.get(attributeName);
+        }
+
+        return attributeOptions;
+    }
+
+    private List<String> getAttributeOptionsLabels(Map<String, List<String>> options, String attributeName, String
+            syntax) {
+        List<String> attributeOptions;
+        if (syntax != null && syntax.equals("on,off")) {
+            final List<String> onOffOptions = new ArrayList<>();
+            onOffOptions.add("On");
+            onOffOptions.add("Off");
             attributeOptions = onOffOptions;
         } else {
             attributeOptions = options.get(attributeName);
@@ -341,6 +352,34 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return properties;
     }
 
+    private List<SMSLabel> getLabels(String sectionName, Document propertySheet, Properties titleProperties,
+                                     Map<String, List<String>> options, Map<String, List<String>> optionLabels)
+            throws IOException, SAXException,
+            ParserConfigurationException, XPathExpressionException {
+        String expression = "/propertysheet/section[@defaultValue='" + sectionName + "']/property/label/@*[name()='defaultValue' or name()='labelFor']";
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList labels = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+        List<SMSLabel> allLabels = new ArrayList<>();
+        for (int i = 0; i < labels.getLength() - 1; i = i + 2) {
+            String defaultValue = labels.item(i).getNodeValue();
+            String labelFor = labels.item(i + 1).getNodeValue();
+            String displayValue = titleProperties.getProperty(defaultValue);
+
+            final String convertedAttributeName = defaultValue.replaceFirst("amconfig.", "");
+            final String syntax = syntaxProperties.getProperty(convertedAttributeName);
+            final String syntaxProperty = syntax == null ? "" : syntax;
+            final String type = syntaxRawToReal.get(syntaxProperty);
+
+            final List<String> attributeOptions = getAttributeOptions(options, convertedAttributeName, type);
+            final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, convertedAttributeName, type);
+
+            allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue, type, attributeOptions, attributeOptionLabels));
+
+        }
+
+        return allLabels;
+    }
+
     private List<String> getDefaultValueNames(String tabName) throws ParserConfigurationException, SAXException,
             IOException,
             XPathExpressionException {
@@ -384,17 +423,36 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return sectionNames;
     }
 
-    private Map<String, Set<String>> getOptions(Document propertySheet, String tabName) {
-        Map<String, Set<String>> radioOptions = new HashMap<>();
+    private Map<String, List<String>> getOptionLabels(Document propertySheet, String tabName, Properties optionProperties) {
+        Map<String, List<String>> options = getOptions(propertySheet, tabName, "@label");
+
+        Map<String, List<String>> allOptionLabels = new HashMap<>();
+        for (String attributeName : options.keySet()) {
+            List<String> optionLabels = new ArrayList<>();
+            for (String option : options.get(attributeName)) {
+                optionLabels.add(optionProperties.getProperty(option));
+            }
+            allOptionLabels.put(attributeName, optionLabels);
+        }
+        return allOptionLabels;
+    }
+
+    private Map<String, List<String>> getOptions(Document propertySheet, String tabName) {
+        return getOptions(propertySheet, tabName, "@value");
+    }
+
+    private Map<String, List<String>> getOptions(Document propertySheet, String tabName, String expressionAttribute) {
+        Map<String, List<String>> radioOptions = new HashMap<>();
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
 
             List<String> attributeNamesForTab = getDefaultValueNames(tabName);
             for (String defaultValueName : attributeNamesForTab) {
                 String convertedName = getConvertedName(defaultValueName);
-                String expression = "//propertysheet/section/property/cc[@name='" + convertedName + "']/option/@value";
+                String expression = "//propertysheet/section/property/cc[@name='" + convertedName + "']/option/" +
+                        expressionAttribute;
                 NodeList optionsList = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
-                Set<String> options = new HashSet<>();
+                List<String> options = new ArrayList<>();
                 for (int i = 0; i < optionsList.getLength(); i++) {
                     options.add(optionsList.item(i).getNodeValue());
                 }
@@ -682,5 +740,48 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         }
 
         return new BadRequestException("Error updating values for " + tabName).asPromise();
+    }
+
+    private class SMSLabel {
+        private final String defaultValue;
+        private final String labelFor;
+        private final String displayValue;
+        private final String type;
+        private final List<String> optionLabels;
+        private final List<String> options;
+
+        public SMSLabel(String defaultValue, String labelFor, String displayValue, String type, List<String> options,
+                        List<String> optionLabels) {
+            this.defaultValue = defaultValue;
+            this.labelFor = labelFor;
+            this.displayValue = displayValue;
+            this.type = type;
+            this.options = options;
+            this.optionLabels = optionLabels;
+        }
+
+        public List<String> getOptions() {
+            return options;
+        }
+
+        public List<String> getOptionLabels() {
+            return optionLabels;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getDisplayValue() {
+            return displayValue;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public String getLabelFor() {
+            return labelFor;
+        }
     }
 }
