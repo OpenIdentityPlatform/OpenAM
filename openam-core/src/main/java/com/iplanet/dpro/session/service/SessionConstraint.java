@@ -24,17 +24,20 @@
  *
  * $Id: SessionConstraint.java,v 1.6 2009/11/21 01:13:24 222713 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
+
 package com.iplanet.dpro.session.service;
 
 import static com.iplanet.dpro.session.service.SessionConstants.SESSION_DEBUG;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -185,23 +188,25 @@ public class SessionConstraint {
     }
 
     /*
-     * Get the sessionQuota
+     * Get the sessionQuota this will follow
+     * this precedence to determine the  quota
+     * user ,realm ,global.
+     *
      * @param InternalSession 
      * @return session quota
      */
     private static int getSessionQuota(InternalSession is) {
 
-        // Note: this method may have to be further enhanced to
-        // retrieve the user based session quota settings using
-        // the latest IDRepo interfaces.
-
         int quota = getDefaultSessionQuota();
-
+        String profile = is.getProperty(ISAuthConstants.USER_PROFILE);
+        AMIdentity identity = null;
         try {
-            AMIdentity iden = IdUtils.getIdentity(SessionCount.getAdminToken(),
-                    is.getUUID());
-            Map serviceAttrs = 
-                iden.getServiceAttributesAscending(AM_SESSION_SERVICE);
+            if (ISAuthConstants.IGNORE.equals(profile)) {
+                identity = new AMIdentityRepository(is.getClientDomain(), SessionCount.getAdminToken()).getRealmIdentity();
+            } else {
+                identity = IdUtils.getIdentity(SessionCount.getAdminToken(), is.getUUID());
+            }
+            Map serviceAttrs = identity.getServiceAttributesAscending(AM_SESSION_SERVICE);
             Set s = (Set) serviceAttrs.get(SESSION_QUOTA_ATTR_NAME);
             Iterator attrs = s.iterator();
             if (attrs.hasNext()) {
@@ -214,7 +219,6 @@ public class SessionConstraint {
                         + "IDRepo interfaces, => Use the default "
                         + "value from the dynamic schema instead.", e);
             }
-
         }
         return quota;
     }
