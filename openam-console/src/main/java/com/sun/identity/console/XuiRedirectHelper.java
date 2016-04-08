@@ -36,6 +36,8 @@ import java.text.MessageFormat;
  */
 public final class XuiRedirectHelper {
 
+    public static final String SERVER_DEFAULT_LOCATION = "configure/server-defaults/general";
+
     private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI/#{1}";
     private static final String DEFAULT_REALM = "/";
 

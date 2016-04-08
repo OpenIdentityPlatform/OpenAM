@@ -36,6 +36,7 @@ import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.AMViewConfig;
@@ -50,6 +51,9 @@ import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.html.CCButton;
+import org.forgerock.http.util.Uris;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,6 +63,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
+
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 /**
  * Servers and Sites Management main page.
@@ -518,7 +524,7 @@ public class ServerSiteViewBean
     }
     
     public void handleBtnDefaultSettingsRequest(RequestInvocationEvent event) {
-        forwardToServerProfilePage(ServerConfiguration.DEFAULT_SERVER_CONFIG);
+        redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION);
     }
 
     
