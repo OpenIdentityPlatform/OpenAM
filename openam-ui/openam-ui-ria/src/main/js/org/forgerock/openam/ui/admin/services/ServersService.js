@@ -56,6 +56,12 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
             url: `/${id}`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "DELETE"
+        }),
+        update:  (id, data) => obj.serviceCall({
+            url: `${id}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "PUT",
+            data: JSON.stringify(data)
         })
     };
 

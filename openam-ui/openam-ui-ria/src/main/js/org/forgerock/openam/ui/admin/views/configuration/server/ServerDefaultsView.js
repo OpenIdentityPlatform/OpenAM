@@ -19,14 +19,16 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/services/ServersService",
     "org/forgerock/openam/ui/common/components/PartialBasedView",
     "org/forgerock/openam/ui/common/components/TabComponent",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
-], ($, _, Messages, AbstractView, ServersService, PartialBasedView, TabComponent, JSONSchema, JSONValues,
-    FlatJSONSchemaView) => {
+], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PartialBasedView, TabComponent,
+    JSONSchema, JSONValues, FlatJSONSchemaView) => {
     function createTabs (schema) {
         return _(schema.raw.properties)
             .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
@@ -73,8 +75,23 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                 });
             });
         },
+        updateData () {
+            this.data.values.extend({
+                [this.subview.getTabId()]: this.getJSONSchemaView().values()
+            });
+        },
         onSave () {
-            // TODO:
+            this.updateData();
+            ServersService.servers.update(this.data.id, this.data.values().raw)
+            .then((data) => {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                this.data.values = data;
+            }, (response) => {
+                Messages.addMessage({
+                    response,
+                    type: Messages.TYPE_DANGER
+                });
+            });
         }
     });
 });
