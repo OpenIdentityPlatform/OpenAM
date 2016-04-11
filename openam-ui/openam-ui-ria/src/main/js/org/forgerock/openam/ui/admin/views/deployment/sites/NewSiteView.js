@@ -16,13 +16,14 @@
 
 define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], ($, Messages, AbstractView, Router, SitesService, FlatJSONSchemaView) => {
+], ($, _, Messages, AbstractView, Router, SitesService, FlatJSONSchemaView) => {
 
     const NewSiteView = AbstractView.extend({
         template: "templates/admin/views/deployment/sites/NewSiteTemplate.html",
@@ -42,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
         },
 
         onCreate () {
-            const values = this.jsonSchemaView.values();
+            const values = _.cloneDeep(this.jsonSchemaView.values());
             const siteId = this.$el.find("[data-site-name]").val();
             values["_id"] = siteId;
 
