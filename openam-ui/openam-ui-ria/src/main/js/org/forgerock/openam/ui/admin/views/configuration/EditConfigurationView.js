@@ -24,13 +24,11 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView"
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationBacklink",
+    "org/forgerock/openam/ui/admin/views/common/Backlink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService,
-    EditConfigurationBacklink) => {
-
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService, Backlink) => {
     const EditConfigurationView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditConfigurationTemplate.html",
         events: {
@@ -47,6 +45,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView"
                 this.data.tabbed = this.data.schema.grouped;
 
                 this.parentRender(() => {
+                    const FRAGMENT_INDEX = 1;
                     if (this.data.tabbed) {
                         this.$el.find("ul.nav a:first").tab("show");
                         this.$el.find(".tab-menu .nav-tabs").tabdrop();
@@ -57,7 +56,8 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView"
                             this.data.values
                         );
                     }
-                    new EditConfigurationBacklink({ el:"#backlink" }).render();
+
+                    new Backlink({ el:"#backlink" }).render(FRAGMENT_INDEX);
                     if (callback) { callback(); }
                 });
             });

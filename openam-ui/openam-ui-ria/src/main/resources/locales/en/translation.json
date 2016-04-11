@@ -710,7 +710,8 @@
                 "cts": "CTS",
                 "uma": "UMA",
                 "advanced": "Advanced",
-                "server-defaults": "Server Defaults"
+                "server-defaults": "Server Defaults",
+                "realms": "Realms"
             },
             "description": "Description",
             "type": "Type",

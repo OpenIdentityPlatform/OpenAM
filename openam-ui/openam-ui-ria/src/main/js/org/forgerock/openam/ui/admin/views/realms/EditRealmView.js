@@ -26,6 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/services/SMSRealmService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/admin/views/common/Backlink",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
@@ -34,8 +35,8 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "bootstrap-tabdrop",
     "popoverclickaway",
     "selectize"
-], function ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, SMSGlobalService,
-             SMSRealmService, FormHelper, JSONSchema, JSONValues, FlatJSONSchemaView, Promise) {
+], ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, SMSGlobalService, SMSRealmService,
+    FormHelper, Backlink, JSONSchema, JSONValues, FlatJSONSchemaView, Promise) => {
 
     function setAutofocus () {
         $("input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
@@ -85,7 +86,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             "change input[name=\"root[name]\"]": "onDataChange"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             let realmPromise;
             let authenticationPromise;
             let allRealmsPromise = SMSGlobalService.realms.all();
@@ -109,6 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
             this.parentRender(function () {
                 Promise.all([realmPromise, allRealmsPromise, authenticationPromise]).then((results) => {
+                    const FRAGMENT_INDEX = 0;
                     let data = results[0];
                     let element = this.$el.find("[data-realm-form]");
                     let allRealmPaths = [];
@@ -148,10 +150,8 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                     $(this.jsonSchemaView.render().el).appendTo(element);
 
                     setAutofocus();
-
-                    if (callback) {
-                        callback();
-                    }
+                    new Backlink({ el:"#backlink" }).render(FRAGMENT_INDEX);
+                    if (callback) { callback(); }
                 }, (response) => {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
@@ -161,7 +161,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             });
         },
 
-        returnBack: function () {
+        returnBack () {
             if (this.data.newEntity) {
                 Router.routeTo(Router.configuration.routes.realms, {
                     args: [],
@@ -175,14 +175,14 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             }
         },
 
-        onDataChange: function () {
+        onDataChange () {
             if (this.jsonSchemaView.subview.jsonEditor) {
                 this.jsonSchemaView.subview.jsonEditor.options["show_errors"] = "never";
             }
             this.toggleSubmitButton(validateRealmName());
         },
 
-        submitForm: function (event) {
+        submitForm (event) {
             event.preventDefault();
             this.toggleSubmitButton(false);
 
@@ -213,14 +213,14 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             });
         },
 
-        onDeleteClick: function (event) {
+        onDeleteClick (event) {
             event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.realms.edit.realm") },
                 _.bind(this.deleteRealm, this));
         },
 
-        deleteRealm: function () {
+        deleteRealm () {
             let realmPath = this.jsonSchemaView.values().name;
 
             SMSGlobalService.realms.remove(realmPath).then(() => {
@@ -244,11 +244,11 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             });
         },
 
-        canRealmBeDeleted: function (realmPath) {
+        canRealmBeDeleted (realmPath) {
             return realmPath === "/" ? false : true;
         },
 
-        toggleSubmitButton: function (flag) {
+        toggleSubmitButton (flag) {
             this.$el.find("[data-save]").prop("disabled", !flag);
         }
     });

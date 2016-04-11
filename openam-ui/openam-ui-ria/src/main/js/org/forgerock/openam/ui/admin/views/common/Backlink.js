@@ -14,7 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationBacklink", [
+/**
+ * @module org/forgerock/openam/ui/admin/views/common/Backlink
+ */
+define("org/forgerock/openam/ui/admin/views/common/Backlink", [
     "jquery",
     "lodash",
     "backbone",
@@ -22,18 +25,21 @@ define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationBackl
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], ($, _, Backbone, URIUtils, UIUtils) => {
 
-    function getBaseURI (allFragments) {
-        return _.take(allFragments, 2).join("/");
+    function getBaseURI (allFragments, fragmentIndex) {
+        return _.take(allFragments, fragmentIndex + 1).join("/");
     }
 
     return Backbone.View.extend({
-
-        render () {
+        /**
+         * Renders a back link navigation element.
+         * @param {number} [fragmentIndex=0] Fragment index indicates which url fragment used for back link
+         */
+        render (fragmentIndex = 0) {
             const allFragments = URIUtils.getCurrentFragment().split("/");
-            const pageFragment = allFragments[1];
+            const pageFragment = allFragments[fragmentIndex];
             const data = {
-                "title": $.t(`config.AppConfiguration.Navigation.links.configure.${pageFragment}`),
-                "hash": `#${getBaseURI(allFragments)}`
+                "title": $.t(`console.common.navigation.${pageFragment}`),
+                "hash": `#${getBaseURI(allFragments, fragmentIndex)}`
             };
 
             UIUtils.fillTemplateWithData(
