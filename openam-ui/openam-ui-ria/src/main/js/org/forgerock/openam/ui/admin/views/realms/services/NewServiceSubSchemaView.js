@@ -29,7 +29,17 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
     GroupedJSONSchemaView) => AbstractView.extend({
         template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
         events: {
-            "click [data-save]": "onSave"
+            "click [data-save]": "onSave",
+            "keyup [data-name]": "onNameChange",
+            "change [data-input]": "onNameChange"
+        },
+        onNameChange (event) {
+            const isEmpty = _.isEmpty(event.currentTarget.value);
+
+            this.setCreateEnabled(!isEmpty);
+        },
+        setCreateEnabled (enabled) {
+            this.$el.find("[data-save]").prop("disabled", !enabled);
         },
         render (args) {
             this.data.realmPath = args[0];
