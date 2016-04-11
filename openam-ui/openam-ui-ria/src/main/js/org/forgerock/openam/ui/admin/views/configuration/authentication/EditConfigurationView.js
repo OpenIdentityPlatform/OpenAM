@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView", [
+define("org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",

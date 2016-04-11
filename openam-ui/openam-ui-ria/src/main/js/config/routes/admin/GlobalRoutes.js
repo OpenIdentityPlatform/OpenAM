@@ -26,7 +26,7 @@ define("config/routes/admin/GlobalRoutes", [
             navGroup: "admin"
         },
         editAuthenticationSettings: {
-            view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
+            view: "org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView",
             url: /configure\/authentication\/([^\/]+)/,
             pattern: "configure/authentication/?",
             role: "ui-global-admin",
@@ -40,9 +40,9 @@ define("config/routes/admin/GlobalRoutes", [
             navGroup: "admin"
         },
         editGlobalService: {
-            view: "org/forgerock/openam/ui/admin/views/configuration/EditConfigurationView",
-            url: /configure\/global-service\/([^\/]+)/,
-            pattern: "configure/global-service/?",
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditConfigurationView",
+            url: /configure\/global-services\/([^\/]+)/,
+            pattern: "configure/global-services/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },

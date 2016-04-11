@@ -1,0 +1,17 @@
+<div class="container">
+    {{> headers/_Title title=title }}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "console.configuration.globalServices.title"}}</h3>
+                <p class="panel-description">{{t "console.configuration.globalServices.description"}}</p>
+                <div class="list-group">
+                    {{#each items}}
+                    <a href="{{routeTo 'editGlobalService' this._id}}" class="list-group-item">{{name}}</a>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

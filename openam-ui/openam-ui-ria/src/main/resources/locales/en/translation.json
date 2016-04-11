@@ -957,6 +957,10 @@
                     "title": "Authentication Module Defaults",
                     "description": "Configure default properties applied when creating new authentication modules."
                 }
+            },
+            "globalServices" : {
+                "title": "Service Defaults",
+                "description": "Configure default properties applied when creating new services."
             }
         },
         "authorization": {
