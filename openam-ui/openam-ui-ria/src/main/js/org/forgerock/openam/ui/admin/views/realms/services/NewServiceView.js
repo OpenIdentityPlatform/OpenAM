@@ -66,19 +66,18 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                 });
             });
         },
-
         onSelectService (event) {
             this.selectService(event.target.value);
         },
-
         selectService (service) {
             toggleCreate(this.$el, false);
-            if (service && service !== this.data.type) {
-                this.data.type = service;
 
-                if (this.jsonSchemaView) {
-                    this.jsonSchemaView.remove();
-                }
+            if (service !== this.data.type && this.jsonSchemaView) {
+                this.jsonSchemaView.remove();
+            }
+
+            if (!_.isEmpty(service)) {
+                this.data.type = service;
 
                 ServicesService.instance.getInitialState(this.data.realmPath, this.data.type).then((response) => {
                     const options = {
