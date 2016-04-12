@@ -140,6 +140,18 @@ public class PushNotificationService {
         delegateUpdater.replaceDelegate(realm, pushNotificationDelegate, config);
     }
 
+
+    private void deleteService(String realm) throws PushNotificationException {
+
+        delegateUpdater.deleteDelegate(realm);
+
+        PushNotificationServiceConfigHelper configHelper = getConfigHelper(realm);
+        String factoryClass = configHelper.getFactoryClass();
+        validateFactoryExists(factoryClass);
+        pushFactoryMap.remove(factoryClass);
+
+    }
+
     private void validateFactoryExists(String factoryClass) throws PushNotificationException {
         try {
             pushFactoryMap.putIfAbsent(factoryClass, createFactory(factoryClass));
@@ -190,15 +202,29 @@ public class PushNotificationService {
         @Override
         public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
                                               String serviceComponent, int type) {
-            try {
-                if (SERVICE_NAME.equals(serviceName) && SERVICE_VERSION.equals(version)) {
-                    //do update
-                    synchronized (pushRealmMap) { //wait here for the thread with first access to update
-                        updatePreferences(DNMapper.orgNameToRealmName(orgName));
+            switch (type) {
+            case ADDED: // OR
+            case MODIFIED:
+                try {
+                    if (SERVICE_NAME.equals(serviceName) && SERVICE_VERSION.equals(version)) {
+                        //do update
+                        synchronized (pushRealmMap) { //wait here for the thread with first access to update
+                            updatePreferences(DNMapper.orgNameToRealmName(orgName));
+                        }
                     }
+                } catch (PushNotificationException e) {
+                    debug.error("Unable to update preferences for organization {}", orgName, e);
                 }
-            } catch (PushNotificationException e) {
-                debug.error("Unable to update preferences for organization {}", orgName, e);
+                break;
+            case REMOVED:
+                try {
+                    deleteService(DNMapper.orgNameToRealmName(orgName));
+                } catch (PushNotificationException e) {
+                    debug.error("Unable to update preferences for organization {}", orgName, e);
+                }
+                break;
+            default:
+                debug.error("Unknown function requested on to update preferences for organization {}", type);
             }
         }
     }
@@ -211,7 +237,6 @@ public class PushNotificationService {
 
         void replaceDelegate(String realm, PushNotificationDelegate newDelegate,
                          PushNotificationServiceConfig config) throws PushNotificationException {
-
             try {
                 PushNotificationDelegate oldDelegate = pushRealmMap.get(realm);
 
@@ -235,6 +260,16 @@ public class PushNotificationService {
         private void start(String realm, PushNotificationDelegate delegate) throws PushNotificationException {
             delegate.startServices();
             pushRealmMap.put(realm, delegate);
+        }
+
+        private void deleteDelegate(String realm) throws PushNotificationException {
+            PushNotificationDelegate removedDelegate = pushRealmMap.remove(realm);
+            try {
+                removedDelegate.close();
+            } catch (IOException e) {
+                throw new PushNotificationException(
+                        "Error Deleting Service {}" + SERVICE_NAME + " for realm {}" + realm);
+            }
         }
     }
 
