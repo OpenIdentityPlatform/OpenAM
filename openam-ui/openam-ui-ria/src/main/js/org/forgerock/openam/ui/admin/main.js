@@ -30,7 +30,6 @@ define([
     "./utils/RedirectToLegacyConsole",
 
     "./views/realms/agents/AgentsView",
-
     "./views/realms/authentication/chains/CriteriaView",
     "./views/realms/authentication/chains/AddChainView",
     "./views/realms/authentication/chains/EditChainView",
@@ -46,29 +45,18 @@ define([
     "./views/realms/dashboard/DashboardView",
     "./views/realms/dashboard/DashboardTasksView",
     "./views/realms/dataStores/DataStoresView",
-
     "./views/realms/authorization/common/AbstractListView",
-
     "./views/realms/authorization/policies/EditPolicyView",
-
     "./views/realms/authorization/policySets/PolicySetsView",
     "./views/realms/authorization/policySets/EditPolicySetView",
-
     "./views/realms/authorization/resourceTypes/ResourceTypesView",
     "./views/realms/authorization/resourceTypes/EditResourceTypeView",
-
     "./views/realms/privileges/PrivilegesView",
-
     "./views/realms/scripts/EditScriptView",
     "./views/realms/scripts/ScriptsView",
-
     "./views/realms/sts/STSView",
-
     "./views/realms/subjects/SubjectsView",
-
     "./views/realms/services/SubSchemaListView",
-
-
     "./views/realms/EditRealmView",
     "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
@@ -80,5 +68,8 @@ define([
     "./views/configuration/authentication/ListAuthenticationView",
     "./views/configuration/global/ListGlobalServicesView",
 
-    "./views/common/ToggleCardListView"
+    "./views/common/ToggleCardListView",
+
+    "./views/deployment/servers/EditServerView",
+    "./views/deployment/servers/NewServerView"
 ]);

@@ -14,25 +14,15 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView", [
-    "jquery",
-    "lodash",
-    "org/forgerock/commons/ui/common/components/Messages",
+define("org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
-], ($, _, Messages, AbstractView) => AbstractView.extend({
-    template: "templates/admin/views/common/HeaderFormTemplate.html",
-    events: {
-        "click [data-save]": "onSave"
-    },
-    getJSONSchemaView () {
-        return this.subview.getTabBody();
-    },
-    render ([serverId, sectionId]) {
-        this.data.todo = serverId;
-        this.data.title = $.t(`console.common.navigation.${sectionId}`);
-        this.parentRender();
-    },
-    onSave () {
-        // TODO:
-    }
-}));
+], (AbstractView) => {
+    const NewServerView = AbstractView.extend({
+        template: "templates/admin/views/deployment/servers/NewServerTemplate.html",
+        render () {
+            this.parentRender();
+        }
+    });
+
+    return new NewServerView();
+});

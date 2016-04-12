@@ -20,16 +20,20 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, AbstractView, ModuleLoader, URIUtils) {
-    var TreeNavigation = AbstractView.extend({
+], ($, _, AbstractView, ModuleLoader, URIUtils) => {
+    const TreeNavigation = AbstractView.extend({
+        template: "templates/admin/views/common/navigation/TreeNavigationTemplate.html",
+        partials: [
+            "partials/breadcrumb/_Breadcrumb.html",
+            "templates/admin/views/common/navigation/_TreeNavigationLeaf.html"
+        ],
         events: {
             "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
         },
-        findActiveNavItem: function (fragment) {
-            var element = this.$el.find(".sidenav ol > li > a[href^=\"#" + fragment + "\"]"),
-                parent, fragmentSections;
+        findActiveNavItem (fragment) {
+            const element = this.$el.find(`.sidenav ol > li > a[href^="#${fragment}"]`);
             if (element.length) {
-                parent = element.parent();
+                const parent = element.parent();
 
                 this.$el.find(".sidenav ol > li").removeClass("active");
                 element.parentsUntil(this.$el.find(".sidenav"), "li").addClass("active");
@@ -39,47 +43,43 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
                     parent.parent().addClass("in");
                 }
             } else {
-                fragmentSections = fragment.split("/");
+                const fragmentSections = fragment.split("/");
                 this.findActiveNavItem(fragmentSections.slice(0, -1).join("/"));
             }
         },
-        navigateToPage: function (event) {
+        navigateToPage (event) {
             this.$el.find(".sidenav ol > li").removeClass("active");
             $(event.currentTarget).parentsUntil(this.$el.find(".sidenav"), "li").addClass("active");
-
             this.nextRenderPage = true;
         },
-        setElement: function (element) {
+        setElement (element) {
             AbstractView.prototype.setElement.call(this, element);
-
             if (this.route && this.nextRenderPage) {
                 ModuleLoader.load(this.route.page).then(
-                    _.bind(function (module) {
+                    _.bind((module) => {
                         this.renderPage(module, this.args);
                     }, this),
-                    _.bind(function () {
-                        throw "Unable to render page for module " + this.route.page;
+                    _.bind(() => {
+                        throw `Unable to render page for module ${this.route.page}`;
                     }, this)
                 );
             }
         },
 
-        render: function (args, callback) {
-            var self = this;
+        render (args, callback) {
             this.args = args;
-
-            self.parentRender(function () {
-                self.$el.find(".sidenav li").removeClass("active");
-                self.findActiveNavItem(URIUtils.getCurrentFragment());
-                if (!self.nextRenderPage) {
-                    ModuleLoader.load(self.route.page).then(function (page) {
-                        self.renderPage(page, args, callback);
+            this.parentRender(() => {
+                this.$el.find(".sidenav li").removeClass("active");
+                this.findActiveNavItem(URIUtils.getCurrentFragment());
+                if (!this.nextRenderPage) {
+                    ModuleLoader.load(this.route.page).then((page) => {
+                        this.renderPage(page, args, callback);
                     });
                 }
             });
         },
-        renderPage: function (Module, args, callback) {
-            var page = new Module();
+        renderPage (Module, args, callback) {
+            const page = new Module();
             this.nextRenderPage = false;
             page.element = "#sidePageContent";
             page.render(args, callback);

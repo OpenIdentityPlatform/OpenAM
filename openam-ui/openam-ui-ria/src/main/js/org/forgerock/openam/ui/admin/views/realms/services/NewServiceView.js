@@ -93,7 +93,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
                         this.jsonSchemaView = new FlatJSONSchemaView(options);
                     }
 
-                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-json-form]"));
                 }, () => {
                     toggleCreate(this.$el, false);
                 });

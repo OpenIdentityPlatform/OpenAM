@@ -14,53 +14,56 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView", [
-    "jquery",
+define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView", [
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
     "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation",
     "org/forgerock/commons/ui/common/main/Router"
-], ($, TreeNavigation, createBreadcrumbs, createTreeNavigation, Router) => {
+], (TreeNavigation, createBreadcrumbs, createTreeNavigation, Router) => {
 
     const navData = [{
         title: "console.common.navigation.general",
         icon: "fa-cog",
-        route: "editServerDefaultsGeneral"
+        route: "editServerGeneral"
     }, {
         title: "console.common.navigation.security",
         icon: "fa-lock",
-        route: "editServerDefaultsSecurity"
+        route: "editServerSecurity"
     }, {
         title: "console.common.navigation.session",
         icon: "fa-key",
-        route: "editServerDefaultsSession"
+        route: "editServerSession"
     }, {
         title: "console.common.navigation.sdk",
         icon: "fa-th",
-        route: "editServerDefaultsSdk"
+        route: "editServerSdk"
     }, {
         title: "console.common.navigation.cts",
         icon: "fa-database",
-        route: "editServerDefaultsCts"
+        route: "editServerCts"
     }, {
         title: "console.common.navigation.uma",
         icon: "fa-check-circle-o",
-        route: "editServerDefaultsUma"
+        route: "editServerUma"
     }, {
         title: "console.common.navigation.advanced",
         icon: "fa-cogs",
-        route: "editServerDefaultsAdvanced"
+        route: "editServerAdvanced"
+    }, {
+        title: "console.common.navigation.directory",
+        icon: "fa-folder-open",
+        route: "editServerDirectory"
     }];
 
-    const EditServerDefaultsTreeNavigationView = TreeNavigation.extend({
+    const EditServerTreeNavigationView = TreeNavigation.extend({
         render (args, callback) {
-            this.data.crumbs = createBreadcrumbs(this.route.pattern);
-            this.data.treeNavigation = createTreeNavigation(navData);
-            this.data.title = $.t("console.common.navigation.serverDefaults");
-            this.data.home = `#${Router.getLink(Router.configuration.routes.editServerDefaultsGeneral, args)}`;
+            const serverName = args[0];
+            this.data.treeNavigation = createTreeNavigation(navData, args);
+            this.data.title = serverName;
+            this.data.home = `#${Router.getLink(Router.configuration.routes.editServerGeneral, [args[0]])}`;
             TreeNavigation.prototype.render.call(this, args, callback);
         }
     });
 
-    return new EditServerDefaultsTreeNavigationView();
+    return new EditServerTreeNavigationView();
 });

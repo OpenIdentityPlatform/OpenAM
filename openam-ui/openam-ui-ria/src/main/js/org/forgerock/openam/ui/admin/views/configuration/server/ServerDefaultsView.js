@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
     }
 
     return AbstractView.extend({
-        template: "templates/admin/views/configuration/server/EditServerDefaultsTemplate.html",
+        template: "templates/admin/views/common/HeaderFormTemplate.html",
         events: {
             "click [data-save]": "onSave"
         },

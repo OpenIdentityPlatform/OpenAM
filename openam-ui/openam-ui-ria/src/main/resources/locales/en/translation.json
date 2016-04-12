@@ -714,7 +714,8 @@
                 "cts": "CTS",
                 "uma": "UMA",
                 "advanced": "Advanced",
-                "server-defaults": "Server Defaults",
+                "serverDefaults": "Server Defaults",
+                "directory" : "Directory",
                 "realms": "Realms"
             },
             "description": "Description",

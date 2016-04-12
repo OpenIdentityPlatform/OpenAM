@@ -135,7 +135,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                         });
                     }
 
-                    this.subview.setElement("[data-service-form]");
+                    this.subview.setElement("[data-json-form]");
                     this.subview.render();
                 });
             });

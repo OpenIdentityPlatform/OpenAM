@@ -103,11 +103,6 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
         events: {
             "click [data-event]": "sendEvent"
         },
-        template: "templates/admin/views/realms/navigation/RealmTreeNavigationTemplate.html",
-        partials: [
-            "partials/breadcrumb/_Breadcrumb.html",
-            "templates/admin/views/common/navigation/_TreeNavigationLeaf.html"
-        ],
         sendEvent (e) {
             e.preventDefault();
             EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
@@ -121,6 +116,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
             this.data.realmName = shortenRealmName(this.data.realmPath);
             this.data.crumbs = createBreadcrumbs(this.route.pattern);
             this.data.treeNavigation = createTreeNavigation(navData, [encodeURIComponent(this.data.realmPath)]);
+            this.data.title = this.data.realmName;
+            this.data.home = `#${Router.getLink(
+                Router.configuration.routes.realmDefault, [encodeURIComponent(this.data.realmPath)])}`;
 
             this.realmExists(this.data.realmPath).then(() => {
                 TreeNavigation.prototype.render.call(this, args, callback);

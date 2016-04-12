@@ -49,6 +49,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
         render (args) {
             this.data.id = args[0];
 
+            // TODO add backlink!
+
             SitesService.sites.get(this.data.id).then((data) => {
                 this.data.name = data.values.raw._id;
                 this.data.etag = data.values.raw.etag;
@@ -62,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
                         values: data.values,
                         onRendered: () => toggleSave(this.$el, true)
                     });
-                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-service-form]"));
+                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-json-form]"));
                 });
             });
         },

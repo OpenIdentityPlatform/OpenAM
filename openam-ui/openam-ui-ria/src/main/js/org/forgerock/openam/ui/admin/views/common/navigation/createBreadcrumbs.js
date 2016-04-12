@@ -32,8 +32,8 @@ define("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"
         return _.last(pattern.split("/"));
     }
 
-    function getPathFragments (allFragments) {
-        return _.drop(allFragments, 2);
+    function getPathFragments (allFragments, droppedFragments) {
+        return _.drop(allFragments, droppedFragments);
     }
 
     function getTitle (fragment, index) {
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"
         }
     }
 
-    return (pattern) => {
+    return (pattern, droppedFragments = 2) => {
 
         throwOnNoPattern(pattern);
 
@@ -73,7 +73,7 @@ define("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"
 
         const allFragments = getAllfragments();
         const base = getBaseURI(allFragments);
-        const fragmentPaths = getPathFragments(allFragments);
+        const fragmentPaths = getPathFragments(allFragments, droppedFragments);
         const fragmentTypes = ["INSTANCE", "ACTION", "COLLECTION"];
         const FIRST_CRUMB = 0;
         const LAST_CRUMB = fragmentPaths.length - 1;

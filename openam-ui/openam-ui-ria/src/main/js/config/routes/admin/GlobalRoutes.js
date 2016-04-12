@@ -70,29 +70,41 @@ define("config/routes/admin/GlobalRoutes", [
         listServers: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
             url: /deployment\/servers/,
-            pattern: "deployment/servers",
+            pattern: "deployment/servers$",
             role: "ui-realm-admin",
             navGroup: "admin"
         },
-        editServer: {
-            view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",
-            url: /deployment\/servers\/edit\/([^\/]+)/,
-            pattern: "deployment/servers/edit/?",
-            role: "ui-global-admin",
+        newServer: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
+            url: /deployment\/servers\/new/,
+            pattern: "deployment/servers/new",
+            role: "ui-realm-admin",
             navGroup: "admin"
         }
     };
 
-    // Add routes for "Server Defaults" tree navigation
-    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (id) => {
-        routes[`editServerDefaults${_.capitalize(id)}`] = {
-            view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView",
-            url: new RegExp(`configure/server-defaults/${id}`),
-            pattern: `configure/server-defaults/${id}`,
+    // Add routes for "Server Edit" tree navigation
+    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directory"], (suffix) => {
+        routes[`editServer${_.capitalize(suffix)}`] = {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
+            page: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",
+            url: new RegExp(`deployment/servers/([^\/]+)/(${suffix})`),
+            pattern: `deployment/servers/?/${suffix}`,
             role: "ui-global-admin",
             navGroup: "admin",
-            defaults: [id],
+            forceUpdate: true
+        };
+    });
+
+    // Add routes for "Server Defaults" tree navigation
+    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (suffix) => {
+        routes[`editServerDefaults${_.capitalize(suffix)}`] = {
+            view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
+            page: "org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView",
+            url: new RegExp(`configure/server-defaults/(${suffix})`),
+            pattern: `configure/server-defaults/${suffix}`,
+            role: "ui-global-admin",
+            navGroup: "admin",
             forceUpdate: true
         };
     });
