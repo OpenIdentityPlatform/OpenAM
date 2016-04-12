@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 define("config/routes/AMRoutesConfig", [], function () {
@@ -39,7 +39,7 @@ define("config/routes/AMRoutesConfig", [], function () {
             forceUpdate: true
         },
         dashboard: {
-            view: "org/forgerock/openam/ui/dashboard/views/DashboardView",
+            view: "org/forgerock/openam/ui/user/dashboard/views/DashboardView",
             role: "ui-self-service-user",
             url: "dashboard/",
             forceUpdate: true,
