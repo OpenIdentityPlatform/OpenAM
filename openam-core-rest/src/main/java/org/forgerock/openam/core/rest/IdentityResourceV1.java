@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.mail.MessagingException;
 
@@ -94,6 +95,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
@@ -102,6 +104,7 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -115,6 +118,8 @@ import com.sun.identity.sm.ServiceNotFoundException;
 public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
+    private static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
+    private static final String PROFILE_ATTRIBUTE = "iplanet-am-auth-dynamic-profile-creation";
 
     private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
     private static Debug debug = Debug.getInstance("frRest");
@@ -122,6 +127,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     public static final String GROUP_TYPE = "group";
     public static final String AGENT_TYPE = "agent";
+
+    private static final Map<String, ServiceConfig> REALM_SERVICECONFIG_MAP = new ConcurrentHashMap<>();
 
     // TODO: filters, sorting, paged results.
 
@@ -1240,22 +1247,37 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         final String realm = realmContext.getResolvedRealm();
 
         IdentityDetails dtls;
+        SSOToken admin = null;
 
         try {
-            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
+            admin = getSSOToken(getCookieFromServerContext(context));
             dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
-                    "principalName={}", resourceId, realm, principalName);
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
+                        "principalName={}", resourceId, realm, principalName);
+            }
             return newResultPromise(buildResourceResponse(resourceId, context, dtls));
         } catch (final NeedMoreCredentials needMoreCredentials) {
             debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : User does not have enough " +
                             "privileges.", resourceId,  needMoreCredentials);
             return new ForbiddenException("User does not have enough privileges.", needMoreCredentials).asPromise();
         } catch (final ObjectNotFound objectNotFound) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Resource cannot be found.",
-                    resourceId, objectNotFound);
-            return new NotFoundException("Resource cannot be found.", objectNotFound).asPromise();
+            if (isIgnoredProfile(resourceId, admin, realm)) {
+                if (debug.messageEnabled()) {
+                    debug.message("IdentityResource.readInstance() :: profile for resourceId {} is set to Ignore, " +
+                            "returning basic entry.", resourceId);
+                }
+                dtls = new IdentityDetails();
+                dtls.setName(resourceId);
+                dtls.setRealm(realm);
+                dtls.setType(USER_TYPE);
+                return newResultPromise(buildResourceResponse(resourceId, context, dtls));
+            } else {
+                debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Resource cannot be found.",
+                        resourceId, objectNotFound);
+                return new NotFoundException("Resource cannot be found.", objectNotFound).asPromise();
+            }
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Unauthorized", resourceId,
                     tokenExpired);
@@ -1411,8 +1433,66 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
+    protected boolean isIgnoredProfile(String resourceId, SSOToken admin, String realm) {
 
+        boolean result = false;
 
+        if (USER_TYPE.equals(objectType)) {
+            try {
+                // If the request is being made by the user themselves then their properties can be used.
+                // The idFromSession call uses the getName() result to generate the resourceId.
+                AMIdentity identity = IdUtils.getIdentity(admin);
+                boolean sameUser = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID) ?
+                        identity.getName().equals(resourceId) :
+                        identity.getName().equalsIgnoreCase(resourceId);
+                if (sameUser) {
+                    result = ISAuthConstants.IGNORE.equals(admin.getProperty(ISAuthConstants.USER_PROFILE));
+                    if (debug.messageEnabled()) {
+                        debug.message("IdentityResource.isIgnoredProfile: for resourceId {} in realm {} was {}",
+                                resourceId, realm, result);
+                    }
+                } else {
+                    // Delegate to the organisation configuration for this realm to get the answer.
+                    try {
+                        result = ISAuthConstants.IGNORE.equals(CollectionHelper.getMapAttr(
+                                getServiceConfig(realm, admin).getAttributes(), PROFILE_ATTRIBUTE));
+                        if (debug.messageEnabled()) {
+                            debug.message("IdentityResource.isIgnoredProfile: for realm {} was {}", realm, result);
+                        }
+                    } catch (SMSException smse) {
+                        debug.error("IdentityResource.isIgnoredProfile :: Cannot create service {}",
+                                AUTH_SERVICE_NAME, smse);
+                    } catch (SSOException ssoe) {
+                        debug.error("IdentityResource.isIgnoredProfile :: Invalid SSOToken ", ssoe);
+                    }
+                }
+            } catch (IdRepoException e) {
+                debug.error("IdentityResource.isIgnoredProfile :: Cannot create identity from SSOToken", e);
+            } catch (SSOException e) {
+                debug.error("IdentityResource.isIgnoredProfile :: Invalid SSOToken ", e);
+            }
+        }
 
+        return result;
+    }
 
+    /**
+     * Retrieve cached realm's ServiceConfig instance
+     **/
+    private ServiceConfig getServiceConfig(final String realm, SSOToken admin) throws SMSException, SSOException {
+
+        ServiceConfig serviceConfig = REALM_SERVICECONFIG_MAP.get(realm);
+        if (serviceConfig == null) {
+            synchronized(REALM_SERVICECONFIG_MAP) {
+                serviceConfig = REALM_SERVICECONFIG_MAP.get(realm);
+                if (serviceConfig == null) {
+                    ServiceConfigManager configManager = new ServiceConfigManager(AUTH_SERVICE_NAME, admin);
+                    serviceConfig = configManager.getOrganizationConfig(realm, null);
+                    REALM_SERVICECONFIG_MAP.put(realm, serviceConfig);
+                }
+            }
+        }
+
+        return serviceConfig;
+    }
 }
