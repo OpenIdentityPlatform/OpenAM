@@ -23,11 +23,18 @@ import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+<<<<<<< 21005172e7f0697acf1f3e1f2fe209d09462c08b
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
+=======
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.EXPIRES_IN;
+>>>>>>> Fix TokenInfoEndpoint
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 
@@ -47,16 +54,7 @@ import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AuthorizationCode;
-import org.forgerock.oauth2.core.DeviceCode;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
-import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.oauth2.core.ResourceOwner;
-import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.*;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
