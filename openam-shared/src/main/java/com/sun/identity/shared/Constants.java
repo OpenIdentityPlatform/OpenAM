@@ -1397,4 +1397,9 @@ public interface Constants {
      * Property to specify the TLS version to connect to the secure ldap server.
      */
     public static final String LDAP_SERVER_TLS_VERSION = "org.forgerock.openam.ldap.secure.protocol.version";
+
+    /**
+     * Property to enable capturing trace-level messages from Log4J world when in message-level debug mode.
+     */
+    public static final String ENABLE_TRACE_IN_MESSAGE_MODE = "org.forgerock.openam.slf4j.enableTraceInMessage";
 }
