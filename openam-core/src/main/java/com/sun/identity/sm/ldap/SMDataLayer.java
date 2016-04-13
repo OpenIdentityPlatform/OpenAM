@@ -189,7 +189,6 @@ class SMDataLayer {
         } catch (LDAPServiceException ex) {
             debug.error("SMDataLayer:initLdapPool()-"
                     + "Error initializing connection pool " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 }
