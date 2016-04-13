@@ -17,6 +17,7 @@
         </div>
     </div>
 
+    {{#unless newEntity}}
     <div class="form-group">
         <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
 
@@ -24,6 +25,7 @@
             <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
         </div>
     </div>
+    {{/unless}}
 
     <div class="form-group">
         <label class="col-sm-2 control-label" for="resTypesSelection">

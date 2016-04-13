@@ -8,9 +8,11 @@
     </div>
 </div>
 
+{{#unless newEntity}}
 <div class="form-group clearfix">
     <label class="col-sm-2 control-label" for="resTypeDescription">{{t "console.common.description"}}</label>
     <div class="col-sm-9">
         <textarea class="form-control" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
     </div>
 </div>
+{{/unless}}

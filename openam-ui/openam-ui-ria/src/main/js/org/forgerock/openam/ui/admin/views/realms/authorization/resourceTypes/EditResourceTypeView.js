@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 this.model.fetch();
             } else {
                 this.template = "templates/admin/views/realms/authorization/resourceTypes/NewResourceTypeTemplate.html";
-                this.newEntity = true;
+                this.data.newEntity = true;
                 this.model = new ResourceTypeModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
@@ -153,7 +153,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             this.updateFields();
             this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
-            if (this.newEntity) {
+            if (this.data.newEntity) {
                 _.extend(this.model.attributes, this.data.entity);
             } else {
                 activeTabProperties = _.pick(this.data.entity, this.tabs[activeTab.index()].attr);
@@ -165,7 +165,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             if (savePromise) {
                 savePromise
                     .done(function () {
-                        if (self.newEntity) {
+                        if (self.data.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
                                 args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
