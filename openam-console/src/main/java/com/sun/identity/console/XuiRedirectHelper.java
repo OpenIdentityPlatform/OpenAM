@@ -51,7 +51,7 @@ public final class XuiRedirectHelper {
      */
     public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
         String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
-                .getRootURL(request);
+                .getContextPath();
         String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
         RequestContext rc = RequestManager.getRequestContext();
         try {

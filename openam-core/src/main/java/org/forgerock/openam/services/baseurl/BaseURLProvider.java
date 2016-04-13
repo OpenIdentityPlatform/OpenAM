@@ -120,6 +120,14 @@ public abstract class BaseURLProvider {
     }
 
     /**
+     * Gets the contextPath.
+     * @return The contextPath.
+     */
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    /**
      * Format the URL
      * @param baseUrl base url to reformat
      * @return the reformat base URL
