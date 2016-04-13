@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyright 2016 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -219,8 +220,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         String username = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_USER_NAME);
         char[] password = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_PASSWORD, "").toCharArray();
-        heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, "10",
-                DEBUG);
+        heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, 10, DEBUG);
         heartBeatTimeUnit = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_HEARTBEAT_TIME_UNIT, "SECONDS");
 
         String connectionMode = CollectionHelper.getMapAttr(configParams, LDAP_CONNECTION_MODE);

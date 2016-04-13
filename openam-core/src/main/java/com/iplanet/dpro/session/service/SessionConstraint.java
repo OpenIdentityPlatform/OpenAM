@@ -25,6 +25,7 @@
  * $Id: SessionConstraint.java,v 1.6 2009/11/21 01:13:24 222713 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service;
@@ -234,9 +235,7 @@ public class SessionConstraint {
                     AM_SESSION_SERVICE, SessionCount.getAdminToken());
             ServiceSchema schema = ssm.getDynamicSchema();
             Map attrs = schema.getAttributeDefaults();
-            quota = CollectionHelper.getIntMapAttr(
-                attrs, SESSION_QUOTA_ATTR_NAME, String.valueOf(DEFAULT_QUOTA),
-                debug);
+            quota = CollectionHelper.getIntMapAttr(attrs, SESSION_QUOTA_ATTR_NAME, DEFAULT_QUOTA, debug);
         } catch (Exception e) {
             if (debug.messageEnabled()) {
                 debug.message("Failed to get the default session quota "

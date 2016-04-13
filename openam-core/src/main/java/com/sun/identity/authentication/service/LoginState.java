@@ -25,6 +25,7 @@
  * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.authentication.service;
@@ -2090,34 +2091,16 @@ public class LoginState {
         return false;
     }
 
-    private String[] getDefaultSessionAttributes(String orgDN) {
-        String defaultMaxSession = LazyConfig.AUTHD.getDefaultMaxSessionTime();
-        String defaultIdleTime = LazyConfig.AUTHD.getDefaultMaxIdleTime();
-        String defaultCacheTime = LazyConfig.AUTHD.getDefaultMaxCachingTime();
-
-        Map map = LazyConfig.AUTHD.getOrgServiceAttributes(orgDN,
-                ISAuthConstants.SESSION_SERVICE_NAME);
-        if (!map.isEmpty()) {
-            if (map.containsKey(ISAuthConstants.MAX_SESSION_TIME)) {
-                defaultMaxSession = (String) ((Set) map.get(
-                        ISAuthConstants.MAX_SESSION_TIME)).iterator().next();
-            }
-            if (map.containsKey(ISAuthConstants.SESS_MAX_IDLE_TIME)) {
-                defaultIdleTime = (String) ((Set) map.get(
-                        ISAuthConstants.SESS_MAX_IDLE_TIME)).iterator().next();
-            }
-            if (map.containsKey(ISAuthConstants.SESS_MAX_CACHING_TIME)) {
-                defaultCacheTime = (String) ((Set) map.get(
-                        ISAuthConstants.SESS_MAX_CACHING_TIME)).iterator().next();
-            }
-        }
-
-        String[] attrs = new String[3];
-        attrs[0] = defaultMaxSession;
-        attrs[1] = defaultIdleTime;
-        attrs[2] = defaultCacheTime;
-
-        return attrs;
+    private int[] getDefaultSessionAttributes(String orgDN) {
+        Map<String, Set<String>> map =
+                LazyConfig.AUTHD.getOrgServiceAttributes(orgDN, ISAuthConstants.SESSION_SERVICE_NAME);
+        return new int[] {
+                CollectionHelper.getIntMapAttr(map, ISAuthConstants.MAX_SESSION_TIME,
+                        LazyConfig.AUTHD.getDefaultMaxSessionTime(), DEBUG),
+                CollectionHelper.getIntMapAttr(map, ISAuthConstants.SESS_MAX_IDLE_TIME,
+                        LazyConfig.AUTHD.getDefaultMaxIdleTime(), DEBUG),
+                CollectionHelper.getIntMapAttr(map, ISAuthConstants.SESS_MAX_CACHING_TIME,
+                        LazyConfig.AUTHD.getDefaultMaxCachingTime(), DEBUG) };
     }
 
     void populateUserAttributes(
@@ -2125,7 +2108,7 @@ public class LoginState {
             boolean loginStatus,
             AMIdentity amIdentity
     ) throws AMException {
-        String[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
+        int[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("default max session time: " + sessionAttrs[0]
@@ -2458,22 +2441,10 @@ public class LoginState {
      * @throws AMException if it fails to populate default user attributes
      */
     public void populateDefaultUserAttributes() throws AMException {
-        String[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
-        try {
-            maxSession = Integer.parseInt(sessionAttrs[0]);
-        } catch (Exception e) {
-            maxSession = 120;
-        }
-        try {
-            idleTime = Integer.parseInt(sessionAttrs[1]);
-        } catch (Exception e) {
-            idleTime = 30;
-        }
-        try {
-            cacheTime = Integer.parseInt(sessionAttrs[2]);
-        } catch (Exception e) {
-            cacheTime = 3;
-        }
+        int[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
+        maxSession = sessionAttrs[0];
+        idleTime = sessionAttrs[1];
+        cacheTime = sessionAttrs[2];
         userEnabled = true;
 
         if (DEBUG.messageEnabled()) {

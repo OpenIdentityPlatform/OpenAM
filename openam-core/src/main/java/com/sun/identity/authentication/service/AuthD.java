@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -25,6 +25,7 @@
  * $Id: AuthD.java,v 1.23 2009/11/25 12:02:02 manish_rustagi Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.authentication.service;
 
@@ -447,27 +448,27 @@ public class AuthD implements ConfigurationListener {
      * Return max session time
      * @return max session time
      */
-    String getDefaultMaxSessionTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.MAX_SESSION_TIME, "120");
+    int getDefaultMaxSessionTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.MAX_SESSION_TIME, 120, debug);
     }
     
     /**
      * Return max session idle time
      * @return max session idle time
      */
-    String getDefaultMaxIdleTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.SESS_MAX_IDLE_TIME, "30");
+    int getDefaultMaxIdleTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.SESS_MAX_IDLE_TIME, 30, debug);
     }
     
     /**
      * Return  max session caching time
      * @return  max session caching time
      */
-    String getDefaultMaxCachingTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.SESS_MAX_CACHING_TIME, "3");
+    int getDefaultMaxCachingTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.SESS_MAX_CACHING_TIME, 3, debug);
     }
 
     /**

@@ -25,6 +25,7 @@
  * $Id: CollectionHelper.java,v 1.6 2010/01/06 22:31:55 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.shared.datastruct;
 
@@ -37,7 +38,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -64,9 +64,8 @@ public class CollectionHelper {
      * @return String from a map of string of set of string
      */
     public static String getMapAttr(Map map, String name) {
-        Set s = (Set)map.get(name);
-        String retVal = ((s == null) || s.isEmpty()) ? null :
-            ((String)s.iterator().next());
+        Set s = (Set) map.get(name);
+        String retVal = ((s == null) || s.isEmpty()) ? null : ((String) s.iterator().next());
         return (retVal != null) ? retVal.trim() : null;
     }
 
@@ -85,11 +84,11 @@ public class CollectionHelper {
 
     /**
      * Return String from a map of strings to set of strings.
-     * @param map
-     * @param key
+     * 
+     * @param map Map of string of set of string.
+     * @param name Key of the map entry.
      * @return the String value from a map of strings to set of strings.
      * @throws ValueNotFoundException if no value is found for the key.
-     *
      */
     public static String getMapAttrThrows(Map map, String key) throws ValueNotFoundException {
         String str = getMapAttr(map, key);
@@ -102,15 +101,10 @@ public class CollectionHelper {
     /**
      * Gets the set based on the passed key.
      *
-     * @param map
-     *         the map
-     * @param key
-     *         key to lookup
-     *
+     * @param map the map
+     * @param key key to lookup
      * @return associated set
-     *
-     * @throws ValueNotFoundException
-     *         should the key not exist
+     * @throws ValueNotFoundException should the key not exist
      */
     public static Set<String> getMapSetThrows(Map<String, Set<String>> map, String key) throws ValueNotFoundException {
         if (!map.containsKey(key)) {
@@ -120,7 +114,7 @@ public class CollectionHelper {
         return map.get(key);
     }
 
-    /*
+    /**
      * The key we are given must refer to an entry in the Map which is a set of lines of the form:<br>
      *     en_GB|Here is some text in English<br>
      *     fr_FR|Voici un texte en français<br>
@@ -188,13 +182,10 @@ public class CollectionHelper {
      * Gets a boolean attribute from a {@code Map<String, Set<String>>}, throwing an exception if no boolean value (case
      * insensitive comparisons against "true" or "false") is found for the given key.
      *
-     * @param map
-     *            the attribute map.
-     * @param name
-     *            the name of the attribute to retrieve.
+     * @param map the attribute map.
+     * @param name the name of the attribute to retrieve.
      * @return the boolean value using {@link Boolean#parseBoolean(String)}.
-     * @throws ValueNotFoundException
-     *             if no boolean value is found for the given key.
+     * @throws ValueNotFoundException if no boolean value is found for the given key.
      */
     public static boolean getBooleanMapAttrThrows(Map map, String name)
             throws ValueNotFoundException {
@@ -207,22 +198,24 @@ public class CollectionHelper {
      * Returns integer value from a Map of String of Set of String.
      *
      * @param map Map of String of Set of String.
-     * @param name Kye of the map entry.
+     * @param name Key of the map entry.
      * @param defaultValue Default value if the integer value is not found.
      * @param debug Debug object.
      * @return integer value from a Map of String of Set of String.
      */
-    public static int getIntMapAttr(
-        Map map,
-        String name,
-        String defaultValue,
-        Debug debug
-    ) {
+    public static int getIntMapAttr(Map map, String name, int defaultValue, Debug debug) {
+        String valueString = null;
         try {
-            return Integer.parseInt(getMapAttr(map, name, defaultValue));
+            valueString = getMapAttr(map, name);
+            if (StringUtils.isBlank(valueString)) {
+                debug.message(
+                        "No value found for key '" + name + "' and default value '" + defaultValue + "'  is returned.");
+                return defaultValue;
+            }
+            return Integer.parseInt(valueString);
         } catch (NumberFormatException nfe) {
-            debug.error("CollectionHelper.getIntMapAttr", nfe);
-            return Integer.parseInt(defaultValue);
+            debug.error("Unable to parse " + name + "=" + valueString);
+            return defaultValue;
         }
     }
 
@@ -231,41 +224,19 @@ public class CollectionHelper {
      *
      * @param map Map of String of Set of String.
      * @param name Key of the map entry.
-     * @param defaultValue Default value if the integer value is not found.
-     * @param debug Debug object.
      * @return integer value from a Map of String of Set of String.
+     * @throws ValueNotFoundException if there is no parsable value for the key provided.
      */
-    public static int getIntMapAttr(
-        Map map,
-        String name,
-        int defaultValue,
-        Debug debug
-    ) {
+    public static int getIntMapAttrThrows(Map map, String name) throws ValueNotFoundException {
+        String valueString = null;
         try {
-            return Integer.parseInt(getMapAttr(map, name));
+            valueString = getMapAttr(map, name);
+            if (StringUtils.isBlank(valueString)) {
+                throw new ValueNotFoundException("No value found for key '" + name + "'.");
+            }
+            return Integer.parseInt(valueString);
         } catch (NumberFormatException nfe) {
-            debug.error("CollectionHelper.getIntMapAttr", nfe);
-            return defaultValue;
-        }
-    }
-
-    /**
-     * Returns integer value from a Map of String of Set of String.
-     *
-     * @param map
-     *            Map of String of Set of String.
-     * @param name
-     *            Key of the map entry.
-     * @return integer value from a Map of String of Set of String.
-     * @throws ValueNotFoundException
-     *             if there is no value for the key provided.
-     */
-    public static int getIntMapAttrThrows(Map map, String name)
-            throws ValueNotFoundException {
-        try {
-            return Integer.parseInt(getMapAttr(map, name));
-        } catch (NumberFormatException nfe) {
-            throw new ValueNotFoundException("No value found for key '" + name + "'.");
+            throw new ValueNotFoundException("Unable to parse " + name + "=" + valueString);
         }
     }
 
@@ -282,9 +253,14 @@ public class CollectionHelper {
         String valueString = null;
         try {
             valueString = getMapAttr(config, name);
+            if (StringUtils.isBlank(valueString)) {
+                debug.message(
+                        "No value found for key '" + name + "' and default value '" + defaultValue + "'  is returned.");
+                return defaultValue;
+            }
             return Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
-            debug.error("Unable to parse " + name + "=" + valueString, nfe);
+            debug.error("Unable to parse " + name + "=" + valueString);
             return defaultValue;
         }
     }
@@ -292,21 +268,21 @@ public class CollectionHelper {
     /**
      * Given the map attempts to return the named value as a long.
      *
-     * @param map
-     *         the map
-     * @param name
-     *         the named value
-     *
+     * @param map the map
+     * @param name the named value
      * @return the corresponding long value
-     *
-     * @throws ValueNotFoundException
-     *         should the value fail to parse
+     * @throws ValueNotFoundException should the value fail to parse
      */
     public static long getLongMapAttrThrows(Map<String, Set<String>> map, String name) throws ValueNotFoundException {
+        String valueString = null;
         try {
-            return Long.parseLong(getMapAttr(map, name));
+            valueString = getMapAttr(map, name);
+            if (StringUtils.isBlank(valueString)) {
+                throw new ValueNotFoundException("No value found for key '" + name + "'.");
+            }
+             return Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
-            throw new ValueNotFoundException("No value found for key '" + name + "'.");
+            throw new ValueNotFoundException("Unable to parse " + name + "=" + valueString);
         }
     }
 
@@ -322,9 +298,13 @@ public class CollectionHelper {
         String valueString = null;
         try {
             valueString = getMapAttr(config, name);
+            if (StringUtils.isBlank(valueString)) {
+                logger.debug("No value found for key '" + name + "' .");
+                return newDate().getTime();
+            }
             return Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
-            logger.error("Unable to parse " + name + "=" + valueString, nfe);
+            logger.error("Unable to parse " + name + "=" + valueString);
             return newDate().getTime();
         }
     }
@@ -344,21 +324,19 @@ public class CollectionHelper {
      */
     public static String getServerMapAttr(Map map, String attrName) {
         String result = null;
-        Set attrValues = (Set)map.get(attrName);
+        Set attrValues = (Set) map.get(attrName);
 
-        if (attrValues.size() == 1) {
-            Iterator iter = attrValues.iterator();
-            String strServer = (String)iter.next();
-            if (strServer != null) {
-                strServer = strServer.trim();
-            }
-            return strServer;
-        }
         if ((attrValues != null) && !attrValues.isEmpty()) {
-            for (Iterator i = attrValues.iterator();
-                i.hasNext() && (result == null);
-            ) {
-                result = (String)i.next();
+            if (attrValues.size() == 1) {
+                Iterator iter = attrValues.iterator();
+                String strServer = (String) iter.next();
+                if (strServer != null) {
+                    strServer = strServer.trim();
+                }
+                return strServer;
+            }
+            for (Iterator i = attrValues.iterator(); i.hasNext() && (result == null);) {
+                result = (String) i.next();
                 if (result != null) {
                     result = result.trim();
                     if (result.startsWith(localDsameServer)) {
