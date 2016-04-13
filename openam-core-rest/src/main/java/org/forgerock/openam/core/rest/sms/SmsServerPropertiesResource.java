@@ -710,9 +710,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             ServiceConfig serverConfigs = getServerConfigs(scm);
             final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
 
-            final JsonValue jsonValue = updateRequest.toJsonValue();
-            final Map newAttributeValues = (Map) ((Map) jsonValue.getObject()).get("content");
-            Set<String> attributesToBeAlteredNames = newAttributeValues.keySet();
+            final JsonValue request = updateRequest.toJsonValue();
+            JsonValue sections = request.get("content");
+            Map<String, String> attributesToBeAlteredNames = new HashMap<>();
+            for (String sectionName : sections.keys()) {
+                attributesToBeAlteredNames.putAll(sections.get(sectionName).asMap(String.class));
+            }
 
             final Map allAttributes = serverConfig.getAttributes();
             Set<String> currentAttributes = (Set) allAttributes.get(SERVER_CONFIG);
@@ -721,8 +724,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             for (String attribute : currentAttributes) {
                 String attributeName = attribute.split("=")[0];
 
-                if (attributesToBeAlteredNames.contains(attributeName)) {
-                    newAttributes.add(attributeName + "=" + newAttributeValues.get(attributeName));
+                if (attributesToBeAlteredNames.keySet().contains(attributeName)) {
+                    newAttributes.add(attributeName + "=" + attributesToBeAlteredNames.get(attributeName));
                 } else {
                     newAttributes.add(attribute);
                 }
@@ -731,8 +734,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             allAttributes.put(SERVER_CONFIG, newAttributes);
             serverConfig.setAttributes(allAttributes);
 
-            return newResultPromise(newResourceResponse(tabName, String.valueOf(jsonValue.hashCode()),
-                    jsonValue.get("content")));
+            return newResultPromise(newResourceResponse(tabName, String.valueOf(request.hashCode()),
+                    request.get("content")));
         } catch (SSOException e) {
             logger.error("Error getting SSOToken", e);
         } catch (SMSException e) {
