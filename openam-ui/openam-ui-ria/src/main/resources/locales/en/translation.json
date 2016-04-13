@@ -1055,9 +1055,13 @@
                 },
                 "list": {
                     "addNew": "New Policy Set",
-                    "importPolicies": "Import Policies",
-                    "exportPolicies": "Export Policies",
-                    "grid": ["Name"]
+                    "description": "Define sets of policies for protecting web sites, web applications, or other resources.",
+                    "importPolicySets": "Import Policy Sets",
+                    "exportPolicySets": "Export Policy Sets",
+                    "grid": ["Name"],
+                    "noPolicySets": "No policy sets found",
+                    "addPolicySets": "Add a Policy Set",
+                    "noResourceTypesMessage" : "Policy Sets require a resource type"
                 }
             },
 
@@ -1246,7 +1250,10 @@
                 "list": {
                     "add": "New Resource Type",
                     "title": "Resource Types",
-                    "grid": ["Name"]
+                    "description": "Define template for the resources that policies apply to, and the actions that could be performed on those resources.",
+                    "grid": ["Name"],
+                    "noResourceTypes" : "No resource types found",
+                    "addNewResourceType" : "Add a Resource Type"
                 },
                 "edit": {
                     "title" : "New Resource Type",
@@ -1257,9 +1264,7 @@
                     "patternsDescription" : "Define resource patterns that policies using this resource type can expand upon.",
                     "specifyPatterns" : "Specify Patterns",
                     "addPattern": "Add Pattern",
-                    "addNewPatternPlaceholder": "Add a new pattern...",
-                    "noResourceTypesMessage" : "Policy Sets require a resource type",
-                    "addNewResourceType" : "Add a Resource Type"
+                    "addNewPatternPlaceholder": "Add a new pattern..."
                 }
             }
         }

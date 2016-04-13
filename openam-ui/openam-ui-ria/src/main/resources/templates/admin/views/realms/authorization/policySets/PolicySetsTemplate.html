@@ -1,22 +1,38 @@
 {{> headers/_Title title="console.authorization.common.policySets" helpLink="backstage.authz.policySets" }}
-
+<p class="page-description">{{t "console.authorization.policySets.list.description"}}</p>
 {{#if hasResourceTypes}}
+    {{#if hasPolicySets}}
     <div class="btn-toolbar page-toolbar" role="toolbar" aria-label="toolbar" data-grid-toolbar></div>
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="table-container"></div>
         </div>
     </div>
-{{else}}
+    {{else}}
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="call-to-action-block">
-
-                <h3>{{t "console.authorization.resourceTypes.edit.noResourceTypesMessage"}}</h3>
-                <button type="button" data-add-resource class="btn btn-primary">
-                    <i class="fa fa-plus"></i> {{t "console.authorization.resourceTypes.edit.addNewResourceType"}}
+                <h3>{{t "console.authorization.policySets.list.noPolicySets"}}</h3>
+                <button type="button" data-add-entity class="btn btn-primary">
+                    <i class="fa fa-plus"></i> {{t "console.authorization.policySets.list.addPolicySets"}}
                 </button>
+                <button type="button" data-import-policies class="btn btn-primary">
+                    <i class="fa fa-download"></i> {{t "console.authorization.policySets.list.importPolicySets"}}
+                </button>
+                <input type="file" name="upload" class="hidden"/>
             </div>
         </div>
     </div>
+    {{/if}}
+{{else}}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="call-to-action-block">
+            <h3>{{t "console.authorization.policySets.list.noResourceTypesMessage"}}</h3>
+            <button type="button" data-add-resource class="btn btn-primary">
+                <i class="fa fa-plus"></i> {{t "console.authorization.resourceTypes.list.addNewResourceType"}}
+            </button>
+        </div>
+    </div>
+</div>
 {{/if}}

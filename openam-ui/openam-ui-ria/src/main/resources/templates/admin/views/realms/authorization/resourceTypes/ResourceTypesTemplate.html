@@ -1,9 +1,22 @@
 {{> headers/_Title title="console.authorization.resourceTypes.list.title" helpLink="backstage.authz.resourceTypes"}}
 
+<p class="page-description">{{t "console.authorization.resourceTypes.list.description"}}</p>
+{{#if hasResourceTypes}}
 <div class="btn-toolbar page-toolbar" role="toolbar" aria-label="toolbar" data-grid-toolbar></div>
-
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="table-container"></div>
     </div>
 </div>
+{{else}}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="call-to-action-block">
+            <h3>{{t "console.authorization.resourceTypes.list.noResourceTypes"}}</h3>
+            <button type="button" data-add-entity class="btn btn-primary">
+                <i class="fa fa-plus"></i> {{t "console.authorization.resourceTypes.list.addNewResourceType"}}
+            </button>
+        </div>
+    </div>
+</div>
+{{/if}}
