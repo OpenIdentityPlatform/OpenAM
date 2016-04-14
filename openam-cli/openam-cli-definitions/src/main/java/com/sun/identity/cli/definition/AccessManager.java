@@ -998,7 +998,7 @@ public class AccessManager {
           mandatoryOptions={
                   "servicename|s|s|Name of service.",
                   "subconfigname|g|s|Name of sub configuration.",
-                  "operation|o|s|Operation (either add/set/modify) to be performed on the sub configuration."},
+                  "operation|o|s|Operation (either add/set/delete) to be performed on the sub configuration."},
           optionAliases={},
           macro="authentication",
           optionalOptions={
