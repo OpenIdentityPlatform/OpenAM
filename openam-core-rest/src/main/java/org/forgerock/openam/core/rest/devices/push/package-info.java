@@ -11,20 +11,10 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.core.rest.devices.services;
-
-import com.iplanet.sso.SSOException;
-import com.sun.identity.sm.SMSException;
 
 /**
- * Produces AuthenticatorOathService's for a specific realm.
+ * This package contains classes for push device data storage.
  */
-public class AuthenticatorOathServiceFactory implements DeviceServiceFactory {
-
-    @Override
-    public AuthenticatorOathService create(String realm) throws SSOException, SMSException {
-        return new AuthenticatorOathService(realm);
-    }
-}
+package org.forgerock.openam.core.rest.devices.push;

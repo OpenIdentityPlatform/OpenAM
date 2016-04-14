@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -28,8 +28,9 @@ import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.dashboard.DashboardResource;
-import org.forgerock.openam.core.rest.devices.OathDevicesResource;
-import org.forgerock.openam.core.rest.devices.TrustedDevicesResource;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
+import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
+import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
@@ -108,6 +109,11 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(OathDevicesResource.class);
+
+        realmRouter.route("users/{user}/devices/push")
+                .auditAs(DEVICES)
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
+                .toCollection(PushDevicesResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))

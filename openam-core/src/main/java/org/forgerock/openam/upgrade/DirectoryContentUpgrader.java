@@ -70,6 +70,7 @@ public class DirectoryContentUpgrader {
     private static final String DASHBOARD_OC = "forgerock-am-dashboard-service";
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
     private static final String OATH_DEVICE_OC = "oathDeviceProfilesContainer";
+    private static final String PUSH_DEVICE_OC = "pushDeviceProfilesContainer";
     private static final String OATH2FAENABLED = "oath2faEnabled";
 
     // Knowledge Based Authentication information container - the object class for kbaInfo
@@ -111,6 +112,7 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddResourceSetsSchema());
             upgraders.add(new AddUmaPendingRequestsSchema());
             upgraders.add(new AddOATHDeviceSchema());
+            upgraders.add(new AddPushDeviceSchema());
             upgraders.add(new OATH2FASchema());
             upgraders.add(new AddKBAInformationSchema());
         }
@@ -465,6 +467,19 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !schema.hasObjectClass(OATH_DEVICE_OC);
+        }
+    }
+
+    private class AddPushDeviceSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_pushdevices.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass(PUSH_DEVICE_OC);
         }
     }
 }

@@ -13,28 +13,19 @@
 *
 * Copyright 2015-2016 ForgeRock AS.
 */
-package org.forgerock.openam.core.rest.devices.services;
+package org.forgerock.openam.core.rest.devices.services.oath;
 
-import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
 
 /**
- * Provides all necessary configuration information at a realm-wide level to device-based
- * authentication modules underneath it.
+ * Produces AuthenticatorOathService's for a specific realm.
  */
-public interface DeviceService {
+public class AuthenticatorOathServiceFactory implements DeviceServiceFactory {
 
-    /**
-     * Retrieve this realm's attribute name, under which the JSON configuration is stored.
-     *
-     * @return Plaintext attribute name.
-     */
-    String getConfigStorageAttributeName();
-
-    /**
-     * Returns the strategy used for storing devices as profile attributes.
-     *
-     * @return the device profile storage strategy.
-     */
-    DeviceSerialisation getDeviceSerialisationStrategy();
-
+    @Override
+    public AuthenticatorOathService create(String realm) throws SSOException, SMSException {
+        return new AuthenticatorOathService(realm);
+    }
 }

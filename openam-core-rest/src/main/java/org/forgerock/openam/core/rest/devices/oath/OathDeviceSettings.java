@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.devices;
+package org.forgerock.openam.core.rest.devices.oath;
 
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+import org.forgerock.openam.core.rest.devices.DeviceSettings;
 import org.forgerock.util.Reject;
 
 /**
@@ -27,7 +27,7 @@ import org.forgerock.util.Reject;
  *
  * @since 13.0.0
  */
-public final class OathDeviceSettings {
+public final class OathDeviceSettings extends DeviceSettings {
 
     private String sharedSecret;
     private String deviceName;
@@ -35,13 +35,13 @@ public final class OathDeviceSettings {
     private int counter;
     private boolean checksumDigit = false;
     private int truncationOffset = 0;
-    private String[] recoveryCodes = new String[0];
-    private String uuid;
     private int clockDriftSeconds = 0;
 
+    /**
+     * Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
+     */
     public OathDeviceSettings() {
-        //Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
-        //UUID is injected by Jackson.
+        //This section intentionally left blank.
     }
 
     /**
@@ -51,32 +51,11 @@ public final class OathDeviceSettings {
      * @param counter The counter value, for HOTP algorithm usage. Non-null value.
      */
     public OathDeviceSettings(String sharedSecret, String deviceName, long lastLogin, int counter) {
+        super();
         setSharedSecret(sharedSecret);
         setDeviceName(deviceName);
         setLastLogin(lastLogin, TimeUnit.SECONDS);
         setCounter(counter);
-
-        //when created w/ the constructor, use a random String
-        uuid = UUID.randomUUID().toString();
-    }
-
-    /**
-     * Sets the remaining recovery codes for this device.
-     *
-     * @param recoveryCodes the remaining recovery codes for this device. Can not be null.
-     */
-    public void setRecoveryCodes(String[] recoveryCodes) {
-        Reject.ifNull(recoveryCodes);
-        this.recoveryCodes = recoveryCodes;
-    }
-
-    /**
-     * Get the array of recovery codes which are usable for this device.
-     *
-     * @return an array of the remaining recovery codes for this device.
-     */
-    public String[] getRecoveryCodes() {
-        return recoveryCodes;
     }
 
     /**
@@ -128,16 +107,6 @@ public final class OathDeviceSettings {
      */
     public void setTruncationOffset(int truncationOffset) {
         this.truncationOffset = truncationOffset;
-    }
-
-    /**
-     * Sets the UUID for this device.
-     *
-     * @param uuid The UUID.
-     */
-    public void setUUID(String uuid) {
-        Reject.ifNull(uuid, "UUID can not be null.");
-        this.uuid = uuid;
     }
 
     /**
@@ -205,16 +174,6 @@ public final class OathDeviceSettings {
     }
 
     /**
-     * Gets the UUID from this class which is used as reference and set
-     * on creation.
-     *
-     * @return UUID the UUID.
-     */
-    public String getUUID() {
-        return uuid;
-    }
-
-    /**
      * The calculated drift between the device and this server, in time steps. Used to implement the
      * resynchronisation protocol described in <a href="https://tools.ietf.org/html/rfc6238#section-6">RFC 6238,
      * section 6</a>.
@@ -270,6 +229,9 @@ public final class OathDeviceSettings {
         if (clockDriftSeconds != that.clockDriftSeconds) {
             return false;
         }
+        if (!Arrays.equals(recoveryCodes, that.getRecoveryCodes())) {
+            return false;
+        }
 
         return true;
     }
@@ -291,27 +253,8 @@ public final class OathDeviceSettings {
                 ", truncationOffset='" + truncationOffset + '\'' +
                 ", UUID='"+ uuid + '\'' +
                 ", clockDriftSeconds=" + clockDriftSeconds +
+                ", recoveryCodes=" + Arrays.toString(recoveryCodes) +
                 '}';
     }
 
-    /**
-     * Generates numCodes of recovery codes, utilising java.util.UUID.randomUUID() to create random
-     * String characters.
-     *
-     * @param numCodes Number of recovery codes to generate. Must be > 0.
-     * @return a String array of randomly generated recovery codes, of size numSize.
-     */
-    public static String[] generateRecoveryCodes(int numCodes) {
-        Reject.ifTrue(numCodes < 1, "numCodes must be greater than or equal to 1.");
-
-        String[] recoveryCodes = new String[numCodes];
-
-        for ( int i = 0; i < numCodes; i++) {
-            String temp = UUID.randomUUID().toString();
-            temp = temp.replace("-", "").substring(0, 10);
-            recoveryCodes[i] = temp;
-        }
-
-        return recoveryCodes;
-    }
 }

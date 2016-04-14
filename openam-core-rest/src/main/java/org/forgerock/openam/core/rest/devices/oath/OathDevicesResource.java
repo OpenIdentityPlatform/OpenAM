@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.devices;
+package org.forgerock.openam.core.rest.devices.oath;
 
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
@@ -22,7 +22,6 @@ import static org.forgerock.util.promise.Promises.*;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import java.util.Set;
@@ -35,13 +34,14 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathService;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.TwoFADevicesResource;
+import org.forgerock.openam.core.rest.devices.UserDevicesResource;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -52,30 +52,17 @@ import org.forgerock.util.promise.Promise;
  */
 public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
-    private final static String SKIP = "skip";
-    private final static String CHECK = "check";
-
-    private final static String VALUE = "value";
-    private final static String RESULT = "result";
-    private final static String RESET = "reset";
-
     private final AuthenticatorOathServiceFactory oathServiceFactory;
-    private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
     public OathDevicesResource(OathDevicesDao dao, ContextHelper helper,
-                               @Named("frRest") Debug debug, AuthenticatorOathServiceFactory oathServiceFactory,
-                               ContextHelper contextHelper) {
+                               @Named("frRest") Debug debug, AuthenticatorOathServiceFactory oathServiceFactory) {
         super(dao, helper);
         this.debug = debug;
         this.oathServiceFactory = oathServiceFactory;
-        this.contextHelper = contextHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
@@ -161,11 +148,4 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
         }
     }
 
-    /**
-     * Retrieving the user id in this fashion ensures that an admin can utilise these functions.
-     */
-    @VisibleForTesting
-    protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
-        return IdUtils.getIdentity(contextHelper.getUserId(context), contextHelper.getRealm(context));
-    }
 }

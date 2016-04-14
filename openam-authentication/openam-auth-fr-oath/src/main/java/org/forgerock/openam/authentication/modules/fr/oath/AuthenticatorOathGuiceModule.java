@@ -21,8 +21,8 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.core.rest.devices.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

@@ -11,54 +11,56 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.authentication.modules.fr.oath;
+package org.forgerock.openam.core.rest.devices;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class JsonConversionUtilsTest {
+public class DeviceJsonUtilsTest {
+
+    DeviceJsonUtils<OathDeviceSettings> deviceJsonUtils = new DeviceJsonUtils<>(OathDeviceSettings.class);
 
     @Test
-    public void shouldPerformRoundTripWithOathDeviceSettingsObject() throws IOException {
+    public void shouldPerformRoundTripWithDeviceSettingsObject() throws IOException {
         //Given
-        OathDeviceSettings object = getOathDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
+        OathDeviceSettings object = getDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
 
         //When
-        JsonValue jsonValue = JsonConversionUtils.toJsonValue(object);
-        OathDeviceSettings oathDeviceSettings = JsonConversionUtils.toOathDeviceSettingValue(jsonValue);
+        JsonValue jsonValue = deviceJsonUtils.toJsonValue(object);
+        OathDeviceSettings oathDeviceSettings = deviceJsonUtils.toDeviceSettingValue(jsonValue);
 
         //Then
         Assert.assertEquals(oathDeviceSettings, object, "Expected OathDeviceSettings objects to have same content.");
     }
 
     @Test
-    public void shouldPerformRoundTripWithOathDeviceSettingsList() throws IOException {
+    public void shouldPerformRoundTripWithDeviceSettingsList() throws IOException {
         //Given
         OathDeviceSettings object1 =
-                getOathDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
+                getDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
         OathDeviceSettings object2 =
-                getOathDeviceSettingsObject("secret2", "Device Name 2", 1431999533, 2, true, -2);
+                getDeviceSettingsObject("secret2", "Device Name 2", 1431999533, 2, true, -2);
         List<OathDeviceSettings> list = new ArrayList<>();
         list.add(object1);
         list.add(object2);
 
         //When
-        List<JsonValue> jsonValueList = JsonConversionUtils.toJsonValues(list);
-        List<OathDeviceSettings> oathDeviceSettingsList = JsonConversionUtils.toOathDeviceSettingValues(jsonValueList);
+        List<JsonValue> jsonValueList = deviceJsonUtils.toJsonValues(list);
+        List<OathDeviceSettings> oathDeviceSettingsList = deviceJsonUtils.toDeviceSettingValues(jsonValueList);
 
         //Then
         Assert.assertEquals(list, oathDeviceSettingsList, "Expected OathDeviceSettings objects to have same content");
     }
 
-    private OathDeviceSettings getOathDeviceSettingsObject(String sharedSecret, String deviceName, long lastLogin,
+    private OathDeviceSettings getDeviceSettingsObject(String sharedSecret, String deviceName, long lastLogin,
                                                            int counter, boolean checksumDigit,
                                                            int truncationOffset) {
         OathDeviceSettings oathDeviceSettings = new OathDeviceSettings(sharedSecret, deviceName, lastLogin, counter);

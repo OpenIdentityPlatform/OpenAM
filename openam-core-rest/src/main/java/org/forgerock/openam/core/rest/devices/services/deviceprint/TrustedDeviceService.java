@@ -13,28 +13,26 @@
 *
 * Copyright 2015-2016 ForgeRock AS.
 */
-package org.forgerock.openam.core.rest.devices.services;
+package org.forgerock.openam.core.rest.devices.services.deviceprint;
 
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
+import org.forgerock.openam.core.rest.devices.JsonDeviceSerialisation;
+import org.forgerock.openam.core.rest.devices.services.DeviceService;
 
 /**
- * Provides all necessary configuration information at a realm-wide level to device-based
- * authentication modules underneath it.
+ * Implementation of the Trusted Device (Device Print) Service. Provides all necessary configuration information
+ * at a realm-wide level to Trusted Device (Device Print) authentication modules underneath it.
  */
-public interface DeviceService {
+public class TrustedDeviceService implements DeviceService {
 
-    /**
-     * Retrieve this realm's attribute name, under which the JSON configuration is stored.
-     *
-     * @return Plaintext attribute name.
-     */
-    String getConfigStorageAttributeName();
+    @Override
+    public String getConfigStorageAttributeName() {
+        return "devicePrintProfiles";
+    }
 
-    /**
-     * Returns the strategy used for storing devices as profile attributes.
-     *
-     * @return the device profile storage strategy.
-     */
-    DeviceSerialisation getDeviceSerialisationStrategy();
+    @Override
+    public DeviceSerialisation getDeviceSerialisationStrategy() {
+        return new JsonDeviceSerialisation();
+    }
 
 }

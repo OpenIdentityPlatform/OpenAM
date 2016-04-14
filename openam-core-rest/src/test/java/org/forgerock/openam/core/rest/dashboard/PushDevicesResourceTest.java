@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.dashboard;
@@ -22,25 +22,22 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.utils.Time.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.ClientContext;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -52,14 +49,15 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.push.PushDevicesDao;
+import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -67,13 +65,13 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class OathDevicesResourceTest {
+public class PushDevicesResourceTest {
 
-    private OathDevicesResource resource;
+    private PushDevicesResource resource;
 
     private static final String USER_ID = "demo";
     @Mock
-    private OathDevicesDao dao;
+    private PushDevicesDao dao;
     @Mock
     private ContextHelper contextHelper;
     @Mock
@@ -81,18 +79,18 @@ public class OathDevicesResourceTest {
     @Mock
     private Debug debug;
     @Mock
-    private AuthenticatorOathServiceFactory oathServiceFactory;
+    private AuthenticatorPushServiceFactory pushServiceFactory;
     @Mock
-    private AuthenticatorOathService oathService;
+    private AuthenticatorPushService pushService;
 
     @BeforeMethod
     public void setUp() throws SMSException, SSOException {
 
         MockitoAnnotations.initMocks(this);
-        resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, oathServiceFactory);
+        resource = new PushDevicesResourceTestClass(dao, contextHelper, debug, pushServiceFactory);
 
         given(contextHelper.getUserId((Context) anyObject())).willReturn(USER_ID);
-        given(oathServiceFactory.create(anyString())).willReturn(oathService);
+        given(pushServiceFactory.create(anyString())).willReturn(pushService);
     }
 
     private Context ctx() throws SSOException {
@@ -122,14 +120,6 @@ public class OathDevicesResourceTest {
         verify(handler, times(2)).handleResource(any(ResourceResponse.class));
     }
 
-    /**
-     * Tests the OathDeveResources deleteInstance() method.
-     * 
-     * @throws ResourceException
-     * @throws SSOException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
     @Test
     public void shouldDeleteDevice()
             throws ResourceException, SSOException, InterruptedException, ExecutionException {
@@ -186,34 +176,6 @@ public class OathDevicesResourceTest {
     }
 
     @Test
-    public void shouldExecuteSkipAction()
-            throws ResourceException, SSOException, InterruptedException, ExecutionException {
-        // given
-        JsonValue contents = JsonValueBuilder.toJsonValue("{ \"value\" : true }");
-        ActionRequest request = Requests.newActionRequest("instanceId", "skip");
-        request.setContent(contents);
-
-        // when
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(ctx(), request);
-
-        // then
-        assertThat(promise).succeeded().withContent().isObject().containsOnly();
-    }
-
-    @Test
-    public void shouldExecuteTrueCheckAction()
-            throws ResourceException, SSOException, InterruptedException, ExecutionException {
-        // give
-        ActionRequest request = Requests.newActionRequest("instanceId", "check");
-
-        // when
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(ctx(), request);
-
-        // then
-        assertThat(promise).succeeded().withContent().booleanAt("result").isTrue();
-    }
-
-    @Test
     public void shouldFailOnUnknownActionInstance() throws ResourceException, SSOException {
         // given
         ActionRequest actionRequest = mock(ActionRequest.class);
@@ -225,25 +187,15 @@ public class OathDevicesResourceTest {
         assertThat(promise).failedWithResourceException().withCode(ResourceException.NOT_SUPPORTED);
     }
 
-    private static class OathDevicesResourceTestClass extends OathDevicesResource {
+    private static class PushDevicesResourceTestClass extends PushDevicesResource {
 
-        public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
-                AuthenticatorOathServiceFactory oathServiceFactory) {
-            super(dao, helper, debug, oathServiceFactory);
+        public PushDevicesResourceTestClass(PushDevicesDao dao, ContextHelper helper, Debug debug,
+                                            AuthenticatorPushServiceFactory pushServiceFactory) {
+            super(dao, helper, debug, pushServiceFactory);
         }
 
         protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
-
-            HashSet<String> attribute = new HashSet<>();
-            attribute.add(String.valueOf(AuthenticatorOathService.SKIPPABLE));
-
-            AMIdentity mockId = mock(AMIdentity.class);
-            try {
-                given(mockId.getAttribute(anyString())).willReturn(attribute); // makes them
-            } catch (IdRepoException | SSOException e) {
-                e.printStackTrace();
-            }
-            return mockId;
+            return mock(AMIdentity.class);
         }
     }
 }

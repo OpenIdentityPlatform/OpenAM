@@ -981,6 +981,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
+                            <Value>pushDeviceProfilesContainer</Value>
                             <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -1081,6 +1082,7 @@
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
+                            <Value>pushDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -1676,6 +1678,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
+                            <Value>pushDeviceProfilesContainer</Value>
                             <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -1773,6 +1776,7 @@
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
+                            <Value>pushDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                             <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
@@ -2247,6 +2251,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
+                            <Value>pushDeviceProfilesContainer</Value>
                             <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -2344,6 +2349,7 @@
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
+                            <Value>pushDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                             <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
@@ -2899,6 +2905,7 @@
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
                             <Value>oathDeviceProfiles</Value>
+                            <Value>pushDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                             <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
@@ -3364,6 +3371,7 @@
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
                             <Value>oathDeviceProfilesContainer</Value>
+                            <Value>pushDeviceProfilesContainer</Value>
                             <Value>kbaInfoContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -3461,6 +3469,7 @@
                             <Value>oath2faEnabled</Value>
                             <Value>kbaInfo</Value>
                             <Value>kbaActiveIndex</Value>
+                            <Value>pushDeviceProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

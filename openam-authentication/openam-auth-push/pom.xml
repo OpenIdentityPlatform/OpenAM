@@ -70,6 +70,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-push-notification</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core-rest</artifactId>
+            <version>14.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

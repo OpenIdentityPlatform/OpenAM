@@ -15,11 +15,12 @@
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
-package org.forgerock.openam.core.rest.devices;
+package org.forgerock.openam.core.rest.devices.deviceprint;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.forgerock.openam.core.rest.devices.services.TrustedDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.UserDevicesDao;
+import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceServiceFactory;
 
 /**
  * Dao for handling the retrieval and saving of a user's trusted devices.

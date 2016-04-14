@@ -11,19 +11,10 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.core.rest.devices.services;
 
 /**
- * Produces new {@link TrustedDeviceService}s, conforming to the
- * {@link DeviceServiceFactory} interface.
+ * This package contains classes for device print attribute management.
  */
-public class TrustedDeviceServiceFactory implements DeviceServiceFactory {
-
-    @Override
-    public DeviceService create(String realm) {
-        return new TrustedDeviceService();
-    }
-
-}
+package org.forgerock.openam.core.rest.devices.services.deviceprint;

@@ -11,23 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.devices;
+package org.forgerock.openam.core.rest.devices.push;
 
 import javax.inject.Inject;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.UserDevicesDao;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
 
 /**
- * A DAO instance for accessing OATH user devices.
+ * A DAO instance for accessing Push user devices.
  *
- * @since 13.0.0
+ * @since 13.5.0
  */
-public class OathDevicesDao extends UserDevicesDao {
+public class PushDevicesDao extends UserDevicesDao {
 
+    /**
+     * Construct a new PushDevicesDao.
+     *
+     * @param serviceFactory Factory used to retrieve the Push Service for this dao.
+     */
     @Inject
-    public OathDevicesDao(AuthenticatorOathServiceFactory serviceFactory) {
+    public PushDevicesDao(AuthenticatorPushServiceFactory serviceFactory) {
         super(serviceFactory);
     }
 

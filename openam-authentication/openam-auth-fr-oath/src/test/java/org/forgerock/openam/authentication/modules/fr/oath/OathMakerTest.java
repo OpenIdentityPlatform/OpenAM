@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
@@ -25,8 +25,9 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
-import org.forgerock.openam.core.rest.devices.OathDevicesDao;
+import org.forgerock.openam.core.rest.devices.DeviceJsonUtils;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -49,7 +50,8 @@ public class OathMakerTest {
     @BeforeMethod
     public void createFactory() {
         MockitoAnnotations.initMocks(this);
-        testFactory = new OathMaker(mockDao, mockDebug, new SecureRandom());
+        testFactory = new OathMaker(mockDao, mockDebug, new SecureRandom(),
+                new DeviceJsonUtils<>(OathDeviceSettings.class));
     }
 
     @Test
@@ -85,7 +87,7 @@ public class OathMakerTest {
         deviceSettings.setLastLogin(99, TimeUnit.MILLISECONDS);
         deviceSettings.setDeviceName("test device");
         deviceSettings.setTruncationOffset(32);
-        JsonValue expectedJson = JsonConversionUtils.toJsonValue(deviceSettings);
+        JsonValue expectedJson = new DeviceJsonUtils<>(OathDeviceSettings.class).toJsonValue(deviceSettings);
 
         // When
         testFactory.saveDeviceProfile(USER, REALM, deviceSettings);

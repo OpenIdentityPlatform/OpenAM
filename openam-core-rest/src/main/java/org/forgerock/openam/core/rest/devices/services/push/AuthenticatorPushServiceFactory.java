@@ -11,26 +11,21 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.core.rest.devices.services;
+package org.forgerock.openam.core.rest.devices.services.push;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
 
 /**
- * Defines the interface for providing {@link AuthenticatorOathServiceFactory}s.
+ * Produces AuthenticatorPushService's for a specific realm.
  */
-public interface DeviceServiceFactory {
+public class AuthenticatorPushServiceFactory implements DeviceServiceFactory {
 
-    /**
-     * Creates a new OathService for the current realm.
-     * @param realm The realm for which to grab the OathService.
-     *
-     * @throws SMSException If we cannot connect to/read from SMS.
-     * @throws SSOException If we cannot utilise the Admin token for access to the service.
-     */
-    DeviceService create(String realm) throws SMSException, SSOException;
-
+    @Override
+    public AuthenticatorPushService create(String realm) throws SSOException, SMSException {
+        return new AuthenticatorPushService(realm);
+    }
 }

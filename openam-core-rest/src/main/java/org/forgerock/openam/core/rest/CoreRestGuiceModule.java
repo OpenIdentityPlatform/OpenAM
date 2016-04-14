@@ -52,11 +52,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
@@ -71,6 +69,9 @@ import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
+import org.forgerock.openam.core.rest.devices.DeviceJsonUtils;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
 import org.forgerock.openam.core.rest.record.DebugRecorder;
 import org.forgerock.openam.core.rest.record.DefaultDebugRecorder;
 import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
@@ -153,6 +154,11 @@ public class CoreRestGuiceModule extends AbstractModule {
                 .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
         smsGlobalAuthzModuleBinder.addBinding(resourcePath("services/scripting/contexts"))
                 .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
+
+        bind(new TypeLiteral<DeviceJsonUtils<OathDeviceSettings>>() {})
+                .toInstance(new DeviceJsonUtils<>(OathDeviceSettings.class));
+        bind(new TypeLiteral<DeviceJsonUtils<PushDeviceSettings>>() {})
+                .toInstance(new DeviceJsonUtils<>(PushDeviceSettings.class));
     }
 
     @Provides

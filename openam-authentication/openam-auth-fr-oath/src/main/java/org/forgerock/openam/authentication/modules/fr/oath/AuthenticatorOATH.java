@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,10 +51,8 @@ import javax.security.auth.callback.NameCallback;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
-import org.forgerock.openam.core.rest.devices.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathService;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.GenerationUtils;
@@ -137,10 +134,8 @@ public class AuthenticatorOATH extends AMLoginModule {
 
     private AuthenticatorOathService realmOathService;
     private AMIdentity id;
-    private String realm;
 
-    private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
-    private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
+    private final OathMaker oathDevices = InjectorHolder.getInstance(OathMaker.class);
 
     private OathDeviceSettings newDevice = null;
 
@@ -199,7 +194,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         //get username from previous authentication
         try {
 
-            realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             id = IdUtils.getIdentity(userName, realm);
             realmOathService = new AuthenticatorOathService(id.getRealm());
 
@@ -421,7 +416,7 @@ public class AuthenticatorOATH extends AMLoginModule {
             }
             if (null == settings) {
                 // this is the first time we have authorised against this device - we can now save it.
-                deviceFactory.saveDeviceProfile(id.getName(), id.getRealm(), deviceToAuthAgainst);
+                oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), deviceToAuthAgainst);
             }
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
@@ -438,7 +433,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
     private OathDeviceSettings createBasicDevice() throws AuthLoginException {
 
-        OathDeviceSettings settings = deviceFactory.createDeviceProfile(minSecretKeyLength);
+        OathDeviceSettings settings = oathDevices.createDeviceProfile(minSecretKeyLength);
         settings.setChecksumDigit(checksum);
         settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
 
@@ -457,8 +452,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         if (recoveryCodes.contains(otp)) {
             recoveryCodes.remove(otp);
             settings.setRecoveryCodes(recoveryCodes.toArray(new String[recoveryCodes.size()]));
-            devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                    Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+            oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
             return true;
         }
 
@@ -746,11 +740,7 @@ public class AuthenticatorOATH extends AMLoginModule {
      */
     private OathDeviceSettings getOathDeviceSettings(String username, String realm)
             throws IOException, AuthLoginException {
-
-        //get data from the DAO
-        List<JsonValue> profiles = devicesDao.getDeviceProfiles(username, realm);
-        List<OathDeviceSettings> allSettings = JsonConversionUtils.toOathDeviceSettingValues(profiles);
-
+        List<OathDeviceSettings> allSettings = oathDevices.getDeviceProfiles(username, realm);
         return CollectionUtils.getFirstItem(allSettings, null);
     }
 
@@ -777,8 +767,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     private void setCounterAttr(AMIdentity id, int counter, OathDeviceSettings settings)
             throws AuthLoginException, IOException {
         settings.setCounter(counter);
-        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+        oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
     }
 
     /**
@@ -800,8 +789,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         }
 
         settings.setClockDriftSeconds((int) drift * totpTimeStep);
-        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+        oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
     }
 
     /**

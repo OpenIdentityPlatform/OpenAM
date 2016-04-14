@@ -14,7 +14,7 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.devices;
+package org.forgerock.openam.core.rest.devices.deviceprint;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 
@@ -26,6 +26,7 @@ import java.util.Date;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.core.rest.devices.UserDevicesResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**

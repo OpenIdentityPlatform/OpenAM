@@ -11,24 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
-import org.forgerock.openam.core.rest.devices.OathDevicesDao;
-import org.forgerock.util.Reject;
-
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.Collections;
+import org.forgerock.openam.core.rest.devices.DeviceJsonUtils;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
+import org.forgerock.util.Reject;
 
 /**
  * Factory object for OATH device profiles. Ensures that consistent device profiles are generated when registering a
@@ -52,15 +53,18 @@ final class OathMaker {
     private final SecureRandom secureRandom;
     private final OathDevicesDao devicesDao;
     private final Debug debug;
+    private final DeviceJsonUtils<OathDeviceSettings> jsonUtils;
 
     @Inject
     OathMaker(final @Nonnull OathDevicesDao devicesDao,
               final @Nonnull @Named("amAuthOATH") Debug debug,
-              final @Nonnull SecureRandom secureRandom) {
+              final @Nonnull SecureRandom secureRandom,
+              final @Nonnull DeviceJsonUtils<OathDeviceSettings> jsonUtils) {
         Reject.ifNull(devicesDao, debug, secureRandom);
         this.devicesDao = devicesDao;
         this.debug = debug;
         this.secureRandom = secureRandom;
+        this.jsonUtils = jsonUtils;
     }
 
     /**
@@ -99,12 +103,25 @@ final class OathMaker {
         Reject.ifNull(user, realm, deviceSettings);
         try {
             devicesDao.saveDeviceProfiles(user, realm,
-                    JsonConversionUtils.toJsonValues(Collections.singletonList(deviceSettings)));
+                    jsonUtils.toJsonValues(Collections.singletonList(deviceSettings)));
         } catch (IOException e) {
             debug.error("OathMaker.createDeviceProfile(): Unable to save device profile for user {} in realm {}",
                     user, realm, e);
             throw new AuthLoginException(e);
         }
+    }
+
+    /**
+     * Retrieves all device profiles for this device type from the datastore for the provided user.
+     *
+     * @param user User whose device profiles to retrieve.
+     * @param realm Realm in which the user exists.
+     * @return A list of {@link OathDeviceSettings}.
+     * @throws IOException If there was issues talking to the datastore.
+     */
+    List<OathDeviceSettings> getDeviceProfiles(@Nonnull String user, @Nonnull String realm)
+            throws IOException {
+        return jsonUtils.toDeviceSettingValues(devicesDao.getDeviceProfiles(user, realm));
     }
 
 }
