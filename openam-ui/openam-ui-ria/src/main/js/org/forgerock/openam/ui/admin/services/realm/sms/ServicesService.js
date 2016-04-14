@@ -142,13 +142,11 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
 
     obj.type = {
         getCreatables (realm) {
-            const creatableTypes = obj.serviceCall({
-                url: scopedByRealm(realm, "services?_action=getCreatableTypes"),
+            return obj.serviceCall({
+                url: scopedByRealm(realm, "services?_action=getCreatableTypes&forUI=true"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            });
-
-            return creatableTypes.then((response) => _.sortBy(response.result, "name"));
+            }).then((response) => _.sortBy(response.result, "name"));
         },
         subSchema: {
             type: {
