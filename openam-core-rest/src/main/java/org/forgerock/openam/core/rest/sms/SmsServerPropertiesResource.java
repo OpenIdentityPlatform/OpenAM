@@ -366,9 +366,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             String displayValue = titleProperties.getProperty(defaultValue);
 
             final String convertedAttributeName = defaultValue.replaceFirst("amconfig.", "");
-            final String syntax = syntaxProperties.getProperty(convertedAttributeName);
-            final String syntaxProperty = syntax == null ? "" : syntax;
-            final String type = syntaxRawToReal.get(syntaxProperty);
+            final String type = getType(convertedAttributeName);
 
             final List<String> attributeOptions = getAttributeOptions(options, convertedAttributeName, type);
             final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, convertedAttributeName, type);
@@ -544,7 +542,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             }
 
             Properties serverSpecificAttributes = getAttributes(serverConfig);
-            Map<String, String> defaultSection = new HashMap<>();
+            Map<String, Object> defaultSection = new HashMap<>();
 
             JsonValue result = json(object());
 
@@ -609,17 +607,16 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 Map<String, String> attributeNamesToSections = getAttributeNamesToSections(tabName);
 
                 for (String attributeName : attributeNamesForTab) {
-                    final String defaultAttribute = (String) defaultAttributes.get(attributeName);
+                    final Object defaultAttribute = getValue(defaultAttributes, attributeName);
                     final String sectionName = attributeNamesToSections.get(attributeName);
 
                     if (defaultAttribute != null) {
-                        defaultSection.put(sectionName + "/" + attributeName, (String) defaultAttributes.get(attributeName));
+                        defaultSection.put(sectionName + "/" + attributeName, defaultAttribute);
                     }
 
-                    final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
+                    final Object serverSpecificAttribute = getValue(serverSpecificAttributes, attributeName);
                     if (serverSpecificAttribute != null) {
-                        result.putPermissive(new JsonPointer(sectionName + "/" + attributeName),
-                                serverSpecificAttribute);
+                        result.putPermissive(new JsonPointer(sectionName + "/" + attributeName), serverSpecificAttribute);
                     }
                 }
             }
@@ -632,6 +629,21 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         }
 
         return new BadRequestException("Error reading properties file for " + tabName).asPromise();
+    }
+
+    private Object getValue(Properties attributes, String attributeName) {
+        final String type = getType(attributeName);
+        if (type != null && type.equals("number")) {
+            return new Integer((String) attributes.get(attributeName));
+        } else {
+            return attributes.get(attributeName);
+        }
+    }
+
+    private String getType(String attributeName) {
+        final String syntax = syntaxProperties.getProperty(attributeName);
+        final String syntaxProperty = syntax == null ? "" : syntax;
+        return syntaxRawToReal.get(syntaxProperty);
     }
 
     private Map<String, String> getAttributeNamesToSections(String tabName) throws IOException, SAXException,
@@ -712,9 +724,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             final JsonValue request = updateRequest.toJsonValue();
             JsonValue sections = request.get("content");
-            Map<String, String> attributesToBeAlteredNames = new HashMap<>();
+            Map<String, Object> attributesToBeAlteredNames = new HashMap<>();
             for (String sectionName : sections.keys()) {
-                attributesToBeAlteredNames.putAll(sections.get(sectionName).asMap(String.class));
+                attributesToBeAlteredNames.putAll(sections.get(sectionName).asMap());
             }
 
             final Map allAttributes = serverConfig.getAttributes();
