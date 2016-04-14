@@ -196,7 +196,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels)) {
                         final String title = label.getDisplayValue();
                         final String type = label.getType();
-                        final String attributeName = label.getLabelFor();
+                        final String attributeName = label.getDefaultValue().replaceFirst("amconfig.", "");
                         final List<String> attributeOptions = label.getOptions();
                         final List<String> attributeOptionLabels = label.getOptionLabels();
                         final boolean isOptional = isDefault ? optionalAttributes.contains(attributeName) : true;
