@@ -16,21 +16,21 @@
 package org.forgerock.openam.entitlement.rest;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.json.resource.ResourceException.getException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -46,21 +46,24 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.rest.wrappers.JsonResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.rest.query.QueryResponsePresentation;
-import org.forgerock.openam.entitlement.rest.wrappers.JsonResourceType;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.RealmAwareResource;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.DataQueryFilterVisitor;
 import org.forgerock.openam.rest.query.QueryException;
-import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.rest.query.QueryResponsePresentation;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Allows for CREST-handling of stored {@link org.forgerock.openam.entitlement.ResourceType}s which know about realms.
@@ -70,9 +73,6 @@ import org.forgerock.util.query.QueryFilter;
  * supported here.
  */
 public class ResourceTypesResource extends RealmAwareResource {
-
-    private static final String METHOD_PUT = "PUT";
-    private static final int METHOD_NOT_ALLOWED = 405;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -117,51 +117,35 @@ public class ResourceTypesResource extends RealmAwareResource {
     /**
      * Create {@link org.forgerock.openam.entitlement.ResourceType} in the system.
      *
-     * The user's {@link org.forgerock.json.resource.SecurityContext} must indicate they are a user with
-     * administrator-level access.
+     * The user's {@link Context} must indicate they are a user with administrator-level access.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-
-        if (METHOD_PUT.equalsIgnoreCase(context.asContext(HttpContext.class).getMethod())) {
-            return getException(METHOD_NOT_ALLOWED).asPromise();
-        }
-
         String principalName = "unknown";
         try {
             final Subject subject = getSubject(context);
             principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
             final JsonResourceType jsonWrapper = createJsonResourceType(request.getContent());
 
-            if (StringUtils.isEmpty(jsonWrapper.getName())) {
+            ensureResourceIdMatch(jsonWrapper, request.getNewResourceId());
+
+            if (isEmpty(jsonWrapper.getName())) {
                 throw new EntitlementException(MISSING_RESOURCE_TYPE_NAME);
             }
 
-            // Here we save the resource type and use that returned, since the resource type service
-            // adds all manner of good stuff - creation dates, updated dates, etc. etc.  It is the resource type filled
-            // out with this extra stuff that we put into the resource and the user gets to see.
-            //
             final ResourceType savedResourceType = resourceTypeService.saveResourceType(subject, getRealm(context),
-                    jsonWrapper.getResourceType(true));
+                    jsonWrapper.getResourceType(isBlank(jsonWrapper.getUUID())));
 
-            if (logger.messageEnabled()) {
-                logger.message("ResourceTypeResource :: CREATE by "
-                        + principalName
-                        + ": for Resource Type: "
-                        + savedResourceType.getName());
-            }
+            logger.message("ResourceTypeResource :: CREATE by {}: for Resource Type: {}", principalName,
+                    savedResourceType.getName());
+
             return newResultPromise(newResourceResponse(savedResourceType.getUUID(), null,
                     new JsonResourceType(savedResourceType).toJsonValue()));
         } catch (EntitlementException e) {
-            if (logger.errorEnabled()) {
-                logger.error("ResourceTypeResource :: CREATE by "
-                             + principalName
-                             + ": Resource Type creation failed. ",
-                             e);
-            }
+            logger.error("ResourceTypeResource :: CREATE by {}: Resource Type creation failed. ", principalName, e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -169,8 +153,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     /**
      * Delete a {@link org.forgerock.openam.entitlement.ResourceType} in the system.
      *
-     * The user's {@link org.forgerock.json.resource.SecurityContext} must indicate they are a user with
-     * administrator-level access.
+     * The user's {@link Context} must indicate they are a user with administrator-level access.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -211,8 +194,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     /**
      * Update a {@link org.forgerock.openam.entitlement.ResourceType} in the system.
      *
-     * The user's {@link org.forgerock.json.resource.SecurityContext} must indicate they are a user with
-     * administrator-level access.
+     * The user's {@link Context} must indicate they are a user with administrator-level access.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -227,33 +209,23 @@ public class ResourceTypesResource extends RealmAwareResource {
             principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
             final JsonResourceType jsonWrapper = createJsonResourceType(request.getContent());
 
-            if (StringUtils.isEmpty(jsonWrapper.getName())) {
+            ensureResourceIdMatch(jsonWrapper, resourceId);
+
+            if (isEmpty(jsonWrapper.getName())) {
                 throw new EntitlementException(MISSING_RESOURCE_TYPE_NAME);
             }
 
-            ResourceType resourceTypeToUpdate = jsonWrapper.getResourceType(false);
-            if (!StringUtils.isEqualTo(resourceId, resourceTypeToUpdate.getUUID())) {
-                throw new EntitlementException(RESOURCE_TYPE_ID_MISMATCH);
-            }
             final ResourceType updatedResourceType = resourceTypeService.updateResourceType(subject, getRealm(context),
-                    resourceTypeToUpdate);
+                    jsonWrapper.getResourceType(false));
 
-            if (logger.messageEnabled()) {
-                logger.message("ResourceTypeResource :: UPDATE by "
-                        + principalName
-                        + ": for Resource Type: "
-                        + jsonWrapper.getName());
-            }
+            logger.message("ResourceTypeResource :: UPDATE by {}: for Resource Type: {}", principalName,
+                    jsonWrapper.getName());
 
             return newResultPromise(newResourceResponse(updatedResourceType.getUUID(), null,
                     new JsonResourceType(updatedResourceType).toJsonValue()));
 
         } catch (EntitlementException e) {
-            if (logger.errorEnabled()) {
-                logger.error("ResourceTypeResource :: UPDATE by "
-                             + principalName
-                             + ": Resource Type update failed. ", e);
-            }
+            logger.error("ResourceTypeResource :: UPDATE by {}: Resource Type update failed. ", principalName, e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -261,8 +233,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     /**
      * Reads the details of all {@link org.forgerock.openam.entitlement.ResourceType}s in the system.
      *
-     * The user's {@link org.forgerock.json.resource.SecurityContext} must indicate they are a user with
-     * administrator-level access.
+     * The user's {@link Context} must indicate they are a user with administrator-level access.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -313,8 +284,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Reads the details of a single instance of an {@link org.forgerock.openam.entitlement.ResourceType} - the instance
      * referred to by the passed-in resourceId.
      *
-     * The user's {@link org.forgerock.json.resource.SecurityContext} must indicate they are a user with
-     * administrator-level access.
+     * The user's {@link Context} must indicate they are a user with administrator-level access.
      *
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
@@ -394,5 +364,18 @@ public class ResourceTypesResource extends RealmAwareResource {
             throw new EntitlementException(EntitlementException.INTERNAL_ERROR, "Cannot retrieve subject");
         }
         return result;
+    }
+
+    private void ensureResourceIdMatch(JsonResourceType jsonWrapper, String resourceId) throws EntitlementException {
+        String uuid = jsonWrapper.getUUID();
+        if (uuid != null && resourceId != null) {
+            if (!uuid.equals(resourceId)) {
+                throw new EntitlementException(RESOURCE_TYPE_ID_MISMATCH);
+            }
+        }
+
+        if (isBlank(uuid)) {
+            jsonWrapper.setUUID(resourceId);
+        }
     }
 }

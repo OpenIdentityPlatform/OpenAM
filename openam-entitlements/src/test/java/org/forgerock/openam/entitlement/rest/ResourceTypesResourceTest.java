@@ -20,23 +20,28 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.entitlement.rest.EntitlementTestUtils.assertResourcePromiseFailedWithCodes;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.newDate;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
+import javax.security.auth.Subject;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.services.context.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -48,6 +53,9 @@ import org.forgerock.openam.rest.query.QueryException;
 import org.forgerock.openam.rest.query.QueryResponseHandler;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -55,36 +63,42 @@ import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 
 public class ResourceTypesResourceTest {
 
     private final String jsonResourceType =
             "{" +
-                    "    \"actions\": {" +
-                    "            \"ACTION\": true," +
-                    "            \"CREATE\": true," +
-                    "            \"DELETE\": true," +
-                    "            \"PATCH\": true," +
-                    "            \"QUERY\": true," +
-                    "            \"READ\": true," +
-                    "            \"UPDATE\": true" +
-                    "    }," +
-                    "    \"description\": \"An example resource type\"," +
-                    "    \"name\": \"myResourceType\"," +
-                    "    \"patterns\": [" +
-                    "            \"http://example.com:80/*\"" +
-                    "    ]" +
-                    "}" +
-                    ";";
+            "    \"actions\": {" +
+            "            \"ACTION\": true," +
+            "            \"CREATE\": true," +
+            "            \"DELETE\": true," +
+            "            \"PATCH\": true," +
+            "            \"QUERY\": true," +
+            "            \"READ\": true," +
+            "            \"UPDATE\": true" +
+            "    }," +
+            "    \"description\": \"An example resource type\"," +
+            "    \"name\": \"myResourceType\"," +
+            "    \"patterns\": [" +
+            "            \"http://example.com:80/*\"" +
+            "    ]" +
+            "};";
+
+    private final String jsonResourceTypeWithId =
+            "{" +
+            "    \"actions\": {" +
+            "            \"ACTION\": true," +
+            "            \"CREATE\": true" +
+            "    }," +
+            "    \"description\": \"An example resource type\"," +
+            "    \"uuid\": \"myResourceTypeId\"," +
+            "    \"name\": \"myResourceType\"," +
+            "    \"patterns\": [" +
+            "            \"http://example.com:80/*\"" +
+            "    ]" +
+            "};";
 
     private final Map<String, Set<String>> rawData = new HashMap<String, Set<String>>();
 
@@ -187,6 +201,27 @@ public class ResourceTypesResourceTest {
     }
 
     @Test
+    public void shouldCreateResourceTypeWithPredefinedId() throws EntitlementException {
+
+        //given
+        CreateRequest mockCreateRequest = mock(CreateRequest.class);
+        JsonValue content = mock(JsonValue.class);
+
+        given(mockCreateRequest.getContent()).willReturn(content);
+        given(content.toString()).willReturn(jsonResourceTypeWithId);
+
+        doCallRealMethod().when(resourceTypeService).saveResourceType(any(Subject.class), anyString(),
+                any(ResourceType.class));
+
+        //when
+        Promise<ResourceResponse, ResourceException> promise =
+                resourceTypesResource.createInstance(mockServerContext, mockCreateRequest);
+
+        //then
+        assertThat(promise).succeeded().withContent().stringAt("uuid").isEqualTo("myResourceTypeId");
+    }
+
+    @Test
     public void createShouldFailIfCallerSubjectNotPresent() {
 
         //given
@@ -251,22 +286,14 @@ public class ResourceTypesResourceTest {
                 EntitlementException.MISSING_RESOURCE_TYPE_NAME);
     }
 
-    /*
-     * This expected failure when the newResourceId in the create request is not the resource type name.
-     *
-     * Now the new resource id is not used.
-     *
-     */
     @Test
-    public void createShouldIgnoreNewResourceId() throws EntitlementException {
+    public void createShouldFailWIthMismatchedResourceIds() throws EntitlementException {
         //given
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         JsonValue content = mock(JsonValue.class);
         given(mockCreateRequest.getContent()).willReturn(content);
-
-        // the resource ID in the request is differs form anything in the JSON resource type
-        given(mockCreateRequest.getNewResourceId()).willReturn("ignored-new-resource-id");
-        given(content.toString()).willReturn(jsonResourceType);
+        given(mockCreateRequest.getNewResourceId()).willReturn("mismatched-resource-id");
+        given(content.toString()).willReturn(jsonResourceTypeWithId);
 
         doCallRealMethod().when(resourceTypeService).saveResourceType(any(Subject.class), anyString(),
                 any(ResourceType.class));
@@ -276,53 +303,27 @@ public class ResourceTypesResourceTest {
                 resourceTypesResource.createInstance(mockServerContext, mockCreateRequest);
 
         //then
-        assertThat(promise).succeeded();
+        assertThat(promise).failedWithResourceException().hasMessageStartingWith("Resource Type UUID specified in URL");
     }
 
-    /*
-     * A UUID is supplied on create, but it is ignored
-     */
     @Test
-    public void createShouldIgnoreUUIDInJson() throws EntitlementException {
+    public void createShouldSucceedWithMatchingResourceIds() throws EntitlementException {
         //given
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         JsonValue content = mock(JsonValue.class);
-
         given(mockCreateRequest.getContent()).willReturn(content);
-        given(mockCreateRequest.getNewResourceId()).willReturn(null);
+        given(mockCreateRequest.getNewResourceId()).willReturn("myResourceTypeId");
+        given(content.toString()).willReturn(jsonResourceTypeWithId);
 
-        String jsonWithUuid =
-                "{" +
-                        "    \"actions\": {" +
-                        "            \"ACTION\": true," +
-                        "            \"CREATE\": true," +
-                        "            \"DELETE\": true," +
-                        "            \"PATCH\": true," +
-                        "            \"QUERY\": true," +
-                        "            \"READ\": true," +
-                        "            \"UPDATE\": true" +
-                        "    }," +
-                        "    \"description\": \"An example resource type\"," +
-                        "    \"uuid\": \"123.456.789\"," +
-                        "    \"name\": \"myResourceType\"," +
-                        "    \"patterns\": [" +
-                        "            \"http://example.com:80/*\"" +
-                        "    ]" +
-                        "}" +
-                        ";";
-
-        // Json has unnecessary UUID
-        given(content.toString()).willReturn(jsonWithUuid);
-
-        doCallRealMethod().when(resourceTypeService).saveResourceType(any(Subject.class), anyString(), any
-                (ResourceType.class));
+        doCallRealMethod().when(resourceTypeService).saveResourceType(any(Subject.class), anyString(),
+                any(ResourceType.class));
 
         //when
         Promise<ResourceResponse, ResourceException> promise =
                 resourceTypesResource.createInstance(mockServerContext, mockCreateRequest);
 
         //then
-        assertThat(promise).succeeded();
+        assertThat(promise).succeeded().withContent().stringAt("uuid").isEqualTo("myResourceTypeId");
     }
 
     @Test
