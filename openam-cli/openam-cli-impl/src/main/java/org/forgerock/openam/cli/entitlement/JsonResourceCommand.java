@@ -88,7 +88,7 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
      * @throws CLIException
      *         should some error occur
      */
-    protected Response sendRequest(Request request, String endpoint) throws CLIException {
+    protected final Response sendRequest(Request request, String endpoint) throws CLIException {
         String serverUrl = getStringOptionValue(IArgument.SERVER_NAME);
         String realm = getStringOptionValue(IArgument.REALM_NAME);
 
@@ -135,7 +135,7 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
      * @throws CLIException
      *         should some error occur
      */
-    protected JsonValue readJsonFile(String jsonFile) throws CLIException {
+    protected final JsonValue readJsonFile(String jsonFile) throws CLIException {
         try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
 
             StringBuilder contents = new StringBuilder();
@@ -162,7 +162,7 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
      * @throws CLIException
      *         should some error occur
      */
-    protected void writeJsonFile(JsonValue jsonValue, String jsonFile) throws CLIException {
+    protected final void writeJsonFile(JsonValue jsonValue, String jsonFile) throws CLIException {
         try (FileWriter fileWriter = new FileWriter(jsonFile)) {
             MAPPER.writerWithDefaultPrettyPrinter().writeValue(fileWriter, jsonValue.getObject());
         } catch (IOException ioE) {

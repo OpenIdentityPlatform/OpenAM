@@ -2655,6 +2655,20 @@ public class AccessManager {
   private String unregister_auth_module;
 
   @SubCommandInfo(
+          implClassName="org.forgerock.openam.cli.entitlement.PolicyImport",
+          description="Import policy model into a given realm",
+          webSupport="true",
+          mandatoryOptions={
+                  "realm|e|s|Realm name",
+                  "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                  "file|D|s|Name of the import file"},
+          optionAliases={},
+          macro="authentication",
+          optionalOptions={},
+          resourceStrings={})
+  private String policy_import;
+
+  @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.CreateApplication",
           description="Create policy set.",
           webSupport="true",
