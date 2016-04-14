@@ -47,7 +47,6 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
             schema: response[0],
             values: response[1]
         })),
-        getDefaults: (section) => obj.servers.get(DEFAULT_SERVER, section),
         getAll: () => obj.serviceCall({
             url: `?_queryFilter=true`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -58,11 +57,20 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
             type: "DELETE"
         }),
         update:  (id, data) => obj.serviceCall({
-            url: `${id}`,
+            url: `/${id}`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(data)
-        })
+        }),
+        defaults: {
+            get: (section) => obj.servers.get(DEFAULT_SERVER, section),
+            update:  (section, data) => obj.serviceCall({
+                url: `/${DEFAULT_SERVER}/properties/${section}`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "PUT",
+                data: JSON.stringify(data)
+            })
+        }
     };
 
     return obj;

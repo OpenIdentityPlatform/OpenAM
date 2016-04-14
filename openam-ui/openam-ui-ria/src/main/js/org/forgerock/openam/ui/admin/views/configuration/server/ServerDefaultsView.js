@@ -45,11 +45,11 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
             return this.subview.getTabBody();
         },
         render (args) {
-            const sectionId = args[0];
+            this.data.sectionId = args[0];
 
-            this.data.title = $.t(`console.common.navigation.${sectionId}`);
+            this.data.title = $.t(`console.common.navigation.${this.data.sectionId}`);
 
-            ServersService.servers.getDefaults(sectionId).then((response) => {
+            ServersService.servers.defaults.get(this.data.sectionId).then((response) => {
                 this.data.schema = response.schema;
                 this.data.values = response.values;
 
@@ -76,13 +76,13 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
             });
         },
         updateData () {
-            this.data.values.extend({
+            this.data.values = this.data.values.extend({
                 [this.subview.getTabId()]: this.getJSONSchemaView().values()
             });
         },
         onSave () {
             this.updateData();
-            ServersService.servers.update(this.data.id, this.data.values().raw)
+            ServersService.servers.defaults.update(this.data.sectionId, this.data.values.raw)
             .then((data) => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 this.data.values = data;
