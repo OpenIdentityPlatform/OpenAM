@@ -26,11 +26,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance",
+    "org/forgerock/openam/ui/admin/views/common/Backlink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
 ], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, FlatJSONSchemaView, FormHelper,
-    deleteInstance) => {
+    deleteInstance, Backlink) => {
 
     function toggleSave (el, enable) {
         el.find("[data-save]").prop("disabled", !enable);
@@ -48,14 +49,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
 
         render (args) {
             this.data.id = args[0];
-
-            // TODO add backlink!
-
             SitesService.sites.get(this.data.id).then((data) => {
                 this.data.name = data.values.raw._id;
                 this.data.etag = data.values.raw.etag;
 
                 this.parentRender(() => {
+                    new Backlink().render();
                     if (this.jsonSchemaView) {
                         this.jsonSchemaView.remove();
                     }

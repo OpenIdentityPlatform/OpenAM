@@ -716,7 +716,8 @@
                 "advanced": "Advanced",
                 "serverDefaults": "Server Defaults",
                 "directory" : "Directory",
-                "realms": "Realms"
+                "realms": "Realms",
+                "sites": "Sites"
             },
             "description": "Description",
             "type": "Type",

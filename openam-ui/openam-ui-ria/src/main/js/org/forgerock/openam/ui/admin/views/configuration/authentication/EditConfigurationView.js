@@ -15,75 +15,14 @@
  */
 
 define("org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView", [
-    "jquery",
-    "lodash",
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/admin/views/common/Backlink",
+    "org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView",
+    "org/forgerock/openam/ui/admin/services/SMSGlobalService"
+], (createEditConfigurationView, SMSGlobalService) => {
 
-    // jquery dependencies
-    "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService, Backlink) => {
-    const EditConfigurationView = AbstractView.extend({
-        template: "templates/admin/views/configuration/EditConfigurationTemplate.html",
-        events: {
-            "click [data-save]": "onSave",
-            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
-        },
-
-        render (args, callback) {
-            this.data.id = args[0];
-            SMSGlobalService.authentication.get(this.data.id).then((data) => {
-                this.data.schema = data.schema;
-                this.data.values = data.values;
-                this.data.name = data.values._type.name;
-                this.data.tabbed = this.data.schema.grouped;
-
-                this.parentRender(() => {
-                    const FRAGMENT_INDEX = 1;
-                    if (this.data.tabbed) {
-                        this.$el.find("ul.nav a:first").tab("show");
-                        this.$el.find(".tab-menu .nav-tabs").tabdrop();
-                    } else {
-                        this.form = new Form(
-                            this.$el.find("#tabpanel")[0],
-                            this.data.schema,
-                            this.data.values
-                        );
-                    }
-
-                    new Backlink({ el:"#backlink" }).render(FRAGMENT_INDEX);
-                    if (callback) { callback(); }
-                });
-            });
-        },
-
-        onSave () {
-            SMSGlobalService.authentication.update(this.data.id, this.form.data())
-                .then((data) => {
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                    this.data.values = data;
-                }, (response) => {
-                    Messages.addMessage({
-                        response,
-                        type: Messages.TYPE_DANGER
-                    });
-                });
-        },
-
-        renderTab (event) {
-            const tabId = $(event.target).data("tabId");
-            const schema = this.data.schema.grouped ? this.data.schema.properties[tabId] : this.data.schema;
-            const element = this.$el.find("#tabpanel").empty().get(0);
-            this.form = new Form(element, schema, this.data.values[tabId]);
-            this.$el.find("[data-header]").parent().hide();
-        }
-    });
+    const EditConfigurationView = createEditConfigurationView(
+        SMSGlobalService.authentication.get,
+        SMSGlobalService.authentication.update
+    );
 
     return new EditConfigurationView();
 });

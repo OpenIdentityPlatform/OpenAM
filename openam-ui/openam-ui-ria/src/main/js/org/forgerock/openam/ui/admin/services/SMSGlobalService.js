@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
         if (realm.parentPath === "/") {
             return realm.parentPath + realm.name;
         } else if (realm.parentPath) {
-            return realm.parentPath + "/" + realm.name;
+            return `${realm.parentPath}/${realm.name}`;
         } else {
             return "/";
         }
@@ -72,12 +72,10 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
             return obj.serviceCall({
                 url: "realms?_queryFilter=true",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).done(function (data) {
-                data.result = _.each(data.result, function (realm) {
+            }).done((data) => {
+                data.result = _(data.result).each((realm) => {
                     realm.path = getRealmPath(realm);
-                }).sort(function (a, b) {
-                    return a.path < b.path ? -1 : 1;
-                });
+                }).sortBy("path").value();
             });
         },
 
@@ -102,7 +100,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            return SMSServiceUtils.schemaWithValues(obj, "realms" + RealmHelper.encodeRealm(path));
+            return SMSServiceUtils.schemaWithValues(obj, `realms${RealmHelper.encodeRealm(path)}`);
         },
 
         /**
@@ -120,7 +118,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
          */
         remove (path) {
             return obj.serviceCall({
-                url: "realms" + RealmHelper.encodeRealm(path),
+                url: `realms${RealmHelper.encodeRealm(path)}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -134,7 +132,7 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
          */
         update (data) {
             return obj.serviceCall({
-                url: "realms" + RealmHelper.encodeRealm(getRealmPath(data)),
+                url: `realms${RealmHelper.encodeRealm(getRealmPath(data))}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data),
@@ -144,30 +142,28 @@ define("org/forgerock/openam/ui/admin/services/SMSGlobalService", [
     };
 
     obj.configuration = {
-        services: {
-            getAll: function () {
-                return obj.serviceCall({
-                    url: "services?_action=nextdescendents",
-                    type: "POST",
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                }).then((response) => {
-                    return _(response.result).map((item) => {
-                        item["name"] = item._type.name;
-                        return item;
-                    }).sortBy("name").value();
-                });
-            },
-            get (id) {
-                return SMSServiceUtils.schemaWithValues(obj, `services/${id}`);
-            },
-            update (id, data) {
-                return obj.serviceCall({
-                    url: `services/${id}`,
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "PUT",
-                    data: JSON.stringify(data)
-                });
-            }
+        getAll () {
+            return obj.serviceCall({
+                url: "services?_action=nextdescendents",
+                type: "POST",
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+            }).then((response) =>
+                _(response.result).map((item) => {
+                    item["name"] = item._type.name;
+                    return item;
+                }).sortBy("name").value()
+            );
+        },
+        get (id) {
+            return SMSServiceUtils.schemaWithValues(obj, `services/${id}`);
+        },
+        update (id, data) {
+            return obj.serviceCall({
+                url: `services/${id}`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "PUT",
+                data: JSON.stringify(data)
+            });
         }
     };
 

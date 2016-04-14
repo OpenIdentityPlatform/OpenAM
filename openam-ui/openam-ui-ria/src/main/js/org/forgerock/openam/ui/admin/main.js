@@ -62,13 +62,13 @@ define([
     "./views/realms/RealmTreeNavigationView",
 
     "./views/configuration/createConfigurationListView",
-    "./views/configuration/createConfigurationBacklink",
     "./views/configuration/EditConfigurationView",
     "./views/configuration/server/EditServerDefaultsView",
     "./views/configuration/authentication/ListAuthenticationView",
     "./views/configuration/global/ListGlobalServicesView",
 
     "./views/common/ToggleCardListView",
+    "org/forgerock/openam/ui/admin/views/common/Backlink",
 
     "./views/deployment/servers/EditServerView",
     "./views/deployment/servers/NewServerView"

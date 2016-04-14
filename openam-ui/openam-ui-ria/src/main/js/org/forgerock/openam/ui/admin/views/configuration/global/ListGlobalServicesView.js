@@ -22,7 +22,7 @@
 
      const ListGlobalServicesView = createConfigurationListView(
          $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
-         SMSGlobalService.configuration.services.getAll,
+         SMSGlobalService.configuration.getAll,
          "templates/admin/views/configuration/global/ListConfigurationTemplate.html"
      );
 

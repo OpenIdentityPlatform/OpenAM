@@ -30,11 +30,12 @@ define("org/forgerock/openam/ui/admin/views/common/Backlink", [
     }
 
     return Backbone.View.extend({
+        el:"#backlink",
         /**
          * Renders a back link navigation element.
-         * @param {number} [fragmentIndex=0] Fragment index indicates which url fragment used for back link
+         * @param {number} [fragmentIndex=1] Fragment index indicates which url fragment used for back link
          */
-        render (fragmentIndex = 0) {
+        render (fragmentIndex = 1) {
             const allFragments = URIUtils.getCurrentFragment().split("/");
             const pageFragment = allFragments[fragmentIndex];
             const data = {

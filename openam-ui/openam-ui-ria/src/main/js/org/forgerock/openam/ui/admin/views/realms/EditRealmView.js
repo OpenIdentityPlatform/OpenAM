@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
     function validateRealmName () {
         let valid = false;
-        let realmName = $("input[name=\"root[name]\"]").val();
+        const realmName = $("input[name=\"root[name]\"]").val();
         let alert = "";
 
         if (realmName.length > 0) {
@@ -89,7 +89,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         render (args, callback) {
             let realmPromise;
             let authenticationPromise;
-            let allRealmsPromise = SMSGlobalService.realms.all();
+            const allRealmsPromise = SMSGlobalService.realms.all();
 
             if (args[0]) {
                 this.data.realmPath = args[0];
@@ -110,11 +110,10 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
             this.parentRender(function () {
                 Promise.all([realmPromise, allRealmsPromise, authenticationPromise]).then((results) => {
-                    const FRAGMENT_INDEX = 0;
-                    let data = results[0];
-                    let element = this.$el.find("[data-realm-form]");
-                    let allRealmPaths = [];
-                    let statelessSessionsEnabled = _.get(results[2],
+                    const data = results[0];
+                    const element = this.$el.find("[data-realm-form]");
+                    const allRealmPaths = [];
+                    const statelessSessionsEnabled = _.get(results[2],
                         "schema.properties.general.properties.statelessSessionsEnabled");
 
                     _.each(results[1][0].result, (realm) => {
@@ -148,25 +147,20 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                         schema: new JSONSchema(data.schema)
                     });
                     $(this.jsonSchemaView.render().el).appendTo(element);
-
+                    const FRAGMENT_INDEX = 0;
+                    new Backlink().render(FRAGMENT_INDEX);
                     setAutofocus();
-                    new Backlink({ el:"#backlink" }).render(FRAGMENT_INDEX);
+
                     if (callback) { callback(); }
                 }, (response) => {
-                    Messages.addMessage({
-                        type: Messages.TYPE_DANGER,
-                        response: response
-                    });
+                    Messages.addMessage({ type: Messages.TYPE_DANGER, response });
                 });
             });
         },
 
         returnBack () {
             if (this.data.newEntity) {
-                Router.routeTo(Router.configuration.routes.realms, {
-                    args: [],
-                    trigger: true
-                });
+                Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
             } else {
                 Router.routeTo(Router.configuration.routes.realmDefault, {
                     args: [encodeURIComponent(this.data.realmPath)],
@@ -187,12 +181,12 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             this.toggleSubmitButton(false);
 
             const failCallback = (response) => { Messages.addMessage({ type: Messages.TYPE_DANGER, response }); };
-            let values = this.jsonSchemaView.values();
-            let savePromise = this.data.newEntity ? SMSGlobalService.realms.create(values)
+            const values = this.jsonSchemaView.values();
+            const savePromise = this.data.newEntity ? SMSGlobalService.realms.create(values)
                             : SMSGlobalService.realms.update(values);
 
             savePromise.then((realm) => {
-                let realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
+                const realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
 
                 SMSRealmService.authentication.update(realmPath, {
                     statelessSessionsEnabled: values.statelessSessionsEnabled
@@ -215,19 +209,15 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
         onDeleteClick (event) {
             event.preventDefault();
-
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.realms.edit.realm") },
                 _.bind(this.deleteRealm, this));
         },
 
         deleteRealm () {
-            let realmPath = this.jsonSchemaView.values().name;
+            const realmPath = this.jsonSchemaView.values().name;
 
             SMSGlobalService.realms.remove(realmPath).then(() => {
-                Router.routeTo(Router.configuration.routes.realms, {
-                    args: [],
-                    trigger: true
-                });
+                Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 if (response && response.status === 409) {
@@ -236,10 +226,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                         type: Messages.TYPE_DANGER
                     });
                 } else {
-                    Messages.addMessage({
-                        response: response,
-                        type: Messages.TYPE_DANGER
-                    });
+                    Messages.addMessage({ response, type: Messages.TYPE_DANGER });
                 }
             });
         },

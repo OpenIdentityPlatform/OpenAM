@@ -22,8 +22,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
-], ($, _, Messages, AbstractView, Router, SitesService, FlatJSONSchemaView) => {
+    "org/forgerock/openam/ui/admin/views/common/Backlink"
+], ($, _, Messages, AbstractView, Router, SitesService, FlatJSONSchemaView, Backlink) => {
 
     const NewSiteView = AbstractView.extend({
         template: "templates/admin/views/deployment/sites/NewSiteTemplate.html",
@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
         },
 
         render () {
-            // TODO add backlink!
             SitesService.sites.getInitialState().then((data) => this.parentRender(() => {
+                new Backlink().render();
                 this.jsonSchemaView = new FlatJSONSchemaView({
                     schema: data.schema,
                     values: data.values
