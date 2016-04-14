@@ -2686,6 +2686,20 @@ public class AccessManager {
   private String create_appl;
 
   @SubCommandInfo(
+          implClassName="org.forgerock.openam.cli.entitlement.PolicyExport",
+          description="Export policy configuration for a given realm",
+          webSupport="true",
+          mandatoryOptions={
+                  "realm|e|s|Realm name",
+                  "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                  "outfile|o|s|Filename where policy definition will be printed to."},
+          optionAliases={},
+          macro="authentication",
+          optionalOptions={},
+          resourceStrings={})
+  private String policy_export;
+
+  @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.ListApplicationTypes",
           description="List application types.",
           webSupport="true",

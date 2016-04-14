@@ -7641,4 +7641,16 @@
         <actions />
     </logmessage>
 
+    <logmessage name="POLICY_EXPORT_SUCCESS" id="6105" loglevel="LL_INFO"
+                description="Successfully exported policy model resources.">
+        <datainfo>
+            <item>Realm</item>
+            <item>Exported File</item>
+        </datainfo>
+        <triggers>
+            <item>Executes export resource Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
 </logmessages>

@@ -16,6 +16,13 @@
 
 package org.forgerock.openam.cli.entitlement;
 
+import static java.util.Collections.singleton;
+
+import java.util.Collections;
+import java.util.Set;
+
+import org.forgerock.json.JsonValue;
+
 /**
  * Represents the policy model endpoints to be used in conjunction with export/import.
  *
@@ -23,18 +30,24 @@ package org.forgerock.openam.cli.entitlement;
  */
 enum ModelDescriptor {
 
-    RESOURCE_TYPE("resourcetypes", "uuid"),
-    APPLICATION("applications", "name"),
+    RESOURCE_TYPE("resourcetypes", "uuid", singleton("20a13582-1f32-4f83-905f-f71ff4e2e00d")),
+    APPLICATION("applications", "name", singleton("sunAMDelegationService")),
     POLICY("policies", "name");
 
     private static final ModelDescriptor[] PRECEDENT_ORDER = {RESOURCE_TYPE, APPLICATION, POLICY};
 
     private final String endpointIdentifier;
     private final String idField;
+    private final Set<String> excludedResources;
 
     ModelDescriptor(String endpointIdentifier, String idField) {
+        this(endpointIdentifier, idField, Collections.<String>emptySet());
+    }
+
+    ModelDescriptor(String endpointIdentifier, String idField, Set<String> excludedResources) {
         this.endpointIdentifier = endpointIdentifier;
         this.idField = idField;
+        this.excludedResources = excludedResources;
     }
 
     static ModelDescriptor[] getPrecedentOrder() {
@@ -47,6 +60,10 @@ enum ModelDescriptor {
 
     String getIdField() {
         return idField;
+    }
+
+    boolean isExcludedResource(JsonValue resource) {
+        return excludedResources.contains(resource.get(idField).required().asString());
     }
 
 }
