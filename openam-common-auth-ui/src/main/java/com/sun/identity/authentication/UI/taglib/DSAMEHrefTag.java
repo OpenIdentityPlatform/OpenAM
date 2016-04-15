@@ -24,10 +24,7 @@
  *
  * $Id: DSAMEHrefTag.java,v 1.3 2008/06/25 05:41:50 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011 ForgeRock Inc.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.UI.taglib;
@@ -41,10 +38,11 @@ import com.iplanet.jato.view.ViewBean;
 import com.iplanet.jato.view.ViewBeanBase;
 import com.sun.identity.authentication.UI.AuthViewBeanBase;
 import com.sun.identity.shared.debug.Debug;
-import java.util.StringTokenizer;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTag;
+
+import org.owasp.esapi.ESAPI;
 
 /**
  * Href tag reimplements JATO Href tag.  It adds a content encoding
@@ -91,49 +89,21 @@ implements BodyTag {
         
         try {
             if (fireBeginDisplayEvent()) {
-                
                 ViewBean viewBean = getParentViewBean();
                 AuthViewBeanBase dsameVB = (AuthViewBeanBase) viewBean;
                 String value = (String)viewBean.getDisplayFieldValue(getName());
-                /*if (debug.messageEnabled()) {
-                 *  debug.message("URL value is : " + value);
-                 *}
-                 */ 
                 buffer = new NonSyncStringBuffer("<a href=\"");
-                String pgEncoding =
-                (String) dsameVB.getDisplayFieldValue(
-                AuthViewBeanBase.PAGE_ENCODING);
-                
-                int paramIdx = value.indexOf('?');
-                if (paramIdx != -1) {
-                    buffer.append(value.substring(0,paramIdx+1));
-                    String qStr = value.substring(paramIdx+1);
-                    // parameter values followed by URL must be encoded
-                    if ((qStr != null) && qStr.length() != 0) {
-                        encodeValues(buffer,pgEncoding, qStr);
-                        String tmpStr = buffer.toString();
-                        if (!tmpStr.endsWith("&amp;") && !tmpStr.endsWith("?")){
-                            buffer.append("&amp;");
-                        }
-                    }
-                } else {
-                    buffer.append(value);
-                    buffer.append('?');
-                }
-                
+                String pgEncoding = (String) dsameVB.getDisplayFieldValue(AuthViewBeanBase.PAGE_ENCODING);
+
+                NonSyncStringBuffer url = new NonSyncStringBuffer(value);
+                url.append(value.contains("?") ? '&' : '?');
+                url.append(AuthViewBeanBase.PAGE_ENCODING).append('=').append(pgEncoding);
+                // Append the Query String NVP's that might have been added as JSP tag attributes
+                appendQueryParams(url);
                 if (getAnchor()!=null) {
-                    buffer.append("#").append(getAnchor());
+                    url.append("#").append(getAnchor());
                 }
-                buffer.append(AuthViewBeanBase.PAGE_ENCODING)
-                .append('=')
-                .append(dsameVB.getDisplayFieldValue(
-                AuthViewBeanBase.PAGE_ENCODING));
-                // buffer.append ("&val="+getName()+"&val2="+value);
-                // Append the Query String NVP's that might have been added
-                // as JSP tag attributes
-                appendQueryParams(buffer);
-                
-                buffer.append("\"");
+                buffer.append(ESAPI.encoder().encodeForHTMLAttribute(url.toString())).append('\"');
                 
                 if (getTarget() != null) {
                     buffer.append(" target=\"")
@@ -175,50 +145,6 @@ implements BodyTag {
             return SKIP_BODY;
         }
     }
-    
-    private void encodeValues( NonSyncStringBuffer buffer, String encoding,
-    String qStr) {
-        int idx = 0;
-        int lastProcessedIdx = 0;
-        char[] carr = null ;
-        try {
-            if (debug.messageEnabled()) {
-                debug.message("in encodeValue");
-                debug.message("buffer is : " + buffer);
-                debug.message("encoding.. : " + encoding);
-                //debug.message("query string : " + qStr);
-            }
-            // If the encoded value has gx_charset , we need to remove it Since 
-            // it may not have the correct value.
-            if (qStr != null) {
-                StringTokenizer st = new StringTokenizer(qStr,"&");
-                while (st.hasMoreTokens()) {
-                    String keyValuePair = (String)st.nextToken();
-                    int valueIdx = keyValuePair.indexOf('=');
-                    if (valueIdx != -1) {
-                        String key = keyValuePair.substring(0,valueIdx);
-                        if (!key.equals("gx_charset")) {
-                            String keyValue =keyValuePair.substring(valueIdx+1);
-                            String hrefName = key;
-                            buffer.append(hrefName).append("=");
-                            buffer.append(keyValue);
-                            buffer.append("&amp;");
-                        }  // end if
-                    } // end if (valueIdx != -1)
-                }  // end while
-            }
-            /*if (debug.messageEnabled()) {
-             *  debug.message("Final buffer is : " + buffer);
-             *}
-             */
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            return;
-        } catch (Exception e) {
-            debug.error("Error : " +e.getMessage());
-            return;
-        }
-    }
-    
     
     /**
      * does nothing here
