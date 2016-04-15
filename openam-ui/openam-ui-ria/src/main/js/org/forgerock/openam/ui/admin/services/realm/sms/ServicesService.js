@@ -22,9 +22,10 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise, RealmHelper) => {
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, arrayify, Promise, RealmHelper) => {
     /**
      * @exports org/forgerock/openam/ui/admin/services/realm/sms/ServicesService
      */
@@ -108,17 +109,11 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
             }));
         },
         remove (realm, types) {
-            if (!_.isArray(types)) {
-                types = [types];
-            }
-
-            const promises = _.map(types, (type) => {
-                obj.serviceCall({
-                    url: scopedByRealm(realm, `services/${type}`),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "DELETE"
-                });
-            });
+            const promises = _.map(arrayify(types), (type) => obj.serviceCall({
+                url: scopedByRealm(realm, `services/${type}`),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "DELETE"
+            }));
 
             return Promise.all(promises);
         },

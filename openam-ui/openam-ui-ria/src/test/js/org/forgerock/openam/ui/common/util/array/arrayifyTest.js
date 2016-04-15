@@ -11,34 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
     "org/forgerock/openam/ui/common/util/array/arrayify"
-], function (arrayify) {
-    describe("org/forgerock/openam/ui/common/array/arrayify", function () {
-        context("when argument is", function () {
-            context("an array", function () {
-                context("of length 0", function () {
-                    it("it returns an empty array", function () {
-                        var args = [];
+], (arrayify) => {
+    describe("org/forgerock/openam/ui/common/array/arrayify", () => {
+        context("when argument is", () => {
+            context("an array", () => {
+                context("of length 0", () => {
+                    it("it returns an empty array", () => {
+                        const args = [];
 
                         expect(arrayify(args)).to.be.an.instanceOf(Array).and.be.empty;
                     });
                 });
-                context("of length 1", function () {
-                    it("it returns an array that contains the same elements", function () {
-                        var args = ["a"];
+                context("of length 1", () => {
+                    it("it returns an array that contains the same elements", () => {
+                        const args = ["a"];
 
                         expect(arrayify(args)).to.be.an.instanceOf(Array).and.have.members(args);
                     });
                 });
             });
         });
-        context("when argument is not an array", function () {
-            it("it returns the argument wrapped in an array", function () {
-                var args = "a";
+        context("when argument is not an array", () => {
+            it("it returns the argument wrapped in an array", () => {
+                const args = "a";
 
                 expect(arrayify(args)).to.be.eql([args]);
             });

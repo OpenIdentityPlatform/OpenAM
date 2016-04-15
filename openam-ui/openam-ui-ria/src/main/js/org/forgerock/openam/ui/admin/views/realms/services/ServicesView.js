@@ -59,33 +59,33 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
             "click [data-delete-services]": "onDeleteMultiple",
             "click [data-add-service]":     "onAddService"
         },
-        serviceSelected: function (event) {
+        serviceSelected (event) {
             const anyServicesSelected = this.$el.find("input[type=checkbox]").is(":checked");
             const row = $(event.currentTarget).closest("tr");
 
             row.toggleClass("selected");
             this.$el.find("[data-delete-services]").prop("disabled", !anyServicesSelected);
         },
-        onAddService: function (event) {
+        onAddService (event) {
             event.preventDefault();
             Router.routeTo(Router.configuration.routes.realmsServiceNew, {
                 args: [encodeURIComponent(this.data.realmPath)],
                 trigger: true
             });
         },
-        onDeleteSingle: function (event) {
+        onDeleteSingle (event) {
             event.preventDefault();
             const id = getServiceIdFromElement(event.currentTarget);
             _.bind(deleteServices, this)([id]);
         },
-        onDeleteMultiple: function (event) {
+        onDeleteMultiple (event) {
             event.preventDefault();
 
             const ids = _(this.$el.find("input[type=checkbox]:checked")).toArray().map(getServiceIdFromElement).value();
 
             _.bind(deleteServices, this)(ids);
         },
-        validateAddButton: function (creatables) {
+        validateAddButton (creatables) {
             if (!_.isEmpty(creatables)) {
                 return;
             }
@@ -96,7 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
                 content: $.t("console.services.edit.unavaliable")
             });
         },
-        render: function (args, callback) {
+        render (args, callback) {
             this.data.args = args;
             this.data.realmPath = args[0];
 
@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
                 });
             });
         },
-        rerender: function () {
+        rerender () {
             this.render(this.data.args);
         }
     });
