@@ -395,26 +395,16 @@ public class SAML2Utils extends SAML2SDKUtils {
                     LogUtil.WRONG_STATUS_CODE,
                     data,
                     null);
-            if (SAML2Constants.RESPONDER.equals(statusCode)) {
-                //In case of passive authentication the NoPassive response will be sent using two StatusCode nodes:
-                //the outer StatusCode will be Responder and the inner StatusCode will contain the NoPassive URN
-                StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
-                if (secondLevelStatusCode != null
-                        && SAML2Constants.NOPASSIVE.equals(secondLevelStatusCode.getValue())) {
-                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "noPassiveResponse", null);
-                }
-            } else if (SAML2Constants.REQUESTER.equals(statusCode)) {
-                // when is AllowCreate=false mode the auth module gets here with a
-                // statusCode of urn:oasis:names:tc:SAML:2.0:status:Requester
-
-                StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
-                if (secondLevelStatusCode != null
-                        && SAML2Constants.INVALID_NAME_ID_POLICY.equals(secondLevelStatusCode.getValue())) {
-                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "nameIDMReqInvalidNameIDPolicy", null);
+            StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
+            String secondLevelStatusCodeValue = (secondLevelStatusCode != null) ? secondLevelStatusCode.getValue() :
+                    null;
+            if (debug.messageEnabled()) {
+                debug.message(method + "First level status code : " + statusCode);
+                if (secondLevelStatusCodeValue != null) {
+                    debug.message(method + "Second level status code : " + secondLevelStatusCodeValue);
                 }
             }
-
-            throw new SAML2Exception(bundle.getString("invalidStatusCodeInResponse"));
+            throw new InvalidStatusCodeSaml2Exception(statusCode, secondLevelStatusCodeValue);
         }
 
         if (saml2MetaManager == null) {

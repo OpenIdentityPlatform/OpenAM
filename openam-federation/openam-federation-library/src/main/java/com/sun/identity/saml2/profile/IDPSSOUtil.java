@@ -611,7 +611,8 @@ public class IDPSSOUtil {
     }
 
     /**
-     * A convenience method to construct NoPassive SAML error responses for SAML passive authentication requests.
+     * A convenience method to construct response with First-level and Second-level status code for
+     * SAML authentication requests.
      *
      * @param request The servlet request.
      * @param response The servlet response.
@@ -622,13 +623,17 @@ public class IDPSSOUtil {
      * @param authnReq The SAML AuthnRequest sent by the SP.
      * @param relayState The RelayState value.
      * @param spEntityID The SP's entity ID.
+     * @param firstlevelStatusCodeValue First-level status code value passed.
+     * @param secondlevelStatusCodeValue Second-level status code value passed.
      * @throws SAML2Exception If there was an error while creating or sending the response back to the SP.
      */
-    public static void sendNoPassiveResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-            String idpMetaAlias, String idpEntityID, String realm, AuthnRequest authnReq, String relayState,
-            String spEntityID) throws SAML2Exception {
-        Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
-                idpEntityID);
+    public static void sendResponseWithStatus(HttpServletRequest request, HttpServletResponse response,
+                                                     PrintWriter out, String idpMetaAlias, String idpEntityID,
+                                                     String realm, AuthnRequest authnReq, String relayState,
+                                                     String spEntityID, String firstlevelStatusCodeValue,
+                                                     String secondlevelStatusCodeValue) throws SAML2Exception {
+        Response res = SAML2Utils.getErrorResponse(authnReq, firstlevelStatusCodeValue, secondlevelStatusCodeValue,
+                null, idpEntityID);
         StringBuffer returnedBinding = new StringBuffer();
         String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
         String acsBinding = returnedBinding.toString();

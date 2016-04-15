@@ -385,9 +385,10 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                         return;
                     } else {
                         try { //and they want to get into the system with passive auth - response no passive
-                            IDPSSOUtil.sendNoPassiveResponse(request, response, out, data.getIdpMetaAlias(),
-                                    data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(), data.getRelayState(),
-                                    data.getSpEntityID());
+                            IDPSSOUtil.sendResponseWithStatus(request, response, out, data.getIdpMetaAlias(),
+                                    data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(),
+                                    data.getRelayState(), data.getSpEntityID(), SAML2Constants.RESPONDER,
+                                    SAML2Constants.NOPASSIVE);
                         } catch (SAML2Exception sme) {
                             SAML2Utils.debug.error(classMethod, sme);
                             redirectException = new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
@@ -580,8 +581,9 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 redirectAuthentication(request, response, idpAuthnContextInfo, data, false);
             } else {
                 try {
-                    IDPSSOUtil.sendNoPassiveResponse(request, response, out, data.getIdpMetaAlias(), data.getIdpEntityID(),
-                            data.getRealm(), data.getAuthnRequest(), data.getRelayState(), data.getSpEntityID());
+                    IDPSSOUtil.sendResponseWithStatus(request, response, out, data.getIdpMetaAlias(),
+                            data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(), data.getRelayState(),
+                            data.getSpEntityID(), SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE);
                 } catch (SAML2Exception sme) {
                     SAML2Utils.debug.error(classMethod, sme);
                     throw new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);

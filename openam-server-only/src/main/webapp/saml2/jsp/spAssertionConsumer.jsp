@@ -33,6 +33,7 @@ com.sun.identity.federation.common.FSUtils,
 com.sun.identity.saml.common.SAMLUtils,
 com.sun.identity.saml2.common.SAML2Constants,
 com.sun.identity.saml2.common.SAML2Exception,
+com.sun.identity.saml2.common.InvalidStatusCodeSaml2Exception,
 com.sun.identity.saml2.common.SAML2Utils,
 com.sun.identity.saml2.logging.LogUtil,
 com.sun.identity.saml2.meta.SAML2MetaException,
@@ -233,42 +234,48 @@ java.io.PrintWriter
                 respInfo, realm, hostEntityId, metaManager, saml2Auditor);
         saml2Auditor.setUserId(sessionProvider.getPrincipalName(newSession));
         saml2Auditor.setSSOTokenId(newSession);
+
     } catch (SAML2Exception se) {
-        SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
         String[] data = {hostEntityId, se.getMessage(), ""};
         if (LogUtil.isErrorLoggable(Level.FINE)) {
             data[2] = saml2Resp.toXMLString(true, true);
         }
         LogUtil.error(Level.INFO, LogUtil.SP_SSO_FAILED, data, null);
-        if (se.isRedirectionDone()) {
-            saml2Auditor.auditAccessSuccess();
-            return;
-        }
-        if (isProxyOn) {
-            if ("noPassiveResponse".equals(se.getErrorCode())) {
+        if (se instanceof InvalidStatusCodeSaml2Exception) {
+            if (isProxyOn) {
+                SAML2Utils.debug.error("spAssertionConsumer.jsp: Non-Success status code in response");
+                String firstlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getFirstlevelStatuscode();
+                String secondlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getSecondlevelStatuscode();
                 try {
-                    IDPProxyUtil.sendNoPassiveProxyResponse(request, response, new PrintWriter(out, true),
-                            requestID, metaAlias, hostEntityId, realm);
+                    IDPProxyUtil.sendResponseWithStatus(request, response, new PrintWriter(out, true),
+                            requestID, metaAlias, hostEntityId, realm, firstlevelStatusCodeValue,
+                            secondlevelStatusCodeValue);
                 } catch (SAML2Exception samle) {
-                    SAML2Utils.debug.error("Failed to send nopassive proxy response", samle);
+                    SAML2Utils.debug.error("Failed to send response with status ", samle);
                 }
                 return;
             }
-        }
-        if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
+        } else {
+            SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
+            if (se.isRedirectionDone()) {
+                saml2Auditor.auditAccessSuccess();
+                return;
             }
-            FSUtils.forwardRequest(request, response,
-                    getLocalLoginUrl(realm, hostEntityId, metaManager, respInfo, requestURL, relayState));
-            saml2Auditor.auditForwardToLocalUserLogin();
+            if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
+                }
+                FSUtils.forwardRequest(request, response,
+                        getLocalLoginUrl(realm, hostEntityId, metaManager, respInfo, requestURL, relayState));
+                saml2Auditor.auditForwardToLocalUserLogin();
+                return;
+            }
+            saml2Auditor.auditAccessFailure(String.valueOf(response.SC_INTERNAL_SERVER_ERROR),
+                    SAML2Utils.bundle.getString("SSOFailed"));
+            SAMLUtils.sendError(request, response, response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
+                    SAML2Utils.bundle.getString("SSOFailed"));
             return;
         }
-        SAMLUtils.sendError(request, response, response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
-                SAML2Utils.bundle.getString("SSOFailed"));
-        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_INTERNAL_SERVER_ERROR),
-                SAML2Utils.bundle.getString("SSOFailed"));
-        return;
     }
 
     if (newSession == null) {

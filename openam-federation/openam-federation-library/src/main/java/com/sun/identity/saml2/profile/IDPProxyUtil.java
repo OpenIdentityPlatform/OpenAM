@@ -569,8 +569,8 @@ public class IDPProxyUtil {
                                   saml2Auditor);
     }
 
-    /**
-     * Sends back a NoPassive response for the original AuthnRequest.
+     /**
+     * Sends back response with firstlevel and secondlevel status code if available for the original AuthnRequest.
      *
      * @param request The request.
      * @param response The response.
@@ -579,17 +579,22 @@ public class IDPProxyUtil {
      * @param idpMetaAlias The IdP's metaAlias.
      * @param hostEntityID The IdP's entity ID.
      * @param realm The realm where the IdP belongs to.
-     * @throws SAML2Exception If there was an error while sending the NoPassive response.
+     * @param firstlevelStatusCodeValue First-level status code value passed.
+     * @param secondlevelStatusCodeValue Second-level status code value passed.
+     * @throws SAML2Exception If there was an error while sending the response with second-level status-code.
      */
-    public static void sendNoPassiveProxyResponse(HttpServletRequest request, HttpServletResponse response,
-            PrintWriter out, String requestID, String idpMetaAlias, String hostEntityID, String realm)
+    public static void sendResponseWithStatus(HttpServletRequest request, HttpServletResponse response,
+                                                          PrintWriter out, String requestID, String idpMetaAlias,
+                                                          String hostEntityID, String realm,
+                                                          String firstlevelStatusCodeValue,
+                                                          String secondlevelStatusCodeValue)
             throws SAML2Exception {
 
         AuthnRequest origRequest = (AuthnRequest) IDPCache.proxySPAuthnReqCache.remove(requestID);
         String relayState = (String) IDPCache.relayStateCache.remove(origRequest.getID());
 
-        IDPSSOUtil.sendNoPassiveResponse(request, response, out, idpMetaAlias, hostEntityID, realm,
-                origRequest, relayState, origRequest.getIssuer().getValue());
+        IDPSSOUtil.sendResponseWithStatus(request, response, out, idpMetaAlias, hostEntityID, realm, origRequest,
+                relayState, origRequest.getIssuer().getValue(), firstlevelStatusCodeValue, secondlevelStatusCodeValue);
     }
 
     /**
