@@ -320,7 +320,10 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             JsonValue schema;
             final JsonPointer tabPointer = new JsonPointer("properties/" + tabName);
-            if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
+
+            if (ADVANCED_TAB_NAME.equals(tabName)) {
+                schema = getAdvancedSchema(serverContext, serverName);
+            } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
                 schema = directoryConfigSchema.get("_schema");
             } else if (serverName.equals(SERVER_DEFAULT_NAME)) {
                 schema = defaultSchema.get(tabPointer);
@@ -376,6 +379,53 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         }
 
         return allLabels;
+    }
+
+    private JsonValue getAdvancedSchema(Context serverContext, String serverName) {
+        JsonValue template = json(object());
+        try {
+            ServiceConfigManager scm = getServiceConfigManager(serverContext);
+            ServiceConfig serverConfigs = getServerConfigs(scm);
+            final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
+            List<String> advancedAttributeNames = getAdvancedTabAttributeNames(serverConfig);
+
+            List<SMSLabel> labels = new ArrayList<>();
+            for (String attributeName : advancedAttributeNames) {
+                labels.add(new SMSLabel(null, attributeName, attributeName, "string", null, null));
+            }
+
+            final String sectionPath = "/properties/" + ADVANCED_TAB_NAME;
+            template.putPermissive(new JsonPointer(sectionPath + "/title"), "Advanced");
+            template.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
+            template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), 0);
+            template.putPermissive(new JsonPointer(sectionPath + "/format"), "map");
+            int attributeOrder = 0;
+
+            for (SMSLabel label : labels) {
+                final String title = label.getDisplayValue();
+                final String type = label.getType();
+                final String attributeName = label.getDisplayValue();
+                final List<String> attributeOptions = label.getOptions();
+                final List<String> attributeOptionLabels = label.getOptionLabels();
+                final boolean isOptional = true;
+
+                final String path = sectionPath + "/properties/" + attributeName;
+                if (attributeOptions != null && !attributeOptions.isEmpty()) {
+                    template.putPermissive(new JsonPointer(path + "/enum"), attributeOptions);
+                    template.putPermissive(new JsonPointer(path + "/options/enum_titles"), attributeOptionLabels);
+                } else {
+                    template.putPermissive(new JsonPointer(path + "/type"), type);
+                }
+
+                template.putPermissive(new JsonPointer(path + "/title"), title);
+                template.putPermissive(new JsonPointer(path + "/propertyOrder"), attributeOrder++);
+                template.putPermissive(new JsonPointer(path + "/required"), !isOptional);
+            }
+        } catch (SSOException | SMSException e) {
+            logger.error("Error getting advanced tab schema", e);
+        }
+
+        return template;
     }
 
     private List<String> getDefaultValueNames(String tabName) throws ParserConfigurationException, SAXException,
