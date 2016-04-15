@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView", 
         "click [data-save]": "onSave"
     },
     getJSONSchemaView () {
-        return this.subview.getTabBody();
+        return this.subview.getBody();
     },
     render ([serverId, sectionId]) {
         this.data.todo = serverId;

@@ -53,16 +53,16 @@ define("org/forgerock/openam/ui/common/components/TabComponent", [
 
             this.options = options;
         },
-        getTabBody () {
+        getBody () {
             return this.tabBody;
         },
-        getTabBodyElement () {
+        getBodyElement () {
             return this.$el.find("[data-tab-panel]");
         },
-        getTabFooter () {
+        getFooter () {
             return this.tabFooter;
         },
-        getTabFooterElement () {
+        getFooterElement () {
             return this.$el.find("[data-tab-footer]");
         },
         getTabId () {
@@ -75,17 +75,17 @@ define("org/forgerock/openam/ui/common/components/TabComponent", [
         handleTabClick (event) {
             this.currentTabId = $(event.currentTarget).data("tab-id");
 
-            this.getTabBodyElement().empty();
-            this.tabBody = this.options.createTabBody(this.currentTabId);
+            this.getBodyElement().empty();
+            this.tabBody = this.options.createBody(this.currentTabId);
             if (this.tabBody) {
-                this.tabBody.setElement(this.getTabBodyElement());
+                this.tabBody.setElement(this.getBodyElement());
                 this.tabBody.render();
             }
 
-            this.getTabFooterElement().empty();
-            this.tabFooter = this.options.createTabFooter(this.currentTabId);
+            this.getFooterElement().empty();
+            this.tabFooter = this.options.createFooter(this.currentTabId);
             if (this.tabFooter) {
-                this.tabFooter.setElement(this.getTabFooterElement());
+                this.tabFooter.setElement(this.getFooterElement());
                 this.tabFooter.render();
             }
         },

@@ -19,16 +19,18 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/ServersService",
+    "org/forgerock/openam/ui/common/components/PanelComponent",
     "org/forgerock/openam/ui/common/components/PartialBasedView",
     "org/forgerock/openam/ui/common/components/TabComponent",
+    "org/forgerock/openam/ui/common/components/table/InlineEditTable",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
-], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PartialBasedView, TabComponent,
-    JSONSchema, JSONValues, FlatJSONSchemaView) => {
+], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PanelComponent, PartialBasedView,
+    TabComponent, InlineEditTable, JSONSchema, JSONValues, FlatJSONSchemaView) => {
     function createTabs (schema) {
         return _(schema.raw.properties)
             .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
@@ -42,7 +44,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
             "click [data-save]": "onSave"
         },
         getJSONSchemaView () {
-            return this.subview.getTabBody();
+            return this.subview.getBody();
         },
         render (args) {
             this.data.sectionId = args[0];
@@ -54,17 +56,23 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                 this.data.values = response.values;
 
                 this.parentRender(() => {
-                    const tabs = createTabs(response.schema);
-
-                    this.subview = new TabComponent({
-                        tabs,
-                        createTabBody: (id) => new FlatJSONSchemaView({
-                            schema: new JSONSchema(this.data.schema.raw.properties[id]),
-                            values: new JSONValues(this.data.values.raw[id])
-                        }),
-                        createTabFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
-                    });
-
+                    if (this.data.sectionId === ServersService.servers.ADVANCED_SECTION) {
+                        this.subview = new PanelComponent({
+                            createBody: () => new InlineEditTable({
+                                values: this.data.values.raw[ServersService.servers.ADVANCED_SECTION] }),
+                            createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
+                        });
+                    } else {
+                        const tabs = createTabs(response.schema);
+                        this.subview = new TabComponent({
+                            tabs,
+                            createBody: (id) => new FlatJSONSchemaView({
+                                schema: new JSONSchema(this.data.schema.raw.properties[id]),
+                                values: new JSONValues(this.data.values.raw[id])
+                            }),
+                            createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
+                        });
+                    }
                     this.subview.setElement("[data-json-form]");
                     this.subview.render();
                 });
@@ -77,7 +85,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
         },
         updateData () {
             this.data.values = this.data.values.extend({
-                [this.subview.getTabId()]: this.getJSONSchemaView().values()
+                [this.data.sectionId]: this.getJSONSchemaView().getData()
             });
         },
         onSave () {

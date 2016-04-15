@@ -181,7 +181,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             this.toggleSubmitButton(false);
 
             const failCallback = (response) => { Messages.addMessage({ type: Messages.TYPE_DANGER, response }); };
-            const values = this.jsonSchemaView.values();
+            const values = this.jsonSchemaView.getData();
             const savePromise = this.data.newEntity ? SMSGlobalService.realms.create(values)
                             : SMSGlobalService.realms.update(values);
 
@@ -214,7 +214,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         },
 
         deleteRealm () {
-            const realmPath = this.jsonSchemaView.values().name;
+            const realmPath = this.jsonSchemaView.getData().name;
 
             SMSGlobalService.realms.remove(realmPath).then(() => {
                 Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });

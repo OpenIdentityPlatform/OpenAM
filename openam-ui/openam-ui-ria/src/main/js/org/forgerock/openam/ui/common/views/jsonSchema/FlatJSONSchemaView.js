@@ -88,9 +88,9 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView", [
 
             return this;
         },
-        values () {
+        getData () {
             if (this.subview) {
-                return this.subview.values();
+                return this.subview.getData();
             }
         }
     });

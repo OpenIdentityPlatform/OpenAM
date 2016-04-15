@@ -77,8 +77,8 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEdi
 
             return this;
         },
-        values () {
-            const values = _.clone(this.jsonEditor.values());
+        getData () {
+            const values = _.clone(this.jsonEditor.getData());
             values[this.options.enablePropertyKey] = this.options.enablePropertyValue;
 
             return values;

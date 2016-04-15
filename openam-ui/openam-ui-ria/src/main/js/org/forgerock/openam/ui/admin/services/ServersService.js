@@ -24,6 +24,13 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
 ], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/servers`);
     const DEFAULT_SERVER = "server-default";
+    const ADVANCED_SECTION = "advanced";
+
+    const objectToArray = (valuesObject) => _.map(valuesObject, (value, key) => ({ key, value }));
+    const arrayToObject = (valuesArray) => _.reduce(valuesArray, (result, item) => {
+        result[item.key] = item.value;
+        return result;
+    }, {});
 
     // TODO: remove when AME-10196 is fixed
     const mockData = (data) => _.extend(data, { type: "object" });
@@ -37,7 +44,25 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
     const getValues = (server, section) => obj.serviceCall({
         url: `/${server}/properties/${section}`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-    }).then((response) => new JSONValues(response));
+    }).then((response) => {
+        if (section === ADVANCED_SECTION) {
+            response[ADVANCED_SECTION] = _.sortBy(objectToArray(response[ADVANCED_SECTION]), (value) => value.key);
+        }
+        return new JSONValues(response);
+    });
+
+    const updateServer = (section, data, id = DEFAULT_SERVER) => {
+        let modifiedData = data;
+        if (section === ADVANCED_SECTION) {
+            modifiedData = { [ADVANCED_SECTION]: arrayToObject(data[ADVANCED_SECTION]) };
+        }
+        return obj.serviceCall({
+            url: `/${id}/properties/${section}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "PUT",
+            data: JSON.stringify(modifiedData)
+        });
+    };
 
     obj.servers = {
         get: (server, section) => Promise.all([
@@ -56,21 +81,12 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "DELETE"
         }),
-        update:  (id, data) => obj.serviceCall({
-            url: `/${id}`,
-            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            type: "PUT",
-            data: JSON.stringify(data)
-        }),
+        update: (section, data, id) => updateServer(section, data, id),
         defaults: {
             get: (section) => obj.servers.get(DEFAULT_SERVER, section),
-            update:  (section, data) => obj.serviceCall({
-                url: `/${DEFAULT_SERVER}/properties/${section}`,
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                type: "PUT",
-                data: JSON.stringify(data)
-            })
-        }
+            update: (section, data) => updateServer(section, data)
+        },
+        ADVANCED_SECTION
     };
 
     return obj;

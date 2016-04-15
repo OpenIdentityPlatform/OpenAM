@@ -30,5 +30,6 @@ define("org/forgerock/openam/ui/common/components/PartialBasedView", [
         const template = `{{> ${this.options.partial}}}`;
         const html = Handlebars.compile(template)(this.options.data);
         this.$el.html(html);
+        return this;
     }
 }));

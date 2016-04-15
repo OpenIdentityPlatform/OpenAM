@@ -106,7 +106,7 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
 
             return this;
         },
-        values () {
+        getData () {
             const passwordKeys = this.options.schema.passwordKeys();
             const values = new JSONValues(this.jsonEditor.getValue());
             const valuesWithoutEmptyPasswords = values.omit((value, key) => {

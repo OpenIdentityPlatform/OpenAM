@@ -84,7 +84,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         createTabComponent (tabs) {
             return new TabComponent({
                 tabs,
-                createTabBody: (id) => {
+                createBody: (id) => {
                     if (id === SUBSCHEMA_TAB.id) {
                         return new SubSchemaListView({
                             realmPath: this.data.realmPath,
@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                         });
                     }
                 },
-                createTabFooter: (id) => {
+                createFooter: (id) => {
                     if (id !== SUBSCHEMA_TAB.id) {
                         return new PartialBasedView({ partial: "form/_JSONSchemaFooter" });
                     }
@@ -110,7 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
             });
         },
         getJSONSchemaView () {
-            return this.subview instanceof TabComponent ? this.subview.getTabBody() : this.subview;
+            return this.subview instanceof TabComponent ? this.subview.getBody() : this.subview;
         },
         render (args) {
             this.data.realmPath = args[0];
@@ -143,10 +143,10 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
         getCurrentValues () {
             if (this.data.schema.isCollection()) {
                 return this.data.values.extend({
-                    [this.subview.getTabId()]: this.getJSONSchemaView().values()
+                    [this.subview.getTabId()]: this.getJSONSchemaView().getData()
                 }).raw;
             } else {
-                return this.getJSONSchemaView().values();
+                return this.getJSONSchemaView().getData();
             }
         },
         onSave () {

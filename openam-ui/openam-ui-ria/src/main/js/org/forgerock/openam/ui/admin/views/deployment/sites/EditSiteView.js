@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
         },
 
         onSave () {
-            SitesService.sites.update(this.data.id, this.jsonSchemaView.values(), this.data.etag)
+            SitesService.sites.update(this.data.id, this.jsonSchemaView.getData(), this.data.etag)
                 .then(() => EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved"),
                 (response) => Messages.addMessage({
                     response,

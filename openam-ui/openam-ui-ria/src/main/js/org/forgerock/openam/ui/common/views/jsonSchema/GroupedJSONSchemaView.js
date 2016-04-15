@@ -105,8 +105,8 @@ define("org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView", 
 
             return this;
         },
-        values () {
-            const values = _.map(this.subviews, (view) => view.values());
+        getData () {
+            const values = _.map(this.subviews, (view) => view.getData());
 
             return _.reduce(values, _.merge, {});
         }

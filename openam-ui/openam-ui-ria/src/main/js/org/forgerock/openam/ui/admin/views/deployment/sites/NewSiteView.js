@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
         },
 
         onCreate () {
-            const values = _.cloneDeep(this.jsonSchemaView.values());
+            const values = _.cloneDeep(this.jsonSchemaView.getData());
             const siteId = this.$el.find("[data-site-name]").val();
             values["_id"] = siteId;
 

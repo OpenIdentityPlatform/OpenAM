@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaV
             });
         },
         onSave () {
-            const formData = this.jsonSchemaView.values();
+            const formData = this.jsonSchemaView.getData();
             const subSchemaInstanceId = this.$el.find("[data-name]").val();
 
             formData["_id"] = subSchemaInstanceId;

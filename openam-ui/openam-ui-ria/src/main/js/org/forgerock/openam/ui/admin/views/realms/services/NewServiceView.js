@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
         },
 
         onCreateClick () {
-            ServicesService.instance.create(this.data.realmPath, this.data.type, this.jsonSchemaView.values())
+            ServicesService.instance.create(this.data.realmPath, this.data.type, this.jsonSchemaView.getData())
             .then(() => {
                 Router.routeTo(Router.configuration.routes.realmsServiceEdit, {
                     args: _.map([this.data.realmPath, this.data.type], encodeURIComponent),
