@@ -322,7 +322,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     waitTime = _.find(element.output, { object: { name: "waitTime" } }).object.value;
 
                     window.setTimeout(function () {
-                        EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {});
+                        EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, { suppressSpinner: true });
                     }, waitTime);
                 }
 

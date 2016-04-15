@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Software, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions copyright [year] [name of copyright owner]".
+
+    Copyright 2016 ForgeRock AS.
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="AuthenticatorPushRegistration" version="1.0" >
+    <!-- LOGIN_START -->
+    <Callbacks length="0" order="1" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+    </Callbacks>
+    <!-- OPTIONS_PAGE -->
+    <Callbacks length="1" order="2" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Get the App</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Register Device</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- GET_THE_APP_INFO_PAGE -->
+    <Callbacks length="2" order="3" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+        <TextOutputCallback>
+            Go to your mobile device application store and get the Forgerock Authenticator application
+            then press OK to continue.
+        </TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>OK</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- WAIT_FOR_RESPONSE_FROM_QR_SCAN -->
+    <Callbacks length="3" order="4" timeout="120" header="Register your device with OpenAM">
+        <TextOutputCallback>
+            Scan the barcode image below with the ForgeRock Authenticator App to register your device with your login.
+        </TextOutputCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <PollingWaitCallback waitTime="6000"/>
+    </Callbacks>
+    <!-- CONFIRMATION -->
+    <Callbacks length="2" order="5" timeout="120" header="Your device has been registered with OpenAM">
+        <TextOutputCallback>
+            Your device has been successfully registered.
+        </TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>OK</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- ERROR_STATE -->
+    <Callbacks length="1" order="6" timeout="120" header="Authenticator Push" error="true">
+        <NameCallback>
+            <Prompt>#THE DUMMY WILL NEVER BE SHOWN#</Prompt>
+        </NameCallback>
+    </Callbacks>
+</ModuleProperties>

@@ -96,10 +96,21 @@ public class PushNotificationService {
      *
      * @param message the message to transmit.
      * @param realm the realm from which to transmit the message.
-     * @throws PushNotificationException if anything untoward occurred during the transmission.
+     * @throws PushNotificationException if there are problems initialising the service or sending the notification.
      */
     public void send(PushMessage message, String realm) throws PushNotificationException {
 
+        initialiseService(realm);
+        getDelegateForRealm(realm).send(message);
+    }
+
+    /**
+     * Initialises the Service so that it is ready to receive messages.
+     *
+     * @param realm the realm the service will be present on
+     * @throws PushNotificationException if there is an error sending the push notification
+     */
+    public void initialiseService(String realm) throws PushNotificationException {
         if (!pushRealmMap.containsKey(realm)) {
 
             synchronized (pushRealmMap) { //wait here for the thread with first access to update
@@ -111,10 +122,7 @@ public class PushNotificationService {
                     }
                 }
             }
-
         }
-
-        getDelegateForRealm(realm).send(message);
     }
 
     /**

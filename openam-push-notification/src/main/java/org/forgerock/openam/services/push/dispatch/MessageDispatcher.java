@@ -106,7 +106,6 @@ public class MessageDispatcher {
             cache.invalidate(messageId);
             return true;
         }
-
         return false;
     }
 }

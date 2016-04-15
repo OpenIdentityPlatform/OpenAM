@@ -58,12 +58,10 @@ public class RestAuthPollingWaitCallbackHandler extends AbstractRestAuthCallback
     @Override
     public JsonValue convertToJson(PollingWaitCallback callback, int index) {
 
-        String waitTime = callback.getWaitTime();
-
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                .addLast(createJsonField(WAIT_TIME_JSON_FIELD_NAME, waitTime))
+                .addLast(createJsonField(WAIT_TIME_JSON_FIELD_NAME, callback.getWaitTime()))
                 .build();
 
         return jsonValue;

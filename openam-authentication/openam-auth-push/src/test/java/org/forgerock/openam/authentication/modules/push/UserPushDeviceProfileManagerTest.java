@@ -31,12 +31,12 @@ import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-public class PusherTest {
+public class UserPushDeviceProfileManagerTest {
 
     private static final String USER = "testUser";
     private static final String REALM = "/test";
 
-    private Pusher pusher;
+    private UserPushDeviceProfileManager userPushDeviceProfileManager;
     private DeviceJsonUtils<PushDeviceSettings> deviceJsonUtils = new DeviceJsonUtils<>(PushDeviceSettings.class);
 
     private PushDevicesDao mockDevicesDao = mock(PushDevicesDao.class);
@@ -45,7 +45,8 @@ public class PusherTest {
 
     @BeforeTest
     public void theSetUp() { //you need this
-        pusher = new Pusher(mockDevicesDao, mockDebug, mockSecureRandom, deviceJsonUtils);
+        userPushDeviceProfileManager = new UserPushDeviceProfileManager(
+                mockDevicesDao, mockDebug, mockSecureRandom, deviceJsonUtils);
     }
 
     @Test
@@ -54,13 +55,13 @@ public class PusherTest {
         //given
 
         //when
-        PushDeviceSettings profile = pusher.createDeviceProfile();
+        PushDeviceSettings profile = userPushDeviceProfileManager.createDeviceProfile();
 
         //then
         assertThat(profile.getCommunicationId()).isNull();
-        assertThat(profile.getDeviceName()).isEqualTo(Pusher.DEVICE_NAME);
+        assertThat(profile.getDeviceName()).isEqualTo(UserPushDeviceProfileManager.DEVICE_NAME);
         assertThat(profile.getSharedSecret()).isNotEmpty();
-        assertThat(profile.getSharedSecret()).hasSize(Pusher.SECRET_HEX_LENGTH * 2);
+        assertThat(profile.getSharedSecret()).hasSize(UserPushDeviceProfileManager.SECRET_HEX_LENGTH * 2);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class PusherTest {
         JsonValue expectedJson = new DeviceJsonUtils<>(PushDeviceSettings.class).toJsonValue(deviceSettings);
 
         // When
-        pusher.saveDeviceProfile(USER, REALM, deviceSettings);
+        userPushDeviceProfileManager.saveDeviceProfile(USER, REALM, deviceSettings);
 
         // Then
         ArgumentCaptor<List> savedProfileList = ArgumentCaptor.forClass(List.class);

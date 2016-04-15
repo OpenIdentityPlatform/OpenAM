@@ -23,6 +23,8 @@ import static org.forgerock.util.promise.Promises.*;
 import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -46,6 +48,8 @@ import org.forgerock.util.promise.Promise;
  */
 @RequestHandler
 public class GcmMessageResource {
+
+    private static final JsonPointer MESSAGE_ID_POINTER = new JsonPointer("data/" + MESSAGE_ID);
 
     private final MessageDispatcher messageDispatcher;
     private final Debug debug;
@@ -78,7 +82,7 @@ public class GcmMessageResource {
         final JsonValue actionContent = actionRequest.getContent();
 
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        String messageId = actionContent.get(MESSAGE_ID).asString();
+        String messageId = actionContent.get(MESSAGE_ID_POINTER).asString();
 
         if (messageId == null) {
             debug.warning("Received message in realm {} with invalid messageId.", realm);

@@ -23,6 +23,7 @@ import javax.security.auth.callback.Callback;
  */
 public class PollingWaitCallback implements Callback {
 
+    /** The public name of this callback object. */
     public static final String NODE_NAME = "PollingWaitCallback";
 
     /** The period of time in milliseconds that the client should wait before replying to this callback. */
@@ -45,7 +46,7 @@ public class PollingWaitCallback implements Callback {
     }
 
     /**
-     * Gets the wait time associated with this callback
+     * Gets the wait time associated with this callback.
      * @return the wait time in milliseconds to use as a String.
      */
     public String getWaitTime() {

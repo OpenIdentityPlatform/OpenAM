@@ -29,6 +29,8 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 import javax.security.auth.Subject;
@@ -40,10 +42,12 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
+import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
 import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -53,7 +57,7 @@ import org.forgerock.util.promise.Promise;
  */
 public class AuthenticatorPush extends AMLoginModule {
 
-    private static final Debug DEBUG = Debug.getInstance(AM_AUTH_AUTHENTICATOR_PUSH);
+    private static final Debug DEBUG = Debug.getInstance("amAuthPush");
 
     private final PushNotificationService pushService =
             InjectorHolder.getInstance(PushNotificationService.class);
@@ -71,6 +75,8 @@ public class AuthenticatorPush extends AMLoginModule {
     private Principal principal;
 
     private PollingWaitAssistant pollingWaitAssistant;
+    private UserPushDeviceProfileManager userPushDeviceProfileManager =
+            InjectorHolder.getInstance(UserPushDeviceProfileManager.class);
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -90,6 +96,12 @@ public class AuthenticatorPush extends AMLoginModule {
             } catch (Exception e) {
                 DEBUG.error("AuthenticatorPush :: init() : Unable to set auth level {}", authLevel, e);
             }
+        }
+
+        try {
+            pushService.initialiseService(realm);
+        } catch (PushNotificationException e) {
+            DEBUG.error("AuthenticatorPush :: init() : Unable to initialise Push system.", e);
         }
     }
 
@@ -150,7 +162,8 @@ public class AuthenticatorPush extends AMLoginModule {
         if (username == null) {
             return USERNAME_STATE;
         } else {
-            if (sendMessage(getDeviceId())) {
+            PushDeviceSettings device = getDevice();
+            if (sendMessage(device.getCommunicationId(), device.getDeviceMechanismUID())) {
                 return STATE_WAIT;
             } else {
                 DEBUG.warning("AuthenticatorPush :: sendState() : Failed to send message.");
@@ -184,9 +197,10 @@ public class AuthenticatorPush extends AMLoginModule {
         throw failedAsLoginException();
     }
 
-    private boolean sendMessage(String deviceId) {
+    private boolean sendMessage(String deviceId, String mechanismId) {
         PushMessage message = new PushMessage(deviceId, json(object(
-                field("message", "User logged in to realm \"" + realm + "\" using OpenAM")
+                field("message", "User logged in to realm \"" + realm + "\" using OpenAM"),
+                field("mechanismUid", mechanismId)
         )));
         try {
             promise = messageDispatcher.expect(message.getData().get(MESSAGE_ID).toString());
@@ -200,8 +214,17 @@ public class AuthenticatorPush extends AMLoginModule {
         return false;
     }
 
-    private String getDeviceId() {
-        return deviceId;
+    private PushDeviceSettings getDevice() throws AuthLoginException {
+        try {
+            PushDeviceSettings firstDevice
+                    = CollectionUtils.getFirstItem(userPushDeviceProfileManager.getDeviceProfiles(username, realm));
+            if (null == firstDevice) {
+                throw failedAsLoginException();
+            }
+            return firstDevice;
+        } catch (IOException e) {
+            throw failedAsLoginException();
+        }
     }
 
     @Override

@@ -31,6 +31,7 @@ public final class PushDeviceSettings extends DeviceSettings {
     private String sharedSecret;
     private String deviceName;
     private String communicationId;
+    private String deviceMechanismUID;
 
     /**
      * Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
@@ -72,13 +73,21 @@ public final class PushDeviceSettings extends DeviceSettings {
     }
 
     /**
-     * Set an arbitrary identifier for the OATH device.
+     * Set an arbitrary identifier for the device.
      *
      * @param deviceName The identifier. Can not be null.
      */
     public void setDeviceName(String deviceName) {
         Reject.ifNull(deviceName, "deviceName can not be null.");
         this.deviceName = deviceName;
+    }
+
+    /**
+     * Set the Device Mechanism ID.
+     * @param deviceMechanismUID
+     */
+    public void setDeviceMechanismUID(String deviceMechanismUID) {
+        this.deviceMechanismUID = deviceMechanismUID;
     }
 
     /**
@@ -108,6 +117,14 @@ public final class PushDeviceSettings extends DeviceSettings {
         return communicationId;
     }
 
+    /**
+     * Get the Device Mechanism ID for the push device.
+     *
+     * @return the Device Mechanism ID.
+     */
+    public String getDeviceMechanismUID() {
+        return deviceMechanismUID;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -120,23 +137,22 @@ public final class PushDeviceSettings extends DeviceSettings {
 
         PushDeviceSettings that = (PushDeviceSettings) o;
 
-        if (!deviceName.equals(that.deviceName)) {
+        if (!Objects.equals(deviceName, that.deviceName)) {
             return false;
         }
-
-        if (!sharedSecret.equals(that.sharedSecret)) {
+        if (!Objects.equals(sharedSecret, that.sharedSecret)) {
             return false;
         }
-
-        if (!uuid.equals(that.getUUID())) {
+        if (!Objects.equals(uuid, that.uuid)) {
             return false;
         }
-
-        if (!communicationId.equals(that.getCommunicationId())) {
+        if (!Objects.equals(communicationId, that.communicationId)) {
             return false;
         }
-
         if (!Arrays.equals(recoveryCodes, that.getRecoveryCodes())) {
+            return false;
+        }
+        if (!Objects.equals(deviceMechanismUID, that.deviceMechanismUID)) {
             return false;
         }
 
@@ -145,7 +161,7 @@ public final class PushDeviceSettings extends DeviceSettings {
 
     @Override
     public int hashCode() {
-        return Objects.hash(sharedSecret, deviceName, uuid, communicationId, recoveryCodes);
+        return Objects.hash(sharedSecret, deviceName, uuid, communicationId, recoveryCodes, deviceMechanismUID);
     }
 
     @Override
@@ -155,7 +171,10 @@ public final class PushDeviceSettings extends DeviceSettings {
                 ", deviceName='" + deviceName + '\'' +
                 ", UUID='"+ uuid + '\'' +
                 ", communicationId='"+ communicationId + '\'' +
+                ", deviceMechanismUID='"+ deviceMechanismUID + '\'' +
                 ", recoveryCodes='"+ Arrays.toString(recoveryCodes) + '\'' +
                 '}';
     }
+
+
 }

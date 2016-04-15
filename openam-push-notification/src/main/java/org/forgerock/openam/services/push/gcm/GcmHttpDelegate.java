@@ -61,7 +61,7 @@ public class GcmHttpDelegate implements PushNotificationDelegate {
      * @param config Necessary to configure this delegate.
      * @param debug to write out debug messages.
      * @param router to attach a newly generate GcmMessageEndpoint upon this delegate's initialization.
-     * @param messageEndpoint the endpoint to attach to the router upon init.
+     * @param messageEndpoint the endpoint to attach to the router upon initialisation.
      */
     public GcmHttpDelegate(HttpClientHandler handler, PushNotificationServiceConfig config, Debug debug,
                            Router router, GcmMessageResource messageEndpoint) {

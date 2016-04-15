@@ -34,12 +34,9 @@ import org.forgerock.util.Reject;
 /**
  * Allows for easy access to storing and creating push device profiles.
  *
- * <blockquote>Ah, push it /
- * Push it real good"</blockquote> - Salt-N-Pepa
- *
  * @since 13.5.0
  */
-final class Pusher {
+public final class UserPushDeviceProfileManager {
 
     static final String DEVICE_NAME = "Push Device";
     static final int SECRET_HEX_LENGTH = 32;
@@ -49,11 +46,19 @@ final class Pusher {
     private final Debug debug;
     private final DeviceJsonUtils<PushDeviceSettings> jsonUtils;
 
+
+    /**
+     * Creates the User Device Profile Manager instance.
+     * @param devicesDao the devices data access object
+     * @param debug the debug object
+     * @param secureRandom the secure random provider
+     * @param jsonUtils the utility class for using json to store the Push device settings
+     */
     @Inject
-    public Pusher(final @Nonnull PushDevicesDao devicesDao,
-           final @Nonnull @Named("amAuthPush") Debug debug,
-           final @Nonnull SecureRandom secureRandom,
-           final @Nonnull DeviceJsonUtils<PushDeviceSettings> jsonUtils) {
+    public UserPushDeviceProfileManager(final @Nonnull PushDevicesDao devicesDao,
+                                        final @Nonnull @Named("amAuthPush") Debug debug,
+                                        final @Nonnull SecureRandom secureRandom,
+                                        final @Nonnull DeviceJsonUtils<PushDeviceSettings> jsonUtils) {
         Reject.ifNull(devicesDao, debug, secureRandom);
         this.devicesDao = devicesDao;
         this.debug = debug;

@@ -31,7 +31,7 @@
     </Callbacks>
     <!-- AWAIT_STATE -->
     <Callbacks length="2" order="3" timeout="9999" header="Authenticator Push">
-        <TextOutputCallback>Please Wait for Response From Device</TextOutputCallback>
+        <TextOutputCallback>Please use your mobile device to authorise this log in.  There may be short wait as the server and your device communicate.</TextOutputCallback>
         <PollingWaitCallback waitTime="6000"/>
         <!-- TODO: VS3 - ADD REGISTER DEVICE OPTION ANBD PROBABLY A CANCEL OPTION -->
         <!--<ConfirmationCallback>-->
