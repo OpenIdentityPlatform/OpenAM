@@ -27,22 +27,7 @@ import javax.inject.Inject;
 
 import org.forgerock.guava.common.base.Predicates;
 import org.forgerock.guava.common.collect.Maps;
-import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.core.exceptions.*;
 import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +81,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             ResourceOwnerConsentRequired, InvalidClientException, UnsupportedResponseTypeException,
             RedirectUriMismatchException, InvalidRequestException, AccessDeniedException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException,
-            ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException {
+            ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException, DuplicateRequestParameterException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -193,7 +178,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     public AuthorizationToken authorize(OAuth2Request request, boolean consentGiven, boolean saveConsent)
             throws AccessDeniedException, ResourceOwnerAuthenticationRequired, InvalidClientException,
             UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException,
-            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException, NotFoundException {
+            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException, NotFoundException, DuplicateRequestParameterException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 

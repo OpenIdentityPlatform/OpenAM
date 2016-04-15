@@ -17,6 +17,7 @@
 package org.forgerock.openidconnect.restlet;
 
 import java.util.Locale;
+import java.util.Set;
 import javax.inject.Inject;
 
 import org.forgerock.http.protocol.Status;
@@ -197,6 +198,27 @@ public class IdTokenInfo extends ServerResource {
                 return (T) realm;
             }
             return delegate.getParameter(name);
+        }
+
+        /**
+         * Gets the count of the parameter present in the request with the given name
+         *
+         * @param name The name of the parameter
+         * @return The count of the the parameter with the given name
+         */
+        @Override
+        public int getParameterCount(String name) {
+            return delegate.getParameterCount(name);
+        }
+
+        /**
+         * Gets the name of the parameters in the current request
+         *
+         * @return The parameter names in the request
+         */
+        @Override
+        public Set<String> getParameterNames() {
+            return delegate.getParameterNames();
         }
 
         @Override

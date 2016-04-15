@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -135,6 +132,10 @@ public class CheckSessionImpl implements CheckSession {
                     throw new UnsupportedOperationException();
                 }
 
+                public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
+
+                public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
+
                 public JsonValue getBody() {
                     throw new UnsupportedOperationException();
                 }
@@ -142,6 +143,7 @@ public class CheckSessionImpl implements CheckSession {
                 public Locale getLocale() {
                     throw new UnsupportedOperationException();
                 }
+
             });
             return clientRegistration;
         }

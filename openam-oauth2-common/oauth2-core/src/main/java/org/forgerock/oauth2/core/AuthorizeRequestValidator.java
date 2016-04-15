@@ -16,14 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.core.exceptions.*;
 
 /**
  * Request validator for the OAuth2 authorize endpoint.
@@ -51,8 +44,9 @@ public interface AuthorizeRequestValidator {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws DuplicateRequestParameterException If the request contains duplicate parameter..
      */
     void validateRequest(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, BadRequestException,
-            InvalidScopeException, NotFoundException;
+            InvalidScopeException, NotFoundException, DuplicateRequestParameterException;
 }

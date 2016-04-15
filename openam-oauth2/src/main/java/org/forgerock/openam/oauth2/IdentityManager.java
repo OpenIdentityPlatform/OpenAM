@@ -104,6 +104,10 @@ public class IdentityManager {
                         throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
                     }
 
+                    public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
+
+                    public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
+
                     @Override
                     public Locale getLocale() {
                         throw new UnsupportedOperationException();

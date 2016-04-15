@@ -19,6 +19,7 @@ package org.forgerock.oauth2.restlet;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -98,6 +99,41 @@ public class RestletOAuth2Request extends OAuth2Request {
                     return (T) form.getValuesMap().get(name);
                 } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
                     return (T) getBody().get(name).getObject();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the count of the parameter in the request with the given name
+     *
+     * @param {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    public int getParameterCount(String name) {
+       return request.getResourceRef().getQueryAsForm().subList(name).size();
+    }
+
+    /**
+     * Gets the name of the parameters in the current request
+     *
+     * @return The parameter names in the request
+     */
+    @Override
+    public Set<String> getParameterNames() {
+
+        if (request.getMethod().equals(Method.GET)) {
+            return request.getResourceRef().getQueryAsForm().getNames();
+        } else if (request.getMethod().equals(Method.POST)) {
+            if (request.getEntity() != null) {
+                if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
+                    Form form = new Form(request.getEntity());
+                    // restore the entity body
+                    request.setEntity(form.getWebRepresentation());
+                   return  form.getNames();
+                } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
+                    return getBody().keys();
                 }
             }
         }

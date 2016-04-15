@@ -21,6 +21,7 @@ import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.JsonValue;
 
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * An abstraction of the actual request so as to allow the core of the OAuth2 provider to be agnostic of the library
@@ -52,6 +53,25 @@ public abstract class OAuth2Request {
      * @return The parameter value.
      */
     public abstract <T> T getParameter(String name);
+
+
+    /**
+     * Gets the count of the parameter present in the request with the given name
+     *
+     * @param name The name of the parameter
+     * @return  The count of the the parameter with the given name
+     */
+    public abstract int getParameterCount(String name);
+
+
+    /**
+     *
+     * Gets the name of the parameters in the current request
+     *
+     *
+     * @return    The parameter names in the request
+     */
+    public abstract Set<String> getParameterNames();
 
     /**
      * Gets the body of the request.

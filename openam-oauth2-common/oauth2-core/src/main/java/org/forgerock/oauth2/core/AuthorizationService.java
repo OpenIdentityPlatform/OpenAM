@@ -16,20 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.core.exceptions.*;
 
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
@@ -78,12 +65,13 @@ public interface AuthorizationService {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws DuplicateRequestParameterException If the request contains duplicate parameter.
      */
     AuthorizationToken authorize(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             ResourceOwnerConsentRequired, InvalidClientException, UnsupportedResponseTypeException,
             RedirectUriMismatchException, InvalidRequestException, AccessDeniedException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException,
-            ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException;
+            ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException, DuplicateRequestParameterException;
 
     /**
      * Handles an authorization request from a OAuth2 client, validates the request is valid and contains the required
@@ -117,9 +105,11 @@ public interface AuthorizationService {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws DuplicateRequestParameterException If the request contains duplicate parameter.
      */
     AuthorizationToken authorize(OAuth2Request request, boolean consentGiven, boolean saveConsent)
             throws AccessDeniedException, ResourceOwnerAuthenticationRequired, InvalidClientException,
             UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException,
-            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException, NotFoundException;
+            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException,
+            NotFoundException, DuplicateRequestParameterException;
 }

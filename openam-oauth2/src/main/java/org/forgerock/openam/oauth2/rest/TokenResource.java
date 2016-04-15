@@ -543,6 +543,10 @@ public class TokenResource implements CollectionResourceProvider {
                     return null;
                 }
 
+            public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
+
+            public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
+
             @Override
             public java.util.Locale getLocale() {
                 throw new UnsupportedOperationException();

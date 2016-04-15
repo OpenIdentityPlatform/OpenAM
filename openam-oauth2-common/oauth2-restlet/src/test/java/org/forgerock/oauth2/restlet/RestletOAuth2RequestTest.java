@@ -15,8 +15,7 @@
 */
 package org.forgerock.oauth2.restlet;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.mockito.invocation.InvocationOnMock;
@@ -114,6 +113,96 @@ public class RestletOAuth2RequestTest {
         assertNull(result);
 
     }
+
+    @Test
+    public void shouldReturnOneAsQueryParamCount() {
+
+        //given
+        setQueryParam(request);
+
+        //when
+        int result = requestUnderTest.getParameterCount("realm");
+
+        //then
+        assertEquals(result, 1);
+
+    }
+
+    @Test
+    public void shouldReturnTwoAsQueryParamCountWhenParamSetTwice() {
+
+        //given
+        setQueryParam(request);
+        request.getResourceRef().addQueryParameter("realm", "secondRealmFromQueryParam");
+
+        //when
+        int result = requestUnderTest.getParameterCount("realm");
+
+        //then
+        assertEquals(result, 2);
+
+    }
+
+    @Test
+    public void shouldReturnZeroAsQueryParamCountWhenParamNotPresent() {
+
+        //given
+        setQueryParam(request);
+
+        //when
+        int result = requestUnderTest.getParameterCount("nonExistent");
+
+        //then
+        assertEquals(result, 0);
+
+    }
+
+    @Test
+    public void shouldReturnParameterNamesWithGET() {
+
+        //given
+        setQueryParam(request);
+        //add a duplicate
+        request.getResourceRef().addQueryParameter("realm", "secondRealmFromQueryParam");
+        //add few more
+        request.getResourceRef().addQueryParameter("one", "1");
+        request.getResourceRef().addQueryParameter("2", "two");
+        request.getResourceRef().addQueryParameter("three", "3");
+
+        //when
+        Set<String>  parameterNames =requestUnderTest.getParameterNames();
+
+
+        //then
+        assertEquals(parameterNames, new HashSet<String>(Arrays.asList(new String[]{"one","2","three","realm"})));
+
+    }
+
+
+    @Test
+    public void shouldReturnParameterNamesWithPOST() {
+
+        //given
+        Map<String, String> bodyParams = new HashMap<String, String>();
+        bodyParams.put("realm", "realmFromBody");
+        bodyParams.put("one", "1");
+        bodyParams.put("2", "two");
+        bodyParams.put("three", "3");
+        final JacksonRepresentation<Map> representation = new JacksonRepresentation<Map>(bodyParams);
+        request.setEntity(representation);
+
+
+        //when
+        Set<String>  parameterNames =requestUnderTest.getParameterNames();
+
+
+        //then
+        assertEquals(parameterNames, new HashSet<String>(Arrays.asList(new String[]{"one","2","three","realm"})));
+
+    }
+
+
+
 
     private void setAttribute(Request request) {
         Map<String, Object> attributes = new HashMap<String, Object>();
