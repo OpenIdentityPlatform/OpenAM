@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.cli.entitlement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.LogWriter;
@@ -28,6 +29,11 @@ import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Given a json file containing the policy model export, attempts to create or update policy model resources.
@@ -36,8 +42,23 @@ import javax.inject.Inject;
  */
 public final class PolicyImport extends JsonResourceCommand {
 
+    private enum ResourceEvent {
+
+        UPDATE_SUCCESS, UPDATE_FAILURE, CREATE_SUCCESS, CREATE_FAILURE, READ_FAILURE;
+
+        private static final EnumSet<ResourceEvent> DETAILED_EVENTS =
+                EnumSet.of(UPDATE_FAILURE, CREATE_FAILURE, READ_FAILURE);
+
+        static boolean shouldReportDetails(ResourceEvent resourceEvent) {
+            return DETAILED_EVENTS.contains(resourceEvent);
+        }
+
+    }
+
     private static final String RESOURCES_REFERENCE = "resources";
     private static final String VERSION_REFERENCE = "version";
+
+    private final Map<ModelDescriptor, Map<ResourceEvent, EventRecord>> eventLogs;
 
     /**
      * Constructs a new json resource command.
@@ -48,15 +69,20 @@ public final class PolicyImport extends JsonResourceCommand {
     @Inject
     public PolicyImport(Client client) {
         super(client);
+        eventLogs = new HashMap<>();
     }
 
     @Override
     public void handleResourceRequest(RequestContext request) throws CLIException {
-        String jsonFile = getStringOptionValue(IArgument.FILE);
-        JsonValue importPayload = readJsonFile(jsonFile);
+        try {
+            String jsonFile = getStringOptionValue(IArgument.FILE);
+            JsonValue importPayload = readJsonFile(jsonFile);
 
-        for (ModelDescriptor modelDescriptor : ModelDescriptor.getPrecedentOrder()) {
-            importResources(importPayload, modelDescriptor);
+            for (ModelDescriptor modelDescriptor : ModelDescriptor.getPrecedentOrder()) {
+                importResources(importPayload, modelDescriptor);
+            }
+        } finally {
+            printReport();
         }
     }
 
@@ -102,9 +128,9 @@ public final class PolicyImport extends JsonResourceCommand {
         } else if (response.getStatus() == Status.NOT_FOUND) {
             createResource(id, version, resource, modelDescriptor);
         } else {
+            logResourceEvent(id, response, modelDescriptor, ResourceEvent.READ_FAILURE);
             String httpCode = String.valueOf(response.getStatus().getCode());
-            writeLog(LogWriter.LOG_ERROR, Level.LL_INFO,
-                    "RESOURCE_READ_FAILED", id, modelDescriptor.name(), httpCode);
+            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_READ_FAILED", id, modelDescriptor.name(), httpCode);
         }
     }
 
@@ -125,12 +151,12 @@ public final class PolicyImport extends JsonResourceCommand {
         Response response = sendRequest(request, updateEndpoint);
 
         if (response.getStatus().isSuccessful()) {
-            writeLog(LogWriter.LOG_ACCESS, Level.LL_INFO,
-                    "RESOURCE_UPDATE_SUCCESS", id, modelDescriptor.name());
+            logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_SUCCESS);
+            auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_UPDATE_SUCCESS", id, modelDescriptor.name());
         } else {
+            logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_FAILURE);
             String httpCode = String.valueOf(response.getStatus().getCode());
-            writeLog(LogWriter.LOG_ERROR, Level.LL_INFO,
-                    "RESOURCE_UPDATE_FAILED", id, modelDescriptor.name(), httpCode);
+            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_UPDATE_FAILED", id, modelDescriptor.name(), httpCode);
         }
     }
 
@@ -151,13 +177,87 @@ public final class PolicyImport extends JsonResourceCommand {
         Response response = sendRequest(request, createEndpoint);
 
         if (response.getStatus().isSuccessful()) {
-            writeLog(LogWriter.LOG_ACCESS, Level.LL_INFO,
-                    "RESOURCE_CREATE_SUCCESS", id, modelDescriptor.name());
+            logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_SUCCESS);
+            auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_CREATE_SUCCESS", id, modelDescriptor.name());
         } else {
+            logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_FAILURE);
             String httpCode = String.valueOf(response.getStatus().getCode());
-            writeLog(LogWriter.LOG_ERROR, Level.LL_INFO,
-                    "RESOURCE_CREATE_FAILED", id, modelDescriptor.name(), httpCode);
+            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_CREATE_FAILED", id, modelDescriptor.name(), httpCode);
         }
+    }
+
+    private void logResourceEvent(String id, Response response,
+            ModelDescriptor modelDescriptor, ResourceEvent resourceEvent) {
+
+        if (!eventLogs.containsKey(modelDescriptor)) {
+            eventLogs.put(modelDescriptor, new HashMap<ResourceEvent, EventRecord>());
+        }
+
+        Map<ResourceEvent, EventRecord> eventRecords = eventLogs.get(modelDescriptor);
+
+        if (!eventRecords.containsKey(resourceEvent)) {
+            if (ResourceEvent.shouldReportDetails(resourceEvent)) {
+                eventRecords.put(resourceEvent, new DetailedEventRecord());
+            } else {
+                eventRecords.put(resourceEvent, new AccumulativeCountEventRecord());
+            }
+        }
+
+        Map<String, Object> eventDetails = new HashMap<>();
+        eventDetails.put("id", id);
+
+        if (response.getStatus() != null) {
+            eventDetails.put("httpCode", response.getStatus().getCode());
+        }
+
+        if (response.getCause() != null) {
+            eventDetails.put("errorMessage", response.getCause().getMessage());
+        }
+
+        eventRecords.get(resourceEvent).log(eventDetails);
+    }
+
+    private void printReport() throws CLIException {
+        getOutputWriter().printMessage(objectToJsonString(eventLogs));
+    }
+
+    private void auditEvent(int eventType, String messageId, String... args) throws CLIException {
+        writeLog(eventType, Level.INFO, messageId, args);
+    }
+
+    private interface EventRecord {
+
+        void log(Map<String, Object> eventDetails);
+
+    }
+
+    private static class AccumulativeCountEventRecord implements EventRecord {
+
+        @JsonProperty("count")
+        private int accumulativeCount;
+
+        @Override
+        public void log(Map<String, Object> eventDetails) {
+            accumulativeCount++;
+        }
+
+    }
+
+    private static final class DetailedEventRecord extends AccumulativeCountEventRecord {
+
+        @JsonProperty("details")
+        private final List<Map<String, Object>> details;
+
+        DetailedEventRecord() {
+            details = new ArrayList<>();
+        }
+
+        @Override
+        public void log(Map<String, Object> eventDetails) {
+            super.log(eventDetails);
+            details.add(eventDetails);
+        }
+
     }
 
 }

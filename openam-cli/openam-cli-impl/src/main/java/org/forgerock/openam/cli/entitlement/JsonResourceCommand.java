@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.cli.entitlement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
@@ -167,6 +168,25 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
             MAPPER.writerWithDefaultPrettyPrinter().writeValue(fileWriter, jsonValue.getObject());
         } catch (IOException ioE) {
             throw new CLIException(ioE, ExitCodes.IO_EXCEPTION);
+        }
+    }
+
+    /**
+     * Given an object, converts it to a well formatted json representation.
+     *
+     * @param object
+     *         object
+     *
+     * @return json representation
+     *
+     * @throws CLIException
+     *         should some error occur during the transformation to json
+     */
+    protected final String objectToJsonString(Object object) throws CLIException {
+        try {
+            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        } catch (JsonProcessingException jpE) {
+            throw new CLIException(jpE, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
 
