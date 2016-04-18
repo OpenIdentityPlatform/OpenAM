@@ -6,7 +6,7 @@ import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 /**
  * Thrown when the duplicate request parameter is found.
  *
- * @since 14.0.0
+ * @since 13.5.0
  */
 public class DuplicateRequestParameterException extends OAuth2Exception {
 

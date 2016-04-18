@@ -12,7 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * @since 14.0.0
+ * @since 13.5.0
  */
 public class DuplicateRequestParameterValidatorTest {
 
