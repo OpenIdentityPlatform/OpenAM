@@ -1,1 +1,27 @@
-TODO
+<nav id="backlink"></nav>
+<div class="container">
+    {{> headers/_Title title="console.servers.new.title" }}
+
+    <div class="panel multiple-panels panel-content">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label" for="serverUrl">{{t "console.servers.new.serverUrl"}}</label>
+                        <div class="col-sm-6">
+                            <input data-server-url type="text" id="serverUrl" class="form-control" required name="serverUrl"
+                                 placeholder="{{t 'common.form.validation.required'}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <a class="btn btn-default" href="{{routeTo 'listServers'}}">{{t "common.form.cancel"}}</a>
+                <button data-create class="btn btn-primary" type="button" disabled>{{t "common.form.create"}}</button>
+            </div>
+        </div>
+    </div>
+</div>

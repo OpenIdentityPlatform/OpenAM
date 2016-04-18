@@ -81,6 +81,12 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "DELETE"
         }),
+        create:  (data) => obj.serviceCall({
+            url: `?_action=create`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST",
+            data: JSON.stringify(data)
+        }),
         update: (section, data, id) => updateServer(section, data, id),
         defaults: {
             get: (section) => obj.servers.get(DEFAULT_SERVER, section),

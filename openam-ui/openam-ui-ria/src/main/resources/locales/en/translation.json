@@ -717,7 +717,8 @@
                 "serverDefaults": "Server Defaults",
                 "directory" : "Directory",
                 "realms": "Realms",
-                "sites": "Sites"
+                "sites": "Sites",
+                "servers": "Servers"
             },
             "description": "Description",
             "type": "Type",
@@ -747,13 +748,17 @@
             }
         },
         "servers" : {
-            "list" :{
+            "list" : {
                 "title" : "Servers",
                 "new" : "Add a Server",
                 "table" : ["Name", "Site Name"],
                 "empty" : "No Servers found",
                 "clone" : "Clone",
                 "description": "Configure server-specific properties in OpenAM instances."
+            },
+            "new": {
+                "title" : "New Server",
+                "serverUrl": "Server URL"
             }
         },
         "authentication": {

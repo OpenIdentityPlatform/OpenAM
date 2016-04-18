@@ -15,12 +15,43 @@
  */
 
 define("org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], (AbstractView) => {
+    "jquery",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/services/ServersService",
+    "org/forgerock/openam/ui/admin/views/common/Backlink"
+], ($, Messages, AbstractView, Router, ServersService, Backlink) => {
+    const getTrimmedValue = (field) => field.val().trim();
+
     const NewServerView = AbstractView.extend({
         template: "templates/admin/views/deployment/servers/NewServerTemplate.html",
+        events: {
+            "click [data-create]": "createServer",
+            "keyup [data-server-url]": "toggleCreateButton"
+        },
+
         render () {
-            this.parentRender();
+            this.parentRender(() => { new Backlink().render(); });
+            return this;
+        },
+
+        createServer () {
+            const serverUrl = getTrimmedValue(this.$el.find("[data-server-url]"));
+
+            ServersService.servers.create({ "_id": serverUrl })
+                .then(() => {
+                    Router.routeTo(Router.configuration.routes.editServerGeneral, { args: [serverUrl], trigger: true });
+                },
+                (response) => { Messages.addMessage({ response, type: Messages.TYPE_DANGER }); }
+            );
+        },
+
+        toggleCreateButton (event) {
+            const serverUrl = getTrimmedValue($(event.currentTarget));
+            const valid = serverUrl !== "";
+
+            this.$el.find("[data-create]").prop("disabled", !valid);
         }
     });
 
