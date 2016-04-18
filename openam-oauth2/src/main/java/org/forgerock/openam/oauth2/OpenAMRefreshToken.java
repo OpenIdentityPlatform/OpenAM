@@ -25,6 +25,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
+import org.forgerock.oauth2.core.StatefulRefreshToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 /**
@@ -32,7 +33,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
  *
  * @since 12.0.0
  */
-public class OpenAMRefreshToken extends RefreshToken {
+public class OpenAMRefreshToken extends StatefulRefreshToken {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
@@ -166,7 +167,7 @@ public class OpenAMRefreshToken extends RefreshToken {
     }
 
     @Override
-    protected String getStringProperty(String key) {
+    public String getStringProperty(String key) {
         final Set<String> value = getParameter(key);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();

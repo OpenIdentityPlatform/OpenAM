@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.oauth2.legacy;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public class LegacyAccessTokenAdapter extends CoreToken {
     private final AccessToken token;
 
     public LegacyAccessTokenAdapter(AccessToken token) {
-        super(token.getTokenId(), token);
+        super(token.getTokenId(), (JsonValue) token);
         this.token = token;
     }
 

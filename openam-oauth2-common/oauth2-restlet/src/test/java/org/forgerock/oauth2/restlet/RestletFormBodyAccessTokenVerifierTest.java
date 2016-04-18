@@ -15,10 +15,7 @@
  */
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AccessTokenVerifier;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.*;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.representation.EmptyRepresentation;
@@ -107,7 +104,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         request.setEntity(form.getWebRepresentation());
         OAuth2Request req = new RestletOAuth2Request(null, request);
 
-        AccessToken token = new AccessToken(json(object()), "access_token", "freddy") {
+        AccessToken token = new StatefulAccessToken(json(object()), "access_token", "freddy") {
             @Override
             public boolean isExpired() {
                 return true;
@@ -132,7 +129,7 @@ public class RestletFormBodyAccessTokenVerifierTest {
         request.setEntity(form.getWebRepresentation());
         OAuth2Request req = new RestletOAuth2Request(null, request);
 
-        AccessToken token = new AccessToken(json(object()), "access_token", "freddy") {
+        AccessToken token = new StatefulAccessToken(json(object()), "access_token", "freddy") {
             @Override
             public boolean isExpired() {
                 return false;

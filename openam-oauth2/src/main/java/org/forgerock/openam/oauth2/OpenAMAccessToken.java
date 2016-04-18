@@ -26,6 +26,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.StatefulAccessToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -35,7 +36,7 @@ import org.forgerock.openam.utils.StringUtils;
  *
  * @since 12.0.0
  */
-public class OpenAMAccessToken extends AccessToken {
+public class OpenAMAccessToken extends StatefulAccessToken {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 

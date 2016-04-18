@@ -16,10 +16,7 @@
 
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.*;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.mockito.invocation.InvocationOnMock;
@@ -89,7 +86,7 @@ public class TokenEndpointResourceTest {
         Request request = new Request();
         Response response = new Response(request);
         tokenEndpointResource.init(context, request, response);
-        doReturn(new AccessToken(null, OAUTH_ACCESS_TOKEN, null))
+        doReturn(new StatefulAccessToken(null, OAUTH_ACCESS_TOKEN, null))
                 .when(accessTokenService).requestAccessToken(any(OAuth2Request.class));
 
         //When

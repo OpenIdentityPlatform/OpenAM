@@ -22,6 +22,7 @@ import java.util.Set;
  * An OAuth 2.0 token abstraction for introspection.
  */
 public interface IntrospectableToken {
+
     long getExpiryTime();
 
     boolean isExpired();

@@ -34,6 +34,7 @@ import javax.script.SimpleBindings;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.StatefulAccessToken;
 import org.forgerock.oauth2.core.UserInfoClaims;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
@@ -72,7 +73,7 @@ public class OidcClaimsExtensionTest {
         this.logger = mock(Debug.class);
         this.ssoToken = mock(SSOToken.class);
         this.identity = mock(AMIdentity.class);
-        this.accessToken = new AccessToken(json(object()), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, "id");
+        this.accessToken = new StatefulAccessToken(json(object()), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, "id");
     }
 
     @Test

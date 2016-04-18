@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.rest.audit;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -103,7 +104,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromChallengeResponse(request);
         if (accessToken != null) {
-            userId = getUserIdFromToken(accessToken);
+            userId = getUserIdFromToken((JsonValue) accessToken);
         }
 
         return userId;
@@ -114,7 +115,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromRequest(request);
         if (accessToken != null) {
-            userId = getUserIdFromToken(accessToken);
+            userId = getUserIdFromToken((JsonValue) accessToken);
         }
 
         return userId;
@@ -125,7 +126,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromChallengeResponse(request);
         if (accessToken != null) {
-            trackingId = getTrackingIdFromToken(accessToken);
+            trackingId = getTrackingIdFromToken((JsonValue) accessToken);
         }
 
         return trackingId;
@@ -136,7 +137,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromRequest(request);
         if (accessToken != null) {
-            trackingId = getTrackingIdFromToken(accessToken);
+            trackingId = getTrackingIdFromToken((JsonValue) accessToken);
         }
 
         return trackingId;

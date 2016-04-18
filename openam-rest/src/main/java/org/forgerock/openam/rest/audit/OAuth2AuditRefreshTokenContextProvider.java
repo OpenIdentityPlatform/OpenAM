@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.rest.audit;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.RefreshToken;
@@ -103,7 +104,7 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
 
         RefreshToken refreshToken = retrieveRefreshTokenFromChallengeResponse(request);
         if (refreshToken != null) {
-            userId = getUserIdFromToken(refreshToken);
+            userId = getUserIdFromToken((JsonValue) refreshToken);
         }
 
         return userId;
@@ -114,7 +115,7 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
 
         RefreshToken refreshToken = retrieveRefreshTokenFromRequest(request);
         if (refreshToken != null) {
-            userId = getUserIdFromToken(refreshToken);
+            userId = getUserIdFromToken((JsonValue) refreshToken);
         }
 
         return userId;
@@ -125,7 +126,7 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
 
         RefreshToken refreshToken = retrieveRefreshTokenFromChallengeResponse(request);
         if (refreshToken != null) {
-            trackingId = getTrackingIdFromToken(refreshToken);
+            trackingId = getTrackingIdFromToken((JsonValue) refreshToken);
         }
 
         return trackingId;
@@ -136,7 +137,7 @@ public class OAuth2AuditRefreshTokenContextProvider extends OAuth2AuditOAuth2Tok
 
         RefreshToken refreshToken = retrieveRefreshTokenFromRequest(request);
         if (refreshToken != null) {
-            trackingId = getTrackingIdFromToken(refreshToken);
+            trackingId = getTrackingIdFromToken((JsonValue) refreshToken);
         }
 
         return trackingId;

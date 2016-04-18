@@ -22,10 +22,7 @@ import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 import static org.forgerock.json.JsonValue.*;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.*;
 import org.forgerock.oauth2.core.exceptions.InsufficientScopeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -67,7 +64,7 @@ public class AccessTokenProtectionFilterTest {
         challengeResponse.setRawValue("tokenId");
         when(req.getChallengeResponse()).thenReturn(challengeResponse);
 
-        AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
+        AccessToken accessToken = new StatefulAccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a", REQUIRED_SCOPE)),
                 field("expireTime", currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);
@@ -91,7 +88,7 @@ public class AccessTokenProtectionFilterTest {
         challengeResponse.setRawValue("tokenId");
         when(req.getChallengeResponse()).thenReturn(challengeResponse);
 
-        AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
+        AccessToken accessToken = new StatefulAccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a")),
                 field("expireTime", currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);
@@ -120,7 +117,7 @@ public class AccessTokenProtectionFilterTest {
         challengeResponse.setRawValue("tokenId");
         when(req.getChallengeResponse()).thenReturn(challengeResponse);
 
-        AccessToken accessToken = new AccessToken(json(object(field("id", "tokenId"),
+        AccessToken accessToken = new StatefulAccessToken(json(object(field("id", "tokenId"),
                 field("tokenName", "access_token"), field("scope", asSet("a")),
                 field("expireTime", currentTimeMillis() + 5000))));
         when(tokenStore.readAccessToken(oAuth2Request, "tokenId")).thenReturn(accessToken);

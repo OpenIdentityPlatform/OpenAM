@@ -34,11 +34,12 @@ import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.StatefulAccessToken;
 
 /**
  * Models a stateless OpenAM OAuth2 access token.
  */
-public final class StatelessAccessToken extends AccessToken {
+public final class StatelessAccessToken extends StatefulAccessToken {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 

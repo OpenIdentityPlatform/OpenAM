@@ -32,11 +32,12 @@ import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
+import org.forgerock.oauth2.core.StatefulRefreshToken;
 
 /**
  * Models a stateless OpenAM OAuth2 refresh token.
  */
-public class StatelessRefreshToken extends RefreshToken {
+public class StatelessRefreshToken extends StatefulRefreshToken {
 
     private final Jwt jwt;
     private final String jwtString;
