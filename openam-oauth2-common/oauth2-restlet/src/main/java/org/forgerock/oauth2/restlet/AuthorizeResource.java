@@ -19,11 +19,17 @@ package org.forgerock.oauth2.restlet;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Set;
+
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.exceptions.*;
+import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
@@ -120,7 +126,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
         } catch (RedirectUriMismatchException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
-        } catch(DuplicateRequestParameterException e) {
+        } catch (DuplicateRequestParameterException e) {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {

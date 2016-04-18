@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.restlet;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +138,7 @@ public class RestletOAuth2Request extends OAuth2Request {
                 }
             }
         }
-        return null;
+        return Collections.emptySet();
     }
 
     /**

@@ -16,7 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.*;
+import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
+import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
@@ -44,24 +58,24 @@ public interface AuthorizationService {
      * @param request The OAuth2Request for the client requesting authorization. Must not be {@code null}.
      * @return An AuthorizationToken containing the OAuth2 tokens granted as apart of the authorize call.
      * @throws ResourceOwnerAuthenticationRequired If the resource owner needs to authenticate before the authorize
-     *          request can be allowed.
+     * request can be allowed.
      * @throws ResourceOwnerConsentRequired If the resource owner's consent is required before the authorize request
-     *          can be allowed.
+     * can be allowed.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
-     *          authenticated.
+     * authenticated.
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
-     *          or the OAuth2 provider.
+     * or the OAuth2 provider.
      * @throws RedirectUriMismatchException If the redirect uri on the request does not match the redirect uri
-     *          registered for the client.
+     * registered for the client.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws AccessDeniedException If resource owner authentication fails.
      * @throws ServerException If any internal server error occurs.
      * @throws LoginRequiredException If authenticating the resource owner fails.
      * @throws BadRequestException If the request is malformed.
      * @throws InteractionRequiredException If the OpenID Connect prompt parameter enforces that the resource owner
-     *          is not asked to authenticate, but the resource owner does not have a current authenticated session.
+     * is not asked to authenticate, but the resource owner does not have a current authenticated session.
      * @throws ResourceOwnerConsentRequiredException If the OpenID Connect prompt parameter enforces that the resource
-     *          owner is not asked for consent, but the resource owners consent has not been previously stored.
+     * owner is not asked for consent, but the resource owners consent has not been previously stored.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
@@ -84,24 +98,24 @@ public interface AuthorizationService {
      * @param request The OAuth2Request for the client requesting authorization. Must not be {@code null}.
      * @param consentGiven {@code true} if the user has given their consent for the requesting client to be authorized.
      * @param saveConsent {@code true} if the user has requested that their consent be saved for future authorization
-     *                    requests.
+     * requests.
      * @return An AuthorizationToken containing the OAuth2 tokens granted as apart of the authorize call.
      * @throws AccessDeniedException If resource owner authentication fails or the resource owner does not grant
-     *          authorization for the client.
+     * authorization for the client.
      * @throws ResourceOwnerAuthenticationRequired If the resource owner needs to authenticate before the authorize
-     *          request can be allowed.
+     * request can be allowed.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
-     *          authenticated.
+     * authenticated.
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
-     *          or the OAuth2 provider.
+     * or the OAuth2 provider.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws RedirectUriMismatchException If the redirect uri on the request does not match the redirect uri
-     *          registered for the client.
+     * registered for the client.
      * @throws ServerException If any internal server error occurs.
      * @throws LoginRequiredException If authenticating the resource owner fails.
      * @throws BadRequestException If the request is malformed.
      * @throws InteractionRequiredException If the OpenID Connect prompt parameter enforces that the resource owner
-     *          is not asked to authenticate, but the resource owner does not have a current authenticated session.
+     * is not asked to authenticate, but the resource owner does not have a current authenticated session.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.

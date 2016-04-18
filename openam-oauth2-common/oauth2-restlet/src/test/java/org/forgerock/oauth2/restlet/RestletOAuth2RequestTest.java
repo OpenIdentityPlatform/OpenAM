@@ -15,26 +15,22 @@
 */
 package org.forgerock.oauth2.restlet;
 
-import java.util.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-
-import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RestletOAuth2RequestTest {
 
@@ -124,7 +120,7 @@ public class RestletOAuth2RequestTest {
         int result = requestUnderTest.getParameterCount("realm");
 
         //then
-        assertEquals(result, 1);
+        assertThat(result).isEqualTo(1);
 
     }
 
@@ -139,7 +135,7 @@ public class RestletOAuth2RequestTest {
         int result = requestUnderTest.getParameterCount("realm");
 
         //then
-        assertEquals(result, 2);
+        assertThat(result).isEqualTo(2);
 
     }
 
@@ -153,7 +149,7 @@ public class RestletOAuth2RequestTest {
         int result = requestUnderTest.getParameterCount("nonExistent");
 
         //then
-        assertEquals(result, 0);
+        assertThat(result).isEqualTo(0);
 
     }
 
@@ -170,11 +166,11 @@ public class RestletOAuth2RequestTest {
         request.getResourceRef().addQueryParameter("three", "3");
 
         //when
-        Set<String>  parameterNames =requestUnderTest.getParameterNames();
+        Set<String> parameterNames = requestUnderTest.getParameterNames();
 
 
         //then
-        assertEquals(parameterNames, new HashSet<String>(Arrays.asList(new String[]{"one","2","three","realm"})));
+        assertThat(parameterNames).containsOnly("one", "2", "three", "realm");
 
     }
 
@@ -193,15 +189,13 @@ public class RestletOAuth2RequestTest {
 
 
         //when
-        Set<String>  parameterNames =requestUnderTest.getParameterNames();
+        Set<String> parameterNames = requestUnderTest.getParameterNames();
 
 
         //then
-        assertEquals(parameterNames, new HashSet<String>(Arrays.asList(new String[]{"one","2","three","realm"})));
+        assertThat(parameterNames).containsOnly("one", "2", "three", "realm");
 
     }
-
-
 
 
     private void setAttribute(Request request) {

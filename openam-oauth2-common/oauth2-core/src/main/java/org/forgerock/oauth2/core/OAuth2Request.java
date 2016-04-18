@@ -69,7 +69,7 @@ public abstract class OAuth2Request {
      * Gets the name of the parameters in the current request
      *
      *
-     * @return    The parameter names in the request
+     * @return The parameter names in the request
      */
     public abstract Set<String> getParameterNames();
 
