@@ -68,21 +68,31 @@ public final class PolicyExport extends JsonResourceCommand {
 
         JsonValue exportPayload = json(object());
 
+        Map<String, Object> exportMetrics = new HashMap<>();
+
         for (ModelDescriptor modelDescriptor : ModelDescriptor.getPrecedentOrder()) {
-            exportResourceToPayload(modelDescriptor, exportPayload);
+            int count = exportResourceToPayload(modelDescriptor, exportPayload);
+            exportMetrics.put(modelDescriptor.getEndpointIdentifier(), count);
         }
 
         writeJsonFile(exportPayload, outfile);
 
         writeLog(LogWriter.LOG_ACCESS, Level.LL_INFO, "POLICY_EXPORT_SUCCESS", realm, outfile);
+
+        getOutputWriter().printlnMessage(objectToJsonString(json(exportMetrics)));
+
     }
 
-    private void exportResourceToPayload(ModelDescriptor modelDescriptor, JsonValue exportPayload) throws CLIException {
+    /*
+     * @return number of resources set to the export payload.
+     */
+    private int exportResourceToPayload(ModelDescriptor modelDescriptor, JsonValue exportPayload) throws CLIException {
 
         Response response = queryForAllResources(modelDescriptor);
         JsonValue resources = extractResources(response);
 
         List<Object> resourceObjects = new ArrayList<>();
+        int countResources = 0;
 
         for (JsonValue resource : resources) {
 
@@ -91,10 +101,11 @@ public final class PolicyExport extends JsonResourceCommand {
             }
 
             resourceObjects.add(resource.getObject());
+            countResources++;
         }
 
         if (resources.size() == 0) {
-            return;
+            return countResources;
         }
 
         String version = extractResourceVersion(response);
@@ -104,6 +115,8 @@ public final class PolicyExport extends JsonResourceCommand {
         exportEntry.put(VERSION_REFERENCE, version);
 
         exportPayload.add(modelDescriptor.getEndpointIdentifier(), exportEntry);
+
+        return countResources;
     }
 
     private Response queryForAllResources(ModelDescriptor endpoint) throws CLIException {
