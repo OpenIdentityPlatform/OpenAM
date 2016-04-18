@@ -71,6 +71,8 @@ define("config/AppConfiguration", [
             moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
             configuration: {
                 templateUrls: [
+                    "templates/common/components/table/ReadOnlyRow.html",
+                    "templates/common/components/table/InlineEditRow.html"
                 ],
                 partialUrls: [
                     "partials/form/_JSONSchemaFooter.html",

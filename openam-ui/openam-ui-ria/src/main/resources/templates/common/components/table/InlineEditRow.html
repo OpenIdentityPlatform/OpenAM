@@ -4,14 +4,13 @@
 </td>
 
 <td class="form-group">
-    <input class="form-control" type="text" value="{{rowData.value}}"
-        placeholder="{{t 'common.form.addValue'}}" data-row-value data-validator="required">
+    <input class="form-control" type="text" value="{{rowData.value}}" placeholder="{{t 'common.form.addValue'}}" data-row-value>
 </td>
 
 <td class="fr-col-btn-2">
     <div class="btn-group">
         <button class="btn btn-link" data-save-row title="{{#if rowData.value}}{{t 'common.form.update'}}{{else}}{{t 'common.form.add'}}{{/if}}"><i class="fa {{#if rowData.value}}fa-check{{else}}fa-plus{{/if}}"></i></button>
-        {{#if rowData.value}}
+        {{#if rowData.key}}
             <button class="btn btn-link" data-undo-edit-row title="{{t 'common.form.cancel'}}"><i class="fa fa-undo"></i></button>
         {{/if}}
     </div>

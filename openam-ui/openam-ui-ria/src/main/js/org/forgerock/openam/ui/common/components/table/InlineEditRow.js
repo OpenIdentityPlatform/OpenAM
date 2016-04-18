@@ -95,13 +95,14 @@ define("org/forgerock/openam/ui/common/components/table/InlineEditRow", [
         },
 
         save (event) {
+            event.preventDefault();
             if (event.type === "keyup" && event.keyCode !== 13) { return; }
 
             const getInputValue = (dataAttr) => this.$el.find(`input[${dataAttr}]`).val().trim();
             const key = getInputValue("data-row-key");
             const value = getInputValue("data-row-value");
 
-            if (!key || !value) {
+            if (!key) {
                 return;
             } else {
                 this.data.rowData = { key, value };

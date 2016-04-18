@@ -73,12 +73,15 @@ define("org/forgerock/openam/ui/common/components/table/InlineEditTable", [
         };
 
         const exitEditMode = (row) => {
-            if (row === this.newEmptyRow) {
-                this.rows.push(row);
-            }
-
             this.currentlyEditedRow.renderInReadOnlyMode();
+
+            const newRowAddedToTheTable = (row === this.newEmptyRow);
             this.appendEmptyNewRowToTheBottom();
+
+            if (newRowAddedToTheTable) {
+                this.rows.push(row);
+                this.newEmptyRow.focus();
+            }
         };
 
         const deleteRow = (row) => {
@@ -96,7 +99,6 @@ define("org/forgerock/openam/ui/common/components/table/InlineEditTable", [
     appendEmptyNewRowToTheBottom () {
         const row = this.initRow();
         this.tBody.append(row.renderInEditMode().$el);
-        row.focus();
 
         this.currentlyEditedRow = row;
         this.newEmptyRow = row;
