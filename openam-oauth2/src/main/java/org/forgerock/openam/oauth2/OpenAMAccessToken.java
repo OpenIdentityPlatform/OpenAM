@@ -376,6 +376,7 @@ public class OpenAMAccessToken extends StatefulAccessToken {
      *
      * @return The audit id.
      */
+    @Override
     public String getAuditTrackingId() {
         return getStringProperty(AUDIT_TRACKING_ID);
     }

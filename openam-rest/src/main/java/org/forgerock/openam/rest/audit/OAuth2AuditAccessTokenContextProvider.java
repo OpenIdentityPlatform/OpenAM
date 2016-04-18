@@ -15,7 +15,6 @@
 */
 package org.forgerock.openam.rest.audit;
 
-import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -104,7 +103,9 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromChallengeResponse(request);
         if (accessToken != null) {
-            userId = getUserIdFromToken((JsonValue) accessToken);
+            String username = accessToken.getResourceOwnerId();
+            String realm = accessToken.getRealm();
+            userId = getUserIdFromUsernameAndRealm(username, realm);
         }
 
         return userId;
@@ -115,7 +116,9 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromRequest(request);
         if (accessToken != null) {
-            userId = getUserIdFromToken((JsonValue) accessToken);
+            String username = accessToken.getResourceOwnerId();
+            String realm = accessToken.getRealm();
+            userId = getUserIdFromUsernameAndRealm(username, realm);
         }
 
         return userId;
@@ -126,7 +129,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromChallengeResponse(request);
         if (accessToken != null) {
-            trackingId = getTrackingIdFromToken((JsonValue) accessToken);
+            trackingId = accessToken.getAuditTrackingId();
         }
 
         return trackingId;
@@ -137,7 +140,7 @@ public class OAuth2AuditAccessTokenContextProvider extends OAuth2AuditOAuth2Toke
 
         AccessToken accessToken = retrieveAccessTokenFromRequest(request);
         if (accessToken != null) {
-            trackingId = getTrackingIdFromToken((JsonValue) accessToken);
+            trackingId = accessToken.getAuditTrackingId();
         }
 
         return trackingId;

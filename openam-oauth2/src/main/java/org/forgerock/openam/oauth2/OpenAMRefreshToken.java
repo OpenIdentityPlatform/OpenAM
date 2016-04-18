@@ -69,7 +69,7 @@ public class OpenAMRefreshToken extends StatefulRefreshToken {
         super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
                 authModules, acr);
         setRealm(realm);
-        setAuditId(auditId);
+        setAuditTrackingId(auditId);
     }
 
     /**
@@ -195,7 +195,7 @@ public class OpenAMRefreshToken extends StatefulRefreshToken {
      *
      * @param auditId The audit id.
      */
-    protected void setAuditId(String auditId) {
+    protected void setAuditTrackingId(String auditId) {
         setStringProperty(AUDIT_TRACKING_ID, auditId);
     }
 
@@ -204,7 +204,8 @@ public class OpenAMRefreshToken extends StatefulRefreshToken {
      *
      * @return The audit id.
      */
-    public String getAuditId() {
+    @Override
+    public String getAuditTrackingId() {
         return getStringProperty(AUDIT_TRACKING_ID);
     }
 

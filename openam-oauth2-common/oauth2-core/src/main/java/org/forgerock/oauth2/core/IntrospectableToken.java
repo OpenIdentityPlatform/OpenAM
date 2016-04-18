@@ -28,10 +28,7 @@ public interface IntrospectableToken {
     boolean isExpired();
 
     String getRealm();
-    /**
-     * Returns the client ID used when obtaining the token.
-     * @return The client ID.
-     */
+
     String getClientId();
 
     String getResourceOwnerId();

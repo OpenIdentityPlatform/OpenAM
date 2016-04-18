@@ -161,8 +161,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * Sets the auth modules used for authentication.
      * @param authModules A pipe-delimited string of auth module names.
      */
-    @Override
-    public void setAuthModules(String authModules) {
+    protected void setAuthModules(String authModules) {
         setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
     }
 
@@ -324,7 +323,12 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     public String getStringProperty(String key) {
         if (isDefined(key)) {
-            return get(key).asString();
+            JsonValue value = get(key);
+            if (value.isString()) {
+                return value.asString();
+            } else if (value.isCollection()) {
+                return (String) value.asList().iterator().next();
+            }
         }
         return null;
     }
@@ -350,6 +354,11 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
         return tokenMap;
     }
 
+    @Override
+    public String getAuditTrackingId() {
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -361,5 +370,19 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
                 getExpiryTime() == -1 ? null : (getExpiryTime() - currentTimeMillis()) / 1000);
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenInfo;
+    }
+
+    /**
+     * Gets the requested claims associated w/ this access token.
+     *
+     * @return Requested claims (JSON as a String).
+     */
+    @Override
+    public String getClaims() {
+        if (isDefined(OAuth2Constants.Custom.CLAIMS)) {
+            return (String) get(OAuth2Constants.Custom.CLAIMS).asSet().iterator().next();
+        }
+
+        return null;
     }
 }

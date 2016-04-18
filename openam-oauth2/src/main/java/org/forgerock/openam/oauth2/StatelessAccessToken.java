@@ -30,16 +30,18 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.StatefulAccessToken;
 
 /**
  * Models a stateless OpenAM OAuth2 access token.
  */
-public final class StatelessAccessToken extends StatefulAccessToken {
+public final class StatelessAccessToken extends JsonValue implements AccessToken {
+
+    protected Map<String, Object> extraData = new HashMap<>();
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
@@ -54,117 +56,9 @@ public final class StatelessAccessToken extends StatefulAccessToken {
      * @param jwtString The JWT string.
      */
     public StatelessAccessToken(Jwt jwt, String jwtString) {
-        super(null, null, null, null, null, null, 0L, null, null, null, null);
+        super(new Object());
         this.jwt = jwt;
         this.jwtString = jwtString;
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param id {@inheritDoc}
-     */
-    @Override
-    protected void setId(String id) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param authorizationCode {@inheritDoc}
-     */
-    @Override
-    protected void setAuthorizationCode(String authorizationCode) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param resourceOwnerId {@inheritDoc}
-     */
-    @Override
-    protected void setResourceOwnerId(String resourceOwnerId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param clientId {@inheritDoc}
-     */
-    @Override
-    protected void setClientId(String clientId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param redirectUri {@inheritDoc}
-     */
-    @Override
-    protected void setRedirectUri(String redirectUri) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param scope {@inheritDoc}
-     */
-    @Override
-    protected void setScope(Set<String> scope) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param expiryTime {@inheritDoc}
-     */
-    @Override
-    protected void setExpiryTime(long expiryTime) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param refreshTokenId {@inheritDoc}
-     */
-    @Override
-    protected void setRefreshTokenId(String refreshTokenId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param tokenName {@inheritDoc}
-     */
-    @Override
-    protected void setTokenName(String tokenName) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param tokenType {@inheritDoc}
-     */
-    @Override
-    protected void setTokenType(String tokenType) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param grantType {@inheritDoc}
-     */
-    @Override
-    protected void setGrantType(String grantType) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param nonce {@inheritDoc}
-     */
-    @Override
-    protected void setNonce(String nonce) {
     }
 
     @Override
@@ -233,7 +127,6 @@ public final class StatelessAccessToken extends StatefulAccessToken {
         return jwt.getClaimsSet().getClaim(GRANT_TYPE, String.class);
     }
 
-    @Override
     protected String getResourceString(String s) {
         return RESOURCE_BUNDLE.getString(s);
     }
@@ -257,5 +150,37 @@ public final class StatelessAccessToken extends StatefulAccessToken {
             tokenInfo.put(key, claimsSet.get(key).getObject());
         }
         return tokenInfo;
+    }
+
+    /**
+     * <p>Adds additional data to the Access Token.</p>
+     *
+     * <p>If the value is {@code null} then this method will ensure that the key is not present in the map.</p>
+     *
+     * @param key The key.
+     * @param value The value.
+     */
+    @Override
+    public void addExtraData(String key, String value) {
+        if (value != null) {
+            extraData.put(key, value);
+        } else {
+            extraData.remove(key);
+        }
+    }
+
+    @Override
+    public String getAuditTrackingId() {
+        return null;
+    }
+
+    /**
+     * Determines if the Access Token is expired.
+     *
+     * @return {@code true} if current time is greater than the expiry time.
+     */
+    @Override
+    public boolean isExpired() {
+        return currentTimeMillis() > getExpiryTime();
     }
 }

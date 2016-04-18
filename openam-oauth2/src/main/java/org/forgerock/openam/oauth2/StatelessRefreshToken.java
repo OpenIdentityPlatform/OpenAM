@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
@@ -28,16 +29,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.oauth2.core.StatefulRefreshToken;
 
 /**
  * Models a stateless OpenAM OAuth2 refresh token.
  */
-public class StatelessRefreshToken extends StatefulRefreshToken {
+public class StatelessRefreshToken extends JsonValue implements RefreshToken {
 
     private final Jwt jwt;
     private final String jwtString;
@@ -49,108 +50,9 @@ public class StatelessRefreshToken extends StatefulRefreshToken {
      * @param jwtString The JWT string.
      */
     public StatelessRefreshToken(Jwt jwt, String jwtString) {
-        super(null, null, null, null, null, 0L, null, null, null, null, null);
+        super(new Object());
         this.jwt = jwt;
         this.jwtString = jwtString;
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param tokenId {@inheritDoc}
-     */
-    @Override
-    protected void setTokenId(String tokenId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param resourceOwnerId {@inheritDoc}
-     */
-    @Override
-    protected void setResourceOwnerId(String resourceOwnerId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param clientId {@inheritDoc}
-     */
-    @Override
-    protected void setClientId(String clientId) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param redirectUri {@inheritDoc}
-     */
-    @Override
-    protected void setRedirectUri(String redirectUri) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param scope {@inheritDoc}
-     */
-    @Override
-    protected void setScope(Set<String> scope) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param expiryTime {@inheritDoc}
-     */
-    @Override
-    protected void setExpiryTime(long expiryTime) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param tokenType {@inheritDoc}
-     */
-    @Override
-    protected void setTokenType(String tokenType) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param tokenName {@inheritDoc}
-     */
-    @Override
-    protected void setTokenName(String tokenName) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param grantType {@inheritDoc}
-     */
-    @Override
-    protected void setGrantType(String grantType) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param authModules {@inheritDoc}
-     */
-    @Override
-    public void setAuthModules(String authModules) {
-    }
-
-    /**
-     * All state is retrieved directly from the {@code Jwt}. No state is store internally.
-     *
-     * @param acr {@inheritDoc}
-     */
-    @Override
-    protected void setAuthenticationContextClassReference(String acr) {
     }
 
     @Override
@@ -227,6 +129,11 @@ public class StatelessRefreshToken extends StatefulRefreshToken {
     }
 
     @Override
+    public String getAuditTrackingId() {
+        return null;
+    }
+
+    @Override
     public Map<String, Object> getTokenInfo() {
         JwtClaimsSet claimsSet = jwt.getClaimsSet();
         Map<String, Object> tokenInfo = new HashMap<>();
@@ -239,5 +146,43 @@ public class StatelessRefreshToken extends StatefulRefreshToken {
     @Override
     public String toString() {
         return jwtString;
+    }
+
+    /**
+     * Get whether or not token expires.
+     *
+     * @return Whether or not token expires.
+     */
+    @Override
+    public boolean isNeverExpires() {
+        return getExpiryTime() == -1;
+    }
+
+    /**
+     * Determines if the Refresh Token has expired.
+     *
+     * @return {@code true} if current time is greater than the expiry time.
+     */
+    @Override
+    public boolean isExpired() {
+        if (isNeverExpires()) {
+            return false;
+        }
+        return currentTimeMillis() > getExpiryTime();
+    }
+
+    /**
+     * Gets the display String for the given String.
+     *
+     * @param s The String.
+     * @return The display String.
+     */
+    protected String getResourceString(final String s) {
+        return s;
+    }
+
+    @Override
+    public String getClaims() {
+        return jwt.getClaimsSet().getClaim(CLAIMS, String.class);
     }
 }

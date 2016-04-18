@@ -138,8 +138,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 Collections.unmodifiableSet(scope), Collections.unmodifiableSet(tokenScope),
                 request);
 
-        final String validatedClaims = providerSettings.validateRequestedClaims(
-                refreshToken.getStringProperty(OAuth2Constants.Custom.CLAIMS));
+        final String validatedClaims = providerSettings.validateRequestedClaims(refreshToken.getClaims());
 
         RefreshToken newRefreshToken = null;
         if (providerSettings.issueRefreshTokensOnRefreshingToken()) {

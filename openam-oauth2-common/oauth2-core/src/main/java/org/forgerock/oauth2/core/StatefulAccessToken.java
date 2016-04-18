@@ -33,7 +33,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
  */
 public class StatefulAccessToken extends JsonValue implements AccessToken {
 
-    protected Map<String, Object> extraData = new HashMap<String, Object>();
+    protected Map<String, Object> extraData = new HashMap<>();
 
     /**
      * Constructs a new AccessToken backed with the data in the specified JsonValue.
@@ -312,11 +312,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getClaims() {
-        if (isDefined(OAuth2Constants.Custom.CLAIMS)) {
-            return (String) get(OAuth2Constants.Custom.CLAIMS).asSet().iterator().next();
-        }
-
-        return null;
+        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
     }
 
     /**
@@ -363,9 +359,14 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param key The property key.
      * @return The value.
      */
-    public String getStringProperty(String key) {
+    protected String getStringProperty(String key) {
         if (isDefined(key)) {
-            return get(key).asString();
+            JsonValue value = get(key);
+            if (value.isString()) {
+                return value.asString();
+            } else if (value.isCollection()) {
+                return (String) value.asList().iterator().next();
+            }
         }
         return null;
     }
@@ -425,6 +426,11 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
         } else {
             extraData.remove(key);
         }
+    }
+
+    @Override
+    public String getAuditTrackingId() {
+        return null;
     }
 
     private void validateTokenName(String tokenName, String tokenId) throws InvalidGrantException {
