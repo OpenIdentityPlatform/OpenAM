@@ -42,7 +42,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     SubjectResponseAttributesView, CustomResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView,
     FormHelper) => AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
         validationFields: ["name", "resources"],
@@ -85,7 +84,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 this.allSubjectsPromise = PoliciesService.getSubjectConditions();
                 this.allEnvironmentsPromise = PoliciesService.getEnvironmentConditions();
                 this.allUserAttributesPromise = PoliciesService.getAllUserAttributes();
-
+                this.data.headerActions = [
+                    { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policies" }
+                ];
                 this.template = "templates/admin/views/realms/authorization/policies/EditPolicyTemplate.html";
                 this.model = new PolicyModel({ name: policyName });
                 this.listenTo(this.model, "sync", this.renderPolicy);
@@ -94,6 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 this.template = "templates/admin/views/realms/authorization/policies/NewPolicyTemplate.html";
                 this.newEntity = true;
                 this.model = new PolicyModel();
+                this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policies" }];
                 this.listenTo(this.model, "sync", this.renderPolicy);
                 this.renderPolicy();
             }

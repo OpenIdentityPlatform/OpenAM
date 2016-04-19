@@ -51,6 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
         render (args, callback) {
             this.realmPath = args[0];
+            this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policySets" }];
             PoliciesService.listResourceTypes().then(_.bind(function (resourceTypes) {
                 if (resourceTypes.resultCount < 1) {
                     this.data.hasResourceTypes = false;

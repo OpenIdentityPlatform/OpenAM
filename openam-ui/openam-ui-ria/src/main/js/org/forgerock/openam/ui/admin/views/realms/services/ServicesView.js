@@ -39,15 +39,15 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         }, () => {
             ServicesService.instance.remove(this.data.realmPath, ids).then(() => {
                 this.rerender();
-            }, (reason) => {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response: reason
-                });
+            }, (response) => {
+                Messages.addMessage({ type: Messages.TYPE_DANGER, response });
                 this.rerender();
             });
         });
     }
+    const HEADER_ACTIONS = [
+        { actionPartial: "util/_HelpLink", helpLink: "backstage.config.services" }
+    ];
     const ServicesView = AbstractView.extend({
         template: "templates/admin/views/realms/services/ServicesTemplate.html",
         partials: [
@@ -99,6 +99,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
         render (args, callback) {
             this.data.args = args;
             this.data.realmPath = args[0];
+            this.data.headerActions = HEADER_ACTIONS;
 
             Promise.all([getServices(this.data.realmPath), getCreatables(this.data.realmPath)]).then((data) => {
                 const services = data[0];

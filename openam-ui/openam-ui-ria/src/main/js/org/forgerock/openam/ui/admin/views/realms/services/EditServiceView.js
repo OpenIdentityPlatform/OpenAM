@@ -29,9 +29,10 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     "org/forgerock/openam/ui/common/components/TabComponent",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
-    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FormHelper,
-    SubSchemaListView, PartialBasedView, TabComponent, JSONSchema, JSONValues, FlatJSONSchemaView) => {
+    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
+    "org/forgerock/openam/ui/admin/views/common/TabSearch"
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FormHelper, SubSchemaListView,
+    PartialBasedView, TabComponent, JSONSchema, JSONValues, FlatJSONSchemaView, TabSearch) => {
     const PSEUDO_TAB = { id: _.uniqueId("pseudo_tab_"), title: $.t("console.common.configuration") };
     const SUBSCHEMA_TAB = { id: "subschema", title: $.t("console.services.edit.secondaryConfigurations") };
 
@@ -44,10 +45,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 trigger: true
             });
         }, (model, response) => {
-            Messages.addMessage({
-                response,
-                type: Messages.TYPE_DANGER
-            });
+            Messages.addMessage({ response, type: Messages.TYPE_DANGER });
         });
     }
     function createTabs (schema, subSchemaTypes) {
@@ -74,8 +72,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/EditServiceTemplate.html",
         partials: [
-            "partials/form/_JSONSchemaFooter.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "partials/form/_JSONSchemaFooter.html"
         ],
         events: {
             "click [data-save]": "onSave",
@@ -120,6 +117,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 this.data.schema = response.schema;
                 this.data.values = response.values;
                 this.data.name = response.name;
+                this.data.headerActions = [{
+                    actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times"
+                }];
 
                 const tabs = createTabs(response.schema, response.subSchemaTypes);
                 const hasTabs = tabs.length > 1;
@@ -128,6 +128,17 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
                 this.parentRender(() => {
                     if (hasTabs) {
                         this.subview = this.createTabComponent(tabs);
+                        if (this.data.schema.isCollection()) {
+                            const options = {
+                                behaviour: TabSearch.BEHAVIOUR_GROUPED_JSONSCHEMA,
+                                properties: this.data.schema.raw.properties,
+                                onChange: (tabId, value) => {
+                                    this.subview.setTabId(tabId);
+                                    this.$el.find(`[data-schemapath="root.${value}"]`).find("input").focus();
+                                }
+                            };
+                            this.$el.find("[data-tab-search]").append(new TabSearch(options).render().$el);
+                        }
                     } else {
                         this.subview = new FlatJSONSchemaView({
                             schema: response.schema,

@@ -1,0 +1,6 @@
+<button class="btn btn-default"
+        type="button"
+        {{#if disabled}}disabled="{{disabled}}"{{/if}}
+        {{#if data}}data-{{data}}{{/if}}>
+     {{#if icon}}<i class="fa {{icon}}"></i> {{/if}}{{t title}}
+</button>

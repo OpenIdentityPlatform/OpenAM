@@ -35,7 +35,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
              EventManager, Router, Constants, UIUtils) {
     return AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
@@ -71,6 +70,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
 
             if (policySetName) {
                 this.template = "templates/admin/views/realms/authorization/policySets/EditPolicySetTemplate.html";
+                this.data.headerActions = [
+                    { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policySets" }
+                ];
                 this.model = new PolicySetModel({ name: policySetName });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
@@ -78,6 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Edit
                 this.data.newEntity = true;
                 this.template = "templates/admin/views/realms/authorization/policySets/NewPolicySetTemplate.html";
                 this.model = new PolicySetModel();
+                this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policySets" }];
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
             }

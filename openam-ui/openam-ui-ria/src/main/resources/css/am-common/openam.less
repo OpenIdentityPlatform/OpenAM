@@ -229,3 +229,24 @@ body, .modal-open {
       color: @base-theme-color;
     }
 }
+
+.am-selectize-search.selectize-control.single, select.am-selectize-search {
+    width: 200px;
+    .selectize-input {
+        border-color: @base-theme-color;
+
+        &:after {
+            display: block;
+            position: absolute;
+            top: 50%;
+            right: 17px;
+            margin: -9px 3px 0 0;
+            width: 0;
+            height: 0;
+            border: none;
+            content: '\f002';
+            font-family: fontawesome;
+            color: @base-theme-color;
+        }
+    }
+}

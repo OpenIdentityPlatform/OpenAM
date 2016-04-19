@@ -39,9 +39,6 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
 
     const EditSitesView = AbstractView.extend({
         template: "templates/admin/views/deployment/sites/EditSiteTemplate.html",
-        partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
-        ],
         events: {
             "click [data-save]": "onSave",
             "click [data-delete]": "onDelete"
@@ -52,6 +49,9 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
             SitesService.sites.get(this.data.id).then((data) => {
                 this.data.name = data.values.raw._id;
                 this.data.etag = data.values.raw.etag;
+                this.data.headerActions = [{
+                    actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times"
+                }];
 
                 this.parentRender(() => {
                     new Backlink().render();

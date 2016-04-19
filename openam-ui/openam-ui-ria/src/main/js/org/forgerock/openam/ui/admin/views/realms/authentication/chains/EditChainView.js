@@ -109,8 +109,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click [data-delete]"        : "onDeleteClick"
         },
         partials: [
-            "partials/alerts/_Alert.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "partials/alerts/_Alert.html"
         ],
 
         addItemToList: function (element) {
@@ -158,7 +157,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             });
         },
 
-
         render: function (args) {
             var self = this;
 
@@ -167,7 +165,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 self.data = {
                     realmPath : args[0],
                     allModules : data.modulesData,
-                    form : { chainData: data.chainData }
+                    form : { chainData: data.chainData },
+                    headerActions: [
+                        { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" }
+                    ]
                 };
 
                 self.parentRender(function () {
@@ -190,7 +191,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                                 $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
                         }
                         // popover doesn't work in case button has disabled attribute
-                        self.$el.find("#delete").addClass("disabled").popover(popoverOpt);
+                        self.$el.find("[data-delete]").addClass("disabled").popover(popoverOpt);
                     }
 
                     if (self.data.form.chainData.authChainConfiguration.length > 0) {

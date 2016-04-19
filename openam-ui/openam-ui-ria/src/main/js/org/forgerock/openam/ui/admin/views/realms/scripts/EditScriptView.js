@@ -46,8 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             this.model = null;
         },
         partials: [
-            "partials/alerts/_Alert.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "partials/alerts/_Alert.html"
         ],
         events: {
             "click [data-upload-script]": "uploadScript",
@@ -67,6 +66,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             var uuid = null;
 
             this.data.realmPath = args[0];
+            this.data.headerActions = [
+                { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" }
+            ];
 
             // As we interrupt render to update the model, we need to remember the callback
             if (callback) {

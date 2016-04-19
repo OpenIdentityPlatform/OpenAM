@@ -46,18 +46,12 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
                 trigger: true
             });
         }, (model, response) => {
-            Messages.addMessage({
-                response,
-                type: Messages.TYPE_DANGER
-            });
+            Messages.addMessage({ response, type: Messages.TYPE_DANGER });
         });
     }
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/services/EditServiceSubSchemaTemplate.html",
-        partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
-        ],
         events: {
             "click [data-save]": "onSave",
             "click [data-delete]": "onDelete",
@@ -69,6 +63,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchema
             this.data.serviceType = args[1];
             this.data.subSchemaType = args[2];
             this.data.id = args[3];
+            this.data.headerActions = [
+                { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" }
+            ];
 
             var self = this;
 

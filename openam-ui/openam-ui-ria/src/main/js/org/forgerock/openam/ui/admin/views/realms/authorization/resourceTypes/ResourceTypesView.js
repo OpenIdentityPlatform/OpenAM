@@ -66,6 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
 
             this.realmPath = args[0];
             this.data.items = new ResourceTypes();
+            this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }];
             this.data.items.fetch({ reset: true }).done((response) => {
                 if (response.resultCount > 0) {
                     this.data.hasResourceTypes = true;

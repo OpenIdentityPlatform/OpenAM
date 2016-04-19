@@ -74,9 +74,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     const EditRealmView = AbstractView.extend({
         template: "templates/admin/views/realms/EditRealmTemplate.html",
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
-            "partials/alerts/_Alert.html",
-            "partials/util/_HelpLink.html"
+            "partials/alerts/_Alert.html"
         ],
         events: {
             "click [data-save]": "submitForm",
@@ -94,10 +92,17 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             if (args[0]) {
                 this.data.realmPath = args[0];
                 this.data.realmName = args[0] === "/" ? $.t("console.common.topLevelRealm") : args[0].split("/").pop();
-                this.data.deleteBtnDisabled = !this.canRealmBeDeleted(this.data.realmPath);
                 this.data.newEntity = false;
+                this.data.headerActions = [{
+                    actionPartial: "form/_Button",
+                    data:"delete",
+                    title:"common.form.delete",
+                    icon:"fa-times",
+                    disabled: !this.canRealmBeDeleted(this.data.realmPath)
+                }];
             } else {
                 this.data.newEntity = true;
+                this.data.headerActions = null;
             }
 
             if (this.data.newEntity) {

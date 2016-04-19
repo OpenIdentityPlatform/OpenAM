@@ -33,7 +33,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
     return AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
         events: {
@@ -66,11 +65,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             if (uuid) {
                 this.template =
                     "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
+                this.data.headerActions = [
+                    { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }
+                ];
                 this.model = new ResourceTypeModel({ uuid: uuid });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
                 this.template = "templates/admin/views/realms/authorization/resourceTypes/NewResourceTypeTemplate.html";
+                this.data.headerActions = [
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }
+                ];
                 this.data.newEntity = true;
                 this.model = new ResourceTypeModel();
                 this.listenTo(this.model, "sync", this.onModelSync);

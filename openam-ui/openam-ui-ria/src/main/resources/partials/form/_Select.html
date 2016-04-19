@@ -1,0 +1,7 @@
+<select class="form-control {{cssClass}}"
+	{{#if data}}data-{{data}}{{/if}}
+	{{#if placeholder}}placeholder="{{t placeholder}}"{{/if}}>
+	{{#if placeholder}}
+		<option value="" disabled selected>{{t placeholder}}</option>
+	{{/if}}
+</select>
