@@ -77,10 +77,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                     this.subview.render();
                 });
             }, (response) => {
-                Messages.addMessage({
-                    type: Messages.TYPE_DANGER,
-                    response
-                });
+                Messages.addMessage({ type: Messages.TYPE_DANGER, response });
             });
         },
         updateData () {

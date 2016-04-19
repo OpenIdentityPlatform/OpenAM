@@ -17,10 +17,9 @@
 define("org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView", [
     "jquery",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
-    "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
     "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation",
     "org/forgerock/commons/ui/common/main/Router"
-], ($, TreeNavigation, createBreadcrumbs, createTreeNavigation, Router) => {
+], ($, TreeNavigation, createTreeNavigation, Router) => {
 
     const navData = [{
         title: "console.common.navigation.general",
@@ -54,7 +53,6 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefau
 
     const EditServerDefaultsTreeNavigationView = TreeNavigation.extend({
         render (args, callback) {
-            this.data.crumbs = createBreadcrumbs(this.route.pattern);
             this.data.treeNavigation = createTreeNavigation(navData);
             this.data.title = $.t("console.common.navigation.serverDefaults");
             this.data.home = `#${Router.getLink(Router.configuration.routes.editServerDefaultsGeneral, args)}`;

@@ -5,13 +5,11 @@
         <div class="row">
             <nav class="navbar navbar-default" role="navigation">
                 <div class="navbar-header {{#if crumbs}}col-sm-3 col-md-3 col-lg-2{{else}}col-sm-12{{/if}}">
-                    {{#if crumbs}}
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#breadcrumbNavBar" aria-expanded="false" aria-controls="navbar">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    {{/if}}
                     <div class="ellipsis">
                         <strong>
                             <i class="fa fa-server"></i> <a href="{{home}}">{{{title}}}</a>
@@ -23,6 +21,7 @@
                 <div class="ellipsis col-sm-9 col-md-9 col-lg-10 hidden-xs">
                     {{> breadcrumb/_Breadcrumb crumbs=crumbs }}
                 </div>
+                {{/if}}
 
                 <div id="breadcrumbNavBar" class="navbar-collapse collapse">
                     <nav class="sidenav visible-xs-block">
@@ -33,7 +32,6 @@
                         </ol>
                     </nav>
                 </div>
-                {{/if}}
             </nav>
         </div>
     </div>
