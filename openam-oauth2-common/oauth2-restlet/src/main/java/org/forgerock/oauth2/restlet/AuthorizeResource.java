@@ -180,6 +180,9 @@ public class AuthorizeResource extends ConsentRequiredResource {
         } catch (RedirectUriMismatchException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
+        } catch (DuplicateRequestParameterException e) {
+            throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
+                    request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
