@@ -657,16 +657,19 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 Map<String, String> attributeNamesToSections = getAttributeNamesToSections(tabName);
 
                 for (String attributeName : attributeNamesForTab) {
-                    final Object defaultAttribute = getValue(defaultAttributes, attributeName);
-                    final String sectionName = attributeNamesToSections.get(attributeName);
+                    final String defaultAttribute = (String) defaultAttributes.get(attributeName);
+                    final String sectionName = tabName.equals(ADVANCED_TAB_NAME) ? "advanced" :
+                                attributeNamesToSections.get(attributeName);
 
+                    String attributePath = sectionName == null ? "" : sectionName + "/";
                     if (defaultAttribute != null) {
-                        defaultSection.put(sectionName + "/" + attributeName, defaultAttribute);
+                        defaultSection.put(attributePath + attributeName, (String) defaultAttributes.get(attributeName));
                     }
 
-                    final Object serverSpecificAttribute = getValue(serverSpecificAttributes, attributeName);
+                    final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
                     if (serverSpecificAttribute != null) {
-                        result.putPermissive(new JsonPointer(sectionName + "/" + attributeName), serverSpecificAttribute);
+                        result.putPermissive(new JsonPointer(attributePath + attributeName),
+                                serverSpecificAttribute);
                     }
                 }
             }
@@ -683,10 +686,11 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
     private Object getValue(Properties attributes, String attributeName) {
         final String type = getType(attributeName);
-        if (type != null && type.equals("number")) {
-            return new Integer((String) attributes.get(attributeName));
+        final String value = (String) attributes.get(attributeName);
+        if (type != null && type.equals("number") && !value.isEmpty()) {
+            return new Integer(value);
         } else {
-            return attributes.get(attributeName);
+            return value;
         }
     }
 
