@@ -26,9 +26,11 @@ import org.forgerock.http.Client;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
+import org.forgerock.http.util.Uris;
 import org.forgerock.json.JsonValue;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -75,7 +77,7 @@ public final class PolicyImport extends JsonResourceCommand {
     @Override
     public void handleResourceRequest(RequestContext request) throws CLIException {
         try {
-            String jsonFile = getStringOptionValue(IArgument.FILE);
+            String jsonFile = getStringOptionValue(IArgument.JSON_FILE);
             JsonValue importPayload = readJsonFile(jsonFile);
 
             for (ModelDescriptor modelDescriptor : ModelDescriptor.getPrecedentOrder()) {
@@ -120,7 +122,8 @@ public final class PolicyImport extends JsonResourceCommand {
         Request readRequest = new Request()
                 .setMethod("GET");
 
-        String readEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + id;
+        String encodedId = Uris.urlEncodePathElement(id);
+        String readEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + encodedId;
         Response response = sendRequest(readRequest, readEndpoint);
 
         if (response.getStatus() == Status.OK) {
@@ -147,7 +150,8 @@ public final class PolicyImport extends JsonResourceCommand {
                     .put("Accept-API-Version", "protocol=1.0,resource=" + version);
         }
 
-        String updateEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + id;
+        String encodedId = Uris.urlEncodePathElement(id);
+        String updateEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + encodedId;
         Response response = sendRequest(request, updateEndpoint);
 
         if (response.getStatus().isSuccessful()) {
@@ -212,6 +216,14 @@ public final class PolicyImport extends JsonResourceCommand {
 
         if (response.getCause() != null) {
             eventDetails.put("errorMessage", response.getCause().getMessage());
+        }
+
+        if (response.getEntity() != null) {
+            try {
+                eventDetails.put("responseBody", response.getEntity().getJson());
+            } catch (IOException ioE) {
+                // Non-critical, do nothing.
+            }
         }
 
         eventRecords.get(resourceEvent).log(eventDetails);

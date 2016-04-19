@@ -64,15 +64,15 @@ public final class PolicyExport extends JsonResourceCommand {
     public void handleResourceRequest(RequestContext request) throws CLIException {
 
         String realm = getStringOptionValue(IArgument.REALM_NAME);
-        String outfile = getStringOptionValue(IArgument.OUTPUT_FILE);
+        String outfile = getStringOptionValue(IArgument.JSON_FILE);
 
         JsonValue exportPayload = json(object());
 
-        Map<String, Object> exportMetrics = new HashMap<>();
+        Map<ModelDescriptor, Integer> exportMetrics = new HashMap<>();
 
         for (ModelDescriptor modelDescriptor : ModelDescriptor.getPrecedentOrder()) {
             int count = exportResourceToPayload(modelDescriptor, exportPayload);
-            exportMetrics.put(modelDescriptor.getEndpointIdentifier(), count);
+            exportMetrics.put(modelDescriptor, count);
         }
 
         writeJsonFile(exportPayload, outfile);
