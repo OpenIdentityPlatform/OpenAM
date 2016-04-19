@@ -79,7 +79,7 @@ public final class PolicyExport extends JsonResourceCommand {
 
         writeLog(LogWriter.LOG_ACCESS, Level.LL_INFO, "POLICY_EXPORT_SUCCESS", realm, outfile);
 
-        getOutputWriter().printlnMessage(objectToJsonString(json(exportMetrics)));
+        getOutputWriter().printlnMessage(objectToJsonString(exportMetrics));
 
     }
 
