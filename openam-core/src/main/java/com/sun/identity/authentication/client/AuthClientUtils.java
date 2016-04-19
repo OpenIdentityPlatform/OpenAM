@@ -2576,7 +2576,11 @@ public class AuthClientUtils {
                     if (queryParams.containsKey(entry.getKey())) {
                         // TODO: do we need to care about params that can be both in GET and POST?
                     } else {
-                        postParams.put(entry.getKey(), new HashSet<String>(asList(entry.getValue())));
+                        Set<String> values = new HashSet<String>();
+                        for (String value : entry.getValue()) {
+                            values.add(getCharDecodedField(value, "UTF-8"));
+                        }
+                        postParams.put(entry.getKey(), values);
                     }
                 }
 
