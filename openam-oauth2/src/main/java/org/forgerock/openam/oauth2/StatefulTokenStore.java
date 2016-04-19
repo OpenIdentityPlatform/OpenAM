@@ -506,7 +506,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
                     nonce, realm, claims, auditId);
         }
         try {
-            tokenStore.create((JsonValue) accessToken);
+            tokenStore.create(accessToken.toJsonValue());
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"CREATED_TOKEN", accessToken.toString()};
                 auditLogger.logAccessMessage("CREATED_TOKEN", obs, null);
@@ -653,7 +653,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
     public void updateAccessToken(OAuth2Request request, AccessToken accessToken) {
         try {
-            tokenStore.update((JsonValue) accessToken);
+            tokenStore.update(accessToken.toJsonValue());
         } catch (CoreTokenException e) {
             logger.error("DefaultOAuthTokenStoreImpl::Unable to update access token "
                     + accessToken.getTokenId(), e);

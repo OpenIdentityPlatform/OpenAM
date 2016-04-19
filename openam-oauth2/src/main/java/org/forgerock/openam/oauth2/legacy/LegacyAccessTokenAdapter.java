@@ -32,7 +32,7 @@ public class LegacyAccessTokenAdapter extends CoreToken {
     private final AccessToken token;
 
     public LegacyAccessTokenAdapter(AccessToken token) {
-        super(token.getTokenId(), (JsonValue) token);
+        super(token.getTokenId(), token.toJsonValue());
         this.token = token;
     }
 

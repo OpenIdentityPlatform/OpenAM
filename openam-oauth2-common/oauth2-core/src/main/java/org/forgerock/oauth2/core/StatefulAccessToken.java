@@ -443,4 +443,8 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
     public String toString() {
         return getTokenId();
     }
+
+    public JsonValue toJsonValue() {
+        return this;
+    }
 }

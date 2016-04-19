@@ -39,7 +39,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 /**
  * Models a stateless OpenAM OAuth2 access token.
  */
-public final class StatelessAccessToken extends JsonValue implements AccessToken {
+public final class StatelessAccessToken implements AccessToken {
 
     protected Map<String, Object> extraData = new HashMap<>();
 
@@ -56,7 +56,6 @@ public final class StatelessAccessToken extends JsonValue implements AccessToken
      * @param jwtString The JWT string.
      */
     public StatelessAccessToken(Jwt jwt, String jwtString) {
-        super(new Object());
         this.jwt = jwt;
         this.jwtString = jwtString;
     }
@@ -182,5 +181,9 @@ public final class StatelessAccessToken extends JsonValue implements AccessToken
     @Override
     public boolean isExpired() {
         return currentTimeMillis() > getExpiryTime();
+    }
+
+    public JsonValue toJsonValue() {
+        return new JsonValue(new Object());
     }
 }

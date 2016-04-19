@@ -38,7 +38,7 @@ import org.forgerock.oauth2.core.RefreshToken;
 /**
  * Models a stateless OpenAM OAuth2 refresh token.
  */
-public class StatelessRefreshToken extends JsonValue implements RefreshToken {
+public class StatelessRefreshToken implements RefreshToken {
 
     private final Jwt jwt;
     private final String jwtString;
@@ -50,7 +50,6 @@ public class StatelessRefreshToken extends JsonValue implements RefreshToken {
      * @param jwtString The JWT string.
      */
     public StatelessRefreshToken(Jwt jwt, String jwtString) {
-        super(new Object());
         this.jwt = jwt;
         this.jwtString = jwtString;
     }
@@ -184,5 +183,9 @@ public class StatelessRefreshToken extends JsonValue implements RefreshToken {
     @Override
     public String getClaims() {
         return jwt.getClaimsSet().getClaim(CLAIMS, String.class);
+    }
+
+    public JsonValue toJsonValue() {
+        return new JsonValue(new Object());
     }
 }

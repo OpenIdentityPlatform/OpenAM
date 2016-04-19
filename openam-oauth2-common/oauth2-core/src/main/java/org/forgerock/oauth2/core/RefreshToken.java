@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.json.JsonValue;
+
 import java.util.Map;
 
 public interface RefreshToken extends IntrospectableToken, Token {
@@ -37,4 +39,6 @@ public interface RefreshToken extends IntrospectableToken, Token {
     Map<String, Object> toMap();
 
     String getAuditTrackingId();
+
+    JsonValue toJsonValue();
 }

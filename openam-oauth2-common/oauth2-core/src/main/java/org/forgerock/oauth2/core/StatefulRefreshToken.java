@@ -385,4 +385,8 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
 
         return null;
     }
+
+    public JsonValue toJsonValue() {
+        return this;
+    }
 }

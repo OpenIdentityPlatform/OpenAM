@@ -25,16 +25,10 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-<<<<<<< 21005172e7f0697acf1f3e1f2fe209d09462c08b
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
-=======
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.EXPIRES_IN;
->>>>>>> Fix TokenInfoEndpoint
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 

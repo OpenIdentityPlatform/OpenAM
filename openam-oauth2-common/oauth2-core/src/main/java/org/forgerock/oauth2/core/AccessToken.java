@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.json.JsonValue;
+
 import java.util.Map;
 
 public interface AccessToken extends IntrospectableToken, Token {
@@ -37,4 +39,6 @@ public interface AccessToken extends IntrospectableToken, Token {
     void addExtraData(String key, String value);
 
     String getAuditTrackingId();
+
+    JsonValue toJsonValue();
 }
