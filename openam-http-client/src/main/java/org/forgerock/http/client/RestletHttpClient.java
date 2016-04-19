@@ -25,6 +25,7 @@ import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.*;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.util.Series;
 
 import java.io.UnsupportedEncodingException;
@@ -126,13 +127,14 @@ public abstract class RestletHttpClient {
     }
 
     private void addHeadersToRequest(HttpClientRequest httpClientRequest, Request request) {
-        Map<String, Object> headersMap = new HashMap<String, Object>();
-        Form headersForm = new Form();
-        for (String key : httpClientRequest.getHeaders().keySet()) {
-            headersForm.set(key, httpClientRequest.getHeaders().get(key));
+        Series<Header> headers = (Series<Header>) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        if (headers == null) {
+            headers = new Series<>(Header.class);
+            request.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, headers);
         }
-        headersMap.put("org.restlet.http.headers", headersForm);
-        request.setAttributes(headersMap);
+        for (String key : httpClientRequest.getHeaders().keySet()) {
+            headers.set(key, httpClientRequest.getHeaders().get(key));
+        }
     }
 
     private void addQueryParametersToRequest(HttpClientRequest httpClientRequest, Request request) throws UnsupportedEncodingException {
