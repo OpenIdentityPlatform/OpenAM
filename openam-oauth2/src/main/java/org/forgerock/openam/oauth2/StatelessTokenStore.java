@@ -134,7 +134,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
-                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString());
+                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
+                .claim(AUTH_GRANT_ID, refreshToken.getAuthGrantId());
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
                 .claims(claimsSetBuilder.build())
@@ -242,6 +243,14 @@ public class StatelessTokenStore implements TokenStore {
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
             throws ServerException, NotFoundException {
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
+                validatedClaims, UUID.randomUUID().toString());
+    }
+
+    @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException {
         String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
@@ -266,7 +275,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, lifeTime.getMillis())
                 .claim(TOKEN_NAME, OAUTH_REFRESH_TOKEN)
-                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString());
+                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
+                .claim(AUTH_GRANT_ID, authGrantId);
 
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
         String authModules = null;

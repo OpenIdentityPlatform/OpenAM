@@ -118,6 +118,25 @@ public interface TokenStore {
             throws ServerException, NotFoundException;
 
     /**
+     * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
+     *
+     * @param grantType       The OAuth2 Grant Type.
+     * @param clientId        The client's id.
+     * @param resourceOwnerId The resource owner's Id.
+     * @param redirectUri     The redirect uri.
+     * @param scope           The requested scope.
+     * @param request         The OAuth2 request.
+     * @param validatedClaims The validated claims.
+     * @param authGrantId     The authorization grant Id.
+     * @return A RefreshToken
+     * @throws ServerException   If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     */
+    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException;
+
+    /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
      *
      * @param request The current request.

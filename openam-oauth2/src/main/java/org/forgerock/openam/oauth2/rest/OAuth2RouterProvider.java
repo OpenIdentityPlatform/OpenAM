@@ -16,23 +16,24 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
-import static org.forgerock.openam.rest.service.RestletUtils.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
 import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.APPLICATION_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.*;
-
-import java.util.Set;
+import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.SCOPES;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import java.util.Set;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
@@ -61,9 +62,6 @@ import org.forgerock.openidconnect.restlet.UserInfo;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * Guice Provider from getting the OAuth2 HTTP router.
@@ -150,6 +148,9 @@ public class OAuth2RouterProvider implements Provider<Router> {
         router.attach("/device/user", auditWithOAuthFilter(wrap(DeviceCodeVerificationResource.class)));
         router.attach("/device/code", auditWithOAuthFilter(wrap(DeviceCodeResource.class),
                 formAuditor(RESPONSE_TYPE, GRANT_TYPE, CLIENT_ID, SCOPE), noBodyAuditor()));
+
+        // OAuth2 Token Revocation
+        router.attach("/token/revoke", auditWithOAuthFilter(wrap(TokenRevocationResource.class)));
 
         return router;
     }

@@ -121,6 +121,19 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     }
 
     @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException {
+        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+            return statelessTokenStore.createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope,
+                    request, validatedClaims, authGrantId);
+        } else {
+            return statefulTokenStore.createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope,
+                    request, validatedClaims, authGrantId);
+        }
+    }
+
+    @Override
     public AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) 
             throws InvalidGrantException, ServerException, NotFoundException {
         if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {

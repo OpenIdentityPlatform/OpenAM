@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.oauth2.core.RefreshToken;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -74,7 +75,7 @@ public final class OpenAMAccessTokenTest {
         String redirectUri = null;
         Set<String> scope = new HashSet<>(Arrays.asList("cn"));
         long expiryTime = 1234567L;
-        String refreshTokenId = null;
+        RefreshToken refreshToken = null;
         String tokenName = "access_token";
         String grantType = "password";
         String nonce = null;
@@ -83,7 +84,7 @@ public final class OpenAMAccessTokenTest {
         String auditTrackingId = "4ed857de-5d18-4afa-bc85-56991b0f8d3d";
 
         return new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, client, redirectUri,
-                scope, expiryTime, refreshTokenId, tokenName, grantType, nonce, realm, claims, auditTrackingId);
+                scope, expiryTime, refreshToken, tokenName, grantType, nonce, realm, claims, auditTrackingId);
     }
 
 }
