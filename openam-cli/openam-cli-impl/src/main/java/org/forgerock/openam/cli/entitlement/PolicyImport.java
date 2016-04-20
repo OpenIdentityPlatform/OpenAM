@@ -16,12 +16,15 @@
 
 package org.forgerock.openam.cli.entitlement;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.identity.cli.CLIException;
-import com.sun.identity.cli.IArgument;
-import com.sun.identity.cli.LogWriter;
-import com.sun.identity.cli.RequestContext;
-import com.sun.identity.log.Level;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.forgerock.http.Client;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -29,13 +32,12 @@ import org.forgerock.http.protocol.Status;
 import org.forgerock.http.util.Uris;
 import org.forgerock.json.JsonValue;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sun.identity.cli.CLIException;
+import com.sun.identity.cli.IArgument;
+import com.sun.identity.cli.LogWriter;
+import com.sun.identity.cli.RequestContext;
+import com.sun.identity.log.Level;
 
 /**
  * Given a json file containing the policy model export, attempts to create or update policy model resources.
@@ -124,16 +126,17 @@ public final class PolicyImport extends JsonResourceCommand {
 
         String encodedId = Uris.urlEncodePathElement(id);
         String readEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + encodedId;
-        Response response = sendRequest(readRequest, readEndpoint);
 
-        if (response.getStatus() == Status.OK) {
-            updateResource(id, version, resource, modelDescriptor);
-        } else if (response.getStatus() == Status.NOT_FOUND) {
-            createResource(id, version, resource, modelDescriptor);
-        } else {
-            logResourceEvent(id, response, modelDescriptor, ResourceEvent.READ_FAILURE);
-            String httpCode = String.valueOf(response.getStatus().getCode());
-            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_READ_FAILED", id, modelDescriptor.name(), httpCode);
+        try (Response response = sendRequest(readRequest, readEndpoint)) {
+            if (response.getStatus() == Status.OK) {
+                updateResource(id, version, resource, modelDescriptor);
+            } else if (response.getStatus() == Status.NOT_FOUND) {
+                createResource(id, version, resource, modelDescriptor);
+            } else {
+                logResourceEvent(id, response, modelDescriptor, ResourceEvent.READ_FAILURE);
+                String httpCode = String.valueOf(response.getStatus().getCode());
+                auditEvent(LogWriter.LOG_ERROR, "RESOURCE_READ_FAILED", id, modelDescriptor.name(), httpCode);
+            }
         }
     }
 
@@ -152,15 +155,16 @@ public final class PolicyImport extends JsonResourceCommand {
 
         String encodedId = Uris.urlEncodePathElement(id);
         String updateEndpoint = modelDescriptor.getEndpointIdentifier() + "/" + encodedId;
-        Response response = sendRequest(request, updateEndpoint);
 
-        if (response.getStatus().isSuccessful()) {
-            logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_SUCCESS);
-            auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_UPDATE_SUCCESS", id, modelDescriptor.name());
-        } else {
-            logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_FAILURE);
-            String httpCode = String.valueOf(response.getStatus().getCode());
-            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_UPDATE_FAILED", id, modelDescriptor.name(), httpCode);
+        try (Response response = sendRequest(request, updateEndpoint)) {
+            if (response.getStatus().isSuccessful()) {
+                logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_SUCCESS);
+                auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_UPDATE_SUCCESS", id, modelDescriptor.name());
+            } else {
+                logResourceEvent(id, response, modelDescriptor, ResourceEvent.UPDATE_FAILURE);
+                String httpCode = String.valueOf(response.getStatus().getCode());
+                auditEvent(LogWriter.LOG_ERROR, "RESOURCE_UPDATE_FAILED", id, modelDescriptor.name(), httpCode);
+            }
         }
     }
 
@@ -178,15 +182,16 @@ public final class PolicyImport extends JsonResourceCommand {
         }
 
         String createEndpoint = modelDescriptor.getEndpointIdentifier() + "?_action=create";
-        Response response = sendRequest(request, createEndpoint);
 
-        if (response.getStatus().isSuccessful()) {
-            logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_SUCCESS);
-            auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_CREATE_SUCCESS", id, modelDescriptor.name());
-        } else {
-            logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_FAILURE);
-            String httpCode = String.valueOf(response.getStatus().getCode());
-            auditEvent(LogWriter.LOG_ERROR, "RESOURCE_CREATE_FAILED", id, modelDescriptor.name(), httpCode);
+        try (Response response = sendRequest(request, createEndpoint)) {
+            if (response.getStatus().isSuccessful()) {
+                logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_SUCCESS);
+                auditEvent(LogWriter.LOG_ACCESS, "RESOURCE_CREATE_SUCCESS", id, modelDescriptor.name());
+            } else {
+                logResourceEvent(id, response, modelDescriptor, ResourceEvent.CREATE_FAILURE);
+                String httpCode = String.valueOf(response.getStatus().getCode());
+                auditEvent(LogWriter.LOG_ERROR, "RESOURCE_CREATE_FAILED", id, modelDescriptor.name(), httpCode);
+            }
         }
     }
 

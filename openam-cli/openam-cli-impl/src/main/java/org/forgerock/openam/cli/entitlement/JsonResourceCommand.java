@@ -117,12 +117,7 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
         request.getHeaders().put("iplanetDirectoryPro", ssoToken);
         request.getHeaders().put("Content-Type", "application/json");
         Promise<Response, NeverThrowsException> promise = client.send(request);
-
-        try {
-            return promise.getOrThrow();
-        } catch (InterruptedException iE) {
-            throw new CLIException(iE, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        }
+        return promise.getOrThrowUninterruptibly();
     }
 
     /**

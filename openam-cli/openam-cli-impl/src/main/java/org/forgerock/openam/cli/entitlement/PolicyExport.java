@@ -16,7 +16,8 @@
 
 package org.forgerock.openam.cli.entitlement;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +63,6 @@ public final class PolicyExport extends JsonResourceCommand {
 
     @Override
     public void handleResourceRequest(RequestContext request) throws CLIException {
-
         String realm = getStringOptionValue(IArgument.REALM_NAME);
         String outfile = getStringOptionValue(IArgument.JSON_FILE);
 
@@ -87,40 +87,39 @@ public final class PolicyExport extends JsonResourceCommand {
      * @return number of resources set to the export payload.
      */
     private int exportResourceToPayload(ModelDescriptor modelDescriptor, JsonValue exportPayload) throws CLIException {
+        try (Response response = queryForAllResources(modelDescriptor)) {
+            JsonValue resources = extractResources(response);
 
-        Response response = queryForAllResources(modelDescriptor);
-        JsonValue resources = extractResources(response);
+            List<Object> resourceObjects = new ArrayList<>();
+            int countResources = 0;
 
-        List<Object> resourceObjects = new ArrayList<>();
-        int countResources = 0;
+            for (JsonValue resource : resources) {
 
-        for (JsonValue resource : resources) {
+                if (modelDescriptor.isExcludedResource(resource)) {
+                    continue;
+                }
 
-            if (modelDescriptor.isExcludedResource(resource)) {
-                continue;
+                resourceObjects.add(resource.getObject());
+                countResources++;
             }
 
-            resourceObjects.add(resource.getObject());
-            countResources++;
-        }
+            if (resources.size() == 0) {
+                return countResources;
+            }
 
-        if (resources.size() == 0) {
+            String version = extractResourceVersion(response);
+
+            Map<String, Object> exportEntry = new HashMap<>();
+            exportEntry.put(RESOURCES_REFERENCE, resourceObjects);
+            exportEntry.put(VERSION_REFERENCE, version);
+
+            exportPayload.add(modelDescriptor.getEndpointIdentifier(), exportEntry);
+
             return countResources;
         }
-
-        String version = extractResourceVersion(response);
-
-        Map<String, Object> exportEntry = new HashMap<>();
-        exportEntry.put(RESOURCES_REFERENCE, resourceObjects);
-        exportEntry.put(VERSION_REFERENCE, version);
-
-        exportPayload.add(modelDescriptor.getEndpointIdentifier(), exportEntry);
-
-        return countResources;
     }
 
     private Response queryForAllResources(ModelDescriptor endpoint) throws CLIException {
-
         Request readRequest = new Request().setMethod("GET");
         String queryEndpoint = endpoint.getEndpointIdentifier() + "?_queryFilter=true";
 
