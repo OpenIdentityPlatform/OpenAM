@@ -753,7 +753,7 @@
                 "table" : ["Name", "Site Name"],
                 "empty" : "No Servers found",
                 "clone" : "Clone",
-                "description": "TODO:AME-10278 Add desciption, foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar"
+                "description": "Configure server-specific properties in OpenAM instances."
             }
         },
         "authentication": {
