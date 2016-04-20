@@ -18,31 +18,23 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.NONCE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.AccessToken;
 
 /**
  * Models a stateless OpenAM OAuth2 access token.
  */
-public final class StatelessAccessToken implements AccessToken {
+public final class StatelessAccessToken extends StatelessToken implements AccessToken {
 
     protected Map<String, Object> extraData = new HashMap<>();
 
@@ -59,6 +51,7 @@ public final class StatelessAccessToken implements AccessToken {
      * @param jwtString The JWT string.
      */
     public StatelessAccessToken(Jwt jwt, String jwtString) {
+        super(jwt);
         this.jwt = jwt;
         this.jwtString = jwtString;
     }
@@ -74,27 +67,6 @@ public final class StatelessAccessToken implements AccessToken {
     }
 
     @Override
-    public String getRealm() {
-        return jwt.getClaimsSet().getClaim(REALM, String.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Set<String> getScope() {
-        Object scope = jwt.getClaimsSet().getClaim(SCOPE);
-        if (scope instanceof List) {
-            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, List.class));
-        } else {
-            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, Set.class));
-        }
-    }
-
-    @Override
-    public String getClientId() {
-        return jwt.getClaimsSet().getAudience().get(0);
-    }
-
-    @Override
     public String getNonce() {
         return jwt.getClaimsSet().getClaim(NONCE, String.class);
     }
@@ -102,26 +74,6 @@ public final class StatelessAccessToken implements AccessToken {
     @Override
     public String getSessionId() {
         throw new UnsupportedOperationException("Stateless access tokens do not support the session id claim");
-    }
-
-    @Override
-    public String getResourceOwnerId() {
-        return jwt.getClaimsSet().getSubject();
-    }
-
-    @Override
-    public String getClaims() {
-        return jwt.getClaimsSet().getClaim(CLAIMS, String.class);
-    }
-
-    @Override
-    public long getExpiryTime() {
-        return jwt.getClaimsSet().getExpirationTime().getTime();
-    }
-
-    @Override
-    public String getTokenType() {
-        return BEARER;
     }
 
     @Override
@@ -145,16 +97,6 @@ public final class StatelessAccessToken implements AccessToken {
 
     private long getExpireTime() {
         return (jwt.getClaimsSet().getExpirationTime().getTime() - currentTimeMillis()) / 1000;
-    }
-
-    @Override
-    public Map<String, Object> getTokenInfo() {
-        JwtClaimsSet claimsSet = jwt.getClaimsSet();
-        Map<String, Object> tokenInfo = new HashMap<>();
-        for (String key : claimsSet.keys()) {
-            tokenInfo.put(key, claimsSet.get(key).getObject());
-        }
-        return tokenInfo;
     }
 
     /**
@@ -187,9 +129,5 @@ public final class StatelessAccessToken implements AccessToken {
     @Override
     public boolean isExpired() {
         return currentTimeMillis() > getExpiryTime();
-    }
-
-    public JsonValue toJsonValue() {
-        return new JsonValue(new Object());
     }
 }

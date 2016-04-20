@@ -19,32 +19,22 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.RefreshToken;
 
 /**
  * Models a stateless OpenAM OAuth2 refresh token.
  */
-public class StatelessRefreshToken implements RefreshToken {
-
-    private final Jwt jwt;
+public class StatelessRefreshToken extends StatelessToken implements RefreshToken {
 
     private final String jwtString;
 
@@ -55,7 +45,7 @@ public class StatelessRefreshToken implements RefreshToken {
      * @param jwtString The JWT string.
      */
     public StatelessRefreshToken(Jwt jwt, String jwtString) {
-        this.jwt = jwt;
+        super(jwt);
         this.jwtString = jwtString;
     }
 
@@ -70,49 +60,13 @@ public class StatelessRefreshToken implements RefreshToken {
     }
 
     @Override
-    public String getRealm() {
-        return jwt.getClaimsSet().getClaim(REALM, String.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Set<String> getScope() {
-        Object scope = jwt.getClaimsSet().getClaim(SCOPE);
-        if (scope instanceof List) {
-            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, List.class));
-        } else {
-            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, Set.class));
-        }
-    }
-
-    @Override
     public String getAuthenticationContextClassReference() {
         return jwt.getClaimsSet().getClaim(ACR, String.class);
     }
 
     @Override
-    public long getExpiryTime() {
-        return jwt.getClaimsSet().getExpirationTime().getTime();
-    }
-
-    @Override
-    public String getClientId() {
-        return jwt.getClaimsSet().getAudience().get(0);
-    }
-
-    @Override
-    public String getResourceOwnerId() {
-        return jwt.getClaimsSet().getSubject();
-    }
-
-    @Override
     public String getRedirectUri() {
         return jwt.getClaimsSet().getClaim(REDIRECT_URI, String.class);
-    }
-
-    @Override
-    public String getTokenType() {
-        return BEARER;
     }
 
     @Override
@@ -136,16 +90,6 @@ public class StatelessRefreshToken implements RefreshToken {
     @Override
     public String getAuditTrackingId() {
         return null;
-    }
-
-    @Override
-    public Map<String, Object> getTokenInfo() {
-        JwtClaimsSet claimsSet = jwt.getClaimsSet();
-        Map<String, Object> tokenInfo = new HashMap<>();
-        for (String key : claimsSet.keys()) {
-            tokenInfo.put(key, claimsSet.get(key).getObject());
-        }
-        return tokenInfo;
     }
 
     @Override
@@ -184,14 +128,5 @@ public class StatelessRefreshToken implements RefreshToken {
      */
     protected String getResourceString(final String string) {
         return string;
-    }
-
-    @Override
-    public String getClaims() {
-        return jwt.getClaimsSet().getClaim(CLAIMS, String.class);
-    }
-
-    public JsonValue toJsonValue() {
-        return new JsonValue(new Object());
     }
 }
