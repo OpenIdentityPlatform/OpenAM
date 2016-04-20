@@ -19,8 +19,13 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.HashMap;
@@ -32,7 +37,6 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
 
 /**
@@ -41,6 +45,7 @@ import org.forgerock.oauth2.core.RefreshToken;
 public class StatelessRefreshToken implements RefreshToken {
 
     private final Jwt jwt;
+
     private final String jwtString;
 
     /**
@@ -61,22 +66,22 @@ public class StatelessRefreshToken implements RefreshToken {
 
     @Override
     public String getTokenName() {
-        return OAuth2Constants.Params.ACCESS_TOKEN;
+        return REFRESH_TOKEN;
     }
 
     @Override
     public String getRealm() {
-        return jwt.getClaimsSet().getClaim("realm", String.class);
+        return jwt.getClaimsSet().getClaim(REALM, String.class);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Set<String> getScope() {
-        Object scope = jwt.getClaimsSet().getClaim("scope");
+        Object scope = jwt.getClaimsSet().getClaim(SCOPE);
         if (scope instanceof List) {
-            return new HashSet<>(jwt.getClaimsSet().getClaim("scope", List.class));
+            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, List.class));
         } else {
-            return new HashSet<>(jwt.getClaimsSet().getClaim("scope", Set.class));
+            return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, Set.class));
         }
     }
 
@@ -102,12 +107,12 @@ public class StatelessRefreshToken implements RefreshToken {
 
     @Override
     public String getRedirectUri() {
-        return jwt.getClaimsSet().getClaim(OAuth2Constants.Params.REDIRECT_URI, String.class);
+        return jwt.getClaimsSet().getClaim(REDIRECT_URI, String.class);
     }
 
     @Override
     public String getTokenType() {
-        return OAuth2Constants.Bearer.BEARER;
+        return BEARER;
     }
 
     @Override
@@ -118,13 +123,14 @@ public class StatelessRefreshToken implements RefreshToken {
     @Override
     public Map<String, Object> toMap() {
         final Map<String, Object> tokenMap = new HashMap<>();
-        tokenMap.put(getResourceString(OAuth2Constants.Params.ACCESS_TOKEN), jwt.build());
-        tokenMap.put(getResourceString(TOKEN_TYPE), "Bearer");
-        tokenMap.put(getResourceString(EXPIRE_TIME),
-                getExpiryTime() == -1
-                        ? null
-                        : (jwt.getClaimsSet().getExpirationTime().getTime() - currentTimeMillis()) / 1000);
+        tokenMap.put(getResourceString(REFRESH_TOKEN), jwt.build());
+        tokenMap.put(getResourceString(TOKEN_TYPE), BEARER);
+        tokenMap.put(getResourceString(EXPIRE_TIME), getExpireTime());
         return tokenMap;
+    }
+
+    private long getExpireTime() {
+        return (getExpiryTime() == -1) ? null : (jwt.getClaimsSet().getExpirationTime().getTime() - currentTimeMillis()) / 1000;
     }
 
     @Override
@@ -173,11 +179,11 @@ public class StatelessRefreshToken implements RefreshToken {
     /**
      * Gets the display String for the given String.
      *
-     * @param s The String.
+     * @param string The String.
      * @return The display String.
      */
-    protected String getResourceString(final String s) {
-        return s;
+    protected String getResourceString(final String string) {
+        return string;
     }
 
     @Override

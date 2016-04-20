@@ -16,8 +16,25 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.PARENT;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REFRESH_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.ACCESS_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.NONCE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.SSO_TOKEN_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
+import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,9 +91,18 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param grantType The grant type.
      * @param nonce The nonce.
      */
-    public StatefulAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId, String redirectUri,
-                               Set<String> scope, long expiryTime, String refreshTokenId, String tokenName, String grantType,
-                               String nonce) {
+    public StatefulAccessToken(
+            String id,
+            String authorizationCode,
+            String resourceOwnerId,
+            String clientId,
+            String redirectUri,
+            Set<String> scope,
+            long expiryTime,
+            String refreshTokenId,
+            String tokenName,
+            String grantType,
+            String nonce) {
         super(new HashMap<String, Object>());
         setId(id);
         setAuthorizationCode(authorizationCode);
@@ -88,7 +114,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
         if (!Utils.isEmpty(refreshTokenId)) {
             setRefreshTokenId(refreshTokenId);
         }
-        setTokenType(OAuth2Constants.Bearer.BEARER);
+        setTokenType(BEARER);
         setTokenName(tokenName);
         setGrantType(grantType);
         setNonce(nonce);
@@ -100,7 +126,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param id The token id.
      */
     protected void setId(String id) {
-        put(ID, id);
+        setStringProperty(ID, id);
     }
 
     /**
@@ -109,7 +135,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param authorizationCode The authorization code.
      */
     protected void setAuthorizationCode(String authorizationCode) {
-        put(PARENT, authorizationCode);
+        setStringProperty(PARENT, authorizationCode);
     }
 
     /**
@@ -118,7 +144,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param resourceOwnerId The resource owner's id.
      */
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(USERNAME, resourceOwnerId);
+        setStringProperty(USERNAME, resourceOwnerId);
     }
 
     /**
@@ -127,7 +153,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param clientId The client's id.
      */
     protected void setClientId(String clientId) {
-        put(CLIENT_ID, clientId);
+        setStringProperty(CLIENT_ID, clientId);
     }
 
     /**
@@ -136,7 +162,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param redirectUri The redirect uri.
      */
     protected void setRedirectUri(String redirectUri) {
-        put(REDIRECT_URI, redirectUri);
+        setStringProperty(REDIRECT_URI, redirectUri);
     }
 
     /**
@@ -163,7 +189,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param refreshTokenId The refresh token id.
      */
     protected void setRefreshTokenId(String refreshTokenId) {
-        put(REFRESH_TOKEN, refreshTokenId);
+        setStringProperty(REFRESH_TOKEN, refreshTokenId);
     }
 
     /**
@@ -172,7 +198,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param tokenType The token type.
      */
     protected void setTokenType(String tokenType) {
-        put(TOKEN_TYPE, tokenType);
+        setStringProperty(TOKEN_TYPE, tokenType);
     }
 
     /**
@@ -181,7 +207,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param tokenName The token name.
      */
     protected void setTokenName(String tokenName) {
-        put(TOKEN_NAME, tokenName);
+        setStringProperty(TOKEN_NAME, tokenName);
     }
 
     /**
@@ -190,7 +216,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param grantType The grant type.
      */
     protected void setGrantType(String grantType) {
-        put(OAuth2Constants.Params.GRANT_TYPE, grantType);
+        setStringProperty(GRANT_TYPE, grantType);
     }
 
     /**
@@ -199,7 +225,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      * @param nonce The nonce.
      */
     protected void setNonce(String nonce) {
-        put(OAuth2Constants.Custom.NONCE, nonce);
+        setStringProperty(NONCE, nonce);
     }
 
     /**
@@ -209,11 +235,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public Set<String> getScope() {
-        final Set<String> scope = (Set<String>) get(SCOPE).getObject();
-        if (!Utils.isEmpty(scope)) {
-            return scope;
-        }
-        return Collections.emptySet();
+        return getSetProperty(SCOPE);
     }
 
     /**
@@ -223,10 +245,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getClientId() {
-        if (isDefined(CLIENT_ID)) {
-            return get(CLIENT_ID).asString();
-        }
-        return null;
+        return getStringProperty(CLIENT_ID);
     }
 
     /**
@@ -236,10 +255,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getNonce() {
-        if (isDefined(OAuth2Constants.Custom.NONCE)) {
-            return get(OAuth2Constants.Custom.NONCE).asString();
-        }
-        return null;
+        return getStringProperty(NONCE);
     }
 
     /**
@@ -249,7 +265,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getSessionId() {
-        return (String) extraData.get(OAuth2Constants.Custom.SSO_TOKEN_ID);
+        return (String) extraData.get(SSO_TOKEN_ID);
     }
 
     /**
@@ -259,10 +275,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getResourceOwnerId() {
-        if (isDefined(USERNAME)) {
-            return get(USERNAME).asString();
-        }
-        return null;
+        return getStringProperty(USERNAME);
     }
 
     /**
@@ -270,10 +283,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getTokenId() {
-        if (isDefined(OAuth2Constants.Params.ID)) {
-            return get(OAuth2Constants.Params.ID).asString();
-        }
-        return null;
+        return getStringProperty(ID);
     }
 
     /**
@@ -281,10 +291,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getTokenName() {
-        if (isDefined(TOKEN_NAME)) {
-            return get(TOKEN_NAME).asString();
-        }
-        return null;
+        return getStringProperty(TOKEN_NAME);
     }
 
     /**
@@ -302,7 +309,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getRealm() {
-        return getStringProperty(OAuth2Constants.Params.REALM);
+        return getStringProperty(REALM);
     }
 
     /**
@@ -312,7 +319,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getClaims() {
-        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
+        return getStringProperty(CLAIMS);
     }
 
     /**
@@ -322,10 +329,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public long getExpiryTime() {
-        if (isDefined(EXPIRE_TIME)) {
-            return get(EXPIRE_TIME).asLong();
-        }
-        return 0;
+        return getLongProperty(EXPIRE_TIME);
     }
 
     /**
@@ -335,10 +339,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getTokenType() {
-        if (isDefined(TOKEN_TYPE)) {
-            return get(TOKEN_TYPE).asString();
-        }
-        return null;
+        return getStringProperty(TOKEN_TYPE);
     }
 
     /**
@@ -348,10 +349,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public String getGrantType() {
-        if (isDefined(OAuth2Constants.Params.GRANT_TYPE)) {
-            return get(OAuth2Constants.Params.GRANT_TYPE).asString();
-        }
-        return null;
+        return getStringProperty(GRANT_TYPE);
     }
 
     /**
@@ -371,14 +369,39 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
         return null;
     }
 
+    protected long getLongProperty(String key) {
+        if (isDefined(key)) {
+            return get(key).asLong();
+        }
+        return 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Set<String> getSetProperty(String key) {
+        final Set<String> scope = (Set<String>) get(SCOPE).getObject();
+        if (!Utils.isEmpty(scope)) {
+            return scope;
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * Set a string property in the store.
+     * @param key The property key.
+     * @param value The value.
+     */
+    protected void setStringProperty(String key, String value) {
+        put(key, value);
+    }
+
     /**
      * Gets the display String for the given String.
      *
-     * @param s The String.
+     * @param string The String.
      * @return The display String.
      */
-    protected String getResourceString(String s) {
-        return s;
+    protected String getResourceString(String string) {
+        return string;
     }
 
     /**
@@ -386,11 +409,10 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public Map<String, Object> toMap() {
-        final Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(getResourceString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenId());
+        final Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put(getResourceString(ACCESS_TOKEN), getTokenId());
         tokenMap.put(getResourceString(TOKEN_TYPE), getTokenType());
-        tokenMap.put(getResourceString(EXPIRE_TIME),
-                (getExpiryTime() - currentTimeMillis()) / 1000);
+        tokenMap.put(getResourceString(EXPIRE_TIME), getExpireTime());
         tokenMap.putAll(extraData);
         return tokenMap;
     }
@@ -400,15 +422,18 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
      */
     @Override
     public Map<String, Object> getTokenInfo() {
-        Map<String, Object> tokenInfo = new HashMap<String, Object>();
+        Map<String, Object> tokenInfo = new HashMap<>();
         tokenInfo.put(getResourceString(ID), getTokenId());
         tokenInfo.put(getResourceString(TOKEN_TYPE), getTokenType());
-        tokenInfo.put(getResourceString(EXPIRE_TIME),
-                (getExpiryTime() - currentTimeMillis())/1000);
+        tokenInfo.put(getResourceString(EXPIRE_TIME), getExpireTime());
         tokenInfo.put(getResourceString(SCOPE), getScope());
         tokenInfo.put(getResourceString(CLIENT_ID), getClientId());
-        tokenInfo.put(getResourceString(OAuth2Constants.Params.GRANT_TYPE), getGrantType());
+        tokenInfo.put(getResourceString(GRANT_TYPE), getGrantType());
         return tokenInfo;
+    }
+
+    private long getExpireTime() {
+        return (getExpiryTime() - currentTimeMillis()) / 1000;
     }
 
     /**
@@ -434,7 +459,7 @@ public class StatefulAccessToken extends JsonValue implements AccessToken {
     }
 
     private void validateTokenName(String tokenName, String tokenId) throws InvalidGrantException {
-        if (!OAuth2Constants.Token.OAUTH_ACCESS_TOKEN.equals(tokenName)) {
+        if (! OAUTH_ACCESS_TOKEN.equals(tokenName)) {
             throw new InvalidGrantException("Token is not an access token: " + tokenId);
         }
     }

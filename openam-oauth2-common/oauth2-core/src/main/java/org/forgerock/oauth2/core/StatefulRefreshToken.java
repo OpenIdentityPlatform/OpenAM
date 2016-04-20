@@ -17,6 +17,20 @@
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
+import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +55,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     public StatefulRefreshToken(JsonValue token) throws InvalidGrantException {
         super(token);
-        if (!OAuth2Constants.Token.OAUTH_REFRESH_TOKEN.equals(getTokenName())) {
+        if (! OAUTH_REFRESH_TOKEN.equals(getTokenName())) {
             throw new InvalidGrantException("Token is not an refresh token: " + getTokenId());
         }
     }
@@ -59,9 +73,18 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param tokenName The token name.
      * @param grantType The grant type.
      */
-    public StatefulRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-                                long expiryTime, String tokenType, String tokenName, String grantType, String authModules,
-                                String acr) {
+    public StatefulRefreshToken(
+            String id,
+            String resourceOwnerId,
+            String clientId,
+            String redirectUri,
+            Set<String> scope,
+            long expiryTime,
+            String tokenType,
+            String tokenName,
+            String grantType,
+            String authModules,
+            String acr) {
         super(new HashMap<String, Object>());
         setTokenId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -82,7 +105,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param tokenId The token id.
      */
     protected void setTokenId(final String tokenId) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.ID, tokenId);
+        setStringProperty(ID, tokenId);
     }
 
     /**
@@ -91,7 +114,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param resourceOwnerId The resource owner's id.
      */
     protected void setResourceOwnerId(final String resourceOwnerId) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
+        setStringProperty(USERNAME, resourceOwnerId);
     }
 
     /**
@@ -100,7 +123,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param clientId The client's id.
      */
     protected void setClientId(final String clientId) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
+        setStringProperty(CLIENT_ID, clientId);
     }
 
     /**
@@ -109,7 +132,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param redirectUri The redirect uri.
      */
     protected void setRedirectUri(final String redirectUri) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+        setStringProperty(REDIRECT_URI, redirectUri);
     }
 
     /**
@@ -118,7 +141,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param scope The scope.
      */
     protected void setScope(final Set<String> scope) {
-        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        put(SCOPE, scope);
     }
 
     /**
@@ -127,7 +150,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param expiryTime The expiry time.
      */
     protected void setExpiryTime(final long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, expiryTime);
+        put(EXPIRE_TIME, expiryTime);
     }
 
     /**
@@ -136,7 +159,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param tokenType The token type.
      */
     protected void setTokenType(final String tokenType) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+        setStringProperty(TOKEN_TYPE, tokenType);
     }
 
     /**
@@ -145,7 +168,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param tokenName The token name.
      */
     protected void setTokenName(final String tokenName) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+        setStringProperty(TOKEN_NAME, tokenName);
     }
 
     /**
@@ -154,7 +177,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param grantType The grant type.
      */
     protected void setGrantType(final String grantType) {
-        setStringProperty(OAuth2Constants.Params.GRANT_TYPE, grantType);
+        setStringProperty(GRANT_TYPE, grantType);
     }
 
     /**
@@ -162,7 +185,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param authModules A pipe-delimited string of auth module names.
      */
     protected void setAuthModules(String authModules) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
+        setStringProperty(AUTH_MODULES, authModules);
     }
 
     /**
@@ -171,7 +194,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      * @param acr The acr.
      */
     protected void setAuthenticationContextClassReference(String acr) {
-        setStringProperty(OAuth2Constants.JWTTokenParams.ACR, acr);
+        setStringProperty(ACR, acr);
     }
 
     /**
@@ -181,11 +204,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public Set<String> getScope() {
-        final Set<String> scope = (Set<String>) get(OAuth2Constants.CoreTokenParams.SCOPE).getObject();
-        if (!Utils.isEmpty(scope)) {
-            return scope;
-        }
-        return Collections.emptySet();
+        return getSetProperty(SCOPE);
     }
 
     /**
@@ -195,7 +214,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getClientId() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        return getStringProperty(CLIENT_ID);
     }
 
     /**
@@ -205,7 +224,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getResourceOwnerId() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
+        return getStringProperty(USERNAME);
     }
 
     /**
@@ -215,7 +234,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getRedirectUri() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        return getStringProperty(REDIRECT_URI);
     }
 
     /**
@@ -223,7 +242,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getTokenId() {
-        return getStringProperty(OAuth2Constants.Params.ID);
+        return getStringProperty(ID);
     }
 
     /**
@@ -231,7 +250,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getTokenName() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+        return getStringProperty(TOKEN_NAME);
     }
 
     /**
@@ -240,7 +259,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getAuthenticationContextClassReference() {
-        return getStringProperty(OAuth2Constants.JWTTokenParams.ACR);
+        return getStringProperty(ACR);
     }
 
     /**
@@ -261,7 +280,17 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getRealm() {
-        return getStringProperty(OAuth2Constants.Params.REALM);
+        return getStringProperty(REALM);
+    }
+
+    /**
+     * Gets the requested claims associated w/ this access token.
+     *
+     * @return Requested claims (JSON as a String).
+     */
+    @Override
+    public String getClaims() {
+        return getStringProperty(CLAIMS);
     }
 
     /**
@@ -271,10 +300,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public long getExpiryTime() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.EXPIRE_TIME)) {
-            return get(OAuth2Constants.CoreTokenParams.EXPIRE_TIME).asLong();
-        }
-        return -1;
+        return getLongProperty(EXPIRE_TIME);
     }
 
     /**
@@ -294,7 +320,7 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getTokenType() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        return getStringProperty(TOKEN_TYPE);
     }
 
     /**
@@ -303,17 +329,17 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public String getAuthModules() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
+        return getStringProperty(AUTH_MODULES);
     }
 
     /**
      * Gets the display String for the given String.
      *
-     * @param s The String.
+     * @param string The String.
      * @return The display String.
      */
-    protected String getResourceString(final String s) {
-        return s;
+    protected String getResourceString(final String string) {
+        return string;
     }
 
     /**
@@ -333,6 +359,22 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
         return null;
     }
 
+    protected long getLongProperty(String key) {
+        if (isDefined(key)) {
+            return get(key).asLong();
+        }
+        return -1;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Set<String> getSetProperty(String key) {
+        final Set<String> scope = (Set<String>) get(key).getObject();
+        if (!Utils.isEmpty(scope)) {
+            return scope;
+        }
+        return Collections.emptySet();
+    }
+
     /**
      * Set a string property in the store.
      * @param key The property key.
@@ -347,16 +389,10 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public Map<String, Object> toMap() {
-        final Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                getExpiryTime() == -1 ? null : (getExpiryTime() - currentTimeMillis()) / 1000);
+        final Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put(getResourceString(TOKEN_TYPE), getTokenType());
+        tokenMap.put(getResourceString(EXPIRE_TIME), getExpireTime());
         return tokenMap;
-    }
-
-    @Override
-    public String getAuditTrackingId() {
-        return null;
     }
 
     /**
@@ -364,25 +400,19 @@ public class StatefulRefreshToken extends JsonValue implements RefreshToken {
      */
     @Override
     public Map<String, Object> getTokenInfo() {
-        final Map<String, Object> tokenInfo = new HashMap<String, Object>();
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
-                getExpiryTime() == -1 ? null : (getExpiryTime() - currentTimeMillis()) / 1000);
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
+        final Map<String, Object> tokenInfo = new HashMap<>();
+        tokenInfo.put(getResourceString(TOKEN_TYPE), getTokenType());
+        tokenInfo.put(getResourceString(EXPIRE_TIME), getExpireTime());
+        tokenInfo.put(getResourceString(SCOPE), getScope());
         return tokenInfo;
     }
 
-    /**
-     * Gets the requested claims associated w/ this access token.
-     *
-     * @return Requested claims (JSON as a String).
-     */
-    @Override
-    public String getClaims() {
-        if (isDefined(OAuth2Constants.Custom.CLAIMS)) {
-            return (String) get(OAuth2Constants.Custom.CLAIMS).asSet().iterator().next();
-        }
+    private long getExpireTime() {
+        return getExpiryTime() == -1 ? null : (getExpiryTime() - currentTimeMillis()) / 1000;
+    }
 
+        @Override
+    public String getAuditTrackingId() {
         return null;
     }
 
