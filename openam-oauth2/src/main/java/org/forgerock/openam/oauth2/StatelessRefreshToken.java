@@ -23,7 +23,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,12 +78,16 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
         final Map<String, Object> tokenMap = new HashMap<>();
         tokenMap.put(getResourceString(REFRESH_TOKEN), jwt.build());
         tokenMap.put(getResourceString(TOKEN_TYPE), BEARER);
-        tokenMap.put(getResourceString(EXPIRE_TIME), getExpireTime());
+        tokenMap.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         return tokenMap;
     }
 
-    private long getExpireTime() {
-        return (getExpiryTime() == -1) ? null : (jwt.getClaimsSet().getExpirationTime().getTime() - currentTimeMillis()) / 1000;
+    protected Long getTimeLeft() {
+        if (isNeverExpires()) {
+            return null;
+        } else {
+            return super.getTimeLeft();
+        }
     }
 
     @Override
@@ -102,9 +105,12 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
      *
      * @return Whether or not token expires.
      */
-    @Override
-    public boolean isNeverExpires() {
-        return getExpiryTime() == -1;
+    private boolean isNeverExpires() {
+        return getExpiryTime() == defaultExpireTime();
+    }
+
+    protected long defaultExpireTime() {
+        return -1;
     }
 
     /**
@@ -114,10 +120,7 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
      */
     @Override
     public boolean isExpired() {
-        if (isNeverExpires()) {
-            return false;
-        }
-        return currentTimeMillis() > getExpiryTime();
+        return ! isNeverExpires() && super.isExpired();
     }
 
     /**

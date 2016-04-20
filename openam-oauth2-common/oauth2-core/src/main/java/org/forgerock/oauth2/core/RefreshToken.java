@@ -30,8 +30,6 @@ public interface RefreshToken extends IntrospectableToken, Token {
 
     String getAuthenticationContextClassReference();
 
-    boolean isNeverExpires();
-
     String getTokenType();
 
     String getAuthModules();

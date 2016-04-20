@@ -26,8 +26,9 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
-public class StatelessToken {
+public abstract class StatelessToken {
 
     protected final Jwt jwt;
 
@@ -80,5 +81,18 @@ public class StatelessToken {
 
     public JsonValue toJsonValue() {
         return new JsonValue(new Object());
+    }
+
+    protected Long getTimeLeft() {
+        return (getExpiryTime() - currentTimeMillis()) / 1000;
+    }
+
+    /**
+     * Determines if the Access Token is expired.
+     *
+     * @return {@code true} if current time is greater than the expiry time.
+     */
+    public boolean isExpired() {
+        return currentTimeMillis() > getExpiryTime();
     }
 }

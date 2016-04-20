@@ -90,13 +90,9 @@ public final class StatelessAccessToken extends StatelessToken implements Access
         final Map<String, Object> tokenMap = new HashMap<>();
         tokenMap.put(getResourceString(ACCESS_TOKEN), jwt.build());
         tokenMap.put(getResourceString(TOKEN_TYPE), BEARER);
-        tokenMap.put(getResourceString(EXPIRE_TIME), getExpireTime());
+        tokenMap.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         tokenMap.putAll(extraData);
         return tokenMap;
-    }
-
-    private long getExpireTime() {
-        return (jwt.getClaimsSet().getExpirationTime().getTime() - currentTimeMillis()) / 1000;
     }
 
     /**
@@ -119,15 +115,5 @@ public final class StatelessAccessToken extends StatelessToken implements Access
     @Override
     public String getAuditTrackingId() {
         return null;
-    }
-
-    /**
-     * Determines if the Access Token is expired.
-     *
-     * @return {@code true} if current time is greater than the expiry time.
-     */
-    @Override
-    public boolean isExpired() {
-        return currentTimeMillis() > getExpiryTime();
     }
 }
