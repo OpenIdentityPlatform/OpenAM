@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -115,27 +115,6 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
         } catch (InvalidRequestException e) {
             //Then
             assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
-        }
-    }
-
-    @Test
-    public void validateShouldFailWithInvalidRequestExceptionAndQueryParameters() throws Exception {
-
-        //Given
-        OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
-
-        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
-        given(request.getParameter("scope")).willReturn("nothing");
-        given(request.getParameter("response_type")).willReturn("code");
-
-        //When
-        try {
-            requestValidator.validateRequest(request);
-            fail();
-        } catch (InvalidRequestException e) {
-            //Then
-            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
         }
     }
 

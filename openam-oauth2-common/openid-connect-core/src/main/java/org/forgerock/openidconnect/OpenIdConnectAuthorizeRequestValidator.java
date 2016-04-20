@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.ID_TOKEN;
 
 import java.util.Set;
 
@@ -92,7 +93,7 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
             if (CollectionUtils.isEmpty(requestedScopes)) {
                 requestedScopes = clientRegistration.getDefaultScopes();
             }
-            if (!requestedScopes.contains(OPENID)) {
+            if (!requestedScopes.contains(OPENID) && responseTypes.contains(ID_TOKEN)) {
                 throw new InvalidRequestException("Missing expected scope=openid from request",
                         Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
             }
