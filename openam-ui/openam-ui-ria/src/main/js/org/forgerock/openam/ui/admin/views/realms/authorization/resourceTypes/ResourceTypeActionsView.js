@@ -11,18 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, AbstractView, EventManager, Constants, UIUtils) {
+], ($, _, AbstractView, EventManager, Constants, UIUtils) => {
 
     return AbstractView.extend({
         element: "#actions",
@@ -33,6 +33,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             "keyup [data-toggle-item]": "toggleRadio",
             "click [data-add-item]": "addItem",
             "keyup [data-add-item]": "addItem",
+            "keyup [data-editing-input]": "addItem",
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },
@@ -77,24 +78,24 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         },
 
         addItem: function (e) {
+            let actionName = this.$el.find("[data-editing-input]").val();
+
             if (e.type === "keyup" && e.keyCode !== 13) {
+                this.toggleAddButton(actionName !== "");
                 return;
             }
 
-            var editing = this.$el.find(".editing"),
-                actionName = editing.find(".form-control").val(),
-                pending = { "name": actionName, "value": true },
-                duplicateIndex = -1,
-                counter = 0,
-                self = this;
+            let pending = { "name": actionName, "value": true };
+            let duplicateIndex = -1;
+            let counter = 0;
 
             if (pending.name === "") {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidItem");
                 return;
             }
 
-            _.each(this.data.actions, function (item) {
-                if (self.isExistingItem(pending, item)) {
+            _.each(this.data.actions, (item) => {
+                if (this.isExistingItem(pending, item)) {
                     duplicateIndex = counter;
                     return;
                 }
@@ -106,8 +107,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             } else {
                 this.data.actions.push(pending);
                 this.updateEntity();
-                this.renderActionsTable(function () {
-                    self.$el.find(".editing input[type=text]").val("").focus();
+                this.renderActionsTable(() => {
+                    this.toggleAddButton(false);
+                    this.$el.find("[data-editing-input]").val("").focus();
                 });
             }
         },
@@ -142,6 +144,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             }).value = (permitted === "true");
 
             this.updateEntity();
+        },
+
+        toggleAddButton (enabled) {
+            this.$el.find("[data-add-item]").prop("disabled", !enabled);
         }
     });
 });

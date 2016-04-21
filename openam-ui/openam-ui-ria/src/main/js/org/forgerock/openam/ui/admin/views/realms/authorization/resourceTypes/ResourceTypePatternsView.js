@@ -11,16 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypePatternsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
-], function ($, _, AbstractView, StripedListEditingView) {
+], ($, _, AbstractView, StripedListEditingView) => {
 
     function ResourceTypePatternsView () {
     }
@@ -40,8 +40,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     };
 
     ResourceTypePatternsView.prototype.getPendingItem = function () {
-        var editing = this.$el.find(".editing");
-        return editing.find(".form-control").val().toString();
+        return this.$el.find("[data-editing-input]").val().toString();
     };
 
     ResourceTypePatternsView.prototype.isValid = function (e) {
@@ -53,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     };
 
     ResourceTypePatternsView.prototype.getCollectionWithout = function (e) {
-        var itemName = $(e.target).parents("li").data("item-name").toString();
+        const itemName = $(e.target).parents("li").data("item-name").toString();
         return _.without(this.data.items, itemName);
     };
 
