@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.console.audit;
@@ -21,7 +22,6 @@ import static com.sun.identity.console.base.AMServiceProfile.PG_SESSION_PROFILE_
 import static com.sun.identity.console.base.model.AMAdminConstants.*;
 import static com.sun.identity.console.base.model.AMPropertySheetModel.*;
 import static com.sun.web.ui.view.alert.CCAlert.*;
-import static java.util.Collections.singletonList;
 import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 
 import com.iplanet.jato.NavigationException;
@@ -44,7 +44,6 @@ import com.sun.web.ui.view.table.CCActionTable;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -173,7 +172,7 @@ public abstract class AbstractAuditViewBean extends AMServiceProfileViewBeanBase
     @SuppressWarnings("unused")
     public void handleTblSubConfigButtonAddRequest(RequestInvocationEvent event) {
         ViewBean vb = getSelectViewBean();
-        setPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS, (Serializable) singletonList(viewBeanPath));
+        addViewBeanClassToPageSession(viewBeanPath);
         unlockPageTrail();
         passPgSessionMap(vb);
         vb.forwardTo(getRequestContext());
@@ -227,7 +226,7 @@ public abstract class AbstractAuditViewBean extends AMServiceProfileViewBeanBase
         String auditHandler = (String) getDisplayFieldValue(TBL_SUB_CONFIG_HREF_NAME);
         setPageSessionAttribute(AUDIT_HANDLER_NAME, auditHandler);
         setPageSessionAttribute(SERVICE_NAME, serviceName);
-        setPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS, (Serializable) singletonList(viewBeanPath));
+        addViewBeanClassToPageSession(viewBeanPath);
         ViewBean vb = getEditViewBean();
         unlockPageTrail();
         passPgSessionMap(vb);
@@ -264,4 +263,14 @@ public abstract class AbstractAuditViewBean extends AMServiceProfileViewBeanBase
     protected boolean startPageTrail() {
         return false;
     }
+
+    private void addViewBeanClassToPageSession(String viewBeanPath) {
+        ArrayList<String> viewBeanClasses = (ArrayList<String>) getPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS);
+        if (viewBeanClasses == null) {
+            viewBeanClasses = new ArrayList<String>();
+            setPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS, viewBeanClasses);
+        }
+        viewBeanClasses.add(0, viewBeanPath);
+    }
+
 }

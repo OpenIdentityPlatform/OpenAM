@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.console.audit;
 
@@ -176,7 +177,7 @@ public abstract class AbstractEventHandlerAddViewBean extends AMPrimaryMastHeadV
     }
 
     private void backToProfileViewBean() {
-        String url = (String) ((List) getPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS)).get(0);
+        String url = (String) ((List) getPageSessionAttribute(PG_SESSION_PROFILE_VIEWBEANS)).remove(0);
         AMPostViewBean vb = (AMPostViewBean) getViewBean(AMPostViewBean.class);
         backTrail();
         passPgSessionMap(vb);
