@@ -59,8 +59,11 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                     if (this.data.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
                             createBody: () => new InlineEditTable({
-                                values: this.data.values.raw[ServersService.servers.ADVANCED_SECTION] }),
-                            createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
+                                values: this.data.values.raw[ServersService.servers.ADVANCED_SECTION]
+                            }),
+                            createFooter: () => new PartialBasedView({
+                                partial: "form/_JSONSchemaFooter"
+                            })
                         });
                     } else {
                         const tabs = createTabs(response.schema);
@@ -82,15 +85,14 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
         },
         updateData () {
             this.data.values = this.data.values.extend({
-                [this.data.sectionId]: this.getJSONSchemaView().getData()
+                [this.subview.getTabId()]: this.getJSONSchemaView().getData()
             });
         },
         onSave () {
             this.updateData();
             ServersService.servers.defaults.update(this.data.sectionId, this.data.values.raw)
-            .then((data) => {
+            .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-                this.data.values = data;
             }, (response) => {
                 Messages.addMessage({
                     response,
