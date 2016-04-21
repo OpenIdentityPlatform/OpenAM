@@ -394,11 +394,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 labels.add(new SMSLabel(null, attributeName, attributeName, "string", null, null));
             }
 
-            final String sectionPath = "/properties/" + ADVANCED_TAB_NAME;
-            template.putPermissive(new JsonPointer(sectionPath + "/title"), "Advanced");
-            template.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
-            template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), 0);
-            template.putPermissive(new JsonPointer(sectionPath + "/format"), "map");
+            template.putPermissive(new JsonPointer("/type"), "object");
             int attributeOrder = 0;
 
             for (SMSLabel label : labels) {
@@ -409,7 +405,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 final List<String> attributeOptionLabels = label.getOptionLabels();
                 final boolean isOptional = true;
 
-                final String path = sectionPath + "/properties/" + attributeName;
+                final String path = "/properties/" + attributeName;
                 if (attributeOptions != null && !attributeOptions.isEmpty()) {
                     template.putPermissive(new JsonPointer(path + "/enum"), attributeOptions);
                     template.putPermissive(new JsonPointer(path + "/options/enum_titles"), attributeOptionLabels);
