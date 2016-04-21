@@ -51,10 +51,6 @@ public interface OAuth2ProviderSettings {
      */
     boolean isStatelessTokensEnabled() throws ServerException;
 
-    String getTokenSigningAlgorithm() throws ServerException;
-
-    String getTokenHmacSharedSecret() throws ServerException;
-
     /**
      * Gets the signing algorithm used when issuing stateless access and refresh tokens.
      *

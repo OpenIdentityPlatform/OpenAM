@@ -23,7 +23,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.EXPIRES_IN;
@@ -132,7 +131,6 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(SCOPE, scope)
                 .claim(CLAIMS, claims)
                 .claim(REALM, realm)
-                .claim(GRANT_TYPE, grantType)
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())

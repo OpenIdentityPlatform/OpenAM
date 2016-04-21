@@ -20,7 +20,11 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 
-import java.util.*;
+import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.HashMap;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;

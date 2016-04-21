@@ -16,7 +16,6 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.PARENT;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.CLIENT_ID;

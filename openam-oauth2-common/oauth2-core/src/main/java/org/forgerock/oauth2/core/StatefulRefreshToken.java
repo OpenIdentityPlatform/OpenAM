@@ -16,7 +16,6 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;

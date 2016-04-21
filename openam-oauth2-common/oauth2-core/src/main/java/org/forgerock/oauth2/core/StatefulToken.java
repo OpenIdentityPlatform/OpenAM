@@ -208,7 +208,7 @@ public abstract class StatefulToken extends JsonValue {
 
     @SuppressWarnings("unchecked")
     protected Set<String> getSetProperty(String key) {
-        final Set<String> scope = (Set<String>) get(SCOPE).getObject();
+        final Set<String> scope = (Set<String>) get(key).getObject();
         if (!Utils.isEmpty(scope)) {
             return scope;
         }

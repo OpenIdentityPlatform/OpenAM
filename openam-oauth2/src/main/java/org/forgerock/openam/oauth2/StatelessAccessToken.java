@@ -22,7 +22,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.Custom.NONCE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.ACCESS_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.HashMap;
 import java.util.Map;
