@@ -25,7 +25,7 @@ public class DuplicateRequestParameterValidatorTest {
     }
 
     @Test(expectedExceptions = {DuplicateRequestParameterException.class})
-    public void shouldThrowInvalidRequestEXceptionWhenDuplicateParameterFound() throws Exception {
+    public void shouldThrowInvalidRequestExceptionWhenDuplicateParameterFound() throws Exception {
 
         //given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -38,7 +38,7 @@ public class DuplicateRequestParameterValidatorTest {
 
 
         //then
-        // invalid request excetption thrown
+        // invalid request exception thrown
 
     }
 

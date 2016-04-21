@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.RedirectUriResolver;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
@@ -43,6 +44,7 @@ public class AuthorizeResourceTest {
     private AuthorizeRequestHook hook;
     private AuthorizationToken authToken = new AuthorizationToken(Collections.singletonMap("fred", "fred"), false);
     private XUIState xuiState;
+    private RedirectUriResolver redirectUriResolver;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -54,11 +56,12 @@ public class AuthorizeResourceTest {
         hook = mock(AuthorizeRequestHook.class);
         service = mock(AuthorizationService.class);
         xuiState = mock(XUIState.class);
+        redirectUriResolver = mock(RedirectUriResolver.class);
 
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
-                CollectionUtils.asSet(hook), xuiState, mock(Router.class), null);
+                CollectionUtils.asSet(hook), xuiState, mock(Router.class), null, redirectUriResolver);
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.RedirectUriResolver;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
@@ -54,6 +55,8 @@ public class AuthorizeResource extends ConsentRequiredResource {
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
+    private final RedirectUriResolver redirectUriResolver;
+
 
     /**
      * Constructs a new AuthorizeResource.
@@ -66,13 +69,15 @@ public class AuthorizeResource extends ConsentRequiredResource {
     @Inject
     public AuthorizeResource(OAuth2RequestFactory<?, Request> requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
-            XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory) {
+            XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory,
+            RedirectUriResolver redirectUriResolver) {
         super(router, baseURLProviderFactory, xuiState);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
         this.representation = representation;
         this.hooks = hooks;
+        this.redirectUriResolver = redirectUriResolver;
     }
 
     /**
@@ -96,7 +101,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
         try {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request);
 
-            final String redirectUri = getQueryValue("redirect_uri");
+            final String redirectUri = redirectUriResolver.resolve(request);
 
             Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
                     redirectUri);
@@ -161,7 +166,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request, consentGiven,
                     saveConsent);
 
-            final String redirectUri = request.getParameter("redirect_uri");
+            final String redirectUri = redirectUriResolver.resolve(request);
             Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
                     redirectUri);
 
