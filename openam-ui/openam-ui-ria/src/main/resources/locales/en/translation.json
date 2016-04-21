@@ -715,7 +715,7 @@
                 "uma": "UMA",
                 "advanced": "Advanced",
                 "serverDefaults": "Server Defaults",
-                "directory" : "Directory",
+                "directoryConfiguration": "Directory Configuration",
                 "realms": "Realms",
                 "sites": "Sites",
                 "servers": "Servers"

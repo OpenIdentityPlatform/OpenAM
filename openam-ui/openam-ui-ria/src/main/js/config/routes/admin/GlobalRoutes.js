@@ -84,7 +84,7 @@ define("config/routes/admin/GlobalRoutes", [
     };
 
     // Add routes for "Server Edit" tree navigation
-    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directory"], (suffix) => {
+    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directoryConfiguration"], (suffix) => {
         routes[`editServer${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
             page: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",

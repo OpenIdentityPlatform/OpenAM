@@ -50,9 +50,9 @@ define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNav
         icon: "fa-cogs",
         route: "editServerAdvanced"
     }, {
-        title: "console.common.navigation.directory",
+        title: "console.common.navigation.directoryConfiguration",
         icon: "fa-folder-open",
-        route: "editServerDirectory"
+        route: "editServerDirectoryConfiguration"
     }];
 
     const EditServerTreeNavigationView = TreeNavigation.extend({
