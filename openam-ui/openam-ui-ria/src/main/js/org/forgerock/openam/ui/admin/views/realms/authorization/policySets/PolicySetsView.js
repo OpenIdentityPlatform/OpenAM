@@ -34,8 +34,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/common/util/URLHelper"
 ], ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration, EventManager,
-    Router, Constants, PolicySetModel, AbstractListView, PoliciesService, BackgridUtils, RealmHelper, URLHelper) => {
-    return AbstractListView.extend({
+    Router, Constants, PolicySetModel, AbstractListView, PoliciesService, BackgridUtils, RealmHelper, URLHelper) =>
+    AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/policySets/PolicySetsTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policySets/PolicySetsToolbarTemplate.html",
@@ -96,8 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
 
         renderTable (callback) {
-            let self = this;
-
+            const self = this;
             const ClickableRow = BackgridUtils.ClickableRow.extend({
                 callback: function (e) {
                     var $target = $(e.target);
@@ -224,5 +223,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 trigger: true
             });
         }
-    });
-});
+    })
+);

@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 self.actionsList = new ResourceTypeActionsView();
                 self.actionsList.render(data, "#resTypeActions", resolve());
 
-                $.when.apply($, promises).done(function () {
+                $.when(...promises).done(function () {
                     FormHelper.setActiveTab(self);
                     if (self.renderCallback) { self.renderCallback(); }
                 });

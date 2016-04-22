@@ -18,9 +18,8 @@ define("org/forgerock/openam/ui/admin/views/common/ToggleCardListView", [
     "jquery",
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], ($, Backbone, UIUtils) => {
-
-    return Backbone.View.extend({
+], ($, Backbone, UIUtils) =>
+    Backbone.View.extend({
 
         initialize (options) {
             this.options = options;
@@ -54,6 +53,5 @@ define("org/forgerock/openam/ui/admin/views/common/ToggleCardListView", [
         }
     }, {
         DEFAULT_VIEW: 0
-    });
-
-});
+    })
+);

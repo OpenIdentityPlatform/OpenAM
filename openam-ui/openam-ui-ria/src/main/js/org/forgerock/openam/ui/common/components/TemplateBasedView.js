@@ -17,8 +17,8 @@
 define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], (Backbone, UIUtils) => {
-    return Backbone.View.extend({
+], (Backbone, UIUtils) =>
+    Backbone.View.extend({
         initialize (options) {
             this.options = options;
         },
@@ -29,5 +29,5 @@ define("org/forgerock/openam/ui/common/components/TemplateBasedView", [
                 (html) => this.$el.html(html)
             );
         }
-    });
-});
+    })
+);

@@ -49,7 +49,7 @@ define([
 
         it("returns a promise", () => {
             getMaxIdlePromise.resolve(getMaxIdlePromisePayload);
-            let func = MaxIdleTimeLeftStrategy();
+            const func = MaxIdleTimeLeftStrategy();
 
             expect(func.then).to.not.be.undefined;
 

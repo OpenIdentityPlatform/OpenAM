@@ -53,7 +53,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/ResourcePage", [
         var creationPromises = _.map(labelNames, function (labelName) {
             return UMAService.labels.create(labelName, "USER");
         });
-        return $.when.apply($, creationPromises).then(function () {
+        return $.when(...creationPromises).then(function () {
             if (creationPromises.length === 1) {
                 return [arguments[0]._id];
             } else {

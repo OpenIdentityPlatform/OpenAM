@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
 ], ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Messages, EventManager, Router,
-    Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) => {
-    return AbstractListView.extend({
+    Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) =>
+    AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesToolbarTemplate.html",
@@ -81,8 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
         },
 
         renderTable (callback) {
-            let self = this;
-
+            const self = this;
             const ClickableRow = BackgridUtils.ClickableRow.extend({
                 callback: function (e) {
                     var $target = $(e.target);
@@ -164,5 +163,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 trigger: true
             });
         }
-    });
-});
+    })
+);

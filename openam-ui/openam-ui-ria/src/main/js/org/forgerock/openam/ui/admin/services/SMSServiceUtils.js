@@ -155,8 +155,8 @@ define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
         };
     };
 
-    obj.schemaWithDefaults = (delegate, url) => {
-        return Promise.all([
+    obj.schemaWithDefaults = (delegate, url) =>
+        Promise.all([
             delegate.serviceCall({
                 url: `${url}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -173,7 +173,6 @@ define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
                 values: results[1][0]
             };
         });
-    };
 
     obj.schemaWithValues = function (delegate, url) {
         return Promise.all([

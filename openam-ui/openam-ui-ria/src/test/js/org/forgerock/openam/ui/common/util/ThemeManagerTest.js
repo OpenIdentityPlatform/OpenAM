@@ -62,9 +62,8 @@ define([
             mock$.Deferred = _.bind($.Deferred, $);
 
             sandbox = sinon.sandbox.create();
-            sandbox.stub(require, "toUrl", (url) => {
-                return baseUrl + url;
-            });
+            sandbox.stub(require, "toUrl", (url) =>
+                baseUrl + url);
 
             Configuration = {
                 globalData: {
@@ -104,11 +103,11 @@ define([
         });
 
         describe("#getTheme", () => {
-            it("sends EVENT_THEME_CHANGED event", () => {
-                return ThemeManager.getTheme().then(() => {
+            it("sends EVENT_THEME_CHANGED event", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_THEME_CHANGED);
-                });
-            });
+                })
+            );
             it("throws if theme configuration does not contain a theme object", () => {
                 delete themeConfig.themes;
                 expect(() => {
@@ -128,11 +127,11 @@ define([
                     done();
                 });
             });
-            it("places the selected theme onto the global data object", () => {
-                return ThemeManager.getTheme().then(() => {
+            it("places the selected theme onto the global data object", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(Configuration.globalData.theme).to.deep.equal(themeConfig.themes.default);
-                });
-            });
+                })
+            );
             it("selects the correct theme based on the realm", () => {
                 Configuration.globalData.realm = "/b";
                 return ThemeManager.getTheme().then(() => {
@@ -274,34 +273,34 @@ define([
                     });
                 });
             });
-            it("removes any existing CSS and favicons from the page", () => {
-                return ThemeManager.getTheme().then(() => {
+            it("removes any existing CSS and favicons from the page", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(mock$).to.be.calledWith("link");
                     sinon.assert.calledOnce(mock$.remove);
-                });
-            });
-            it("adds the favicon to the page", () => {
-                return ThemeManager.getTheme().then(() => {
+                })
+            );
+            it("adds the favicon to the page", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "icon",
                         type: "image/x-icon",
                         href: baseUrl + "icon.png"
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
-                });
-            });
-            it("adds the alternate favicon to the page", () => {
-                return ThemeManager.getTheme().then(() => {
+                })
+            );
+            it("adds the alternate favicon to the page", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "shortcut icon",
                         type: "image/x-icon",
                         href: baseUrl + "icon.png"
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
-                });
-            });
-            it("adds any stylesheets to the page", () => {
-                return ThemeManager.getTheme().then(() => {
+                })
+            );
+            it("adds any stylesheets to the page", () =>
+                ThemeManager.getTheme().then(() => {
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
@@ -313,16 +312,16 @@ define([
                         href: baseUrl + "c.css"
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
-                });
-            });
-            it("doesn't update the page if the theme hasn't changed since the last call", () => {
-                return ThemeManager.getTheme().then(() => {
+                })
+            );
+            it("doesn't update the page if the theme hasn't changed since the last call", () =>
+                ThemeManager.getTheme().then(() => {
                     mock$.reset();
                     return ThemeManager.getTheme();
                 }).then(() => {
                     expect(mock$).to.not.be.called;
-                });
-            });
+                })
+            );
             it("overrides the theme's stylesheets if the user is on an admin page", () => {
                 Router.currentRoute.navGroup = "admin";
                 return ThemeManager.getTheme().then(() => {
