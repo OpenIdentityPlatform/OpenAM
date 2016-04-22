@@ -11,22 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
     "squire",
     "sinon"
-], function (Squire, sinon) {
-    describe("org/forgerock/openam/ui/common/util/RealmHelper", function () {
-        var RealmHelper, URIUtils, Configuration;
+], (Squire, sinon) => {
+    describe("org/forgerock/openam/ui/common/util/RealmHelper", () => {
+        let RealmHelper;
+        let URIUtils;
+        let Configuration;
 
-        before(function (done) {
-            var injector = new Squire();
+        before((done) => {
+            const injector = new Squire();
             injector
                 .store("org/forgerock/commons/ui/common/main/Configuration")
                 .store("org/forgerock/commons/ui/common/util/URIUtils")
-                .require(["org/forgerock/openam/ui/common/util/RealmHelper", "mocks"], function (d, mocks) {
+                .require(["org/forgerock/openam/ui/common/util/RealmHelper", "mocks"], (d, mocks) => {
                     RealmHelper = d;
                     URIUtils = mocks.store["org/forgerock/commons/ui/common/util/URIUtils"];
                     Configuration = mocks.store["org/forgerock/commons/ui/common/main/Configuration"];
@@ -40,7 +42,7 @@ define([
                 });
         });
 
-        describe("#decorateURLWithOverrideRealm", function () {
+        describe("#decorateURLWithOverrideRealm", () => {
             it("appends the current query string to the URL", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm1");
 
@@ -56,7 +58,7 @@ define([
             }));
         });
 
-        describe("#decorateURIWithRealm", function () {
+        describe("#decorateURIWithRealm", () => {
             it("appends as a query parameter the realm from the current query string", sinon.test(function () {
                 Configuration.globalData.auth.subRealm = "realm1";
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm2");
@@ -66,15 +68,15 @@ define([
             }));
         });
 
-        describe("#decorateURIWithSubRealm", function () {
-            it("replaces __subrealm__ with the sub realm from global configuration", sinon.test(function () {
+        describe("#decorateURIWithSubRealm", () => {
+            it("replaces __subrealm__ with the sub realm from global configuration", sinon.test(() => {
                 Configuration.globalData.auth.subRealm = "realm1";
 
                 expect(RealmHelper.decorateURIWithSubRealm("http://www.example.com/__subrealm__/"))
                     .to.equal("http://www.example.com/realm1/");
             }));
 
-            it("strips out __subrealm__ when there is no sub realm", sinon.test(function () {
+            it("strips out __subrealm__ when there is no sub realm", sinon.test(() => {
                 Configuration.globalData.auth.subRealm = "";
 
                 expect(RealmHelper.decorateURIWithSubRealm("http://www.example.com/__subrealm__/"))
@@ -82,7 +84,7 @@ define([
             }));
         });
 
-        describe("#getOverrideRealm", function () {
+        describe("#getOverrideRealm", () => {
             it("returns the realm from the current query string", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentQueryString").returns("realm=realm1");
 
@@ -103,7 +105,7 @@ define([
             }));
         });
 
-        describe("#getSubRealm", function () {
+        describe("#getSubRealm", () => {
             it("returns the realm from the fragment path", sinon.test(function () {
                 this.stub(URIUtils, "getCurrentFragment").returns("login/realm1");
 

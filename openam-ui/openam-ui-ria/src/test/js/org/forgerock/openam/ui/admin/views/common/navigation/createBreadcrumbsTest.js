@@ -17,13 +17,13 @@
 define([
     "squire",
     "sinon"
-], function (Squire, sinon) {
-    describe("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs", function () {
+], (Squire, sinon) => {
+    describe("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs", () => {
         let createBreadcrumbs;
         let URIUtils;
         let $;
 
-        beforeEach(function (done) {
+        beforeEach((done) => {
             const injector = new Squire();
 
             URIUtils = {
@@ -37,14 +37,14 @@ define([
             injector
                 .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
                 .mock("jquery", $)
-                .require(["org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"], function (obj) {
+                .require(["org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"], (obj) => {
                     createBreadcrumbs = obj;
                     done();
                 });
         });
 
-        context("When on the Authentication - Dashboard view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - Dashboard view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/dashboard");
                 $.t.returns("Authentication - Dashboard");
                 const pattern = "realms/?/dashboard";
@@ -54,8 +54,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - Settings view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - Settings view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-settings");
                 $.t.returns("Authentication - Settings");
                 const pattern = "realms/?/authentication-settings";
@@ -65,8 +65,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - List Chains view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - List Chains view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-chains");
                 $.t.returns("Authentication - Chains");
                 const pattern = "realms/?/authentication-chains";
@@ -76,8 +76,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - New Chain view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - New Chain view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-chains/new");
                 $.t.returns("Authentication - Chains");
                 const pattern = "realms/?/authentication-chains/new";
@@ -93,8 +93,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - Edit Chain view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - Edit Chain view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-chains/edit/foo");
                 $.t.returns("Authentication - Chains");
                 const pattern = "realms/?/authentication-chains/edit/?";
@@ -110,8 +110,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - List Modules view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - List Modules view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-modules");
                 $.t.returns("Authentication - Modules");
                 const pattern = "realms/?/authentication-modules";
@@ -123,8 +123,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - New Module view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - New Module view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-modules/new");
                 $.t.returns("Authentication - Modules");
                 const pattern = "realms/?/authentication-modules/new";
@@ -140,8 +140,8 @@ define([
             }));
         });
 
-        context("When on the Authentication - Edit Module view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Authentication - Edit Module view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authentication-modules/foo/edit/bar");
                 $.t.returns("Authentication - Modules");
                 const pattern = "realms/?/authentication-modules/?/edit/?";
@@ -160,8 +160,8 @@ define([
             }));
         });
 
-        context("When on the List Services view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the List Services view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/services");
                 $.t.returns("Services");
                 const pattern = "realms/?/services";
@@ -171,8 +171,8 @@ define([
             }));
         });
 
-        context("When on the New Service view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the New Service view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/services/new");
                 $.t.returns("Services");
                 const pattern = "realms/?/services/new";
@@ -188,8 +188,8 @@ define([
             }));
         });
 
-        context("When on the Edit Service view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Edit Service view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/services/edit/audit");
                 $.t.returns("Services");
                 const pattern = "realms/?/services/edit/?";
@@ -205,8 +205,8 @@ define([
             }));
         });
 
-        context("When on the New Service Subschema view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the New Service Subschema view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/services/edit/audit/CSV/new");
                 $.t.returns("Services");
                 const pattern = "realms/?/services/edit/?/?/new";
@@ -229,8 +229,8 @@ define([
             }));
         });
 
-        context("When on the Edit Service Subschema view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Edit Service Subschema view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/services/edit/audit/CSV/edit/foo");
                 $.t.returns("Services");
                 const pattern = "realms/?/services/edit/?/?/edit/?";
@@ -253,11 +253,11 @@ define([
             }));
         });
 
-        context("When on the List Policy Sets view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the List Policy Sets view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authorization-policySets");
                 $.t.returns("Authorization - Policy Sets");
-                let pattern = "realms/?/authorization-policySets";
+                const pattern = "realms/?/authorization-policySets";
                 expect(createBreadcrumbs(pattern)).to.eql([
                     {
                         title:"Authorization - Policy Sets"
@@ -266,11 +266,11 @@ define([
             }));
         });
 
-        context("When on the Edit Policy Set view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Edit Policy Set view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authorization-policySets/edit/foo");
                 $.t.returns("Authorization - Policy Sets");
-                let pattern = "realms/?/authorization-policySets/edit/?";
+                const pattern = "realms/?/authorization-policySets/edit/?";
                 expect(createBreadcrumbs(pattern)).to.eql([
                     {
                         title:"Authorization - Policy Sets",
@@ -283,8 +283,8 @@ define([
             }));
         });
 
-        context("When on the New Policy view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the New Policy view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns("realms/%2F/authorization-policySets/edit/foo/policies/new");
                 $.t.returns("Authorization - Policy Sets");
                 const pattern = "realms/?/authorization-policySets/edit/?/policies/new";
@@ -307,8 +307,8 @@ define([
             }));
         });
 
-        context("When on the Edit Policy view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Edit Policy view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns(
                     "realms/%2F/authorization-policySets/edit/foo/policies/edit/bar%20bar");
                 $.t.returns("Authorization - Policy Sets");
@@ -332,8 +332,8 @@ define([
             }));
         });
 
-        context("When on the List Resource Types view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the List Resource Types view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns(
                     "realms/%2F/authorization-resourceTypes");
                 $.t.returns("Authorization - Resource Types");
@@ -344,8 +344,8 @@ define([
             }));
         });
 
-        context("When on the New Resource Type view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the New Resource Type view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns(
                     "realms/%2F/authorization-resourceTypes/new");
                 $.t.returns("Authorization - Resource Types");
@@ -362,8 +362,8 @@ define([
             }));
         });
 
-        context("When on the Edit Resource Type view", function () {
-            it("correctly outputs object breadcrumbs", sinon.test(function () {
+        context("When on the Edit Resource Type view", () => {
+            it("correctly outputs object breadcrumbs", sinon.test(() => {
                 URIUtils.getCurrentFragment.returns(
                     "realms/%2F/authorization-resourceTypes/edit/76656a38-5f8e-401b-83aa-4ccb74ce88d2");
                 $.t.returns("Authorization - Resource Types");

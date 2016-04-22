@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
@@ -19,11 +19,15 @@ define([
     "squire",
     "sinon",
     "org/forgerock/openam/ui/common/util/Constants"
-], function ($, Squire, sinon, Constants) {
-    var Configuration, EventManager, Router, RouteTo, SessionManager;
-    describe("org/forgerock/openam/ui/common/RouteTo", function () {
-        beforeEach(function (done) {
-            var injector = new Squire();
+], ($, Squire, sinon, Constants) => {
+    let Configuration;
+    let EventManager;
+    let Router;
+    let RouteTo;
+    let SessionManager;
+    describe("org/forgerock/openam/ui/common/RouteTo", () => {
+        beforeEach((done) => {
+            const injector = new Squire();
 
             Configuration = {
                 globalData: {
@@ -55,15 +59,15 @@ define([
                     .mock("org/forgerock/commons/ui/common/main/EventManager", EventManager)
                     .mock("org/forgerock/commons/ui/common/main/Router", Router)
                     .mock("org/forgerock/commons/ui/common/main/SessionManager", SessionManager)
-                    .require(["org/forgerock/openam/ui/common/RouteTo"], function (subject) {
+                    .require(["org/forgerock/openam/ui/common/RouteTo"], (subject) => {
                         RouteTo = subject;
                         done();
                     });
         });
 
-        describe("#setGoToUrlProperty", function () {
-            context("when a gotoURL is not set and the current hash does not match the login route's URL", function () {
-                it("sets the gotoURL to be the current hash", function () {
+        describe("#setGoToUrlProperty", () => {
+            context("when a gotoURL is not set and the current hash does not match the login route's URL", () => {
+                it("sets the gotoURL to be the current hash", () => {
                     RouteTo.setGoToUrlProperty();
 
                     expect(Configuration.setProperty).to.be.calledOnce.calledWith("gotoURL", "#page");
@@ -71,13 +75,13 @@ define([
             });
         });
 
-        describe("#forbiddenPage", function () {
-            it("deletes \"authorizationFailurePending\" attribute Configuration.globalData", function () {
+        describe("#forbiddenPage", () => {
+            it("deletes \"authorizationFailurePending\" attribute Configuration.globalData", () => {
                 RouteTo.forbiddenPage();
 
                 expect(Configuration.globalData).to.not.have.ownProperty("authorizationFailurePending");
             });
-            it("sends EVENT_CHANGE_VIEW event", function () {
+            it("sends EVENT_CHANGE_VIEW event", () => {
                 RouteTo.forbiddenPage();
 
                 expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_CHANGE_VIEW, {
@@ -90,8 +94,8 @@ define([
             });
         });
 
-        describe("#forbiddenError", function () {
-            it("sends EVENT_DISPLAY_MESSAGE_REQUEST event", function () {
+        describe("#forbiddenError", () => {
+            it("sends EVENT_DISPLAY_MESSAGE_REQUEST event", () => {
                 RouteTo.forbiddenError();
 
                 expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_DISPLAY_MESSAGE_REQUEST,
@@ -99,27 +103,27 @@ define([
             });
         });
 
-        describe("#logout", function () {
-            var promise;
+        describe("#logout", () => {
+            let promise;
 
-            beforeEach(function () {
+            beforeEach(() => {
                 promise = $.Deferred();
                 SessionManager.logout = sinon.stub().returns(promise);
                 sinon.spy(RouteTo, "setGoToUrlProperty");
             });
 
-            afterEach(function () {
+            afterEach(() => {
                 RouteTo.setGoToUrlProperty.restore();
             });
 
-            it("invokes #setGoToUrlProperty", function () {
+            it("invokes #setGoToUrlProperty", () => {
                 RouteTo.logout();
 
                 expect(RouteTo.setGoToUrlProperty).to.be.calledOnce;
             });
 
-            context("when logout is successful", function () {
-                it("sends EVENT_AUTHENTICATION_DATA_CHANGED event", function () {
+            context("when logout is successful", () => {
+                it("sends EVENT_AUTHENTICATION_DATA_CHANGED event", () => {
                     promise.resolve();
 
                     RouteTo.logout();
@@ -129,7 +133,7 @@ define([
                     });
                 });
 
-                it("sends EVENT_CHANGE_VIEW event", function () {
+                it("sends EVENT_CHANGE_VIEW event", () => {
                     promise.resolve();
 
                     RouteTo.logout();
@@ -140,8 +144,8 @@ define([
                 });
             });
 
-            context("when logout is unsuccessful", function () {
-                it("sends no events", function () {
+            context("when logout is unsuccessful", () => {
+                it("sends no events", () => {
                     promise.fail();
 
                     RouteTo.logout();
@@ -151,16 +155,16 @@ define([
             });
         });
 
-        describe("#loginDialog", function () {
-            it("sends EVENT_SHOW_LOGIN_DIALOG event", function () {
+        describe("#loginDialog", () => {
+            it("sends EVENT_SHOW_LOGIN_DIALOG event", () => {
                 RouteTo.loginDialog();
 
                 expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_SHOW_LOGIN_DIALOG);
             });
         });
 
-        describe("#sessionExpired", function () {
-            it("sends EVENT_SHOW_LOGIN_DIALOG event", function () {
+        describe("#sessionExpired", () => {
+            it("sends EVENT_SHOW_LOGIN_DIALOG event", () => {
                 RouteTo.sessionExpired();
 
                 expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_CHANGE_VIEW, {
