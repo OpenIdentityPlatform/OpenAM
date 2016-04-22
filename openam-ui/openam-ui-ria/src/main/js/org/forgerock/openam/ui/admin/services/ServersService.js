@@ -32,14 +32,11 @@ define("org/forgerock/openam/ui/admin/services/ServersService", [
         return result;
     }, {});
 
-    // TODO: remove when AME-10196 is fixed
-    const mockData = (data) => _.extend(data, { type: "object" });
-
     const getSchema = (server, section) => obj.serviceCall({
         url: `/${server}/properties/${section}?_action=schema`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST"
-    }).then((response) => new JSONSchema(mockData(response)));
+    }).then((response) => new JSONSchema(response));
 
     const getValues = (server, section) => obj.serviceCall({
         url: `/${server}/properties/${section}`,
