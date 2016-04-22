@@ -11,21 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.xml.bind.StringInputStream;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -39,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.parsers.DocumentBuilder;
@@ -48,6 +46,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
@@ -70,11 +69,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.xml.bind.StringInputStream;
 
 /**
  * A service to allow the modification of server properties
@@ -653,19 +657,18 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 Map<String, String> attributeNamesToSections = getAttributeNamesToSections(tabName);
 
                 for (String attributeName : attributeNamesForTab) {
-                    final String defaultAttribute = (String) defaultAttributes.get(attributeName);
+                    final Object defaultAttribute = getValue(defaultAttributes, attributeName);
                     final String sectionName = tabName.equals(ADVANCED_TAB_NAME) ? "advanced" :
                                 attributeNamesToSections.get(attributeName);
 
                     String attributePath = sectionName == null ? "" : sectionName + "/";
                     if (defaultAttribute != null) {
-                        defaultSection.put(attributePath + attributeName, (String) defaultAttributes.get(attributeName));
+                        defaultSection.put(attributePath + attributeName, defaultAttribute);
                     }
 
-                    final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
+                    final Object serverSpecificAttribute = getValue(serverSpecificAttributes, attributeName);
                     if (serverSpecificAttribute != null) {
-                        result.putPermissive(new JsonPointer(attributePath + attributeName),
-                                serverSpecificAttribute);
+                        result.putPermissive(new JsonPointer(attributePath + attributeName), serverSpecificAttribute);
                     }
                 }
             }
@@ -683,11 +686,16 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     private Object getValue(Properties attributes, String attributeName) {
         final String type = getType(attributeName);
         final String value = (String) attributes.get(attributeName);
-        if (type != null && type.equals("number") && !value.isEmpty()) {
-            return new Integer(value);
-        } else {
+        if (isBlank(value)) {
             return value;
         }
+        if ("number".equals(type)) {
+            return parseInt(value);
+        }
+        if ("boolean".equals(type)) {
+            return parseBoolean(value);
+        }
+        return value;
     }
 
     private String getType(String attributeName) {
