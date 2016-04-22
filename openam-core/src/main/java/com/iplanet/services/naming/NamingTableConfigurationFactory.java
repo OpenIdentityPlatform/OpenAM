@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.services.naming;
 
@@ -19,6 +19,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -109,6 +110,7 @@ public class NamingTableConfigurationFactory {
      */
     private static void updateServerIdMappings(NamingTableConfiguration config) {
         Hashtable serverIdTbl = new Hashtable();
+        Collection<String> siteIds = getSiteIdMappings(config).values();
         for (Map.Entry<String, String> entry : config.getNamingTable().entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -120,7 +122,27 @@ public class NamingTableConfigurationFactory {
             if (key.equals(Constants.PLATFORM_LIST)) {
                 continue;
             }
-            serverIdTbl.put(value, key);
+
+            /**
+             * serverIDTbl stores mappings of Server URL to Server ID.
+             * e.g. http://openam.example.com:8080/openam -> 01
+             * If another Server ID or Site ID also uses the same URL,
+             * this is a conflict. The following protects the server
+             * configuration from being corrupted by this conflict and
+             * make sure the mapping is to a non-siteID
+             */
+            if (serverIdTbl.get(value) != null) {
+               if (debug.warningEnabled()) {
+                  debug.warning("NamingTable.updateServerIdMappings: multiple mapping for URL: {} IDs: {} and {}", value, serverIdTbl.get(value), key);
+               }
+               // If the Server ID is not a known Site ID,
+               // then we are ok to add it to the table.
+               if (!siteIds.contains(key)) {
+                  serverIdTbl.put(value, key);
+               }
+            } else {
+               serverIdTbl.put(value, key);
+            }
         }
 
         config.setServerIDTable(serverIdTbl);
@@ -128,30 +150,11 @@ public class NamingTableConfigurationFactory {
 
     private static void updateSiteIdMappings(NamingTableConfiguration config) {
         Hashtable<String, String> siteIdTbl = new Hashtable<String, String>();
-        String serverSet = (String) config.namingTable.get(Constants.SITE_ID_LIST);
-
-        if ((serverSet == null) || (serverSet.length() == 0)) {
-            return;
-        }
-
-        StringTokenizer tok = new StringTokenizer(serverSet, ",");
-        while (tok.hasMoreTokens()) {
-            String serverid = tok.nextToken();
-            String siteid = serverid;
-            int idx = serverid.indexOf(NODE_SEPARATOR);
-            if (idx != -1) {
-                siteid = serverid.substring(idx + 1, serverid.length());
-                serverid = serverid.substring(0, idx);
-            }
-            siteIdTbl.put(serverid, siteid);
-        }
-
+        siteIdTbl.putAll(getSiteIdMappings(config));
         config.setSiteIdTable(siteIdTbl);
         if (debug.messageEnabled()) {
             debug.message("SiteID table -> " + config.getSiteIDsTable().toString());
         }
-
-        return;
     }
 
     private static void updateSiteNameToIDMappings(NamingTableConfiguration config) {
@@ -181,8 +184,6 @@ public class NamingTableConfigurationFactory {
         if (debug.messageEnabled()) {
             debug.message("SiteNameToIDs table -> " + config.getSiteNameToIdTable().toString());
         }
-
-        return;
     }
 
     private static void updatePlatformServerIDs(NamingTableConfiguration config)
@@ -226,8 +227,6 @@ public class NamingTableConfigurationFactory {
             debug.message("WebtopNaming.updateLBCookieValueMappings():" +
                     "LBCookieValues table -> " + config.getLbCookieValuesTable().toString());
         }
-
-        return;
     }
 
     private static void updatePlatformSets(NamingTableConfiguration config) {
@@ -263,6 +262,25 @@ public class NamingTableConfigurationFactory {
         return null;
     }
 
+    private static Map<String, String> getSiteIdMappings(NamingTableConfiguration config) {
+        String serverSet = (String) config.namingTable.get(Constants.SITE_ID_LIST);
+        if ((serverSet == null) || (serverSet.length() == 0)) {
+            return Collections.EMPTY_MAP;
+        }
+        HashMap<String, String> map = new HashMap<String, String>();
+        StringTokenizer tok = new StringTokenizer(serverSet, ",");
+        while (tok.hasMoreTokens()) {
+            String serverid = tok.nextToken();
+            String siteid = serverid;
+            int idx = serverid.indexOf(NODE_SEPARATOR);
+            if (idx != -1) {
+                siteid = serverid.substring(idx + 1, serverid.length());
+                serverid = serverid.substring(0, idx);
+            }
+            map.put(serverid, siteid);
+        }
+        return map;
+    }
 
     /**
      * Configuration based on the naming table provided. This configuration is intended to

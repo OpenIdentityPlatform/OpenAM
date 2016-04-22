@@ -233,13 +233,19 @@ public class SessionServerConfig {
      * AM-instance host of the session). WebtopNaming will then be called to turn this serverId (01,02, etc) into a
      * URL which will point a PLL client GetSession request. Calling this method is part of insuring that the PLL GetSession
      * request does not get routed to a site (load-balancer).
+     *
+     * This method checks whether the provided ID (let it be server or site ID)
+     * belongs to a local site. If the current server is not member of a site,
+     * then the ID will be compared to the current server's ID.
      * @param siteID the server id (PRIMARY_ID) pulled from a presented cookie.
-     * @return true if the specified serverId is actually a site identifier for the current deployment
+     * @return <code>true</code> if the provided ID corresponds to a local server or site.
      */
     public boolean isLocalSite(String siteID) {
-        // TODO: Investigate this method further and rename / better document its behaviour
-        // How does this method compare to WebtopNaming.isSite? Is this method redundant?
-        return getSiteID().equals(siteID) || getSecondarySiteIDs().contains(siteID);
+        String localID = getSiteID();
+        if (localID == null) {
+           localID = getLocalServerID();
+        }
+        return localID.equals(siteID) || getSecondarySiteIDs().contains(siteID);
     }
 
     /**
@@ -293,7 +299,11 @@ public class SessionServerConfig {
      * of one or more sites, the returned set will only include this server's ID.
      */
     public Set<String> getServerIDsInLocalSite() throws Exception {
-        Set<String> serverIDs = WebtopNaming.getSiteNodes(getSiteID());
+        String siteid = getSiteID();
+        if (siteid == null) {
+           return Collections.singleton(localServerID);
+        }
+        Set<String> serverIDs = WebtopNaming.getSiteNodes(siteid);
         if ((serverIDs == null) || (serverIDs.isEmpty())) {
             serverIDs = new HashSet<String>();
             serverIDs.add(localServerID);
