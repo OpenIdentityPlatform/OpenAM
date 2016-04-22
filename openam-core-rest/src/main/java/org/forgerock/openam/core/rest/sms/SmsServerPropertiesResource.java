@@ -18,9 +18,12 @@ package org.forgerock.openam.core.rest.sms;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
@@ -200,6 +203,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels)) {
                         final String title = label.getDisplayValue();
                         final String type = label.getType();
+                        final String description = label.getDescription();
                         final String attributeName = label.getDefaultValue().replaceFirst("amconfig.", "");
                         final List<String> attributeOptions = label.getOptions();
                         final List<String> attributeOptionLabels = label.getOptionLabels();
@@ -217,6 +221,10 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                         template.putPermissive(new JsonPointer(path + "/propertyOrder"), attributeOrder++);
                         template.putPermissive(new JsonPointer(path + "/required"), !isOptional);
                         template.putPermissive(new JsonPointer(path + "/pattern"), ".+");
+
+                        if (isNotBlank(description)) {
+                            template.putPermissive(new JsonPointer(path + "/description"), description);
+                        }
 
                         allAttributeNamesInNamedTabs.add(attributeName);
                     }
@@ -371,6 +379,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             String defaultValue = labels.item(i).getNodeValue();
             String labelFor = labels.item(i + 1).getNodeValue();
             String displayValue = titleProperties.getProperty(defaultValue);
+            String defaultHelpValue = defaultValue.replaceFirst("amconfig.", "amconfig.help.");
+            String description = titleProperties.getProperty(defaultHelpValue);
 
             final String convertedAttributeName = defaultValue.replaceFirst("amconfig.", "");
             final String type = getType(convertedAttributeName);
@@ -378,7 +388,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             final List<String> attributeOptions = getAttributeOptions(options, convertedAttributeName, type);
             final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, convertedAttributeName, type);
 
-            allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue, type, attributeOptions, attributeOptionLabels));
+            allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue,
+                    description, type, attributeOptions, attributeOptionLabels));
 
         }
 
@@ -395,7 +406,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             List<SMSLabel> labels = new ArrayList<>();
             for (String attributeName : advancedAttributeNames) {
-                labels.add(new SMSLabel(null, attributeName, attributeName, "string", null, null));
+                labels.add(new SMSLabel(null, attributeName, attributeName, null, "string", null, null));
             }
 
             template.putPermissive(new JsonPointer("/type"), "object");
@@ -819,15 +830,17 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         private final String defaultValue;
         private final String labelFor;
         private final String displayValue;
+        private final String description;
         private final String type;
         private final List<String> optionLabels;
         private final List<String> options;
 
-        public SMSLabel(String defaultValue, String labelFor, String displayValue, String type, List<String> options,
-                        List<String> optionLabels) {
+        public SMSLabel(String defaultValue, String labelFor, String displayValue, String description, String type,
+                List<String> options, List<String> optionLabels) {
             this.defaultValue = defaultValue;
             this.labelFor = labelFor;
             this.displayValue = displayValue;
+            this.description = description;
             this.type = type;
             this.options = options;
             this.optionLabels = optionLabels;
@@ -847,6 +860,10 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
         public String getDisplayValue() {
             return displayValue;
+        }
+
+        public String getDescription() {
+            return description;
         }
 
         public String getDefaultValue() {
