@@ -84,8 +84,12 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
             });
         },
         updateData () {
+            const section = this.data.sectionId === ServersService.servers.ADVANCED_SECTION
+                ? this.data.sectionId
+                : this.subview.getTabId();
+
             this.data.values = this.data.values.extend({
-                [this.subview.getTabId()]: this.getJSONSchemaView().getData()
+                [section]: this.getJSONSchemaView().getData()
             });
         },
         onSave () {
