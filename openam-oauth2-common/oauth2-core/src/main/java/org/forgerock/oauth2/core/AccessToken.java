@@ -20,6 +20,9 @@ import org.forgerock.json.JsonValue;
 
 import java.util.Map;
 
+/**
+ * Base type for StatefulAccessToken and StatelessAccessToken.
+ */
 public interface AccessToken extends IntrospectableToken, Token {
 
     String getNonce();

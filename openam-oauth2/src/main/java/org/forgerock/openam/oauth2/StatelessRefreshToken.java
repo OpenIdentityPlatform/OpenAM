@@ -17,8 +17,8 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
@@ -35,8 +35,6 @@ import org.forgerock.oauth2.core.RefreshToken;
  */
 public class StatelessRefreshToken extends StatelessToken implements RefreshToken {
 
-    private final String jwtString;
-
     /**
      * Constructs a new StatelessRefreshToken backed with the specified {@code Jwt}.
      *
@@ -44,13 +42,7 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
      * @param jwtString The JWT string.
      */
     public StatelessRefreshToken(Jwt jwt, String jwtString) {
-        super(jwt);
-        this.jwtString = jwtString;
-    }
-
-    @Override
-    public String getTokenId() {
-        return jwtString;
+        super(jwt, jwtString);
     }
 
     @Override
@@ -88,16 +80,6 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
         } else {
             return super.getTimeLeft();
         }
-    }
-
-    @Override
-    public String getAuditTrackingId() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return jwtString;
     }
 
     /**

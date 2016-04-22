@@ -21,17 +21,21 @@ import org.forgerock.json.JsonValue;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 public abstract class StatefulToken extends JsonValue {
-
-    public StatefulToken(JsonValue token) {
-        super(token);
-    }
 
     public StatefulToken(Object object) {
         super(object);
@@ -176,7 +180,7 @@ public abstract class StatefulToken extends JsonValue {
     }
 
     public String getAuditTrackingId() {
-        return null;
+        return getStringProperty(AUDIT_TRACKING_ID);
     }
 
     /**

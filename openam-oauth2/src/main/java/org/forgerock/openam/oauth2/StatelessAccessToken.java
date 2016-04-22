@@ -39,10 +39,6 @@ public final class StatelessAccessToken extends StatelessToken implements Access
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
-    private final Jwt jwt;
-
-    private String jwtString;
-
     /**
      * Constructs a new StatelessAccessToken backed with the specified {@code Jwt}.
      *
@@ -50,14 +46,7 @@ public final class StatelessAccessToken extends StatelessToken implements Access
      * @param jwtString The JWT string.
      */
     public StatelessAccessToken(Jwt jwt, String jwtString) {
-        super(jwt);
-        this.jwt = jwt;
-        this.jwtString = jwtString;
-    }
-
-    @Override
-    public String getTokenId() {
-        return jwtString;
+        super(jwt, jwtString);
     }
 
     @Override
@@ -109,10 +98,5 @@ public final class StatelessAccessToken extends StatelessToken implements Access
         } else {
             extraData.remove(key);
         }
-    }
-
-    @Override
-    public String getAuditTrackingId() {
-        return null;
     }
 }

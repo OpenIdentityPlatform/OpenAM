@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
@@ -36,8 +37,15 @@ public abstract class StatelessToken {
 
     protected final Jwt jwt;
 
-    public StatelessToken(Jwt jwt) {
+    private String jwtString;
+
+    public StatelessToken(Jwt jwt, String jwtString) {
         this.jwt = jwt;
+        this.jwtString = jwtString;
+    }
+
+    public String getTokenId() {
+        return jwtString;
     }
 
     public String getRealm() {
@@ -98,5 +106,14 @@ public abstract class StatelessToken {
      */
     public boolean isExpired() {
         return currentTimeMillis() > getExpiryTime();
+    }
+
+    public String getAuditTrackingId() {
+        return jwt.getClaimsSet().getClaim(AUDIT_TRACKING_ID, String.class);
+    }
+
+    @Override
+    public String toString() {
+        return jwtString;
     }
 }
