@@ -35,6 +35,13 @@
                 resourceName="authPushReg">
 
             <Organization>
+                <AttributeSchema name="UrlValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.URLValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-push-reg-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -50,10 +57,10 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a651"
-                                 resourceName="deviceId">
-                    <DefaultValues>
+                                 resourceName="issuer">
+                    <ExampleValue>
                         <Value>ForgeRock</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
                                  type="single"
@@ -65,8 +72,35 @@
                         <Value>120000</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-hex-bgcolour"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a653"
+                                 resourceName="bgcolour">
+                    <DefaultValues>
+                        <Value>#519387</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-img-url"
+                                 type="single"
+                                 syntax="string"
+                                 validator="UrlValidator"
+                                 i18nKey="a654"
+                                 resourceName="imgUrl">
+                    <DefaultValues>
+                        <Value>http://example.com/image.png</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                    <AttributeSchema name="UrlValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.URLValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-push-reg-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -82,10 +116,10 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="a651"
-                                     resourceName="deviceId">
-                        <DefaultValues>
-                            <Value />
-                        </DefaultValues>
+                                     resourceName="issuer">
+                        <ExampleValue>
+                            <Value>ForgeRock</Value>
+                        </ExampleValue>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
                                      type="single"
@@ -97,7 +131,26 @@
                             <Value>120000</Value>
                         </DefaultValues>
                     </AttributeSchema>
-
+                    <AttributeSchema name="forgerock-am-auth-hex-bgcolour"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a653"
+                                     resourceName="bgcolour">
+                        <ExampleValue>
+                            <Value>#519387</Value>
+                        </ExampleValue>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-img-url"
+                                     type="single"
+                                     syntax="string"
+                                     validator="UrlValidator"
+                                     i18nKey="a654"
+                                     resourceName="imgUrl">
+                        <ExampleValue>
+                            <Value>http://example.com/image.png</Value>
+                        </ExampleValue>
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

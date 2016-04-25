@@ -32,12 +32,6 @@
 
                 <!-- validators -->
 
-                <AttributeSchema name="PortValidator" type="validator" syntax="string">
-                    <DefaultValues>
-                        <Value>org.forgerock.openam.sm.validation.PortValidator</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <AttributeSchema name="EndpointValidator" type="validator" syntax="string">
                     <DefaultValues>
                         <Value>org.forgerock.openam.sm.validation.EndpointValidator</Value>
@@ -46,19 +40,25 @@
 
                 <!-- configuration settings -->
 
-                <AttributeSchema name="senderId" type="single" i18nKey="a010" validator="RequiredValueValidator"/>
+                <AttributeSchema name="accessKey" type="single" i18nKey="a010" validator="RequiredValueValidator"/>
 
-                <AttributeSchema name="apiKey" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
+                <AttributeSchema name="secret" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
 
-                <AttributeSchema name="endpoint" type="single" i18nKey="a030" validator="EndpointValidator">
+                <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value>https://gcm-http.googleapis.com/gcm/send</Value>
+                        <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="delegateFactory" type="single" i18nKey="a040" validator="RequiredValueValidator">
+                <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.services.push.gcm.GcmHttpDelegateFactory</Value>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="delegateFactory" type="single" i18nKey="a050" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.services.push.sns.SnsHttpDelegateFactory</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

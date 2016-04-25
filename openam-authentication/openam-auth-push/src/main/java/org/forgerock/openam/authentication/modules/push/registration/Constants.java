@@ -15,8 +15,6 @@
  */
 package org.forgerock.openam.authentication.modules.push.registration;
 
-import org.forgerock.json.JsonPointer;
-
 /**
  * Constants used by the Authenticator Push Registration Module.
  */
@@ -25,16 +23,26 @@ final class Constants {
     private Constants() { }
 
     /**
+     * VALUES.
+     */
+    /** The number of recovery codes to generate for a newly minted device. */
+    static final int NUM_RECOVERY_CODES = 10;
+
+    /**
      * KEYS.
      */
-    /** The Name of the AuthenticatorPush authentication registration module for debug logging purposes. */
+    /** The name of the AuthenticatorPush authentication registration module for debug logging purposes. */
     static final String AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION = "amAuthAuthenticatorPushRegistration";
     /** Module configuration key for push timeout. */
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-registration-response-timeout";
-    /** The Name of the Auth Level key for the AuthenticatorPushRegistration authentication registration. */
+    /** The name of the Auth Level key for the Authenticator Push registration. */
     static final String AUTHLEVEL = "forgerock-am-auth-push-reg-auth-level";
-    /** The name of the Issuer key for the AuthenticatorPushRegistration authentication registration. */
+    /** The name of the Issuer key for the Authenticator Push registration. */
     static final String ISSUER_OPTION_KEY = "forgerock-am-auth-push-reg-issuer";
+    /** The name of the background colour key for the Authenticator Push registration . */
+    static final String BGCOLOUR = "forgerock-am-auth-hex-bgcolour";
+    /** The name of the img url key for the Authenticator Push registration. */
+    static final String IMG_URL = "forgerock-am-auth-img-url";
 
     /**
      * STATES.
@@ -47,13 +55,10 @@ final class Constants {
     static final int STATE_WAIT_FOR_RESPONSE_FROM_QR_SCAN = 4;
     /** State to gather username if not already supplied. */
     static final int STATE_CONFIRMATION = 5;
-    /** State to display an error message to the end-user. */
-    static final int ERROR_STATE = 6;
 
     /**
      * Callback Options
      */
-    /** NAVIGATION */
     /** Option begin the registration process now. */
     public static final int START_REGISTRATION_OPTION = 1;
     /** Option to navigate to the get the app page. */
@@ -64,25 +69,18 @@ final class Constants {
     /** Index to use to access the wait period callback placeholder. */
     public static final int POLLING_TIME_OUTPUT_CALLBACK_INDEX = 2;
 
-    /**
-     * Messaging constants
-     */
-    /** Pointer to the location of the Device name in the mobile message. */
-    static final JsonPointer DEVCIE_NAME_JSON_POINTER = new JsonPointer("data/devcieName");
-    /** Pointer to the location of the Mobile platform Communication ID in the mobile message. */
-    static final JsonPointer DEVICE_COMMUNICATION_ID_JSON_POINTER = new JsonPointer("data/communicationId");
-    /** Pointer to the location of the login mechanism id in the mobile message. */
-    static final JsonPointer DEVICE_MECHANISM_UID_JSON_POINTER = new JsonPointer("data/mechanismUid");
-    /** The Return message  REST endpoint. */
-    static final String MESSAGE_RESPONSE_ENDPOINT = "/json/push/gcm/message?_action=send";
-
-    /**
-     * QR code constants
-     */
-    /** The key to put the endpoint value in the QR URL. */
-    static final String ENDPOINT_URL_KEY = "endpoint";
-    /** The Key for the Message Id query component of the QR code. */
-    static final String MESSAGE_ID_QR_CODE_KEY = "messageId";
-    /** The Keu for the Issuer query component of the QR code. */
+    /** The key for the Message Id query component of the QR code. */
+    static final String MESSAGE_ID_QR_CODE_KEY = "m";
+    /** The key for the shared secret query component of the QR code. */
+    static final String SHARED_SECRET_QR_CODE_KEY = "s";
+    /** The key for the Issuer query component of the QR code. */
     static final String ISSUER_QR_CODE_KEY = "issuer";
+    /** The key for the bgcolour query component of the QR code. */
+    static final String BGCOLOUR_QR_CODE_KEY = "b";
+    /** The key for the Issuer query component of the QR code. */
+    static final String REG_QR_CODE_KEY = "r";
+    /** The key for the Issuer query component of the QR code. */
+    static final String AUTH_QR_CODE_KEY = "a";
+    /** The key for the Issuer query component of the QR code. */
+    static final String IMG_QR_CODE_KEY = "image";
 }

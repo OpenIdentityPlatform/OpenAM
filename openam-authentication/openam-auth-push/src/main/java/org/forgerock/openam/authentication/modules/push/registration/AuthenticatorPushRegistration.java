@@ -16,31 +16,7 @@
 package org.forgerock.openam.authentication.modules.push.registration;
 
 import static org.forgerock.openam.authentication.modules.push.registration.Constants.*;
-
-import java.security.Principal;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
-import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
-import org.forgerock.openam.authentication.callbacks.helpers.QRCallbackBuilder;
-import org.forgerock.openam.authentication.modules.push.AuthenticatorPushPrincipal;
-import org.forgerock.openam.authentication.modules.push.UserPushDeviceProfileManager;
-import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
-import org.forgerock.openam.services.push.PushNotificationException;
-import org.forgerock.openam.services.push.PushNotificationService;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
-import org.forgerock.util.encode.Base64;
-import org.forgerock.util.promise.Promise;
+import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -51,6 +27,29 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import java.security.Principal;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
+import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
+import org.forgerock.openam.authentication.callbacks.helpers.QRCallbackBuilder;
+import org.forgerock.openam.authentication.modules.push.AuthenticatorPushPrincipal;
+import org.forgerock.openam.authentication.modules.push.UserPushDeviceProfileManager;
+import org.forgerock.openam.core.rest.devices.DeviceSettings;
+import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
+import org.forgerock.openam.services.push.PushNotificationException;
+import org.forgerock.openam.services.push.PushNotificationService;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.util.encode.Base64url;
+import org.forgerock.util.promise.Promise;
 
 /**
  * The Authenticator Push Registration Module is a registration module that does not authenticate a user but
@@ -73,26 +72,35 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
     private Promise<JsonValue, Exception> deviceResponsePromise;
     private String issuer;
 
+    private String bgColour;
+    private String imgUrl;
+
     @Override
     public void init(final Subject subject, final Map sharedState, final Map options) {
-        DEBUG.message("{}::initialiseService", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION);
+        DEBUG.message("{}::init", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION);
 
         final String authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
         if (authLevel != null) {
             try {
                 setAuthLevel(Integer.parseInt(authLevel));
             } catch (Exception e) {
-                DEBUG.error("{} :: initialiseService() : Unable to set auth level {}",
+                DEBUG.error("{} :: init() : Unable to set auth level {}",
                         AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, authLevel, e);
             }
         }
         this.issuer = CollectionHelper.getMapAttr(options, ISSUER_OPTION_KEY);
+        this.imgUrl = CollectionHelper.getMapAttr(options, IMG_URL);
+        this.bgColour = CollectionHelper.getMapAttr(options, BGCOLOUR);
+
+        if (bgColour != null && bgColour.startsWith("#")) {
+            bgColour = bgColour.substring(1);
+        }
 
         amIdentityPrincipal = establishPreauthenticatedUser(sharedState);
         pollingWaitAssistant = setUpPollingWaitCallbackAssistant(options);
 
         try {
-            pushMessageSendingService.initialiseService(amIdentityPrincipal.getRealm());
+            pushMessageSendingService.init(amIdentityPrincipal.getRealm());
         } catch (PushNotificationException e) {
             DEBUG.error("AuthenticatorPush :: initialiseService() : Unable to initialiseService Push system.", e);
         }
@@ -195,11 +203,18 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
         try {
             JsonValue deviceResponse = deviceResponsePromise.get();
 
-            newDeviceRegistrationProfile.setDeviceName(deviceResponse.get(DEVCIE_NAME_JSON_POINTER).asString());
+            newDeviceRegistrationProfile.setDeviceName(deviceResponse.get(DEVICE_NAME_JSON_POINTER).asString());
             newDeviceRegistrationProfile.setCommunicationId(deviceResponse.get(
                     DEVICE_COMMUNICATION_ID_JSON_POINTER).asString());
             newDeviceRegistrationProfile.setDeviceMechanismUID(deviceResponse.get(
                     DEVICE_MECHANISM_UID_JSON_POINTER).asString());
+            newDeviceRegistrationProfile.setCommunicationType(deviceResponse.get(
+                    DEVICE_COMMUNICATION_TYPE_JSON_POINTER).asString());
+            newDeviceRegistrationProfile.setDeviceType(deviceResponse.get(
+                    DEVICE_TYPE_JSON_POINTER).asString());
+            newDeviceRegistrationProfile.setDeviceId(deviceResponse.get(
+                    DEVICE_ID_JSON_POINTER).asString());
+            newDeviceRegistrationProfile.setRecoveryCodes(DeviceSettings.generateRecoveryCodes(NUM_RECOVERY_CODES));
 
             userDeviceHandler.saveDeviceProfile(
                     amIdentityPrincipal.getName(), amIdentityPrincipal.getRealm(), newDeviceRegistrationProfile);
@@ -219,26 +234,28 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
                 createQRCodeCallback(newDeviceRegistrationProfile, id, messageId, SCRIPT_OUTPUT_CALLBACK_INDEX));
     }
 
-    private Callback createQRCodeCallback(
-            final PushDeviceSettings deviceProfile, // TODO: VS4 will be used to communicate the secret id
-            final AMIdentity id,
-            final String messageId,
-            final int callbackIndex) {
-
+    private Callback createQRCodeCallback(PushDeviceSettings deviceProfile, AMIdentity id, String messageId,
+                                          int callbackIndex) {
         return new QRCallbackBuilder().withUriScheme("pushauth")
-                .withUriHost("hotp")
-                .withUriPath("Forgerock")
+                .withUriHost("push")
+                .withUriPath("forgerock")
                 .withUriPort(id.getName())
                 .withCallbackIndex(callbackIndex)
-                .addUriQueryComponent(ENDPOINT_URL_KEY, getMessageResponseUrl())
                 .addUriQueryComponent(ISSUER_QR_CODE_KEY, issuer)
                 .addUriQueryComponent(MESSAGE_ID_QR_CODE_KEY, messageId)
+                .addUriQueryComponent(SHARED_SECRET_QR_CODE_KEY, deviceProfile.getSharedSecret())
+                .addUriQueryComponent(BGCOLOUR_QR_CODE_KEY, bgColour)
+                .addUriQueryComponent(REG_QR_CODE_KEY,
+                        getMessageResponseUrl(pushMessageSendingService.getRegServiceAddress(id.getRealm())))
+                .addUriQueryComponent(AUTH_QR_CODE_KEY,
+                        getMessageResponseUrl(pushMessageSendingService.getAuthServiceAddress(id.getRealm())))
+                .addUriQueryComponent(IMG_QR_CODE_KEY, Base64url.encode(imgUrl.getBytes()))
                 .build();
     }
 
-    private String getMessageResponseUrl() {
-        String localServerURL = WebtopNaming.getLocalServer();
-        return Base64.encode((localServerURL + MESSAGE_RESPONSE_ENDPOINT).getBytes());
+    private String getMessageResponseUrl(String component) {
+        String localServerURL = WebtopNaming.getLocalServer() + "/json/";
+        return Base64url.encode((localServerURL + component).getBytes());
     }
 
     private AuthLoginException failedAsLoginException() throws AuthLoginException {

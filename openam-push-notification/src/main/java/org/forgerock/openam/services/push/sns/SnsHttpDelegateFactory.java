@@ -13,53 +13,50 @@
 *
 * Copyright 2016 ForgeRock AS.
 */
-package org.forgerock.openam.services.push.gcm;
+package org.forgerock.openam.services.push.sns;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.services.push.PushNotificationDelegateFactory;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
-import org.forgerock.util.Options;
 
 /**
- * Produces GcmHttpDelegates matching the PushNotificationServiceFactory interface.
+ * Produces SnsHttpDelegates matching the PushNotificationServiceFactory interface.
  */
-public class GcmHttpDelegateFactory implements PushNotificationDelegateFactory {
+public class SnsHttpDelegateFactory implements PushNotificationDelegateFactory {
 
     private final static Key<Router> KEY = Key.get(Router.class, Names.named("CrestRealmRouter"));
 
     private final Debug debug;
-    private final GcmMessageResource messageResource;
+    private final SnsMessageResource messageResource;
+    private final SnsPushMessageConverter pushMessageConverter;
     private final Router router;
 
     /**
-     * Default constructor sets the debug so passing into produced delegates.
+     * Default constructor sets the debug for passing into produced delegates.
      */
-    public GcmHttpDelegateFactory() {
+    public SnsHttpDelegateFactory() {
         debug = Debug.getInstance("frPush");
-        messageResource = InjectorHolder.getInstance(GcmMessageResource.class);
+        messageResource = InjectorHolder.getInstance(SnsMessageResource.class);
+        pushMessageConverter  = InjectorHolder.getInstance(SnsPushMessageConverter.class);
         router = InjectorHolder.getInstance(KEY);
     }
 
     @Override
-    public GcmHttpDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException {
+    public SnsHttpDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException {
 
-        HttpClientHandler handler;
-        Options options = Options.defaultOptions();
-
-        try {
-            handler = new HttpClientHandler(options);
-        } catch (HttpApplicationException e) {
-            throw new PushNotificationException("Unable to generate HTTP client for the GcmHttpDelegate.", e);
-        }
-
-        return new GcmHttpDelegate(handler, config, debug, router, messageResource);
+        AmazonSNSClient service = new AmazonSNSClient(
+                new BasicAWSCredentials(config.getAccessKey(), config.getSecret()));
+        service.setRegion(Region.getRegion(Regions.US_WEST_2));
+        return new SnsHttpDelegate(service, config, router, messageResource, pushMessageConverter, debug);
     }
 
 }

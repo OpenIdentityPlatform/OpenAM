@@ -17,7 +17,6 @@ package org.forgerock.openam.authentication.modules.push;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
-import static org.forgerock.openam.services.push.PushMessage.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -65,7 +64,6 @@ public class AuthenticatorPush extends AMLoginModule {
             InjectorHolder.getInstance(MessageDispatcher.class);
 
     //From config
-    private String deviceId;
     private Map<String, String> sharedState;
 
     //Internal state
@@ -82,10 +80,15 @@ public class AuthenticatorPush extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
 
         this.sharedState = sharedState;
-        this.deviceId = CollectionHelper.getMapAttr(options, DEVICE_MESSAGING_ID);
         long timeoutInMilliSeconds = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
 
         this.realm = DNMapper.orgNameToRealmName(getRequestOrg());
+
+        try {
+            pushService.init(realm);
+        } catch (PushNotificationException e) {
+            DEBUG.error("AuthenticatorPush :: init() : Unable to init Push system.", e);
+        }
 
         pollingWaitAssistant = new PollingWaitAssistant(timeoutInMilliSeconds);
 
@@ -96,12 +99,6 @@ public class AuthenticatorPush extends AMLoginModule {
             } catch (Exception e) {
                 DEBUG.error("AuthenticatorPush :: init() : Unable to set auth level {}", authLevel, e);
             }
-        }
-
-        try {
-            pushService.initialiseService(realm);
-        } catch (PushNotificationException e) {
-            DEBUG.error("AuthenticatorPush :: init() : Unable to initialise Push system.", e);
         }
     }
 
@@ -197,13 +194,17 @@ public class AuthenticatorPush extends AMLoginModule {
         throw failedAsLoginException();
     }
 
-    private boolean sendMessage(String deviceId, String mechanismId) {
-        PushMessage message = new PushMessage(deviceId, json(object(
+    private boolean sendMessage(String communicationId, String mechanismId) {
+
+        String jsonContent = json(object(
                 field("message", "User logged in to realm \"" + realm + "\" using OpenAM"),
                 field("mechanismUid", mechanismId)
-        )));
+        )).toString();
+
+        PushMessage message = new PushMessage(communicationId, jsonContent, "Authentication");
+
         try {
-            promise = messageDispatcher.expect(message.getData().get(MESSAGE_ID).toString());
+            promise = messageDispatcher.expect(message.getMessageId());
             pushService.send(message, realm);
             pollingWaitAssistant.start(promise);
             return true;

@@ -45,21 +45,11 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerock-am-auth-push-device-messaging-id"
-                                 type="single"
-                                 syntax="string"
-                                 validator="RequiredValueValidator"
-                                 i18nKey="a601"
-                                 resourceName="deviceId">
-                    <DefaultValues>
-                        <Value />
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-push-message-response-timeout"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a602"
+                                 i18nKey="a601"
                                  resourceName="timeoutInMilliSecconds">
                     <DefaultValues>
                         <Value>120000</Value>
@@ -77,21 +67,11 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="forgerock-am-auth-push-device-messaging-id"
-                                     type="single"
-                                     syntax="string"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a601"
-                                     resourceName="deviceId">
-                        <DefaultValues>
-                            <Value />
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-push-message-response-timeout"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      validator="RequiredValueValidator"
-                                     i18nKey="a602"
+                                     i18nKey="a601"
                                      resourceName="timeoutInMilliSecconds">
                         <DefaultValues>
                             <Value>120000</Value>

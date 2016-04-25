@@ -4,6 +4,18 @@ DO NOT TRANSLATE OR LOCALIZE
 Apache Software License, Version 2.0
 ***************************************************************************
 
+Version: aws-java-sdk-core-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: aws-java-sdk-sns-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: aws-java-sdk-sqs-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: jackson-dataformat-cbor-2.5.3.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
 Version: bootstrap-tabdrop-1.0.js
 Copyright: Copyright 2012 Stefan Petre
 

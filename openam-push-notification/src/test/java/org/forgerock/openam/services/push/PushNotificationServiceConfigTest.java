@@ -26,27 +26,32 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-            .withEndpoint("www.forgerock.org")
-            .withApiKey("apiKey")
-            .withSenderId("senderId");
+            .withAppleEndpoint("www.apple.com")
+            .withGoogleEndpoint("www.google.com")
+            .withAccessKey("apiKey")
+            .withSecret("secret")
+            .withDelegateFactory("classname");
 
         //when
         PushNotificationServiceConfig config = builder.build();
 
         //then
         assertThat(config).isNotNull();
-        assertThat(config.getEndpoint()).isEqualTo("www.forgerock.org");
-        assertThat(config.getApiKey()).isEqualTo("apiKey");
-        assertThat(config.getSenderId()).isEqualTo("senderId");
+        assertThat(config.getAppleEndpoint()).isEqualTo("www.apple.com");
+        assertThat(config.getGoogleEndpoint()).isEqualTo("www.google.com");
+        assertThat(config.getAccessKey()).isEqualTo("apiKey");
+        assertThat(config.getSecret()).isEqualTo("secret");
+        assertThat(config.getDelegateFactory()).isEqualTo("classname");
     }
 
     @Test (expectedExceptions = PushNotificationException.class)
-    public void shouldNotCreateConfigMissingEndpoint() throws PushNotificationException {
+    public void shouldNotCreateConfigMissingBothEndpoints() throws PushNotificationException {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withApiKey("apiKey")
-                .withSenderId("senderId");
+                .withAccessKey("accessKey")
+                .withSecret("secret")
+                .withDelegateFactory("classname");
 
         //when
         builder.build();
@@ -55,12 +60,14 @@ public class PushNotificationServiceConfigTest {
     }
 
     @Test (expectedExceptions = PushNotificationException.class)
-    public void shouldNotCreateConfigMissingSenderId() throws PushNotificationException {
+    public void shouldNotCreateConfigMissingGoogleEndpoint() throws PushNotificationException {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withApiKey("apiKey")
-                .withEndpoint("www.forgerock.org");
+                .withAccessKey("accessKey")
+                .withAppleEndpoint("www.apple.com")
+                .withSecret("secret")
+                .withDelegateFactory("classname");
 
         //when
         builder.build();
@@ -69,12 +76,60 @@ public class PushNotificationServiceConfigTest {
     }
 
     @Test (expectedExceptions = PushNotificationException.class)
-    public void shouldNotCreateConfigMissingApiKey() throws PushNotificationException {
+    public void shouldNotCreateConfigMissingAppleEndpoint() throws PushNotificationException {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withSenderId("senderId")
-                .withEndpoint("www.forgerock.org");
+                .withAccessKey("accessKey")
+                .withGoogleEndpoint("www.google.com")
+                .withSecret("secret")
+                .withDelegateFactory("classname");
+
+        //when
+        builder.build();
+
+        //then
+    }
+
+    @Test (expectedExceptions = PushNotificationException.class)
+    public void shouldNotCreateConfigMissingSecret() throws PushNotificationException {
+
+        //given
+        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
+                .withAccessKey("accessKey")
+                .withGoogleEndpoint("www.google.com")
+                .withDelegateFactory("classname");
+
+        //when
+        builder.build();
+
+        //then
+    }
+
+    @Test (expectedExceptions = PushNotificationException.class)
+    public void shouldNotCreateConfigMissingAccessKey() throws PushNotificationException {
+
+        //given
+        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
+                .withSecret("secret")
+                .withGoogleEndpoint("www.google.com")
+                .withAppleEndpoint("www.apple.com")
+                .withDelegateFactory("classname");
+
+        //when
+        builder.build();
+
+        //then
+    }
+
+    @Test (expectedExceptions = PushNotificationException.class)
+    public void shouldNotCreateConfigMissingDelegateFactory() throws PushNotificationException {
+
+        //given
+        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
+                .withSecret("secret")
+                .withGoogleEndpoint("www.google.com")
+                .withAppleEndpoint("www.apple.com");
 
         //when
         builder.build();
