@@ -20,17 +20,24 @@ package org.forgerock.openam.authentication.modules.push.registration;
  */
 final class Constants {
 
-    private Constants() { }
+    /**
+     * Uninstantiable.
+     */
+    private Constants() {
+        //This section intentionally left blank.
+    }
 
     /**
      * VALUES.
      */
+
     /** The number of recovery codes to generate for a newly minted device. */
     static final int NUM_RECOVERY_CODES = 10;
 
     /**
      * KEYS.
      */
+
     /** The name of the AuthenticatorPush authentication registration module for debug logging purposes. */
     static final String AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION = "amAuthAuthenticatorPushRegistration";
     /** Module configuration key for push timeout. */
@@ -47,6 +54,7 @@ final class Constants {
     /**
      * STATES.
      */
+
     /** State to register device or get the App page. */
     static final int STATE_OPTIONS = 2;
     /** State to display an error message to the end-user. */
@@ -57,8 +65,9 @@ final class Constants {
     static final int STATE_CONFIRMATION = 5;
 
     /**
-     * Callback Options
+     * CALLBACK OPTIONS.
      */
+
     /** Option begin the registration process now. */
     public static final int START_REGISTRATION_OPTION = 1;
     /** Option to navigate to the get the app page. */
@@ -69,12 +78,14 @@ final class Constants {
     /** Index to use to access the wait period callback placeholder. */
     public static final int POLLING_TIME_OUTPUT_CALLBACK_INDEX = 2;
 
+    /**
+     * QR CODE KEYS.
+     */
+
     /** The key for the Message Id query component of the QR code. */
     static final String MESSAGE_ID_QR_CODE_KEY = "m";
     /** The key for the shared secret query component of the QR code. */
     static final String SHARED_SECRET_QR_CODE_KEY = "s";
-    /** The key for the Issuer query component of the QR code. */
-    static final String ISSUER_QR_CODE_KEY = "issuer";
     /** The key for the bgcolour query component of the QR code. */
     static final String BGCOLOUR_QR_CODE_KEY = "b";
     /** The key for the Issuer query component of the QR code. */
@@ -83,4 +94,8 @@ final class Constants {
     static final String AUTH_QR_CODE_KEY = "a";
     /** The key for the Issuer query component of the QR code. */
     static final String IMG_QR_CODE_KEY = "image";
+    /** The key for the challenge inside the registration challenge. */
+    static final String CHALLENGE_QR_CODE_KEY = "c";
+    /** The key for the total JWS challenge for registration. */
+    static final String ISSUER_QR_CODE_KEY = "issuer";
 }

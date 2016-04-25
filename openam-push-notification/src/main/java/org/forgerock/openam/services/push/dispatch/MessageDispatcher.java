@@ -18,13 +18,13 @@ package org.forgerock.openam.services.push.dispatch;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
+import java.util.Set;
 import javax.inject.Inject;
 import org.forgerock.guava.common.cache.Cache;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 
 /**
@@ -36,13 +36,18 @@ import org.forgerock.util.promise.PromiseImpl;
  *
  * Later, the MessageDispatcher may be asked to handle a message with a messageId and its JsonValue contents.
  *
- * If this messageId is expected, then the promise associated with that messageId will complete, and be removed
- * from the cache.
+ * If this messageId is expected, then the promise associated with that messageId will be asked whether it has
+ * any predicates:
+ *
+ *  -   If it does not, the promise will complete, and be removed from the cache.
+ *  -   If it does, then all the predicates will be run - one at a time, and if any of them return boolean false
+ *          then the MessagePromise will NOT be completed, and the MessageDispatcher will continue to await
+ *          a valid message in response to that messageId.
  */
 @Singleton
 public class MessageDispatcher {
 
-    private final Cache<String, PromiseImpl<JsonValue, Exception>> cache;
+    private final Cache<String, MessagePromise> cache;
     private final Debug debug;
 
     /**
@@ -53,7 +58,7 @@ public class MessageDispatcher {
      * @param debug for writing debug messages.
      */
     @Inject
-    public MessageDispatcher(Cache<String, PromiseImpl<JsonValue, Exception>> dispatch, @Named("frPush") Debug debug) {
+    public MessageDispatcher(Cache<String, MessagePromise> dispatch, @Named("frPush") Debug debug) {
         this.cache = dispatch;
         this.debug = debug;
     }
@@ -64,13 +69,20 @@ public class MessageDispatcher {
      * @param messageId The messageId of the promise to complete. May not be null.
      * @param content The contents to complete the awaiting promise with. May not be null.
      * @throws NotFoundException If the provided was messageId was null.
+     * @throws PredicateNotMetException If any expected-successful predicate fails.
      */
-    public void handle(String messageId, JsonValue content) throws NotFoundException {
+    public void handle(String messageId, JsonValue content) throws NotFoundException, PredicateNotMetException {
         Reject.ifNull(content);
         Reject.ifNull(messageId);
-        PromiseImpl<JsonValue, Exception> promise = cache.getIfPresent(messageId);
-        if (promise != null) {
-            promise.tryHandleResult(content);
+        MessagePromise messagePromise = cache.getIfPresent(messageId);
+        if (messagePromise != null) {
+            for (Predicate p : messagePromise.getPredicates()) {
+                if (!p.perform(content)) {
+                    throw new PredicateNotMetException("Predicate was not matched. Message invalid.");
+                }
+            }
+
+            messagePromise.getPromise().tryHandleResult(content);
             cache.invalidate(messageId);
         } else {
             debug.warning("Cache was asked to handle {} but never expected it.", messageId);
@@ -83,13 +95,15 @@ public class MessageDispatcher {
      * an incomplete promise.
      *
      * @param messageId The messageId to inform this cache to prepare to handle. May not be null or empty.
+     * @param predicates The predicates that must be run against the content of any response to this messageId.
      * @return A promise which will later be completed by this MessageDispatcher handling a JsonValue for the messageId.
      */
-    public Promise<JsonValue, Exception> expect(String messageId) {
+    public MessagePromise expect(String messageId, Set<Predicate> predicates) {
         Reject.ifTrue(StringUtils.isBlank(messageId));
-        PromiseImpl<JsonValue, Exception> promise = PromiseImpl.create();
-        cache.put(messageId, promise);
-        return promise;
+        Reject.ifNull(predicates);
+        MessagePromise mp = new MessagePromise(PromiseImpl.<JsonValue, Exception>create(), predicates);
+        cache.put(messageId, mp);
+        return mp;
     }
 
     /**
@@ -101,8 +115,8 @@ public class MessageDispatcher {
      * the cache.
      */
     public boolean forget(String messageId) {
-        PromiseImpl<JsonValue, Exception> promise = cache.getIfPresent(messageId);
-        if (promise != null) {
+        MessagePromise messagePromise = cache.getIfPresent(messageId);
+        if (messagePromise != null) {
             cache.invalidate(messageId);
             return true;
         }

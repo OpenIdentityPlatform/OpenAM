@@ -20,9 +20,6 @@ import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 import static org.forgerock.util.promise.Promises.*;
 
-import com.amazonaws.services.sns.AmazonSNSClient;
-import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
-import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
 import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,13 +33,25 @@ import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
 /**
  * An endpoint, created and attached to the Router at the point of a new {@link SnsHttpDelegate} being
- * configured to accept inbound messages from a remote device over GCM.
+ * configured to accept inbound messages from a remote device over SNS. Converts messages that come in
+ * from an SNS-specific format into a generalised one that the Push auth system and message dispatcher can use.
+ *
+ * The registration field is special, as it communicates out with Amazon's SNS to ensure that the registration
+ * is successfully completed.
+ *
+ * This endpoint will receive both authentication and registration messages. The format of these messages will be:
+ *
+ * {
+ *     "jwt" : "...", // signed jwt, including all claims necessary for operation (reg or auth)
+ *     "messageId" : "..." // unique identifier for this message
+ * }
  *
  * {@see SnsHttpDelegate}.
  * {@see PushNotificationService}.
@@ -52,10 +61,6 @@ public class SnsMessageResource {
 
     private final MessageDispatcher messageDispatcher;
     private final Debug debug;
-
-    private AmazonSNSClient client;
-    private String googleArn;
-    private String appleArn;
 
     /**
      * Generate a new SnsMessageResource using the provided MessageDispatcher.
@@ -80,26 +85,7 @@ public class SnsMessageResource {
      */
     @Action
     public Promise<ActionResponse, ResourceException> authenticate(Context context, ActionRequest actionRequest) {
-        Reject.ifFalse(context.containsContext(RealmContext.class));
-
-        final JsonValue actionContent = actionRequest.getContent();
-
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        String messageId = actionContent.get(MESSAGE_ID_JSON_POINTER).asString();
-
-        if (messageId == null) {
-            debug.warning("Received message in realm {} with invalid messageId.", realm);
-            return RestUtils.generateBadRequestException();
-        }
-
-        try {
-            messageDispatcher.handle(messageId, actionRequest.getContent());
-        } catch (NotFoundException e) {
-            debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
-            return RestUtils.generateBadRequestException(); //drop down to CTS [?]
-        }
-
-        return newResultPromise(newActionResponse(json(object())));
+        return handle(context, actionRequest);
     }
 
     /**
@@ -114,57 +100,34 @@ public class SnsMessageResource {
      */
     @Action
     public Promise<ActionResponse, ResourceException> register(Context context, ActionRequest actionRequest) {
+        return handle(context, actionRequest);
+    }
+
+    private Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest actionRequest) {
         Reject.ifFalse(context.containsContext(RealmContext.class));
-        Reject.ifNull(client);
 
         final JsonValue actionContent = actionRequest.getContent();
 
-        String deviceId = actionContent.get(DEVICE_ID_JSON_POINTER).asString();
-        String communicationType = actionContent.get(DEVICE_COMMUNICATION_TYPE_JSON_POINTER).asString();
-        String deviceName = actionContent.get(DEVICE_NAME_JSON_POINTER).asString();
+        String realm = context.asContext(RealmContext.class).getResolvedRealm();
         String messageId = actionContent.get(MESSAGE_ID_JSON_POINTER).asString();
-        String mechanismUid = actionContent.get(DEVICE_MECHANISM_UID_JSON_POINTER).asString();
-        String deviceType = actionContent.get(DEVICE_TYPE_JSON_POINTER).asString();
 
-        String platformApplicationArn;
-
-        if (communicationType.equals("apns")) {
-            platformApplicationArn = appleArn;
-        } else {
-            platformApplicationArn = googleArn;
+        if (messageId == null) {
+            debug.warning("Received message in realm {} with invalid messageId.", realm);
+            return RestUtils.generateBadRequestException();
         }
 
-        CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest()
-                        .withPlatformApplicationArn(platformApplicationArn)
-                        .withToken(deviceId);
-
-        CreatePlatformEndpointResult communicationId = client.createPlatformEndpoint(request);
-
-        JsonValue json = json(
-            object(
-                field("data", object(
-                    field("deviceName", deviceName),
-                    field("communicationId", communicationId.getEndpointArn()),
-                    field("mechanismUid", mechanismUid),
-                    field("communicationType", communicationType),
-                    field("deviceType", deviceType),
-                    field("deviceId", deviceId)
-                )
-            )
-        ));
-
         try {
-            messageDispatcher.handle(messageId, json);
+            messageDispatcher.handle(messageId, actionContent);
         } catch (NotFoundException e) {
+            debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
+            return RestUtils.generateBadRequestException(); //drop down to CTS [?]
+        } catch (PredicateNotMetException e) {
+            debug.warning("Unable to deliver message with messageId {} in realm {} as predicate not met.",
+                    messageId, realm, e);
             return RestUtils.generateBadRequestException();
         }
 
         return newResultPromise(newActionResponse(json(object())));
     }
 
-    void init(AmazonSNSClient client, String appleArn, String googleArn) {
-        this.client = client;
-        this.appleArn = appleArn;
-        this.googleArn = googleArn;
-    }
 }

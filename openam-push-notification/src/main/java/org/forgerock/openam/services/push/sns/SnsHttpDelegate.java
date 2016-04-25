@@ -23,11 +23,14 @@ import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationDelegate;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
+import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.services.routing.RouteMatcher;
 
 /**
@@ -91,13 +94,24 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
     }
 
     @Override
+    public Set<Predicate> getRegistrationMessagePredicates() {
+        Predicate predicate = new SnsRegistrationPredicate(client,
+                config.getAppleEndpoint(), config.getGoogleEndpoint());
+        return Collections.singleton(predicate);
+    }
+
+    @Override
+    public Set<Predicate> getAuthenticationMessagePredicates() {
+        return Collections.emptySet();
+    }
+
+    @Override
     public String getRegServiceLocation() {
         return ROUTE + "?_action=register";
     }
 
     @Override
     public void startServices() throws PushNotificationException {
-        messageEndpoint.init(client, config.getAppleEndpoint(), config.getGoogleEndpoint());
         routeMatcher = router.addRoute(EQUALS, uriTemplate(ROUTE), newAnnotatedRequestHandler(messageEndpoint));
     }
 

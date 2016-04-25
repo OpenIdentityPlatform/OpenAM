@@ -58,9 +58,9 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a651"
                                  resourceName="issuer">
-                    <ExampleValue>
+                    <DefaultValues>
                         <Value>ForgeRock</Value>
-                    </ExampleValue>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
                                  type="single"
@@ -117,9 +117,9 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a651"
                                      resourceName="issuer">
-                        <ExampleValue>
+                        <DefaultValues>
                             <Value>ForgeRock</Value>
-                        </ExampleValue>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
                                      type="single"
@@ -137,9 +137,9 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a653"
                                      resourceName="bgcolour">
-                        <ExampleValue>
+                        <DefaultValues>
                             <Value>#519387</Value>
-                        </ExampleValue>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerock-am-auth-img-url"
                                      type="single"
@@ -147,9 +147,9 @@
                                      validator="UrlValidator"
                                      i18nKey="a654"
                                      resourceName="imgUrl">
-                        <ExampleValue>
+                        <DefaultValues>
                             <Value>http://example.com/image.png</Value>
-                        </ExampleValue>
+                        </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

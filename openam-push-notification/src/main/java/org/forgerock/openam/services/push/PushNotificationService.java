@@ -26,10 +26,12 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceListener;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.openam.services.push.dispatch.Predicate;
 
 /**
  * The PushNotificationManager holds a map of instantiated PushNotificationDelegates to their realm in which they exist.
@@ -128,26 +130,28 @@ public class PushNotificationService {
      * Returns the relative location of the registration service endpoint in this realm.
      * @param realm The realm of the service to check.
      * @return The relative location of the service.
+     * @throws PushNotificationException if the is not service available for that realm.
      */
-    public String getRegServiceAddress(String realm) {
+    public String getRegServiceAddress(String realm) throws PushNotificationException {
         if (pushRealmMap.containsKey(realm)) {
             return pushRealmMap.get(realm).getRegServiceLocation();
-        } else {
-            return null;
         }
+
+        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
     }
 
     /**
      * Returns the relative location of the authentication service endpoint in this realm.
      * @param realm The realm of the service to check.
      * @return The relative location of the service.
+     * @throws PushNotificationException if the is not service available for that realm.
      */
-    public String getAuthServiceAddress(String realm) {
+    public String getAuthServiceAddress(String realm) throws PushNotificationException {
         if (pushRealmMap.containsKey(realm)) {
             return pushRealmMap.get(realm).getAuthServiceLocation();
-        } else {
-            return null;
         }
+
+        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
     }
 
     /**
@@ -167,13 +171,12 @@ public class PushNotificationService {
         PushNotificationDelegate pushNotificationDelegate = pushFactoryMap.get(factoryClass).produceDelegateFor(config);
 
         if (pushNotificationDelegate == null) {
-            throw new PushNotificationException("PushNotificationFactory produced a null delete. Aborting update.");
+            throw new PushNotificationException("PushNotificationFactory produced a null delegate. Aborting update.");
         }
 
         delegateUpdater.replaceDelegate(realm, pushNotificationDelegate, config);
         init(realm);
     }
-
 
     private void deleteService(String realm) throws PushNotificationException {
 
@@ -209,6 +212,38 @@ public class PushNotificationService {
     private PushNotificationDelegateFactory createFactory(String factoryClass)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         return (PushNotificationDelegateFactory) Class.forName(factoryClass).newInstance();
+    }
+
+    /**
+     * Retrieve the message predicates (if any) specific to the delegate implementation for the given realm,
+     * which must be passed during registration message(s).
+     *
+     * @param realm The realm in which the service (should) exist.
+     * @return A set of predicates necessary for messages returning from that specific service to be valid.
+     * @throws PushNotificationException if the service is not available for that realm.
+     */
+    public Set<Predicate> getRegistrationMessagePredicatesFor(String realm) throws PushNotificationException {
+        if (pushRealmMap.containsKey(realm)) {
+            return pushRealmMap.get(realm).getRegistrationMessagePredicates();
+        }
+
+        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
+    }
+
+    /**
+     * Retrieve the message predicates (if any) specific to the delegate implementation for the given realm,
+     * which must be passed during authentication message(s).
+     *
+     * @param realm The realm in which the service (should) exist.
+     * @return A set of predicates necessary for messages returning from that specific service to be valid.
+     * @throws PushNotificationException if the service is not available for that realm.
+     */
+    public Set<Predicate> getAuthenticationMessagePredicatesFor(String realm) throws PushNotificationException {
+        if (pushRealmMap.containsKey(realm)) {
+            return pushRealmMap.get(realm).getAuthenticationMessagePredicates();
+        }
+
+        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
     }
 
     /**

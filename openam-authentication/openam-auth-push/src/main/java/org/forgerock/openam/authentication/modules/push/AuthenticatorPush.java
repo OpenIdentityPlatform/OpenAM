@@ -15,8 +15,8 @@
  */
 package org.forgerock.openam.authentication.modules.push;
 
-import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
+import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -27,18 +27,23 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.DNMapper;
-
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
+import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
+import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
@@ -46,10 +51,13 @@ import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.dispatch.MessagePromise;
+import org.forgerock.openam.services.push.dispatch.Predicate;
+import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
+import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-import org.forgerock.util.promise.Promise;
 
 /**
  * ForgeRock Authentication (Push) Authentication Module.
@@ -68,7 +76,6 @@ public class AuthenticatorPush extends AMLoginModule {
 
     //Internal state
     private String realm;
-    private Promise<JsonValue, Exception> promise;
     private String username;
     private Principal principal;
 
@@ -160,7 +167,7 @@ public class AuthenticatorPush extends AMLoginModule {
             return USERNAME_STATE;
         } else {
             PushDeviceSettings device = getDevice();
-            if (sendMessage(device.getCommunicationId(), device.getDeviceMechanismUID())) {
+            if (sendMessage(device)) {
                 return STATE_WAIT;
             } else {
                 DEBUG.warning("AuthenticatorPush :: sendState() : Failed to send message.");
@@ -194,19 +201,38 @@ public class AuthenticatorPush extends AMLoginModule {
         throw failedAsLoginException();
     }
 
-    private boolean sendMessage(String communicationId, String mechanismId) {
+    private boolean sendMessage(PushDeviceSettings device) {
 
-        String jsonContent = json(object(
-                field("message", "User logged in to realm \"" + realm + "\" using OpenAM"),
-                field("mechanismUid", mechanismId)
-        )).toString();
+        String communicationId = device.getCommunicationId();
+        String mechanismId = device.getDeviceMechanismUID();
 
-        PushMessage message = new PushMessage(communicationId, jsonContent, "Authentication");
+        String challenge = userPushDeviceProfileManager.createRandomBytes(SECRET_BYTE_LENGTH);
+
+        JwtClaimsSetBuilder jwtClaimsSetBuilder = new JwtClaimsSetBuilder()
+                .claim(Constants.MECHANISM_ID_KEY, mechanismId)
+                .claim(CHALLENGE_KEY, challenge);
+
+        String jwt = new SignedJwtBuilderImpl(new SigningManager()
+                .newHmacSigningHandler(Base64.decode(device.getSharedSecret())))
+                .claims(jwtClaimsSetBuilder.build())
+                .headers().alg(JwsAlgorithm.HS256).done().build();
+
+        PushMessage message = new PushMessage(communicationId, jwt, "Authentication");
+
+        Set<Predicate> servicePredicates = new HashSet<>();
+        servicePredicates.add(
+                new SignedJwtVerificationPredicate(Base64.decode(device.getSharedSecret()), DATA_JSON_POINTER));
+        servicePredicates.add(
+                new PushMessageChallengeResponsePredicate(Base64.decode(device.getSharedSecret()), challenge,
+                        DATA_JSON_POINTER, DEBUG));
 
         try {
-            promise = messageDispatcher.expect(message.getMessageId());
+
+            servicePredicates.addAll(pushService.getAuthenticationMessagePredicatesFor(realm));
+
+            MessagePromise promise = messageDispatcher.expect(message.getMessageId(), servicePredicates);
             pushService.send(message, realm);
-            pollingWaitAssistant.start(promise);
+            pollingWaitAssistant.start(promise.getPromise());
             return true;
         } catch (PushNotificationException e) {
             DEBUG.error("AuthenticatorPush :: sendMessage() : Failed to transmit message through PushService.");
@@ -216,6 +242,7 @@ public class AuthenticatorPush extends AMLoginModule {
     }
 
     private PushDeviceSettings getDevice() throws AuthLoginException {
+
         try {
             PushDeviceSettings firstDevice
                     = CollectionUtils.getFirstItem(userPushDeviceProfileManager.getDeviceProfiles(username, realm));

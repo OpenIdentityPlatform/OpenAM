@@ -52,7 +52,6 @@ public class SnsHttpDelegateFactory implements PushNotificationDelegateFactory {
 
     @Override
     public SnsHttpDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException {
-
         AmazonSNSClient service = new AmazonSNSClient(
                 new BasicAWSCredentials(config.getAccessKey(), config.getSecret()));
         service.setRegion(Region.getRegion(Regions.US_WEST_2));

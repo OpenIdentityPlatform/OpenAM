@@ -31,8 +31,7 @@ import javax.inject.Named;
 import org.forgerock.guava.common.cache.Cache;
 import org.forgerock.guava.common.cache.CacheBuilder;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.json.JsonValue;
-import org.forgerock.util.promise.PromiseImpl;
+import org.forgerock.openam.services.push.dispatch.MessagePromise;
 
 /**
  * Guice module for OpenAM Push related classes.
@@ -50,7 +49,7 @@ public class PushGuiceModule extends AbstractModule {
      * @return a newly constructed Cache.
      */
     @Provides
-    public Cache<String, PromiseImpl<JsonValue, Exception>> getMessageDispatchCache() {
+    public Cache<String, MessagePromise> getMessageDispatchCache() {
         return CacheBuilder.newBuilder()
                 .concurrencyLevel(16)
                 .maximumSize(10000)

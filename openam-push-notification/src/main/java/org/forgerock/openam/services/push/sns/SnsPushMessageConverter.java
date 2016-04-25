@@ -41,6 +41,8 @@ public class SnsPushMessageConverter implements PushMessageConverter {
     private final static String APNS_APS = "aps";
     private final static String APNS_ALERT = "alert";
 
+    private final static String DEFAULT = "default";
+
     @Override
     public String toTransferFormat(PushMessage message) {
 
@@ -52,11 +54,11 @@ public class SnsPushMessageConverter implements PushMessageConverter {
 
         JsonValue apple = json(object(
                 field(APNS_APS, object(
-                        field(APNS_ALERT, message.getBody()))),
-                field(MESSAGE_ID, message.getMessageId())));
+                        field(APNS_ALERT, message.getBody()),
+                        field(MESSAGE_ID, message.getMessageId())))));
 
         JsonValue toSend = json(object(
-                field("default", "Default message"),
+                field(DEFAULT, message.getMessageId() + " :: " + message.getBody()),
                 field(GCM, gcm.toString()),
                 field(APNS, apple.toString()
                 )

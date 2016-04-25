@@ -16,6 +16,8 @@
 package org.forgerock.openam.services.push;
 
 import java.io.Closeable;
+import java.util.Set;
+import org.forgerock.openam.services.push.dispatch.Predicate;
 
 /**
  * The {@link PushNotificationService} is responsible for monitoring configuration changes and detecting
@@ -82,5 +84,20 @@ public interface PushNotificationDelegate extends Closeable {
      * OpenAM server instance ID {@see WebtopNaming}.
      */
     String getAuthServiceLocation();
+
+    /**
+     * Returns a set of registration message predicates required by this delegate. Must return an empty set
+     * if there are no predicates to be run.
+     * @return A set of predicate delegates.
+     */
+    Set<Predicate> getRegistrationMessagePredicates();
+
+    /**
+     * Returns a set of authentication message predicates required by this delegate. Must return an empty set
+     * if there are no predicates to be run.
+     * @return A set of predicate delegates.
+     */
+    Set<Predicate> getAuthenticationMessagePredicates();
+
 
 }

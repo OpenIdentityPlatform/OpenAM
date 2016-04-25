@@ -18,7 +18,7 @@ package org.forgerock.openam.authentication.modules.push;
 /**
  * Constants for the ForgeRock Authenticator (Push) Auth Module.
  */
-final class Constants {
+public final class Constants {
 
     /**
      * Uninstantiable.
@@ -37,6 +37,16 @@ final class Constants {
     /** Module configuration key for authentication level of module. */
     static final String AUTH_LEVEL = "forgerock-am-auth-push-auth-level";
 
+
+    /**
+     * MESSAGE CODE KEYS.
+     */
+
+    /** The key for the Message Id query component of the QR code. */
+    static final String MECHANISM_ID_KEY = "u";
+    /** The key for the challenge inside the registration challenge. */
+    static final String CHALLENGE_KEY = "c";
+
     /**
      * STATES.
      */
@@ -47,5 +57,11 @@ final class Constants {
 
     /** The Position of the Polling callback in the callbacks step in the xml for this module. */
     static final int POLLING_CALLBACK_POSITION = 1;
+
+    /**
+     * CONFIG.
+     */
+    /** Length of a generic secret key (in bytes). */
+    public static final int SECRET_BYTE_LENGTH = 32;
 
 }

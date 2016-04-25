@@ -20,10 +20,10 @@ import static org.forgerock.json.JsonValue.*;
 import static org.mockito.Mockito.*;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.HashSet;
 import org.forgerock.guava.common.cache.Cache;
 import org.forgerock.guava.common.cache.CacheBuilder;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -45,30 +45,31 @@ public class MessageDispatcherTest {
         //given
 
         //when
-        Promise result = messageDispatcher.expect("expectMessage");
+        MessagePromise result = messageDispatcher.expect("expectMessage", new HashSet<Predicate>());
 
         //then
-        assertThat(result.isDone()).isFalse();
+        assertThat(result.getPromise().isDone()).isFalse();
     }
 
     @Test
-    public void shouldCompletePromiseForhandleedMessageIdWhenexpectd() throws NotFoundException {
+    public void shouldCompletePromiseForhandleedMessageIdWhenexpectd()
+            throws NotFoundException, PredicateNotMetException {
         //given
-        Promise result = messageDispatcher.expect("completeexpect");
+        MessagePromise result = messageDispatcher.expect("completeexpect", new HashSet<Predicate>());
 
         //when
         messageDispatcher.handle("completeexpect", json(object()));
 
         //then
-        assertThat(result.isDone()).isTrue();
+        assertThat(result.getPromise().isDone()).isTrue();
     }
 
     @Test(expectedExceptions = NotFoundException.class)
-    public void shouldErrorForhandleedMessageIdWhenNotexpectd() throws NotFoundException {
+    public void shouldErrorForHandleMessageIdWhenNotExpected() throws NotFoundException, PredicateNotMetException {
         //given
 
         //when
-        messageDispatcher.handle("notexpectd", json(object()));
+        messageDispatcher.handle("notexpected", json(object()));
 
         //then
     }
@@ -78,7 +79,7 @@ public class MessageDispatcherTest {
         //given
 
         //when
-        messageDispatcher.expect(null);
+        messageDispatcher.expect(null, null);
 
         //then
     }
@@ -88,15 +89,15 @@ public class MessageDispatcherTest {
         //given
 
         //when
-        messageDispatcher.expect("");
+        messageDispatcher.expect("", new HashSet<Predicate>());
 
         //then
     }
 
     @Test
-    public void shouldReturnTrueAndForgetMessageIdWhenexpectd() {
+    public void shouldReturnTrueAndForgetMessageIdWhenExpected() {
         //given
-        messageDispatcher.expect("toForget");
+        messageDispatcher.expect("toForget", new HashSet<Predicate>());
 
         //when
         boolean result = messageDispatcher.forget("toForget");
@@ -107,7 +108,7 @@ public class MessageDispatcherTest {
     }
 
     @Test
-    public void shouldReturnFalseForgetWhenNotexpectd() {
+    public void shouldReturnFalseForgetWhenNotExpected() {
         //given
 
         //when
@@ -118,10 +119,10 @@ public class MessageDispatcherTest {
     }
 
     @Test
-    public void shouldReturnFalseForgetWhenAlreadyhandleed() throws NotFoundException {
+    public void shouldReturnFalseForgetWhenAlreadyhandleed() throws NotFoundException, PredicateNotMetException {
         //given
-        messageDispatcher.expect("alreadyhandleed");
-        messageDispatcher.handle("alreadyhandleed", json(object()));
+        messageDispatcher.expect("alreadyhandled", new HashSet<Predicate>());
+        messageDispatcher.handle("alreadyhandled", json(object()));
 
         //when
         boolean result = messageDispatcher.forget("alreadyhandleed");

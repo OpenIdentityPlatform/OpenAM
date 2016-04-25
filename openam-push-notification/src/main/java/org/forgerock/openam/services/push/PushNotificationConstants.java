@@ -32,23 +32,35 @@ public final class PushNotificationConstants {
     }
 
     /**
+     * KEYS.
+     */
+
+    /** Name of the key where the communicationType is stored. */
+    public static final String COMMUNICATION_TYPE = "communicationType";
+    /** Name of the key where the deviceType is stored. */
+    public static final String DEVICE_TYPE = "deviceType";
+    /** Name of the key where the communicationId is stored. */
+    public static final String COMMUNICATION_ID = "communicationId";
+    /** Name of the key where the deviceId is stored. */
+    public static final String DEVICE_ID = "deviceId";
+    /** Name of the key where the mechanismUid is stored. */
+    public static final String MECHANISM_UID = "mechanismUid";
+    /** Name of the key where the JWT is stored. */
+    public static final String JWT = "jwt";
+
+    /**
      * MESSAGE.
      */
 
-    /** Pointer to the location of the Device name in the mobile message. */
-    public static final JsonPointer DEVICE_NAME_JSON_POINTER = new JsonPointer("data/deviceName");
-    /** Pointer to the location of the Mobile platform Communication ID in the mobile message. */
-    public static final JsonPointer DEVICE_COMMUNICATION_ID_JSON_POINTER = new JsonPointer("data/communicationId");
-    /** Pointer to the location of the login mechanism id in the mobile message. */
-    public static final JsonPointer DEVICE_MECHANISM_UID_JSON_POINTER = new JsonPointer("data/mechanismUid");
-    /** Pointer to the location of the communication type id in the mobile message. */
-    public static final JsonPointer DEVICE_COMMUNICATION_TYPE_JSON_POINTER = new JsonPointer("data/communicationType");
-    /** Pointer to the location of the device type id in the mobile message. */
-    public static final JsonPointer DEVICE_TYPE_JSON_POINTER = new JsonPointer("data/deviceType");
-    /** Pointer to the location of the device id in the mobile message. */
-    public static final JsonPointer DEVICE_ID_JSON_POINTER = new JsonPointer("data/deviceId");
     /** Pointer to the location of the messageId in the mobile message. */
-    public static final JsonPointer MESSAGE_ID_JSON_POINTER = new JsonPointer("data/" + MESSAGE_ID);
+    public static final JsonPointer MESSAGE_ID_JSON_POINTER = new JsonPointer(MESSAGE_ID);
+    /** Pointer to the location of the JWT data returned by the device. */
+    public static final JsonPointer DATA_JSON_POINTER = new JsonPointer(JWT);
+    /** Claim set location of response. */
+    public static final String RESPONSE_LOCATION = "response";
+    /** General alg. */
+    public static final String HMACSHA256 = "HmacSHA256";
+
 
     /**
      * DELEGATE.
@@ -73,6 +85,15 @@ public final class PushNotificationConstants {
     static final String DEFAULT_DELEGATE_FACTORY_CLASS = "org.forgerock.openam.push.sns.SnsHttpDelegateFactory";
 
     /**
+     * REMOTE SERVICE NAMES.
+     */
+
+    /** Apple Push Notification Service. */
+    public static final String APNS = "apns";
+    /** Google Cloud Messenger. */
+    public static final String GCM = "gcm";
+
+    /**
      * SERVICE.
      */
 
@@ -80,4 +101,5 @@ public final class PushNotificationConstants {
     public static final String SERVICE_NAME = "PushNotificationService";
     /** Version of the PushNotificationService. */
     public static final String SERVICE_VERSION = "1.0";
+
 }

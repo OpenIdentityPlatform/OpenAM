@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
@@ -80,6 +81,19 @@ public class UserPushDeviceProfileManagerTest {
         verify(mockDevicesDao).saveDeviceProfiles(eq(USER), eq(REALM), savedProfileList.capture());
         assertThat(savedProfileList.getValue()).hasSize(1);
         assertThat(savedProfileList.getValue().get(0).toString()).isEqualTo(expectedJson.toString());
+    }
+
+    @Test
+    public void correctNumRandomBytesAreProducedAsBase64() {
+
+        //given
+        int num = 10;
+        String byteArray = userPushDeviceProfileManager.createRandomBytes(num);
+
+        //when
+
+        //then
+        assertThat(Base64.decode(byteArray)).hasSize(num);
     }
 
 }
