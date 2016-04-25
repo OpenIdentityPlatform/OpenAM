@@ -97,6 +97,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     public static final String ADVANCED_TAB_NAME = "advanced";
     private static final String SERVER_DEFAULT_NAME = "server-default";
     public static final String SERVER_TABLE_PROPERTY_PREFIX = "amconfig.serverconfig.xml.server.table.column.";
+    private static final String SERVER_PARENT_SITE = "amconfig.header.site";
     private static Map<String, String> syntaxRawToReal = new HashMap<>();
     private static JsonValue defaultSchema;
     private static JsonValue nonDefaultSchema;
@@ -193,6 +194,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 template.putPermissive(new JsonPointer("/properties/" + tabName + "/type"), "object");
                 int sectionOrder = 0;
                 for (String sectionName : sectionNames) {
+                    if (isDefault && SERVER_PARENT_SITE.equals(sectionName)) {
+                        continue;
+                    }
                     final String sectionPath = "/properties/" + tabName + "/properties/" + sectionName;
                     template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
                     template.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
@@ -205,6 +209,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                         final String type = label.getType();
                         final String description = label.getDescription();
                         final String attributeName = label.getDefaultValue().replaceFirst("amconfig.", "");
+                        if (isDefault && Constants.AM_SERVICES_SECRET.equals(attributeName)) {
+                            continue;
+                        }
                         final List<String> attributeOptions = label.getOptions();
                         final List<String> attributeOptionLabels = label.getOptionLabels();
                         final boolean isOptional = isDefault ? optionalAttributes.contains(attributeName) : true;
@@ -220,7 +227,6 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                         template.putPermissive(new JsonPointer(path + "/title"), title);
                         template.putPermissive(new JsonPointer(path + "/propertyOrder"), attributeOrder++);
                         template.putPermissive(new JsonPointer(path + "/required"), !isOptional);
-                        template.putPermissive(new JsonPointer(path + "/pattern"), ".+");
 
                         if (isNotBlank(description)) {
                             template.putPermissive(new JsonPointer(path + "/description"), description);
