@@ -164,6 +164,7 @@
                                 <include>com/iplanet/ums/validation/URLValidator*</include>
                                 <include>com/sun/identity/authentication/*</include>
                                 <include>com/sun/identity/authentication/client/**</include>
+                                <include>com/sun/identity/authentication/config/**</include>
                                 <include>com/sun/identity/authentication/internal/AuthSSOProvider*</include>
                                 <include>com/sun/identity/authentication/internal/AuthSSOToken*</include>
                                 <include>com/sun/identity/authentication/internal/InvalidAuthContextException*</include>
@@ -187,6 +188,7 @@
                                 <include>com/sun/identity/authentication/spi/RedirectCallback*</include>
                                 <include>com/sun/identity/authentication/spi/X509CertificateCallback*</include>
                                 <include>com/sun/identity/authentication/util/ISAuthConstants*</include>
+                                <include>com/sun/identity/authentication/util/AMAuthUtils*</include>
                                 <include>com/sun/identity/common/admin/DisplayOptionsUtils*</include>
                                 <include>com/sun/identity/common/configuration/Configuration*</include>
                                 <include>com/sun/identity/common/configuration/ServerConfiguration*</include>
@@ -213,6 +215,7 @@
                                 <include>com/sun/identity/common/SystemConfigurationUtil*</include>
                                 <include>com/sun/identity/common/SystemProperties*</include>
                                 <include>com/sun/identity/configuration/SystemProperties*</include>
+                                <include>com/sun/identity/delegation/DelegationManager*</include>
                                 <include>com/sun/identity/delegation/DelegationException*</include>
                                 <include>com/sun/identity/entitlement/**</include>
                                 <include>com/sun/identity/entity/*</include>
@@ -235,9 +238,17 @@
                                 <include>com/sun/identity/log/spi/Debug*</include>
                                 <include>com/sun/identity/log/spi/IDebug*</include>
                                 <include>com/sun/identity/log/spi/ISDebug*</include>
+                                <include>com/sun/identity/monitoring/Agent*</include>
                                 <include>com/sun/identity/monitoring/MonitoringUtil*</include>
                                 <include>com/sun/identity/monitoring/SsoServerIdRepoSvcImpl*</include>
+                                <include>com/sun/identity/monitoring/SsoServerPolicySvc*</include>
+                                <include>com/sun/identity/monitoring/SsoServerPolicySvcImpl*</include>
+                                <include>com/sun/identity/policy/Agen**</include>
                                 <include>com/sun/identity/policy/**</include>
+                                <include>com/sun/identity/policy/client/**</include>
+                                <include>com/sun/identity/policy/interfaces/**</include>
+                                <include>com/sun/identity/policy/remote/**</include>
+                                <include>com/sun/identity/policy/util/**</include>
                                 <include>com/sun/identity/protocol/**</include>
                                 <include>com/sun/identity/security/AMSecurityPropertiesException*</include>
                                 <include>com/sun/identity/security/AdminTokenAction*</include>
@@ -253,16 +264,20 @@
                                 <include>org/forgerock/openam/idm/**</include>
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
                                 <include>org/forgerock/openam/console/base/ConsoleViewBeanBase*</include>
+                                <include>org/forgerock/openam/entitlement/service/ApplicationService*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSaveIndex*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSearchIndex*</include>
                                 <include>org/forgerock/openam/entitlement/utils/EntitlementUtils*</include>
                                 <include>org/forgerock/openam/entitlement/conditions/**</include>
+                                <include>org/forgerock/openam/entitlement/PolicyConstants*</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
                                 <include>org/forgerock/openam/session/*</include>
                                 <include>org/forgerock/openam/security/whitelist/**</include>
                                 <include>org/forgerock/openam/sso/providers/stateless/*</include>
                                 <include>org/forgerock/openam/upgrade/UpgradeException*</include>
                                 <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
+                                <include>org/forgerock/openam/network/ipv4/**</include>
+                                <include>org/forgerock/openam/network/ipv6/**</include>
                                 <include>META-INF/services/org.forgerock.openam.entitlement.ConditionTypeRegistry</include>
                             </includes>
                             <excludes>
@@ -294,8 +309,6 @@
                                 <exclude>com/sun/identity/idm/AgentMigration71*</exclude>
                                 <exclude>com/sun/identity/log/LoggerProvider*</exclude>
                                 <exclude>com/sun/identity/policy/jaas/**</exclude>
-                                <exclude>com/sun/identity/policy/remote/PolicyRequestHandler*</exclude>
-                                <exclude>com/sun/identity/policy/util/**</exclude>
                                 <exclude>com/sun/identity/sm/jaxrpc/SMSJAXRPCObjectImpl*</exclude>
                             </excludes>
                         </filter>
