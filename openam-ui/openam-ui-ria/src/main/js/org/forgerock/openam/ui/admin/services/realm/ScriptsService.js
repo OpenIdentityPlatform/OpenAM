@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/services/realm/ScriptsService", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (Messages, AbstractDelegate, Configuration, Constants, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getLocalizedResponse (response) {
         Messages.addMessage({

@@ -58,8 +58,9 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
                 var realm = (Configuration.globalData.auth.passedInRealm != null)
                                 ? Configuration.globalData.auth.passedInRealm
                                 : Configuration.globalData.auth.subRealm;
-                location.href = "#login/" + realm +
-                    restLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams);
+                location.href = `#login/${
+                    realm
+                    }${restLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams)}`;
             });
             return false;
         }

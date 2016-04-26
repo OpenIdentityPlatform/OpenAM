@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                 sortField: "value",
                                 render: {
                                     item: function (item) {
-                                        return "<span class='time-zone-selected'>" + item.text + "</span>";
+                                        return `<span class='time-zone-selected'>${item.text}</span>`;
                                     }
                                 },
                                 load: function () {

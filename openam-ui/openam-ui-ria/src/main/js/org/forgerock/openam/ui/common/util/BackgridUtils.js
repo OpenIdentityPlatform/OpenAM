@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/common/util/BackgridUtils", [
@@ -63,9 +63,9 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
             for (; i < arrayVal.length; i++) {
                 if (_.isString(arrayVal[i])) {
-                    result += "<li>" + arrayVal[i] + "</li>";
+                    result += `<li>${arrayVal[i]}</li>`;
                 } else {
-                    result += "<li>" + JSON.stringify(arrayVal[i]) + "</li>";
+                    result += `<li>${JSON.stringify(arrayVal[i])}</li>`;
                 }
             }
             result += "</ul>";
@@ -101,9 +101,9 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
             for (prop in object) {
                 if (_.isString(object[prop])) {
-                    result += "<dt>" + prop + "</dt><dd>" + object[prop] + "</dd>";
+                    result += `<dt>${prop}</dt><dd>${object[prop]}</dd>`;
                 } else {
-                    result += "<dt>" + prop + "</dt><dd>" + JSON.stringify(object[prop]) + "</dd>";
+                    result += `<dt>${prop}</dt><dd>${JSON.stringify(object[prop])}</dd>`;
                 }
             }
             result += "</dl>";
@@ -248,10 +248,10 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
                 return data && data.filterName && data.filterName === "eq"
                     ? function (filterName, filterQuery) {
                         // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
-                        return filterName + "+eq+" + encodeURIComponent('"*' + filterQuery + '*"');
+                        return `${filterName}+eq+${encodeURIComponent(`"*${filterQuery}*"`)}`;
                     }
                     : function (filterName, filterQuery) {
-                        return filterName + "+co+" + encodeURIComponent('"' + filterQuery + '"');
+                        return `${filterName}+co+${encodeURIComponent(`"${filterQuery}"`)}`;
                     };
             }());
 
@@ -280,7 +280,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     };
 
     obj.sortKeys = function () {
-        return this.state.order === 1 ? "-" + this.state.sortKey : this.state.sortKey;
+        return this.state.order === 1 ? `-${this.state.sortKey}` : this.state.sortKey;
     };
 
     obj.sync = function (method, model, options) {
@@ -297,7 +297,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
         _.forIn(options.data, function (val, key) {
             if (_.include(includeList, key)) {
-                params.push(key + "=" + val);
+                params.push(`${key}=${val}`);
             }
         });
 

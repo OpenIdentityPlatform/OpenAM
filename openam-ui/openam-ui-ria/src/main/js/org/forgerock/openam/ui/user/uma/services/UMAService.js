@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 
     obj.getUmaConfig = function () {
         return obj.serviceCall({
@@ -38,9 +38,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
 
     obj.unshareAllResources = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                encodeURIComponent(Configuration.loggedUser.get("username")) +
-                "/oauth2/resources/sets?_action=revokeAll"),
+            url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))
+                }/oauth2/resources/sets?_action=revokeAll`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -48,9 +48,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
 
     obj.approveRequest = function (id, permissions) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id +
-                "?_action=approve"),
+            url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))
+                }/uma/pendingrequests/${id}?_action=approve`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify({
@@ -61,9 +61,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
 
     obj.denyRequest = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                encodeURIComponent(Configuration.loggedUser.get("username")) + "/uma/pendingrequests/" + id +
-                "?_action=deny"),
+            url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))
+                }/uma/pendingrequests/${id}?_action=deny`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -73,17 +73,17 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
     obj.labels = {
         all: function () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                    encodeURIComponent(Configuration.loggedUser.get("username")) +
-                    "/oauth2/resources/labels?_queryFilter=true"),
+                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                    encodeURIComponent(Configuration.loggedUser.get("username"))
+                    }/oauth2/resources/labels?_queryFilter=true`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
         create: function (name, type) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                    encodeURIComponent(Configuration.loggedUser.get("username")) +
-                    "/oauth2/resources/labels?_action=create"),
+                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                    encodeURIComponent(Configuration.loggedUser.get("username"))
+                    }/oauth2/resources/labels?_action=create`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify({
@@ -94,9 +94,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
         },
         get: function (id) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                                                      encodeURIComponent(Configuration.loggedUser.get("username")) +
-                                                      "/oauth2/resources/labels?_queryFilter=true"),
+                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                    encodeURIComponent(Configuration.loggedUser.get("username"))
+                    }/oauth2/resources/labels?_queryFilter=true`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then(function (data) {
                 return _.find(data.result, { _id: id });
@@ -104,9 +104,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
         },
         getByName: function (name) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                    encodeURIComponent(Configuration.loggedUser.get("username")) +
-                    "/oauth2/resources/labels?_queryFilter=true"),
+                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                    encodeURIComponent(Configuration.loggedUser.get("username"))
+                    }/oauth2/resources/labels?_queryFilter=true`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then(function (data) {
                 data = !_.any(data.result, function (label) { return label.name.toLowerCase() === name; });
@@ -114,10 +114,9 @@ define("org/forgerock/openam/ui/user/uma/services/UMAService", [
         },
         remove: function (id) {
             return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
-                    encodeURIComponent(Configuration.loggedUser.get("username")) +
-                    "/oauth2/resources/labels/" +
-                    encodeURIComponent(id)),
+                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
+                    encodeURIComponent(Configuration.loggedUser.get("username"))
+                    }/oauth2/resources/labels/${encodeURIComponent(id)}`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE"
             });

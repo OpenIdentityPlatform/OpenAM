@@ -42,8 +42,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 populatedRequirements.callbacks[1].input[0].value = params.password;
             } else {
                 _.each(requirements.callbacks, function (obj, i) {
-                    if (params.hasOwnProperty("callback_" + i)) {
-                        populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
+                    if (params.hasOwnProperty(`callback_${i}`)) {
+                        populatedRequirements.callbacks[i].input[0].value = params[`callback_${i}`];
                     }
                 });
             }
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         var href = "#login",
                             realm = Configuration.globalData.auth.subRealm;
                         if (realm) {
-                            href += "/" + realm;
+                            href += `/${realm}`;
                         }
                         location.href = href;
                     }
@@ -113,8 +113,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         if (urlParams && urlParams.goto) {
             AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
                 if (data.successURL.indexOf("/") === 0 &&
-                    data.successURL.indexOf("/" + Constants.context) !== 0) {
-                    context = "/" + Constants.context;
+                    data.successURL.indexOf(`/${Constants.context}`) !== 0) {
+                    context = `/${Constants.context}`;
                 }
                 Configuration.globalData.auth.urlParams.goto = context + data.successURL;
                 promise.resolve();
@@ -139,7 +139,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
             filteredParams = _.pick(params, paramsToSave);
 
-        return _.isEmpty(filteredParams) ? "" : "&" + $.param(filteredParams);
+        return _.isEmpty(filteredParams) ? "" : `&${$.param(filteredParams)}`;
     };
 
     obj.logout = function (successCallback, errorCallback) {

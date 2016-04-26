@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         // problems during the next failed login request because the Router.configuration.routes.login.defaults[0] is
         // already populated with the previous subrealm.
         // This quick solution just over-rides this property with the subrealm in the current request.
-        Router.configuration.routes.login.defaults[0] = "/" + RealmHelper.getSubRealm();
+        Router.configuration.routes.login.defaults[0] = `/${RealmHelper.getSubRealm()}`;
 
         // We cannot use the Router.getLink() method here and simply apply the subrealm to the route because
         // Router.getLink() does more than its title suggests. It also applies the default properties to the route and
@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             _.each(_.keys(auth.urlParams), function (key) {
                 if (key.indexOf("IDToken") > -1) {
                     index = parseInt(key.substring(7), 10) - 1;
-                    submitContent["callback_" + index] = auth.urlParams["IDToken" + key.substring(7)];
+                    submitContent[`callback_${index}`] = auth.urlParams[`IDToken${key.substring(7)}`];
                 }
             });
             auth.autoLoginAttempts = 1;
@@ -170,7 +170,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     if (Configuration.globalData.auth.currentStage > 1) {
                         urlParams = URIUtils.getCurrentFragmentQueryString();
                         if (urlParams) {
-                            urlParams = "&" + urlParams;
+                            urlParams = `&${urlParams}`;
                         }
                         // Go to the Login Unavailable view with all the original url params.
                         routeToLoginUnavailable(urlParams);
@@ -233,7 +233,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                 // Copied from EVENT_LOGIN_REQUEST handler
                                 if (Configuration.gotoURL &&
                                     _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
-                                    console.log("Auto redirect to " + Configuration.gotoURL);
+                                    console.log(`Auto redirect to ${Configuration.gotoURL}`);
                                     Router.navigate(Configuration.gotoURL, { trigger: true });
                                     delete Configuration.gotoURL;
                                 } else {
@@ -305,13 +305,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         return [o.name, o.value];
                     }));
 
-                    redirectForm = $("<form action='" + redirectCallback.redirectUrl + "' method='POST'></form>");
+                    redirectForm = $(`<form action='${redirectCallback.redirectUrl}' method='POST'></form>`);
 
                     if (redirectCallback.redirectMethod === "POST") {
 
                         _.each(redirectCallback.redirectData, function (v, k) {
                             redirectForm.append(
-                                "<input type='hidden' name='" + k + "' value='" + v + "' aria-hidden='true' />");
+                                `<input type='hidden' name='${k}' value='${v}' aria-hidden='true' />`);
                         });
 
                         redirectForm.appendTo("body").submit();
@@ -365,7 +365,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                template = "templates/openam/authn/" + reqs.stage + ".html";
+                template = `templates/openam/authn/${reqs.stage}.html`;
                 UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
@@ -406,16 +406,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
                         urlParams.authIndexValue = urlParams[param];
                         //*** Note special case for authLevel
-                        Configuration.globalData.auth.additional += "&authIndexType=" +
-                        ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
+                        Configuration.globalData.auth.additional += `&authIndexType=${
+                            ((param === "authlevel") ? "level" : param)
+                            }&authIndexValue=${urlParams[param]}`;
                     }
                 });
             }
 
             // Special case for SSORedirect
             if (urlParams.goto && urlParams.goto.indexOf("/SSORedirect") === 0) {
-                urlParams.goto = "/" + Constants.context + urlParams.goto;
-                Configuration.globalData.auth.additional.replace("&goto=", "&goto=" + "/" + Constants.context);
+                urlParams.goto = `/${Constants.context}${urlParams.goto}`;
+                Configuration.globalData.auth.additional.replace("&goto=", `&goto=/${Constants.context}`);
             }
 
             Configuration.globalData.auth.urlParams = urlParams;
@@ -445,7 +446,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
         function renderPartial (name, context) {
             return _.find(Handlebars.partials, function (code, templateName) {
-                return templateName.indexOf("login/_" + name) !== -1;
+                return templateName.indexOf(`login/_${name}`) !== -1;
             })(_.merge(renderContext, context));
         }
 
@@ -522,7 +523,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     Handlebars.registerHelper("gotoParameter", function () {
         return _.has(Configuration, "globalData.auth.urlParams.goto")
-            ? "&goto=" + encodeURIComponent(Configuration.globalData.auth.urlParams.goto)
+            ? `&goto=${encodeURIComponent(Configuration.globalData.auth.urlParams.goto)}`
             : "";
     });
 

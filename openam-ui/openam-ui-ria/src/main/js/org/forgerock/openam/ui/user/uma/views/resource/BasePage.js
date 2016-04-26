@@ -53,28 +53,32 @@ define("org/forgerock/openam/ui/user/uma/views/resource/BasePage", [
             });
         },
         createLabelCollection: function (labelId) {
-            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
+            var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
 
             if (labelId) {
-                filters.push("labels eq \"" + labelId + "\"");
+                filters.push(`labels eq \"${labelId}\"`);
             }
 
-            return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                                          "/json/__subrealm__/users/" +
-                                                                          Configuration.loggedUser.get("username") +
-                                                                          "/oauth2/resources/sets"), filters);
+            return this.createCollection(
+                RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
+                    Configuration.loggedUser.get("username")
+                    }/oauth2/resources/sets`),
+                filters
+            );
         },
         createSetCollection: function (notResourceOwner) {
-            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.get("username") + "\""];
+            var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
 
             if (notResourceOwner) {
-                filters[0] = "! " + filters[0];
+                filters[0] = `! ${filters[0]}`;
             }
 
-            return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                                          "/json/__subrealm__/users/" +
-                                                                          Configuration.loggedUser.get("username") +
-                                                                          "/oauth2/resources/sets"), filters);
+            return this.createCollection(
+                RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
+                    Configuration.loggedUser.get("username")
+                    }/oauth2/resources/sets`),
+                filters
+            );
         },
         createColumns: function (pathToResource) {
             return [{
@@ -83,7 +87,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/BasePage", [
                 cell: BackgridUtils.UriExtCell,
                 headerCell: BackgridUtils.FilterHeaderCell,
                 href: function (rawValue, formattedValue, model) {
-                    return "#uma/resources/" + pathToResource + "/" + model.get("_id");
+                    return `#uma/resources/${pathToResource}/${model.get("_id")}`;
                 },
                 editable: false
             }, {

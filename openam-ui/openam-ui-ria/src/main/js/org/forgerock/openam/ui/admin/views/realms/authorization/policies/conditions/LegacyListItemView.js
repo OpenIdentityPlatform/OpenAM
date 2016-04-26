@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 "templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
                 this.data,
                 function () {
-                    self.setElement("#legacy_" + itemID);
+                    self.setElement(`#legacy_${itemID}`);
                     self.delegateEvents();
 
                     self.$el.data("itemData", itemData);

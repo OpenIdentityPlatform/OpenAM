@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
 
         initBasic: function (data, el, cssClasses) {
-            var elWrapper = $('<div class="condition-attr form-inline ' + cssClasses + '"></div>');
+            var elWrapper = $(`<div class="condition-attr form-inline ${cssClasses}"></div>`);
             el.append(elWrapper);
 
             this.data = data;

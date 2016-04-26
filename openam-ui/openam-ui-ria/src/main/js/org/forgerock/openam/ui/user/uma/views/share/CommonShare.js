@@ -62,9 +62,9 @@ define("org/forgerock/openam/ui/user/uma/views/share/CommonShare", [
             this.$el.find("input#shareButton").prop("disabled", !(subjectValid && permissionsValid));
         },
         onParentModelError: function (model, response) {
-            console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
-                           response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
-                           response.responseJSON.message);
+            console.error(`Unrecoverable load failure UMAResourceSetWithPolicy. ${response.responseJSON.code} (${
+                response.responseJSON.reason
+                }) ${response.responseJSON.message}`);
             // TODO : Fire and event message
         },
         onParentModelSync: function (model) {

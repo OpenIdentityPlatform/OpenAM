@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     "ConditionAttrObject", "ConditionAttrTime", "ConditionAttrDay", "ConditionAttrDate",
                     "OperatorRulesTemplate", "EditSubjectTemplate", "EditEnvironmentTemplate"
                 ], function (filename) {
-                    return "templates/admin/views/realms/authorization/policies/conditions/" + filename + ".html";
+                    return `templates/admin/views/realms/authorization/policies/conditions/${filename}.html`;
                 })
             );
         },
@@ -147,7 +147,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.groupCounter++;
 
             this.$el.find("ol#dropbox").nestingSortable({
-                group: self.element + "rule-creation-group" + self.groupCounter,
+                group: `${self.element}rule-creation-group${self.groupCounter}`,
                 exclude: ".item-button-panel, li.editing",
                 delay: 100,
 
@@ -398,7 +398,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
 
             var rules = this.$el.find("ol#dropbox").nestingSortable("serialize").get(),
-                operatorData = this.$el.find("#operator" + this.idPrefix + "0").data().itemData;
+                operatorData = this.$el.find(`#operator${this.idPrefix}0`).data().itemData;
 
             // Removing any obsolete root logicals.
             if (operatorData[this.properties]) {
@@ -422,7 +422,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 console.error("This should never be triggered", this.property, operatorData);
             }
 
-            console.log("\n" + this.property + ":", JSON.stringify(this.data.entity[this.property], null, 2));
+            console.log(`\n${this.property}:`, JSON.stringify(this.data.entity[this.property], null, 2));
 
             this.identifyDroppableLogical();
         },
@@ -432,7 +432,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
          * container was not found, disables "Add" buttons and displays corresponding message.
          */
         identifyDroppableLogical: function () {
-            var rootLogical = this.$el.find("#operator" + this.idPrefix + "0"),
+            var rootLogical = this.$el.find(`#operator${this.idPrefix}0`),
                 nestedItems,
                 nestedLogicals,
                 nestedLogicalsLength,

@@ -24,9 +24,9 @@ define("org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService"
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, Configuration, Constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/"),
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`),
         getPath = function () {
-            return "__subrealm__/users/" + Configuration.loggedUser.get("uid") + "/devices/2fa/oath/";
+            return `__subrealm__/users/${Configuration.loggedUser.get("uid")}/devices/2fa/oath/`;
         };
 
     /**
@@ -51,7 +51,7 @@ define("org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService"
     obj.setDevicesOathSkippable = function (skip) {
         var skipOption = { value: skip };
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=skip"),
+            url: RealmHelper.decorateURIWithRealm(`${getPath()}?_action=skip`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             data: JSON.stringify(skipOption),
             suppressEvents: true,
@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService"
      */
     obj.checkDevicesOathSkippable = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(getPath() + "?_action=check"),
+            url: RealmHelper.decorateURIWithRealm(`${getPath()}?_action=check`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true,
             method: "POST"
@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService"
      */
     obj.getDevices = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm(getPath() + "?_queryFilter=true"),
+            url: RealmHelper.decorateURIWithSubRealm(`${getPath()}?_queryFilter=true`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true
         });

@@ -68,7 +68,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
 
             if (model.id === null) {
                 method = "create";
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

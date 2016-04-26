@@ -93,8 +93,9 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, conf) {
             var subRealm = conf.globalData.auth.subRealm || "/";
-            window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" +
-                                   encodeURIComponent(subRealm);
+            window.location.href = `/${Constants.context}/realm/RMRealm?RMRealm.tblDataActionHref=${
+                encodeURIComponent(subRealm)
+                }`;
         }
     }, {
         startEvent: Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,

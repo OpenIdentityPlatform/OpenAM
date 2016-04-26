@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (_, AbstractDelegate, Constants, AdministeredRealmsHelper, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`),
         getCurrentAdministeredRealm = function () {
             var realm = AdministeredRealmsHelper.getCurrentRealm();
             return realm === "/" ? "" : RealmHelper.encodeRealm(realm);
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
 
     obj.getApplicationType = function (type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/applicationtypes/" + type),
+            url: RealmHelper.decorateURLWithOverrideRealm(`/applicationtypes/${type}`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
@@ -60,39 +60,41 @@ define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
 
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() +
-                "/subjectattributes?_queryFilter=true"),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${
+                getCurrentAdministeredRealm()
+                }/subjectattributes?_queryFilter=true`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.queryIdentities = function (name, query) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + name + "?_queryId=" +
-                query + "*"),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${
+                getCurrentAdministeredRealm()
+                }/${name}?_queryId=${query}*`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getUniversalId = function (name, type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type + "/" + name +
-                "?_fields=universalid"),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${
+                getCurrentAdministeredRealm()
+                }/${type}/${name}?_fields=universalid`),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0" }
         });
     };
 
     obj.getDataByType = function (type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type +
-                "?_queryFilter=true"),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${getCurrentAdministeredRealm()}/${type}?_queryFilter=true`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getScriptById = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/scripts/" + id),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${getCurrentAdministeredRealm()}/scripts/${id}`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
@@ -106,8 +108,8 @@ define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
 
     obj.importPolicies = function (data) {
         return obj.serviceCall({
-            serviceUrl: Constants.host + "/" + Constants.context,
-            url: RealmHelper.decorateURLWithOverrideRealm("/xacml" + getCurrentAdministeredRealm() + "/policies"),
+            serviceUrl: `${Constants.host}/${Constants.context}`,
+            url: RealmHelper.decorateURLWithOverrideRealm(`/xacml${getCurrentAdministeredRealm()}/policies`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: data
@@ -116,8 +118,9 @@ define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
 
     obj.listResourceTypes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() +
-                "/resourcetypes?_queryFilter=name+eq+" + encodeURIComponent('"^(?!Delegation Service$).*"')),
+            url: RealmHelper.decorateURLWithOverrideRealm(`${
+                getCurrentAdministeredRealm()
+                }/resourcetypes?_queryFilter=name+eq+${encodeURIComponent('"^(?!Delegation Service$).*"')}`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };

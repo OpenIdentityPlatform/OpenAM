@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/user/uma/util/URLHelper", [
     return {
         substitute: function (url) {
             return function () {
-                var replacedUrl = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                var replacedUrl = url.replace("__api__", `${Constants.host}/${Constants.context}/json`)
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
                     .replace("__username__", Configuration.loggedUser.get("username"));

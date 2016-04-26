@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/user/services/AuthNService", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, _, AbstractDelegate, Configuration, Constants, CookieHelper, EventManager, Messages, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/"),
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`),
         requirementList = [],
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
 
@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/user/services/AuthNService", [
             args.realm = RealmHelper.getOverrideRealm();
         }
 
-        url = url + "?" + $.param(args);
+        url = `${url}?${$.param(args)}`;
 
         return obj.serviceCall({
             type: "POST",
@@ -265,7 +265,7 @@ define("org/forgerock/openam/ui/user/services/AuthNService", [
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: JSON.stringify({ "goto": urlGoTo }),
             url: "",
-            serviceUrl: Constants.host + "/" + Constants.context + "/json/users?_action=validateGoto",
+            serviceUrl: `${Constants.host}/${Constants.context}/json/users?_action=validateGoto`,
             errorsHandlers: { "Bad Request": { status: "400" } }
         });
     };

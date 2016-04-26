@@ -126,7 +126,7 @@ require([
         // add prefix to templates for custom theme when path is defined
         var themePath = Configuration.globalData.theme.path;
         templatePaths = _.map(templatePaths, function (templatePath) {
-            return "text!" + themePath + templatePath;
+            return `text!${themePath}${templatePath}`;
         });
 
         require(templatePaths, function (AuthorizeTemplate, LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate) {

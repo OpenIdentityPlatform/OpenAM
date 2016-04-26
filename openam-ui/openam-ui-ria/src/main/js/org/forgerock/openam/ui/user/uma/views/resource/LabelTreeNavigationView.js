@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/LabelTreeNavigationView"
             var myLabelsRoute = Router.configuration.routes.umaResourcesMyLabelsResource,
                 isCurrentRouteForResource = Router.currentRoute === myLabelsRoute,
                 subFragment = (isCurrentRouteForResource) ? _.initial(fragment.split("/")).join("/") : fragment,
-                anchor = this.$el.find(".sidenav ol > li > a[href='#" + subFragment + "']"),
+                anchor = this.$el.find(`.sidenav ol > li > a[href='#${subFragment}']`),
                 parentOls;
 
             if (anchor.length) {

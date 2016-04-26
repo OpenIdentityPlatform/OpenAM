@@ -81,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
 
             if (duplicateIndex >= 0) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
-                this.flashDomItem(this.$el.find(".list-group-item:eq(" + duplicateIndex + ")"), "text-danger");
+                this.flashDomItem(this.$el.find(`.list-group-item:eq(${duplicateIndex})`), "text-danger");
             } else {
                 this.data.items.push(pending);
                 this.data.options.justAdded = pending;

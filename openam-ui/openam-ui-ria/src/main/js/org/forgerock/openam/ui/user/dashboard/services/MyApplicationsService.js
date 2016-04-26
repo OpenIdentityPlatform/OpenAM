@@ -21,8 +21,8 @@ define("org/forgerock/openam/ui/user/dashboard/services/MyApplicationsService", 
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (_, constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/");
+], function (_, Constants, AbstractDelegate, RealmHelper) {
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 
     function sortApps (apps) {
         return _.map(_.sortBy(_.keys(apps), function (key) { return key; }), function (key) {

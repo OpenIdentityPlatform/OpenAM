@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function ($, AbstractDelegate, Configuration, Constants) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
         redirector = function (tab) {
             return function (realm) {
                 obj.realm.redirectToTab(tab, realm);
@@ -34,22 +34,24 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
         redirectToTab: function (tabIndex) {
             obj.getJATOPageSession("/").done(function (session) {
                 if (session) {
-                    window.location.href = "/" + Constants.context + "/task/Home?" +
-                        "Home.tabCommon.TabHref=" + tabIndex +
-                        "&jato.pageSession=" + session + "&requester=XUI";
+                    window.location.href = `/${Constants.context}/task/Home?Home.tabCommon.TabHref=${
+                        tabIndex
+                        }&jato.pageSession=${session}&requester=XUI`;
                 } else {
-                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
         },
         configuration: function () {
             obj.getJATOPageSession("/").done(function (session) {
                 if (session) {
-                    window.location.href = "/" + Constants.context + "/service/SCConfigAuth?" +
-                        "SCConfigAuth.tabCommon.TabHref=445" +
-                        "&jato.pageSession=" + session + "&requester=XUI";
+                    window.location.href = `/${
+                        Constants.context
+                        }/service/SCConfigAuth?SCConfigAuth.tabCommon.TabHref=445&jato.pageSession=${
+                        session
+                        }&requester=XUI`;
                 } else {
-                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
         }
@@ -57,11 +59,11 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
 
     obj.commonTasks = function (realm, link) {
         var query = link.indexOf("?") === -1 ? "?" : "&";
-        window.location.href = "/" + Constants.context + "/" + link + query + "realm=" + encodeURIComponent(realm);
+        window.location.href = `/${Constants.context}/${link}${query}realm=${encodeURIComponent(realm)}`;
     };
 
     obj.serverSite = function () {
-        window.location.href = "/" + Constants.context + "/service/ServerSite";
+        window.location.href = `/${Constants.context}/service/ServerSite`;
     };
 
     obj.realm = {
@@ -73,12 +75,11 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
         redirectToTab : function (tabIndex, realm) {
             obj.getJATOPageSession(realm).done(function (session) {
                 if (session) {
-                    window.location.href = "/" + Constants.context + "/realm/RealmProperties?" +
-                        "RMRealm.tblDataActionHref=" + realm +
-                        "&RealmProperties.tabCommon.TabHref=" + tabIndex +
-                        "&jato.pageSession=" + session + "&requester=XUI";
+                    window.location.href = `/${Constants.context}/realm/RealmProperties?RMRealm.tblDataActionHref=${
+                        realm
+                        }&RealmProperties.tabCommon.TabHref=${tabIndex}&jato.pageSession=${session}&requester=XUI`;
                 } else {
-                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
         }
@@ -86,7 +87,7 @@ define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
 
     obj.getJATOPageSession = function (realm) {
         var promise = obj.serviceCall({
-            url: "/realm/RMRealm?RMRealm.tblDataActionHref=" + realm + "&requester=XUI",
+            url: `/realm/RMRealm?RMRealm.tblDataActionHref=${realm}&requester=XUI`,
             dataType: "html"
         });
 

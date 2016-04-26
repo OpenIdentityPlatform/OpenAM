@@ -89,7 +89,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                 getFormInputLabel: function (text) {
                     var el = document.createElement("label");
                     el.appendChild(document.createTextNode(text));
-                    el.className += " control-label col-sm-" + gridColWidth2;
+                    el.className += ` control-label col-sm-${gridColWidth2}`;
                     return el;
                 },
 
@@ -105,13 +105,13 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     group.className = "form-group";
 
                     if (label) {
-                        label.className += " control-label col-sm-" + gridColWidth2;
+                        label.className += ` control-label col-sm-${gridColWidth2}`;
                         group.appendChild(label);
                     }
 
                     if (input.nodeName.toLowerCase() === "input" || input.nodeName.toLowerCase() === "select") {
                         // All Inputs need to be wrapped in a div with the BS grid class added.
-                        div.className += "col-sm-" + gridColWidth1;
+                        div.className += `col-sm-${gridColWidth1}`;
                         div.appendChild(input);
                         group.appendChild(div);
                     } else {
@@ -140,8 +140,8 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     var el = document.createElement("div"),
                         parseHtml = document.implementation.createHTMLDocument("");
 
-                    el.className = "col-sm-offset-" + gridColWidth2 + " col-sm-" + gridColWidth3 + " help-block";
-                    parseHtml.body.innerHTML = "<div class='wordwrap'>" + text + "</div>";
+                    el.className = `col-sm-offset-${gridColWidth2} col-sm-${gridColWidth3} help-block`;
+                    parseHtml.body.innerHTML = `<div class='wordwrap'>${text}</div>`;
                     el.appendChild(parseHtml.body.getElementsByTagName("div")[0]);
 
                     return el;
@@ -243,7 +243,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     bar.setAttribute("aria-valuenow", start);
                     bar.setAttribute("aria-valuemin", min);
                     bar.setAttribute("aria-valuenax", max);
-                    bar.innerHTML = start + "%";
+                    bar.innerHTML = `${start}%`;
                     container.appendChild(bar);
 
                     return container;
@@ -255,7 +255,7 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
                     }
 
                     var bar = progressBar.firstChild,
-                        percentage = progress + "%";
+                        percentage = `${progress}%`;
                     bar.setAttribute("aria-valuenow", progress);
                     bar.style.width = percentage;
                     bar.innerHTML = percentage;
@@ -275,13 +275,13 @@ define("org/forgerock/openam/ui/admin/utils/JSONEditorTheme", [
 
                 getFirstColumnWrapper: function () {
                     var wrapper = document.createElement("div");
-                    wrapper.className = "col-sm-" + gridColWidth1;
+                    wrapper.className = `col-sm-${gridColWidth1}`;
                     return wrapper;
                 },
 
                 getSecondColumnWrapper: function () {
                     var wrapper = document.createElement("div");
-                    wrapper.className = "col-sm-offset-1 col-sm-" + (gridColWidth2 - 1);
+                    wrapper.className = `col-sm-offset-1 col-sm-${(gridColWidth2 - 1)}`;
                     return wrapper;
                 },
 

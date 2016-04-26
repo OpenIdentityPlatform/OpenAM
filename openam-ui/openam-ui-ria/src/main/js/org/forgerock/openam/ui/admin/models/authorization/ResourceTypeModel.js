@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define("org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel", [
@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel", [
             options.error = ModelUtils.errorHandler;
 
             if (method.toLowerCase() === "create" || model.id === null) {
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

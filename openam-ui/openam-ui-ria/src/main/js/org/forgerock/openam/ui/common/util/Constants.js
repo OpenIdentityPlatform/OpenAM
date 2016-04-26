@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     path.splice(-1);
 
     Constants.context = path.join("/");
-    Constants.CONSOLE_PATH = "/" + Constants.context + "/console";
+    Constants.CONSOLE_PATH = `/${Constants.context}/console`;
     Constants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
 
     // Realm
