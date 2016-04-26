@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -133,8 +133,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     clientRegistration.getScopeDescriptions(locale));
             final Map<String, String> claimDescriptions = getClaimDescriptions(userInfo.getValues(),
                     clientRegistration.getClaimDescriptions(locale));
+            final boolean saveConsentEnabled = providerSettings.isSaveConsentEnabled();
+
             throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions, claimDescriptions,
-                    userInfo, resourceOwner.getName(providerSettings));
+                    userInfo, resourceOwner.getName(providerSettings), saveConsentEnabled);
         }
 
         return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);

@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.forgerock.oauth2.core.UserInfoClaims;
 
@@ -34,7 +33,7 @@ public class ResourceOwnerConsentRequired extends Exception {
     private final String userDisplayName;
     private final Map<String, String> claimDesciptions;
     private final UserInfoClaims claims;
-
+    private final boolean saveConsentEnabled;
     /**
      * Constructs a new ResourceOwnerConsentRequired instance with the specified client name, description and scope
      * descriptions.
@@ -45,16 +44,18 @@ public class ResourceOwnerConsentRequired extends Exception {
      * @param claimDescriptions The display descriptions of the provided claims.
      * @param claims The claims being provided.
      * @param userDisplayName The displayable name of the user, if it can be deduced.
+     * @param saveConsentEnabled true if we can save the consent
      */
     public ResourceOwnerConsentRequired(String clientName, String clientDescription,
             Map<String, String> scopeDescriptions, Map<String, String> claimDescriptions, UserInfoClaims claims,
-            String userDisplayName) {
+            String userDisplayName, boolean saveConsentEnabled) {
         this.clientName = clientName;
         this.clientDescription = clientDescription;
         this.scopeDesciptions = scopeDescriptions;
         this.claimDesciptions = claimDescriptions;
         this.claims = claims;
         this.userDisplayName = userDisplayName;
+        this.saveConsentEnabled = saveConsentEnabled;
     }
 
     /**
@@ -109,5 +110,13 @@ public class ResourceOwnerConsentRequired extends Exception {
      */
     public UserInfoClaims getClaims() {
         return claims;
+    }
+
+    /**
+     * Is save consent enabled
+     * @return true if you can save the consent
+     */
+    public boolean isSaveConsentEnabled() {
+        return saveConsentEnabled;
     }
 }

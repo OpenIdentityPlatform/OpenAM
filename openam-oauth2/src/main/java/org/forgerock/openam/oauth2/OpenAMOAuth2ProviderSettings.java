@@ -275,12 +275,24 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public boolean isConsentSaved(ResourceOwner resourceOwner, String clientId, Set<String> scope) {
-
-        String consentAttribute = null;
+    public boolean isSaveConsentEnabled() {
         try {
-            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
-            if (consentAttribute != null) {
+            return getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE)!= null;
+        } catch (SMSException | SSOException e) {
+            logger.error("There was a problem getting the consent configuration for realm:" + realm, e);
+        }
+        return false;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isConsentSaved(ResourceOwner resourceOwner, String clientId, Set<String> scope) {
+        String consentAttribute = "";
+        try {
+            if (isSaveConsentEnabled()) {
+                consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
                 AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
                 if (id != null) {
                     Set<String> attributeSet = id.getAttribute(consentAttribute);
@@ -318,7 +330,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     }
                 }
             } else {
-                logger.error("No saved consent attribute defined in realm:" + realm);
+                logger.error("Can't save consent as it is not configured properly for the realm:" + realm);
             }
         } catch (Exception e) {
             logger.error("There was a problem getting the saved consent from the attribute: "

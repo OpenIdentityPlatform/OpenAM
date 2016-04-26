@@ -21,7 +21,6 @@ import java.security.KeyPair;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
 import freemarker.template.Template;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -76,6 +75,15 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     Map<String, ResponseTypeHandler> getAllowedResponseTypes() throws UnsupportedResponseTypeException, ServerException;
+
+
+    /**
+     * Determines if the consent can be saved or not, due to a lack of configuration.
+     *
+     * @return {@code true} if the consent can be saved, false if it is not configured properly.
+     */
+    boolean isSaveConsentEnabled();
+
 
     /**
      * Determines whether a resource owner's consent has been saved from a previous authorize request.

@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright 2012-2015 ForgeRock AS.
+  ~ Copyright 2012-2016 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -54,6 +54,7 @@
                     displayName: "${display_name?js_string}",
                     <#if user_name??>userName: "${user_name?js_string}",</#if>
                     <#if user_code??>userCode: "${user_code?js_string}",</#if>
+                    <#if saveConsentEnabled >isSaveConsentEnabled: true,</#if>
                     displayScopes: ${display_scopes},
                     displayClaims: ${display_claims}
                 }

@@ -79,6 +79,7 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
         data.put("user_code", request.getParameter(OAuth2Constants.DeviceCode.USER_CODE));
         data.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
                 .getRootURL(ServletUtils.getRequest(getRequest())));
+        data.put("saveConsentEnabled", consentRequired.isSaveConsentEnabled());
         return data;
     }
 
