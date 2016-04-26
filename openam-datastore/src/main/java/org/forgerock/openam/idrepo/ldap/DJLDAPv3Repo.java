@@ -69,6 +69,7 @@ import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdapFromJsonQueryFilterVisitor;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -99,6 +100,7 @@ import org.forgerock.opendj.ldap.schema.UnknownSchemaElementException;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Function;
 import org.forgerock.util.Options;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.time.Duration;
 
 /**
@@ -2066,23 +2068,26 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         if (DEBUG.messageEnabled()) {
             DEBUG.message("addListener invoked");
         }
-        String psearchBaseDN = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN);
-        if (psearchBaseDN == null || psearchBaseDN.isEmpty()) {
-            DEBUG.error("Persistent search base DN is missing, persistent search is disabled.");
-            return 0;
-        }
-        String pSearchId = getPSearchId();
-
         //basically we should have only one idRepoListener per IdRepo
         if (this.idRepoListener != null) {
             throw new IllegalStateException("There is an idRepoListener already registered within this IdRepo");
         }
+
         this.idRepoListener = idRepoListener;
+        String psearchBaseDN = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN);
+        if (StringUtils.isEmpty(psearchBaseDN)) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("Persistent search base DN is missing, persistent search is disabled.");
+            }
+            return 0;
+        }
+
+        String pSearchId = getPSearchId();
         synchronized (pSearchMap) {
             DJLDAPv3PersistentSearch pSearch = pSearchMap.get(pSearchId);
-            String username = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_USER_NAME);
-            char[] password = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_PASSWORD, "").toCharArray();
             if (pSearch == null) {
+                String username = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_USER_NAME);
+                char[] password = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_PASSWORD, "").toCharArray();
                 pSearch = new DJLDAPv3PersistentSearch(configMap, createConnectionFactory(username, password, 1));
                 if (dnCacheEnabled) {
                     pSearch.addMovedOrRenamedListener(this);
@@ -2109,17 +2114,24 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         if (DEBUG.messageEnabled()) {
             DEBUG.message("removelistener invoked");
         }
-        String pSearchId = getPSearchId();
-        synchronized (pSearchMap) {
-            DJLDAPv3PersistentSearch pSearch = pSearchMap.get(pSearchId);
-            if (pSearch == null) {
-                DEBUG.error("PSearch is already removed, unable to unregister");
-            } else {
-                pSearch.removeMovedOrRenamedListener(this);
-                pSearch.removeListener(idRepoListener);
-                if (!pSearch.hasListeners()) {
-                    pSearch.stopSearch();
-                    pSearchMap.remove(pSearchId);
+        String psearchBaseDN = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN);
+        if (StringUtils.isEmpty(psearchBaseDN)) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Persistent search is disabled, no need to unregister.");
+            }
+        } else {
+            String pSearchId = getPSearchId();
+            synchronized (pSearchMap) {
+                DJLDAPv3PersistentSearch pSearch = pSearchMap.get(pSearchId);
+                if (pSearch == null) {
+                    DEBUG.error("PSearch is already removed, unable to unregister");
+                } else {
+                    pSearch.removeMovedOrRenamedListener(this);
+                    pSearch.removeListener(idRepoListener);
+                    if (!pSearch.hasListeners()) {
+                        pSearch.stopSearch();
+                        pSearchMap.remove(pSearchId);
+                    }
                 }
             }
         }
@@ -2555,5 +2567,15 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
     private String generateDNCacheKey(String name, IdType idType) {
         return name + "," + idType;
+    }
+
+    /**
+     * Get the pSearchMap.
+     *
+     * @return the pSearchMap
+     */
+    @VisibleForTesting
+    Map<String, DJLDAPv3PersistentSearch> getPsearchMap() {
+        return pSearchMap;
     }
 }

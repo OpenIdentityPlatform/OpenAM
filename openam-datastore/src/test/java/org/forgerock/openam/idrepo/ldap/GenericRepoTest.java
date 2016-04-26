@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -28,11 +28,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.idm.IdRepoListener;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.mockito.ArgumentCaptor;
+import org.powermock.api.mockito.PowerMockito;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -674,4 +676,18 @@ public class GenericRepoTest extends IdRepoTestBase {
                     String.valueOf(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED.intValue()));
         }
     }
+
+    @ Test (expectedExceptions = IllegalStateException.class)
+    public void shouldThrowExceptionIfListenerAlreadyExists() {
+        IdRepoListener newIdRepoListener = PowerMockito.mock(IdRepoListener.class);
+        idrepo.addListener(null, newIdRepoListener);
+    }
+
+    @Test
+    public void removeListenerWithPSearch() {
+        assertThat(idrepo.getPsearchMap()).hasSize(1);
+        idrepo.removeListener();
+        assertThat(idrepo.getPsearchMap()).hasSize(0);
+    }
+
 }
