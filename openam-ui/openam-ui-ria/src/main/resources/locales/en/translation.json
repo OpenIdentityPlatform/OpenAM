@@ -970,7 +970,6 @@
                 }
             },
             "globalServices" : {
-                "title": "Service Defaults",
                 "description": "Configure default properties applied when creating new services."
             }
         },
