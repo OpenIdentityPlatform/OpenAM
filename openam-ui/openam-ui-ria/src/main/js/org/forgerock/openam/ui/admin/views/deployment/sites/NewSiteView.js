@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/SitesService",
+    "org/forgerock/openam/ui/admin/services/global/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/views/common/Backlink"
 ], ($, _, Messages, AbstractView, Router, SitesService, FlatJSONSchemaView, Backlink) => {

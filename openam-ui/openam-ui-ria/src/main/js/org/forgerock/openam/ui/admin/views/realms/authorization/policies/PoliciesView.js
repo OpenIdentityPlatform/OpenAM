@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/openam/ui/admin/services/PoliciesService",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,

@@ -28,8 +28,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/services/ScriptsService",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/admin/services/realm/ScriptsService",
+    "org/forgerock/openam/ui/admin/services/global/ScriptsService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/common/util/Promise",
     "libs/codemirror/mode/groovy/groovy",
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     // jquery dependencies
     "selectize"
 ], function ($, _, BootstrapDialog, CodeMirror, ChangesPending, Messages, AbstractView, EventManager, Router, Base64,
-             Constants, UIUtils, Script, ScriptsService, SMSGlobalService, FormHelper, Promise) {
+             Constants, UIUtils, Script, RealmScriptsService, GlobalScriptsService, FormHelper, Promise) {
 
     return AbstractView.extend({
         initialize: function () {
@@ -80,10 +80,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 uuid = args[1];
             }
 
-            this.contextsPromise = SMSGlobalService.scripts.getAllContexts();
-            this.defaultContextPromise = SMSGlobalService.scripts.getDefaultGlobalContext();
-            this.contextSchemaPromise = SMSGlobalService.scripts.getSchema();
-            this.languageSchemaPromise = SMSGlobalService.scripts.getContextSchema();
+            this.contextsPromise = GlobalScriptsService.scripts.getAllContexts();
+            this.defaultContextPromise = GlobalScriptsService.scripts.getDefaultGlobalContext();
+            this.contextSchemaPromise = GlobalScriptsService.scripts.getSchema();
+            this.languageSchemaPromise = GlobalScriptsService.scripts.getContextSchema();
 
             if (uuid) {
                 this.template = "templates/admin/views/realms/scripts/EditScriptTemplate.html";
@@ -268,7 +268,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 language: language
             };
 
-            ScriptsService.validateScript(script).done(function (result) {
+            RealmScriptsService.validateScript(script).done(function (result) {
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
                     result,
                     function (tpl) {

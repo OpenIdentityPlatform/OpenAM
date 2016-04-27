@@ -26,12 +26,11 @@ define("org/forgerock/openam/ui/admin/views/configuration/createEditConfiguratio
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, SMSGlobalService, Backlink) => {
+], ($, _, Messages, AbstractView, EventManager, Router, Constants, Form, Backlink) => {
 
     /**
      * Returns a edit configuration view

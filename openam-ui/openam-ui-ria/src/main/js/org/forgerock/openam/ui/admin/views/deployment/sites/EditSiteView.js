@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SitesService",
+    "org/forgerock/openam/ui/admin/services/global/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance",

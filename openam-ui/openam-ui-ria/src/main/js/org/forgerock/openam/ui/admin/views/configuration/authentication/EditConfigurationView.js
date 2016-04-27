@@ -16,12 +16,12 @@
 
 define("org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView", [
     "org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService"
-], (createEditConfigurationView, SMSGlobalService) => {
+    "org/forgerock/openam/ui/admin/services/global/AuthenticationService"
+], (createEditConfigurationView, AuthenticationService) => {
 
     const EditConfigurationView = createEditConfigurationView(
-        SMSGlobalService.authentication.get,
-        SMSGlobalService.authentication.update
+        AuthenticationService.authentication.get,
+        AuthenticationService.authentication.update
     );
 
     return new EditConfigurationView();

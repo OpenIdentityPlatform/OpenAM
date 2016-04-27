@@ -19,11 +19,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddMod
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
 
     // jquery dependencies
     "selectize"
-], function ($, _, AbstractView, Router, Messages, SMSRealmService) {
+], function ($, _, AbstractView, Router, Messages, AuthenticationService) {
 
     function validateModuleProps () {
         var moduleName = this.$el.find("#newModuleName").val(),
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddMod
             var self = this;
             this.data.realmPath = args[0];
 
-            SMSRealmService.authentication.modules.types.all(this.data.realmPath).then(function (modulesData) {
+            AuthenticationService.authentication.modules.types.all(this.data.realmPath).then(function (modulesData) {
                 self.data.types = modulesData.result;
                 self.parentRender(function () {
                     self.$el.find("#newModuleType").selectize();
@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddMod
             var self = this,
                 moduleName = self.$el.find("#newModuleName").val(),
                 moduleType = self.$el.find("#newModuleType").val(),
-                modulesService = SMSRealmService.authentication.modules;
+                modulesService = AuthenticationService.authentication.modules;
 
             modulesService.exists(self.data.realmPath, moduleName).then(function (result) {
                 var authenticationModules = modulesService;

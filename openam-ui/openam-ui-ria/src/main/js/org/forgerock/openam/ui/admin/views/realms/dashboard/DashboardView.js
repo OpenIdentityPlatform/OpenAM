@@ -21,9 +21,9 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService"
-], function ($, _, AbstractView, DashboardTasksView, Messages, SMSGlobalService, SMSRealmService) {
+    "org/forgerock/openam/ui/admin/services/global/RealmsService",
+    "org/forgerock/openam/ui/admin/services/realm/DashboardService"
+], function ($, _, AbstractView, DashboardTasksView, Messages, RealmsService, DashboardService) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTemplate.html",
         partials: [
@@ -31,8 +31,8 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
         ],
         render: function (args, callback) {
             var self = this,
-                realmPromise = SMSGlobalService.realms.get(args[0]),
-                tasksPromise = SMSRealmService.dashboard.commonTasks.all(args[0]);
+                realmPromise = RealmsService.realms.get(args[0]),
+                tasksPromise = DashboardService.dashboard.commonTasks.all(args[0]);
 
             this.data.realmPath = args[0];
 

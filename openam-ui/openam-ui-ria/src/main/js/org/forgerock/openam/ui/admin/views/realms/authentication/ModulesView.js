@@ -25,18 +25,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/Promise",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
 
     // jquery dependencies
     "selectize"
 ], function ($, _, AbstractView, arrayify, Configuration, EditModuleDialog, Form, FormHelper, Messages,
-             Promise, SMSRealmService) {
+             Promise, AuthenticationService) {
     function getModuleInfoFromElement (element) {
         return $(element).closest("tr").data();
     }
     function performDeleteModules (realmPath, moduleInfos) {
         return Promise.all(arrayify(moduleInfos).map(function (moduleInfo) {
-            return SMSRealmService.authentication.modules.remove(realmPath, moduleInfo.moduleName,
+            return AuthenticationService.authentication.modules.remove(realmPath, moduleInfo.moduleName,
                                                                   moduleInfo.moduleType);
         }));
     }
@@ -130,8 +130,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             this.data.args = args;
             this.data.realmPath = args[0];
 
-            chainsPromise = SMSRealmService.authentication.chains.all(this.data.realmPath);
-            modulesPromise = SMSRealmService.authentication.modules.all(this.data.realmPath);
+            chainsPromise = AuthenticationService.authentication.chains.all(this.data.realmPath);
+            modulesPromise = AuthenticationService.authentication.modules.all(this.data.realmPath);
 
             Promise.all([chainsPromise, modulesPromise]).then(function (values) {
                 _.each(values[1][0].result, function (module) {
@@ -167,7 +167,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             });
         },
         save: function (event) {
-            var promise = SMSRealmService.authentication.update(this.data.form.data());
+            var promise = AuthenticationService.authentication.update(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         }

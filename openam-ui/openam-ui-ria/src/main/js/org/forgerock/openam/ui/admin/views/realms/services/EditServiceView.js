@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/EditServiceView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView",
     "org/forgerock/openam/ui/common/components/PartialBasedView",

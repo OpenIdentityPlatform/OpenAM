@@ -20,11 +20,11 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/admin/services/global/RealmsService",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
     "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation"
-], ($, _, Constants, EventManager, Router, SMSGlobalService, TreeNavigation, createBreadcrumbs,
+], ($, _, Constants, EventManager, Router, RealmsService, TreeNavigation, createBreadcrumbs,
     createTreeNavigation) => {
 
     const navData = [{
@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
         },
 
         realmExists (path) {
-            return SMSGlobalService.realms.get(path);
+            return RealmsService.realms.get(path);
         },
         render (args, callback) {
             this.data.realmPath = args[0];

@@ -19,13 +19,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/commons/ui/common/components/Messages",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, EventManager, Constants, SMSRealmService, Form, Messages) {
+], function ($, AbstractView, EventManager, Constants, AuthenticationService, Form, Messages) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -41,9 +41,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             this.data.name = args[2];
 
             $.when(
-                SMSRealmService.authentication.modules.schema(this.data.realmPath, this.data.type),
-                SMSRealmService.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
-                SMSRealmService.authentication.modules.types.get(this.data.realmPath, this.data.type)
+                AuthenticationService.authentication.modules.schema(this.data.realmPath, this.data.type),
+                AuthenticationService.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type),
+                AuthenticationService.authentication.modules.types.get(this.data.realmPath, this.data.type)
             ).done((schemaData, valuesData, moduleType) => {
                 self.data.schema = schemaData;
                 self.data.values = valuesData;
@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             });
         },
         save: function () {
-            SMSRealmService.authentication.modules
+            AuthenticationService.authentication.modules
             .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");

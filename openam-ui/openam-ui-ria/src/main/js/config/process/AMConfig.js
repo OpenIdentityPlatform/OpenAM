@@ -213,12 +213,12 @@ define("config/process/AMConfig", [
         dependencies: [
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/util/CookieHelper",
-            "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+            "org/forgerock/openam/ui/admin/services/global/RealmsService",
             "org/forgerock/openam/ui/common/sessions/SessionValidator",
             "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
             "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, Configuration, CookieHelper, SMSGlobalService, SessionValidator,
+        processDescription: function (event, Configuration, CookieHelper, RealmsService, SessionValidator,
                                       MaxIdleTimeLeftStrategy, NavigationHelper) {
             var queueName = "loginDialogAuthCallbacks",
                 authenticatedCallback,
@@ -229,7 +229,7 @@ define("config/process/AMConfig", [
             }
 
             if (Configuration.loggedUser.hasRole("ui-realm-admin")) {
-                SMSGlobalService.realms.all().then(NavigationHelper.populateRealmsDropdown);
+                RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
             }
 
             if (Configuration.globalData.xuiUserSessionValidationEnabled &&

@@ -27,11 +27,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     // jquery dependencies
     "sortable"
 ], function ($, _, AbstractView, Constants, EventManager, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
-             PostProcessView, Router, SMSRealmService) {
+             PostProcessView, Router, AuthenticationService) {
 
     var createLinkView = function (index, view) {
             var linkView = new LinkView();
@@ -137,7 +137,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         deleteChain: function () {
             var self = this;
 
-            SMSRealmService.authentication.chains.remove(
+            AuthenticationService.authentication.chains.remove(
                 self.data.realmPath,
                 self.data.form.chainData._id)
             .then(() => {
@@ -160,7 +160,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         render: function (args) {
             var self = this;
 
-            SMSRealmService.authentication.chains.get(args[0], args[1]).then((data) => {
+            AuthenticationService.authentication.chains.get(args[0], args[1]).then((data) => {
 
                 self.data = {
                     realmPath : args[0],
@@ -232,7 +232,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     loginSuccessUrl: chainData.loginSuccessUrl
                 };
 
-                SMSRealmService.authentication.chains.update(self.data.realmPath, chainData._id, savedData)
+                AuthenticationService.authentication.chains.update(self.data.realmPath, chainData._id, savedData)
                 .then(() => {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 }, (response) => {
@@ -250,7 +250,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     authChainConfiguration: chainData.authChainConfiguration
                 };
 
-            SMSRealmService.authentication.chains.update(this.data.realmPath, chainData._id, savedData)
+            AuthenticationService.authentication.chains.update(this.data.realmPath, chainData._id, savedData)
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

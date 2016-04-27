@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/NewServiceView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView",
 

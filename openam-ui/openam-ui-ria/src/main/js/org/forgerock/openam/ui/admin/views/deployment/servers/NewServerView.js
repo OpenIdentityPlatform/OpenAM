@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/ServersService",
+    "org/forgerock/openam/ui/admin/services/global/ServersService",
     "org/forgerock/openam/ui/admin/views/common/Backlink"
 ], ($, Messages, AbstractView, Router, ServersService, Backlink) => {
     const getTrimmedValue = (field) => field.val().trim();

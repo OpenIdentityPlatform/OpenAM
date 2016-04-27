@@ -14,7 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
+/**
+* @module org/forgerock/openam/ui/admin/services/realm/ServicesService
+*/
+define("org/forgerock/openam/ui/admin/services/realm/ServicesService", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -27,7 +30,7 @@ define("org/forgerock/openam/ui/admin/services/realm/sms/ServicesService", [
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, arrayify, Promise, RealmHelper) => {
     /**
-     * @exports org/forgerock/openam/ui/admin/services/realm/sms/ServicesService
+     * @exports org/forgerock/openam/ui/admin/services/realm/ServicesService
      */
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     const scopedByRealm = function (realm, path) {

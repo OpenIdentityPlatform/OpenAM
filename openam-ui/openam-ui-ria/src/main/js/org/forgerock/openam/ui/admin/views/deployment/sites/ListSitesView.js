@@ -20,7 +20,7 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/services/SitesService",
+    "org/forgerock/openam/ui/admin/services/global/SitesService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView",
     "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance"

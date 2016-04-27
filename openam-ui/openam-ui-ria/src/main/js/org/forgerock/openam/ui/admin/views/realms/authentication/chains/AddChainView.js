@@ -19,8 +19,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChai
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService"
-], function ($, _, AbstractView, Router, Messages, SMSRealmService) {
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService"
+], function ($, _, AbstractView, Router, Messages, AuthenticationService) {
     function validateChainProps () {
         var name = this.$el.find("[data-chain-name]").val().trim(),
             nameExists,
@@ -49,7 +49,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChai
                 chainsData = [];
             this.data.realmPath = args[0];
 
-            SMSRealmService.authentication.chains.all(this.data.realmPath).then(function (data) {
+            AuthenticationService.authentication.chains.all(this.data.realmPath).then(function (data) {
                 _.each(data.values.result, function (obj) {
                     chainsData.push(obj);
                 });
@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChai
             var self = this,
                 name = this.$el.find("[data-chain-name]").val().trim();
 
-            SMSRealmService.authentication.chains.create(
+            AuthenticationService.authentication.chains.create(
                 self.data.realmPath,
                 { _id: name }
             ).then(function () {

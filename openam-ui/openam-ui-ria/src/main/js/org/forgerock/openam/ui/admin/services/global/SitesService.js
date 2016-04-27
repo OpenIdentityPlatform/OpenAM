@@ -14,7 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/services/SitesService", [
+/**
+ * @module org/forgerock/openam/ui/admin/services/global/SitesService
+ */
+define("org/forgerock/openam/ui/admin/services/global/SitesService", [
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -22,12 +25,12 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (_, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
 
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/`);
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/sites`);
 
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
 
     const getSchema = () => obj.serviceCall({
-        url: "sites?_action=schema",
+        url: "?_action=schema",
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST",
         success: (data) => {
@@ -38,7 +41,7 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
     });
 
     const getValues = (id) => obj.serviceCall({
-        url: `sites/${id}`,
+        url: `/${id}`,
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         success: (data, jqXHR) => {
             data.etag = jqXHR.getResponseHeader("ETag");
@@ -48,7 +51,7 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
 
     const getTemplate = () =>
         obj.serviceCall({
-            url: "sites?_action=template",
+            url: "?_action=template",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -56,7 +59,7 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
     obj.sites = {
         getAll: () =>
             obj.serviceCall({
-                url: "sites?_queryFilter=true",
+                url: "?_queryFilter=true",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((data) => _.sortBy(data.result, "_id")),
         get: (id) =>
@@ -66,21 +69,21 @@ define("org/forgerock/openam/ui/admin/services/SitesService", [
             })),
         create: (data) =>
             obj.serviceCall({
-                url: `sites?_action=create`,
+                url: `?_action=create`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(_.omit(data, ["servers"]))
             }),
         update: (id, data, etag) =>
             obj.serviceCall({
-                url: `sites/${id}`,
+                url: `/${id}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "PUT",
                 data: JSON.stringify(filterUnEditableProperties(data))
             }),
         remove: (id, etag) =>
             obj.serviceCall({
-                url: `sites/${id}`,
+                url: `/${id}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
             }),

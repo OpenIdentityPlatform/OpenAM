@@ -16,10 +16,14 @@
 
 define([
     "./services/SMSServiceUtils",
-    "./services/SMSGlobalService",
-    "./services/SMSRealmService",
-    "./services/SitesService",
-    "./services/ServersService",
+    "./services/realm/AuthenticationService",
+    "./services/realm/DashboardService",
+    "./services/global/SitesService",
+    "./services/global/ServersService",
+    "./services/global/AuthenticationService",
+    "./services/global/RealmsService",
+    "./services/global/ServicesService",
+    "./services/global/ScriptsService",
 
     "./models/Form",
     "./models/FormCollection",

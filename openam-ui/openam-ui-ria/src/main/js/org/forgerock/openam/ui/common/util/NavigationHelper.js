@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
          * @param  {Object} data Result of the service call
          * @param  {Array} data.result List of the available realms
          * @example
-         *   SMSGlobalService.realms.all().then(NavigationHelper.populateRealmsDropdown);
+         *   RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
          */
         populateRealmsDropdown: function (data) {
             var maxRealms = 4,

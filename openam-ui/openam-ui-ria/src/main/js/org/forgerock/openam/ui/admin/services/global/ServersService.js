@@ -14,7 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/services/ServersService", [
+ /**
+  * @module org/forgerock/openam/ui/admin/services/global/ServersService
+  */
+define("org/forgerock/openam/ui/admin/services/global/ServersService", [
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",

@@ -19,7 +19,7 @@
   */
  define("org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance", [
      "org/forgerock/commons/ui/common/components/Messages",
-     "org/forgerock/openam/ui/admin/services/SitesService"
+     "org/forgerock/openam/ui/admin/services/global/SitesService"
  ], (Messages, SitesService) => (id, etag, callback) => {
      SitesService.sites.remove(id, etag).then(() => {
          callback();

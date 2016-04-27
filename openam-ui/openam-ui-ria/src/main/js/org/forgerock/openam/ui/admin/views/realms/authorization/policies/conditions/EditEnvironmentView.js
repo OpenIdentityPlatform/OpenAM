@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/services/PoliciesService",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBooleanView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrStringView",

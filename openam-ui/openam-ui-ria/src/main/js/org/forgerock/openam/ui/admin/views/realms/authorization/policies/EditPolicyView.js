@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
-    "org/forgerock/openam/ui/admin/services/PoliciesService",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/CreatedResourcesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PolicyActionsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView",

@@ -23,8 +23,9 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/global/RealmsService",
+    "org/forgerock/openam/ui/admin/services/global/AuthenticationService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
     "org/forgerock/openam/ui/common/models/JSONSchema",
@@ -35,8 +36,9 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
     "bootstrap-tabdrop",
     "popoverclickaway",
     "selectize"
-], ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, SMSGlobalService, SMSRealmService,
-    FormHelper, Backlink, JSONSchema, JSONValues, FlatJSONSchemaView, Promise) => {
+], ($, _, Handlebars, Messages, AbstractView, EventManager, Router, Constants, RealmsService,
+    GlobalAuthenticationService, RealmAuthenticationService, FormHelper, Backlink, JSONSchema, JSONValues,
+    FlatJSONSchemaView, Promise) => {
 
     function setAutofocus () {
         $("input[type=\"text\"]:not(:disabled):first").prop("autofocus", true);
@@ -87,7 +89,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         render (args, callback) {
             let realmPromise;
             let authenticationPromise;
-            const allRealmsPromise = SMSGlobalService.realms.all();
+            const allRealmsPromise = RealmsService.realms.all();
 
             if (args[0]) {
                 this.data.realmPath = args[0];
@@ -106,11 +108,11 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
             }
 
             if (this.data.newEntity) {
-                realmPromise = SMSGlobalService.realms.schema();
-                authenticationPromise = SMSGlobalService.authentication.schema();
+                realmPromise = RealmsService.realms.schema();
+                authenticationPromise = GlobalAuthenticationService.authentication.schema();
             } else {
-                realmPromise = SMSGlobalService.realms.get(this.data.realmPath);
-                authenticationPromise = SMSRealmService.authentication.get(this.data.realmPath);
+                realmPromise = RealmsService.realms.get(this.data.realmPath);
+                authenticationPromise = RealmAuthenticationService.authentication.get(this.data.realmPath);
             }
 
             this.parentRender(function () {
@@ -187,13 +189,13 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
 
             const failCallback = (response) => { Messages.addMessage({ type: Messages.TYPE_DANGER, response }); };
             const values = this.jsonSchemaView.getData();
-            const savePromise = this.data.newEntity ? SMSGlobalService.realms.create(values)
-                            : SMSGlobalService.realms.update(values);
+            const savePromise = this.data.newEntity ? RealmsService.realms.create(values)
+                            : RealmsService.realms.update(values);
 
             savePromise.then((realm) => {
                 const realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
 
-                SMSRealmService.authentication.update(realmPath, {
+                RealmAuthenticationService.authentication.update(realmPath, {
                     statelessSessionsEnabled: values.statelessSessionsEnabled
                 }).then(() => {
                     if (this.data.newEntity) {
@@ -221,7 +223,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
         deleteRealm () {
             const realmPath = this.jsonSchemaView.getData().name;
 
-            SMSGlobalService.realms.remove(realmPath).then(() => {
+            RealmsService.realms.remove(realmPath).then(() => {
                 Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

@@ -22,10 +22,10 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/NavigationHelper",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/services/SMSGlobalService",
+    "org/forgerock/openam/ui/admin/services/global/RealmsService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
-], ($, _, AbstractView, BootstrapDialog, Messages, NavigationHelper, Router, SMSGlobalService, TemplateBasedView,
+], ($, _, AbstractView, BootstrapDialog, Messages, NavigationHelper, Router, RealmsService, TemplateBasedView,
     ToggleCardListView) => {
     const ListRealmsView = AbstractView.extend({
         template: "templates/admin/views/realms/ListRealmsTemplate.html",
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                     label: $.t("common.form.deactivate"),
                     action: function (dialog) {
                         realm.active = false;
-                        SMSGlobalService.realms.update(realm).then(null, function (response) {
+                        RealmsService.realms.update(realm).then(null, function (response) {
                             Messages.addMessage({
                                 type: Messages.TYPE_DANGER,
                                 response: response
@@ -100,7 +100,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
         performDeleteRealm (path) {
             var self = this;
 
-            return SMSGlobalService.realms.remove(path).then(() => {
+            return RealmsService.realms.remove(path).then(() => {
                 return self.render();
             }, (response) => {
                 if (response && response.status === 409) {
@@ -122,7 +122,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
         render (args, callback) {
             var self = this;
 
-            SMSGlobalService.realms.all().then((data) => {
+            RealmsService.realms.all().then((data) => {
                 var result = _.find(data.result, { name: "/" });
 
                 if (result) {
@@ -188,7 +188,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
                 realm = this.getRealmFromEvent(event);
 
             realm.active = !realm.active;
-            SMSGlobalService.realms.update(realm).then(null, (response) => {
+            RealmsService.realms.update(realm).then(null, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
                     response

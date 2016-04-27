@@ -15,9 +15,9 @@
  */
 
 /**
- * @module org/forgerock/openam/ui/admin/services/SMSRealmService
+ * @module org/forgerock/openam/ui/admin/services/realm/AuthenticationService
  */
-define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
+define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -221,17 +221,6 @@ define("org/forgerock/openam/ui/admin/services/SMSRealmService", [
                     type: "POST"
                 }).then(function (data) {
                     return SMSServiceUtils.sanitizeSchema(data);
-                });
-            }
-        }
-    };
-
-    obj.dashboard = {
-        commonTasks: {
-            all: function (realm) {
-                return obj.serviceCall({
-                    url: scopedByRealm(realm, "commontasks?_queryFilter=true"),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 });
             }
         }

@@ -23,11 +23,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
-    "org/forgerock/openam/ui/admin/services/SMSRealmService",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Constants, EventManager, Form, Messages, SMSServiceUtils, SMSRealmService) {
+], function ($, _, AbstractView, Constants, EventManager, Form, Messages, SMSServiceUtils, AuthenticationService) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
             this.data.realmLocation = args[0];
 
-            SMSRealmService.authentication.get(this.data.realmLocation).then((data) => {
+            AuthenticationService.authentication.get(this.data.realmLocation).then((data) => {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             var formData = this.data.form.data(),
                 self = this;
 
-            SMSRealmService.authentication.update(this.data.realmLocation, formData).then((data) => {
+            AuthenticationService.authentication.update(this.data.realmLocation, formData).then((data) => {
                 // update formData for correct re-render tab after saving
                 _.extend(self.data.formData.values, data);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");

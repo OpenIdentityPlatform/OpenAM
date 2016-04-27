@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/services/ServicesView", [
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/services/realm/sms/ServicesService",
+    "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/common/util/Promise"

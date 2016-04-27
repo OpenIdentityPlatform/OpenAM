@@ -19,7 +19,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "jquery",
     "underscore",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
-    "org/forgerock/openam/ui/admin/services/PoliciesService",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
 
     // jquery dependencies
     "selectize"
