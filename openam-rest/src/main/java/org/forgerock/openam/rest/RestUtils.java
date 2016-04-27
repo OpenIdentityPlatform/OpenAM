@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
 
 import javax.mail.internet.MimeUtility;
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -213,6 +214,29 @@ final public class RestUtils {
     public static String getMimeHeaderValue(final Context serverContext, final String headerName) {
         final HttpContext httpContext = serverContext.asContext(HttpContext.class);
         final String headerValue = httpContext.getHeaderAsString(headerName);
+        try {
+            return headerValue == null ? null : MimeUtility.decodeText(headerValue);
+        } catch (UnsupportedEncodingException ex) {
+            if (debug.warningEnabled()) {
+                debug.warning("Unable to decode mime header: " + ex);
+            }
+            return headerValue;
+        }
+    }
+
+    /**
+     * Returns the value of the named header field from the request, decoding it if it is mime-encoded. If the header
+     * is not mime-encoded then it is returned as-is. If no such header is present, then {@code null} is returned.If
+     * there are multiple values for the header, then the first value is returned.
+     * @param request HTTPServletRequest
+     * @param headerName the name of the header to get.
+     * @return the decoded header value, or {@code null} if no such header exists in the request.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc2047">RFC 2047: MIME Part 3: Message Header Extensions for Non-ASCII
+     * Text</a>
+     */
+    public static String getMimeHeaderValue(HttpServletRequest request, final String headerName) {
+        final String headerValue = request.getHeader(headerName);
         try {
             return headerValue == null ? null : MimeUtility.decodeText(headerValue);
         } catch (UnsupportedEncodingException ex) {
