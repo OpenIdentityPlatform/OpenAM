@@ -213,6 +213,10 @@ public class AMSendMail {
         MimeMessage msg = new MimeMessage(session);
 
         // set the from and to address
+        if (from == null) {
+            throw new MessagingException("the 'Email From Address' configuration is empty, please check your email " +
+                                                 "service configuration");
+        }
         InternetAddress addressFrom = new InternetAddress(from);
         msg.setFrom(addressFrom);
 
