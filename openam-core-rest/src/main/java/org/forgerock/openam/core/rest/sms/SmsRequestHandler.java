@@ -56,7 +56,6 @@ import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
@@ -114,11 +113,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
     private final RealmContextFilter realmContextFilter;
-    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceSingletons =
-            new HashMap<>();
-    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceCollections =
-            new HashMap<>();
-    private final SitesResourceProvider sitesResourceProvider;
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceSingletons = new HashMap<>();
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceCollections = new HashMap<>();
     private final RealmNormaliser realmNormaliser;
     private final ServicesRealmSmsHandler servicesRealmSmsHandler;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
@@ -126,23 +122,24 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private final SmsServiceHandlerFunction smsServiceHandlerFunction;
+    private final SitesResourceProvider sitesResourceProvider;
+    private final ServersResourceProvider serversResourceProvider;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
-            ExcludedServicesFactory excludedServicesFactory, SitesResourceProvider sitesResourceProvider,
-            AuthenticationChainsFilter authenticationChainsFilter, RealmContextFilter realmContextFilter,
-            SessionCache sessionCache, CoreWrapper coreWrapper, RealmNormaliser realmNormaliser,
-            Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
+            ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
+            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
+            RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
             PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
-            PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler)
+            PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler,
+            SitesResourceProvider sitesResourceProvider, ServersResourceProvider serversResourceProvider)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
-        this.sitesResourceProvider = sitesResourceProvider;
         this.debug = debug;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
@@ -166,6 +163,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         );
 
         this.smsServiceHandlerFunction = smsServiceHandlerFunction;
+        this.sitesResourceProvider = sitesResourceProvider;
+        this.serversResourceProvider = serversResourceProvider;
 
         addExcludedServiceProviders();
         createServices();
@@ -189,6 +188,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         addRealmHandler();
         addCommonTasksHandler();
         addSitesHandler();
+        addServersHandler();
     }
 
     //hard-coded authentication routes
@@ -230,6 +230,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private void addSitesHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
             routeTree.addRoute(STARTS_WITH, "sites", newCollection(sitesResourceProvider));
+        }
+    }
+
+    //routes under global-config/servers
+    private void addServersHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(STARTS_WITH, "servers", newCollection(serversResourceProvider));
         }
     }
 

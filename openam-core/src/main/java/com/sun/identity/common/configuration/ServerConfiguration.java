@@ -451,6 +451,22 @@ public class ServerConfiguration extends ConfigurationBase {
         Set servers =  getServers(ssoToken);
         return servers.contains(instanceName);
     }
+
+    /**
+     * Returns <code>true</code> if server or site id exists.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the service management datastore.
+     * @param serverId Id of the server instance.
+     *
+     * @return <code>true</code> if server id exists.
+     *
+     * @throws SMSException if errors access in the service management datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     */
+    public static boolean hasServerOrSiteId(SSOToken ssoToken, String serverId) throws SMSException, SSOException {
+        return getServerConfigurationId(getRootServerConfig(ssoToken)).contains(serverId) ||
+            getSiteConfigurationId(getRootSiteConfig(ssoToken)).contains(serverId);
+    }
     
     /**
      * Sets configuration to a server instance.
