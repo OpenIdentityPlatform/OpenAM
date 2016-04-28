@@ -386,16 +386,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>oauth</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>com.sun.identity.oauth.service.RestService</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>click-servlet</servlet-name>
         <servlet-class>org.apache.click.ClickServlet</servlet-class>
     </servlet>
@@ -782,11 +772,6 @@
     <servlet-mapping>
         <servlet-name>ws</servlet-name>
         <url-pattern>/ws/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>oauth</servlet-name>
-        <url-pattern>/resources/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

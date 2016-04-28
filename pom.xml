@@ -329,9 +329,6 @@
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
 
-        <!-- OpenAM OAuth Token Service -->
-        <module>openam-oauth</module>
-
         <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2-common</module>
         <module>openam-oauth2</module>
@@ -784,11 +781,6 @@
                 <artifactId>openam-example-clientsdk-war</artifactId>
                 <version>${project.version}</version>
                 <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth</artifactId>
-                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
