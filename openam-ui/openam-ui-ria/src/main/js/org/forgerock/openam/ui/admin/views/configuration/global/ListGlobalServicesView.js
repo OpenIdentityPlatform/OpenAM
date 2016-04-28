@@ -22,7 +22,7 @@
 
      const ListGlobalServicesView = createConfigurationListView(
          $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
-         ServicesService.configuration.getAll,
+         ServicesService.instance.getAll,
          "templates/admin/views/configuration/global/ListConfigurationTemplate.html"
      );
 

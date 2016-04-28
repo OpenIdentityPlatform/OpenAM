@@ -40,18 +40,18 @@ define([
             encodedRealm = RealmHelper.encodeRealm(realm);
         }
 
-        return `${encodedRealm}/realm-config/${path}`;
+        return `${encodedRealm}/realm-config/services${path}`;
     };
     const getServiceSchema = function (realm, type) {
         return obj.serviceCall({
-            url: scopedByRealm(realm, `services/${type}?_action=schema`),
+            url: scopedByRealm(realm, `/${type}?_action=schema`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((response) => new JSONSchema(response));
     };
     const getServiceSubSchema = function (realm, serviceType, subSchemaType) {
         return obj.serviceCall({
-            url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}?_action=schema`),
+            url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}?_action=schema`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((data) => SMSServiceUtils.sanitizeSchema(data));
@@ -60,47 +60,28 @@ define([
     obj.instance = {
         getAll (realm) {
             return obj.serviceCall({
-                url: scopedByRealm(realm, "services?_queryFilter=true"),
+                url: scopedByRealm(realm, "?_queryFilter=true"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) => _.sortBy(response.result, "name"));
         },
         get (realm, type) {
             function getInstance () {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `services/${type}`),
+                    url: scopedByRealm(realm, `/${type}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 });
             }
 
-            function getName () {
-                return obj.serviceCall({
-                    url: scopedByRealm(realm, "services?_action=getAllTypes"),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "POST"
-                }).then((all) => _.findWhere(all.result, { "_id": type }).name);
-            }
-
-
-            function getSubSchemaTypes () {
-                return obj.serviceCall({
-                    url: scopedByRealm(realm, `services/${type}?_action=getAllTypes`),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-                    type: "POST"
-                });
-            }
-
-            return Promise.all([getServiceSchema(realm, type), getInstance(), getName(), getSubSchemaTypes()])
-                .then((response) => ({
-                    schema: response[0],
-                    values: new JSONValues(response[1][0]),
-                    name:  response[2],
-                    subSchemaTypes: response[3][0].result
-                }));
+            return Promise.all([getServiceSchema(realm, type), getInstance()]).then((response) => ({
+                name: response[1][0]._type.name,
+                schema: response[0],
+                values: new JSONValues(response[1][0])
+            }));
         },
         getInitialState (realm, type) {
             function getTemplate () {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `services/${type}?_action=template`),
+                    url: scopedByRealm(realm, `/${type}?_action=template`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then((response) => new JSONValues(response));
@@ -113,7 +94,7 @@ define([
         },
         remove (realm, types) {
             const promises = _.map(arrayify(types), (type) => obj.serviceCall({
-                url: scopedByRealm(realm, `services/${type}`),
+                url: scopedByRealm(realm, `/${type}`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE"
             }));
@@ -122,7 +103,7 @@ define([
         },
         update (realm, type, data) {
             return obj.serviceCall({
-                url: scopedByRealm(realm, `services/${type}`),
+                url: scopedByRealm(realm, `/${type}`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
@@ -130,7 +111,7 @@ define([
         },
         create (realm, type, data) {
             return obj.serviceCall({
-                url: scopedByRealm(realm, `services/${type}?_action=create`),
+                url: scopedByRealm(realm, `/${type}?_action=create`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(data)
@@ -141,16 +122,23 @@ define([
     obj.type = {
         getCreatables (realm) {
             return obj.serviceCall({
-                url: scopedByRealm(realm, "services?_action=getCreatableTypes&forUI=true"),
+                url: scopedByRealm(realm, "?_action=getCreatableTypes&forUI=true"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((response) => _.sortBy(response.result, "name"));
         },
         subSchema: {
             type: {
+                getAll (realm, serviceType) {
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, `/${serviceType}?_action=getAllTypes`),
+                        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                        type: "POST"
+                    }).then((response) => response.result);
+                },
                 getCreatables (realm, serviceType) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, `services/${serviceType}?_action=getCreatableTypes`),
+                        url: scopedByRealm(realm, `/${serviceType}?_action=getCreatableTypes`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "name"));
@@ -159,7 +147,7 @@ define([
             instance: {
                 getAll (realm, serviceType) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, `services/${serviceType}?_action=nextdescendents`),
+                        url: scopedByRealm(realm, `/${serviceType}?_action=nextdescendents`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "_id"));
@@ -167,7 +155,7 @@ define([
                 get (realm, serviceType, subSchemaType, subSchemaInstance) {
                     function getInstance () {
                         return obj.serviceCall({
-                            url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
+                            url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                         });
                     }
@@ -179,7 +167,7 @@ define([
                 getInitialState (realm, serviceType, subSchemaType) {
                     function getTemplate (serviceType, subSchemaType) {
                         return obj.serviceCall({
-                            url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}?_action=template`),
+                            url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}?_action=template`),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                             type: "POST"
                         });
@@ -196,7 +184,7 @@ define([
 
                 remove (realm, serviceType, subSchemaType, subSchemaInstance) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
+                        url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "DELETE"
                     });
@@ -204,7 +192,7 @@ define([
 
                 update (realm, serviceType, subSchemaType, subSchemaInstance, data) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
+                        url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}/${subSchemaInstance}`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "PUT",
                         data: JSON.stringify(data)
@@ -213,7 +201,7 @@ define([
 
                 create (realm, serviceType, subSchemaType, data) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, `services/${serviceType}/${subSchemaType}?_action=create`),
+                        url: scopedByRealm(realm, `/${serviceType}/${subSchemaType}?_action=create`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST",
                         data: JSON.stringify(data)
