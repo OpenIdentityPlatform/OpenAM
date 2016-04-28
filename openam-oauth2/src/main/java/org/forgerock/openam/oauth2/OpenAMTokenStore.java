@@ -48,13 +48,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OpenIdConnectTokenStore statefulTokenStore;
     private final TokenStore statelessTokenStore;
+    private final StatelessCheck<Boolean> isStateless;
 
     @Inject
     public OpenAMTokenStore(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            StatefulTokenStore statefulTokenStore, StatelessTokenStore statelessTokenStore) {
+            StatefulTokenStore statefulTokenStore, StatelessTokenStore statelessTokenStore,
+            StatelessCheck<Boolean> isStateless) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.statefulTokenStore = statefulTokenStore;
         this.statelessTokenStore = statelessTokenStore;
+        this.isStateless = isStateless;
     }
 
     @Override
@@ -140,7 +143,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void updateAccessToken(OAuth2Request request, AccessToken accessToken) throws NotFoundException,
             ServerException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(accessToken.getTokenId(), request)) {
             statelessTokenStore.updateAccessToken(request, accessToken);
         } else {
             statefulTokenStore.updateAccessToken(request, accessToken);
@@ -160,7 +163,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException,
             NotFoundException, ServerException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(tokenId, request)) {
             return statelessTokenStore.queryForToken(request, tokenId);
         } else {
             return statefulTokenStore.queryForToken(request, tokenId);
@@ -170,7 +173,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void deleteAccessToken(OAuth2Request request, String accessTokenId) throws ServerException,
             NotFoundException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(accessTokenId, request)) {
             statelessTokenStore.deleteAccessToken(request, accessTokenId);
         } else {
             statefulTokenStore.deleteAccessToken(request, accessTokenId);
@@ -180,7 +183,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void deleteRefreshToken(OAuth2Request request, String refreshTokenId) throws InvalidRequestException,
             NotFoundException, ServerException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(refreshTokenId, request)) {
             statelessTokenStore.deleteRefreshToken(request, refreshTokenId);
         } else {
             statefulTokenStore.deleteRefreshToken(request, refreshTokenId);
@@ -190,7 +193,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(tokenId, request)) {
             return statelessTokenStore.readAccessToken(request, tokenId);
         } else {
             return statefulTokenStore.readAccessToken(request, tokenId);
@@ -200,7 +203,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
-        if (providerSettingsFactory.get(request).isStatelessTokensEnabled()) {
+        if (isStateless.apply(tokenId, request)) {
             return statelessTokenStore.readRefreshToken(request, tokenId);
         } else {
             return statefulTokenStore.readRefreshToken(request, tokenId);

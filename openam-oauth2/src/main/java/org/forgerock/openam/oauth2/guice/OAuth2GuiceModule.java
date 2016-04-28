@@ -22,9 +22,6 @@ import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.inject.Inject;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -42,10 +40,15 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.AccessTokenServiceImpl;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
@@ -66,6 +69,7 @@ import org.forgerock.oauth2.core.DuplicateRequestParameterValidator;
 import org.forgerock.oauth2.core.GrantTypeHandler;
 import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -85,6 +89,8 @@ import org.forgerock.oauth2.core.TokenIntrospectionServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
@@ -112,6 +118,7 @@ import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
+import org.forgerock.openam.oauth2.StatelessCheck;
 import org.forgerock.openam.oauth2.StatelessTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
@@ -252,6 +259,26 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
         bind(new TypeLiteral<OAuth2UrisFactory<RealmInfo>>() {}).to(OpenAMOAuth2UrisFactory.class);
+        bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessTest.class);
+    }
+
+    public static class DefaultStatelessTest implements StatelessCheck<Boolean> {
+        private final OAuth2ProviderSettingsFactory providerSettings;
+
+        @Inject
+        public DefaultStatelessTest(OAuth2ProviderSettingsFactory oAuth2ProviderSettings) {
+            this.providerSettings = oAuth2ProviderSettings;
+        }
+
+        @Override
+        public Boolean apply(String tokenId, OAuth2Request request) {
+            try {
+                OAuth2ProviderSettings oAuth2ProviderSettings = providerSettings.get(request);
+                return oAuth2ProviderSettings.isStatelessTokensEnabled();
+            } catch (ServerException | NotFoundException e) {
+                return false;
+            }
+        }
     }
 
     @Provides
@@ -318,7 +345,22 @@ public class OAuth2GuiceModule extends AbstractModule {
                 realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, clientRegistrationStore,
                 realmNormaliser, oauth2UrisFactory);
         return new OpenAMTokenStore(providerSettingsFactory, realmAgnosticStatefulTokenStore,
-                realmAgnosticStatelessTokenStore);
+                realmAgnosticStatelessTokenStore, new StatelessCheck<Boolean>() {
+
+            @Inject
+            public OAuth2ProviderSettingsFactory providerSettings;
+
+            @Override
+            public Boolean apply(String tokenId, OAuth2Request
+                    request) {
+                try {
+                    SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
+                    return true;
+                } catch (InvalidJwtException e) {
+                    return false;
+                }
+            }
+        });
     }
 
     @Inject
