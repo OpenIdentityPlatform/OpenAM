@@ -22,10 +22,9 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/global/SitesService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
-    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView",
-    "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance"
-], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, SitesService, TemplateBasedView, ToggleCardListView,
-    deleteInstance) => {
+    "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
+], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, SitesService, TemplateBasedView,
+    ToggleCardListView) => {
 
     const ListSitesView = AbstractView.extend({
         template: "templates/admin/views/deployment/sites/ListSitesTemplate.html",
@@ -40,10 +39,17 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView", [
         onDelete (event) {
             event.preventDefault();
             const id = $(event.currentTarget).data().deleteItem;
-            SitesService.sites.get(id).then((data) => {
-                showConfirmationBeforeDeleting({
-                    message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
-                }, _.partial(deleteInstance, data.values.raw._id, data.values.raw.etag, () => this.render()));
+
+            showConfirmationBeforeDeleting({
+                message: $.t("console.common.confirmDeleteText", {
+                    type: $.t("console.sites.common.confirmType")
+                })
+            },
+            () => {
+                SitesService.sites.remove(id).then(
+                    () => this.render(),
+                    (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER })
+                );
             });
         },
 

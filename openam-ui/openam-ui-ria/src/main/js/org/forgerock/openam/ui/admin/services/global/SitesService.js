@@ -24,7 +24,6 @@ define("org/forgerock/openam/ui/admin/services/global/SitesService", [
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (_, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
-
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/sites`);
 
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
@@ -81,12 +80,19 @@ define("org/forgerock/openam/ui/admin/services/global/SitesService", [
                 type: "PUT",
                 data: JSON.stringify(filterUnEditableProperties(data))
             }),
-        remove: (id, etag) =>
-            obj.serviceCall({
+        remove: (id, etag) => {
+            const remove = (id, etag) => obj.serviceCall({
                 url: `/${id}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
-            }),
+            });
+
+            if (_.isUndefined(etag)) {
+                return getValues(id).then((response) => remove(id, response.etag));
+            } else {
+                return remove(id, etag);
+            }
+        },
         getInitialState: () =>
             Promise.all([getSchema(), getTemplate()]).then((response) => ({
                 schema: new JSONSchema(response[0]),

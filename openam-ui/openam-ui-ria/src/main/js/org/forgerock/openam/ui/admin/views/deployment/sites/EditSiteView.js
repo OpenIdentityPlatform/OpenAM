@@ -25,13 +25,12 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
     "org/forgerock/openam/ui/admin/services/global/SitesService",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/views/deployment/sites/deleteInstance",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
 
     // jquery dependencies
     "bootstrap-tabdrop"
 ], ($, _, Messages, AbstractView, EventManager, Router, Constants, SitesService, FlatJSONSchemaView, FormHelper,
-    deleteInstance, Backlink) => {
+    Backlink) => {
 
     function toggleSave (el, enable) {
         el.find("[data-save]").prop("disabled", !enable);
@@ -70,20 +69,23 @@ define("org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView", [
 
         onSave () {
             SitesService.sites.update(this.data.id, this.jsonSchemaView.getData(), this.data.etag)
-                .then(() => EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved"),
-                (response) => Messages.addMessage({
-                    response,
-                    type: Messages.TYPE_DANGER
-                }));
+                .then(
+                    () => EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved"),
+                    (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER })
+                );
         },
 
-        onDelete (e) {
-            e.preventDefault();
+        onDelete (event) {
+            event.preventDefault();
+
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
-            }, _.partial(deleteInstance, this.data.id, this.data.etag,
-                () => { Router.routeTo(Router.configuration.routes.listSites, { args: [], trigger: true }); })
-            );
+            }, () => {
+                SitesService.sites.remove(this.data.id, this.data.etag).then(
+                    () => Router.routeTo(Router.configuration.routes.listSites, { args: [], trigger: true }),
+                    (response) => Messages.addMessage({ response, type: Messages.TYPE_DANGER })
+                );
+            });
         }
     });
 
