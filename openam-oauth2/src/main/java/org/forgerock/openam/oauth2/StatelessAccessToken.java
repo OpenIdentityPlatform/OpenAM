@@ -16,12 +16,12 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.NONCE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 
 import java.util.HashMap;
 import java.util.Map;

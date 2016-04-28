@@ -16,11 +16,11 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REDIRECT_URI;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 
 import java.util.HashMap;
 import java.util.Map;

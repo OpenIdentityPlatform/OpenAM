@@ -185,8 +185,8 @@
             <artifactId>openam-license-manager-cli</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>oauth2-core</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>

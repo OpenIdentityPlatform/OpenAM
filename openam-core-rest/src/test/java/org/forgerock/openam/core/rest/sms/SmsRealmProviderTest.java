@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
 import org.assertj.core.api.Assertions;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

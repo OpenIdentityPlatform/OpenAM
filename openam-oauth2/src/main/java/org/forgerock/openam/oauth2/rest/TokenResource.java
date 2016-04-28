@@ -26,11 +26,11 @@ package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -85,7 +85,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;

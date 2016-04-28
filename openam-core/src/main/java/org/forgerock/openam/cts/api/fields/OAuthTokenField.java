@@ -1,5 +1,5 @@
-/**
- * Copyright 2013-2015 ForgeRock AS.
+/*
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.tokens.CoreTokenField;
 
 /**

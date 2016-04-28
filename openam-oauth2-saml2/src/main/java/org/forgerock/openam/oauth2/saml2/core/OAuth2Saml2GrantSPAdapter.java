@@ -27,7 +27,7 @@ import com.sun.identity.saml2.protocol.ManageNameIDRequest;
 import com.sun.identity.saml2.protocol.ManageNameIDResponse;
 import com.sun.identity.saml2.protocol.Response;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
 

@@ -32,7 +32,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -63,8 +63,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.*;
 
 /**
  * This is the default scope implementation class. This class by default

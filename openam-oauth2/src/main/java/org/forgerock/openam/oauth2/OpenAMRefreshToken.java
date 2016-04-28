@@ -11,19 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Set;
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.StatefulRefreshToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;

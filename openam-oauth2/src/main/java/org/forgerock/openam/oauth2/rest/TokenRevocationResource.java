@@ -17,9 +17,9 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static java.util.Collections.singletonList;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.restlet.RestletConstants.SUPPORTED_RESTLET_CHALLENGE_SCHEMES;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.*;
@@ -34,7 +34,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams;
+import org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2TokenIntrospectionHandler;

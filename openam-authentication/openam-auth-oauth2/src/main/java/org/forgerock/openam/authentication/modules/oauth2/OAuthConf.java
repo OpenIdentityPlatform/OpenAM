@@ -29,7 +29,7 @@ package org.forgerock.openam.authentication.modules.oauth2;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;

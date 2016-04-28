@@ -16,16 +16,15 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.StatefulAccessToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;

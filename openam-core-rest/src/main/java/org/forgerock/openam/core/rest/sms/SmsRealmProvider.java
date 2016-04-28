@@ -531,7 +531,7 @@ public class SmsRealmProvider implements RequestHandler {
             if (!realmPath.equals(requestPath)) {
                 return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
             }
-        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+        } catch (NotFoundException e) {
             return new BadRequestException(BAD_REQUEST_REALM_NAME_ERROR_MESSAGE).asPromise();
         }
 
@@ -562,7 +562,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     protected String getExpectedPathFromRequestContext(UpdateRequest request)
-            throws org.forgerock.oauth2.core.exceptions.NotFoundException {
+            throws NotFoundException {
         String contextPath = request.getContent().get(PATH_ATTRIBUTE_NAME).asString();
         String realmName = request.getContent().get(REALM_NAME_ATTRIBUTE_NAME).asString();
 

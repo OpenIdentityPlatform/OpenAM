@@ -22,7 +22,7 @@
 package org.forgerock.openam.oauth2.legacy;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -15,7 +15,7 @@
  */
 /*
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
- * Portions Copyright 2011-2015 ForgeRock AS.
+ * Portions Copyright 2011-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -62,7 +62,6 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
 import javax.security.auth.Subject;
-import org.forgerock.oauth2.core.Utils;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_REALM_CONDITION_ADVICE;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTH_LEVEL;
@@ -135,7 +134,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
                     debug.message(localDebugName + "adviceName : " + adviceName + " and adviceValue : " + adviceValue);
                 }
 
-                if (!Utils.isEmpty(adviceName) && !Utils.isEmpty(adviceValue)) {
+                if (!StringUtils.isEmpty(adviceName) && !StringUtils.isEmpty(adviceValue)) {
                     if (adviceName.equalsIgnoreCase(ISAuthConstants.MODULE_PARAM)) {
                         Set<String> adviceMessages = getAdviceMessagesforAuthScheme(adviceValue, token, env);
                         if (adviceMessages.isEmpty()) {
@@ -759,7 +758,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
             final String envParamValue = condition.paramValue;
 
             Set<String> envSet = (Set<String>) env.get(envParamName);
-            if (!Utils.isEmpty(envSet)) {
+            if (!CollectionUtils.isEmpty(envSet)) {
                 for (String strEnv : envSet) {
                     if ((strEnv != null) && (strEnv.equalsIgnoreCase(envParamValue))) {
                         matchingCondition = condition;

@@ -330,7 +330,6 @@
         <module>openam-federation</module>
 
         <!-- OpenAM OAuth2 Token Service -->
-        <module>openam-oauth2-common</module>
         <module>openam-oauth2</module>
         <module>openam-uma</module>
 
@@ -795,26 +794,6 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-uma</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>oauth2-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openid-connect-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>oauth2-restlet</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openid-connect-restlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

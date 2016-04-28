@@ -18,7 +18,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
 
@@ -67,8 +67,8 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.NoneResponseTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;

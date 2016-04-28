@@ -21,7 +21,7 @@ package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.ResourceOwner;

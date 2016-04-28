@@ -11,11 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.oauth2;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -27,26 +34,17 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.services.context.Context;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.forgerock.services.context.Context;
 
 /**
  * The OpenAM OAuth2 and OpenId Connect provider's store for all client registrations.
@@ -85,10 +83,13 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
      */
     public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request)
             throws InvalidClientException, NotFoundException {
-
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-        return new OpenAMClientRegistration(getIdentity(clientId, realm, request), pemDecoder, resolverService,
-                providerSettingsFactory.get(request), failureFactory);
+        try {
+            final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
+            return new OpenAMClientRegistration(getIdentity(clientId, realm, request), pemDecoder, resolverService,
+                    providerSettingsFactory.get(request), failureFactory);
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     /**
@@ -96,10 +97,13 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
      */
     public OpenIdConnectClientRegistration get(String clientId, String realm, Context context)
             throws InvalidClientException, NotFoundException {
-
-        final String normalisedRealm = realmNormaliser.normalise(realm);
-        return new OpenAMClientRegistration(getIdentity(clientId, normalisedRealm), pemDecoder, resolverService,
-                providerSettingsFactory.get(normalisedRealm), failureFactory);
+        try {
+            final String normalisedRealm = realmNormaliser.normalise(realm);
+            return new OpenAMClientRegistration(getIdentity(clientId, normalisedRealm), pemDecoder, resolverService,
+                    providerSettingsFactory.get(normalisedRealm), failureFactory);
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     private AMIdentity getIdentity(String uName, String realm) throws InvalidClientException {

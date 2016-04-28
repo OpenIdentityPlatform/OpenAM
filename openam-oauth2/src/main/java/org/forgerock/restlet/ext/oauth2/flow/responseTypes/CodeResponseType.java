@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.oauth2.core.AuthorizationCode;
 import org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.ResourceOwner;

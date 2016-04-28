@@ -16,14 +16,14 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.CLIENT_ID;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ResourceSets.NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ResourceSets.SCOPES;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ShortClientAttributeNames.*;
 import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
@@ -35,7 +35,6 @@ import java.util.Set;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
@@ -47,6 +46,7 @@ import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
 import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
