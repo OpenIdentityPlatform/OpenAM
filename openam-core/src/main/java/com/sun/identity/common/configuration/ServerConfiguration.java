@@ -24,21 +24,10 @@
  *
  * $Id: ServerConfiguration.java,v 1.16 2010/01/15 18:10:55 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.RemoteServiceAttributeValidator;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,12 +44,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.RemoteServiceAttributeValidator;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
 
 /**
  * This manages server configuration information.
@@ -958,11 +960,13 @@ public class ServerConfiguration extends ConfigurationBase {
      *
      * @param serverName Server name to clone.
      * @param cloneName server name.
+     * @param cloneId new server id
      */
     public static void cloneServerInstance(
         SSOToken ssoToken,
         String serverName,
-        String cloneName
+        String cloneName,
+        String cloneId
     ) throws SMSException, SSOException, ConfigurationException {
         URL url = null;
         try {
@@ -977,9 +981,9 @@ public class ServerConfiguration extends ConfigurationBase {
             Map map = cfg.getAttributes();
 
             ServiceConfig sc = getRootServerConfig(ssoToken);
-            String serverId = getNextId(ssoToken);
+
             Set setID = new HashSet(2);
-            setID.add(serverId);
+            setID.add(cloneId);
             map.put(ATTR_SERVER_ID, setID);
             setProtocolHostPortURI(map, cloneName);
 
@@ -987,6 +991,28 @@ public class ServerConfiguration extends ConfigurationBase {
             sc.addSubConfig(cloneName, SUBSCHEMA_SERVER, 0, map);
             updateOrganizationAlias(ssoToken, cloneName, true);
         }
+    }
+
+    /**
+     * Clones an existing server using the new cloned server name.
+     *
+     * @param token
+     *         SSO token
+     * @param serverName
+     *         name of existing server
+     * @param cloneName
+     *         name of new cloned server
+     *
+     * @throws SSOException
+     *         should there be some issue with the passed token
+     * @throws SMSException
+     *         should some SMS error occur
+     * @throws ConfigurationException
+     *         should some issue occur within configuration handling
+     */
+    public static void cloneServerInstance(SSOToken token, String serverName, String cloneName)
+            throws SSOException, SMSException, ConfigurationException {
+        cloneServerInstance(token, serverName, cloneName, getNextId(token));
     }
 
     private static void setProtocolHostPortURI(Map map, String serverName)

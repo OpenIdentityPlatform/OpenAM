@@ -19,6 +19,7 @@ import static com.sun.identity.common.configuration.ServerConfiguration.*;
 import static java.util.Collections.emptySet;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Set;
@@ -27,6 +28,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
@@ -38,6 +41,7 @@ import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.json.resource.annotations.Create;
 import org.forgerock.json.resource.annotations.Delete;
 import org.forgerock.json.resource.annotations.Query;
@@ -164,6 +168,53 @@ public final class ServersResourceProvider {
             return new InternalServerErrorException("Error reading configuration for server: " + id).asPromise();
         } catch (NotFoundException e) {
             return new NotFoundException("Cannot find server ID: " + id).asPromise();
+        }
+    }
+
+    @Action
+    public Promise<ActionResponse, ResourceException> clone(
+            String existingServerId, Context context, ActionRequest request) {
+        try {
+            if (isEmpty(existingServerId)) {
+                return new BadRequestException("Existing server Id must be specified").asPromise();
+            }
+
+            SSOToken ssoToken = getSsoToken(context);
+            String existingServerUrl = getServerUrl(ssoToken, existingServerId);
+
+            JsonValue requestBody = request.getContent();
+            String clonedUrl = requestBody.get("clonedUrl").asString();
+
+            if (isEmpty(clonedUrl)) {
+                return new BadRequestException("Missing clonedUrl from json body").asPromise();
+            }
+            if (isServerInstanceExist(ssoToken, clonedUrl)) {
+                return new ConflictException("Server URL already exists: " + clonedUrl).asPromise();
+            }
+
+            String clonedId = requestBody.get("clonedId").asString();
+
+            if (isNotEmpty(clonedId)) {
+                if (hasServerOrSiteId(ssoToken, clonedId)) {
+                    return new ConflictException("Server ID already exists: " + clonedId).asPromise();
+                }
+
+                cloneServerInstance(ssoToken, existingServerUrl, clonedUrl, clonedId);
+            } else {
+                cloneServerInstance(ssoToken, existingServerUrl, clonedUrl);
+                clonedId = getServerID(ssoToken, clonedUrl);
+            }
+
+            JsonValue responseBody = json(
+                    object(
+                            field("clonedId", clonedId),
+                            field("clonedUrl", clonedUrl)));
+
+            return newResultPromise(newActionResponse(responseBody));
+        } catch (SSOException | SMSException | ConfigurationException e) {
+            return new InternalServerErrorException("Failed to clone server", e).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
         }
     }
 
