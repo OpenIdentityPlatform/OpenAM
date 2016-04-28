@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",

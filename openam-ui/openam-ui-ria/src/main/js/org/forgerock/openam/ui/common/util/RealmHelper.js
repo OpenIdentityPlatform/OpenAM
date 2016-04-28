@@ -15,7 +15,7 @@
  */
 
 define("org/forgerock/openam/ui/common/util/RealmHelper", [
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/URIUtils"
 ], function (_, Configuration, URIUtils) {

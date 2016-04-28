@@ -15,7 +15,7 @@
  */
 
 define("org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel", [
-    "underscore",
+    "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/utils/ModelUtils"

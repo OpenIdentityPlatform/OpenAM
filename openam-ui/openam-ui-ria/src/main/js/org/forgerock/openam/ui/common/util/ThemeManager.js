@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,7 +24,7 @@
 
 define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",

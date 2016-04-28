@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageRulesView",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function ($, _, ManageRulesView, Constants) {

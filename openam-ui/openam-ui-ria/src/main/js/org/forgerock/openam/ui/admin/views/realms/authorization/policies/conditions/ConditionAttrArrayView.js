@@ -17,7 +17,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
     "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
 

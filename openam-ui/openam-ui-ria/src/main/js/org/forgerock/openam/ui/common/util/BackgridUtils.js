@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "moment",
     "org/forgerock/commons/ui/common/backgrid/Backgrid",

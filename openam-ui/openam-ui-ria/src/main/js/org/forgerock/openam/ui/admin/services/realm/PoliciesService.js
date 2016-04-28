@@ -18,7 +18,7 @@
 * @module org/forgerock/openam/ui/admin/services/realm/PoliciesService
 */
 define("org/forgerock/openam/ui/admin/services/realm/PoliciesService", [
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",

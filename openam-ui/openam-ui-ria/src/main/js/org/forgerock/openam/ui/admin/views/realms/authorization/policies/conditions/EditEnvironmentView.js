@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditEnvironmentView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/services/realm/PoliciesService",

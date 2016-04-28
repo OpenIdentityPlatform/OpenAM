@@ -17,7 +17,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "handlebars",

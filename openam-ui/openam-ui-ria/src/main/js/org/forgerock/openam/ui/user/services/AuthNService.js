@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/user/services/AuthNService", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",

@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "libs/codemirror/lib/codemirror",
     "org/forgerock/commons/ui/common/components/ChangesPending",

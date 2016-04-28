@@ -17,7 +17,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/OperatorRulesView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {

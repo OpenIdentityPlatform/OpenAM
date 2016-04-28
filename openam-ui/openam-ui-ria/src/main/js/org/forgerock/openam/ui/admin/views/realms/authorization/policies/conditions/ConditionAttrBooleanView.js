@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2106 ForgeRock AS.
  */
 
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBooleanView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({

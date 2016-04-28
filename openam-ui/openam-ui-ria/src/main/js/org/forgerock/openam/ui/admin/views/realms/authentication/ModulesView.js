@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",

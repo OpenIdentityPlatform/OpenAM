@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
 
     // jquery dependencies

@@ -16,7 +16,7 @@
 
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/commons/ui/common/util/CookieHelper",
