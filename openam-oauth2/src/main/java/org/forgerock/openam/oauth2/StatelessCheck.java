@@ -24,5 +24,28 @@ import org.forgerock.oauth2.core.OAuth2Request;
  */
 public interface StatelessCheck<T> {
 
-    T apply(String tokenId, OAuth2Request request);
+    /**
+     * Interrogates token to ascertain the OAuth2 token is stateless or not
+     *
+     * @param tokenId The token id
+     * @return The result of the check
+     */
+    T byToken(String tokenId);
+
+    /**
+     * Checks the OAuth2 token is stateless or not based on the realm
+     *
+     * @param realm The realm
+     * @return The result of the check
+     */
+    T byRealm(String realm);
+
+    /**
+     *
+     * Checks the OAuth2 token is stateless or not based on the request
+     *
+     * @param request The OAuth2 request
+     * @return The result of the check
+     */
+    T byRequest(OAuth2Request request);
 }

@@ -23,6 +23,9 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Interface for a Token Store which the OAuth2 Provider will implement.
@@ -313,4 +316,35 @@ public interface TokenStore {
     void deleteDeviceCode(String clientId, String code, OAuth2Request request)
             throws ServerException, NotFoundException, InvalidGrantException;
 
+    /**
+     *  Queries the OAuth2 Provider's store for tokens.
+     *
+     * @param realm The Realm.
+     * @param queryFilter The query  keyed by auth grant id, client id and resource owner.
+     * @return A JsonValue of the query results.
+     * @throws ServerException If there was an error in reading the token using the id.
+     * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
+     */
+    JsonValue queryForToken(String realm, QueryFilter<CoreTokenField> queryFilter) throws ServerException, NotFoundException;
+
+
+    /**
+     * Deletes the Token from the OAuth2 Provider's store with the specified identifier.
+     *
+     * @param realm The Realm
+     * @param tokenId The token ID
+     * @throws ServerException If there was an error in reading the token using the id.
+     * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
+     */
+    void delete(String realm, String tokenId) throws ServerException, NotFoundException;
+
+    /**
+     * Reads the Token from the OAuth2 Provider's store with the specified identifier.
+     *
+     * @param tokenId The token ID
+     * @return  A JsonValue of the token. May be {@code null} if the token is not found.
+     * @throws ServerException If there was an error in reading the token using the id.
+     * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
+     */
+    JsonValue read(String tokenId) throws ServerException, NotFoundException;
 }

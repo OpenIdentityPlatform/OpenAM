@@ -16,15 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.Set;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2RealmResolver;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.query.QueryFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Invalidates tokens and all their associated tokens. i.e. an Access Token and the Refresh Tokens and Authorization
@@ -34,71 +40,61 @@ import java.util.Set;
  */
 public class TokenInvalidator {
 
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+
+    public static final CoreTokenField GRANT_ID_FIELD = CoreTokenField.STRING_FIFTEEN;
+    public static final CoreTokenField CLIENT_ID_FIELD = CoreTokenField.STRING_NINE;
+    public static final CoreTokenField USERNAME_FIELD = CoreTokenField.STRING_THREE;
+
     private final TokenStore tokenStore;
+    private final OAuth2RealmResolver realmResolver;
 
     /**
      * Constructs a new TokenInvalidator.
      *
      * @param tokenStore An instance of the TokenStore.
+     * @param realmResolver An instance of the OAuth2RealmResolver
      */
     @Inject
-    public TokenInvalidator(TokenStore tokenStore) {
+    public TokenInvalidator(TokenStore tokenStore, OAuth2RealmResolver realmResolver) {
         this.tokenStore = tokenStore;
+        this.realmResolver = realmResolver;
     }
 
+
     /**
-     * Invalidates the specified token and all associated tokens.
+     * Invalidates all tokens associated with same auth grant, client and resource owner.
      *
-     * @param tokenId The token identifier of the token to invalidate.
+     * @param request The request.
+     * @param clientId The client id.
+     * @param userName The username denoting the resource owner id
+     * @param authGrantId The auth grant id.
+     * @throws ServerException
+     * @throws NotFoundException
      */
-    @SuppressWarnings("unchecked")
-    public void invalidateTokens(OAuth2Request request, String tokenId) throws InvalidRequestException, ServerException,
-            NotFoundException {
+    public void invalidateTokens(OAuth2Request request, String clientId, String userName,
+            String authGrantId) throws  ServerException, NotFoundException {
 
-        JsonValue token = tokenStore.queryForToken(request, tokenId);
+        String realm = realmResolver.resolveFrom(request);
+        QueryFilter<CoreTokenField> allTokensQuery = and(equalTo(USERNAME_FIELD, userName),
+                equalTo(CLIENT_ID_FIELD, clientId), equalTo(GRANT_ID_FIELD, authGrantId));
+        JsonValue tokens = tokenStore.queryForToken(realm, allTokensQuery);
+        for (JsonValue token : tokens) {
+            tokenStore.delete(realm, getAttributeValue(token, ID));
+        }
+    }
 
-        Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) token.getObject();
-
-        if (list != null && !list.isEmpty()) {
-            for (HashMap<String, Set<String>> entry : list) {
-                Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
-                Set<String> tokenNameSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
-                Set<String> refreshTokenSet = entry.get(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
-                String refreshTokenID;
-                if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()) {
-                    String entryID = idSet.iterator().next();
-                    String type = tokenNameSet.iterator().next();
-
-                    //if access_token delete the refresh token if it exists
-                    if (tokenNameSet.iterator().next().equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)
-                            && refreshTokenSet != null && !refreshTokenSet.isEmpty()) {
-                        refreshTokenID = refreshTokenSet.iterator().next();
-                        deleteToken(request, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
-                    }
-                    //delete the access_token
-                    invalidateTokens(request, entryID);
-                    deleteToken(request, type, entryID);
-                }
+    private String getAttributeValue(JsonValue token, String attributeName) {
+        String value = null;
+        JsonValue jsonValue = token.get(attributeName);
+        if (jsonValue.isString()) {
+            value = jsonValue.asString();
+        } else if (jsonValue.isSet()) {
+            Set<String> set = jsonValue.asSet(String.class);
+            if (!set.isEmpty()) {
+                value = set.iterator().next();
             }
         }
-    }
-
-    /**
-     * Deletes the token with the specified type and identifier.
-     *
-     * @param type The type of token.
-     * @param id The token's identifier.
-     */
-    private void deleteToken(OAuth2Request request, String type, String id) throws ServerException,
-            InvalidRequestException, NotFoundException {
-        if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
-            tokenStore.deleteAccessToken(request, id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)) {
-            tokenStore.deleteRefreshToken(request, id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)) {
-            tokenStore.deleteAuthorizationCode(request, id);
-        } else {
-            //shouldn't ever happen
-        }
+        return value;
     }
 }

@@ -19,7 +19,11 @@ import static com.google.inject.name.Names.named;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
 import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.JWT_BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.PASSWORD;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
@@ -176,7 +180,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
-        bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
         bind(ResourceOwnerSessionValidator.class).to(OpenAMResourceOwnerSessionValidator.class);
         bind(ClientAuthenticator.class).to(ClientAuthenticatorImpl.class);
         bind(TokenStore.class).to(OpenAMTokenStore.class);
@@ -256,19 +259,39 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
         bind(new TypeLiteral<OAuth2UrisFactory<RealmInfo>>() {}).to(OpenAMOAuth2UrisFactory.class);
-        bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessTest.class);
+        bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessCheck.class);
+
     }
 
-    public static class DefaultStatelessTest implements StatelessCheck<Boolean> {
+    public static class DefaultStatelessCheck implements StatelessCheck<Boolean> {
         private final OAuth2ProviderSettingsFactory providerSettings;
 
         @Inject
-        public DefaultStatelessTest(OAuth2ProviderSettingsFactory oAuth2ProviderSettings) {
+        public DefaultStatelessCheck(OAuth2ProviderSettingsFactory oAuth2ProviderSettings) {
             this.providerSettings = oAuth2ProviderSettings;
         }
 
         @Override
-        public Boolean apply(String tokenId, OAuth2Request request) {
+        public Boolean byToken(String tokenId) {
+            try {
+                new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
+                return true;
+            } catch (InvalidJwtException e) {
+                return false;
+            }
+        }
+
+        @Override
+        public Boolean byRealm(String realm) {
+            try {
+                return providerSettings.get(realm).isStatelessTokensEnabled();
+            } catch (ServerException | NotFoundException e) {
+                return false;
+            }
+        }
+
+        @Override
+        public Boolean byRequest(OAuth2Request request) {
             try {
                 OAuth2ProviderSettings oAuth2ProviderSettings = providerSettings.get(request);
                 return oAuth2ProviderSettings.isStatelessTokensEnabled();
@@ -333,31 +356,15 @@ public class OAuth2GuiceModule extends AbstractModule {
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
-            ClientAuthenticationFailureFactory failureFactory, StatelessTokenStore statelessTokenStore,
-            JwtBuilderFactory jwtBuilder) {
+            ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder) {
         StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
                 providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
                 cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
         StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
-                realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, clientRegistrationStore,
+                realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
                 realmNormaliser, oauth2UrisFactory);
-        return new OpenAMTokenStore(providerSettingsFactory, realmAgnosticStatefulTokenStore,
-                realmAgnosticStatelessTokenStore, new StatelessCheck<Boolean>() {
-
-            @Inject
-            public OAuth2ProviderSettingsFactory providerSettings;
-
-            @Override
-            public Boolean apply(String tokenId, OAuth2Request
-                    request) {
-                try {
-                    SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-                    return true;
-                } catch (InvalidJwtException e) {
-                    return false;
-                }
-            }
-        });
+        return new OpenAMTokenStore(realmAgnosticStatefulTokenStore,
+                realmAgnosticStatelessTokenStore, new DefaultStatelessCheck(providerSettingsFactory));
     }
 
     @Inject
@@ -423,11 +430,11 @@ public class OAuth2GuiceModule extends AbstractModule {
     public static class RealmAgnosticStatelessTokenStore extends StatelessTokenStore {
 
         public RealmAgnosticStatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
-                OAuth2ProviderSettingsFactory providerSettingsFactory,
+                OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory) {
-            super(statefulTokenStore, jwtBuilder, providerSettingsFactory, clientRegistrationStore, realmNormaliser,
-                    oAuth2UrisFactory);
+            super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
+                    realmNormaliser, oAuth2UrisFactory);
         }
 
         @Override
@@ -450,4 +457,5 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         return set;
     }
+
 }

@@ -27,7 +27,6 @@ import static org.forgerock.util.query.QueryFilter.and;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -37,19 +36,19 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.OAuth2TokenIntrospectionHandler;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.oauth2.OAuthTokenStore;
+import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.query.QueryFilter;
 import org.restlet.Request;
 import org.restlet.data.ChallengeRequest;
@@ -72,29 +71,28 @@ public class TokenRevocationResource extends ServerResource {
 
     private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ClientAuthenticator clientAuthenticator;
-    private final OAuth2TokenIntrospectionHandler oAuth2TokenIntrospectionHandler;
-    private final OAuthTokenStore tokenStore;
+    private final TokenStore tokenStore;
     private final ExceptionHandler exceptionHandler;
+    private final OAuth2RealmResolver realmResolver;
 
     /**
      * Constructs a new TokenRevocationResource.
      *
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param clientAuthenticator An instance of the ClientAuthenticator.
-     * @param oAuth2TokenIntrospectionHandler An instance of the OAuth2TokenIntrospectionHandler.
      * @param tokenStore An instance of the OAuthTokenStore.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param realmResolver An instance of the OAuth2RealmResolver
      */
     @Inject
     public TokenRevocationResource(OAuth2RequestFactory<?, Request> requestFactory,
             ClientAuthenticator clientAuthenticator,
-            OAuth2TokenIntrospectionHandler oAuth2TokenIntrospectionHandler,
-            OAuthTokenStore tokenStore, ExceptionHandler exceptionHandler) {
+            TokenStore tokenStore, ExceptionHandler exceptionHandler, OAuth2RealmResolver realmResolver) {
         this.clientAuthenticator = clientAuthenticator;
         this.requestFactory = requestFactory;
-        this.oAuth2TokenIntrospectionHandler = oAuth2TokenIntrospectionHandler;
         this.tokenStore = tokenStore;
         this.exceptionHandler = exceptionHandler;
+        this.realmResolver = realmResolver;
     }
 
     /**
@@ -107,6 +105,7 @@ public class TokenRevocationResource extends ServerResource {
     @Post
     public Representation revoke(Representation entity) throws OAuth2RestletException {
         final OAuth2Request request = requestFactory.create(getRequest());
+        final String realm = realmResolver.resolveFrom(request);
         final String tokenId = request.getParameter("token");
         try {
             if(isEmpty(tokenId)) {
@@ -119,10 +118,10 @@ public class TokenRevocationResource extends ServerResource {
                 final String tokenName = getAttributeValue(token, TOKEN_NAME);
                 switch (tokenName) {
                     case ACCESS_TOKEN:
-                        deleteAccessToken(tokenId);
+                        deleteAccessToken(realm, tokenId);
                         break;
                     case REFRESH_TOKEN:
-                        deleteRefreshTokenAndAccessTokens(token, clientId);
+                        deleteRefreshTokenAndAccessTokens(realm, token, clientId);
                         break;
                     default:
                         throw new InvalidRequestException("Invalid token name: " + tokenName);
@@ -153,29 +152,30 @@ public class TokenRevocationResource extends ServerResource {
 
     }
 
-    private void deleteAccessToken(String tokenId) throws ServerException {
+    private void deleteAccessToken(String realm, String tokenId) throws ServerException, NotFoundException {
         try {
-            tokenStore.delete(tokenId);
-        } catch (CoreTokenException e) {
+            tokenStore.delete(realm, tokenId);
+        } catch (ServerException e) {
             logger.error("Failed to delete access token with id :" + tokenId, e);
             throw new ServerException("Failed to revoke access token");
         }
     }
 
-    private void deleteRefreshTokenAndAccessTokens(JsonValue token, String clientId) throws ServerException {
+    private void deleteRefreshTokenAndAccessTokens(String realm, JsonValue token,
+            String clientId) throws ServerException, NotFoundException {
         final String userName = getAttributeValue(token, USER_NAME.getOAuthField());
         final String authGrantId = getAttributeValue(token, CoreTokenParams.AUTH_GRANT_ID);
         final JsonValue userTokens;
         int deletedTokens = 0;
         try {
-            userTokens = getTokens(clientId, userName, authGrantId);
+            userTokens = getTokens(realm, clientId, userName, authGrantId);
             String tokenId = null;
             for (JsonValue userToken : userTokens) {
                 try {
                     tokenId = getAttributeValue(userToken, ID.getOAuthField());
-                    tokenStore.delete(tokenId);
+                    tokenStore.delete(realm, tokenId);
                     deletedTokens++;
-                } catch (CoreTokenException e) {
+                } catch (ServerException e) {
                     logger.error("Failed to delete token with id :" + tokenId, e);
                 }
             }
@@ -184,42 +184,46 @@ public class TokenRevocationResource extends ServerResource {
                 int notRevoked = allTokens - deletedTokens;
                 logger.error("Failed to revoke " + notRevoked + " from " + allTokens + " tokens");
             }
-        } catch (CoreTokenException e) {
-            logger.error("Failed to fetch all the related tokens for the client :" + clientId + "and user name :" + userName, e);
+        } catch (ServerException | NotFoundException e) {
+            logger.error("Failed to fetch all the related tokens for the client :"
+                    + clientId + "and user name :" + userName, e);
             throw new ServerException("Failed to revoke refresh and access tokens");
         }
     }
 
-    private JsonValue getTokens(String clientId, String userName, String authGrantId) throws CoreTokenException {
+    private JsonValue getTokens(String realm, String clientId, String userName,
+            String authGrantId) throws ServerException, NotFoundException {
         QueryFilter<CoreTokenField> allTokensQuery = and(equalTo(USER_NAME.getField(), userName),
                 equalTo(CLIENT_ID.getField(), clientId), equalTo(AUTH_GRANT_ID.getField(), authGrantId));
-        return tokenStore.query(allTokensQuery);
+        return tokenStore.queryForToken(realm, allTokensQuery);
     }
 
     private JsonValue getToken(String clientId, String tokenId)
-            throws CoreTokenException, InvalidRequestException, InvalidGrantException, ServerException {
-        QueryFilter<CoreTokenField> tokenQuery = equalTo(ID.getField(), tokenId);
-        JsonValue tokens = tokenStore.query(tokenQuery);
-        if (tokens.asCollection().isEmpty()) {
-            return null;
-        } else if (tokens.size() == 1) {
-            JsonValue token = tokens.iterator().next();
+            throws CoreTokenException, InvalidRequestException, InvalidGrantException,
+            ServerException, NotFoundException {
+        JsonValue token = tokenStore.read(tokenId);
+        if(token != null) {
             String tokenClientId = getAttributeValue(token, CLIENT_ID.getOAuthField());
             if (!clientId.equals(tokenClientId)) {
-               throw new InvalidGrantException("The provided token id : " + tokenId + " belongs to different access grant.");
+                throw new InvalidGrantException("The provided token id : "
+                        + tokenId + " belongs to different access grant.");
             }
-            return token;
         }
-        logger.error("More than one token found for the given token id : " + tokenId + "client id : " + clientId);
-        throw new ServerException("Could not find the token");
+        return token;
     }
 
     private String getAttributeValue(JsonValue token, String attributeName) {
-        Set<String> value = token.get(attributeName).asSet(String.class);
-        if (CollectionUtils.isNotEmpty(value)) {
-            return value.iterator().next();
+        String value = null;
+        JsonValue jsonValue = token.get(attributeName);
+        if (jsonValue.isString()) {
+            value = jsonValue.asString();
+        } else if (jsonValue.isSet()) {
+            Set<String> set = jsonValue.asSet(String.class);
+            if (!set.isEmpty()) {
+                value = set.iterator().next();
+            }
         }
-        return null;
+        return value;
     }
 
     /**

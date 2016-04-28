@@ -27,16 +27,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 
@@ -52,18 +48,21 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<>();
     private final CookieExtractor cookieExtractor;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
+    private final OAuth2RealmResolver realmResolver;
 
     /**
      * Constructs a new OpenAMOAuth2ProviderSettingsFactory.
      *
      * @param cookieExtractor An instance of the CookieExtractor.
      * @param resourceSetStoreFactory An instance of the ResourceSetStoreFactory.
+     * @param realmResolver An instance of the RealmResolver
      */
     @Inject
     public OpenAMOAuth2ProviderSettingsFactory(CookieExtractor cookieExtractor,
-            ResourceSetStoreFactory resourceSetStoreFactory) {
+            ResourceSetStoreFactory resourceSetStoreFactory, OAuth2RealmResolver realmResolver) {
         this.cookieExtractor = cookieExtractor;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
+        this.realmResolver = realmResolver;
         addServiceListener();
     }
 
@@ -87,22 +86,12 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        AccessToken accessToken = request.getToken(AccessToken.class);
-        String realm;
-        if (accessToken != null) {
-            realm = accessToken.getRealm();
-        } else {
-            realm = request.getParameter(RestletRealmRouter.REALM);
-        }
-        return get(realm);
+        return get(realmResolver.resolveFrom(request));
     }
 
     @Override
     public OAuth2ProviderSettings get(Context context) throws NotFoundException {
-        Reject.ifFalse(context.containsContext(RealmContext.class), "Must contain a RealmContext cannot be null");
-        Reject.ifNull(context, "Context cannot be null");
-        String realm = RealmContext.getRealm(context);
-        return get(realm);
+        return get(realmResolver.resolveFrom(context));
     }
 
     @Override

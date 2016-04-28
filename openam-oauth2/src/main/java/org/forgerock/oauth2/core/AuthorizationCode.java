@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
 import static org.forgerock.openam.utils.Time.*;
 
 import org.forgerock.json.JsonValue;
@@ -60,7 +61,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      */
     public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri,
             Set<String> scope, long expiryTime, String nonce, String authModules, String acr, String codeChallenge,
-                             String codeChallengeMethod) {
+                             String codeChallengeMethod, String authGrantId) {
         super(new HashMap<String, Object>());
         setCode(code);
         setResourceOwnerId(resourceOwnerId);
@@ -75,6 +76,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         setAuthenticationContextClassReference(acr);
         setCodeChallenge(codeChallenge);
         setCodeChallengeMethod(codeChallengeMethod);
+        setAuthGrantId(authGrantId);
     }
 
     /**
@@ -384,4 +386,21 @@ public class AuthorizationCode extends JsonValue implements Token {
     public String getCodeChallengeMethod() {
         return getStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
     }
+
+    /**
+     *
+     * Sets the authorization grant id
+     *
+     * @param authGrantId The authorization grant id
+     */
+    public void setAuthGrantId(String authGrantId) {
+        setStringProperty(AUTH_GRANT_ID, authGrantId);
+    }
+
+    /**
+     * Gets the authorization grant id
+     *
+     * @return The authorization grant id
+     */
+    public String getAuthGrantId() { return getStringProperty(AUTH_GRANT_ID); }
 }

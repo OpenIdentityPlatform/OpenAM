@@ -17,8 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -47,6 +46,14 @@ public abstract class StatelessToken implements Token {
 
     public String getTokenId() {
         return jwtString;
+    }
+
+    public String getTokenName() {
+        return jwt.getClaimsSet().getClaim(TOKEN_NAME, String.class);
+    }
+
+    public String getJwtId() {
+        return jwt.getClaimsSet().getJwtId();
     }
 
     public String getRealm() {
@@ -112,6 +119,11 @@ public abstract class StatelessToken implements Token {
 
     public String getAuditTrackingId() {
         return jwt.getClaimsSet().getClaim(AUDIT_TRACKING_ID, String.class);
+    }
+
+
+    public String getAuthGrantId() {
+        return jwt.getClaimsSet().getClaim(AUTH_GRANT_ID, String.class);
     }
 
     @Override

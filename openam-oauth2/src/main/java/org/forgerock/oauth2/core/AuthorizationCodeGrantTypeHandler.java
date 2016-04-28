@@ -109,8 +109,10 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         // Only allow one request per code through here at a time, to prevent replay.
         synchronized (code.intern()) {
             if (authorizationCode.isIssued()) {
-                tokenInvalidator.invalidateTokens(request, code);
-                tokenStore.deleteAuthorizationCode(request, code);
+                String clientId = authorizationCode.getClientId();
+                String userName = authorizationCode.getResourceOwnerId();
+                String authGrantId = authorizationCode.getAuthGrantId();
+                tokenInvalidator.invalidateTokens(request, clientId, userName, authGrantId);
                 logger.error("Authorization Code has already been issued, " + code);
                 throw new InvalidGrantException();
             }

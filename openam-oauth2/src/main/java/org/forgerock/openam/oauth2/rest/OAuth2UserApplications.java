@@ -48,11 +48,14 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
+import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -71,14 +74,14 @@ import org.joda.time.format.ISODateTimeFormat;
 @RequestHandler
 public class OAuth2UserApplications {
 
-    private final OAuthTokenStore tokenStore;
+    private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
-    public OAuth2UserApplications(OAuthTokenStore tokenStore,
+    public OAuth2UserApplications(TokenStore tokenStore,
             OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
             ClientRegistrationStore clientRegistrationStore, ContextHelper contextHelper,
             @Named("frRest") Debug debug) {
@@ -112,7 +115,7 @@ public class OAuth2UserApplications {
         try {
             QueryFilter<CoreTokenField> queryFilter = getQueryFilter(userId, realm);
 
-            JsonValue tokens = tokenStore.query(queryFilter);
+            JsonValue tokens = tokenStore.queryForToken(realm, queryFilter);
 
             Map<String, Set<JsonValue>> applicationTokensMap = new HashMap<>();
 
@@ -133,7 +136,7 @@ public class OAuth2UserApplications {
             }
 
             return Promises.newResultPromise(Responses.newQueryResponse());
-        } catch (CoreTokenException | ServerException | InvalidClientException |
+        } catch (ServerException | InvalidClientException |
                 NotFoundException e) {
             debug.message("Failed to query OAuth2 clients for user {}", userId, e);
             return new InternalServerErrorException(e).asPromise();
@@ -165,7 +168,7 @@ public class OAuth2UserApplications {
                     equalTo(CLIENT_ID.getField(), resourceId)
             );
 
-            JsonValue tokens = tokenStore.query(queryFilter);
+            JsonValue tokens = tokenStore.queryForToken(realm, queryFilter);
 
             if (tokens.asCollection().isEmpty()) {
                 return new org.forgerock.json.resource.NotFoundException().asPromise();
@@ -174,11 +177,11 @@ public class OAuth2UserApplications {
             for (JsonValue token : tokens) {
                 String tokenId = getAttributeValue(token, ID.getOAuthField());
                 debug.message("Removing OAuth2 token {} with client {} for user {}", tokenId, resourceId, userId);
-                tokenStore.delete(tokenId);
+                tokenStore.delete(realm, tokenId);
             }
 
             return getResourceResponse(context, resourceId, tokens).asPromise();
-        } catch (CoreTokenException | InvalidClientException | NotFoundException | ServerException e) {
+        } catch (InvalidClientException | NotFoundException | ServerException e) {
             debug.message("Failed to revoke access to OAuth2 client {} for user {}", resourceId, userId, e);
             return new InternalServerErrorException(e).asPromise();
         } catch (InternalServerErrorException e) {

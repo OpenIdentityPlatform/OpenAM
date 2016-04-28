@@ -77,7 +77,9 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.encode.Base64url;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Request;
@@ -174,7 +176,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
                 redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realm,
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
-                ssoTokenId, codeChallenge, codeChallengeMethod);
+                ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString());
 
         // Store in CTS
         try {
@@ -549,8 +551,15 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
             throws ServerException, NotFoundException {
+        AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
+        String authGrantId = null;
+        if (authorizationCode != null && authorizationCode.getAuthGrantId() != null) {
+            authGrantId = authorizationCode.getAuthGrantId();
+        } else {
+            authGrantId = UUID.randomUUID().toString();
+        }
         return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
-                validatedClaims, UUID.randomUUID().toString());
+                validatedClaims, authGrantId);
     }
 
         @Override
@@ -997,4 +1006,40 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not delete user code state");
         }
     }
+
+    @Override
+    public JsonValue queryForToken(String realm, QueryFilter<CoreTokenField> queryFilter) throws ServerException, NotFoundException {
+        try {
+            return tokenStore.query(queryFilter);
+        } catch (CoreTokenException e) {
+            logger.error("Unable to read the token using to query: " + queryFilter, e);
+            throw new ServerException("Could not read token in CTS: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(String realm, String tokenId) throws ServerException, NotFoundException {
+        delete(tokenId);
+    }
+
+    private void delete(String tokenId) throws ServerException {
+        try {
+            tokenStore.delete(tokenId);
+        } catch (CoreTokenException e) {
+            logger.error("Unable to delete token corresponding to id : " + tokenId, e);
+            throw new ServerException("Could not delete token in CTS: " + e.getMessage());
+        }
+
+    }
+
+    @Override
+    public JsonValue read(String tokenId) throws ServerException {
+        try {
+            return tokenStore.read(tokenId);
+        } catch (CoreTokenException e) {
+            logger.error("Unable to read token corresponding to id : " + tokenId, e);
+            throw new ServerException("Could not read token in CTS: " + e.getMessage());
+        }
+    }
+
 }

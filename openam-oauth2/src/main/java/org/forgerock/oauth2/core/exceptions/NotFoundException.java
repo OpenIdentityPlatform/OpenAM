@@ -28,7 +28,7 @@ public class NotFoundException extends OAuth2Exception {
     /**
      * Constructs a new NotFoundException with the specified message.
      *
-     * @param message The reason for the exceptioin.
+     * @param message The reason for the exception.
      */
     public NotFoundException(final String message) {
         super(404, "not_found", message);
