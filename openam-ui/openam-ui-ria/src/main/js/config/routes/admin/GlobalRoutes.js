@@ -20,7 +20,7 @@ define([
     const routes = {
         listAuthenticationSettings: {
             view: "org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView",
-            url: /configure\/authentication/,
+            url: /configure\/authentication$/,
             pattern: "configure/authentication",
             role: "ui-global-admin",
             navGroup: "admin"
@@ -34,21 +34,37 @@ define([
         },
         listGlobalServices: {
             view: "org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView",
-            url: /configure\/global-services/,
+            url: /configure\/global-services$/,
             pattern: "configure/global-services",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         editGlobalService: {
             view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceView",
-            url: /configure\/global-services\/([^\/]+)/,
+            url: /configure\/global-services\/([^\/]+)$/,
             pattern: "configure/global-services/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },
+        globalServiceSubSchemaNew: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/NewGlobalServiceSubSchemaView",
+            url: /configure\/global-services\/([^\/]+)\/([^\/]+)\/new/,
+            pattern: "configure/global-services/?/?/new",
+            role: "ui-realm-admin",
+            navGroup: "admin",
+            forceUpdate: true
+        },
+        globalServiceSubSchemaEdit: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceSubSchemaView",
+            url: /configure\/global-services\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)/,
+            pattern: "configure/global-services/?/?/edit/?",
+            role: "ui-realm-admin",
+            navGroup: "admin",
+            forceUpdate: true
+        },
         listSites: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
-            url: /deployment\/sites/,
+            url: /deployment\/sites$/,
             pattern: "deployment/sites",
             role: "ui-realm-admin",
             navGroup: "admin"
@@ -69,14 +85,14 @@ define([
         },
         listServers: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
-            url: /deployment\/servers/,
-            pattern: "deployment/servers$",
+            url: /deployment\/servers$/,
+            pattern: "deployment/servers",
             role: "ui-realm-admin",
             navGroup: "admin"
         },
         newServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
-            url: /deployment\/servers\/new/,
+            url: /deployment\/servers\/new$/,
             pattern: "deployment/servers/new",
             role: "ui-realm-admin",
             navGroup: "admin"

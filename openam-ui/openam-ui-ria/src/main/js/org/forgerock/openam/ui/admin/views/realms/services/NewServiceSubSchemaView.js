@@ -15,83 +15,31 @@
  */
 
 define([
-    "jquery",
     "lodash",
-    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/realm/ServicesService",
-    "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView",
-    "org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView"
-], ($, _, Messages, AbstractView, EventManager, Router, Constants, ServicesService, FlatJSONSchemaView,
-    GroupedJSONSchemaView) => AbstractView.extend({
-        template: "templates/admin/views/realms/services/NewServiceSubSchemaTemplate.html",
-        events: {
-            "click [data-save]": "onSave",
-            "keyup [data-name]": "onNameChange",
-            "change [data-input]": "onNameChange"
-        },
-        onNameChange (event) {
-            const isEmpty = _.isEmpty(event.currentTarget.value);
+    "org/forgerock/openam/ui/admin/views/common/schema/NewSchemaComponent"
+], (_, AbstractView, Router, ServicesService, NewSchemaComponent) => AbstractView.extend({
+    render ([realmPath, serviceInstance, subSchemaType]) {
+        const newSchemaComponent = new NewSchemaComponent({
+            data: { realmPath, serviceInstance, subSchemaType },
 
-            this.setCreateEnabled(!isEmpty);
-        },
-        setCreateEnabled (enabled) {
-            this.$el.find("[data-save]").prop("disabled", !enabled);
-        },
-        render (args) {
-            this.data.realmPath = args[0];
-            this.data.serviceInstance = args[1];
-            this.data.subSchemaType = args[2];
+            listRoute: Router.configuration.routes.realmsServiceEdit,
+            listRouteArgs: _.map([realmPath, serviceInstance], encodeURIComponent),
 
-            this.parentRender(() => {
-                ServicesService.type.subSchema.instance.getInitialState(
-                    this.data.realmPath, this.data.serviceInstance, this.data.subSchemaType
-                ).then((response) => {
-                    const options = {
-                        schema: response.schema,
-                        values: response.values,
-                        showOnlyRequiredAndEmpty: true
-                    };
+            editRoute: Router.configuration.routes.realmsServiceSubSchemaEdit,
+            editRouteArgs: (newInstanceId) => _.map([realmPath, serviceInstance, subSchemaType, newInstanceId],
+                encodeURIComponent),
 
-                    if (response.schema.isCollection()) {
-                        this.jsonSchemaView = new GroupedJSONSchemaView(options);
-                    } else {
-                        this.jsonSchemaView = new FlatJSONSchemaView(options);
-                    }
+            template: "templates/admin/views/common/schema/NewServiceSubSchemaTemplate.html",
 
-                    $(this.jsonSchemaView.render().el).appendTo(this.$el.find("[data-json-form]"));
-                });
-            });
-        },
-        onSave () {
-            const formData = this.jsonSchemaView.getData();
-            const subSchemaInstanceId = this.$el.find("[data-name]").val();
+            getInitialState: () => ServicesService.type.subSchema.instance.getInitialState(
+                    realmPath, serviceInstance, subSchemaType),
+            createInstance: (values) => ServicesService.type.subSchema.instance.create(
+                    realmPath, serviceInstance, subSchemaType, values)
+        });
 
-            formData["_id"] = subSchemaInstanceId;
-
-            ServicesService.type.subSchema.instance.create(
-                this.data.realmPath,
-                this.data.serviceInstance,
-                this.data.subSchemaType,
-                formData
-            ).then(() => {
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-
-                Router.routeTo(Router.configuration.routes.realmsServiceSubSchemaEdit, {
-                    args: _.map([
-                        this.data.realmPath, this.data.serviceInstance, this.data.subSchemaType, subSchemaInstanceId
-                    ], encodeURIComponent),
-                    trigger: true
-                });
-            }, (response) => {
-                Messages.addMessage({
-                    response,
-                    type: Messages.TYPE_DANGER
-                });
-            });
-        }
-    })
-);
+        this.parentRender(() => { this.$el.append(newSchemaComponent.render().$el); });
+    }
+}));

@@ -22,13 +22,12 @@ define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, arrayify, Promise) => {
+], ($, _, AbstractDelegate, Constants, JSONSchema, JSONValues, arrayify, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/services`);
 
     const getServiceSchema = function (type) {
@@ -46,7 +45,7 @@ define([
             url: `/${serviceType}/${subSchemaType}?_action=schema`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
-        }).then((data) => SMSServiceUtils.sanitizeSchema(data));
+        }).then((response) => new JSONSchema(response));
     };
 
     obj.instance = {
@@ -144,11 +143,14 @@ define([
                         return obj.serviceCall({
                             url: `/${serviceType}/${subSchemaType}/${subSchemaInstance}`,
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                        });
+                        }).then((response) => new JSONValues(response));
                     }
 
-                    return $.when(getServiceSubSchema(serviceType, subSchemaType), getInstance())
-                        .then((subSchema, values) => ({ schema: subSchema, values: values[0] }));
+                    return Promise.all([getServiceSubSchema(serviceType, subSchemaType), getInstance()])
+                        .then((response) => ({
+                            schema: response[0],
+                            values: response[1]
+                        }));
                 },
 
                 getInitialState (serviceType, subSchemaType) {
@@ -157,15 +159,15 @@ define([
                             url: `/${serviceType}/${subSchemaType}?_action=template`,
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                             type: "POST"
-                        });
+                        }).then((response) => new JSONValues(response));
                     }
 
-                    return $.when(
+                    return Promise.all([
                         getServiceSubSchema(serviceType, subSchemaType),
                         getTemplate(serviceType, subSchemaType)
-                    ).then((subSchema, values) => ({
-                        schema: new JSONSchema(subSchema),
-                        values: new JSONValues(values[0])
+                    ]).then((response) => ({
+                        schema: response[0],
+                        values: response[1]
                     }));
                 },
 
