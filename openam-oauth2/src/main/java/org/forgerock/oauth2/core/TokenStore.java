@@ -186,19 +186,6 @@ public interface TokenStore {
             ServerException;
 
     /**
-     * Queries the OAuth2 Provider's store for a specified token.
-     *
-     * @param request The current request.
-     * @param tokenId The token identifier.
-     * @return A {@link JsonValue} containing the token.
-     * @throws InvalidRequestException If the tokens could not be queried.
-     * @throws ServerException If the tokens could not be queried.
-     * @throws NotFoundException If the requested realm does not exist.
-     */
-    JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException, NotFoundException,
-            ServerException;
-
-    /**
      * Deletes an Access Token from the OAuth2 Provider's store.
      *
      * @param request The current request.
@@ -326,7 +313,6 @@ public interface TokenStore {
      * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
      */
     JsonValue queryForToken(String realm, QueryFilter<CoreTokenField> queryFilter) throws ServerException, NotFoundException;
-
 
     /**
      * Deletes the Token from the OAuth2 Provider's store with the specified identifier.

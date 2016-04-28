@@ -172,16 +172,6 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     }
 
     @Override
-    public JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException,
-            NotFoundException, ServerException {
-        if (statelessCheck.byToken(tokenId)) {
-            return statelessTokenStore.queryForToken(request, tokenId);
-        } else {
-            return statefulTokenStore.queryForToken(request, tokenId);
-        }
-    }
-
-    @Override
     public void deleteAccessToken(OAuth2Request request, String accessTokenId) throws ServerException,
             NotFoundException {
         if (statelessCheck.byToken(accessTokenId)) {
