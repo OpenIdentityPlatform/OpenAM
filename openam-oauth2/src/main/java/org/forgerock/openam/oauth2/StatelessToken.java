@@ -19,6 +19,8 @@ package org.forgerock.openam.oauth2;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.Token;
 
 import java.util.Set;
 import java.util.List;
@@ -28,12 +30,13 @@ import java.util.HashMap;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
 import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
-public abstract class StatelessToken {
+public abstract class StatelessToken implements Token {
 
     protected final Jwt jwt;
 
@@ -88,6 +91,7 @@ public abstract class StatelessToken {
         for (String key : claimsSet.keys()) {
             tokenInfo.put(key, claimsSet.get(key).getObject());
         }
+        tokenInfo.put(getTokenName(), jwtString);
         return tokenInfo;
     }
 

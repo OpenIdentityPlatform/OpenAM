@@ -61,7 +61,7 @@ public final class StatelessAccessToken extends StatelessToken implements Access
 
     @Override
     public String getSessionId() {
-        throw new UnsupportedOperationException("Stateless access tokens do not support the session id claim");
+        return null;
     }
 
     @Override
