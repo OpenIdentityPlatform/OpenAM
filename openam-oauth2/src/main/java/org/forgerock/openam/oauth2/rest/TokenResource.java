@@ -566,20 +566,23 @@ public class TokenResource implements CollectionResourceProvider {
         }
 
         try {
-            if (token.isDefined("refreshToken")) {
-                if (oAuth2ProviderSettings.issueRefreshTokensOnRefreshingToken()) {
+
+            boolean isRefreshTokenDefined = token.isDefined(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+            if (isRefreshTokenDefined && oAuth2ProviderSettings.issueRefreshTokensOnRefreshingToken()) {
+                return getIndefinitelyString(context);
+            }
+
+            JsonValue refreshToken = tokenStore.read(getAttributeValue(token,
+                                                                       OAuth2Constants.CoreTokenParams.REFRESH_TOKEN));
+            if (isRefreshTokenDefined && refreshToken != null) {
+                //Use refresh token expiry
+                long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(refreshToken, EXPIRE_TIME_KEY));
+
+                if (expiryTimeInMilliseconds == -1) {
                     return getIndefinitelyString(context);
-                } else {
-                    //Use refresh token expiry
-                    JsonValue refreshToken = tokenStore.read(getAttributeValue(token, "refreshToken"));
-                    long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(refreshToken, EXPIRE_TIME_KEY));
-
-                    if (expiryTimeInMilliseconds == -1) {
-                        return getIndefinitelyString(context);
-                    }
-
-                    return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
                 }
+
+                return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
             } else {
                 //Use access token expiry
                 long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(token, EXPIRE_TIME_KEY));
