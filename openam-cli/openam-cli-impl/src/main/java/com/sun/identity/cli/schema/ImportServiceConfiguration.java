@@ -24,7 +24,7 @@
  *
  * $Id: ImportServiceConfiguration.java,v 1.10 2010/01/11 17:34:33 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.schema;
@@ -77,8 +77,8 @@ import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
  * Import service configuration data.
  */
 public class ImportServiceConfiguration extends AuthenticatedCommand {
-    private static final String DS_LDIF = "odsee_config_schema.ldif";
-    private static final String DS_IDX = "odsee_config_index.ldif";
+    private static final String DS_LDIF = "ldif/odsee/odsee_config_schema.ldif";
+    private static final String DS_IDX = "ldif/odsee/odsee_config_index.ldif";
 
     /**
      * Services a Commandline Request.
@@ -125,7 +125,10 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
             
-            loadLDIF(vendor, ldConnection);
+            if (vendor.name.equals(DirectoryServerVendor.ODSEE)) {
+                loadLDIF(vendor, ldConnection);
+            }
+
             String ouServices = "ou=services," + initSys.getRootSuffix();
             
             if (this.isOuServicesExists(ssoToken, ouServices)) {

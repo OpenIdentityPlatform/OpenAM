@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2014-2016 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -90,6 +90,7 @@
                 <include>org.forgerock.commons:i18n-core</include>
                 <include>org.forgerock.commons:forgerock-audit-core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
+                <include>org.forgerock.openam:openam-auth-fr-oath</include>
             </includes>
         </dependencySet>
         <dependencySet>

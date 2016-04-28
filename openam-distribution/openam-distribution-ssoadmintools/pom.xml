@@ -310,6 +310,11 @@
             <artifactId>opendj-grizzly</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-fr-oath</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
 
