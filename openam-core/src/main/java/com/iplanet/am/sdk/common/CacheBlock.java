@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2016 ForgeRock AS.
  */
-
 package com.iplanet.am.sdk.common;
 
 import com.iplanet.am.util.SystemProperties;
