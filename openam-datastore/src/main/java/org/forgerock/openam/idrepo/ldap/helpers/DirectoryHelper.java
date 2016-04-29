@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.idrepo.ldap.helpers;
@@ -81,24 +81,24 @@ public class DirectoryHelper {
      * Converts the directory specific status value to the default Inactive/Active values.
      *
      * @param value The value of the user's status attribute.
-     * @param inactiveValue The inactive value configured in the data store settings.
-     * @return <code>Active</code> if the value is null or the value is not the same as inactiveValue. Otherwise
+     * @param activeValue The active value configured in the data store settings.
+     * @return <code>Active</code> if the value is null or the value is the same as activeValue. Otherwise
      * returns <code>Inactive</code>.
      */
-    public String convertToInetUserStatus(String value, String inactiveValue) {
-        return isActive(value, inactiveValue) ? STATUS_ACTIVE : STATUS_INACTIVE;
+    public String convertToInetUserStatus(String value, String activeValue) {
+        return isActive(value, activeValue) ? STATUS_ACTIVE : STATUS_INACTIVE;
     }
 
     /**
      * Tells whether the user's status attribute corresponds to active or inactive status.
      *
      * @param value The value of the user's status attribute.
-     * @param inactiveValue The inactive value configured in the data store settings.
-     * @return <code>true</code> if the value is null or the value is not the same as inactiveValue. Otherwise
+     * @param activeValue The active value configured in the data store settings.
+     * @return <code>true</code> if the value is null or the value is the same as activeValue. Otherwise
      * returns <code>false</code>.
      */
-    public boolean isActive(String value, String inactiveValue) {
-        return value == null || !value.equalsIgnoreCase(inactiveValue);
+    public boolean isActive(String value, String activeValue) {
+        return value == null || value.equalsIgnoreCase(activeValue);
     }
 
     /**
