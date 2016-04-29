@@ -1,19 +1,19 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * <p/>
+ *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
- * <p/>
+ *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
  * compliance with the License.
- * <p/>
+ *
  * You can obtain a copy of the License at
  * https://opensso.dev.java.net/public/CDDLv1.0.html or
  * opensso/legal/CDDLv1.0.txt
  * See the License for the specific language governing
  * permission and limitations under the License.
- * <p/>
+ *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
  * at opensso/legal/CDDLv1.0.txt.
@@ -21,9 +21,9 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * <p/>
+ *
  * $Id: CacheBlock.java,v 1.4 2008/06/25 05:41:23 qcheng Exp $
- * <p/>
+ *
  * Portions Copyrighted 2016 ForgeRock AS.
  */
 
