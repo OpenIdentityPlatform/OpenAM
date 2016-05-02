@@ -23,7 +23,7 @@ define([
     var exports = function (object) {
         return _.mapValues(object, function (value) {
             if (_.isArray(value) && value.length === 1) {
-                return value [0];
+                return value[0];
             }
 
             return value;

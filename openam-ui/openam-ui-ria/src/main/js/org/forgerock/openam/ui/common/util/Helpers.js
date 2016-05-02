@@ -32,7 +32,7 @@ define([
         result = result.replace(/\*/g,
             '<input class="form-control" required type="text" value="*" placeholder="*" />');
         result = result.replace("̂",
-            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^/]+" />');
 
         return new Handlebars.SafeString(result);
     });

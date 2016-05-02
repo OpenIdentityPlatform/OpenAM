@@ -35,6 +35,7 @@ define([
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
+
     var defaultThemeName = "default",
         applyThemeToPage = function (path, icon, stylesheets) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.

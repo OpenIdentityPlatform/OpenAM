@@ -36,7 +36,7 @@ define([
             "name": "Valid Email Address",
             "dependencies": [],
             "validator": function (el, input, callback) {
-                var emailPattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+                var emailPattern = /^([A-Za-z0-9_\-\.])+@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
                     value = input.val();
 
                 if (typeof value === "string" && value.length && !emailPattern.test(value)) {

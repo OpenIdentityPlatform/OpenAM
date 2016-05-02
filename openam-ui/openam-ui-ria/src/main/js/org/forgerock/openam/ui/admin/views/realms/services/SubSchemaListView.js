@@ -24,8 +24,9 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], ($, _, Backbone, Messages, EventManager, Router, Constants, ServicesService, FormHelper, UIUtils) => {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/Promise"
+], ($, _, Backbone, Messages, EventManager, Router, Constants, ServicesService, FormHelper, UIUtils, Promise) => {
     function deleteSubSchema (realmPath, type, subSchemaType, subSchemaInstance) {
         return ServicesService.type.subSchema.instance.remove(realmPath, type, subSchemaType, subSchemaInstance);
     }

@@ -22,8 +22,9 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/models/JSONSchema",
-    "org/forgerock/openam/ui/common/models/JSONValues"
-], (_, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/sites`);
 
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
@@ -68,7 +69,7 @@ define([
             })),
         create: (data) =>
             obj.serviceCall({
-                url: `?_action=create`,
+                url: "?_action=create",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(_.omit(data, ["servers"]))

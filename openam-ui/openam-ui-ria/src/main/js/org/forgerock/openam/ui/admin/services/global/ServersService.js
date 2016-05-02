@@ -23,8 +23,9 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/models/JSONSchema",
-    "org/forgerock/openam/ui/common/models/JSONValues"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues) => {
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/servers`);
     const DEFAULT_SERVER = "server-default";
     const ADVANCED_SECTION = "advanced";
@@ -73,7 +74,7 @@ define([
             values: response[1]
         })),
         getAll: () => obj.serviceCall({
-            url: `?_queryFilter=true`,
+            url: "?_queryFilter=true",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then((response) => _.reject(response.result, { "_id" : "server-default" })),
         remove: (id) => obj.serviceCall({
@@ -82,7 +83,7 @@ define([
             type: "DELETE"
         }),
         create:  (data) => obj.serviceCall({
-            url: `?_action=create`,
+            url: "?_action=create",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data)

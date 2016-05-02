@@ -1,26 +1,17 @@
-{
-    "root": true,
-    "extends": [
+module.exports = {
+    root: true,
+    extends: [
         "forgerock"
     ],
-    "parser": "babel-eslint",
-    "env": {
-        "amd": true,
-        "browser": true
+    parser: "babel-eslint",
+    parserOptions: {
+        ecmaVersion: 6
     },
-    "ecmaFeatures": {
-        arrowFunctions: true,
-        blockBindings: true,
-        defaultParams: true,
-        destructuring: true,
-        objectLiteralComputedProperties: true,
-        objectLiteralDuplicateProperties: true,
-        objectLiteralShorthandMethods: true,
-        objectLiteralShorthandProperties: true,
-        spread: true,
-        templateStrings: true
+    env: {
+        amd: true,
+        browser: true
     },
-    "rules": {
+    rules: {
         /*
          * --------------------------------------------------------------------------------
          * ERROR RULES
@@ -49,20 +40,23 @@
             "SwitchCase": 1,
             "VariableDeclarator": 1
         }],
+        "keyword-spacing": 2,
         "max-len": [2, 120, 4],
         "new-cap": [2, {
             "capIsNew": false
         }],
         "new-parens": 2,
         "no-alert": 2,
-        "no-arrow-condition": 2,
         "no-bitwise": 2,
         "no-catch-shadow": 2,
+        "no-confusing-arrow": 2,
+        "no-constant-condition": 2,
         "no-continue": 2,
         "no-duplicate-case": 2,
         "no-empty-character-class": 2,
         "no-empty-pattern": 2,
         "no-extend-native": 2,
+        "no-implicit-globals": 2,
         "no-invalid-regexp": 2,
         "no-irregular-whitespace": 2,
         "no-labels": 2,
@@ -72,9 +66,13 @@
         "no-multi-spaces": 2,
         "no-multi-str": 2,
         "no-native-reassign": 2,
+        "no-self-assign": 2,
         "no-trailing-spaces": 2,
+        "no-unmodified-loop-condition": 2,
         "no-unused-vars": 2,
+        "no-useless-escape": 2,
         "no-void": 2,
+        "no-whitespace-before-property": 2,
         "object-curly-spacing": [2, "always"],
         "operator-linebreak": 2,
         "prefer-const": 2,
@@ -83,15 +81,14 @@
             "before": false,
             "after": true
         }],
-        "space-after-keywords": [2, "always"],
         "space-before-blocks": [2, "always"],
         "space-before-function-paren": [2, "always"],
-        "space-before-keywords": 2,
         "space-in-parens": [2, "never"],
         "space-infix-ops": [2, {
             "int32Hint": false
         }],
         "space-unary-ops": 2,
+        "template-curly-spacing": 2,
         "valid-jsdoc": [2, {
             "prefer": {
                 "return": "returns"
@@ -109,7 +106,6 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
-
         "no-var": 1,
         "prefer-arrow-callback": 1,
         "prefer-template": 1,
@@ -119,5 +115,13 @@
         // TODO: Need an abstraction for logging before we can enable this.
         //"no-console": 0
         //"no-param-reassign": 0
+
+
+        /**
+         * Disabled because these rules aren't available in ESLint 2.0.
+         * TODO: Remove them from eslint-config-forgerock
+         */
+        "no-empty-label": 0,
+        "space-return-throw-case": 0
     }
-}
+};
