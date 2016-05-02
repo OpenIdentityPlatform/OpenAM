@@ -11,12 +11,7 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label" for="newModuleType">{{t "common.form.type"}}</label>
                 <div class="col-sm-9">
-                    <select class="form-control" id="newModuleType" data-module-type required>
-                        <option disabled selected value="">{{t "console.authentication.modules.selectModuleType"}}</option>
-                        {{#each types}}
-                        <option value="{{ _id }}">{{ name }}</option>
-                        {{/each}}
-                    </select>
+                    <div data-module-type></div>
                 </div>
             </div>
         </div>

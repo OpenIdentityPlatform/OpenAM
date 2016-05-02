@@ -20,10 +20,15 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/components/SelectComponent",
+    "org/forgerock/openam/ui/common/components/TemplateComponent",
+    "text!templates/admin/views/realms/authentication/SelectModuleItem.html",
+    "text!templates/admin/views/realms/authentication/SelectModuleOption.html"
+], ($, _, AbstractView, BootstrapDialog, UIUtils, SelectComponent, TemplateComponent, SelectModuleItemTemplate,
+    SelectModuleOptionTemplate) => {
 
-    // jquery dependencies
-    "selectize"
-], function ($, _, AbstractView, BootstrapDialog, UIUtils) {
+    SelectComponent = SelectComponent.default;
+    TemplateComponent = TemplateComponent.default;
 
     var EditLinkView = AbstractView.extend({
         editLinkTemplate: "templates/admin/views/realms/authentication/chains/EditLinkTemplate.html",
@@ -37,11 +42,7 @@ define([
                 title = linkConfig.module ? $.t("console.authentication.editChains.editModule")
                     : $.t("console.authentication.editChains.newModule");
 
-            UIUtils.fillTemplateWithData(self.editLinkTemplate, {
-                linkConfig,
-                allModules: formData.allModules,
-                allCriteria: formData.allCriteria
-            }, function (template) {
+            UIUtils.fillTemplateWithData(self.editLinkTemplate, {}, function (template) {
                 UIUtils.fillTemplateWithData(self.editLinkTableTemplate, {
                     linkConfig
                 }, function (tableTemplate) {
@@ -64,15 +65,6 @@ define([
                             cssClass: "btn-primary",
                             id: "saveBtn",
                             action (dialog) {
-                                var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize;
-
-                                linkConfig.module = moduleSelectize.getValue();
-                                linkConfig.type = _.find(moduleSelectize.options, {
-                                    _id: moduleSelectize.getValue()
-                                }).type;
-                                linkConfig.criteria =
-                                    dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
-
                                 if (newLink) {
                                     view.data.linkConfig = linkConfig;
                                     view.parent.data.form.chainData.authChainConfiguration.push(linkConfig);
@@ -85,32 +77,43 @@ define([
                         }],
                         onshow (dialog) {
                             dialog.getButton("saveBtn").disable();
-                            dialog.getModalBody().find("#selectModule").selectize({
+
+                            const itemComponent = new TemplateComponent({
+                                template: SelectModuleItemTemplate
+                            });
+
+                            const optionComponent = new TemplateComponent({
+                                template: SelectModuleOptionTemplate
+                            });
+
+                            self.moduleSelect = new SelectComponent({
                                 options: formData.allModules,
-                                searchField: ["_id", "typeDescription"],
-                                render: {
-                                    item (item) {
-                                        return `<div>${item._id} - <span class='text-muted'><em>${
-                                            item.typeDescription
-                                            }</em></span></div>`;
-                                    },
-                                    option (item) {
-                                        return `<div><div>${item._id}</div><div class='small text-muted'><em>${
-                                            item.typeDescription
-                                            }</em></div></div>`;
-                                    }
+                                selectedOption: _.find(formData.allModules, "_id", linkConfig.module),
+                                onChange (module) {
+                                    linkConfig.module = module._id;
+                                    linkConfig.type = module.type;
+                                    dialog.options.validateDialog(dialog);
                                 },
-                                onChange () {
-                                    dialog.options.validateDialog(dialog);
-                                }
-
+                                itemComponent,
+                                optionComponent,
+                                searchFields: ["_id", "typeDescription"]
                             });
+                            dialog.getModalBody().find("[data-module-select]")
+                                .append(self.moduleSelect.render().el);
 
-                            dialog.getModalBody().find("#selectCriteria").selectize({
-                                onChange () {
+                            const criteriaOptions = _.map(formData.allCriteria, (value, key) => ({ key, value }));
+                            self.criteriaSelect = new SelectComponent({
+                                options: criteriaOptions,
+                                selectedOption: _.find(criteriaOptions, "key", linkConfig.criteria),
+                                onChange (option) {
+                                    linkConfig.criteria = option.key;
                                     dialog.options.validateDialog(dialog);
-                                }
+                                },
+                                labelField: "value",
+                                searchFields: ["value"]
                             });
+                            dialog.getModalBody().find("[data-criteria-select]")
+                                .append(self.criteriaSelect.render().el);
 
                             dialog.getModalBody().on("click", "[data-add-option]", function (e) {
                                 var
@@ -137,9 +140,7 @@ define([
                             });
                         },
                         validateDialog (dialog) {
-                            var moduleValue = dialog.getModalBody().find("#selectModule")[0].selectize.getValue(),
-                                criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
-                            if (moduleValue.length === 0 || criteriaValue.length === 0) {
+                            if (linkConfig.module.length === 0 || linkConfig.criteria.length === 0) {
                                 dialog.getButton("saveBtn").disable();
                             } else {
                                 dialog.getButton("saveBtn").enable();

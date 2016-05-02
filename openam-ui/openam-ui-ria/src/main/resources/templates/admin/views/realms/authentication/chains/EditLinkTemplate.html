@@ -2,22 +2,12 @@
     <div class="row">
         <div class="col-sm-6">
             <label class="block-header">{{t "console.authentication.editChains.selectModule"}}</label>
-            <select id="selectModule" type="text" class="form-control" single value="{{linkConfig.module}}">
-                <option value="" selected disabled >{{t 'common.form.select'}}...</option>
-                {{#each allModules}}
-                <option value="{{this._id}}" {{#equals ../linkConfig.module this._id}} selected{{/equals}}>{{this.type}}</option>
-                {{/each}}
-            </select>
+            <span data-module-select></span>
         </div>
 
         <div class="col-sm-6">
             <label class="block-header">{{t "console.authentication.editChains.selectCriteria"}}</label>
-            <select id="selectCriteria" type="text" class="form-control" single value="{{linkConfig.module}}">
-                <option value="" selected disabled >{{t "common.form.select"}}...</option>
-                {{#each allCriteria}}
-                <option value="{{@key}}" {{#equals ../linkConfig.criteria @key}} selected{{/equals}}>{{this}}</option>
-                {{/each}}
-            </select>
+            <span data-criteria-select></span>
         </div>
     </div>
 </div>

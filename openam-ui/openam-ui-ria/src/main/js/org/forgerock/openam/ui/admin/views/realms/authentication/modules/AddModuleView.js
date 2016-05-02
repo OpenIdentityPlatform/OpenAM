@@ -20,14 +20,14 @@ define([
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
+    "org/forgerock/openam/ui/common/components/SelectComponent"
+], function ($, _, AbstractView, Router, Messages, AuthenticationService, SelectComponent) {
 
-    // jquery dependencies
-    "selectize"
-], function ($, _, AbstractView, Router, Messages, AuthenticationService) {
+    SelectComponent = SelectComponent.default;
 
     function validateModuleProps () {
         var moduleName = this.$el.find("#newModuleName").val(),
-            moduleType = this.$el.find("#newModuleType")[0].selectize.getValue(),
+            moduleType = this.moduleType,
             isValid;
 
         if (moduleName.indexOf(" ") !== -1) {
@@ -55,9 +55,18 @@ define([
             this.data.realmPath = args[0];
 
             AuthenticationService.authentication.modules.types.all(this.data.realmPath).then(function (modulesData) {
-                self.data.types = modulesData.result;
                 self.parentRender(function () {
-                    self.$el.find("#newModuleType").selectize();
+                    const selectComponent = new SelectComponent({
+                        options: modulesData.result,
+                        onChange: (option) => {
+                            self.moduleType = option._id;
+                            self.onValidateModuleProps();
+                        },
+                        searchFields: ["name"],
+                        labelField: "name",
+                        placeholderText: $.t("console.authentication.modules.selectModuleType")
+                    });
+                    self.$el.find("[data-module-type]").append(selectComponent.render().el);
                     self.$el.find("[autofocus]").focus();
                     if (callback) {
                         callback();
@@ -68,7 +77,7 @@ define([
         save () {
             var self = this,
                 moduleName = self.$el.find("#newModuleName").val(),
-                moduleType = self.$el.find("#newModuleType").val(),
+                moduleType = this.moduleType,
                 modulesService = AuthenticationService.authentication.modules;
 
             modulesService.exists(self.data.realmPath, moduleName).then(function (result) {

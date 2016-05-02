@@ -65,7 +65,8 @@ require.config({
         "selectize"   : "libs/selectize-non-standalone-0.12.1-min",
         "sifter"      : "libs/sifter-0.4.1-min",
         "microplugin" : "libs/microplugin-0.0.3",
-        "popoverclickaway" : "libs/popover-clickaway"
+        "popoverclickaway" : "libs/popover-clickaway",
+        "text": "libs/text"
     },
     shim: {
         "autosizeInput": {
