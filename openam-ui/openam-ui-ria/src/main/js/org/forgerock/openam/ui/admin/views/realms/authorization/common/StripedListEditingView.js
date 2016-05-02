@@ -22,8 +22,8 @@ define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "doTimeout"
-], ($, _, AbstractView, EventManager, Constants) => {
-    return AbstractView.extend({
+], ($, _, AbstractView, EventManager, Constants) =>
+    AbstractView.extend({
         noBaseTemplate: true,
         events: {
             "click [data-add-item]": "addItem",
@@ -61,7 +61,7 @@ define([
                 return;
             }
 
-            let pending = this.getPendingItem(e); // provide child implementation
+            const pending = this.getPendingItem(e); // provide child implementation
             let duplicateIndex = -1;
             let counter = 0;
 
@@ -117,5 +117,5 @@ define([
         toggleAddButton (enabled) {
             this.$el.find("[data-add-item]").prop("disabled", !enabled);
         }
-    });
-});
+    })
+);

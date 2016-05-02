@@ -100,9 +100,7 @@ define([
         performDeleteRealm (path) {
             var self = this;
 
-            return RealmsService.realms.remove(path).then(() => {
-                return self.render();
-            }, (response) => {
+            return RealmsService.realms.remove(path).then(() => self.render(), (response) => {
                 if (response && response.status === 409) {
                     Messages.addMessage({
                         message: $.t("console.realms.parentRealmCannotDeleted"),

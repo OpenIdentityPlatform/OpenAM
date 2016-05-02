@@ -29,6 +29,9 @@
          * --------------------------------------------------------------------------------
          */
         "array-bracket-spacing": [2, "never"],
+        "arrow-body-style": [2, "as-needed"],
+        "arrow-parens": [2, "always"],
+        "arrow-spacing": 2,
         "block-spacing": [2, "always"],
         "brace-style": [2, "1tbs", { "allowSingleLine": true }],
         "camelcase": [2, {
@@ -52,11 +55,13 @@
         }],
         "new-parens": 2,
         "no-alert": 2,
+        "no-arrow-condition": 2,
         "no-bitwise": 2,
         "no-catch-shadow": 2,
         "no-continue": 2,
         "no-duplicate-case": 2,
         "no-empty-character-class": 2,
+        "no-empty-pattern": 2,
         "no-extend-native": 2,
         "no-invalid-regexp": 2,
         "no-irregular-whitespace": 2,
@@ -72,6 +77,7 @@
         "no-void": 2,
         "object-curly-spacing": [2, "always"],
         "operator-linebreak": 2,
+        "prefer-const": 2,
         "quotes": [2, "double", "avoid-escape"],
         "semi-spacing": [2, {
             "before": false,
@@ -103,17 +109,12 @@
          * error rules.
          * --------------------------------------------------------------------------------
          */
-        "arrow-body-style": [1, "as-needed"],
-        "arrow-parens": [1, "always"],
-        "arrow-spacing": 1,
-        "no-arrow-condition": 1,
+
         "no-var": 1,
         "prefer-arrow-callback": 1,
-        "prefer-const": 1,
         "prefer-template": 1,
         "object-shorthand": 1,
         "prefer-spread": 1,
-        "no-empty-pattern": 1,
 
         // TODO: Need an abstraction for logging before we can enable this.
         //"no-console": 0

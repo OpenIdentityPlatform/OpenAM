@@ -22,9 +22,8 @@ define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], ($, _, AbstractView, EventManager, Constants, UIUtils) => {
-
-    return AbstractView.extend({
+], ($, _, AbstractView, EventManager, Constants, UIUtils) =>
+    AbstractView.extend({
         element: "#actions",
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesActionsTemplate.html",
         noBaseTemplate: true,
@@ -78,14 +77,14 @@ define([
         },
 
         addItem: function (e) {
-            let actionName = this.$el.find("[data-editing-input]").val();
+            const actionName = this.$el.find("[data-editing-input]").val();
 
             if (e.type === "keyup" && e.keyCode !== 13) {
                 this.toggleAddButton(actionName !== "");
                 return;
             }
 
-            let pending = { "name": actionName, "value": true };
+            const pending = { "name": actionName, "value": true };
             let duplicateIndex = -1;
             let counter = 0;
 
@@ -149,5 +148,5 @@ define([
         toggleAddButton (enabled) {
             this.$el.find("[data-add-item]").prop("disabled", !enabled);
         }
-    });
-});
+    })
+);
