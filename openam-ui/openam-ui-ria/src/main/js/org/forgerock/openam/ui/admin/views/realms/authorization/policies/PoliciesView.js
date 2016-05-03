@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView", [
+define([
     "jquery",
     "lodash",
     "backbone",

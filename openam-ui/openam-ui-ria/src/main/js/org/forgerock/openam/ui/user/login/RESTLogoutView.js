@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/login/RESTLogoutView", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",

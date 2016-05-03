@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/dashboard/services/TrustedDevicesService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

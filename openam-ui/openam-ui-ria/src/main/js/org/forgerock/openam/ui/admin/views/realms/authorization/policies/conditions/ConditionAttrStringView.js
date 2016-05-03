@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrStringView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/util/Constants",

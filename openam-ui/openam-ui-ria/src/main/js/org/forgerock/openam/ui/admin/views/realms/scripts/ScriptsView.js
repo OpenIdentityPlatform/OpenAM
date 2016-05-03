@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
+define([
     "jquery",
     "lodash",
     "backbone",

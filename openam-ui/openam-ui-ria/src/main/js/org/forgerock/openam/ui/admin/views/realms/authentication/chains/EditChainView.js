@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",

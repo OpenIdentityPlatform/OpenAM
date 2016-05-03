@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("config/routes/admin/GlobalRoutes", [
+define([
     "lodash"
 ], (_) => {
     const routes = {

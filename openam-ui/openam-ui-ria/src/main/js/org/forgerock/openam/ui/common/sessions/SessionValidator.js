@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/sessions/SessionValidator
   */
-define("org/forgerock/openam/ui/common/sessions/SessionValidator", [
+define([
     "org/forgerock/openam/ui/common/RouteTo"
 ], function (RouteTo) {
     var delay, ONE_SECOND_IN_MILLISECONDS = 1000, SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS = 1;

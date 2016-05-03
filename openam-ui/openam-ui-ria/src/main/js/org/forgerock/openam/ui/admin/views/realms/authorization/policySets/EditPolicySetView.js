@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",

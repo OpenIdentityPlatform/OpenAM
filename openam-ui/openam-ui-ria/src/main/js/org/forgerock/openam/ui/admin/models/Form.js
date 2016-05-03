@@ -17,7 +17,7 @@
  /**
  * @deprecated
  */
-define("org/forgerock/openam/ui/admin/models/Form", [
+define([
     "jquery",
     "lodash",
     "jsonEditor",

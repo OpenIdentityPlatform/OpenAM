@@ -19,7 +19,7 @@
   *
   * @module org/forgerock/openam/ui/common/RouteTo
   */
-define("org/forgerock/openam/ui/common/RouteTo", [
+define([
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",

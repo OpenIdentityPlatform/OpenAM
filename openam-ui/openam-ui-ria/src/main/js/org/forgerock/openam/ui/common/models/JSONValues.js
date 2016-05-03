@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/models/JSONValues", [
+define([
     "lodash"
 ], (_) => {
     function JSONValues (values) {

@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/services/ServerService
   */
-define("org/forgerock/openam/ui/common/services/ServerService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

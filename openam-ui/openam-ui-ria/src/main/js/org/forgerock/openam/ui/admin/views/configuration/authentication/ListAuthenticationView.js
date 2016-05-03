@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView", [
+ define([
      "jquery",
      "org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/global/AuthenticationService"

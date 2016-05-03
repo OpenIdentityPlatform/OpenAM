@@ -16,7 +16,7 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/ExternalLinks", [
+define([
     "lodash"
 ], (_) => {
 

@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/user/oauth2/TokensView", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/services/TokenService",

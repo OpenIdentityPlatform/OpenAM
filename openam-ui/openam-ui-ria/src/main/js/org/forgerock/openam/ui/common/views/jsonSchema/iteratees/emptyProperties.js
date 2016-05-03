@@ -17,6 +17,6 @@
  /**
   * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/emptyProperties
   */
-define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/emptyProperties", [
+define([
     "lodash"
 ], (_) => (schemaValuePair) => _.isEmpty(schemaValuePair.schema.raw.defaultProperties));

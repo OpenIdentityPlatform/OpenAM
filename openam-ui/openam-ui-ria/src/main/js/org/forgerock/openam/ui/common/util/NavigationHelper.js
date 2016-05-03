@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/common/util/NavigationHelper
  */
-define("org/forgerock/openam/ui/common/util/NavigationHelper", [
+define([
     "lodash",
     "jquery",
     "org/forgerock/commons/ui/common/components/Navigation",

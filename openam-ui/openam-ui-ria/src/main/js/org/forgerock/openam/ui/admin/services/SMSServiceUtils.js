@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/SMSServiceUtils
  */
-define("org/forgerock/openam/ui/admin/services/SMSServiceUtils", [
+define([
     "lodash",
     "org/forgerock/openam/ui/common/util/Promise"
 ], (_, Promise) => {

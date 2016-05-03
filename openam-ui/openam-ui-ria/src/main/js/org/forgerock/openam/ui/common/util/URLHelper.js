@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/URLHelper", [
+define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
     "org/forgerock/commons/ui/common/util/Constants",

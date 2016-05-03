@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/uma/views/history/ListHistory", [
+define([
     "jquery",
     "lodash",
     "backbone",

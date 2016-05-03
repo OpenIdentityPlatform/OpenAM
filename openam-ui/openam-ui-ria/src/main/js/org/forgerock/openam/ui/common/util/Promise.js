@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/util/Promise
   */
-define("org/forgerock/openam/ui/common/util/Promise", [
+define([
     "jquery",
     "lodash"
 ], ($, _) => ({

@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/util/array/arrayify
   */
-define("org/forgerock/openam/ui/common/util/array/arrayify", () => {
+define(() => {
     /**
      * Wraps any value in an array.
      * <p/>

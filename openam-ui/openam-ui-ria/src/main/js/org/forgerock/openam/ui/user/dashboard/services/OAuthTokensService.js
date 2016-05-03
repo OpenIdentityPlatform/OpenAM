@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/dashboard/services/OAuthTokensService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

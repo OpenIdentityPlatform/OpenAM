@@ -14,7 +14,7 @@
  * Copyright 2011-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/models/User", [
+define([
     "backbone"
 ], function (Backbone) {
     var User = Backbone.Model.extend({

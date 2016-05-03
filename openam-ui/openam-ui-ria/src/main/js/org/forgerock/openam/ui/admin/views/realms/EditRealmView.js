@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
+define([
     "jquery",
     "lodash",
     "handlebars",

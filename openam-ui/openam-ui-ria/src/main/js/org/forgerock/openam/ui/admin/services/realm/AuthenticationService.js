@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/realm/AuthenticationService
  */
-define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

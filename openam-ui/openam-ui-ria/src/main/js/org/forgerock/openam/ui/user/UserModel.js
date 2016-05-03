@@ -14,7 +14,7 @@
  * Portions copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/UserModel", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractModel",

@@ -14,7 +14,7 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/services/AuthNService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

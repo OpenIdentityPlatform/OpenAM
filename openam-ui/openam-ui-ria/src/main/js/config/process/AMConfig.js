@@ -14,7 +14,7 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("config/process/AMConfig", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/openam/ui/common/util/Constants",

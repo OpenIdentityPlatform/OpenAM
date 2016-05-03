@@ -14,7 +14,7 @@
  * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/RealmHelper", [
+define([
     "lodash",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/URIUtils"

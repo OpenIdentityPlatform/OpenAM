@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/createJSONEditorView
   */
-define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/createJSONEditorView", [
+define([
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/JSONEditorView",
     "org/forgerock/openam/ui/common/views/jsonSchema/editors/TogglableJSONEditorView"
 ], (JSONEditorView, TogglableJSONEditorView) => (schemaValuePair) => {

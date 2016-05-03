@@ -16,7 +16,7 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/Helpers", [
+define([
     "jquery",
     "handlebars",
     "lodash",

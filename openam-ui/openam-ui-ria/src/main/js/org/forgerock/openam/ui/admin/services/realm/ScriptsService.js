@@ -17,7 +17,7 @@
 /**
 * @module org/forgerock/openam/ui/admin/services/realm/ScriptsService
 */
-define("org/forgerock/openam/ui/admin/services/realm/ScriptsService", [
+define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",

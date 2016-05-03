@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView", [
+define([
     "jquery",
     "lodash",
     "backbone",

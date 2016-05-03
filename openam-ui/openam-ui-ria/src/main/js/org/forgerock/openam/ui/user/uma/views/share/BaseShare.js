@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/uma/views/share/BaseShare", [
+define([
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/uma/views/share/CommonShare"
 ], function (AbstractView, CommonShare) {

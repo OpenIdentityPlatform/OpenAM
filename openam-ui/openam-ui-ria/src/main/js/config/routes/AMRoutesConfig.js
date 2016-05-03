@@ -14,7 +14,7 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("config/routes/AMRoutesConfig", [], function () {
+define([], function () {
     return {
         continuePasswordReset: {
             view: "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",

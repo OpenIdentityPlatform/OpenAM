@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService
  */
-define("org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",

@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/util/Constants",

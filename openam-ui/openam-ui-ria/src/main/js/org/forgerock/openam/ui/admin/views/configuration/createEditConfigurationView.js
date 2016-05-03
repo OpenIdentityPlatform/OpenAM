@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView
   */
-define("org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",

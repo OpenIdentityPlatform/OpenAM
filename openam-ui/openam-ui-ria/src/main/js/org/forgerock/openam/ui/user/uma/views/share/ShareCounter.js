@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/share/ShareCounter", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function ($, AbstractView) {

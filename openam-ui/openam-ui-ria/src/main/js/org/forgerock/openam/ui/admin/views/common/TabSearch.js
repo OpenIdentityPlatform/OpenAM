@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/views/common/TabSearch
  */
-define("org/forgerock/openam/ui/admin/views/common/TabSearch", [
+define([
     "lodash",
     "jquery",
     "backbone",

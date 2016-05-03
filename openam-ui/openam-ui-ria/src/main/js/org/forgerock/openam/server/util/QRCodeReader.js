@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/server/util/QRCodeReader", [
+define([
     "jquery",
     "qrcode"
 ], function ($, QRCodeReader) {

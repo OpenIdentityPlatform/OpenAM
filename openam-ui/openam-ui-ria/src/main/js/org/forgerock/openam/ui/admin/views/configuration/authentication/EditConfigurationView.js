@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView", [
+define([
     "org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView",
     "org/forgerock/openam/ui/admin/services/global/AuthenticationService"
 ], (createEditConfigurationView, AuthenticationService) => {

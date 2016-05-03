@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", [
+define([
     "jquery",
     "lodash",
     "backbone",

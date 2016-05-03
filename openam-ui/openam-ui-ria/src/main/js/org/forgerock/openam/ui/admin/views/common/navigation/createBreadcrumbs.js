@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/util/URIUtils"

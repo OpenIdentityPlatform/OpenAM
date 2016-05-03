@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/backgrid/cells/PermissionsCell", [
+define([
     "jquery",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
 

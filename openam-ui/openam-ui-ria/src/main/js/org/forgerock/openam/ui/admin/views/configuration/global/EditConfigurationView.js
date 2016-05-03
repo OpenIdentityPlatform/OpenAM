@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/global/EditConfigurationView", [
+define([
     "org/forgerock/openam/ui/admin/views/configuration/createEditConfigurationView",
     "org/forgerock/openam/ui/admin/services/global/ServicesService"
 ], (createEditConfigurationView, ServicesService) => {

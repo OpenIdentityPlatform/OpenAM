@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/common/util/ThemeManager", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/openam/ui/common/util/Constants",

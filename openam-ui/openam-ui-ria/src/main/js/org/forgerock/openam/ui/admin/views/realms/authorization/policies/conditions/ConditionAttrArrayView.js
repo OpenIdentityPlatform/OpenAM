@@ -14,8 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",

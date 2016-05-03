@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/request/ListRequest", [
+define([
     "jquery",
     "backbone",
     "backbone.paginator",

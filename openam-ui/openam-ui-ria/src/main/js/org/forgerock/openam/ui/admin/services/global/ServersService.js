@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/admin/services/global/ServersService
   */
-define("org/forgerock/openam/ui/admin/services/global/ServersService", [
+define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",

@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel", [
+define([
     "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",

@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/realm/DashboardService
  */
-define("org/forgerock/openam/ui/admin/services/realm/DashboardService", [
+define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"

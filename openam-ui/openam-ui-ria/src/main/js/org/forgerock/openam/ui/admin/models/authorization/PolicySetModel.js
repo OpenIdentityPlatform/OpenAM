@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
+define([
     "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",

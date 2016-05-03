@@ -30,7 +30,7 @@
   * </code>
   * @module org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView
   */
-define("org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView", [
+define([
     "jquery",
     "lodash",
     "backbone",

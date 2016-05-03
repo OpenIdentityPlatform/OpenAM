@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/admin/utils/deprecatedWarning
   */
- define("org/forgerock/openam/ui/admin/utils/deprecatedWarning", [
+ define([
  ], () =>
      function deprecatedWarning (deprecated, replacement) {
          console.warn(`${deprecated} is marked as deprecated. \nPlease use ${replacement}`);
