@@ -21,7 +21,15 @@ import org.forgerock.json.JsonValue;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
@@ -85,15 +93,6 @@ public abstract class StatefulToken extends JsonValue {
      */
     protected void setExpiryTime(long expiryTime) {
         put(EXPIRE_TIME, expiryTime);
-    }
-
-    /**
-     * Sets the authorization grant id.
-     *
-     * @param authGrantId The authorization grant id.
-     */
-    protected void setAuthGrantId(String authGrantId) {
-        setStringProperty(AUTH_GRANT_ID, authGrantId);
     }
 
     /**

@@ -79,7 +79,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param redirectUri The redirect uri.
      * @param scope The scope.
      * @param expiryTime The expiry time.
-     * @param refreshToken The refresh token.
+     * @param refreshTokenId The refresh token id.
      * @param tokenName The token name.
      * @param grantType The grant type.
      * @param nonce The nonce.
@@ -92,7 +92,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
             String redirectUri,
             Set<String> scope,
             long expiryTime,
-            RefreshToken refreshToken,
+            String refreshTokenId,
             String tokenName,
             String grantType,
             String nonce) {
@@ -104,9 +104,8 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         setRedirectUri(redirectUri);
         setScope(scope);
         setExpiryTime(expiryTime);
-        if (refreshToken != null) {
-            setRefreshTokenId(refreshToken.getTokenId());
-            setAuthGrantId(refreshToken.getAuthGrantId());
+        if (!Utils.isEmpty(refreshTokenId)) {
+            setRefreshTokenId(refreshTokenId);
         }
         setTokenType(BEARER);
         setTokenName(tokenName);

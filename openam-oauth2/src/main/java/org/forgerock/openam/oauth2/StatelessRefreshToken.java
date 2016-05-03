@@ -16,7 +16,9 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REFRESH_TOKEN;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.REDIRECT_URI;
@@ -101,11 +103,6 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
     @Override
     public boolean isExpired() {
         return ! isNeverExpires() && super.isExpired();
-    }
-
-    @Override
-    public String getAuthGrantId() {
-        return jwt.getClaimsSet().getClaim(AUTH_GRANT_ID, String.class);
     }
 
     /**
