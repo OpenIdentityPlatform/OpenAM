@@ -307,7 +307,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
             }
         }
         if (!matched) {
-            throw authenticationRequired(request, token);
+            throw authenticationRequired(request);
         }
     }
 
