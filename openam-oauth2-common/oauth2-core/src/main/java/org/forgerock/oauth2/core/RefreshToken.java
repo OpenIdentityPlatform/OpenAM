@@ -42,4 +42,6 @@ public interface RefreshToken extends IntrospectableToken, Token {
     String getAuditTrackingId();
 
     JsonValue toJsonValue();
+
+    String getAuthGrantId();
 }

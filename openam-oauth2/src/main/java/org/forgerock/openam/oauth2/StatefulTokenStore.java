@@ -495,16 +495,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + currentTimeMillis();
         }
         
-        final AccessToken accessToken;
-        if (refreshToken == null) {
-            accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
-                    scope, expiryTime, null, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType, nonce,
-                    realm, claims, auditId);
-        } else {
-            accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
-                    scope, expiryTime, refreshToken.getTokenId(), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType,
-                    nonce, realm, claims, auditId);
-        }
+        final AccessToken accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId,
+                clientId, redirectUri, scope, expiryTime, refreshToken, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN,
+                grantType, nonce, realm, claims, auditId);
         try {
             tokenStore.create(accessToken.toJsonValue());
             if (auditLogger.isAuditLogEnabled()) {
@@ -533,6 +526,14 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     @Override
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
+            throws ServerException, NotFoundException {
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
+                validatedClaims, UUID.randomUUID().toString());
+    }
+
+        @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
             throws ServerException, NotFoundException {
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
@@ -570,7 +571,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
-                realm, authModules, acr, auditId);
+                realm, authModules, acr, auditId, authGrantId);
 
         if (!StringUtils.isBlank(validatedClaims)) {
             refreshToken.setClaims(validatedClaims);

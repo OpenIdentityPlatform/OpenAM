@@ -16,17 +16,14 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
 import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -75,7 +72,8 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
             String tokenName,
             String grantType,
             String authModules,
-            String acr) {
+            String acr,
+            String authGrantId) {
         super(new HashMap<String, Object>());
         setId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -83,6 +81,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         setRedirectUri(redirectUri);
         setScope(scope);
         setExpiryTime(expiryTime);
+        setAuthGrantId(authGrantId);
         setTokenType(tokenType);
         setTokenName(tokenName);
         setGrantType(grantType);
@@ -173,6 +172,11 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         tokenInfo.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         tokenInfo.put(getResourceString(SCOPE), getScope());
         return tokenInfo;
+    }
+
+    @Override
+    public String getAuthGrantId() {
+        return getStringProperty(AUTH_GRANT_ID);
     }
 
     protected Long getTimeLeft() {

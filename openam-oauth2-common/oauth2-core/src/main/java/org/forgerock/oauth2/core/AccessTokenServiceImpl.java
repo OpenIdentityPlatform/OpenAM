@@ -144,7 +144,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
             newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
                     refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request,
-                    validatedClaims);
+                    validatedClaims, refreshToken.getAuthGrantId());
 
             tokenStore.deleteRefreshToken(request, refreshToken.toString());
         }

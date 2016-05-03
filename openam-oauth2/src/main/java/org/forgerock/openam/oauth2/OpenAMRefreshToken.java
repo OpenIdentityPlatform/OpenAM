@@ -65,9 +65,9 @@ public class OpenAMRefreshToken extends StatefulRefreshToken {
      */
     public OpenAMRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             long expiryTime, String tokenType, String tokenName, String grantType, String realm,
-            String authModules, String acr, String auditId) {
+            String authModules, String acr, String auditId, String authGrantId) {
         super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
-                authModules, acr);
+                authModules, acr, authGrantId);
         setRealm(realm);
         setAuditTrackingId(auditId);
     }
