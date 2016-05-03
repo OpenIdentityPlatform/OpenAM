@@ -453,8 +453,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private boolean hasGlobalSchema(ServiceSchema globalSchema) throws SMSException {
         return globalSchema != null
-                && (!globalSchema.getAttributeSchemaNames().isEmpty()
-                        || !globalSchema.getSubSchemaNames().isEmpty());
+                && !globalSchema.getAttributeSchemaNames().isEmpty()
+                && !globalSchema.getSubSchemaNames().isEmpty();
     }
 
     /**
