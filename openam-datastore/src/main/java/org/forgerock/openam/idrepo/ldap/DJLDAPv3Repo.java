@@ -812,7 +812,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 }
                 result.put(attribute.getAttributeDescriptionAsString(), function.apply(attribute));
                 if (attrName.equalsIgnoreCase(userStatusAttr) && attrs.contains(DEFAULT_USER_STATUS_ATTR)) {
-                    String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), activeValue);
+                    String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), inactiveValue);
                     result.put(DEFAULT_USER_STATUS_ATTR,
                             function.apply(new LinkedAttribute(DEFAULT_USER_STATUS_ATTR, converted)));
                 }

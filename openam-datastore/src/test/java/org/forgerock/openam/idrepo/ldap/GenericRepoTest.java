@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -137,9 +137,9 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void isActiveReturnsFalseForInactiveUser() throws Exception {
-        idrepo.setActiveStatus(null, IdType.USER, DEMO, true);
-        assertThat(idrepo.isActive(null, IdType.USER, DEMO)).isFalse();
         idrepo.setActiveStatus(null, IdType.USER, DEMO, false);
+        assertThat(idrepo.isActive(null, IdType.USER, DEMO)).isFalse();
+        idrepo.setActiveStatus(null, IdType.USER, DEMO, true);
         assertThat(idrepo.isActive(null, IdType.USER, DEMO)).isTrue();
     }
 
