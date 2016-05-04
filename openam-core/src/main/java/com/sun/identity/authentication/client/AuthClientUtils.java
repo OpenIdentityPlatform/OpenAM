@@ -368,14 +368,17 @@ public class AuthClientUtils {
                 }
                 continue;
             }
-            if (name.equalsIgnoreCase("SunQueryParamsString")){
+            if (name.equalsIgnoreCase("SunQueryParamsString")) {
                 // This will normally be the case when browser back button is
-                // used and the form is posted again with the base64 encoded 
-                // parameters            	
-                if (!value.isEmpty()){
+                // used and the form is posted again with the base64 encoded parameters
+                if (!value.isEmpty()) {
                     String decodedValue = Base64.decodeAsUTF8String(value);
-                    if (decodedValue == null && utilDebug.warningEnabled()) {
-                        utilDebug.warning("Parameter ['{}']='{}' should be base64 encoded", name, value);
+                    if (decodedValue == null) {
+                        if (utilDebug.warningEnabled()) {
+                            utilDebug.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64"
+                                    + " encoded", name, value);
+                        }
+                        continue;
                     }
                     value = decodedValue;
                     if (utilDebug.messageEnabled()) {
@@ -384,14 +387,14 @@ public class AuthClientUtils {
                     StringTokenizer st = new StringTokenizer(value, "&");
                     while (st.hasMoreTokens()) {
                         String str = st.nextToken();
-                        if (str.indexOf("=") != -1 ) {
+                        if (str.indexOf("=") != -1) {
                             int index = str.indexOf("=");
-                            String parameter = str.substring(0,index);
+                            String parameter = str.substring(0, index);
                             String parameterValue = str.substring(index + 1);
                             putDecodedValue(data, parameter, parameterValue, encoding);
-                        } 
+                        }
                     }
-            	}
+                }
             } else if (name.equals(RedirectUrlValidator.GOTO) || name.equals(RedirectUrlValidator.GOTO_ON_FAIL)){
                 // Again this will be the case when browser back
                 // button is used and the form is posted with the
