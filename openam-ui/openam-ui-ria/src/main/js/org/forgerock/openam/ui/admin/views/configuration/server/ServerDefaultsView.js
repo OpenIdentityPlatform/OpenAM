@@ -59,7 +59,7 @@ define([
                     if (this.data.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
                             createBody: () => new InlineEditTable({
-                                values: this.data.values.raw[ServersService.servers.ADVANCED_SECTION]
+                                values: this.data.values.raw
                             }),
                             createFooter: () => new PartialBasedView({
                                 partial: "form/_JSONSchemaFooter"

@@ -47,7 +47,7 @@ define([
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
     }).then((response) => {
         if (section === ADVANCED_SECTION) {
-            response[ADVANCED_SECTION] = _.sortBy(objectToArray(response[ADVANCED_SECTION]), (value) => value.key);
+            response = _.sortBy(objectToArray(response), (value) => value.key);
         }
         return new JSONValues(response);
     });
@@ -55,7 +55,7 @@ define([
     const updateServer = (section, data, id = DEFAULT_SERVER) => {
         let modifiedData = data;
         if (section === ADVANCED_SECTION) {
-            modifiedData = { [ADVANCED_SECTION]: arrayToObject(data[ADVANCED_SECTION]) };
+            modifiedData = arrayToObject(data[ADVANCED_SECTION]);
         }
         return obj.serviceCall({
             url: `/${id}/properties/${section}`,
