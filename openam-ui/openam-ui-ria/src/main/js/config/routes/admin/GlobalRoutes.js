@@ -80,6 +80,13 @@ define([
             pattern: "deployment/servers/new",
             role: "ui-realm-admin",
             navGroup: "admin"
+        },
+        cloneServer: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
+            url: /deployment\/servers\/([^\/]+)\/clone/,
+            pattern: "deployment/servers/?/clone",
+            role: "ui-realm-admin",
+            navGroup: "admin"
         }
     };
 

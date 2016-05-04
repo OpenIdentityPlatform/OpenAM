@@ -66,8 +66,16 @@ define([
     };
 
     obj.servers = {
-        get: (server, section) => Promise.all([getSchema(server, section), getValues(server, section)])
-        .then((response) => ({
+        clone: (id, clonedUrl) => obj.serviceCall({
+            url: `/${id}?_action=clone`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST",
+            data: JSON.stringify({ clonedUrl })
+        }),
+        get: (server, section) => Promise.all([
+            getSchema(server, section),
+            getValues(server, section)
+        ]).then((response) => ({
             schema: response[0],
             values: response[1]
         })),
