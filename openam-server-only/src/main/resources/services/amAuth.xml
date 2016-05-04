@@ -187,7 +187,7 @@
                                  validator="RequiredValueValidator"
                                  resourceName="sharedSecret">
                     <DefaultValues>
-                        <DefaultValuesClassName className="org.forgerock.openam.sm.HmacSharedSecretDefaultValues"/>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-default-role"
