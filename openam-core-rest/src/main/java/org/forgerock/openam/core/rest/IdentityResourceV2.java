@@ -35,6 +35,7 @@ import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,6 +55,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
@@ -147,17 +149,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
     private final String objectType;
     private final RestSecurityProvider restSecurityProvider;
 
-    private ServiceConfigManager mailmgr;
-    private ServiceConfig mailscm;
-    private Map<String, Set<String>> mailattrs;
-
     final static String MAIL_IMPL_CLASS = "forgerockMailServerImplClassName";
     final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
     final static String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
     final static String MAIL_ATTRIBUTE = "openamEmailAttribute";
 
     final static String UNIVERSAL_ID = "universalid";
-    final static String UNIVERSAL_ID_ABBREV = "uid";
     final static String USERNAME = "username";
     final static String EMAIL = "email";
     final static String TOKEN_ID = "tokenId";
@@ -206,8 +203,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler,
             BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = userType;
-        this.mailmgr = mailmgr;
-        this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
         this.configHandler = configHandler;
@@ -746,101 +741,88 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             // Generate Admin Token
             SSOToken adminToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
 
-            Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm, objectType);
-            searchAttributes.putAll(getAttributeFromRequest(jsonBody));
+            String username = getUsername(mailLDAPAttribute, realm, jsonBody, adminToken);
 
-            List<String> searchResults = identityServices.search(new CrestQuery("*"), searchAttributes, adminToken);
+            IdentityDetails identityDetails = identityServices.read(username,
+                    getIdentityServicesAttributes(realm, objectType), adminToken);
 
-            if (searchResults.isEmpty()) {
-                throw new NotFoundException("User not found");
-
-            } else if (searchResults.size() > 1) {
-                throw new ConflictException("Multiple users found");
-
-            } else {
-                String username = searchResults.get(0);
-
-                IdentityDetails identityDetails = identityServices.read(username,
-                        getIdentityServicesAttributes(realm, objectType), adminToken);
-
-                String email = null;
-                String uid = null;
-                for (Map.Entry<String, Set<String>> attribute : asMap(identityDetails.getAttributes()).entrySet()) {
-                    String attributeName = attribute.getKey();
-                    if (mailLDAPAttribute.equalsIgnoreCase(attributeName)) {
-                        if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
-                            email = attribute.getValue().iterator().next();
-                        }
-                    } else if (UNIVERSAL_ID.equalsIgnoreCase(attributeName)) {
-                        if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
-                            uid = attribute.getValue().iterator().next();
-                        }
+            String email = null;
+            String uid = null;
+            for (Map.Entry<String, Set<String>> attribute : asMap(identityDetails.getAttributes()).entrySet()) {
+                String attributeName = attribute.getKey();
+                if (mailLDAPAttribute.equalsIgnoreCase(attributeName)) {
+                    if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
+                        email = attribute.getValue().iterator().next();
+                    }
+                } else if (UNIVERSAL_ID.equalsIgnoreCase(attributeName)) {
+                    if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
+                        uid = attribute.getValue().iterator().next();
                     }
                 }
-                // Check to see if user is Active/Inactive
-                if (!isUserActive(uid)) {
-                    throw new ForbiddenException("Request is forbidden for this user");
+            }
+            // Check to see if user is Active/Inactive
+            if (!isUserActive(uid)) {
+                throw new ForbiddenException("Request is forbidden for this user");
+            }
+            // Check if email is provided
+            if (email == null || email.isEmpty()) {
+                throw new BadRequestException("No email provided in profile.");
+            }
+
+            // Get full deployment URL
+            HttpContext header = context.asContext(HttpContext.class);
+
+            String baseURL = baseURLProviderFactory.get(realm).getRootURL(header);
+
+            String subject = jsonBody.get("subject").asString();
+            String message = jsonBody.get("message").asString();
+
+            // Retrieve email registration token life time
+            if (restSecurity == null) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Rest Security not created. restSecurity={}", restSecurity);
                 }
-                // Check if email is provided
-                if (email == null || email.isEmpty()) {
-                    throw new BadRequestException("No email provided in profile.");
-                }
+                throw new NotFoundException("Rest Security Service not created");
+            }
+            Long tokenLifeTime = restSecurity.getForgotPassTLT();
 
-                // Get full deployment URL
-                HttpContext header = context.asContext(HttpContext.class);
+            // Generate Token
+            org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username,
+                    tokenLifeTime, realm);
 
-                String baseURL = baseURLProviderFactory.get(realm).getRootURL(header);
+            // Store token in datastore
+            CTSHolder.getCTS().createAsync(ctsToken);
 
-                String subject = jsonBody.get("subject").asString();
-                String message = jsonBody.get("message").asString();
+            // Create confirmationId
+            String confirmationId = Hash.hash(
+                    ctsToken.getTokenId() + username + SystemProperties.get(AM_ENCRYPTION_PWD));
 
-                // Retrieve email registration token life time
-                if (restSecurity == null) {
-                    if (debug.warningEnabled()) {
-                        debug.warning("Rest Security not created. restSecurity={}", restSecurity);
-                    }
-                    throw new NotFoundException("Rest Security Service not created");
-                }
-                Long tokenLifeTime = restSecurity.getForgotPassTLT();
+            // Build Confirmation URL
+            String confURL = restSecurity.getForgotPasswordConfirmationUrl();
+            StringBuilder confURLBuilder = new StringBuilder(100);
+            if (StringUtils.isEmpty(confURL)) {
+                confURLBuilder.append(baseURL).append("/json/confirmation/forgotPassword");
+            } else if(confURL.startsWith("/")) {
+                confURLBuilder.append(baseURL).append(confURL);
+            }  else {
+                confURLBuilder.append(confURL);
+            }
+            String confirmationLink = confURLBuilder.append("?confirmationId=")
+                    .append(requestParamEncode(confirmationId))
+                    .append("&tokenId=").append(requestParamEncode(ctsToken.getTokenId()))
+                    .append("&username=").append(requestParamEncode(username))
+                    .append("&realm=").append(realm)
+                    .toString();
 
-                // Generate Token
-                org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username,
-                        tokenLifeTime, realm);
+            // Send Registration
+            sendNotification(email, subject, message, realm, confirmationLink);
 
-                // Store token in datastore
-                CTSHolder.getCTS().createAsync(ctsToken);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
-                // Create confirmationId
-                String confirmationId = Hash.hash(
-                        ctsToken.getTokenId() + username + SystemProperties.get(AM_ENCRYPTION_PWD));
-
-                // Build Confirmation URL
-                String confURL = restSecurity.getForgotPasswordConfirmationUrl();
-                StringBuilder confURLBuilder = new StringBuilder(100);
-                if (StringUtils.isEmpty(confURL)) {
-                    confURLBuilder.append(baseURL).append("/json/confirmation/forgotPassword");
-                } else if(confURL.startsWith("/")) {
-                    confURLBuilder.append(baseURL).append(confURL);
-                }  else {
-                    confURLBuilder.append(confURL);
-                }
-                String confirmationLink = confURLBuilder.append("?confirmationId=")
-                        .append(requestParamEncode(confirmationId))
-                        .append("&tokenId=").append(requestParamEncode(ctsToken.getTokenId()))
-                        .append("&username=").append(requestParamEncode(username))
-                        .append("&realm=").append(realm)
-                        .toString();
-
-                // Send Registration
-                sendNotification(email, subject, message, realm, confirmationLink);
-
-                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-
-                if (debug.messageEnabled()) {
-                    debug.message("IdentityResource.generateNewPasswordEmail :: ACTION of generate new password email "
-                            + " for username={} in realm={} performed by principalName={}", username, realm,
-                            principalName);
-                }
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.generateNewPasswordEmail :: ACTION of generate new password email "
+                        + " for username={} in realm={} performed by principalName={}", username, realm,
+                        principalName);
             }
             return newResultPromise(newActionResponse(result));
         } catch (ResourceException re) {
@@ -854,24 +836,44 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         }
     }
 
-    private Map<String, Set<String>> getAttributeFromRequest(JsonValue jsonBody) throws BadRequestException {
-        String username = jsonBody.get(USERNAME).asString();
-        String email = jsonBody.get(EMAIL).asString();
+    private String getUsername(String mailAttribute, String realm, JsonValue jsonRequest, SSOToken adminToken) throws
+            ResourceException, GeneralFailure, TokenExpired, RemoteException, ObjectNotFound {
 
-        if (username != null && email != null) {
+        String username = jsonRequest.get(USERNAME).asString();
+        String email = jsonRequest.get(EMAIL).asString();
+
+        //We need the username or the email
+        if (StringUtils.isEmpty(username) && StringUtils.isEmpty(email)) {
+            throw new BadRequestException("Username or email not provided in request");
+        }
+
+        //We can't have both username and email
+        if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(email)) {
             throw new BadRequestException("Both username and email specified - only one allowed in request.");
         }
 
-        if (username != null && !username.isEmpty()) {
-            return Collections.singletonMap(UNIVERSAL_ID_ABBREV, Collections.singleton(username));
+        if (StringUtils.isNotEmpty(username)) {
+            return username;
         }
 
-        if (email != null && !email.isEmpty()) {
-            String mailLDAPAttribute = CollectionHelper.getMapAttr(mailscm.getAttributes(), MAIL_ATTRIBUTE);
-            return Collections.singletonMap(mailLDAPAttribute, Collections.singleton(email));
-        }
 
-        throw new BadRequestException("Username or email not provided in request");
+        Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm, objectType);
+        Set<String> attributesValues = new HashSet<>();
+        attributesValues.add(email);
+
+        searchAttributes.put(mailAttribute, attributesValues);
+
+        List<String> searchResults = identityServices.search(new CrestQuery("*"), searchAttributes, adminToken);
+
+
+        if (searchResults.isEmpty()) {
+            throw new ObjectNotFound("User not found");
+
+        } else if (searchResults.size() > 1) {
+            throw new ConflictException("Multiple users found");
+        } else {
+            return searchResults.get(0);
+        }
     }
 
     /**
