@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 import java.security.KeyPair;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.util.HashMap;
@@ -26,17 +27,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.jose.builders.JweHeaderBuilder;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
-import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuthProblemException;
+import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,17 +56,27 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
     private final byte[] clientSecret;
-    private final KeyPair keyPair;
-    private final String algorithm;
-    private final String kid;
+    private final KeyPair signingKeyPair;
+    private final PublicKey encryptionPublicKey;
+    private final String signingAlgorithm;
+    private final boolean isIDTokenEncryptionEnabled;
+    private final String encryptionAlgorithm;
+    private final String encryptionMethod;
+    private final String signingKeyId;
+    private final String encryptionKeyId;
 
     /**
      * Constructs a new OpenIdConnectToken.
      *
-     * @param kid The key id.
+     * @param signingKeyId The signing key id.
+     * @param encryptionKeyId The encryption key id.
      * @param clientSecret The client's secret.
-     * @param keyPair The token's signing key pair.
-     * @param algorithm The algorithm.
+     * @param signingKeyPair The token's signing key pair.
+     * @param encryptionPublicKey The token's encryption public key.
+     * @param signingAlgorithm The signing algorithm.
+     * @param encryptionAlgorithm The encryption algorithm.
+     * @param encryptionMethod The encryption method.
+     * @param isIDTokenEncryptionEnabled {@code true} If ID token encryption is enabled.
      * @param iss The issuer.
      * @param sub The subject.
      * @param aud The audience.
@@ -75,14 +91,20 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param acr The acr.
      * @param amr The amr.
      */
-    public OpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
-            String sub, String aud, String azp, long exp, long iat, long authTime, String nonce, String ops,
-            String atHash, String cHash, String acr, List<String> amr) {
+    public OpenIdConnectToken(String signingKeyId, String encryptionKeyId, byte[] clientSecret, KeyPair signingKeyPair,
+            PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm, String encryptionMethod,
+            boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp, long exp, long iat,
+            long authTime, String nonce, String ops, String atHash, String cHash, String acr, List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
-        this.algorithm = algorithm;
-        this.keyPair = keyPair;
-        this.kid = kid;
+        this.signingAlgorithm = signingAlgorithm;
+        this.isIDTokenEncryptionEnabled = isIDTokenEncryptionEnabled;
+        this.encryptionAlgorithm = encryptionAlgorithm;
+        this.encryptionMethod = encryptionMethod;
+        this.signingKeyPair = signingKeyPair;
+        this.encryptionPublicKey = encryptionPublicKey;
+        this.signingKeyId = signingKeyId;
+        this.encryptionKeyId = encryptionKeyId;
         setIss(iss);
         setSub(sub);
         setAud(aud);
@@ -254,7 +276,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      */
     public String getTokenId() throws ServerException {
         try {
-            return sign().build();
+            return createJwt().build();
         } catch (SignatureException e) {
             logger.error("Cant get JWT id", e);
             throw new ServerException("Cant get JWT id");
@@ -274,7 +296,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     public Map<String, Object> toMap() throws ServerException {
         final Map<String, Object> tokenMap = new HashMap<String, Object>();
         try {
-            tokenMap.put(OAuth2Constants.JWTTokenParams.ID_TOKEN, sign());
+            tokenMap.put(OAuth2Constants.JWTTokenParams.ID_TOKEN, createJwt());
         } catch (SignatureException e) {
             logger.error("Cant sign JWT", e);
             throw new ServerException("Cant sign JWT");
@@ -295,27 +317,58 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @return A SignedJwt
      * @throws SignatureException If an error occurs with the signing of the OpenId Connect token.
      */
-    public SignedJwt sign() throws SignatureException {
-        final JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
-        if (jwsAlgorithm == null) {
-            logger.error("Unable to find jws algorithm for: " + algorithm);
-            throw new SignatureException();
+    private Jwt createJwt() throws SignatureException {
+        JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(signingAlgorithm);
+        if (isIDTokenEncryptionEnabled && (isEmpty(encryptionAlgorithm) || isEmpty(encryptionMethod)
+                || encryptionPublicKey == null)) {
+            logger.info("ID Token Encryption not set. algorithm: {}, method: {}", encryptionAlgorithm,
+                    encryptionMethod);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "ID Token Encryption not set. algorithm: " + encryptionAlgorithm + ", method: " + encryptionMethod);
         }
+        SigningHandler signingHandler = getSigningHandler(jwsAlgorithm);
 
-        final SigningHandler signingHandler;
+        JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(asMap()).build();
+        if (isIDTokenEncryptionEnabled) {
+            logger.info("ID Token Encryption enabled. algorithm: {}, method: {}", encryptionAlgorithm,
+                    encryptionMethod);
+            return createEncryptedJwt(signingHandler, jwsAlgorithm, claimsSet);
+        } else {
+            return createSignedJwt(signingHandler, jwsAlgorithm, claimsSet);
+        }
+    }
+
+    private SigningHandler getSigningHandler(JwsAlgorithm jwsAlgorithm) {
+        SigningHandler signingHandler;
         if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
-            signingHandler = new SigningManager().newRsaSigningHandler(keyPair.getPrivate());
+            signingHandler = new SigningManager().newRsaSigningHandler(signingKeyPair.getPrivate());
         } else if (JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
-            signingHandler = new SigningManager().newEcdsaSigningHandler((ECPrivateKey) keyPair.getPrivate());
+            signingHandler = new SigningManager().newEcdsaSigningHandler((ECPrivateKey) signingKeyPair.getPrivate());
         } else {
             signingHandler = new SigningManager().newHmacSigningHandler(clientSecret);
         }
+        return signingHandler;
+    }
 
+    private Jwt createEncryptedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
+        JweHeaderBuilder builder = jwtBuilderFactory.jwe(encryptionPublicKey).headers()
+                .alg(JweAlgorithm.parseAlgorithm(encryptionAlgorithm))
+                .enc(EncryptionMethod.parseMethod(encryptionMethod));
+        if (encryptionKeyId != null) {
+            builder.kid(encryptionKeyId);
+        }
+        return builder.done().claims(claimsSet)
+                .sign(signingHandler, jwsAlgorithm)
+                .headers()
+                .kid(signingKeyId)
+                .done()
+                .asJwt();
+    }
+
+    private Jwt createSignedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
         JwsHeaderBuilder builder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm);
-        JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(asMap()).build();
-
-        if (kid != null) {
-            builder.kid(kid);
+        if (signingKeyId != null) {
+            builder.kid(signingKeyId);
         }
         return builder.done().claims(claimsSet).asJwt();
     }

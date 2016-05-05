@@ -19,6 +19,7 @@ package org.forgerock.openam.openidconnect;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.security.KeyPair;
+import java.security.PublicKey;
 import java.util.List;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openidconnect.OpenIdConnectToken;
@@ -33,10 +34,15 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
     /**
      * Constructs a new OpenAMOpenIdConnectToken.
      *
-     * @param kid The key id.
+     * @param signingKeyId The signing key id.
+     * @param encryptionKeyId The encryption key id.
      * @param clientSecret The client's secret.
-     * @param algorithm The algorithm.
-     * @param keyPair The token's signing key pair.
+     * @param signingAlgorithm The signing algorithm.
+     * @param encryptionAlgorithm The encryption algorithm.
+     * @param encryptionMethod The encryption method.
+     * @param signingKeyPair The token's signing key pair.
+     * @param encryptionPublicKey The token's encryption public key.
+     * @param isIDTokenEncryptionEnabled {@code true} if ID token encryption is enabled.
      * @param iss The issuer.
      * @param sub The subject.
      * @param aud The audience.
@@ -52,11 +58,13 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param amr The amr.
      * @param realm The realm.
      */
-    public OpenAMOpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
-            String sub, String aud, String azp, long exp, long iat, long authTime, String nonce, String ops,
-            String atHash, String cHash, String acr, List<String> amr, String realm) {
-        super(kid, clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, authTime,
-                nonce, ops, atHash, cHash, acr, amr);
+    public OpenAMOpenIdConnectToken(String signingKeyId, String encryptionKeyId, byte[] clientSecret,
+            KeyPair signingKeyPair, PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm,
+            String encryptionMethod, boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp,
+            long exp, long iat, long authTime, String nonce, String ops, String atHash, String cHash, String acr,
+            List<String> amr, String realm) {
+        super(signingKeyId, encryptionKeyId, clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
+                encryptionMethod, isIDTokenEncryptionEnabled, iss, sub, aud, azp, exp, iat, authTime, nonce, ops, atHash, cHash, acr, amr);
         setRealm(realm);
     }
 

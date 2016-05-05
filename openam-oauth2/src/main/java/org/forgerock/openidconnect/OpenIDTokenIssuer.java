@@ -89,12 +89,8 @@ public class OpenIDTokenIssuer {
                         nonce,
                         getOps(accessToken, request),
                         request);
-                final SignedJwt signedJwt = openIdToken.sign();
-                return new AbstractMap.SimpleEntry<String, String>(
-                        OAuth2Constants.JWTTokenParams.ID_TOKEN, signedJwt.build());
-            } catch (SignatureException e) {
-                logger.error("Unable to sign JWT", e);
-                throw new ServerException("Cant sign JWT");
+                return new AbstractMap.SimpleEntry<>(
+                        OAuth2Constants.JWTTokenParams.ID_TOKEN, openIdToken.getTokenId());
             } catch (OAuth2Exception e) {
                 logger.error("User must be authenticated to issue ID tokens.", e);
                 throw new ServerException("User must be authenticated to issue ID tokens.");

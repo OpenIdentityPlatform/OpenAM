@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -98,6 +98,17 @@ public interface OpenAMSettings {
      * @throws SMSException If there is a problem getting the setting value.
      */
     KeyPair getServerKeyPair(String realm) throws SMSException, SSOException;
+
+    /**
+     * Gets the key pair that OpenAM is configured to use for the specified realm.
+     *
+     * @param realm The realm.
+     * @param attributeName The attribute name the alias for the key pair is stored.
+     * @return The key pair.
+     * @throws SSOException If there is a problem getting the setting value.
+     * @throws SMSException If there is a problem getting the setting value.
+     */
+    KeyPair getServerKeyPair(String realm, String attributeName) throws SMSException, SSOException;
 
     /**
      * Gets the name of the SSO Cookie.

@@ -616,6 +616,16 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return getSettingStrings(OAuth2ProviderService.ID_TOKEN_SIGNING_ALGORITHMS);
     }
 
+    @Override
+    public Set<String> getSupportedIDTokenEncryptionAlgorithms() throws ServerException {
+        return getSettingStrings("supportedIDTokenEncryptionAlgorithms");
+    }
+
+    @Override
+    public Set<String> getSupportedIDTokenEncryptionMethods() throws ServerException {
+        return getSettingStrings("supportedIDTokenEncryptionMethods");
+    }
+
     /**
      * {@inheritDoc}
      */
