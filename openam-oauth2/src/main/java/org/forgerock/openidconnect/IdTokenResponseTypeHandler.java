@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
@@ -29,24 +32,31 @@ import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * Implementation of the ResponseTypeHandler for handling OpenId Connect token response types.
  *
  * @since 12.0.0
  */
-public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler {
+@Singleton
+public class IdTokenResponseTypeHandler implements ResponseTypeHandler {
 
     private final OpenIdConnectTokenStore tokenStore;
+    private final OpenAMSettings openAMSettings;
 
     /**
      * Constructs a new IdTokenResponseTypeHandler.
      *
      * @param tokenStore An instance of the OpenIdConnectTokenStore.
+     * @param openAMSettings An instance of the OpenAMSettings.
      */
     @Inject
-    public IdTokenResponseTypeHandler(OpenIdConnectTokenStore tokenStore) {
+    public IdTokenResponseTypeHandler(OpenIdConnectTokenStore tokenStore, OpenAMSettings openAMSettings) {
         this.tokenStore = tokenStore;
+        this.openAMSettings = openAMSettings;
     }
 
     /**
@@ -70,7 +80,18 @@ public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler 
      * @param request The OAuth2 request.
      * @return The ops value.
      */
-    protected abstract String getOps(OAuth2Request request);
+    private String getOps(OAuth2Request request) {
+        final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
+        if (req.getCookies() != null) {
+            final String cookieName = openAMSettings.getSSOCookieName();
+            for (final Cookie cookie : req.getCookies()) {
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * {@inheritDoc}

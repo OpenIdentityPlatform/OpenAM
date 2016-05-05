@@ -46,6 +46,8 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
         tokenLifetimeAttributeNames.add(ACCESS_TOKEN_LIFETIME_NAME);
         tokenLifetimeAttributeNames.add(JWT_TOKEN_LIFETIME_NAME);
         attributes.addAll(tokenLifetimeAttributeNames);
+
+        attributes.add(RESPONSE_TYPE_LIST);
     }
 
     @Override
@@ -75,6 +77,8 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
             }
         } else if (tokenLifetimeAttributeNames.contains(newAttr.getName())) {
             return newAttr;
+        } else if (RESPONSE_TYPE_LIST.equals(newAttr.getName())) {
+            return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
         }
 
         return null;
