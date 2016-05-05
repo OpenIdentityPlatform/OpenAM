@@ -35,6 +35,7 @@ import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.security.AccessController;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -59,12 +61,16 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.opensso.GeneralAccessDeniedError;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
@@ -119,12 +125,15 @@ import org.forgerock.util.promise.Promise;
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class IdentityResourceV2 implements CollectionResourceProvider {
+public final class IdentityResourceV2 implements CollectionResourceProvider, ServiceListener {
 
     private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
 
     private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
-    private static Debug debug = Debug.getInstance("frRest");
+    private static final Map<String, ServiceConfig> mailServiceConfigMapByRealm = new ConcurrentHashMap<String, ServiceConfig>();
+
+    private static final Debug debug = Debug.getInstance("frRest");
+
 
     public static final String USER_TYPE = "user";
     public static final String GROUP_TYPE = "group";
@@ -140,14 +149,14 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     private ServiceConfigManager mailmgr;
     private ServiceConfig mailscm;
-    private Map<String, HashSet<String>> mailattrs;
+    private Map<String, Set<String>> mailattrs;
 
     final static String MAIL_IMPL_CLASS = "forgerockMailServerImplClassName";
     final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
     final static String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
+    final static String MAIL_ATTRIBUTE = "openamEmailAttribute";
 
     final static String UNIVERSAL_ID = "universalid";
-    final static String MAIL = "mail";
     final static String UNIVERSAL_ID_ABBREV = "uid";
     final static String USERNAME = "username";
     final static String EMAIL = "email";
@@ -219,6 +228,32 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         return identityResourceV1.addRoleInformation(context, resourceId, value);
     }
 
+    @Override
+    public void schemaChanged(String serviceName, String version) {
+        debug.message("The schemaChanged ServiceListener method was invoked for service='{}'", serviceName);
+    }
+
+    @Override
+    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,
+            int type) {
+        debug.message("The globalConfigChanged ServiceListener method was invoked for for service='{}'", serviceName);
+    }
+
+    @Override
+    public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+            String serviceComponent, int type) {
+
+        if (debug.messageEnabled()) {
+            debug.message("The organizationConfigChanged ServiceListener method was invoked for service='{}'," +
+                    " orgName='{}'", serviceName, orgName);
+        }
+
+        if (serviceName.equalsIgnoreCase(MailServerImpl.SERVICE_NAME) && version.equalsIgnoreCase(MailServerImpl
+                .SERVICE_VERSION)) {
+            String realm = DNMapper.orgNameToRealmName(orgName).toLowerCase();
+            mailServiceConfigMapByRealm.remove(realm);
+        }
+    }
     /**
      * Gets the user id from the session provided in the server context
      *
@@ -427,31 +462,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private void sendNotification(String to, String subject, String message,
                                   String realm, String confirmationLink) throws ResourceException {
 
-        try {
-            mailmgr = new ServiceConfigManager(RestUtils.getToken(),
-                    MailServerImpl.SERVICE_NAME, MailServerImpl.SERVICE_VERSION);
-            mailscm = mailmgr.getOrganizationConfig(realm,null);
-            mailattrs = mailscm.getAttributes();
-
-        } catch (SMSException smse) {
-            if (debug.errorEnabled()) {
-                debug.error("{} :: Cannot create service {}", SEND_NOTIF_TAG, MailServerImpl.SERVICE_NAME, smse);
-            }
-            throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, smse);
-
-        } catch (SSOException ssoe) {
-            if (debug.errorEnabled()) {
-                debug.error("{} :: Invalid SSOToken ", SEND_NOTIF_TAG, ssoe);
-            }
-            throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, ssoe);
-        }
-
-        if (mailattrs == null || mailattrs.isEmpty()) {
-            if (debug.errorEnabled()) {
-                debug.error("{} :: no attrs set {}", SEND_NOTIF_TAG, mailattrs);
-            }
-            throw new NotFoundException("No service Config Manager found for realm " + realm);
-        }
+        ServiceConfig mailscm = getMailServiceConfig(realm);
+        Map<String, Set<String>> mailattrs = mailscm.getAttributes();
 
         // Get MailServer Implementation class
         String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
@@ -708,6 +720,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         final JsonValue jsonBody = request.getContent();
 
         try {
+            ServiceConfig mailscm = getMailServiceConfig(realm);
+            String mailLDAPAttribute = CollectionHelper.getMapAttr(mailscm.getAttributes(), MAIL_ATTRIBUTE);
 
             // Check to make sure forgotPassword enabled
             if (restSecurity == null) {
@@ -753,7 +767,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 String uid = null;
                 for (Map.Entry<String, Set<String>> attribute : asMap(identityDetails.getAttributes()).entrySet()) {
                     String attributeName = attribute.getKey();
-                    if (MAIL.equalsIgnoreCase(attributeName)) {
+                    if (mailLDAPAttribute.equalsIgnoreCase(attributeName)) {
                         if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
                             email = attribute.getValue().iterator().next();
                         }
@@ -853,7 +867,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         }
 
         if (email != null && !email.isEmpty()) {
-            return Collections.singletonMap(MAIL, Collections.singleton(email));
+            String mailLDAPAttribute = CollectionHelper.getMapAttr(mailscm.getAttributes(), MAIL_ATTRIBUTE);
+            return Collections.singletonMap(mailLDAPAttribute, Collections.singleton(email));
         }
 
         throw new BadRequestException("Username or email not provided in request");
@@ -1366,4 +1381,40 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private String getObjectType() {
         return objectType;
     }
+
+    private ServiceConfig getMailServiceConfig(String realm) throws InternalServerErrorException, NotFoundException {
+        realm = DNMapper.orgNameToRealmName(realm).toLowerCase();
+        ServiceConfig mailscm = mailServiceConfigMapByRealm.get(realm);
+        if (mailscm == null || !mailscm.isValid()) {
+            synchronized (mailServiceConfigMapByRealm) {
+                mailscm = mailServiceConfigMapByRealm.get(realm);
+                if (mailscm == null || !mailscm.isValid()) {
+
+                    try {
+                        SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                        ServiceConfigManager mailmgr = new ServiceConfigManager(token, MailServerImpl.SERVICE_NAME,
+                                                                                MailServerImpl.SERVICE_VERSION);
+                        mailscm = mailmgr.getOrganizationConfig(realm, null);
+                        Map<String, Set<String>> mailattrs = mailscm.getAttributes();
+
+                        if (mailattrs == null || mailattrs.isEmpty()) {
+                            throw new InternalServerErrorException("No service Config Manager found for realm " + realm);
+                        }
+                        mailmgr.addListener(this);
+                        mailServiceConfigMapByRealm.put(realm.toLowerCase(), mailscm);
+
+                    } catch (SMSException smse) {
+                        throw new InternalServerErrorException("Cannot retrieve configuration '" +
+                                                                       MailServerImpl.SERVICE_NAME + "'.", smse);
+
+                    } catch (SSOException ssoe) {
+                        throw new InternalServerErrorException("Cannot retrieve configuration '" +
+                                                                       MailServerImpl.SERVICE_NAME + "'.", ssoe);
+                    }
+                }
+            }
+        }
+        return mailscm;
+    }
+
 }
