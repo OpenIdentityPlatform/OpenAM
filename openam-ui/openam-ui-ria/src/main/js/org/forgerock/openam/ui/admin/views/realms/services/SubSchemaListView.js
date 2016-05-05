@@ -45,8 +45,8 @@ define([
                 ServicesService.type.subSchema.type.getCreatables(this.options.realmPath, this.options.type)
             ]).then((response) => {
                 const data = _.merge({}, this.options, {
-                    instances: response[0],
-                    creatables:response[1]
+                    instances: response[0][0],
+                    creatables:response[1][0]
                 });
 
                 UIUtils.fillTemplateWithData(this.template, data, (html) => {

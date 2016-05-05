@@ -64,8 +64,8 @@ define([
             }).then((data) => _.sortBy(data.result, "_id")),
         get: (id) =>
             Promise.all([getSchema(), getValues(id)]).then((response) => ({
-                schema: new JSONSchema(response[0]),
-                values: new JSONValues(response[1])
+                schema: new JSONSchema(response[0][0]),
+                values: new JSONValues(response[1][0])
             })),
         create: (data) =>
             obj.serviceCall({
@@ -96,8 +96,8 @@ define([
         },
         getInitialState: () =>
             Promise.all([getSchema(), getTemplate()]).then((response) => ({
-                schema: new JSONSchema(response[0]),
-                values: new JSONValues(response[1])
+                schema: new JSONSchema(response[0][0]),
+                values: new JSONValues(response[1][0])
             }))
     };
 
