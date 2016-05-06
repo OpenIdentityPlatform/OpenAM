@@ -64,6 +64,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.guava.common.collect.ImmutableList;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
@@ -2869,26 +2870,23 @@ public class LoginState {
      * @return set of  <code>SSOToken</code> associated with subject
      */
     Set<String> getTokenFromPrincipal(Subject subject) {
-        Set<Principal> principal = subject.getPrincipals();
-        Set<String> tokenSet = new HashSet<String>();
-        StringBuilder pList = new StringBuilder();
-        Iterator<Principal> p = principal.iterator();
+        Set<String> tokenSet = new HashSet<>();
+        List<String> principalNames = new ArrayList<>(subject.getPrincipals().size());
 
-        while (p.hasNext()) {
-            this.token = (p.next()).getName();
-            if (this.token != null && !containsToken(pList, token)) {
-                pList.append(this.token).append("|");
-                String tmpDN = DNUtils.normalizeDN(this.token);
-                if (tmpDN != null) {
-                    this.userDN = tmpDN;
-                    this.token = DNUtils.DNtoName(this.token);
-                } else if (tmpDN == null && this.userDN == null) {
-                    this.userDN = this.token;
+        for (Principal p : subject.getPrincipals()) {
+            token = p.getName();
+            if (token != null && !principalNames.contains(token)) {
+                principalNames.add(token);
+                if (LDAPUtils.isDN(token)) {
+                    userDN = token;
+                    token = DNUtils.DNtoName(token);
+                } else if (!LDAPUtils.isDN(token) && userDN == null) {
+                    userDN = token;
                 }
             }
 
-            if (!tokenSet.contains(this.token)) {
-                tokenSet.add(this.token);
+            if (!tokenSet.contains(token)) {
+                tokenSet.add(token);
             }
 
             if (DEBUG.messageEnabled()) {
@@ -2896,11 +2894,7 @@ public class LoginState {
             }
         }
 
-        principalList = pList.toString();
-        if (principalList != null) {
-            principalList = principalList.substring(0,
-                    principalList.length() - 1); // remove the last "|"
-        }
+        principalList = Joiner.on('|').join(principalNames);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Principal List is :" + principalList);
@@ -5281,28 +5275,6 @@ public class LoginState {
      */
     public boolean ignoreProfile() {
         return ignoreUserProfile;
-    }
-
-    boolean containsToken(StringBuilder principalBuffer, String token) {
-        String principalString = principalBuffer.toString();
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("principalString : " + principalString);
-        }
-
-        try {
-            StringTokenizer st = new StringTokenizer(principalString, "|");
-            while (st.hasMoreTokens()) {
-                String s = st.nextToken();
-                if (s.equals(token)) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            if (DEBUG.warningEnabled()) {
-                DEBUG.warning("getToken: ", e);
-            }
-        }
-        return false;
     }
 
     /**
