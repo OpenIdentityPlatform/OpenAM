@@ -68,8 +68,8 @@ define([
     obj.servers = {
         get: (server, section) => Promise.all([getSchema(server, section), getValues(server, section)])
         .then((response) => ({
-            schema: response[0][0],
-            values: response[1][0]
+            schema: response[0],
+            values: response[1]
         })),
         getAll: () => obj.serviceCall({
             url: "?_queryFilter=true",
