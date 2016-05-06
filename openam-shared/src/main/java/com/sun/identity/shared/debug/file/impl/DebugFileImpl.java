@@ -135,6 +135,10 @@ public class DebugFileImpl implements DebugFile {
         }
     }
 
+    private boolean isConfigFileInitialized() {
+        return currentFile != null && currentFile.exists();
+    }
+
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
 
@@ -151,7 +155,7 @@ public class DebugFileImpl implements DebugFile {
             buf.append(stBuf.toString());
         }
 
-        if (isConfigChanged()) {
+        if (isConfigChanged() || !isConfigFileInitialized()) {
             initialize();
         }
 
@@ -161,7 +165,7 @@ public class DebugFileImpl implements DebugFile {
 
         fileLock.readLock().lock();
         try {
-            if (debugWriter != null) { 
+            if (debugWriter != null) {
                 debugWriter.println(buf.toString());
             } else {
                 StdDebugFile.printError(prefix, msg, th);

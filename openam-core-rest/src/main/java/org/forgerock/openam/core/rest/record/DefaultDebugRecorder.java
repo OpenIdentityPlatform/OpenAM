@@ -581,13 +581,13 @@ public class DefaultDebugRecorder implements DebugRecorder {
         private long getFileSize(File folder) {
             long folderSize = 0;
             File[] fileList = folder.listFiles();
-            for (int i = 0;
-                    i < fileList.length;
-                    i++) {
-                if (fileList[i].isDirectory()) {
-                    folderSize += getFileSize(fileList[i]);
-                } else {
-                    folderSize += fileList[i].length();
+            if (fileList != null) {
+                for (File file : fileList) {
+                    if (file.isDirectory()) {
+                        folderSize += getFileSize(file);
+                    } else {
+                        folderSize += file.length();
+                    }
                 }
             }
             return folderSize;
