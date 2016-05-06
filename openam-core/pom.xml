@@ -362,10 +362,6 @@
             <artifactId>jdmkrt</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>publicsuffix</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <classifier>no_aop</classifier>

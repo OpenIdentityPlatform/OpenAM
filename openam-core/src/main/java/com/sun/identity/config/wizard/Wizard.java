@@ -24,7 +24,7 @@
  *
  * $Id: Wizard.java,v 1.27 2009/01/17 02:05:35 kevinserwin Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
@@ -279,12 +279,8 @@ public class Wizard extends ProtectedPage implements Constants {
                 SetupConstants.ENCRYPTED_LDAP_USER_PWD, tmp);
         }
 
-        String cookie = (String)getContext().getSessionAttribute(
-            SessionAttributeNames.COOKIE_DOMAIN);
-        if (cookie == null) {
-            cookie = getCookieDomain();
-        }
-        request.addParameter(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, cookie);       
+        String cookieDomain = (String)getContext().getSessionAttribute(SessionAttributeNames.COOKIE_DOMAIN);
+        request.addParameter(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, cookieDomain);
         
         String locale = (String)getContext().getSessionAttribute(
             SessionAttributeNames.PLATFORM_LOCALE);

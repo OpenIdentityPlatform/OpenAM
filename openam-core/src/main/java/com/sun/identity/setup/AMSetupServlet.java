@@ -33,6 +33,7 @@ import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
+import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedReader;
@@ -904,6 +905,12 @@ public class AMSetupServlet extends HttpServlet {
         try {
             if (!isDITLoaded) {
                 ServerConfiguration.createDefaults(adminSSOToken);
+                final String cookieDomain = (String) map.get(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN);
+                if (isNotEmpty(cookieDomain)) {
+                    ServiceSchemaManager scm = new ServiceSchemaManager(Constants.SVC_NAME_PLATFORM, adminSSOToken);
+                    ServiceSchema globalSchema = scm.getGlobalSchema();
+                    globalSchema.setAttributeDefaults(Constants.ATTR_COOKIE_DOMAINS, asSet(cookieDomain));
+                }
             }
             if (!isDITLoaded || !ServerConfiguration.isServerInstanceExist(adminSSOToken, serverInstanceName)) {
                 ServerConfiguration.createServerInstance(adminSSOToken, serverInstanceName,

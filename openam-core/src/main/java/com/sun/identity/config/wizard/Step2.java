@@ -24,7 +24,7 @@
  *
  * $Id: Step2.java,v 1.15 2010/01/04 19:08:36 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
@@ -32,31 +32,21 @@ package com.sun.identity.config.wizard;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import org.apache.click.control.ActionLink;
-import org.publicsuffix.PSS;
+import org.forgerock.openam.utils.StringUtils;
 
 public class Step2 extends ProtectedPage {
     public ActionLink validateConfigDirLink = 
         new ActionLink("validateConfigDir", this, "validateConfigDir");
     public ActionLink validateCookieDomainLink = 
         new ActionLink("validateCookieDomain", this, "validateCookieDomain");
-    private PSS publicSuffixies = null;
 
-    public Step2() {
-        try {
-            publicSuffixies = new PSS();
-        } catch (IOException ioe) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "Unable to load public suffix database");
-        }
-    }
-    
     @Override
     public void onInit() {
         String val = (String)getContext().getSessionAttribute(
@@ -156,21 +146,13 @@ public class Step2 extends ProtectedPage {
     public boolean validateCookieDomain() {
         String serverUrl = toString("serverurl");
         String domain = toString("domain");
-        
-        if (domain == null) {
-            writeToResponse(getLocalizedString("missing.required.field"));
-        } else if (domain.indexOf(':') != -1) {
-            writeToResponse(getLocalizedString(
-                "configuration.wizard.step2.invalid.cookie.domain"));
-        } else if (invalidCookieDomain(serverUrl, domain)) {
-             writeToResponse("warning" + getLocalizedString( 
-                "configuration.wizard.step2.invalid.tld"));   
+
+        if (!ServicesDefaultValues.isCookieDomainValid(domain)) {
+            writeToResponse(getLocalizedString("configurator.invalidcookiedomain"));
         } else if (mismatchedCookieDomain(serverUrl, domain)) {
-             writeToResponse("warning" + getLocalizedString(
-                "configuration.wizard.step2.mismatched.cookie.domain"));            
+             writeToResponse("warning" + getLocalizedString("configuration.wizard.step2.mismatched.cookie.domain"));
         } else {
-            getContext().setSessionAttribute(
-                SessionAttributeNames.COOKIE_DOMAIN, domain);
+            getContext().setSessionAttribute(SessionAttributeNames.COOKIE_DOMAIN, domain);
             writeToResponse("true");
         }
         setPath(null);
@@ -178,51 +160,19 @@ public class Step2 extends ProtectedPage {
     }
     
     private boolean mismatchedCookieDomain(String serverUrl, String domain) {
-        if (serverUrl == null || domain == null) {
-            return false;
-        }
-
-        return !serverUrl.contains(domain);
-    }
-    
-    private boolean invalidCookieDomain(String serverUrl, String domain) {
-        if (publicSuffixies == null) {
-            return false;
-        }
-        
-        if (serverUrl == null || domain == null) {
-            return false;
-        }
-        
-        URL url = null;
-        
-        try {
-            url = new URL(serverUrl);
-        } catch (MalformedURLException mue) {
-            return false;
-        }
-        
-        if (url != null) {
-            String tld = getTLDFromFQDN(url.getHost());
-
-            if (domain.equals(tld)) {
-                return true;
+        if (StringUtils.isNotEmpty(serverUrl) && StringUtils.isNotEmpty(domain)) {
+            try {
+                URL url = new URL(serverUrl);
+                return !url.getHost().endsWith(domain);
+            } catch (MalformedURLException mue) {
+                return false;
             }
         }
 
         return false;
     }
 
-    private String getTLDFromFQDN(String fqdn) {
-        if (publicSuffixies == null) {
-            return null;
-        }
-
-        int tldLength = publicSuffixies.getEffectiveTLDLength(fqdn);
-        return fqdn.substring(tldLength);
-    }
-
-    private String getServerURL() {        
+    private String getServerURL() {
         String hostname = (String)getContext().getRequest().getServerName();
         int portnum  = (int)getContext().getRequest().getServerPort();
         String protocol = (String)getContext().getRequest().getScheme();
