@@ -22,11 +22,9 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014 Forgerock AS.
- *
  * $Id: RegExResourceName.java,v 1.1 2009/12/07 19:53:02 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -178,30 +176,14 @@ public class RegExResourceName implements ResourceName {
                 return pattern;
             }
 
-            StringBuilder buff = new StringBuilder();
-            for (int i = 0; i < strPattern.length()-1; i++) {
-                char c = strPattern.charAt(i);
-                if (c == '.') {
-                    buff.append("\\.");
-                } else if (c == '*') {
-                    buff.append(".*?");
-                } else if (c == '?') {
-                    buff.append("\\?");
-                } else if (c == '+') {
-                    buff.append("\\+");
-                } else {
-                    buff.append(c);
-                }
-            }
+            // take every non-star character literally, and replace * with .*? to get a compilable regex
+            String buff = strPattern.replaceAll("([^*]+)", "\\\\Q$1\\\\E").replace("*", ".*?");
 
-            char lastChar = strPattern.charAt(strPattern.length()-1);
-            if (lastChar == '*') {
-                buff.append(".*");
-            } else {
-                buff.append(lastChar);
+            // replace trailing .*? with .*
+            if(buff.endsWith(".*?")) {
+                buff = buff.substring(0, buff.length()-1);
             }
-
-            pattern = Pattern.compile(buff.toString() + "(.*)");
+            pattern = Pattern.compile(buff + "(.*)");
             patternCache.put(strPattern, pattern);
             return pattern;
         } finally {
