@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.saml2;
 
@@ -59,7 +59,7 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
         // When in ECP mode, can only be a SOAP binding.
         this.reqBinding = isFromECP ? SAML2Constants.SOAP : reqBinding;
         this.saml2MetaManager = saml2MetaManager;
-        debug.message("Using request binding: {0}", reqBinding);
+        debug.message("Using request binding: {}", reqBinding);
     }
 
     /**
@@ -74,10 +74,10 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
      */
     public String getMetaAlias(HttpServletRequest request) throws ClientFaultException {
         String r = request.getParameter(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
-        debug.message("Checking for Meta Alias in Parameter: {0}", r);
+        debug.message("Checking for Meta Alias in Parameter: {}", r);
         if (StringUtils.isBlank(r)) {
             r = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
-            debug.message("Checking for Meta Alias in URI: {0}", r);
+            debug.message("Checking for Meta Alias in URI: {}", r);
         }
         if (StringUtils.isBlank(r)) {
             throw new ClientFaultException("IDPMetaAliasNotFound");
@@ -100,7 +100,7 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
         try {
             idpEntityID = saml2MetaManager.getEntityByMetaAlias(idpMetaAlias);
             if (StringUtils.isBlank(idpEntityID)) {
-                debug.error("Failed to locate IDP Entity ID\nRealm: {0}\nIDP Meta Alias: {1}", realm, idpMetaAlias);
+                debug.error("Failed to locate IDP Entity ID\nRealm: {}\nIDP Meta Alias: {}", realm, idpMetaAlias);
                 LogUtil.error(Level.INFO, LogUtil.INVALID_IDP, new String[]{idpEntityID}, null);
                 throw new ClientFaultException("nullIDPEntityID");
             }
@@ -109,12 +109,12 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
                     realm, idpEntityID, SAML2Constants.SSO_SERVICE, reqBinding);
 
             if (!profileEnabled) {
-                debug.error("SSO Binding {0} is not enabled for {0}", reqBinding, idpEntityID);
+                debug.error("SSO Binding {} is not enabled for {}", reqBinding, idpEntityID);
                 LogUtil.error(Level.INFO, LogUtil.BINDING_NOT_SUPPORTED, new String[]{ idpEntityID, reqBinding }, null);
                 throw new ClientFaultException("unsupportedBinding");
             }
         } catch (SAML2MetaException sme) {
-            debug.error("Unable to get IDP Entity ID from meta: {0}", sme.getMessage());
+            debug.error("Unable to get IDP Entity ID from meta: {}", sme.getMessage());
             LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, new String[]{ idpMetaAlias }, null);
             throw new ServerFaultException("nullIDPEntityID", sme.getMessage());
         }
@@ -135,17 +135,17 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
     public SAML2IdentityProviderAdapter getIDPAdapter(String realm, String idpEntityID) {
         SAML2IdentityProviderAdapter r;
         if (idpEntityID == null) {
-            if (debug.errorEnabled()) debug.error("No IDP Entity ID provided");
+            debug.error("No IDP Entity ID provided");
             r = new DefaultIDPAdapter();
         } else {
             try {
                 r = IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
             } catch (SAML2Exception se2) {
-                debug.error("Unexpected error instantiating IDP Adapter: {0}", se2.getMessage(), se2);
+                debug.error("Unexpected error instantiating IDP Adapter: {}", se2.getMessage(), se2);
                 r = new DefaultIDPAdapter();
             }
         }
-        debug.message("Using IDP Adapter class: {0}", r.getClass().getSimpleName());
+        debug.message("Using IDP Adapter class: {}", r.getClass().getSimpleName());
         return r;
     }
 
