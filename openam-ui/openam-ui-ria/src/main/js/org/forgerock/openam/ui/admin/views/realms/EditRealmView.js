@@ -152,8 +152,8 @@ define([
                     this.jsonSchemaView = new FlatJSONSchemaView({
                         values: new JSONValues(data.values),
                         schema: new JSONSchema(data.schema)
-                    });
-                    $(this.jsonSchemaView.render().el).appendTo(element);
+                    }).render().$el.appendTo(element);
+
                     const FRAGMENT_INDEX = 0;
                     new Backlink().render(FRAGMENT_INDEX);
                     setAutofocus();
