@@ -277,8 +277,8 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.4.2</nodeVersion>
-                            <npmVersion>3.8.5</npmVersion>
+                            <nodeVersion>v4.4.3</nodeVersion>
+                            <npmVersion>3.8.8</npmVersion>
                             <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot>
                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
                         </configuration>

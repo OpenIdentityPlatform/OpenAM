@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/CreatedResourcesView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -132,7 +132,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
 
             if (duplicateIndex >= 0) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
-                this.flashDomItem(this.$el.find("#createdResources ul li:eq(" + duplicateIndex + ")"), "text-danger");
+                this.flashDomItem(this.$el.find(`#createdResources ul li:eq(${duplicateIndex})`), "text-danger");
             } else {
                 this.data.entity.resources.push(resource);
                 this.data.options.justAdded = resource;

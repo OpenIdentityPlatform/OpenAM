@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/URLHelper", [
+define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -24,8 +24,9 @@ define("org/forgerock/openam/ui/common/util/URLHelper", [
         substitute: function (url) {
             return function () {
                 var realm = AdministeredRealmsHelper.getCurrentRealm(),
-                    apiUrlBase = Constants.host + "/" + Constants.context + "/json" +
-                        (realm !== "/" ? RealmHelper.encodeRealm(realm) : "");
+                    apiUrlBase = `${Constants.host}/${Constants.context}/json${
+                        (realm !== "/" ? RealmHelper.encodeRealm(realm) : "")
+                        }`;
 
                 return url.replace("__api__", apiUrlBase)
                     .replace("__host__", Constants.host)

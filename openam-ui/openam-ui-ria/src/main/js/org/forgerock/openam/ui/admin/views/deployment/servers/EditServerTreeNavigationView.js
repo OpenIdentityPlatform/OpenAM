@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView", [
+define([
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
     "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation",

@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -100,9 +100,7 @@ define("org/forgerock/openam/ui/admin/views/realms/ListRealmsView", [
         performDeleteRealm (path) {
             var self = this;
 
-            return RealmsService.realms.remove(path).then(() => {
-                return self.render();
-            }, (response) => {
+            return RealmsService.realms.remove(path).then(() => self.render(), (response) => {
                 if (response && response.status === 409) {
                     Messages.addMessage({
                         message: $.t("console.realms.parentRealmCannotDeleted"),

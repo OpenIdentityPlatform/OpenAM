@@ -26,7 +26,6 @@ import com.sun.identity.sm.SchemaType;
 import org.forgerock.openam.core.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.core.rest.sms.SmsServerPropertiesResource;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
-import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
@@ -60,7 +59,7 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("global-config/servers/{serverName}/properties/{tab}")
                 .auditAs(CONFIG)
                 .authorizeWith(PrivilegeAuthzModule.class)
-                .toSingleton(SmsServerPropertiesResource.class);
+                .toAnnotatedSingleton(SmsServerPropertiesResource.class);
     }
 
     @Inject

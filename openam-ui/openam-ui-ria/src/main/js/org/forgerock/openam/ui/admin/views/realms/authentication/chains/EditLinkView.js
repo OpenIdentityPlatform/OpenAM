@@ -14,9 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -90,12 +90,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 searchField: ["_id", "typeDescription"],
                                 render: {
                                     item: function (item) {
-                                        return "<div>" + item._id + " - <span class='text-muted'><em>" +
-                                            item.typeDescription + "</em></span></div>";
+                                        return `<div>${item._id} - <span class='text-muted'><em>${
+                                            item.typeDescription
+                                            }</em></span></div>`;
                                     },
                                     option: function (item) {
-                                        return "<div><div>" + item._id + "</div><div class='small text-muted'><em>" +
-                                            item.typeDescription + "</em></div></div>";
+                                        return `<div><div>${item._id}</div><div class='small text-muted'><em>${
+                                            item.typeDescription
+                                            }</em></div></div>`;
                                     }
                                 },
                                 onChange: function () {

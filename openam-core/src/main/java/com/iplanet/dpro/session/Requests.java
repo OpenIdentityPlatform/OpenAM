@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -102,12 +102,15 @@ public class Requests {
      */
     public SessionResponse getSessionResponseWithRetry(URL svcurl, SessionRequest sreq, Session session) throws SessionException {
         SessionResponse sres;
-        Object context = RestrictedTokenContext.getCurrent();
+        Object context;
 
         SSOToken appSSOToken = null;
-        if (!SystemProperties.isServerMode() && !(session.getID().getComingFromAuth())) {
+        if (!SystemProperties.isServerMode() && !session.getID().getComingFromAuth()) {
             appSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             session.createContext(appSSOToken);
+            context = session.getContext();
+        } else {
+            context = RestrictedTokenContext.getCurrent();
         }
         try {
             if (context != null) {

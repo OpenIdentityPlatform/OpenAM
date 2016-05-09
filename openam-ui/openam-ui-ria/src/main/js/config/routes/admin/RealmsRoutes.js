@@ -14,12 +14,12 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("config/routes/admin/RealmsRoutes", function () {
+define(function () {
     var scopedByRealm = function (fragment) {
-            return new RegExp("^realms\/((?:%2F)[^\/]*)\/" + fragment + "$");
+            return new RegExp(`^realms\/((?:%2F)[^\/]*)\/${fragment}$`);
         },
         defaultScopedByRealm = function (fragment) {
-            return scopedByRealm("?(?:" + fragment + ")?");
+            return scopedByRealm(`?(?:${fragment})?`);
         },
         routes = {
             "realms": {
@@ -48,7 +48,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsDashboard": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView",
-                url: defaultScopedByRealm("dashboard\/?"),
+                url: defaultScopedByRealm("dashboard/?"),
                 pattern: "realms/?/dashboard",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -57,7 +57,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationSettings": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
-                url: scopedByRealm("authentication-settings\/?"),
+                url: scopedByRealm("authentication-settings/?"),
                 pattern: "realms/?/authentication-settings",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -66,7 +66,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationChains": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView",
-                url: scopedByRealm("authentication-chains\/?"),
+                url: scopedByRealm("authentication-chains/?"),
                 pattern: "realms/?/authentication-chains",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -75,7 +75,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationChainEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView",
-                url: scopedByRealm("authentication-chains\/edit\/([^\/]+)"),
+                url: scopedByRealm("authentication-chains/edit/([^/]+)"),
                 pattern: "realms/?/authentication-chains/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin"
@@ -83,7 +83,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationChainNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/chains/AddChainView",
-                url: scopedByRealm("authentication-chains\/new"),
+                url: scopedByRealm("authentication-chains/new"),
                 pattern: "realms/?/authentication-chains/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -93,7 +93,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationModules": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView",
-                url: scopedByRealm("authentication-modules\/?"),
+                url: scopedByRealm("authentication-modules/?"),
                 pattern: "realms/?/authentication-modules",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -102,7 +102,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationModuleNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/modules/AddModuleView",
-                url: scopedByRealm("authentication-modules\/new"),
+                url: scopedByRealm("authentication-modules/new"),
                 pattern: "realms/?/authentication-modules/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -111,7 +111,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsAuthenticationModuleEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView",
-                url: scopedByRealm("authentication-modules\/([^\/]+)\/edit\/([^\/]+)"),
+                url: scopedByRealm("authentication-modules/([^/]+)/edit/([^/]+)"),
                 pattern: "realms/?/authentication-modules/?/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -120,7 +120,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsServices": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/ServicesView",
-                url: scopedByRealm("services\/?"),
+                url: scopedByRealm("services/?"),
                 pattern: "realms/?/services",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -129,7 +129,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsServiceEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceView",
-                url: scopedByRealm("services\/edit\/([^\/]+)"),
+                url: scopedByRealm("services/edit/([^/]+)"),
                 pattern: "realms/?/services/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -138,7 +138,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsServiceNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/NewServiceView",
-                url: scopedByRealm("services\/new"),
+                url: scopedByRealm("services/new"),
                 pattern: "realms/?/services/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -147,7 +147,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsServiceSubSchemaNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/NewServiceSubSchemaView",
-                url: scopedByRealm("services\/edit\/([^\/]+)\/([^\/]+)\/new"),
+                url: scopedByRealm("services/edit/([^/]+)/([^/]+)/new"),
                 pattern: "realms/?/services/edit/?/?/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -156,7 +156,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsServiceSubSchemaEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/services/EditServiceSubSchemaView",
-                url: scopedByRealm("services\/edit\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)"),
+                url: scopedByRealm("services/edit/([^/]+)/([^/]+)/edit/([^/]+)"),
                 pattern: "realms/?/services/edit/?/?/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -165,7 +165,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsPolicySets": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView",
-                url: scopedByRealm("authorization-policySets\/?"),
+                url: scopedByRealm("authorization-policySets/?"),
                 pattern: "realms/?/authorization-policySets",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -174,7 +174,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsPolicySetEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView",
-                url: scopedByRealm("authorization-policySets\/edit\/([^\/]+)"),
+                url: scopedByRealm("authorization-policySets/edit/([^/]+)"),
                 pattern: "realms/?/authorization-policySets/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -183,7 +183,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsPolicySetNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView",
-                url: scopedByRealm("authorization-policySets\/new"),
+                url: scopedByRealm("authorization-policySets/new"),
                 pattern: "realms/?/authorization-policySets/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -192,7 +192,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsPolicyNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView",
-                url: scopedByRealm("authorization-policySets\/edit\/([^\/]+)\/policies\/new"),
+                url: scopedByRealm("authorization-policySets/edit/([^/]+)/policies/new"),
                 pattern: "realms/?/authorization-policySets/edit/?/policies/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -201,7 +201,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsPolicyEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView",
-                url: scopedByRealm("authorization-policySets\/edit\/([^\/]+)\/policies\/edit\/([^\/]+)"),
+                url: scopedByRealm("authorization-policySets/edit/([^/]+)/policies/edit/([^/]+)"),
                 pattern: "realms/?/authorization-policySets/edit/?/policies/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -210,7 +210,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsResourceTypes": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView",
-                url: scopedByRealm("authorization-resourceTypes\/?"),
+                url: scopedByRealm("authorization-resourceTypes/?"),
                 pattern: "realms/?/authorization-resourceTypes",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -219,7 +219,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsResourceTypeEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView",
-                url: scopedByRealm("authorization-resourceTypes\/edit\/([^\/]*)"),
+                url: scopedByRealm("authorization-resourceTypes/edit/([^/]*)"),
                 pattern: "realms/?/authorization-resourceTypes/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -228,7 +228,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsResourceTypeNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView",
-                url: scopedByRealm("authorization-resourceTypes\/new"),
+                url: scopedByRealm("authorization-resourceTypes/new"),
                 pattern: "realms/?/authorization-resourceTypes/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -237,7 +237,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsScripts": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView",
-                url: scopedByRealm("scripts\/?"),
+                url: scopedByRealm("scripts/?"),
                 pattern: "realms/?/scripts",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -246,7 +246,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsScriptEdit": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView",
-                url: scopedByRealm("scripts\/edit\/([^\/]*)"),
+                url: scopedByRealm("scripts/edit/([^/]*)"),
                 pattern: "realms/?/scripts/edit/?",
                 role: "ui-realm-admin",
                 navGroup: "admin",
@@ -255,7 +255,7 @@ define("config/routes/admin/RealmsRoutes", function () {
             "realmsScriptNew": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView",
-                url: scopedByRealm("scripts\/new"),
+                url: scopedByRealm("scripts/new"),
                 pattern: "realms/?/scripts/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",

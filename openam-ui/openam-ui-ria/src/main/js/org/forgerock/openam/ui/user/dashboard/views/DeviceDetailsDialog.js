@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/dashboard/views/DeviceDetailsDialog", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/user/dashboard/views/DeviceDetailsDialog", [
                 }],
                 onshown: function (dialog) {
                     dialog.$modalBody.find(".recovery-codes-download").click(function () {
-                        location.href = "data:text/plain," + encodeURIComponent(device.recoveryCodes.join("\r\n"));
+                        location.href = `data:text/plain,${encodeURIComponent(device.recoveryCodes.join("\r\n"))}`;
                     });
                 }
             });

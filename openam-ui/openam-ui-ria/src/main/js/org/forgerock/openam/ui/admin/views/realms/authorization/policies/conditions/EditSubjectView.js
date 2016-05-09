@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditSubjectView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView",
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
-                self.setElement("#subject_" + itemID);
+                self.setElement(`#subject_${itemID}`);
 
                 if (itemData) {
                     // Temporary fix: The name attribute is being added by the server after the policy is created.
@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         if (key !== "subjectValues") {
                             list = "";
                             _.forOwn(val, function (prop) {
-                                list += prop + " ";
+                                list += `${prop} `;
                             });
 
                             itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = list;
@@ -118,7 +118,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 },
                 function (tpl) {
                     item.find(".item-data").html(tpl);
-                    self.setElement("#" + item.attr("id"));
+                    self.setElement(`#${item.attr("id")}`);
                 });
         },
 

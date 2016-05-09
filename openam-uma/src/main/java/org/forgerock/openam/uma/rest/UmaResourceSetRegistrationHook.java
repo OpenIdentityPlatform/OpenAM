@@ -24,7 +24,7 @@ import javax.security.auth.Subject;
 
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ApplicationService;

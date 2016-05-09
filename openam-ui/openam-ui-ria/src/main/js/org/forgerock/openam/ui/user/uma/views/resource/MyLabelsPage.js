@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/resource/MyLabelsPage", [
+define([
     "jquery",
     "backbone",
     "org/forgerock/commons/ui/common/backgrid/Backgrid",
@@ -87,7 +87,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/MyLabelsPage", [
             UMAService.labels.get(labelId).then(function (result) {
                 self.data.label = result;
                 if (result) {
-                    self.renderGrid(self.createLabelCollection(labelId), self.createColumns("mylabels/" + labelId),
+                    self.renderGrid(self.createLabelCollection(labelId), self.createColumns(`mylabels/${labelId}`),
                         callback);
                 } else {
                     self.parentRender(callback);

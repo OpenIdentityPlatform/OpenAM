@@ -73,7 +73,7 @@ require.config({
             exports: "autosizeInput"
         },
         "backbone": {
-            deps: ["underscore"],
+            deps: ["lodash"],
             exports: "Backbone"
         },
         "backbone.paginator": {
@@ -84,7 +84,7 @@ require.config({
         },
 
         "backgrid": {
-            deps: ["jquery", "underscore", "backbone"],
+            deps: ["jquery", "lodash", "backbone"],
             exports: "Backgrid"
         },
         "backgrid-filter": {
@@ -101,7 +101,7 @@ require.config({
             deps: ["jquery"]
         },
         "bootstrap-dialog": {
-            deps: ["jquery", "underscore", "backbone", "bootstrap"]
+            deps: ["jquery", "lodash", "backbone", "bootstrap"]
         },
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
@@ -144,7 +144,7 @@ require.config({
         "spin": {
             exports: "spin"
         },
-        "underscore": {
+        "lodash": {
             exports: "_"
         },
         "xdate": {
@@ -162,7 +162,7 @@ require([
 
     // other modules that are necessary to include to startup the app
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "handlebars",
     "i18next",

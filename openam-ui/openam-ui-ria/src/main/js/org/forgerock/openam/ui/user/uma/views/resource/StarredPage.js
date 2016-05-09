@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/resource/StarredPage", [
+define([
     "lodash",
     "org/forgerock/openam/ui/user/uma/views/resource/BasePage",
     "org/forgerock/openam/ui/user/uma/services/UMAService"

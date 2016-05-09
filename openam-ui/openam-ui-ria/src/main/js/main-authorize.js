@@ -49,7 +49,7 @@ require.config({
             deps: ["jquery", "handlebars"],
             exports: "i18next"
         },
-        "underscore": {
+        "lodash": {
             exports: "_"
         }
     }
@@ -57,7 +57,7 @@ require.config({
 
 require([
     "jquery",
-    "underscore",
+    "lodash",
     "handlebars",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
@@ -126,7 +126,7 @@ require([
         // add prefix to templates for custom theme when path is defined
         var themePath = Configuration.globalData.theme.path;
         templatePaths = _.map(templatePaths, function (templatePath) {
-            return "text!" + themePath + templatePath;
+            return `text!${themePath}${templatePath}`;
         });
 
         require(templatePaths, function (AuthorizeTemplate, LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate) {

@@ -36,7 +36,7 @@ public class QRCallbackBuilder {
     private String scheme;
     private String host;
     private String path = "";
-    private Map<String, String> queryContents = new HashMap<String, String>();
+    private Map<String, String> queryContents = new HashMap<>();
     private String port;
 
     /**
@@ -123,12 +123,13 @@ public class QRCallbackBuilder {
                 .append("://").append(host)
                 .append("/").append(path)
                 .append(":").append(port)
-                .append("?").append(getQueryString(sb));
+                .append("?").append(getQueryString());
 
         return sb.toString();
     }
 
-    private StringBuilder getQueryString(StringBuilder sb) {
+    private String getQueryString() {
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         for(Map.Entry<String, String> entries : queryContents.entrySet()) {
             if (first) {
@@ -140,6 +141,6 @@ public class QRCallbackBuilder {
             sb.append("=");
             sb.append(entries.getValue());
         }
-        return sb;
+        return sb.toString();
     }
 }

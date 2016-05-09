@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/admin/utils/form/bindSavePromiseToElement
   */
- define("org/forgerock/openam/ui/admin/utils/form/bindSavePromiseToElement", [
+ define([
      "jquery",
      "lodash",
      "org/forgerock/commons/ui/common/components/Messages"

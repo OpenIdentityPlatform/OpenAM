@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/request/ListRequest", [
+define([
     "jquery",
     "backbone",
     "backbone.paginator",
@@ -41,8 +41,9 @@ define("org/forgerock/openam/ui/user/uma/views/request/ListRequest", [
                 RequestsCollection;
 
             RequestsCollection = Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" +
-                     Configuration.loggedUser.get("username") + "/uma/pendingrequests"),
+                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
+                     Configuration.loggedUser.get("username")
+                    }/uma/pendingrequests`),
                 state: {
                     pageSize: 10,
                     sortKey: "user"

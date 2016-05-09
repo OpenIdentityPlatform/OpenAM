@@ -14,9 +14,9 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("config/process/AMConfig", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -93,8 +93,9 @@ define("config/process/AMConfig", [
         ],
         processDescription: function (event, conf) {
             var subRealm = conf.globalData.auth.subRealm || "/";
-            window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" +
-                                   encodeURIComponent(subRealm);
+            window.location.href = `/${Constants.context}/realm/RMRealm?RMRealm.tblDataActionHref=${
+                encodeURIComponent(subRealm)
+                }`;
         }
     }, {
         startEvent: Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,

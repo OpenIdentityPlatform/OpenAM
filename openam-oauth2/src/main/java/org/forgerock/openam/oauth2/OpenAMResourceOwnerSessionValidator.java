@@ -17,14 +17,14 @@
 package org.forgerock.openam.oauth2;
 
 import static com.sun.identity.shared.DateUtils.stringToDate;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.DeviceCode.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.USER_CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.FRAGMENT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.QUERY;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
 import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
@@ -57,11 +57,9 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.IntrospectableToken;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -71,8 +69,8 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
@@ -166,6 +164,8 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     }
                 } catch (SSOException e) {
                     throw new AccessDeniedException(e);
+                } catch (org.forgerock.json.resource.NotFoundException e) {
+                    throw new NotFoundException(e.getMessage());
                 }
 
                 if (openIdPrompt.containsLogin()) {
@@ -307,7 +307,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
             }
         }
         if (!matched) {
-            throw authenticationRequired(request, token);
+            throw authenticationRequired(request);
         }
     }
 

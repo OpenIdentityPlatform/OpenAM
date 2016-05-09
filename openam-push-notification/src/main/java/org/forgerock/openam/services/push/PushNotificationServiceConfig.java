@@ -23,9 +23,11 @@ import org.forgerock.openam.utils.StringUtils;
  */
 public final class PushNotificationServiceConfig {
 
-    private String apiKey;
-    private String senderId;
-    private String endpoint;
+    private String accessKey;
+    private String appleEndpoint;
+    private String googleEndpoint;
+    private String secret;
+    private String delegateFactory;
 
     /**
      * Only access is via the Builder.
@@ -34,46 +36,72 @@ public final class PushNotificationServiceConfig {
         //This section intentionally left blank
     }
 
-    private void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+    private void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
     }
 
-    private void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
+    private void setAppleEndpoint(String appleEndpoint) {
+        this.appleEndpoint = appleEndpoint;
     }
 
-    private void setSenderId(String senderId) {
-        this.senderId = senderId;
+    private void setGoogleEndpoint(String googleEndpoint) {
+        this.googleEndpoint = googleEndpoint;
+    }
+
+    private void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    private void setDelegateFactory(String delegateFactory) {
+        this.delegateFactory = delegateFactory;
     }
 
     private boolean isValid() {
-        return StringUtils.isNotBlank(senderId)
-                && StringUtils.isNotBlank(apiKey)
-                && StringUtils.isNotBlank(endpoint);
+        return StringUtils.isNotBlank(accessKey)
+                && StringUtils.isNotBlank(appleEndpoint)
+                && StringUtils.isNotBlank(googleEndpoint)
+                && StringUtils.isNotBlank(secret)
+                && StringUtils.isNotBlank(delegateFactory);
     }
 
     /**
      * Get the api key to allow access to the remote service.
      * @return the api key.
      */
-    public String getApiKey() {
-        return apiKey;
+    public String getAccessKey() {
+        return accessKey;
     }
 
     /**
      * Get the sender ID to authenticate to the remote service.
      * @return the sender id.
      */
-    public String getSenderId() {
-        return senderId;
+    public String getSecret() {
+        return secret;
     }
 
     /**
      * Get the endpoint for this notification service to connect to.
      * @return the endpoint.
      */
-    public String getEndpoint() {
-        return endpoint;
+    public String getAppleEndpoint() {
+        return appleEndpoint;
+    }
+
+    /**
+     * Get the endpoint for this notification service to connect to.
+     * @return the endpoint.
+     */
+    public String getGoogleEndpoint() {
+        return googleEndpoint;
+    }
+
+    /**
+     * Get the delegate factory class used to produce delegates.
+     * @return the delegate factory.
+     */
+    public String getDelegateFactory() {
+        return delegateFactory;
     }
 
     @Override
@@ -91,14 +119,16 @@ public final class PushNotificationServiceConfig {
         }
 
         final PushNotificationServiceConfig that = (PushNotificationServiceConfig) underTest;
-        return Objects.equals(this.endpoint, that.endpoint)
-                && Objects.equals(this.senderId, that.senderId)
-                && Objects.equals(this.apiKey, that.apiKey);
+        return Objects.equals(this.appleEndpoint, that.appleEndpoint)
+                && Objects.equals(this.accessKey, that.accessKey)
+                && Objects.equals(this.secret, that.secret)
+                && Objects.equals(this.googleEndpoint, that.googleEndpoint)
+                && Objects.equals(this.delegateFactory, that.delegateFactory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiKey, senderId, endpoint);
+        return Objects.hash(accessKey, secret, appleEndpoint, googleEndpoint);
     }
 
     /**
@@ -117,32 +147,52 @@ public final class PushNotificationServiceConfig {
         }
 
         /**
-         * Sets the senderId of the GCM configuration.
-         * @param senderId The senderId for GCM.
+         * Sets the accessKey of the SNS configuration.
+         * @param accessKey The accessKey for SNS.
          * @return The builder.
          */
-        public Builder withSenderId(String senderId) {
-            config.setSenderId(senderId);
+        public Builder withAccessKey(String accessKey) {
+            config.setAccessKey(accessKey);
             return this;
         }
 
         /**
-         * Sets the api key for contacting GCM.
-         * @param apiKey The API key for GCM.
+         * Sets the secret for contacting to SNS.
+         * @param secret The API key for SNS.
          * @return The builder.
          */
-        public Builder withApiKey(String apiKey) {
-            config.setApiKey(apiKey);
+        public Builder withSecret(String secret) {
+            config.setSecret(secret);
             return this;
         }
 
         /**
-         * The address of the remote service.
-         * @param endpoint The address of the remote service.
+         * The address of the remote service for Apple devices.
+         * @param appleEndpoint The address of the remote service.
          * @return The builder.
          */
-        public Builder withEndpoint(String endpoint) {
-            config.setEndpoint(endpoint);
+        public Builder withAppleEndpoint(String appleEndpoint) {
+            config.setAppleEndpoint(appleEndpoint);
+            return this;
+        }
+
+        /**
+         * The address of the remote service for Google devices.
+         * @param googleEndpoint The address of the remote service.
+         * @return The builder.
+         */
+        public Builder withGoogleEndpoint(String googleEndpoint) {
+            config.setGoogleEndpoint(googleEndpoint);
+            return this;
+        }
+
+        /**
+         * The address of the remote service for Google devices.
+         * @param delegateFactory The class used to produce delegates.
+         * @return The builder.
+         */
+        public Builder withDelegateFactory(String delegateFactory) {
+            config.setDelegateFactory(delegateFactory);
             return this;
         }
 

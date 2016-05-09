@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("config/routes/admin/GlobalRoutes", [
+define([
     "lodash"
 ], (_) => {
     const routes = {
@@ -26,7 +26,7 @@ define("config/routes/admin/GlobalRoutes", [
             navGroup: "admin"
         },
         editAuthenticationSettings: {
-            view: "org/forgerock/openam/ui/admin/views/configuration/authentication/EditConfigurationView",
+            view: "org/forgerock/openam/ui/admin/views/configuration/authentication/EditGlobalAuthenticationView",
             url: /configure\/authentication\/([^\/]+)/,
             pattern: "configure/authentication/?",
             role: "ui-global-admin",
@@ -40,7 +40,7 @@ define("config/routes/admin/GlobalRoutes", [
             navGroup: "admin"
         },
         editGlobalService: {
-            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditConfigurationView",
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceView",
             url: /configure\/global-services\/([^\/]+)/,
             pattern: "configure/global-services/?",
             role: "ui-global-admin",

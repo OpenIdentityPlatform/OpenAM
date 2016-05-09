@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define("org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView", [
+ define([
      "jquery",
      "org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/global/ServicesService"
@@ -22,7 +22,7 @@
 
      const ListGlobalServicesView = createConfigurationListView(
          $.t("config.AppConfiguration.Navigation.links.configure.global-services"),
-         ServicesService.configuration.getAll,
+         ServicesService.instance.getAll,
          "templates/admin/views/configuration/global/ListConfigurationTemplate.html"
      );
 

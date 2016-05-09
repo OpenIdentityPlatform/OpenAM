@@ -92,27 +92,26 @@ public class PushNotificationService {
 
     /**
      * Primary method of this class. Used to communicate via the appropriate delegate for this realm out
-     * to a Push communication service such as GCM.
+     * to a Push communication service such as SNS.
      *
      * @param message the message to transmit.
      * @param realm the realm from which to transmit the message.
      * @throws PushNotificationException if there are problems initialising the service or sending the notification.
      */
     public void send(PushMessage message, String realm) throws PushNotificationException {
-
-        initialiseService(realm);
+        init(realm);
         getDelegateForRealm(realm).send(message);
     }
 
     /**
-     * Initialises the Service so that it is ready to receive messages.
+     * Initializes the PushNotification system for this realm. If the system is already up-to-date and
+     * operational in the realm, this call will make no changes.
      *
-     * @param realm the realm the service will be present on
-     * @throws PushNotificationException if there is an error sending the push notification
+     * @param realm Realm in which this PushNotification system exists.
+     * @throws PushNotificationException If there were issues configuring the Push system.
      */
-    public void initialiseService(String realm) throws PushNotificationException {
+    public void init(String realm) throws PushNotificationException {
         if (!pushRealmMap.containsKey(realm)) {
-
             synchronized (pushRealmMap) { //wait here for the thread with first access to update
                 if (!pushRealmMap.containsKey(realm)) {
                     updatePreferences(realm);
@@ -122,6 +121,32 @@ public class PushNotificationService {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Returns the relative location of the registration service endpoint in this realm.
+     * @param realm The realm of the service to check.
+     * @return The relative location of the service.
+     */
+    public String getRegServiceAddress(String realm) {
+        if (pushRealmMap.containsKey(realm)) {
+            return pushRealmMap.get(realm).getRegServiceLocation();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the relative location of the authentication service endpoint in this realm.
+     * @param realm The realm of the service to check.
+     * @return The relative location of the service.
+     */
+    public String getAuthServiceAddress(String realm) {
+        if (pushRealmMap.containsKey(realm)) {
+            return pushRealmMap.get(realm).getAuthServiceLocation();
+        } else {
+            return null;
         }
     }
 
@@ -146,6 +171,7 @@ public class PushNotificationService {
         }
 
         delegateUpdater.replaceDelegate(realm, pushNotificationDelegate, config);
+        init(realm);
     }
 
 
@@ -215,7 +241,6 @@ public class PushNotificationService {
             case MODIFIED:
                 try {
                     if (SERVICE_NAME.equals(serviceName) && SERVICE_VERSION.equals(version)) {
-                        //do update
                         synchronized (pushRealmMap) { //wait here for the thread with first access to update
                             updatePreferences(DNMapper.orgNameToRealmName(orgName));
                         }
@@ -275,8 +300,7 @@ public class PushNotificationService {
             try {
                 removedDelegate.close();
             } catch (IOException e) {
-                throw new PushNotificationException(
-                        "Error Deleting Service {}" + SERVICE_NAME + " for realm {}" + realm);
+                throw new PushNotificationException("Error Deleting Service " + SERVICE_NAME + " for realm: " + realm);
             }
         }
     }

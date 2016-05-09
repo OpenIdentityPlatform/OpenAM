@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     filterName: "eq",
-                    _queryFilter: ['applicationName+eq+"' + encodeURIComponent(this.data.policySetModel.id) + '"']
+                    _queryFilter: [`applicationName+eq+"${encodeURIComponent(this.data.policySetModel.id)}"`]
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,

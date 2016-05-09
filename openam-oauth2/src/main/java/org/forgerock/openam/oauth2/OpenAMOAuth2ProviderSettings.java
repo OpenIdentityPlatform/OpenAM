@@ -18,25 +18,9 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -55,9 +39,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
@@ -67,8 +64,6 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.NoneResponseTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
@@ -84,12 +79,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.oauth2.legacy.CoreToken;
-import org.forgerock.openam.oauth2.legacy.LegacyAccessTokenAdapter;
-import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
-import org.forgerock.openam.oauth2.legacy.LegacyResponseTypeHandler;
-import org.forgerock.openam.oauth2.provider.ResponseType;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
@@ -97,8 +87,6 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * Models all of the possible settings the OpenAM OAuth2 provider can have and that can be configured.
@@ -258,14 +246,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
         try {
             final Class<?> responseTypeHandlerClass = Class.forName(responseTypeHandlerClassName);
-            if (ResponseType.class.isAssignableFrom(responseTypeHandlerClass)) {
-                ResponseType responseType = InjectorHolder.getInstance(responseTypeHandlerClass
-                        .asSubclass(ResponseType.class));
-                return new LegacyResponseTypeHandler(responseType, realm, getSSOCookieName(), cookieExtractor);
-            }
-
             return InjectorHolder.getInstance(responseTypeHandlerClass.asSubclass(ResponseTypeHandler.class));
-
         } catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
             throw new UnsupportedResponseTypeException("Response type is not supported");
@@ -348,127 +329,14 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     logger.message("Scope Validator class not set.");
                     throw new ServerException("Scope Validator class not set.");
                 }
-
                 final Class<?> scopeValidatorClass = Class.forName(scopeValidatorClassName);
-
-                if (Scope.class.isAssignableFrom(scopeValidatorClass)) {
-                    final Scope scopeClass = InjectorHolder.getInstance(scopeValidatorClass.asSubclass(Scope.class));
-                    return new LegacyScopeValidator(scopeClass);
-                }
-
                 scopeValidator = InjectorHolder.getInstance(scopeValidatorClass.asSubclass(ScopeValidator.class));
-
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage());
                 throw new ServerException(e);
             }
         }
         return scopeValidator;
-    }
-
-    /**
-     * Wraps a legacy {@link Scope} as a {@link ScopeValidator}.
-     *
-     * @since 12.0.0
-     */
-    @Deprecated
-    private final class LegacyScopeValidator implements ScopeValidator {
-
-        private Scope scopeValidator;
-
-        private LegacyScopeValidator(final Scope scopeValidator) {
-            this.scopeValidator = scopeValidator;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
-                OAuth2Request request) throws ServerException, InvalidScopeException {
-            return scopeValidator.scopeToPresentOnAuthorizationPage(scope, clientRegistration.getAllowedScopes(),
-                    clientRegistration.getDefaultScopes());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-                OAuth2Request request) throws ServerException, InvalidScopeException {
-            return scopeValidator.scopeRequestedForAccessToken(scope, clientRegistration.getAllowedScopes(),
-                    clientRegistration.getDefaultScopes());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-                Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException {
-            return scopeValidator.scopeRequestedForRefreshToken(requestedScope, clientRegistration.getAllowedScopes(),
-                    tokenScope, clientRegistration.getDefaultScopes());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request)
-                throws UnauthorizedClientException {
-            return scopeValidator.getUserInfo(new LegacyAccessTokenAdapter(token));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Map<String, Object> evaluateScope(AccessToken accessToken) {
-            return scopeValidator.evaluateScope(new LegacyAccessTokenAdapter(accessToken));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Map<String, String> additionalDataToReturnFromAuthorizeEndpoint(Map<String, Token> tokens,
-                OAuth2Request request) {
-            final Map<String, CoreToken> legacyTokens = new HashMap<String, CoreToken>();
-            for (final Map.Entry<String, Token> token : tokens.entrySet()) {
-                try {
-                    legacyTokens.put(token.getKey(), new LegacyCoreTokenAdapter(token.getValue()));
-                } catch (ServerException e) {
-                    throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, e.getMessage());
-                }
-            }
-            return scopeValidator.extraDataToReturnForAuthorizeEndpoint(new HashMap<String, String>(), legacyTokens);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request)
-                throws ServerException, InvalidClientException, NotFoundException {
-
-            final Map<String, String> data = new HashMap<String, String>();
-            data.put("nonce", accessToken.getNonce());
-            data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getSsoToken(ServletUtils.getRequest(request.<Request>getRequest())));
-
-            final Map<String, Object> tokenEntries = scopeValidator.extraDataToReturnForTokenEndpoint(data,
-                    new LegacyAccessTokenAdapter(accessToken));
-
-            if (tokenEntries != null) {
-                for (final Map.Entry<String, Object> tokenEntry : tokenEntries.entrySet()) {
-                    accessToken.addExtraData(tokenEntry.getKey(), (String) tokenEntry.getValue());
-                }
-            }
-        }
-
-        private String getSsoToken(final HttpServletRequest request) {
-            if (request.getCookies() != null) {
-                final String cookieName = getSSOCookieName();
-                for (final Cookie cookie : request.getCookies()) {
-                    if (cookie.getName().equals(cookieName)) {
-                        return cookie.getValue();
-                    }
-                }
-            }
-            return null;
-        }
     }
 
     /**

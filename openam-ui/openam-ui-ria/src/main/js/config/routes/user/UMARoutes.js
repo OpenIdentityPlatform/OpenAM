@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("config/routes/user/UMARoutes", function () {
+define(function () {
     return {
         // My Resources
         "umaResourcesMyResources": {

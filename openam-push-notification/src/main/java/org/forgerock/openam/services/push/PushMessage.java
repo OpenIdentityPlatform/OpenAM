@@ -16,7 +16,7 @@
 package org.forgerock.openam.services.push;
 
 import java.util.UUID;
-import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 
 /**
@@ -24,47 +24,46 @@ import org.forgerock.util.Reject;
  */
 public class PushMessage {
 
-    /** Key used to reference the messageId located in an OpenAM Push Message. */
-    public final static String MESSAGE_ID = "messageId";
+    /** Key for locating the message ID inside an OpenAM Push message. */
+    public static final String MESSAGE_ID = "messageId";
 
     private final String recipient;
-    private final JsonValue data;
+    private final String body;
+    private final String subject;
     private final String messageId;
 
     /**
      * Create a new PushMessage.
      * @param recipient To whom the message will be addressed. May not be null.
-     * @param data The data to contain within the message. May not be null.
+     * @param body The message to contain within the message. May not be null.
+     * @param subject The subject to contain within the message. May not be null.
      * @param messageId The messageId which defines the message's unique reference. If null, a random messageId will
      *                  be generated.
      */
-    public PushMessage(String recipient, JsonValue data, String messageId) {
+    public PushMessage(String recipient, String body, String subject, String messageId) {
         Reject.ifNull(recipient);
-        Reject.ifNull(data);
+        Reject.ifNull(body);
+        Reject.ifNull(subject);
 
         this.recipient = recipient;
-        this.data = data;
-        this.messageId = messageId;
+        this.body = body;
+        this.subject = subject;
 
-        if (getMessageId() == null) {
-            insertRandomMessageId();
+        if (messageId == null) {
+            this.messageId = UUID.randomUUID().toString() + Time.currentTimeMillis();
         } else {
-            data.put(MESSAGE_ID, messageId);
+            this.messageId = messageId;
         }
     }
 
     /**
      * Create a new PushMessage with a default-generated messageId.
      * @param recipient To whom the message will be addressed. May not be null.
-     * @param data The data to contain within the message. May not be null.
+     * @param body The data to contain within the message. May not be null.
+     * @param subject The subject to contain within the message. May not be null.
      */
-    public PushMessage(String recipient, JsonValue data) {
-        this(recipient, data, null);
-    }
-
-    //todo improve choice of random unique code generation
-    private void insertRandomMessageId() {
-        data.put(MESSAGE_ID, UUID.randomUUID());
+    public PushMessage(String recipient, String body, String subject) {
+        this(recipient, body, subject, null);
     }
 
     /**
@@ -79,8 +78,16 @@ public class PushMessage {
      * Retrieve the contents of this message.
      * @return The data stored within this message.
      */
-    public JsonValue getData() {
-        return data;
+    public String getBody() {
+        return body;
+    }
+
+    /**
+     * Retrieve the subject of this message.
+     * @return The subject stored within this message.
+     */
+    public String getSubject() {
+        return subject;
     }
 
     /**

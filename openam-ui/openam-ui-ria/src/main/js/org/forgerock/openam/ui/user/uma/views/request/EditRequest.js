@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/request/EditRequest", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
@@ -63,8 +63,9 @@ define("org/forgerock/openam/ui/user/uma/views/request/EditRequest", [
             id = args[0];
 
             RequestCollection = Backbone.Collection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" +
-                     Configuration.loggedUser.get("username") + "/uma/pendingrequests/" + id)
+                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
+                     Configuration.loggedUser.get("username")
+                    }/uma/pendingrequests/${id}`)
             });
 
             columns = [{

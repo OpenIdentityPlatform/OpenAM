@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,9 +22,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/common/util/ThemeManager", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -35,6 +35,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
+
     var defaultThemeName = "default",
         applyThemeToPage = function (path, icon, stylesheets) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.

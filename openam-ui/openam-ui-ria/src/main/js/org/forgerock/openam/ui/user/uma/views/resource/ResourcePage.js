@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/resource/ResourcePage", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -85,9 +85,9 @@ define("org/forgerock/openam/ui/user/uma/views/resource/ResourcePage", [
             "click button#discardLabels": "discardLabelsChanges"
         },
         onModelError: function (model, response) {
-            console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
-                response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
-                response.responseJSON.message);
+            console.error(`Unrecoverable load failure UMAResourceSetWithPolicy. ${response.responseJSON.code} (${
+                response.responseJSON.reason
+                })${response.responseJSON.message}`);
         },
         onModelChange: function (model) {
             this.render([undefined, model.get("_id")]);
@@ -173,7 +173,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/ResourcePage", [
                     },
                     render: {
                         item: function (item) {
-                            return "<div data-value=\"" + item.name + "\" class=\"item\">" + item.name + "</div>\"";
+                            return `<div data-value=\"${item.name}\" class=\"item\">${item.name}</div>\"`;
                         }
                     },
                     labelField: "name",

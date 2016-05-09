@@ -35,7 +35,7 @@
 * </code>
  * @module org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView
  */
-define("org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView", [
+define([
     "jquery",
     "lodash",
     "backbone",

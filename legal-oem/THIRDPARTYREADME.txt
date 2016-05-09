@@ -971,9 +971,6 @@ Mozilla Public License 2.0 (MPL-2.0)
 Version: jss4-2007-08-11.jar
 Copyright: Copyright Mozilla Foundation
 
-Version: publicsuffix-1.0.1.jar
-Copyright: Copyright 2004 Sam Hocevar
-
 Version: rhino-1.7R4.jar
 Copyright: Copyright Mozilla Foundation
 

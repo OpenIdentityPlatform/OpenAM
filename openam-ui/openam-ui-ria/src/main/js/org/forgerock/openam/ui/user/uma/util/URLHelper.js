@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/util/URLHelper", [
+define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/user/uma/util/URLHelper", [
     return {
         substitute: function (url) {
             return function () {
-                var replacedUrl = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                var replacedUrl = url.replace("__api__", `${Constants.host}/${Constants.context}/json`)
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
                     .replace("__username__", Configuration.loggedUser.get("username"));

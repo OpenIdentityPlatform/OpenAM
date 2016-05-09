@@ -25,8 +25,8 @@ package com.sun.identity.workflow;
 
 import static java.text.MessageFormat.format;
 import static java.util.Collections.singleton;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.query.QueryFilter.equalTo;

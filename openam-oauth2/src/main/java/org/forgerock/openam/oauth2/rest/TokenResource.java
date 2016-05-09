@@ -26,11 +26,11 @@ package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -85,7 +85,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -566,20 +566,23 @@ public class TokenResource implements CollectionResourceProvider {
         }
 
         try {
-            if (token.isDefined("refreshToken")) {
-                if (oAuth2ProviderSettings.issueRefreshTokensOnRefreshingToken()) {
+
+            boolean isRefreshTokenDefined = token.isDefined(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+            if (isRefreshTokenDefined && oAuth2ProviderSettings.issueRefreshTokensOnRefreshingToken()) {
+                return getIndefinitelyString(context);
+            }
+
+            JsonValue refreshToken = tokenStore.read(getAttributeValue(token,
+                                                                       OAuth2Constants.CoreTokenParams.REFRESH_TOKEN));
+            if (isRefreshTokenDefined && refreshToken != null) {
+                //Use refresh token expiry
+                long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(refreshToken, EXPIRE_TIME_KEY));
+
+                if (expiryTimeInMilliseconds == -1) {
                     return getIndefinitelyString(context);
-                } else {
-                    //Use refresh token expiry
-                    JsonValue refreshToken = tokenStore.read(getAttributeValue(token, "refreshToken"));
-                    long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(refreshToken, EXPIRE_TIME_KEY));
-
-                    if (expiryTimeInMilliseconds == -1) {
-                        return getIndefinitelyString(context);
-                    }
-
-                    return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
                 }
+
+                return getDateFormat(context).format(new Date(expiryTimeInMilliseconds));
             } else {
                 //Use access token expiry
                 long expiryTimeInMilliseconds = Long.parseLong(getAttributeValue(token, EXPIRE_TIME_KEY));

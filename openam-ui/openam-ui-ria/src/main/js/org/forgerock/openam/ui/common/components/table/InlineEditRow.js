@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/table/InlineEditRow", [
+define([
     "jquery",
     "lodash",
     "backbone",

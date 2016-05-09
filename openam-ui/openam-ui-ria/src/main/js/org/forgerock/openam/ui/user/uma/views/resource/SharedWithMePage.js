@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/resource/SharedWithMePage", [
+define([
     "org/forgerock/openam/ui/user/uma/views/resource/BasePage"
 ], function (BasePage) {
     var SharedWithMePage = BasePage.extend({

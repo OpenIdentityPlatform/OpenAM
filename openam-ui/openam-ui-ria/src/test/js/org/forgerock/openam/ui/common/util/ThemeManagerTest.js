@@ -265,10 +265,10 @@ define([
                 return ThemeManager.getTheme().then(() => {
                     expect(Configuration.globalData.theme.settings).to.deep.equal({
                         logo: {
-                            src: baseUrl + "foo"
+                            src: `${baseUrl}foo`
                         },
                         loginLogo: {
-                            src: baseUrl + "bar"
+                            src: `${baseUrl}bar`
                         }
                     });
                 });
@@ -284,7 +284,7 @@ define([
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "icon",
                         type: "image/x-icon",
-                        href: baseUrl + "icon.png"
+                        href: `${baseUrl}icon.png`
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
                 })
@@ -294,7 +294,7 @@ define([
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "shortcut icon",
                         type: "image/x-icon",
-                        href: baseUrl + "icon.png"
+                        href: `${baseUrl}icon.png`
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
                 })
@@ -304,12 +304,12 @@ define([
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: baseUrl + "a.css"
+                        href: `${baseUrl}a.css`
                     });
                     expect(mock$).to.be.calledWith("<link/>", {
                         rel: "stylesheet",
                         type: "text/css",
-                        href: baseUrl + "c.css"
+                        href: `${baseUrl}c.css`
                     });
                     expect(mock$.appendTo).to.be.calledWith("head");
                 })

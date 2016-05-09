@@ -61,7 +61,7 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
     private final SoapSTSAgentCredentialsAccess credentialsAccess;
     private final Logger logger;
 
-    private AtomicReference<String> accessTokenRef = new AtomicReference<String>();
+    private static AtomicReference<String> accessTokenRef = new AtomicReference<String>();
 
     @Inject
     SoapSTSAccessTokenProviderImpl(HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,

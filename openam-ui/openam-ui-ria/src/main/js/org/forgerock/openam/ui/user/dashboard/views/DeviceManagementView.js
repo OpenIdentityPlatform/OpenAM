@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/dashboard/views/DeviceManagementView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",

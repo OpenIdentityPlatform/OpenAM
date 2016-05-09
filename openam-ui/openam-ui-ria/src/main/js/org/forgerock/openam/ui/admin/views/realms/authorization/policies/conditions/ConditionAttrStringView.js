@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrStringView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
 ], function ($, _, Constants, ConditionAttrBaseView) {
@@ -42,7 +42,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 data.pattern = null;
             }
 
-            this.initBasic(data, element, "field-float-pattern data-obj " + cssClass);
+            this.initBasic(data, element, `field-float-pattern data-obj ${cssClass}`);
 
             this.parentRender(function () {
                 if (callback) {
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             if (this.data.title === "authenticateToRealm") {
                 var itemData = this.data.itemData;
                 if (itemData.authenticateToRealm.indexOf("/") !== 0) {
-                    itemData.authenticateToRealm = "/" + itemData.authenticateToRealm;
+                    itemData.authenticateToRealm = `/${itemData.authenticateToRealm}`;
                 }
             }
         }

@@ -17,9 +17,9 @@
  /**
  * @deprecated
  */
-define("org/forgerock/openam/ui/admin/models/Form", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "jsonEditor",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
     "popoverclickaway", // depends on jquery and bootstrap

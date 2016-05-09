@@ -14,7 +14,7 @@
  * Portions copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/UserModel", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractModel",
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "org/forgerock/openam/ui/common/util/object/flattenValues"
 ], function ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper, Router,
              ServiceInvoker, flattenValues) {
-    var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
+    var baseUrl = `${Constants.host}/${Constants.context}/json/__subrealm__/users`,
         UserModel = AbstractModel.extend({
             idAttribute: "id",
             defaults: {
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     if (_.has(this.changed, "password")) {
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
-                            url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
+                            url: RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}?_action=changePassword`),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
                             suppressEvents: true,
@@ -89,7 +89,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                         .value()
                                 ),
                                 suppressEvents: true,
-                                url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                                url: RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}`),
                                 headers: {
                                     "If-Match": this.getMVCCRev(),
                                     "Accept-API-Version": "protocol=1.0,resource=2.0",
@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     // The only other supported operation is read
                     return ServiceInvoker.restCall(_.extend(
                         {
-                            "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                            "url" : RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}`),
                             "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
             },
             getProfile: function () {
                 return ServiceInvoker.restCall({
-                    url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
+                    url: RealmHelper.decorateURIWithRealm(`${baseUrl}?_action=idFromSession`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                     type: "POST",
                     errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }

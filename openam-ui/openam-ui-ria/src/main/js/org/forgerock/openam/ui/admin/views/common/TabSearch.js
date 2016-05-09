@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/views/common/TabSearch
  */
-define("org/forgerock/openam/ui/admin/views/common/TabSearch", [
+define([
     "lodash",
     "jquery",
     "backbone",
@@ -25,15 +25,10 @@ define("org/forgerock/openam/ui/admin/views/common/TabSearch", [
     "selectize"
 ], (_, $, Backbone, Handlebars) => {
 
-    const BEHAVIOUR_GROUPED_JSONSCHEMA = "groupedJsonSchema";
-
     function throwOnInvalidOptions (options) {
         if (!options || !_.isObject(options)) {
             throw new Error("[TabSearch] No \"options\" object found.");
         } else {
-            if (!options.behaviour) {
-                throw new Error("[TabSearch] No \"options.behaviour\" string found.");
-            }
             if (!options.onChange) {
                 throw new Error("[TabSearch] No \"options.onChange\" function found.");
             }
@@ -74,16 +69,9 @@ define("org/forgerock/openam/ui/admin/views/common/TabSearch", [
         selectize.refreshOptions(false);
     }
 
-    function populateSelectizeOptions (properties, behaviour, selectize) {
-        if (behaviour === BEHAVIOUR_GROUPED_JSONSCHEMA) {
-            populateOptionsFromJsonSchemaGroup(properties, selectize);
-        }
-    }
-
     const TabSearch = Backbone.View.extend({
         /**
          * @param  {object} options Contains the options which are passed in
-         * @param  {string} options.behaviour Determines the behavior of the TabSearch
          * @param  {object} options.properties Contains the list of searchable properties
          * @param  {function} options.onChangeCallback. The function that is called when an option is selected,
          */
@@ -102,14 +90,11 @@ define("org/forgerock/openam/ui/admin/views/common/TabSearch", [
             const html = Handlebars.compile(template)(data);
             this.$el.html(html);
             const selectize = createSelectize(this.$el.find("[data-search]"), this.options.onChange);
-            populateSelectizeOptions(this.options.properties, this.options.behaviour, selectize);
+            populateOptionsFromJsonSchemaGroup(this.options.properties, selectize);
 
             return this;
         }
     });
-
-    TabSearch.BEHAVIOUR_GROUPED_JSONSCHEMA = BEHAVIOUR_GROUPED_JSONSCHEMA;
-
 
     return TabSearch;
 });

@@ -63,7 +63,6 @@ import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.util.Options;
 import org.forgerock.util.time.Duration;
-import org.publicsuffix.PSS;
 
 public abstract class AjaxPage extends Page {
 
@@ -330,25 +329,7 @@ public abstract class AjaxPage extends Page {
     }
     
     public String getCookieDomain() {
-        String hostname = getHostName();
-
-        try {
-            PSS pss = new PSS();
-            int idx = pss.getEffectiveTLDLength(hostname);
-            int lastidx = hostname.lastIndexOf('.', idx - 1);
-            if (lastidx == -1) {
-                if (hostname.indexOf('.', idx + 1) != -1) {
-                    return "." + hostname;
-                } else {
-                    return "";
-                }
-            } else {
-                return hostname.substring(lastidx);
-            }
-        } catch (IOException ioe) {
-            debug.error("Unable to load public suffix database", ioe);
-            return "";
-        }
+        return getHostName();
     }
 
     public boolean validateInput() {

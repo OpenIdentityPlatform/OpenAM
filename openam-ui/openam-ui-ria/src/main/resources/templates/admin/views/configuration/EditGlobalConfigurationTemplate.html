@@ -1,0 +1,14 @@
+{{> headers/_Title title=name }}
+
+{{#if hasTabs}}
+    <form data-json-form></form>
+{{else}}
+    <div class="panel panel-default">
+        <div class="panel-body ">
+            <form data-json-form></form>
+        </div>
+        <div class="panel-footer clearfix">
+            {{> form/_JSONSchemaFooter}}
+        </div>
+    </div>
+{{/if}}

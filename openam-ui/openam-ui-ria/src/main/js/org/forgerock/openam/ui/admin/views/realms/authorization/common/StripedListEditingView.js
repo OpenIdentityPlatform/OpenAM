@@ -15,15 +15,15 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "doTimeout"
-], ($, _, AbstractView, EventManager, Constants) => {
-    return AbstractView.extend({
+], ($, _, AbstractView, EventManager, Constants) =>
+    AbstractView.extend({
         noBaseTemplate: true,
         events: {
             "click [data-add-item]": "addItem",
@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
                 return;
             }
 
-            let pending = this.getPendingItem(e); // provide child implementation
+            const pending = this.getPendingItem(e); // provide child implementation
             let duplicateIndex = -1;
             let counter = 0;
 
@@ -81,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
 
             if (duplicateIndex >= 0) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
-                this.flashDomItem(this.$el.find(".list-group-item:eq(" + duplicateIndex + ")"), "text-danger");
+                this.flashDomItem(this.$el.find(`.list-group-item:eq(${duplicateIndex})`), "text-danger");
             } else {
                 this.data.items.push(pending);
                 this.data.options.justAdded = pending;
@@ -117,5 +117,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
         toggleAddButton (enabled) {
             this.$el.find("[data-add-item]").prop("disabled", !enabled);
         }
-    });
-});
+    })
+);

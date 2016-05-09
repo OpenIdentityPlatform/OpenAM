@@ -14,7 +14,7 @@
  * Portions copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/CustomResponseAttributesView", [
+define([
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function (AbstractView) {
     var CustomResponseAttributesView = AbstractView.extend({

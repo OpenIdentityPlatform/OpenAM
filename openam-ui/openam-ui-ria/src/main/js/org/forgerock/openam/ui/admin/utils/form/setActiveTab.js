@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/admin/utils/form/setActiveTab
   */
- define("org/forgerock/openam/ui/admin/utils/form/setActiveTab", [
+ define([
  ], () =>
      /**
       * Sets active tab whose ID indicated in the variable view.activeTabId.

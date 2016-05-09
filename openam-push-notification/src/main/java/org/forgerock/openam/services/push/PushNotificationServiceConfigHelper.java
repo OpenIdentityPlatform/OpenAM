@@ -52,14 +52,18 @@ public class PushNotificationServiceConfigHelper {
      */
     public PushNotificationServiceConfig getConfig() throws PushNotificationException {
 
-        String senderId = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_SENDER_ID);
-        String apiKey = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_API_KEY);
-        String endpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_ENDPOINT);
+        String accessKey = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_ACCESS_KEY);
+        String secret = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_SECRET);
+        String appleEndpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_APPLE_ENDPOINT);
+        String googleEndpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_GOOGLE_ENDPOINT);
+        String delegateFactory = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_FACTORY_CLASS);
 
         return new PushNotificationServiceConfig.Builder()
-                .withSenderId(senderId)
-                .withApiKey(apiKey)
-                .withEndpoint(endpoint)
+                .withAccessKey(accessKey)
+                .withSecret(secret)
+                .withAppleEndpoint(appleEndpoint)
+                .withGoogleEndpoint(googleEndpoint)
+                .withDelegateFactory(delegateFactory)
                 .build();
     }
 

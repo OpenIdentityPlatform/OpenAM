@@ -1,7 +1,0 @@
-{
-    "response_type":"code",
-    "client_id":"s6BhdRkqt3",
-    "redirect_uri":"riap://client",
-    "scope":"test view",
-    "state":"xyz"
-}

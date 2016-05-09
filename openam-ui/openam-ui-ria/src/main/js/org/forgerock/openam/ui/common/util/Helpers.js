@@ -16,7 +16,7 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/Helpers", [
+define([
     "jquery",
     "handlebars",
     "lodash",
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/common/util/Helpers", [
         result = result.replace(/\*/g,
             '<input class="form-control" required type="text" value="*" placeholder="*" />');
         result = result.replace("̂",
-            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^/]+" />');
 
         return new Handlebars.SafeString(result);
     });

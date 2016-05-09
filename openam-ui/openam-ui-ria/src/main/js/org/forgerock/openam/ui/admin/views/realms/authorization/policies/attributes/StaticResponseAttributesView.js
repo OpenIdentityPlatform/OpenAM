@@ -14,7 +14,7 @@
  * Copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView", [
+define([
     "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/components/table/InlineEditTable"

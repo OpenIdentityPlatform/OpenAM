@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/user/oauth2/TokensView", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/services/TokenService",
@@ -67,8 +67,9 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                         var data = { aaData: tokens }, i, cleanScope, cleanDate;
 
                         for (i = 0; i < data.aaData.length; i++) {
-                            data.aaData[i].selector = '<input name="selector" id="' +
-                                                      data.aaData[i].id + '" type="checkbox" />';
+                            data.aaData[i].selector = `<input name="selector" id="${
+                                data.aaData[i].id
+                                }" type="checkbox" />`;
 
                             if (typeof data.aaData[i].scope !== "undefined") {
                                 cleanScope = data.aaData[i].scope;
@@ -112,13 +113,14 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                     }
                 ],
                 "oLanguage": {
-                    "sUrl": require.toUrl("locales/" + i18nManager.language + "/translation.json")
+                    "sUrl": require.toUrl(`locales/${i18nManager.language}/translation.json`)
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",
                 "fnInitComplete": function () {
-                    $(".deleteSelected").html('<input type="submit" class="button orange floatRight" value="' +
-                        $.t("common.form.deleteSelected") + '" >');
+                    $(".deleteSelected").html(`<input type="submit" class="button orange floatRight" value="${
+                        $.t("common.form.deleteSelected")
+                        }" >`);
                 },
                 "fnRowCallback": function (row, data) {
                     $(row).children().not(":first").click(function () {
@@ -129,24 +131,29 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                             output = '<table width="100%" cellpadding="5" cellspacing="0" border="0" ' +
                                 'style="padding:25px;">';
                             if (tokenInfo.realm) {
-                                output += "<tr><td>" + $.t("templates.oauth.realm") + "</td><td>" + tokenInfo.realm +
-                                          "</td></tr>";
+                                output += `<tr><td>${$.t("templates.oauth.realm")}</td><td>${
+                                        tokenInfo.realm
+                                    }</td></tr>`;
                             }
                             if (tokenInfo.refreshToken) {
-                                output += "<tr><td>" + $.t("templates.oauth.refreshToken") + "</td><td>" +
-                                          tokenInfo.refreshToken + "</td></tr>";
+                                output += `<tr><td>${$.t("templates.oauth.refreshToken")}</td><td>${
+                                          tokenInfo.refreshToken
+                                    }</td></tr>`;
                             }
                             if (tokenInfo.redirectURI) {
-                                output += "<tr><td>" + $.t("templates.oauth.redirectURI") + "</td><td>" +
-                                          tokenInfo.redirectURI + "</td></tr>";
+                                output += `<tr><td>${$.t("templates.oauth.redirectURI")}</td><td>${
+                                          tokenInfo.redirectURI
+                                    }</td></tr>`;
                             }
                             if (tokenInfo.userName) {
-                                output += "<tr><td>" + $.t("templates.oauth.username") + "</td><td>" +
-                                          tokenInfo.userName + "</td></tr>";
+                                output += `<tr><td>${$.t("templates.oauth.username")}</td><td>${
+                                          tokenInfo.userName
+                                    }</td></tr>`;
                             }
                             if (tokenInfo.parent) {
-                                output += "<tr><td>" + $.t("templates.oauth.parent") + "</td><td>" + tokenInfo.parent +
-                                          "</td></tr>";
+                                output += `<tr><td>${$.t("templates.oauth.parent")}</td><td>${
+                                        tokenInfo.parent
+                                    }</td></tr>`;
                             }
                             output += "</table>";
 

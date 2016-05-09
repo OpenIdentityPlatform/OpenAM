@@ -61,7 +61,6 @@ public class UserPushDeviceProfileManagerTest {
         assertThat(profile.getCommunicationId()).isNull();
         assertThat(profile.getDeviceName()).isEqualTo(UserPushDeviceProfileManager.DEVICE_NAME);
         assertThat(profile.getSharedSecret()).isNotEmpty();
-        assertThat(profile.getSharedSecret()).hasSize(UserPushDeviceProfileManager.SECRET_HEX_LENGTH * 2);
     }
 
     @Test
@@ -70,6 +69,7 @@ public class UserPushDeviceProfileManagerTest {
         PushDeviceSettings deviceSettings = new PushDeviceSettings();
         deviceSettings.setSharedSecret("sekret");
         deviceSettings.setDeviceName("test device");
+
         JsonValue expectedJson = new DeviceJsonUtils<>(PushDeviceSettings.class).toJsonValue(deviceSettings);
 
         // When

@@ -129,7 +129,9 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: transpiledDirectory,
-                    src: transpiledFiles,
+                    src: transpiledFiles.concat([
+                        "!main.js" // Output by r.js
+                    ]),
                     dest: compiledDirectory
                 }]
             }

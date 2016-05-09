@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/views/resource/MyResourcesPage", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/user/uma/views/resource/MyResourcesPage", [
             } else {
                 // Resolve label ID to name
                 UMAService.labels.get(this.data.labelId).then(function (data) {
-                    columns = self.createColumns("myresources/" + encodeURIComponent(data.id));
+                    columns = self.createColumns(`myresources/${encodeURIComponent(data.id)}`);
                     // Splice out the "Hosts" column
                     columns.splice(1, 1);
 

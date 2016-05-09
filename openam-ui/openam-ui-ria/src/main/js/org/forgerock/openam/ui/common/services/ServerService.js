@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/services/ServerService
   */
-define("org/forgerock/openam/ui/common/services/ServerService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -25,15 +25,14 @@ define("org/forgerock/openam/ui/common/services/ServerService", [
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, _, AbstractDelegate, Constants, RealmHelper) {
 
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 
     obj.getVersion = function () {
         return obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/version")
         }).then(function (data) {
-            return "OpenAM " + data.version + " " + $.t("common.form.build") + " " +
-                data.revision + " (" + data.date + ")";
+            return `OpenAM ${data.version} ${$.t("common.form.build")} ${data.revision} (${data.date})`;
         });
     };
 

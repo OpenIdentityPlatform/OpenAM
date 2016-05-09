@@ -22,12 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/user/services/SessionService", [
+define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (_, AbstractDelegate, Constants) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/sessions");
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/sessions`);
 
     function performServiceCall (options) {
         return obj.serviceCall(_.merge({
@@ -40,27 +40,27 @@ define("org/forgerock/openam/ui/user/services/SessionService", [
 
     obj.getMaxIdle = function (token) {
         return performServiceCall({
-            url: "?_action=getMaxIdle&tokenId=" + token,
+            url: `?_action=getMaxIdle&tokenId=${token}`,
             suppressSpinner: true
         });
     };
 
     obj.getTimeLeft = function (token) {
         return performServiceCall({
-            url: "?_action=getTimeLeft&tokenId=" + token,
+            url: `?_action=getTimeLeft&tokenId=${token}`,
             suppressSpinner: true
         });
     };
 
     obj.isSessionValid = function (token) {
         return performServiceCall({
-            url: "/" + token + "?_action=validate"
+            url: `/${token}?_action=validate`
         });
     };
 
     obj.logout = function (token) {
         return performServiceCall({
-            url: "/" + token + "?_action=logout"
+            url: `/${token}?_action=logout`
         });
     };
 

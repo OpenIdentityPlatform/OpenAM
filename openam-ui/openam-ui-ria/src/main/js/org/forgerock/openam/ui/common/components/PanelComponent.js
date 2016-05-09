@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/components/PanelComponent", [
+define([
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], (Backbone, UIUtils) => {

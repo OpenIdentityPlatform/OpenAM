@@ -185,8 +185,8 @@
             <artifactId>openam-license-manager-cli</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>oauth2-core</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
@@ -360,10 +360,6 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>jdmkrt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>publicsuffix</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

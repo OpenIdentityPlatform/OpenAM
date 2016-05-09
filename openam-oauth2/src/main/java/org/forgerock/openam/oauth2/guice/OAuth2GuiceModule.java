@@ -17,11 +17,14 @@ package org.forgerock.openam.oauth2.guice;
 
 import static com.google.inject.name.Names.named;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
 import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
 import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import javax.inject.Inject;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -40,8 +42,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -68,7 +68,6 @@ import org.forgerock.oauth2.core.DeviceCodeGrantTypeHandler;
 import org.forgerock.oauth2.core.DuplicateRequestParameterValidator;
 import org.forgerock.oauth2.core.GrantTypeHandler;
 import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -78,6 +77,7 @@ import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
+import org.forgerock.oauth2.core.RedirectUriResolver;
 import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
 import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
@@ -91,7 +91,6 @@ import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
 import org.forgerock.oauth2.restlet.OpenAMClientAuthenticationFailureFactory;
@@ -109,6 +108,7 @@ import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
 import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
 import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
@@ -117,6 +117,7 @@ import org.forgerock.openam.oauth2.OpenAMOAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
 import org.forgerock.openam.oauth2.StatelessCheck;
 import org.forgerock.openam.oauth2.StatelessTokenStore;
@@ -124,9 +125,7 @@ import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
-import org.forgerock.openam.oauth2.saml2.core.Saml2GrantTypeHandler;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
-import org.forgerock.openam.openidconnect.OpenAMIdTokenResponseTypeHandler;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
@@ -143,7 +142,6 @@ import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.ClaimsParameterValidator;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.CodeVerifierValidator;
-import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
@@ -171,8 +169,9 @@ public class OAuth2GuiceModule extends AbstractModule {
      */
     @Override
     protected void configure() {
+        bind(RedirectUriResolver.class);
         bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-        bind(new TypeLiteral<OAuth2RequestFactory<?, Request>>() { }).to(RestletOAuth2RequestFactory.class);
+        bind(new TypeLiteral<OAuth2RequestFactory<?, Request>>() {}).to(RestletOAuth2RequestFactory.class);
         bind(ResourceOwnerConsentVerifier.class).to(OpenIdResourceOwnerConsentVerifier.class);
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
@@ -184,7 +183,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(OpenIdConnectTokenStore.class).to(OpenAMTokenStore.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
         bind(ResourceOwnerAuthenticator.class).to(OpenAMResourceOwnerAuthenticator.class);
-        bind(IdTokenResponseTypeHandler.class).to(OpenAMIdTokenResponseTypeHandler.class);
         bind(UserInfoService.class).to(UserInfoServiceImpl.class);
         bind(TokenInfoService.class).to(TokenInfoServiceImpl.class);
         bind(ClientAuthenticationFailureFactory.class).to(OpenAMClientAuthenticationFailureFactory.class);
@@ -232,7 +230,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.addBinding(AUTHORIZATION_CODE).to(AuthorizationCodeGrantTypeHandler.class);
         grantTypeHandlers.addBinding(DEVICE_CODE).to(DeviceCodeGrantTypeHandler.class);
         grantTypeHandlers.addBinding(JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
-        grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.SAML2_BEARER).to(Saml2GrantTypeHandler.class);
 
         final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
                 binder(), AuthorizeRequestHook.class);

@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
@@ -42,18 +42,19 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             }
 
             if (overrideRealm && overrideRealm !== "/") {
-                endpoint = (overrideRealm.substring(0, 1) === "/" ? overrideRealm.slice(1) : overrideRealm) + "/" +
-                    endpoint;
+                endpoint = `${(overrideRealm.substring(0, 1) === "/" ? overrideRealm.slice(1) : overrideRealm)}"/${
+                    endpoint
+                    }`;
                 realmPath = overrideRealm;
             } else if (!overrideRealm && subRealm) {
-                endpoint = subRealm + "/" + endpoint;
+                endpoint = `${subRealm}/${endpoint}`;
                 realmPath = subRealm;
             }
 
-            realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
+            realmPath = realmPath.substring(0, 1) === "/" ? realmPath : `/${realmPath}`;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate("json/" + endpoint, params.token);
+                this.setDelegate(`json/${endpoint}`, params.token);
             }
 
             if (params.token) {

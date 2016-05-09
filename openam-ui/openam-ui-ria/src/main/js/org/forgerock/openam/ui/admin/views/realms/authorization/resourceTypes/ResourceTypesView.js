@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -51,7 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     _queryFilter: [
-                        "name+eq+" + encodeURIComponent('"^(?!Delegation Service$).*"')
+                        `name+eq+${encodeURIComponent('"^(?!Delegation Service$).*"')}`
                     ]
                 }),
                 parseState: BackgridUtils.parseState,

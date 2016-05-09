@@ -17,14 +17,14 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/global/SitesService
  */
-define("org/forgerock/openam/ui/admin/services/global/SitesService", [
+define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/models/JSONSchema",
-    "org/forgerock/openam/ui/common/models/JSONValues"
-], (_, AbstractDelegate, Constants, JSONSchema, JSONValues) => {
-
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/sites`);
 
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
@@ -64,12 +64,12 @@ define("org/forgerock/openam/ui/admin/services/global/SitesService", [
             }).then((data) => _.sortBy(data.result, "_id")),
         get: (id) =>
             Promise.all([getSchema(), getValues(id)]).then((response) => ({
-                schema: new JSONSchema(response[0]),
-                values: new JSONValues(response[1])
+                schema: new JSONSchema(response[0][0]),
+                values: new JSONValues(response[1][0])
             })),
         create: (data) =>
             obj.serviceCall({
-                url: `?_action=create`,
+                url: "?_action=create",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(_.omit(data, ["servers"]))
@@ -81,16 +81,23 @@ define("org/forgerock/openam/ui/admin/services/global/SitesService", [
                 type: "PUT",
                 data: JSON.stringify(filterUnEditableProperties(data))
             }),
-        remove: (id, etag) =>
-            obj.serviceCall({
+        remove: (id, etag) => {
+            const remove = (id, etag) => obj.serviceCall({
                 url: `/${id}`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
-            }),
+            });
+
+            if (_.isUndefined(etag)) {
+                return getValues(id).then((response) => remove(id, response.etag));
+            } else {
+                return remove(id, etag);
+            }
+        },
         getInitialState: () =>
             Promise.all([getSchema(), getTemplate()]).then((response) => ({
-                schema: new JSONSchema(response[0]),
-                values: new JSONValues(response[1])
+                schema: new JSONSchema(response[0][0]),
+                values: new JSONValues(response[1][0])
             }))
     };
 

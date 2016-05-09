@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsV
                     if (this.data.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
                             createBody: () => new InlineEditTable({
-                                values: this.data.values.raw[ServersService.servers.ADVANCED_SECTION]
+                                values: this.data.values.raw
                             }),
                             createFooter: () => new PartialBasedView({
                                 partial: "form/_JSONSchemaFooter"

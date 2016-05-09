@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/login/LoginFailureView", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper"

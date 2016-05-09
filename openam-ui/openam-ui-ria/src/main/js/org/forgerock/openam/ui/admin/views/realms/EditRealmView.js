@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
+define([
     "jquery",
     "lodash",
     "handlebars",
@@ -136,7 +136,7 @@ define("org/forgerock/openam/ui/admin/views/realms/EditRealmView", [
                         // Only create dropdowns if the field is editable
                         data.schema.properties.parentPath["enum"] = allRealmPaths;
                         data.schema.properties.parentPath.options = { "enum_titles": allRealmPaths };
-                        data.schema.properties.name.pattern = "^[^\ @#$%&+?:;,/=\\<>\"]+$";
+                        data.schema.properties.name.pattern = "^[^ @#$%&+?:;,/=\\<>\"]+$";
                     } else {
                         // Once created, it should not be possible to edit a realm's name or who it's parent is.
                         data.schema.properties.name.readonly = true;

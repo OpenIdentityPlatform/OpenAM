@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
  /**
@@ -19,7 +19,7 @@
   *
   * @module org/forgerock/openam/ui/common/RouteTo
   */
-define("org/forgerock/openam/ui/common/RouteTo", [
+define([
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/common/RouteTo", [
         setGoToUrlProperty: function () {
             var hash = Router.getCurrentHash();
             if (!Configuration.gotoURL && !hash.match(Router.configuration.routes.login.url)) {
-                Configuration.setProperty("gotoURL", "#" + hash);
+                Configuration.setProperty("gotoURL", `#${hash}`);
             }
         },
         forbiddenPage: function () {

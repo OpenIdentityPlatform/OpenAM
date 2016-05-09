@@ -22,11 +22,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/user/services/TokenService", [
+define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (constants, AbstractDelegate) {
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/frrest/oauth2/token");
+], function (Constants, AbstractDelegate) {
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/frrest/oauth2/token`);
 
     /**
      * Gets all the OAuth 2 tokens for a user
@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/user/services/TokenService", [
      * @param {String} id TokenID
      */
     obj.deleteToken = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ type: "DELETE", url: "/" + id, success: function () {
+        obj.serviceCall({ type: "DELETE", url: `/${id}`, success: function () {
             if (successCallback) {
                 successCallback(id);
             }
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/user/services/TokenService", [
      * @param {String} id TokenID
      */
     obj.getTokenByID = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ url: "/" + id, success: function (data) {
+        obj.serviceCall({ url: `/${id}`, success: function (data) {
             if (successCallback) {
                 successCallback(data);
             }

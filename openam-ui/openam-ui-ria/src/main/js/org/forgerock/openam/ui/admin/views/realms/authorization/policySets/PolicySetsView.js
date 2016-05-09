@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                         queryParams: BackgridUtils.getQueryParams({
                             filterName: "eq",
                             _queryFilter: [
-                                "name+eq+" + encodeURIComponent('"^(?!sunAMDelegationService$).*"')
+                                `name+eq+${encodeURIComponent('"^(?!sunAMDelegationService$).*"')}`
                             ]
                         }),
                         parseState: BackgridUtils.parseState,
@@ -207,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         exportPolicies () {
             var realm = this.realmPath === "/" ? "" : RealmHelper.encodeRealm(this.realmPath);
             this.$el.find("[data-export-policies]").attr("href",
-                Constants.host + "/" + Constants.context + "/xacml" + realm + "/policies");
+                `${Constants.host}/${Constants.context}/xacml${realm}/policies`);
         },
 
         addResource () {

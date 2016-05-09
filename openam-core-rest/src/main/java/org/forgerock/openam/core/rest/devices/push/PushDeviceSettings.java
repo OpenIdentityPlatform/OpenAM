@@ -28,10 +28,13 @@ import org.forgerock.util.Reject;
  */
 public final class PushDeviceSettings extends DeviceSettings {
 
-    private String sharedSecret;
-    private String deviceName;
-    private String communicationId;
-    private String deviceMechanismUID;
+    private String sharedSecret; // 256 bits randomly generated on push device creation
+    private String deviceName; // name of the device granted by openam, currently unused
+    private String communicationType; // the delivery mechanism type for the device - "gcm" or "apns"
+    private String deviceType; // type of device - "ios" or "android"
+    private String communicationId; // the device id for this comms. (may be higher level than gcm / apns e.g. asns)
+    private String deviceMechanismUID; // identifier for the mechanism on the remote device
+    private String deviceId; // the device id as known to the final delivery mechanism (gcm / apns)
 
     /**
      * Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
@@ -44,7 +47,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * Construct a new PushDeviceSettings object with the provided values.
      *
      * @param sharedSecret The device's shared secret. Non-null value.
-     * @param deviceName An arbitrary identifier for the device. Non-null value.
+     * @param deviceName   An arbitrary identifier for the device. Non-null value.
      */
     public PushDeviceSettings(String sharedSecret, String deviceName) {
         super();
@@ -60,6 +63,17 @@ public final class PushDeviceSettings extends DeviceSettings {
     public void setCommunicationId(String communicationId) {
         Reject.ifNull(communicationId, "communicationId can not be null.");
         this.communicationId = communicationId;
+    }
+
+
+    /**
+     * Set the device ID used to reference the user's handset.
+     *
+     * @param deviceId The device id. Can not be null.
+     */
+    public void setDeviceId(String deviceId) {
+        Reject.ifNull(deviceId, "deviceId can not be null.");
+        this.deviceId = deviceId;
     }
 
     /**
@@ -84,10 +98,29 @@ public final class PushDeviceSettings extends DeviceSettings {
 
     /**
      * Set the Device Mechanism ID.
-     * @param deviceMechanismUID
+     * @param deviceMechanismUID The identifier (unique on the phone) to the specific mechanism.
      */
     public void setDeviceMechanismUID(String deviceMechanismUID) {
+        Reject.ifNull(deviceMechanismUID);
         this.deviceMechanismUID = deviceMechanismUID;
+    }
+
+    /**
+     * The communication medium used to commune with this device
+     * @param communicationType The communication medium.
+     */
+    public void setCommunicationType(String communicationType) {
+        Reject.ifNull(communicationType, "communicationType can not be null");
+        this.communicationType = communicationType;
+    }
+
+    /**
+     * The type of device we are communicating with.
+     * @param deviceType The device type (likely ios or android).
+     */
+    public void setDeviceType(String deviceType) {
+        Reject.ifNull(deviceType, "deviceType can not be null");
+        this.deviceType = deviceType;
     }
 
     /**
@@ -109,7 +142,7 @@ public final class PushDeviceSettings extends DeviceSettings {
     }
 
     /**
-     * Get the communication ID for the Push device on the communication network..
+     * Get the communication ID for the Push device on the communication network.
      *
      * @return The communication identifier.
      */
@@ -126,6 +159,33 @@ public final class PushDeviceSettings extends DeviceSettings {
         return deviceMechanismUID;
     }
 
+    /**
+     * Get the type of the Push device.
+     *
+     * @return The identifier.
+     */
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    /**
+     * Get the arbitrary identifier for the Push device.
+     *
+     * @return The identifier.
+     */
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    /**
+     * Get the communication ID for the Push device on the communication network..
+     *
+     * @return The communication identifier.
+     */
+    public String getCommunicationType() {
+        return communicationType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -137,31 +197,21 @@ public final class PushDeviceSettings extends DeviceSettings {
 
         PushDeviceSettings that = (PushDeviceSettings) o;
 
-        if (!Objects.equals(deviceName, that.deviceName)) {
-            return false;
-        }
-        if (!Objects.equals(sharedSecret, that.sharedSecret)) {
-            return false;
-        }
-        if (!Objects.equals(uuid, that.uuid)) {
-            return false;
-        }
-        if (!Objects.equals(communicationId, that.communicationId)) {
-            return false;
-        }
-        if (!Arrays.equals(recoveryCodes, that.getRecoveryCodes())) {
-            return false;
-        }
-        if (!Objects.equals(deviceMechanismUID, that.deviceMechanismUID)) {
-            return false;
-        }
-
-        return true;
+        return Objects.equals(deviceName, that.deviceName)
+                && Objects.equals(sharedSecret, that.sharedSecret)
+                && Objects.equals(uuid, that.uuid)
+                && Objects.equals(deviceType, that.deviceType)
+                && Objects.equals(communicationId, that.communicationId)
+                && Objects.equals(communicationType, that.communicationType)
+                && Objects.equals(deviceMechanismUID, that.deviceMechanismUID)
+                && Objects.equals(deviceId, that.deviceId)
+                && Arrays.equals(recoveryCodes, recoveryCodes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sharedSecret, deviceName, uuid, communicationId, recoveryCodes, deviceMechanismUID);
+        return Objects.hash(sharedSecret, deviceName, uuid, communicationId, communicationType, deviceType,
+                recoveryCodes, deviceMechanismUID, deviceId);
     }
 
     @Override
@@ -172,6 +222,9 @@ public final class PushDeviceSettings extends DeviceSettings {
                 ", UUID='"+ uuid + '\'' +
                 ", communicationId='"+ communicationId + '\'' +
                 ", deviceMechanismUID='"+ deviceMechanismUID + '\'' +
+                ", deviceType='" + deviceType + '\'' +
+                ", communicationType='"+ communicationType + '\'' +
+                ", deviceId='"+ deviceId + '\'' +
                 ", recoveryCodes='"+ Arrays.toString(recoveryCodes) + '\'' +
                 '}';
     }

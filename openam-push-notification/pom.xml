@@ -40,6 +40,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sns</artifactId>
+            <version>1.10.72</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -16,16 +16,16 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.StatefulAccessToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -72,7 +72,7 @@ public class OpenAMAccessToken extends StatefulAccessToken {
      * @param redirectUri       The redirect uri.
      * @param scope             The scope.
      * @param expiryTime        The expiry time.
-     * @param refreshTokenId    The refresh token id.
+     * @param refreshToken      The refresh token.
      * @param tokenName         The token name.
      * @param grantType         The grant type.
      * @param nonce             The nonce.
@@ -81,10 +81,10 @@ public class OpenAMAccessToken extends StatefulAccessToken {
      * @param auditTrackingId   The tracking ID, used for tracking tokens throughout the audit logs.
      */
     public OpenAMAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
-                             String redirectUri, Set<String> scope, long expiryTime, String refreshTokenId,
+                             String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
                              String tokenName, String grantType, String nonce, String realm, String claims,
                              String auditTrackingId) {
-        super(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshTokenId,
+        super(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshToken,
                 tokenName, grantType, nonce);
         setRealm(realm);
         setAuditTrackingId(auditTrackingId);

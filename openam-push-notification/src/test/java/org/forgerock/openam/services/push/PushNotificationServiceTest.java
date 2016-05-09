@@ -15,7 +15,6 @@
 */
 package org.forgerock.openam.services.push;
 
-import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
@@ -49,9 +48,11 @@ public class PushNotificationServiceTest {
         this.mockHelperFactory = mock(PushNotificationServiceConfigHelperFactory.class);
         this.mockHelper = mock(PushNotificationServiceConfigHelper.class);
         this.config = new PushNotificationServiceConfig.Builder()
-                .withApiKey("apiKey")
-                .withEndpoint("endpoint")
-                .withSenderId("senderId")
+                .withAccessKey("accessKey")
+                .withAppleEndpoint("appleEndpoint")
+                .withGoogleEndpoint("googleEndpoint")
+                .withSecret("secret")
+                .withDelegateFactory("factoryClass")
                 .build();
         this.mockDelegateFactory = mock(PushNotificationDelegateFactory.class);
         this.mockDelegate = mock(PushNotificationDelegate.class);
@@ -76,7 +77,7 @@ public class PushNotificationServiceTest {
     @Test
     public void shouldSendMessage() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
 
         //when
         notificationService.send(pushMessage, "realm");
@@ -88,7 +89,7 @@ public class PushNotificationServiceTest {
     @Test
     public void shouldLoadDelegateAndSendMessage() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
         given(mockHelper.getFactoryClass())
                 .willReturn("org.forgerock.openam.services.push.PushNotificationServiceTest$TestDelegateFactory");
 
@@ -104,7 +105,7 @@ public class PushNotificationServiceTest {
     @Test (expectedExceptions = PushNotificationException.class)
     public void shouldFailWhenDelegateCannotLoad() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
         given(mockHelper.getFactoryClass()).willReturn("invalid factory");
 
         //when
@@ -116,7 +117,7 @@ public class PushNotificationServiceTest {
     @Test (expectedExceptions = PushNotificationException.class)
     public void shouldFailWhenConfigNotFound() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
 
         //when
         notificationService.send(pushMessage, "realm4");
@@ -127,7 +128,7 @@ public class PushNotificationServiceTest {
     @Test (expectedExceptions = PushNotificationException.class)
     public void shouldFailWhenDelegateFactoryIsBroken() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
         given(mockHelper.getFactoryClass())
                 .willReturn("org.forgerock.openam.services.push.PushNotificationServiceTest$TestBrokenDelegateFactory");
 
@@ -140,7 +141,7 @@ public class PushNotificationServiceTest {
     @Test (expectedExceptions = PushNotificationException.class)
     public void shouldFailWhenConfigCannotBeCreated() throws PushNotificationException {
         //given
-        PushMessage pushMessage = new PushMessage("identity", json(object()), null);
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
         given(mockHelper.getFactoryClass())
                 .willReturn("org.forgerock.openam.services.push.PushNotificationServiceTest$TestDelegateFactory");
         given(mockHelper.getConfig()).willThrow(new PushNotificationException("Build sanity check failed"));

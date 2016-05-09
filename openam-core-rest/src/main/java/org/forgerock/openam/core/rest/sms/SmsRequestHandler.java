@@ -19,7 +19,7 @@ package org.forgerock.openam.core.rest.sms;
 import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.json.resource.Resources.*;
 import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +74,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.configuration.ConfigurationBase;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -300,9 +298,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 case SMSObjectListener.MODIFY:
                     removeService(svcName);
                     serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
-                    if (ISAuthConstants.PLATFORM_SERVICE_NAME.equals(svcName)) {
-                        addServersRoutes(getServiceManager(), serviceRoutes);
-                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown modification type: " + type);
@@ -361,30 +356,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 serviceRoutes.put(serviceName, routes);
             }
         }
-        if (schemaType == SchemaType.GLOBAL) {
-            addServersRoutes(sm, serviceRoutes);
-        }
+
         this.serviceRoutes = serviceRoutes;
     }
-
-    private void addServersRoutes(ServiceManager sm, Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes)
-            throws SSOException, SMSException {
-        ServiceSchemaManager ssm = sm.getSchemaManager(ISAuthConstants.PLATFORM_SERVICE_NAME, DEFAULT_VERSION);
-        Set<RouteMatcher<Request>> rootRoutes = new HashSet<>();
-        serviceRoutes.get(ISAuthConstants.PLATFORM_SERVICE_NAME).put(routeTree, rootRoutes);
-        addServersRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SERVERS, ConfigurationBase.SUBSCHEMA_SERVER);
-    }
-
-    private void addServersRoutes(ServiceSchemaManager ssm, Set<RouteMatcher<Request>> serviceRoutes, String parentName,
-            String schemaName) throws SSOException, SMSException {
-        ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(parentName);
-        ServiceSchema schema = parentSchema.getSubSchema(schemaName);
-        HashMap<SmsRouteTree, Set<RouteMatcher<Request>>> routes = new HashMap<>();
-        addPaths("", new ArrayList<>(Collections.singletonList(parentSchema)), schema,
-                null, routes, Collections.<Pattern>emptyList(), routeTree);
-        serviceRoutes.addAll(routes.get(routeTree));
-    }
-
 
     /**
      * Remove routes for the service name.

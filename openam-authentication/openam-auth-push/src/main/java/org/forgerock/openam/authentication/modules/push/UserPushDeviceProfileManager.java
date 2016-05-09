@@ -17,6 +17,7 @@ package org.forgerock.openam.authentication.modules.push;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -24,7 +25,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.bind.DatatypeConverter;
 import org.forgerock.openam.core.rest.devices.DeviceJsonUtils;
 import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
@@ -75,7 +75,7 @@ public final class UserPushDeviceProfileManager {
     public PushDeviceSettings createDeviceProfile() {
         byte[] secretBytes = new byte[SECRET_HEX_LENGTH];
         secureRandom.nextBytes(secretBytes);
-        String sharedSecret = DatatypeConverter.printHexBinary(secretBytes);
+        String sharedSecret = Base64.encode(secretBytes);
 
         return new PushDeviceSettings(sharedSecret, DEVICE_NAME);
     }

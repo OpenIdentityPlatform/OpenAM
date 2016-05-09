@@ -17,14 +17,14 @@
 /**
 * @module org/forgerock/openam/ui/admin/services/realm/ScriptsService
 */
-define("org/forgerock/openam/ui/admin/services/realm/ScriptsService", [
+define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (Messages, AbstractDelegate, Configuration, Constants, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getLocalizedResponse (response) {
         Messages.addMessage({

@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/common/util/NavigationHelper
  */
-define("org/forgerock/openam/ui/common/util/NavigationHelper", [
+define([
     "lodash",
     "jquery",
     "org/forgerock/commons/ui/common/components/Navigation",
@@ -51,8 +51,8 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
             _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
                 name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
                 Navigation.addLink({
-                    "url": "#" + Router.getLink(Router.configuration.routes.realmDefault,
-                        [encodeURIComponent(realm.path)]),
+                    "url": `#${Router.getLink(Router.configuration.routes.realmDefault,
+                        [encodeURIComponent(realm.path)])}`,
                     "name": name,
                     "cssClass": "dropdown-sub",
                     "dynamicLink": true
@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/common/util/NavigationHelper", [
             }).run();
 
             Navigation.addLink({
-                "url": "#" + Router.getLink(Router.configuration.routes.realms),
+                "url": `#${Router.getLink(Router.configuration.routes.realms)}`,
                 "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
                 "cssClass": "dropdown-sub",
                 "dynamicLink": true

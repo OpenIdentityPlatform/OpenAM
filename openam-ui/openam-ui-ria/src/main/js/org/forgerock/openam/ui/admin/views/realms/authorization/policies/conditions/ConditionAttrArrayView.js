@@ -14,10 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
     "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
 
@@ -82,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                 sortField: "value",
                                 render: {
                                     item: function (item) {
-                                        return "<span class='time-zone-selected'>" + item.text + "</span>";
+                                        return `<span class='time-zone-selected'>${item.text}</span>`;
                                     }
                                 },
                                 load: function () {

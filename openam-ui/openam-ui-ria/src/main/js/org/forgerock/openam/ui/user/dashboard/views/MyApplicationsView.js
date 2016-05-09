@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/dashboard/views/MyApplicationsView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",

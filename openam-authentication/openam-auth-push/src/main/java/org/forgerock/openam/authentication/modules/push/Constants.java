@@ -32,8 +32,6 @@ final class Constants {
      */
     /** The Name of the AuthenticatorPush authentication module for debug logging purposes. */
     static final String AM_AUTH_AUTHENTICATOR_PUSH = "amAuthAuthenticatorPush";
-    /** Module configuration key for device identifier. */
-    static final String DEVICE_MESSAGING_ID = "forgerock-am-auth-push-device-messaging-id";
     /** Module configuration key for push timeout. */
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-response-timeout";
     /** Module configuration key for authentication level of module. */
@@ -46,8 +44,6 @@ final class Constants {
     static final int USERNAME_STATE = 2;
     /** State to display please wait message to the  end-user. */
     static final int STATE_WAIT = 3;
-    /** State to display an error message to the end-user. */
-    static final int STATE_ERROR = 4;
 
     /** The Position of the Polling callback in the callbacks step in the xml for this module. */
     static final int POLLING_CALLBACK_POSITION = 1;

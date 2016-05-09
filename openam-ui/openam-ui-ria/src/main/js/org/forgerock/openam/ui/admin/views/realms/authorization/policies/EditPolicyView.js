@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -136,7 +136,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                     this.allUserAttributesPromise,
                     this.resourceTypesPromise
                 ).done((policySetModel, allSubjects, allEnvironments, allUserAttributes, resourceTypes) => {
-                    let resourceType;
                     const policySet = policySetModel[0];
 
                     self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
@@ -153,7 +152,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                     self.data.options.availableSubjects =
                         _.findByValues(allSubjects[0].result, "title", policySet.subjects);
 
-                    resourceType = _.find(self.data.options.availableResourceTypes, {
+                    const resourceType = _.find(self.data.options.availableResourceTypes, {
                         uuid: self.model.attributes.resourceTypeUuid
                     });
 

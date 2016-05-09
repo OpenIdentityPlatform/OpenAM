@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -24,8 +24,9 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], ($, _, Backbone, Messages, EventManager, Router, Constants, ServicesService, FormHelper, UIUtils) => {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/Promise"
+], ($, _, Backbone, Messages, EventManager, Router, Constants, ServicesService, FormHelper, UIUtils, Promise) => {
     function deleteSubSchema (realmPath, type, subSchemaType, subSchemaInstance) {
         return ServicesService.type.subSchema.instance.remove(realmPath, type, subSchemaType, subSchemaInstance);
     }
@@ -44,8 +45,8 @@ define("org/forgerock/openam/ui/admin/views/realms/services/SubSchemaListView", 
                 ServicesService.type.subSchema.type.getCreatables(this.options.realmPath, this.options.type)
             ]).then((response) => {
                 const data = _.merge({}, this.options, {
-                    instances: response[0],
-                    creatables:response[1]
+                    instances: response[0][0],
+                    creatables:response[1][0]
                 });
 
                 UIUtils.fillTemplateWithData(this.template, data, (html) => {

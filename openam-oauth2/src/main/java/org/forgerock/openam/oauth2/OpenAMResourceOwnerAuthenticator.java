@@ -16,8 +16,18 @@
 
 package org.forgerock.openam.oauth2;
 
-import static com.sun.identity.shared.DateUtils.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static com.sun.identity.shared.DateUtils.stringToDate;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.text.ParseException;
+import java.util.ArrayList;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -32,17 +42,6 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.security.AccessController;
-import java.text.ParseException;
-import java.util.ArrayList;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
@@ -90,9 +89,13 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
             final String username = request.getParameter(USERNAME);
             final char[] password = request.getParameter(PASSWORD) == null ? null :
                     request.<String>getParameter(PASSWORD).toCharArray();
-            final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-            final String authChain = request.getParameter(AUTH_CHAIN);
-            return authenticate(username, password, realm, authChain);
+            try {
+                final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
+                final String authChain = request.getParameter(AUTH_CHAIN);
+                return authenticate(username, password, realm, authChain);
+            } catch (org.forgerock.json.resource.NotFoundException e) {
+                throw new NotFoundException(e.getMessage());
+            }
         } else {
             try {
                 final AMIdentity id = IdUtils.getIdentity(

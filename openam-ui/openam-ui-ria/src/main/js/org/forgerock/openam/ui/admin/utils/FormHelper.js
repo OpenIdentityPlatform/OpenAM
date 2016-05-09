@@ -18,7 +18,7 @@
  * @module org/forgerock/openam/ui/admin/utils/FormHelper
  * @deprecated
  */
-define("org/forgerock/openam/ui/admin/utils/FormHelper", [
+define([
     "org/forgerock/openam/ui/admin/utils/form/bindSavePromiseToElement",
     "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting",
     "org/forgerock/openam/ui/admin/utils/form/setActiveTab",

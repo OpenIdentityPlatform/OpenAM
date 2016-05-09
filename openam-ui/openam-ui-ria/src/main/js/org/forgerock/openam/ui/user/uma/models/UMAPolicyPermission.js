@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/models/UMAPolicyPermission", [
+define([
     "backbone",
     "backbone-relational",
     "org/forgerock/openam/ui/user/uma/models/UMAPolicyPermissionScope"

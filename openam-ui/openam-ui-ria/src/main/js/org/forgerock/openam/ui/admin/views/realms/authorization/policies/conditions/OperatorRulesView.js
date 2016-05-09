@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/OperatorRulesView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
-                self.setElement("#operator" + itemID);
+                self.setElement(`#operator${itemID}`);
                 self.select = self.$el.find("select");
                 self.delegateEvents();
 
@@ -105,7 +105,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             if (dropbox.children(":not(.dragged)").length > 1) {
                 _.each(this.data.operators, function (obj) {
-                    option = select.find('option[value="' + obj.title + '"]');
+                    option = select.find(`option[value="${obj.title}"]`);
                     var isDisabled = !!(obj.config.properties.condition || obj.config.properties.subject);
                     option.prop("disabled", isDisabled);
                 });

@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 import static org.forgerock.oauth2.core.Utils.*;
 import static org.forgerock.openam.utils.Time.*;
 
@@ -42,7 +42,7 @@ import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.GrantTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;

@@ -15,9 +15,9 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "handlebars",
@@ -56,8 +56,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
                 index = selected.index(),
                 data = {
                     criteria : selected.val().toLowerCase(),
-                    passText : $.t("console.authentication.editChains.criteria." + index + ".passText"),
-                    failText : $.t("console.authentication.editChains.criteria." + index + ".failText")
+                    passText : $.t(`console.authentication.editChains.criteria.${index}.passText`),
+                    failText : $.t(`console.authentication.editChains.criteria.${index}.failText`)
                 };
 
             UIUtils.fillTemplateWithData(self.popoverTemplate, data, function (data) {
@@ -74,9 +74,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
         renderArrows: function () {
             var html = Handlebars.compile(
-                    "{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='" +
-                    this.data.linkConfig.criteria + "'}}"
-                );
+                `{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='${
+                    this.data.linkConfig.criteria
+                    }'}}`);
 
             this.$el.find(".criteria-view").html(html);
         },

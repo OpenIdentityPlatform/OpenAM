@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/setDefaultPropertiesToRequiredAndEmpty
   */
-define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/setDefaultPropertiesToRequiredAndEmpty", [
+define([
     "lodash"
 ], (_) => (schemaValuePair) => {
     const requiredSchemaKeys = schemaValuePair.schema.getRequiredPropertyKeys();

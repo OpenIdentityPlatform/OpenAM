@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/uma/models/UMAPolicyPermissionScope", [
+define([
     "jquery",
     "lodash",
     "backbone",

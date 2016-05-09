@@ -16,7 +16,7 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/ExternalLinks", [
+define([
     "lodash"
 ], (_) => {
 
@@ -28,9 +28,9 @@ define("org/forgerock/openam/ui/common/util/ExternalLinks", [
                 policySets: "#configure-apps-with-console",
                 policies: "#configure-policies-with-console",
                 resourceTypes: "#configure-resource-types-with-console"
-            }, (hash) => backstageDocsUrl + "admin-guide" + hash),
+            }, (hash) => `${backstageDocsUrl}admin-guide${hash}`),
             config: {
-                services : backstageDocsUrl + "reference" + "#chap-config-ref"
+                services : `${backstageDocsUrl}reference#chap-config-ref`
             }
         }
     };

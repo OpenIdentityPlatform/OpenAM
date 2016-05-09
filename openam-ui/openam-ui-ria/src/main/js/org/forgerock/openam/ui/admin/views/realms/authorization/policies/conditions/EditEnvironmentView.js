@@ -14,9 +14,9 @@
  * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditEnvironmentView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
-                self.setElement("#environment_" + itemID);
+                self.setElement(`#environment_${itemID}`);
 
                 if (itemData) {
                     // Temporary fix, the name attribute is being added by the server after the policy is created.
@@ -108,7 +108,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
                         self.i18n.condition.title);
                     PoliciesService.getScriptById(mergedData.scriptId).done(function (script) {
-                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + "scriptId"] =
+                        itemToDisplay[`${self.i18n.condition.key}${type}${self.i18n.condition.props}scriptId`] =
                             script.name;
                         self.setListItemHtml(item, itemToDisplay);
                     });
@@ -137,7 +137,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 },
                 function (tpl) {
                     item.find(".item-data").html(tpl);
-                    self.setElement("#" + item.attr("id"));
+                    self.setElement(`#${item.attr("id")}`);
                 });
         },
 
@@ -225,7 +225,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 new ArrayAttr().render({
                     itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]],
                     title: "scriptId", dataSource: "scripts", multiple: false,
-                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId"
+                    i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}scriptId`
                 }, itemDataEl, htmlBuiltPromise.resolve);
             }
 
@@ -242,7 +242,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     itemData: itemData,
                     data: [itemData.enforcementTimeZone],
                     title: "enforcementTimeZone",
-                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "enforcementTimeZone",
+                    i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}enforcementTimeZone`,
                     dataSource: "enforcementTimeZone",
                     multiple: false
                 }, itemDataEl);

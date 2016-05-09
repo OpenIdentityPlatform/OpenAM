@@ -65,4 +65,22 @@ public interface PushNotificationDelegate extends Closeable {
      */
     void updateDelegate(PushNotificationServiceConfig newConfig);
 
+    /**
+     * Returns the (public, relative) registration service location of this delegate - if appropriate.
+     * Otherwise returns null.
+     *
+     * @return The (public, relative) service location of this delegate as exposed to the world, may be relative to the
+     * OpenAM server instance ID {@see WebtopNaming}.
+     */
+    String getRegServiceLocation();
+
+    /**
+     * Returns the (public, relative) authentication service location of this delegate - if appropriate.
+     * Otherwise returns null.
+     *
+     * @return The (public, relative) service location of this delegate as exposed to the world, may be relative to the
+     * OpenAM server instance ID {@see WebtopNaming}.
+     */
+    String getAuthServiceLocation();
+
 }

@@ -24,7 +24,7 @@
  *
  * $Id: IdUtils.java,v 1.34 2009/11/20 23:52:54 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -50,6 +50,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
@@ -63,6 +64,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -87,10 +89,14 @@ public final class IdUtils {
     protected static Map typesCanAddMembers = new CaseInsensitiveHashMap();
 
     // Static map to cache "orgIdentifier" and organization DN
-    private static Map orgIdentifierToOrgName = Collections.synchronizedMap(
-        new CaseInsensitiveHashMap());
-    private static Map orgStatusCache = Collections.synchronizedMap(
-        new CaseInsensitiveHashMap());
+    private static Map<String, String> orgIdentifierToOrgName = Collections.synchronizedMap(
+        new CaseInsensitiveHashMap<String, String>());
+    private static Map<String, Boolean> orgStatusCache = Collections.synchronizedMap(
+        new CaseInsensitiveHashMap<String, Boolean>());
+
+    // Static Set to cache unknown organisation lookups
+    private static Set<String> unknownOrgLookupCache =
+            Collections.synchronizedSet(new CaseInsensitiveHashSet<String>());
 
     // ServiceConfigManager for sunidentityrepository service
     private static String notificationId;
@@ -457,9 +463,19 @@ public final class IdUtils {
     public static String getOrganization(SSOToken token, String orgIdentifier)
             throws IdRepoException, SSOException {
         // Check in cache first
-        String id = null;
-        if ((id = (String) orgIdentifierToOrgName.get(orgIdentifier)) != null) {
+        String id = orgIdentifierToOrgName.get(orgIdentifier);
+        if (id != null) {
             return (id);
+        }
+
+        String[] args = {orgIdentifier};
+        // Don't go to the expense of an organisation search if we have failed to look this up already.
+        if (unknownOrgLookupCache.contains(orgIdentifier)) {
+            if (debug.messageEnabled()) {
+                debug.message("IdUtils.getOrganization: orgIdentifier {} found in unknown org lookup cache.",
+                        orgIdentifier);
+            }
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
         }
 
         // Compute the organization name
@@ -477,8 +493,10 @@ public final class IdUtils {
             try {
                 new OrganizationConfigManager(token, orgIdentifier);
             } catch (SMSException e) {
-                debug.message("IdUtils.getOrganization Exception in getting org name from SMS", e);
-                Object[] args = { orgIdentifier };
+                if (debug.messageEnabled()) {
+                    debug.message("IdUtils.getOrganization Exception in getting org name from SMS", e);
+                }
+                unknownOrgLookupCache.add(orgIdentifier);
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         } else if (LDAPUtils.isDN(orgIdentifier)) {
@@ -488,12 +506,10 @@ public final class IdUtils {
                 OrganizationConfigManager ocm = 
                     new OrganizationConfigManager(token, orgIdentifier);
             } catch (SMSException smse) {
-                // debug message here.
                 if (debug.messageEnabled()) {
-                    debug.message("IdUtils.getOrganization Exception in "
-                            + "getting org name from SMS", smse);
+                    debug.message("IdUtils.getOrganization Exception in getting org name from SMS", smse);
                 }
-                Object[] args = { orgIdentifier };
+                unknownOrgLookupCache.add(orgIdentifier);
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         } else if (ServiceManager.isCoexistenceMode()) {
@@ -521,35 +537,27 @@ public final class IdUtils {
                 boolean foundOrg = false;
                 ServiceManager sm = new ServiceManager(token);
                 // First search for realms with orgIdentifier name
-                OrganizationConfigManager ocm = sm
-                        .getOrganizationConfigManager("/");
-                Set subOrgNames = ocm.getSubOrganizationNames(orgIdentifier,
-                        true);
-                if (subOrgNames != null && !subOrgNames.isEmpty()) {
+                OrganizationConfigManager ocm = sm.getOrganizationConfigManager("/");
+                Set<String> subOrgNames = ocm.getSubOrganizationNames(orgIdentifier, true);
+                if (CollectionUtils.isNotEmpty(subOrgNames)) {
                     if (subOrgNames.size() == 1) {
-                        id = DNMapper.orgNameToDN((String) subOrgNames
-                                .iterator().next());
+                        id = DNMapper.orgNameToDN(subOrgNames.iterator().next());
                         foundOrg = true;
                     } else {
-                        for (Iterator items = subOrgNames.iterator();
-                            items.hasNext();) {
+                        for (String subRealmName : subOrgNames) {
                             // check for orgIdentifier
-                            String subRealmName = (String) items.next();
-                            StringTokenizer st = new StringTokenizer(
-                                    subRealmName, "/");
+                            StringTokenizer st = new StringTokenizer(subRealmName, "/");
                             // Need to handle the scenario where multiple
                             // sub-realm with the same name should not be
                             // allowed
                             while (st.hasMoreTokens()) {
-                                if (st.nextToken().equalsIgnoreCase(
-                                        orgIdentifier)) {
+                                if (st.nextToken().equalsIgnoreCase(orgIdentifier)) {
                                     if (!foundOrg) {
                                         id = DNMapper.orgNameToDN(subRealmName);
                                         foundOrg = true;
                                     } else {
-                                        Object[] args = {orgIdentifier};
-                                        throw new IdRepoException(IdRepoBundle
-                                            .BUNDLE_NAME, IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
+                                        throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                                                IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
                                     }
                                 }
                             }
@@ -563,28 +571,24 @@ public final class IdUtils {
                         "SMS realms aliases");
                 }
                 // perform organization alias search
-                Set vals = new HashSet();
+                Set<String> vals = new HashSet<>(1);
                 vals.add(orgIdentifier);
                 Set orgAliases = sm.searchOrganizationNames(
-                    IdConstants.REPO_SERVICE,
-                    IdConstants.ORGANIZATION_ALIAS_ATTR, vals);
-                if (!foundOrg &&
-                    ((orgAliases == null) || orgAliases.isEmpty())) {
+                        IdConstants.REPO_SERVICE,
+                        IdConstants.ORGANIZATION_ALIAS_ATTR, vals);
+                if (!foundOrg && CollectionUtils.isEmpty(orgAliases)) {
                     if (debug.warningEnabled()) {
-                        debug.warning("IdUtils.getOrganization Unable" +
-                            " to find Org name for: " + orgIdentifier);
+                        debug.warning("IdUtils.getOrganization Unable to find Org name for: " + orgIdentifier);
                     }
-                    Object[] args = {orgIdentifier};
+                    unknownOrgLookupCache.add(orgIdentifier);
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                             IdRepoErrorCode.NO_MAPPING_FOUND, args);
-                } else if ((orgAliases != null)  && (orgAliases.size() > 0) &&
-                    (foundOrg || orgAliases.size() > 1)) {
+                } else if (CollectionUtils.isNotEmpty(orgAliases) && (foundOrg || orgAliases.size() > 1)) {
                     // Multiple realms should not have the same alias
                     if (debug.warningEnabled()) {
                         debug.warning("IdUtils.getOrganization Multiple " +
-                            " matching Orgs found for: " + orgIdentifier);
+                                " matching Orgs found for: " + orgIdentifier);
                     }
-                    Object[] args = {orgIdentifier};
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                             IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
                 }
@@ -593,12 +597,11 @@ public final class IdUtils {
                     id = DNMapper.orgNameToDN(tmpS);
                 }
             } catch (SMSException smse) {
-                // debug message here.
                 if (debug.messageEnabled()) {
                     debug.message("IdUtils.getOrganization Exception in "
                             + "getting org name from SMS", smse);
                 }
-                Object[] args = { orgIdentifier };
+                unknownOrgLookupCache.add(orgIdentifier);
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
             }
         }
@@ -619,6 +622,7 @@ public final class IdUtils {
     protected static void clearOrganizationNamesCache() {
         orgIdentifierToOrgName.clear();
         orgStatusCache.clear();
+        unknownOrgLookupCache.clear();
         if (debug.messageEnabled()) {
             debug.message("IdUtils.clearOrganizationNamesCache called");
         }
@@ -644,7 +648,7 @@ public final class IdUtils {
             throws IdRepoException, SSOException {
         // Check the cache
         if (orgStatusCache.containsKey(org)) {
-            return (((Boolean) orgStatusCache.get(org)).booleanValue());
+            return orgStatusCache.get(org);
         }
         boolean isActive = true;
         // Need to initialize ServiceManager by creating the constructor

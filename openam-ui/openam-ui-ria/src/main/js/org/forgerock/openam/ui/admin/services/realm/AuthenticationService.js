@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/realm/AuthenticationService
  */
-define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
-    const obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function scopedByRealm (realm, path) {
         var encodedRealm = "";
@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
         if (realm !== "/") {
             encodedRealm = RealmHelper.encodeRealm(realm);
         }
-        return encodedRealm + "/realm-config/" + path;
+        return `${encodedRealm}/realm-config/${path}`;
     }
 
     obj.authentication = {
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
 
                 return $.when(
                     obj.serviceCall({
-                        url: url + "/chains?_queryFilter=true",
+                        url: `${url}/chains?_queryFilter=true`,
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
@@ -99,11 +99,11 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url: url + "/chains/" + name,
+                        url: `${url}/chains/${name}`,
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url: url + "/modules?_queryFilter=true",
+                        url: `${url}/modules?_queryFilter=true`,
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     })
                 ).then(function (authenticationData, chainData, modulesData) {
@@ -134,14 +134,14 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             },
             remove: function (realm, name) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/chains/" + name),
+                    url: scopedByRealm(realm, `authentication/chains/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update: function (realm, name, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/chains/" + name),
+                    url: scopedByRealm(realm, `authentication/chains/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
@@ -157,7 +157,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             },
             create: function (realm, data, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "?_action=create"),
+                    url: scopedByRealm(realm, `authentication/modules/${type}?_action=create`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST",
                     data: JSON.stringify(data)
@@ -165,7 +165,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             },
             get: function (realm, name, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).then(function (data) {
                     return data;
@@ -174,8 +174,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             exists: function (realm, name) {
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
-                        url: scopedByRealm(realm, 'authentication/modules?_queryFilter=_id eq "' + name +
-                            '"&_fields=_id'),
+                        url: scopedByRealm(realm, `authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
 
@@ -186,14 +185,14 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             },
             remove: function (realm, name, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update: function (realm, name, type, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
@@ -216,7 +215,7 @@ define("org/forgerock/openam/ui/admin/services/realm/AuthenticationService", [
             },
             schema: function (realm, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + type + "?_action=schema"),
+                    url: scopedByRealm(realm, `authentication/modules/${type}?_action=schema`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then(function (data) {

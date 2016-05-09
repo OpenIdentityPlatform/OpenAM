@@ -14,8 +14,8 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
-    "underscore",
+define([
+    "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/utils/ModelUtils"
@@ -68,7 +68,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
 
             if (model.id === null) {
                 method = "create";
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

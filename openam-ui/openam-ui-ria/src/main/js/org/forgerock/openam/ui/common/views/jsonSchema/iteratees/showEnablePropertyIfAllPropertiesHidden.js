@@ -17,7 +17,7 @@
  /**
   * @module org/forgerock/openam/ui/common/views/jsonSchema/iteratees/showEnablePropertyIfAllPropertiesHidden
   */
-define("org/forgerock/openam/ui/common/views/jsonSchema/iteratees/showEnablePropertyIfAllPropertiesHidden", [
+define([
     "lodash"
 ], (_) => (schemaValuePair) => {
     const allPropertiesHidden = _.isEmpty(schemaValuePair.schema.raw.defaultProperties);

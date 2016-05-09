@@ -141,8 +141,8 @@
                                  i18nKey="a105"
                                  resourceName="responseTypeClasses">
                     <DefaultValues>
-                        <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
-                        <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
+                        <Value>token|org.forgerock.oauth2.core.TokenResponseTypeHandler</Value>
+                        <Value>code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

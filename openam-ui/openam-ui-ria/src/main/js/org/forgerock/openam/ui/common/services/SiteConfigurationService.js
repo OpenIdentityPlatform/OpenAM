@@ -14,7 +14,7 @@
  * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/services/SiteConfigurationService", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/common/services/SiteConfigurationService", [
     "org/forgerock/openam/ui/common/services/ServerService",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
         lastKnownSubRealm,
         lastKnownOverrideRealm,
         setRequireMapConfig = function (serverInfo) {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/common/services/SiteConfigurationService", [
             try {
                 console.log("No current SUB REALM was detected. Applying from current URI values...");
                 var subRealm = RealmHelper.getSubRealm();
-                console.log("Changing SUB REALM to '" + subRealm + "'");
+                console.log(`Changing SUB REALM to '${subRealm}'`);
 
                 Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
 
@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/common/services/SiteConfigurationService", [
             overrideRealmChanged = lastKnownOverrideRealm !== currentOverrideRealm;
         if (subRealmChanged || overrideRealmChanged) {
             if (currentSubRealm !== lastKnownSubRealm) {
-                console.log("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
+                console.log(`Changing SUB REALM from '${lastKnownSubRealm}' to '${currentSubRealm}'`);
                 Configuration.globalData.auth.subRealm = currentSubRealm;
                 lastKnownSubRealm = currentSubRealm;
             }

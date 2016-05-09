@@ -17,7 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 import static org.forgerock.util.query.QueryFilter.or;
@@ -51,7 +51,6 @@ import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthorizationCode;
 import org.forgerock.oauth2.core.DeviceCode;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -164,8 +163,15 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         final String ssoTokenId = getSsoTokenId(request);
 
+        String realm;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
+
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
-                redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)),
+                redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realm,
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
                 ssoTokenId, codeChallenge, codeChallengeMethod);
 
@@ -244,7 +250,12 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final long exp = TimeUnit.MILLISECONDS.toSeconds(clientRegistration.getJwtTokenLifeTime(providerSettings)) +
                 currentTimeInSeconds;
 
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        final String realm;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
 
         final String iss = oAuth2Uris.getIssuer();
 
@@ -486,7 +497,12 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final String id = UUID.randomUUID().toString();
         final String auditId = UUID.randomUUID().toString();
 
-        String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        String realm = null;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
 
         long expiryTime = 0;
         if (clientRegistration == null) {
@@ -495,16 +511,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + currentTimeMillis();
         }
         
-        final AccessToken accessToken;
-        if (refreshToken == null) {
-            accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
-                    scope, expiryTime, null, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType, nonce,
-                    realm, claims, auditId);
-        } else {
-            accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
-                    scope, expiryTime, refreshToken.getTokenId(), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType,
-                    nonce, realm, claims, auditId);
-        }
+        final AccessToken accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId,
+                clientId, redirectUri, scope, expiryTime, refreshToken, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN,
+                grantType, nonce, realm, claims, auditId);
         try {
             tokenStore.create(accessToken.toJsonValue());
             if (auditLogger.isAuditLogEnabled()) {
@@ -534,7 +543,20 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
             throws ServerException, NotFoundException {
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
+                validatedClaims, UUID.randomUUID().toString());
+    }
+
+        @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException {
+        final String realm;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
 
         logger.message("Create refresh token");
         
@@ -570,7 +592,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
-                realm, authModules, acr, auditId);
+                realm, authModules, acr, auditId, authGrantId);
 
         if (!StringUtils.isBlank(validatedClaims)) {
             refreshToken.setClaims(validatedClaims);
@@ -815,10 +837,14 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
     protected void validateTokenRealm(final String tokenRealm, final OAuth2Request request)
             throws InvalidGrantException, NotFoundException {
-        final String normalisedRequestRealm = realmNormaliser.normalise(request.<String>getParameter(REALM));
-        if (!tokenRealm.equals(normalisedRequestRealm) && !realmNormaliser.normalise(tokenRealm).equals(
-                normalisedRequestRealm)) {
-            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        try {
+            final String normalisedRequestRealm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+            if (!tokenRealm.equals(normalisedRequestRealm) && !realmNormaliser.normalise(tokenRealm).equals(
+                    normalisedRequestRealm)) {
+                throw new InvalidGrantException("Grant is not valid for the requested realm");
+            }
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
@@ -860,11 +886,18 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not generate a unique user code");
         }
 
+        String realm;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
+
         long expiryTime = currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
         String resourceOwnerId = resourceOwner == null ? null : resourceOwner.getId();
         final DeviceCode code = new DeviceCode(deviceCode, userCode, resourceOwnerId, clientId, nonce,
                 responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
-                realmNormaliser.normalise(request.<String>getParameter(REALM)), codeChallenge, codeChallengeMethod);
+                realm, codeChallenge, codeChallengeMethod);
 
         // Store in CTS
         try {

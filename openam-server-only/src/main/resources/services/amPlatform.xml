@@ -26,8 +26,7 @@
   
    $Id: amPlatform.xml,v 1.6 2008/06/25 05:46:12 qcheng Exp $
 
-   Portions Copyrighted 2015 ForgeRock AS.
-  
+   Portions Copyrighted 2015-2016 ForgeRock AS.
 -->
 
 
@@ -67,9 +66,6 @@
                     syntax="string"
                     i18nKey="a103"
                     resourceName="cookieDomains">
-                    <DefaultValues>
-                        <Value>@COOKIE_DOMAIN@</Value>
-                    </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="com-sun-identity-sites">
                     <SubSchema name="site" inheritance="multiple" resourceName="sites">

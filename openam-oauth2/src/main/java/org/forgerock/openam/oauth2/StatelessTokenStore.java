@@ -18,16 +18,16 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.set;
-import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.CLAIMS;
-import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.ACR;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.TOKEN_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.EXPIRES_IN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 
@@ -47,7 +47,16 @@ import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
-import org.forgerock.oauth2.core.*;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AuthorizationCode;
+import org.forgerock.oauth2.core.DeviceCode;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
+import org.forgerock.oauth2.core.RefreshToken;
+import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -119,7 +128,12 @@ public class StatelessTokenStore implements TokenStore {
             expiresIn = Duration.millis(clientRegistration.getAccessTokenLifeTime(providerSettings));
         }
         expiryTime = expiresIn.plus(currentTime);
-        String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        String realm = null;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
         JwtClaimsSetBuilder claimsSetBuilder = jwtBuilder.claims()
                 .jti(UUID.randomUUID().toString())
                 .exp(newDate(expiryTime.getMillis()))
@@ -134,7 +148,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
-                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString());
+                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
+                .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString());
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
                 .claims(claimsSetBuilder.build())
@@ -242,7 +257,20 @@ public class StatelessTokenStore implements TokenStore {
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
             throws ServerException, NotFoundException {
-        String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
+                validatedClaims, UUID.randomUUID().toString());
+    }
+
+    @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException {
+        String realm = null;
+        try {
+            realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         Duration currentTime = Duration.millis(currentTimeMillis());
@@ -266,7 +294,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, lifeTime.getMillis())
                 .claim(TOKEN_NAME, OAUTH_REFRESH_TOKEN)
-                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString());
+                .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
+                .claim(AUTH_GRANT_ID, authGrantId);
 
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
         String authModules = null;
@@ -438,10 +467,14 @@ public class StatelessTokenStore implements TokenStore {
 
     protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException,
             NotFoundException {
-        final String normalisedRequestRealm = realmNormaliser.normalise(request.<String>getParameter(REALM));
-        if (!tokenRealm.equals(normalisedRequestRealm) && !realmNormaliser.normalise(tokenRealm).equals(
-                normalisedRequestRealm)) {
-            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        try {
+            final String normalisedRequestRealm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+            if (!tokenRealm.equals(normalisedRequestRealm) && !realmNormaliser.normalise(tokenRealm).equals(
+                    normalisedRequestRealm)) {
+                throw new InvalidGrantException("Grant is not valid for the requested realm");
+            }
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 }

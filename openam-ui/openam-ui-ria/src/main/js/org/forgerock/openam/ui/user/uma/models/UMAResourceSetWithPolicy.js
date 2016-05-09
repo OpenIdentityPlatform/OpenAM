@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/uma/models/UMAResourceSetWithPolicy", [
+define([
     "jquery",
     "lodash",
     "backbone",

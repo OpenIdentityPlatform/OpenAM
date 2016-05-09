@@ -14,9 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "libs/codemirror/lib/codemirror",
     "org/forgerock/commons/ui/common/components/ChangesPending",

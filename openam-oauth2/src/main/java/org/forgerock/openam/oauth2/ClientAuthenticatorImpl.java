@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 /*
@@ -20,25 +20,24 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
 
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.shared.debug.Debug;
-import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -88,10 +87,10 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 clientCredentialsReader.extractCredentials(request, endpoint);
         Reject.ifTrue(isEmpty(clientCredentials.getClientId()), "Missing parameter, 'client_id'");
 
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-
         boolean authenticated = false;
         try {
+            final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
+
             final ClientRegistration clientRegistration = clientRegistrationStore.get(clientCredentials.getClientId(),
                     request);
             // Do not need to authenticate public clients
@@ -108,6 +107,9 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             authenticated = true;
 
             return clientRegistration;
+
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         } finally {
             if (auditLogger.isAuditLogEnabled()) {
                 if (authenticated) {

@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/user/uma/views/history/ListHistory", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -42,10 +42,9 @@ define("org/forgerock/openam/ui/user/uma/views/history/ListHistory", [
                 paginator;
 
             collection = new (Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                      "/json/__subrealm__/users/" +
-                                                      Configuration.loggedUser.get("username") +
-                                                      "/uma/auditHistory"),
+                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
+                    Configuration.loggedUser.get("username")
+                    }/uma/auditHistory`),
                 state: {
                     pageSize: 10,
                     sortKey: "eventTime",
@@ -76,7 +75,7 @@ define("org/forgerock/openam/ui/user/uma/views/history/ListHistory", [
                     headerCell: BackgridUtils.FilterHeaderCell,
                     cell: BackgridUtils.UriExtCell,
                     href: function (rawValue, formattedValue, model) {
-                        return "#uma/resources/myresources/all/" + encodeURIComponent(model.get("resourceSetId"));
+                        return `#uma/resources/myresources/all/${encodeURIComponent(model.get("resourceSetId"))}`;
                     },
                     editable: false,
                     sortType: "toggle"
@@ -86,7 +85,7 @@ define("org/forgerock/openam/ui/user/uma/views/history/ListHistory", [
                     cell: "string",
                     formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                         fromRaw: function (rawValue) {
-                            return $.t("uma.history.grid.types." + rawValue.toLowerCase());
+                            return $.t(`uma.history.grid.types.${rawValue.toLowerCase()}`);
                         }
                     }),
                     editable: false,

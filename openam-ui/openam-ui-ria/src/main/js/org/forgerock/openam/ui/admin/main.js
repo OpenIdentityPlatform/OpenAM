@@ -60,13 +60,11 @@ define([
     "./views/realms/scripts/ScriptsView",
     "./views/realms/sts/STSView",
     "./views/realms/subjects/SubjectsView",
-    "./views/realms/services/SubSchemaListView",
     "./views/realms/EditRealmView",
     "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
 
     "./views/configuration/createConfigurationListView",
-    "./views/configuration/EditConfigurationView",
     "./views/configuration/server/EditServerDefaultsView",
     "./views/configuration/authentication/ListAuthenticationView",
     "./views/configuration/global/ListGlobalServicesView",

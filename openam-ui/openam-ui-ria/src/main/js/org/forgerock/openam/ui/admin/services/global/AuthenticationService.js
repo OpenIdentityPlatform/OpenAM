@@ -17,21 +17,20 @@
 /**
  * @module org/forgerock/openam/ui/admin/services/global/AuthenticationService
  */
-define("org/forgerock/openam/ui/admin/services/global/AuthenticationService", [
+define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSServiceUtils"
-], (_, AbstractDelegate, Constants, SMSServiceUtils) => {
+    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/authentication`);
 
-    const getModuleUrl = (id) => {
-        if (id === "core") {
-            return "";
-        } else {
-            return `/modules/${id}`;
-        }
-    };
+    function getModuleUrl (id) {
+        return id === "core" ? "" : `/modules/${id}`;
+    }
 
     obj.authentication = {
         getAll () {
@@ -41,12 +40,33 @@ define("org/forgerock/openam/ui/admin/services/global/AuthenticationService", [
                 type: "POST"
             }).then((data) => _.sortBy(data.result, "name"));
         },
-        get (id) {
-            return SMSServiceUtils.schemaWithValues(obj, getModuleUrl(id));
-        },
+
         schema () {
             return SMSServiceUtils.schemaWithDefaults(obj, "");
         },
+
+        get: (id) => {
+            const getSchema = () => obj.serviceCall({
+                url: `${getModuleUrl(id)}?_action=schema`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            }).then((response) => {
+                delete response.properties.defaults; // TODO: remove when OPENAM-8822 is fixed
+                return new JSONSchema(response);
+            });
+
+            const getValues = () => obj.serviceCall({
+                url: getModuleUrl(id),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+            });
+
+            return Promise.all([getSchema(), getValues()]).then((response) => ({
+                schema: response[0],
+                values: new JSONValues(response[1][0]),
+                name: response[1][0]._type.name
+            }));
+        },
+
         update (id, data) {
             return obj.serviceCall({
                 url: getModuleUrl(id),

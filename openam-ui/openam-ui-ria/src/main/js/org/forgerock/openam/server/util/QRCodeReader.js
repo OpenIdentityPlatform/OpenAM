@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/server/util/QRCodeReader", [
+define([
     "jquery",
     "qrcode"
 ], function ($, QRCodeReader) {
@@ -45,7 +45,7 @@ define("org/forgerock/openam/server/util/QRCodeReader", [
             element = $("<div class='text-center'/>");
         element.append(code);
 
-        $("#" + options.id).append(element);
+        $(`#${options.id}`).append(element);
 
     };
 

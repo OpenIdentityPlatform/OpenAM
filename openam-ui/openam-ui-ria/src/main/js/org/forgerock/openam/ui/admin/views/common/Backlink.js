@@ -17,7 +17,7 @@
 /**
  * @module org/forgerock/openam/ui/admin/views/common/Backlink
  */
-define("org/forgerock/openam/ui/admin/views/common/Backlink", [
+define([
     "jquery",
     "lodash",
     "backbone",
