@@ -23,7 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: ServiceProvider.cs,v 1.6 2010/01/26 01:20:14 ggennaro Exp $
- *
+ */
+/*
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
@@ -666,11 +667,17 @@ namespace Sun.Identity.Saml2
         /// <param name="signMetadata">
         /// Flag to specify if the exportable metadata should be signed.
         /// </param>
+        /// <param name="signatureSigningAlgorithm">
+        /// The algorithm used to sign the xml.
+        /// </param>   
+        /// <param name="digestAlgorithm">
+        /// The method used to create the message digest.
+        /// </param>     
         /// <returns>
         /// String with runtime representation of the metadata for this
         /// service provider.
         /// </returns>
-        public string GetExportableMetadata(bool signMetadata)
+        public string GetExportableMetadata(bool signMetadata, string signatureSigningAlgorithm, string digestAlgorithm)
         {
             XmlDocument exportableXml = (XmlDocument)this.metadata.CloneNode(true);
             XmlNode entityDescriptorNode
@@ -692,10 +699,31 @@ namespace Sun.Identity.Saml2
                 descriptorId.Value = Saml2Utils.GenerateId();
                 entityDescriptorNode.Attributes.Append(descriptorId);
 
-                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true, this);
+                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true, signatureSigningAlgorithm, digestAlgorithm, this);
             }
 
             return exportableXml.InnerXml;
+        }
+
+        /// <summary>
+        /// Returns a string representing the configured metadata for
+        /// this service provider.  This will include key information
+        /// as well if the metadata and extended metadata have this
+        /// information specified. This version will, if signing is
+        /// enabled, use the default SHA1 based digest and signature
+        /// algorithms. This public method is provided for consistency
+        /// with earlier releases.
+        /// </summary>
+        /// <param name="signMetadata">
+        /// Flag to specify if the exportable metadata should be signed.
+        /// </param>  
+        /// <returns>
+        /// String with runtime representation of the metadata for this
+        /// service provider.
+        /// </returns>
+        public string GetExportableMetadata(bool signMetadata)
+        {
+            return GetExportableMetadata(signMetadata, null, null);
         }
 
         /// <summary>

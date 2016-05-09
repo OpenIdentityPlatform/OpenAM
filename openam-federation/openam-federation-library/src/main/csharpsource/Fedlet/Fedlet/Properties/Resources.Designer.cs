@@ -421,6 +421,15 @@ namespace Sun.Identity.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to load extended signature algorithms..
+        /// </summary>
+        public static string ExtendedAlgorithmsUnavailable {
+            get {
+                return ResourceManager.GetString("ExtendedAlgorithmsUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred in retrieving the certificate by friendly name..
         /// </summary>
         public static string FedletCertificateFactoryGetByFriendlyNameFailed {
