@@ -25,7 +25,7 @@
  * $Id: Saml2Utils.cs,v 1.8 2010/01/26 01:20:14 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 using System;
@@ -334,6 +334,11 @@ namespace Sun.Identity.Saml2
                 throw new Saml2Exception(Resources.SignedQueryStringInvalidQueryString);
             }
 
+            if (!FedletEncryptedXMLSigSupportSingleton.isInitialised)
+            {
+                throw new Saml2Exception(Resources.ExtendedAlgorithmsUnavailable);
+            }
+
             char[] queryStringSep = { '&' };
             NameValueCollection queryParams = new NameValueCollection();
             foreach (string pairs in queryString.Split(queryStringSep))
@@ -363,18 +368,53 @@ namespace Sun.Identity.Saml2
             string encodedSignature = string.Empty;
             string signatureAlgorithm = HttpUtility.UrlDecode(queryParams[Saml2Constants.SignatureAlgorithm]);
 
-            if (signatureAlgorithm == Saml2Constants.SignatureAlgorithmRsa)
-            {
-                RSACryptoServiceProvider privateKey = (RSACryptoServiceProvider)cert.PrivateKey;
-                byte[] signature = privateKey.SignData(
-                                                Encoding.UTF8.GetBytes(queryString.ToString()),
-                                                new SHA1CryptoServiceProvider());
+            // Setup the key
+            var cspParams = new CspParameters(24) { KeyContainerName = "XML_DISG_RSA_KEY" };
+            RSACryptoServiceProvider privateKey = new RSACryptoServiceProvider(cspParams);
+            privateKey.FromXmlString(cert.PrivateKey.ToXmlString(true));
 
-                encodedSignature = Convert.ToBase64String(signature);
-            }
-            else
+            switch (signatureAlgorithm)
             {
-                throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+                case Saml2Constants.SignatureAlgorithmRsa:
+                {
+                    byte[] signature = privateKey.SignData(Encoding.UTF8.GetBytes(queryString.ToString()),
+                                                           new SHA1CryptoServiceProvider());
+
+                    encodedSignature = Convert.ToBase64String(signature);
+                    break;
+                }
+
+                case Saml2Constants.SignatureAlgorithmRsa256:
+                {
+                    byte[] signature = privateKey.SignData(Encoding.UTF8.GetBytes(queryString.ToString()),
+                                                           new SHA256CryptoServiceProvider());
+
+                    encodedSignature = Convert.ToBase64String(signature);
+                    break;
+                }
+
+                case Saml2Constants.SignatureAlgorithmRsa384:
+                {
+                    byte[] signature = privateKey.SignData(Encoding.UTF8.GetBytes(queryString.ToString()),
+                                                            new SHA384CryptoServiceProvider());
+
+                    encodedSignature = Convert.ToBase64String(signature);
+                    break;
+                }
+
+                case Saml2Constants.SignatureAlgorithmRsa512:
+                {
+                    byte[] signature = privateKey.SignData(Encoding.UTF8.GetBytes(queryString.ToString()),
+                                                            new SHA512CryptoServiceProvider());
+
+                    encodedSignature = Convert.ToBase64String(signature);
+                    break;
+                }
+
+                default:
+                {
+                    throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+                }
             }
 
             string signedQueryString
@@ -404,13 +444,30 @@ namespace Sun.Identity.Saml2
         /// <param name="includePublicKey">
         /// Flag to determine whether to include the public key in the 
         /// signed xml.
-        /// </param>       
+        /// </param>    
+        /// <param name="signatureSigningAlgorithm">
+        /// The algorithm used to sign the xml.
+        /// </param>   
+        /// <param name="digestAlgorithm">
+        /// The method used to create the message digest.
+        /// </param>      
         /// <param name="serviceProviderInstance">
         /// ServiceProvider instance for retreaving Signature transform 
         /// and canonicalization method
         /// </param>
-        public static void SignXml(string certFriendlyName, IXPathNavigable xmlDoc, string targetReferenceId, bool includePublicKey, ServiceProvider serviceProviderInstance)
+        public static void SignXml(string certFriendlyName, 
+                                   IXPathNavigable xmlDoc, 
+                                   string targetReferenceId, 
+                                   bool includePublicKey,
+                                   string signatureSigningAlgorithm,
+                                   string digestAlgorithm,
+                                   ServiceProvider serviceProviderInstance)
         {
+            if (!FedletEncryptedXMLSigSupportSingleton.isInitialised)
+            {
+                throw new Saml2Exception(Resources.ExtendedAlgorithmsUnavailable);
+            }
+
             if (string.IsNullOrEmpty(certFriendlyName))
             {
                 throw new Saml2Exception(Resources.SignedXmlInvalidCertFriendlyName);
@@ -434,7 +491,12 @@ namespace Sun.Identity.Saml2
 
             XmlDocument xml = (XmlDocument)xmlDoc;
             SignedXml signedXml = new SignedXml(xml);
-            signedXml.SigningKey = cert.PrivateKey;
+
+            var cspParams = new CspParameters(24) { KeyContainerName = "XML_DISG_RSA_KEY" };
+            var key = new RSACryptoServiceProvider(cspParams);
+            key.FromXmlString(cert.PrivateKey.ToXmlString(true));
+
+            signedXml.SigningKey = key;
 
             if (includePublicKey)
             {
@@ -446,7 +508,7 @@ namespace Sun.Identity.Saml2
             Reference reference = new Reference();
             reference.Uri = "#" + targetReferenceId;
 
-            //Read the transform type and canonicalization method from sp-extended.xml
+            //Read the transform type, signature digest and canonicalization method from sp-extended.xml
             string transformType = serviceProviderInstance.SignatureTransformMethod;
             string canonicalizationMethodType = serviceProviderInstance.CanonicalizationMethod;
             Transform sigTransform;
@@ -472,11 +534,19 @@ namespace Sun.Identity.Saml2
                     }
             
             reference.AddTransform(sigTransform);
-            signedXml.AddReference(reference);
-            signedXml.ComputeSignature();
+            if (!String.IsNullOrEmpty(digestAlgorithm))
+            {
+                reference.DigestMethod = digestAlgorithm;
+            }
 
-            XmlElement xmlSignature = signedXml.GetXml();
- 
+            signedXml.AddReference(reference);
+            if (!String.IsNullOrEmpty(signatureSigningAlgorithm))
+            {
+                signedXml.SignedInfo.SignatureMethod = signatureSigningAlgorithm;
+            }
+            
+            signedXml.ComputeSignature();
+            XmlElement xmlSignature = signedXml.GetXml(); 
             XmlNamespaceManager nsMgr = new XmlNamespaceManager(xml.NameTable);
             nsMgr.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);
             nsMgr.AddNamespace("saml", Saml2Constants.NamespaceSamlAssertion);
@@ -654,10 +724,15 @@ namespace Sun.Identity.Saml2
         /// </param>
         public static void ValidateSignedXml(X509Certificate2 cert, IXPathNavigable xmlDoc, IXPathNavigable xmlSignature, string targetReferenceId)
         {
+            if(!FedletEncryptedXMLSigSupportSingleton.isInitialised)
+            {
+                throw new Saml2Exception(Resources.ExtendedAlgorithmsUnavailable);
+            }
+
             SignedXml signedXml = new SignedXml((XmlDocument)xmlDoc);
             signedXml.LoadXml((XmlElement)xmlSignature);
-
             bool results = signedXml.CheckSignature(cert, true);
+
             if (results == false)
             {
                 throw new Saml2Exception(Resources.SignedXmlCheckSignatureFailed);
@@ -699,6 +774,11 @@ namespace Sun.Identity.Saml2
             if (string.IsNullOrEmpty(queryString))
             {
                 throw new Saml2Exception(Resources.SignedQueryStringIsNull);
+            }
+
+            if (!FedletEncryptedXMLSigSupportSingleton.isInitialised)
+            {
+                throw new Saml2Exception(Resources.ExtendedAlgorithmsUnavailable);
             }
 
             char[] queryStringSep = { '&' };
@@ -744,34 +824,67 @@ namespace Sun.Identity.Saml2
 
             byte[] dataBuffer = Encoding.UTF8.GetBytes(newQueryString);
             byte[] sigBuffer = Convert.FromBase64String(signature);
+            RSACryptoServiceProvider publicKey = (RSACryptoServiceProvider)cert.PublicKey.Key;
 
-            if (sigAlg == Saml2Constants.SignatureAlgorithmDsa)
+            switch (sigAlg)
             {
-                /*
-                 * Issues with the way the signature is created in 
-                 * Java (DER Encoding) versus what is used in the 
-                 * .NET framework (IEEE P1363 standard).
-                 * 
-                 * TODO: Will need to create the DSA signature converter
-                 * DSACryptoServiceProvider publicKey = (DSACryptoServiceProvider)cert.PublicKey.Key;
-                 * if(!publicKey.VerifyData(dataBuffer, sigBuffer)) {
-                 *      throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
-                 * }
-                 */
-                throw new Saml2Exception(Resources.SignedQueryStringUnsupportedSigAlg);
-            }
-            else if (sigAlg == Saml2Constants.SignatureAlgorithmRsa)
-            {
-                RSACryptoServiceProvider publicKey = (RSACryptoServiceProvider)cert.PublicKey.Key;
-                if (!publicKey.VerifyData(dataBuffer, new SHA1CryptoServiceProvider(), sigBuffer))
+                case Saml2Constants.SignatureAlgorithmDsa:
                 {
-                    throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                    /*
+                     * Issues with the way the signature is created in 
+                     * Java (DER Encoding) versus what is used in the 
+                     * .NET framework (IEEE P1363 standard).
+                     * 
+                     * TODO: Will need to create the DSA signature converter
+                     * DSACryptoServiceProvider publicKey = (DSACryptoServiceProvider)cert.PublicKey.Key;
+                     * if(!publicKey.VerifyData(dataBuffer, sigBuffer)) {
+                     *      throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                     * }
+                     */
+                    throw new Saml2Exception(Resources.SignedQueryStringUnsupportedSigAlg);
                 }
-            }
-            else
-            {
-                throw new Saml2Exception(Resources.SignedQueryStringUnsupportedSigAlg);
-            }
+                
+                case Saml2Constants.SignatureAlgorithmRsa:
+                {
+                    if (!publicKey.VerifyData(dataBuffer, new SHA1CryptoServiceProvider(), sigBuffer))
+                    {
+                        throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                    }
+                    break;
+                }
+
+                case Saml2Constants.SignatureAlgorithmRsa256:
+                {
+                    if (!publicKey.VerifyData(dataBuffer, new SHA256CryptoServiceProvider(), sigBuffer))
+                    {
+                        throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                    }
+                    break;
+                }
+
+                case Saml2Constants.SignatureAlgorithmRsa384:
+                {
+                    if (!publicKey.VerifyData(dataBuffer, new SHA384CryptoServiceProvider(), sigBuffer))
+                    {
+                        throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                    }
+                    break;
+                }
+                
+                case Saml2Constants.SignatureAlgorithmRsa512:
+                {
+                    if (!publicKey.VerifyData(dataBuffer, new SHA512CryptoServiceProvider(), sigBuffer))
+                    {
+                        throw new Saml2Exception(Resources.SignedQueryStringVerifyDataFailed);
+                    }
+                    break;
+                }
+
+                default:
+                {
+                    throw new Saml2Exception(Resources.SignedQueryStringUnsupportedSigAlg);
+                } 
+            } 
         }
 
         #endregion

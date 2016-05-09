@@ -468,4 +468,7 @@
   <data name="ServiceProviderUtilityErrorSamlResponseReceived" xml:space="preserve">
     <value>Received Error in SAML Response.</value>
   </data>
+  <data name="ExtendedAlgorithmsUnavailable" xml:space="preserve">
+    <value>Unable to load extended signature algorithms.</value>
+  </data>
 </root>
