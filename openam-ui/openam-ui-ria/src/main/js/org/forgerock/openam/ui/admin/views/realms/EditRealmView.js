@@ -193,7 +193,17 @@ define([
                             : RealmsService.realms.update(values);
 
             savePromise.then((realm) => {
-                const realmPath = realm.parentPath === "/" ? `/${realm.name}` : `${realm.parentPath}/${realm.name}`;
+                const isRootRealm = realm.name === "/";
+                const hasRootRealmAsParent = realm.parentPath === "/";
+                let realmPath;
+
+                if (isRootRealm) {
+                    realmPath = "/";
+                } else if (hasRootRealmAsParent) {
+                    realmPath = `/${realm.name}`;
+                } else {
+                    realmPath = `${realm.parentPath}/${realm.name}`;
+                }
 
                 RealmAuthenticationService.authentication.update(realmPath, {
                     statelessSessionsEnabled: values.statelessSessionsEnabled
