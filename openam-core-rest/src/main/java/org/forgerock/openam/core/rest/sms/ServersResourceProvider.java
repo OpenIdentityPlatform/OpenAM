@@ -101,14 +101,14 @@ public final class ServersResourceProvider {
                 createServerInstance(token, url, id, emptySet(), svrConfigXML);
             }
             return newResultPromise(getServer(token, url));
-        } catch (SSOException | SMSException | ConfigurationException e) {
+        } catch (SSOException | SMSException e) {
             debug.error("Could not create server", e);
             return new InternalServerErrorException("Could not create server").asPromise();
         } catch (NotFoundException e) {
             debug.error("Could not read server", e);
             return new InternalServerErrorException("Could not read server just created").asPromise();
-        } catch (UnknownPropertyNameException e) {
-           return new BadRequestException(e.getMessage()).asPromise();
+        } catch (UnknownPropertyNameException | ConfigurationException e) {
+           return new BadRequestException(e).asPromise();
         }
     }
 
@@ -144,7 +144,7 @@ public final class ServersResourceProvider {
             }
 
             return newResultPromise(newQueryResponse());
-        } catch (SSOException | SMSException | ConfigurationException e) {
+        } catch (SSOException | SMSException e) {
             debug.error("Could not read servers", e);
             return new InternalServerErrorException("Could not read servers").asPromise();
         } catch (NotFoundException e) {
@@ -163,9 +163,6 @@ public final class ServersResourceProvider {
             return new InternalServerErrorException("Error reading SMS", e).asPromise();
         } catch (SSOException e) {
             return new PermanentException(401, "Invalid ssoToken", e).asPromise();
-        } catch (ConfigurationException e) {
-            debug.error("Could not read server {}", id, e);
-            return new InternalServerErrorException("Error reading configuration for server: " + id).asPromise();
         } catch (NotFoundException e) {
             return new NotFoundException("Cannot find server ID: " + id).asPromise();
         }
@@ -211,15 +208,17 @@ public final class ServersResourceProvider {
                             field("clonedUrl", clonedUrl)));
 
             return newResultPromise(newActionResponse(responseBody));
-        } catch (SSOException | SMSException | ConfigurationException e) {
+        } catch (SSOException | SMSException e) {
             return new InternalServerErrorException("Failed to clone server", e).asPromise();
+        } catch (ConfigurationException e) {
+            return new BadRequestException(e).asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
         }
     }
 
-    private ResourceResponse getServer(SSOToken token, String serverUrl) throws SMSException, SSOException,
-            ConfigurationException, NotFoundException {
+    private ResourceResponse getServer(SSOToken token, String serverUrl)
+            throws SMSException, SSOException, NotFoundException {
 
         if (!isServerInstanceExist(token, serverUrl)) {
             throw new NotFoundException();
