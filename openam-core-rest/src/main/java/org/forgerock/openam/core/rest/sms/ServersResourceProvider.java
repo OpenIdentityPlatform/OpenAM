@@ -224,11 +224,13 @@ public final class ServersResourceProvider {
             throw new NotFoundException();
         }
         String serverId = getServerID(token, serverUrl);
-        JsonValue site = json(object(
+        String siteName = getServerSite(token, serverUrl);
+        JsonValue responseBody = json(object(
                 field("_id", serverId),
-                field("url", serverUrl)
+                field("url", serverUrl),
+                field("siteName", siteName)
         ));
-        return newResourceResponse(serverId, String.valueOf(site.getObject().hashCode()), site);
+        return newResourceResponse(serverId, String.valueOf(responseBody.getObject().hashCode()), responseBody);
     }
 
     private SSOToken getSsoToken(Context context) throws SSOException {
