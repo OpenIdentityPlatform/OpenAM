@@ -86,7 +86,7 @@ define([
             "change input[name=\"root[name]\"]": "onDataChange"
         },
 
-        render (args, callback) {
+        render (args) {
             let realmPromise;
             let authenticationPromise;
             const allRealmsPromise = RealmsService.realms.all();
@@ -157,8 +157,6 @@ define([
                     const FRAGMENT_INDEX = 0;
                     new Backlink().render(FRAGMENT_INDEX);
                     setAutofocus();
-
-                    if (callback) { callback(); }
                 }, (response) => {
                     Messages.addMessage({ type: Messages.TYPE_DANGER, response });
                 });
