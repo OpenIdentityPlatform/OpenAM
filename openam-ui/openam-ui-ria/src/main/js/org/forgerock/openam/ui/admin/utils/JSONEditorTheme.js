@@ -21,6 +21,22 @@ define([
 ], function ($, _, JSONEditor) {
     var obj = {};
 
+    const buildTitaToggle = (checkbox, gridColWidth2) => {
+        const div = document.createElement("div");
+        const container = document.createElement("div");
+        const label = document.createElement("label");
+        const span = document.createElement("span");
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        div.setAttribute("class", `checkbox checkbox-slider-primary
+            checkbox-slider checkbox-slider--b-flat`);
+        div.style.marginTop = "-5px";
+        div.appendChild(label);
+        container.setAttribute("class", `col-sm-${gridColWidth2}`);
+        container.appendChild(div);
+        return container;
+    };
+
     obj.getTheme = function (gridColWidth1, gridColWidth2) {
         // Magic number 12 is the number of colomns in the bootstrap grid.
         var gridColWidth3 = 12 - gridColWidth2,
@@ -71,18 +87,16 @@ define([
                     }
                     return el;
                 },
-
-                getFormInputField: function (type, placeholder) {
-                    var input = this._super(type);
-                    if (type === "checkbox") {
-                        input.style.marginTop = "12px";
-                    } else {
+                getFormInputField (type, placeholder) {
+                    const input = this._super(type);
+                    if (type !== "checkbox") {
                         input.className += "form-control";
                     }
                     if (placeholder) {
                         input.setAttribute("placeholder", placeholder);
                     }
                     input.setAttribute("autocomplete", "off");
+
                     return input;
                 },
 
@@ -97,12 +111,12 @@ define([
                     var group = document.createElement("div"),
                         div = document.createElement("div");
 
-                    if (label && $(input).find("input").prop("type") === "checkbox") {
-                        group.className += " checkbox";
+                    group.className = "form-group";
+
+                    if (label && $(input).prop("type") === "checkbox") {
+                        input = buildTitaToggle(input, gridColWidth2);
                         input.style.marginTop = "12px";
                     }
-
-                    group.className = "form-group";
 
                     if (label) {
                         label.className += ` control-label col-sm-${gridColWidth2}`;
