@@ -1,17 +1,19 @@
-# OpenAM Sample Custom Authentication Module
+# OpenAM Sample Policy Evaluation Plugin
 
 ## Warning
 **This code is not supported by ForgeRock and it is your responsibility to verify that the software is suitable and safe for use.**
 
 ## About
 
-*An OpenAM Sample Custom Authentication Module*
+This sample code demonstrates an OpenAM plugin library
+that implements the service provider interfaces
+for evaluating policy and returning resource attributes.
 
-For instructions on using this sample authentication
-module with OpenAM, see the section
-*Customizing Authentication Modules* in the *OpenAM Developer's Guide*.
+For instructions on using this sample policy evaluation
+plugin with OpenAM, see the section
+*Customizing Policy Evaluation* in the *OpenAM Developer's Guide*.
 
-* * *
+* * * 
 
 The contents of this file are subject to the terms of the Common Development and
 Distribution License (the License). You may not use this file except in compliance with the
