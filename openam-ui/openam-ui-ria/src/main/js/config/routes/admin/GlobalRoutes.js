@@ -110,7 +110,7 @@ define([
     _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directoryConfiguration"], (suffix) => {
         routes[`editServer${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",
+            page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
             url: new RegExp(`deployment/servers/([^\/]+)/(${suffix})`),
             pattern: `deployment/servers/?/${suffix}`,
             role: "ui-global-admin",
@@ -123,8 +123,8 @@ define([
     _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (suffix) => {
         routes[`editServerDefaults${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView",
-            url: new RegExp(`configure/server-defaults/(${suffix})`),
+            page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
+            url: new RegExp(`configure/(server-defaults)/(${suffix})`),
             pattern: `configure/server-defaults/${suffix}`,
             role: "ui-global-admin",
             navGroup: "admin",

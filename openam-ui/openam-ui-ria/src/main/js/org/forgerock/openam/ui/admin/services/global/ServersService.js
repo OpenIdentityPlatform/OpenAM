@@ -82,7 +82,7 @@ define([
         getAll: () => obj.serviceCall({
             url: "?_queryFilter=true",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-        }).then((response) => _.reject(response.result, { "_id" : "server-default" })),
+        }).then((response) => _.reject(response.result, { "_id" : DEFAULT_SERVER })),
         remove: (id) => obj.serviceCall({
             url: `/${id}`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -95,11 +95,8 @@ define([
             data: JSON.stringify(data)
         }),
         update: (section, data, id) => updateServer(section, data, id),
-        defaults: {
-            get: (section) => obj.servers.get(DEFAULT_SERVER, section),
-            update: (section, data) => updateServer(section, data)
-        },
-        ADVANCED_SECTION
+        ADVANCED_SECTION,
+        DEFAULT_SERVER
     };
 
     return obj;
