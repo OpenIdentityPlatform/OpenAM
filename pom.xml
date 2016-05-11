@@ -194,7 +194,7 @@
         <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
         <forgerock.license.version>1.0.0</forgerock.license.version>
         <checkstyleFailOnError>false</checkstyleFailOnError>
-
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <!-- Profiles -->
