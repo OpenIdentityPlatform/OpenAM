@@ -16,6 +16,6 @@ public class GlobalAdminUiRolePredicate implements UiRolePredicate {
 
     @Override
     public boolean apply(Context context) {
-        return isAdmin(context) && context.asContext(RealmContext.class).isRootRealm();
+        return isAdmin(context, getRole()) && context.asContext(RealmContext.class).isRootRealm();
     }
 }
