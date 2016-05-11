@@ -21,7 +21,7 @@ define([
 ], function ($, _, JSONEditor) {
     var obj = {};
 
-    const buildTitaToggle = (checkbox, gridColWidth2) => {
+    const buildTitaToggle = (checkbox, gridColWidth1) => {
         const div = document.createElement("div");
         const container = document.createElement("div");
         const label = document.createElement("label");
@@ -32,7 +32,7 @@ define([
             checkbox-slider checkbox-slider--b-flat`);
         div.style.marginTop = "-5px";
         div.appendChild(label);
-        container.setAttribute("class", `col-sm-${gridColWidth2}`);
+        container.setAttribute("class", `col-sm-${gridColWidth1}`);
         container.appendChild(div);
         return container;
     };
@@ -114,7 +114,7 @@ define([
                     group.className = "form-group";
 
                     if (label && $(input).prop("type") === "checkbox") {
-                        input = buildTitaToggle(input, gridColWidth2);
+                        input = buildTitaToggle(input, gridColWidth1);
                         input.style.marginTop = "12px";
                     }
 
