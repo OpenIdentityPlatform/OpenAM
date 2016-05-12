@@ -373,8 +373,7 @@ public class SmsServerPropertiesResource {
         String serverUrl = "";
         try {
             serverUrl = getServerUrl(getSsoToken(serverContext), serverId);
-            ServiceConfigManager scm = getServiceConfigManager(serverContext);
-            ServiceConfig serverConfigs = getServerConfigs(scm);
+            ServiceConfig serverConfigs = getServerConfigs(serverContext);
             if (!serverConfigs.getSubConfigNames().contains(serverUrl)) {
                 return new BadRequestException("Unknown server ID: " + serverId).asPromise();
             }
@@ -456,8 +455,7 @@ public class SmsServerPropertiesResource {
     private JsonValue getAdvancedSchema(Context serverContext, String serverName) {
         JsonValue template = json(object());
         try {
-            ServiceConfigManager scm = getServiceConfigManager(serverContext);
-            ServiceConfig serverConfigs = getServerConfigs(scm);
+            ServiceConfig serverConfigs = getServerConfigs(serverContext);
             final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
             List<String> advancedAttributeNames = getAdvancedTabAttributeNames(serverConfig);
 
@@ -614,13 +612,13 @@ public class SmsServerPropertiesResource {
                 ("/com/sun/identity/console/" + propertyFileName);
     }
 
-    protected ServiceConfigManager getServiceConfigManager(Context context) throws SSOException, SMSException {
-        SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-        return new ServiceConfigManager(ssoToken, "iPlanetAMPlatformService", "1.0");
+    protected ServiceConfig getServerConfigs(Context serverContext) throws SMSException, SSOException {
+        SSOToken ssoToken = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
+        return getServerConfigs(ssoToken);
     }
 
-    protected ServiceConfig getServerConfigs(ServiceConfigManager scm)
-            throws SMSException, SSOException {
+    protected ServiceConfig getServerConfigs(SSOToken ssoToken) throws SMSException, SSOException {
+        ServiceConfigManager scm = new ServiceConfigManager(ssoToken, "iPlanetAMPlatformService", "1.0");
         ServiceConfig config = scm.getGlobalConfig(null);
         return config.getSubConfig(SCHEMA_NAME);
     }
@@ -641,8 +639,7 @@ public class SmsServerPropertiesResource {
 
         try {
             String serverUrl = getServerUrl(getSsoToken(serverContext), serverId);
-            ServiceConfigManager scm = getServiceConfigManager(serverContext);
-            ServiceConfig serverConfigs = getServerConfigs(scm);
+            ServiceConfig serverConfigs = getServerConfigs(serverContext);
             boolean isServerDefault = serverUrl.equalsIgnoreCase(SERVER_DEFAULT_NAME);
             ServiceConfig defaultConfig = serverConfigs.getSubConfig(SERVER_DEFAULT_NAME);
             ServiceConfig serverConfig = isServerDefault ? defaultConfig : serverConfigs.getSubConfig(serverUrl);
@@ -908,6 +905,7 @@ public class SmsServerPropertiesResource {
         Map<String, String> attributeValues = new HashMap<>();
         if (advancedConfig) {
             addAttributeValues(content, attributeValues);
+            removeUnusedAdvancedAttributes(token, attributeValues.keySet(), SERVER_DEFAULT_NAME);
         } else {
             for (String sectionName : content.keys()) {
                 addAttributeValues(content.get(sectionName), attributeValues);
@@ -925,6 +923,7 @@ public class SmsServerPropertiesResource {
 
         if (advancedConfig) {
             addAttributeValues(content, attributeValues);
+            removeUnusedAdvancedAttributes(token, attributeValues.keySet(), serverUrl);
         } else {
             for (String sectionName : content.keys()) {
                 addAttributesAndInheritanceValues(content.get(sectionName), attributeValues, inheritedAttributeNames);
@@ -954,6 +953,15 @@ public class SmsServerPropertiesResource {
                 attributeValues.put(attributeName, valueOf(attribute.get("value").getObject()));
             }
         }
+    }
+
+    private void removeUnusedAdvancedAttributes(SSOToken token, Set<String> newAttributeNames, String serverName)
+            throws SSOException, SMSException, IOException {
+
+        ServiceConfig serviceConfig = getServerConfigs(token).getSubConfig(serverName);
+        List<String> attributesToRemove = getAdvancedTabAttributeNames(serviceConfig);
+        attributesToRemove.removeAll(newAttributeNames);
+        removeServerConfiguration(token, serverName, attributesToRemove);
     }
 
     private String getServerUrl(SSOToken token, String serverId) throws NotFoundException, SSOException, SMSException {
