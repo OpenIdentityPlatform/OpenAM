@@ -135,12 +135,24 @@ define([
 
             return new JSONSchema(schema);
         }
-        removeInheritance () {
+        removeInheritance (jsonValues) {
             const schema = _.cloneDeep(this.raw);
+
             schema.properties = _.mapValues(this.raw.properties, (rawValue) => {
                 const value = rawValue.properties.value;
                 value.title = rawValue.title;
                 return value;
+            });
+
+            schema.properties = _.transform(schema.properties, (result, n, key) => {
+                result[key] = n;
+                result[key].hasInheritance = true;
+                if (jsonValues[key] && jsonValues[key].inherited) {
+                    result[key].isInherited = true;
+                } else {
+                    result[key].isInherited = false;
+                }
+                return result;
             });
 
             return new JSONSchema(schema);

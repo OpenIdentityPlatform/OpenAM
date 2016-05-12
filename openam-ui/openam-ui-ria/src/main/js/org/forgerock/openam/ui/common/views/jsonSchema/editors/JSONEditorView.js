@@ -63,7 +63,7 @@ define([
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(GRID_COLUMN_WIDTH_1, GRID_COLUMN_WIDTH_2);
 
         const hasInheritance = schema.hasInheritance();
-        const actualSchema = (hasInheritance ? schema.removeInheritance() : schema).raw;
+        const actualSchema = (hasInheritance ? schema.removeInheritance(values.raw) : schema).raw;
         const actualValues = (hasInheritance ? values.removeInheritance() : values).raw;
 
         const editor = new JSONEditor(element[0], {
@@ -103,6 +103,25 @@ define([
                 this.options.schema,
                 this.options.values
             );
+
+            this.$el[0].addEventListener("click", (event) => {
+                const data = $(event.target).data();
+                const key = data.schemapath.slice(5); // remove "root." prefix
+                const isInherited = data.isinherited;
+
+                this.options.values = this.options.values.updateIsInherited(key, !isInherited);
+
+                this.$el.empty();
+                this.jsonEditor = applyJSONEditorToElement(
+                    this.$el,
+                    this.options.schema,
+                    this.options.values
+                );
+
+                if (!this.options.displayTitle) {
+                    this.$el.find("[data-header]").parent().hide();
+                }
+            });
 
             if (!this.options.displayTitle) {
                 this.$el.find("[data-header]").parent().hide();

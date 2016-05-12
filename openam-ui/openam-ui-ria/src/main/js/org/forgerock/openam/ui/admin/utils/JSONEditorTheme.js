@@ -79,6 +79,12 @@ define([
                     }
                 },
 
+                getInlineButton: function (text, icon, title) {
+                    var el = this._super(text, icon, title);
+                    el.className += "btn btn-link delete-row-item";
+                    return el;
+                },
+
                 getTextareaInput: function (placeholder) {
                     var el = document.createElement("textarea");
                     el.className = "form-control";
@@ -96,7 +102,6 @@ define([
                         input.setAttribute("placeholder", placeholder);
                     }
                     input.setAttribute("autocomplete", "off");
-
                     return input;
                 },
 
@@ -107,7 +112,7 @@ define([
                     return el;
                 },
 
-                getFormControl: function (label, input, description) {
+                getFormControl: function (label, input, description, inheritanceButton) {
                     var group = document.createElement("div"),
                         div = document.createElement("div");
 
@@ -130,6 +135,10 @@ define([
                         group.appendChild(div);
                     } else {
                         group.appendChild(input);
+                    }
+
+                    if (inheritanceButton) {
+                        group.appendChild(inheritanceButton);
                     }
 
                     if (description) {
@@ -174,12 +183,6 @@ define([
                 getButton: function (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += "btn btn-default";
-                    return el;
-                },
-
-                getInlineButton: function (text, icon, title) {
-                    var el = this._super(text, icon, title);
-                    el.className += "btn btn-link delete-row-item";
                     return el;
                 },
 
@@ -344,6 +347,26 @@ define([
 
                 getInputId: function () {
                     return _.uniqueId();
+                },
+
+                getInheritanceButton: function (isInherited, path) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "btn btn-inherit";
+                    button.dataToggle = "button";
+                    button.title = "Inherit value";
+                    const icon = document.createElement("i");
+                    icon.className = "fa fa-unlock";
+                    if (isInherited) {
+                        button.className = "btn btn-inherit active";
+                        icon.className = "fa fa-lock";
+                    }
+                    button.appendChild(icon);
+                    button.setAttribute("data-schemapath", path);
+                    icon.setAttribute("data-schemapath", path);
+                    button.setAttribute("data-isinherited", isInherited);
+                    icon.setAttribute("data-isinherited", isInherited);
+                    return button;
                 },
 
                 getModal: function () {

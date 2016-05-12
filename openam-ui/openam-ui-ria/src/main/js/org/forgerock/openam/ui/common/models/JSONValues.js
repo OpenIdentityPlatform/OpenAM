@@ -118,4 +118,10 @@ define([
 
         return new JSONValues(values);
     }
+    //TODO naming
+    updateIsInherited (key, isInherited) {
+        const clone = _.clone(this.raw);
+        clone[key].inherited = isInherited;
+        return new JSONValues(clone);
+    }
 });
