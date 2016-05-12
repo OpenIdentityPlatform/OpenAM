@@ -201,6 +201,15 @@ public class AttributeSchema {
     }
 
     /**
+     * Returns the order of this attribute.
+     *
+     * @return the order of this attribute, null if not defined
+     */
+    public Integer getOrder() {
+        return as.getOrder();
+    }
+
+    /**
      * Sets the I18N key to describe the configuration attribute.
      * 
      * @param i18nKey
@@ -213,6 +222,20 @@ public class AttributeSchema {
      */
     public void setI18NKey(String i18nKey) throws SMSException, SSOException {
         updateXMLDocument(SMSUtils.I18N_KEY, i18nKey);
+    }
+
+    /**
+     * Sets the order of this attribute.
+     *
+     * @param order
+     *            the integer value representing the order
+     * @throws SMSException
+     *             if an error is encountered
+     * @throws SSOException
+     *             if the single sign on token is invalid or expired
+     */
+    public void setOrder(Integer order) throws SMSException, SSOException {
+        updateXMLDocument(SMSUtils.ORDER, String.valueOf(order));
     }
 
     /**

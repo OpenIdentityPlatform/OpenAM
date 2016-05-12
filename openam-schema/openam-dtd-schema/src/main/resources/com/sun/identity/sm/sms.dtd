@@ -166,6 +166,7 @@ Unique Declaration name for DOCTYPE tag:
         propertiesViewBeanURL CDATA #IMPLIED
         isSearchable ( yes | no ) "no"
         resourceName CDATA #IMPLIED
+        order CDATA #IMPLIED
         %i18nIndex;
 >
 

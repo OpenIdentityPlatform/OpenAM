@@ -68,6 +68,11 @@ public class SMSUtils {
 
     public static final String I18N_KEY = "i18nKey";
 
+    /**
+     * Key used to reference the order of an SMS attribute.
+     */
+    public static final String ORDER = "order";
+
     public static final String ORG_CONFIG = "OrganizationConfiguration";
 
     public static final String DYNAMIC_SCHEMA = "Dynamic";

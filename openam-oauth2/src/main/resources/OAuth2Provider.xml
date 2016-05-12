@@ -33,7 +33,8 @@
                 <AttributeSchema name="statelessTokensEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a099">
+                                 i18nKey="a099"
+                                 order="0">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -46,7 +47,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a100" resourceName="codeLifetime">
+                                 i18nKey="a100" resourceName="codeLifetime"
+                                 order="10">
                     <DefaultValues>
                         <Value>120</Value>
                     </DefaultValues>
@@ -56,7 +58,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="-1" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a101" resourceName="refreshTokenLifetime">
+                                 i18nKey="a101" resourceName="refreshTokenLifetime"
+                                 order="20">
                     <DefaultValues>
                         <Value>604800</Value>
                     </DefaultValues>
@@ -66,7 +69,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a102" resourceName="accessTokenLifetime">
+                                 i18nKey="a102" resourceName="accessTokenLifetime"
+                                 order="30">
                     <DefaultValues>
                         <Value>3600</Value>
                     </DefaultValues>
@@ -75,7 +79,8 @@
                 <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a103" resourceName="issueRefreshToken">
+                                 i18nKey="a103" resourceName="issueRefreshToken"
+                                 order="40">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -88,7 +93,8 @@
                 <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a103a" resourceName="issueRefreshTokenOnRefreshedToken">
+                                 i18nKey="a103a" resourceName="issueRefreshTokenOnRefreshedToken"
+                                 order="50">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -101,7 +107,8 @@
                 <AttributeSchema name="customLoginUrlTemplate"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a103b">
+                                 i18nKey="a103b"
+                                 order="60">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -109,7 +116,8 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a104" resourceName="scopeImplementationClass">
+                                 i18nKey="a104" resourceName="scopeImplementationClass"
+                                 order="70">
                     <DefaultValues>
                         <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
                     </DefaultValues>
@@ -121,7 +129,8 @@
                                  propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                  syntax="string"
                                  i18nKey="a104aa"
-                                 resourceName="oidcClaimsScript">
+                                 resourceName="oidcClaimsScript"
+                                 order="80">
                     <ChoiceValues>
                         <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
                             <AttributeValuePair>
@@ -139,7 +148,8 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a105"
-                                 resourceName="responseTypeClasses">
+                                 resourceName="responseTypeClasses"
+                                 order="90">
                     <DefaultValues>
                         <Value>token|org.forgerock.oauth2.core.TokenResponseTypeHandler</Value>
                         <Value>code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler</Value>
@@ -151,7 +161,8 @@
                         type="list"
                         syntax="string"
                         i18nKey="a106"
-                        resourceName="authenticationAttributes">
+                        resourceName="authenticationAttributes"
+                        order="100">
                     <DefaultValues>
                         <Value>uid</Value>
                     </DefaultValues>
@@ -161,7 +172,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="savedConsentAttribute"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 order="110">
                     <IsOptional/>
                     <DefaultValues>
                         <Value></Value>
@@ -171,7 +183,8 @@
                 <AttributeSchema name="displayNameAttribute"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a1075">
+                                 i18nKey="a1075"
+                                 order="120">
                     <DefaultValues>
                         <Value>cn</Value>
                     </DefaultValues>
@@ -182,7 +195,8 @@
                         type="list"
                         syntax="string"
                         resourceName="supportedScopes"
-                        i18nKey="a108">
+                        i18nKey="a108"
+                        order="130">
                 </AttributeSchema>
 
                 <AttributeSchema
@@ -190,7 +204,8 @@
                         type="single"
                         syntax="string"
                         resourceName="jkwsURI"
-                        i18nKey="a109">
+                        i18nKey="a109"
+                        order="140">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -199,7 +214,8 @@
                         type="list"
                         syntax="string"
                         resourceName="supportedSubjectTypes"
-                        i18nKey="a110">
+                        i18nKey="a110"
+                        order="150">
                     <DefaultValues>
                         <Value>public</Value>
                     </DefaultValues>
@@ -210,7 +226,8 @@
                         type="list"
                         syntax="string"
                         resourceName="supportedIDTokenSigningAlgorithms"
-                        i18nKey="a111">
+                        i18nKey="a111"
+                        order="160">
                     <DefaultValues>
                         <Value>HS256</Value>
                         <Value>HS384</Value>
@@ -225,7 +242,8 @@
                         name="supportedIDTokenEncryptionAlgorithms"
                         type="list"
                         syntax="string"
-                        i18nKey="a111a">
+                        i18nKey="a111a"
+                        order="170">
                     <DefaultValues>
                         <Value>RSA1_5</Value>
                     </DefaultValues>
@@ -234,7 +252,8 @@
                         name="supportedIDTokenEncryptionMethods"
                         type="list"
                         syntax="string"
-                        i18nKey="a111b">
+                        i18nKey="a111b"
+                        order="180">
                     <DefaultValues>
                         <Value>A128CBC-HS256</Value>
                         <Value>A256CBC-HS512</Value>
@@ -245,7 +264,8 @@
                         type="list"
                         syntax="string"
                         resourceName="supportedClaims"
-                        i18nKey="a112">
+                        i18nKey="a112"
+                        order="190">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -254,7 +274,8 @@
                         type="list"
                         syntax="string"
                         resourceName="defaultScopes"
-                        i18nKey="a122">
+                        i18nKey="a122"
+                        order="200">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -263,7 +284,8 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  resourceName="jwtTokenLifetime"
-                                 i18nKey="a113">
+                                 i18nKey="a113"
+                                 order="210">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>3600</Value>
@@ -273,7 +295,8 @@
                                  type="single_choice"
                                  listOrder="insertion"
                                  syntax="string"
-                                 i18nKey="a113a">
+                                 i18nKey="a113a"
+                                 order="220">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceHS256">HS256</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
@@ -290,7 +313,8 @@
                 <AttributeSchema name="tokenSigningHmacSharedSecret"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a113b">
+                                 i18nKey="a113b"
+                                 order="230">
                     <DefaultValues>
                         <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
@@ -300,7 +324,8 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  resourceName="keypairName"
-                                 i18nKey="a114">
+                                 i18nKey="a114"
+                                 order="240">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>test</Value>
@@ -310,7 +335,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="claimsParameterSupported"
-                                 i18nKey="a123">
+                                 i18nKey="a123"
+                                 order="250">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -324,7 +350,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="hashSalt"
-                                 i18nKey="a124">
+                                 i18nKey="a124"
+                                 order="260">
                     <IsOptional/>
                     <ExampleValue>
                         <Value>changeme</Value>
@@ -335,7 +362,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="codeVerifierEnforced"
-                                 i18nKey="a126">
+                                 i18nKey="a126"
+                                 order="270">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -349,7 +377,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="allowDynamicRegistration"
-                                 i18nKey="a115">
+                                 i18nKey="a115"
+                                 order="280">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -363,7 +392,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="generateRegistrationAccessTokens"
-                                 i18nKey="a116">
+                                 i18nKey="a116"
+                                 order="290">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -376,7 +406,8 @@
 
                 <AttributeSchema name="MapValueValidator"
                                  type="validator"
-                                 syntax="string">
+                                 syntax="string"
+                                 order="300">
                     <DefaultValues>
                         <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
                     </DefaultValues>
@@ -388,7 +419,8 @@
                                  uitype="maplist"
                                  validator="MapValueValidator"
                                  resourceName="loaMapping"
-                                 i18nKey="a117">
+                                 i18nKey="a117"
+                                 order="310">
                     <IsOptional/>
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -400,7 +432,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="defaultACR"
-                                 i18nKey="a118">
+                                 i18nKey="a118"
+                                 order="320">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -410,7 +443,8 @@
                                  uitype="maplist"
                                  validator="MapValueValidator"
                                  resourceName="amrMappings"
-                                 i18nKey="a119">
+                                 i18nKey="a119"
+                                 order="330">
                     <IsOptional/>
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -423,7 +457,8 @@
                         type="single"
                         syntax="string"
                         resourceName="modifiedTimestampAttribute"
-                        i18nKey="a120">
+                        i18nKey="a120"
+                        order="340">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -432,14 +467,16 @@
                         type="single"
                         syntax="string"
                         resourceName="createdTimestampAttribute"
-                        i18nKey="a121">
+                        i18nKey="a121"
+                        order="350">
                     <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="alwaysAddClaimsToToken"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a125">
+                                 i18nKey="a125"
+                                 order="360">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -449,29 +486,34 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="verificationUrl" type="single" syntax="string" i18nKey="a127">
+                <AttributeSchema name="verificationUrl" type="single" syntax="string" i18nKey="a127"
+                                 order="370">
                     <IsOptional/>
                 </AttributeSchema>
 
-                <AttributeSchema name="completionUrl" type="single" syntax="string" i18nKey="a128">
+                <AttributeSchema name="completionUrl" type="single" syntax="string" i18nKey="a128"
+                                 order="380">
                     <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="deviceCodeLifetime" type="single" i18nKey="a129"
-                        syntax="number_range" rangeStart="0" rangeEnd="2147483647">
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        order="390">
                     <DefaultValues>
                         <Value>300</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="devicePollInterval" type="single" i18nKey="a130"
-                        syntax="number_range" rangeStart="0" rangeEnd="2147483647">
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        order="400">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="storeOpsTokens" type="single" i18nKey="a131" syntax="boolean">
+                <AttributeSchema name="storeOpsTokens" type="single" i18nKey="a131" syntax="boolean"
+                                 order="410">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

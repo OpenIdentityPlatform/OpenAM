@@ -17,6 +17,7 @@ package org.forgerock.openam.upgrade;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
+import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import org.forgerock.guice.core.GuiceModule;
@@ -49,6 +50,13 @@ public final class UpgradeGuiceModule extends PrivateModule {
     Set<String> getRemovedDefaultApplications() {
         return asSet("crestPolicyService", "sunIdentityServerDiscoveryService",
                 "sunIdentityServerLibertyPPService", "openProvisioning", "paycheck", "calendar", "im", "sunBank");
+    }
+
+    @Provides
+    @Exposed
+    @Named("attributeKeys")
+    Set<String> getAttributeKeys() {
+        return asSet("resourceName", "order");
     }
 
 }

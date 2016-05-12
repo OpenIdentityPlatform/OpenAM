@@ -18,15 +18,19 @@ package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.sm.SMSUtils.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -51,65 +55,84 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
- * Applies the resourceName attributes from all schema files in one go, rather than letting them be
+ * Applies XML attribute updates within all schema files in one go, rather than letting them be
  * updated one attribute at a time (which would trigger a mass of notifications in the SMS).
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
-public class SchemaResourceNamesStep extends AbstractUpgradeStep {
+public class SchemaXmlAttributeUpgradeStep extends AbstractUpgradeStep {
 
-    private static final String PROGRESS = "upgrade.resourcenames.progress";
-    private static final int AM_13 = 1300;
+    private static final String PROGRESS = "upgrade.schema.xml.attributes.progress";
+    private static final int AM_14 = 1400;
 
     private Map<String, Function<Document, Boolean, XPathExpressionException>> serviceModifications;
     private XPath xpath = XPathFactory.newInstance().newXPath();
 
+    private final Set<String> attributeKeys;
+
     @Inject
-    public SchemaResourceNamesStep(PrivilegedAction<SSOToken> adminTokenAction,
-            @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory) {
+    public SchemaXmlAttributeUpgradeStep(PrivilegedAction<SSOToken> adminTokenAction,
+            @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory,
+            @Named("attributeKeys") Set<String> attributeKeys) {
         super(adminTokenAction, connectionFactory);
+        this.attributeKeys = attributeKeys;
     }
 
     @Override
     public void initialize() throws UpgradeException {
-        if (VersionUtils.isCurrentVersionLessThan(AM_13, true)) {
-            Map<String, Document> serviceXmlContent = UpgradeServiceUtils.getServiceDefinitions(getAdminToken());
-            serviceModifications = new HashMap<>();
-            for (Map.Entry<String, Document> service : serviceXmlContent.entrySet()) {
-                try {
-                    DEBUG.message("Finding resource names in {}", service.getKey());
-                    ServiceModifier modifier = new ServiceModifier();
-                    NodeList nodes = (NodeList) xpath.evaluate("//*[@" + RESOURCE_NAME + "]",
-                            service.getValue().getDocumentElement(), XPathConstants.NODESET);
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        Element element = (Element) nodes.item(i);
-                        ElementModifier target = buildPath(element, modifier);
-                        target.resourceNameModifier = new ResourceNameModifier(element.getAttribute(RESOURCE_NAME));
-                    }
-                    if (!modifier.modifiers.isEmpty()) {
-                        serviceModifications.put(service.getKey(), modifier);
-                    }
-                } catch (XPathExpressionException e) {
-                    throw new UpgradeException(e);
-                }
+        if (!VersionUtils.isCurrentVersionLessThan(AM_14, true)) {
+            return;
+        }
+
+        Map<String, Document> serviceXmlContent = UpgradeServiceUtils.getServiceDefinitions(getAdminToken());
+        serviceModifications = new HashMap<>();
+
+        for (Map.Entry<String, Document> service : serviceXmlContent.entrySet()) {
+            try {
+                buildModifierPathForService(service.getKey(), service.getValue());
+            } catch (XPathExpressionException e) {
+                throw new UpgradeException(e);
             }
         }
     }
 
-    private ElementModifier buildPath(Element target, ServiceModifier modifier) {
+    private void buildModifierPathForService(String serviceName, Document serviceXml) throws XPathExpressionException {
+        ServiceModifier modifier = new ServiceModifier();
+
+        for (String attributeKey : attributeKeys) {
+            DEBUG.message("Finding {} in {}", attributeKey, serviceName);
+            NodeList nodes = (NodeList) xpath.evaluate("//*[@" + attributeKey + "]",
+                    serviceXml.getDocumentElement(), XPathConstants.NODESET);
+            buildModifierPathForAttribute(attributeKey, nodes, modifier);
+        }
+
+        if (!modifier.modifiers.isEmpty()) {
+            serviceModifications.put(serviceName, modifier);
+        }
+    }
+
+    private void buildModifierPathForAttribute(String attributeKey, NodeList nodes, ServiceModifier modifier) {
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element element = (Element) nodes.item(i);
+            String attributeValue = element.getAttribute(attributeKey);
+            buildModifierPath(element, modifier).addAttributeModifier(attributeKey, attributeValue);
+        }
+    }
+
+    private ElementModifier buildModifierPath(Element target, ServiceModifier modifier) {
         switch (target.getTagName()) {
-            case SERVICE:
-                return modifier.forService(SERVICE + "[" +
-                        "@" + NAME + "='" + target.getAttribute(NAME) + "' and " +
-                        "@" + VERSION + "='" + target.getAttribute(VERSION) + "']");
-            case SCHEMA_ATTRIBUTE:
-                return buildPath((Element) target.getParentNode(), modifier)
-                        .forPath(SCHEMA_ATTRIBUTE + "[@" + NAME + "='" + target.getAttribute(NAME) + "']");
-            case SUB_SCHEMA:
-                return buildPath((Element) target.getParentNode(), modifier)
-                        .forPath(SUB_SCHEMA + "[@" + NAME + "='" + target.getAttribute(NAME) + "']");
-            default:
-                return buildPath((Element) target.getParentNode(), modifier)
-                        .forName(target.getTagName());
+        case SERVICE:
+            return modifier.forService(SERVICE + "[" +
+                    "@" + NAME + "='" + target.getAttribute(NAME) + "' and " +
+                    "@" + VERSION + "='" + target.getAttribute(VERSION) + "']");
+        case SCHEMA_ATTRIBUTE:
+            return buildModifierPath((Element) target.getParentNode(), modifier)
+                    .forPath(SCHEMA_ATTRIBUTE + "[@" + NAME + "='" + target.getAttribute(NAME) + "']");
+        case SUB_SCHEMA:
+            return buildModifierPath((Element) target.getParentNode(), modifier)
+                    .forPath(SUB_SCHEMA + "[@" + NAME + "='" + target.getAttribute(NAME) + "']");
+        default:
+            return buildModifierPath((Element) target.getParentNode(), modifier)
+                    .forName(target.getTagName());
         }
     }
 
@@ -125,7 +148,7 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
             try {
                 long startTime = currentTimeMillis();
                 UpgradeProgress.reportStart(PROGRESS, service.getKey());
-                DEBUG.message("Found resource names for {}. Applying now.", service.getKey());
+                DEBUG.message("Found schema xml attribute changes for {}. Applying now.", service.getKey());
                 new ServiceSchemaManager(service.getKey(), getAdminToken()).modifySchema(service.getValue());
                 DEBUG.message("Completed ({}ms)", currentTimeMillis() - startTime);
                 UpgradeProgress.reportEnd("upgrade.success");
@@ -148,19 +171,21 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
 
         @Override
         public Boolean apply(Document document) throws XPathExpressionException {
-            boolean result = false;
             Element documentElement = document.getDocumentElement();
+
             for (ElementModifier modifier : modifiers.values()) {
-                Boolean modificationResult = modifier.apply(documentElement);
-                result = result || modificationResult;
+                if (modifier.apply(documentElement)) {
+                    return true;
+                }
             }
-            return result;
+
+            return false;
         }
     }
 
     private abstract class ElementModifier implements Function<Element, Boolean, XPathExpressionException> {
         private final Map<String, ElementModifier> modifiers = new HashMap<>();
-        private ResourceNameModifier resourceNameModifier;
+        private final List<AttributeModifier> attributeModifiers = new ArrayList<>();
 
         ElementModifier forName(String name) {
             if (!modifiers.containsKey(name)) {
@@ -176,22 +201,31 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
             return modifiers.get(path);
         }
 
+        void addAttributeModifier(String attributeKey, String attributeValue) {
+            attributeModifiers.add(new AttributeModifier(attributeKey, attributeValue));
+        }
+
         @Override
         public Boolean apply(Element parent) throws XPathExpressionException {
-            boolean result = false;
             Element element = getElement(parent);
+
             for (ElementModifier modifier : modifiers.values()) {
-                Boolean modificationResult = modifier.apply(element);
-                result = result || modificationResult;
+                if (modifier.apply(element)) {
+                    return true;
+                }
             }
-            if (resourceNameModifier != null) {
-                Boolean modificationResult = resourceNameModifier.apply(element);
-                result = result || modificationResult;
+
+            for (AttributeModifier modifier : attributeModifiers) {
+                if (modifier.apply(element)) {
+                    return true;
+                }
             }
-            return result;
+
+            return false;
         }
 
         protected abstract Element getElement(Element parent) throws XPathExpressionException;
+
     }
 
     private class XpathElementModifier extends ElementModifier {
@@ -200,6 +234,7 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
         XpathElementModifier(String path) {
             this.path = path;
         }
+
         @Override
         protected Element getElement(Element parent) throws XPathExpressionException {
             return (Element) xpath.evaluate(path, parent, XPathConstants.NODE);
@@ -212,24 +247,27 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
         NamedElementModifier(String name) {
             this.name = name;
         }
+
         @Override
         protected Element getElement(Element parent) throws XPathExpressionException {
             return (Element) parent.getElementsByTagName(name).item(0);
         }
     }
 
-    private class ResourceNameModifier implements Function<Element, Boolean, XPathExpressionException> {
+    private class AttributeModifier implements Function<Element, Boolean, XPathExpressionException> {
 
-        private final String resourceName;
+        private final String attributeKey;
+        private final String attributeValue;
 
-        private ResourceNameModifier(String resourceName) {
-            this.resourceName = resourceName;
+        private AttributeModifier(String attributeKey, String attributeValue) {
+            this.attributeKey = attributeKey;
+            this.attributeValue = attributeValue;
         }
 
         @Override
         public Boolean apply(Element element) throws XPathExpressionException {
-            if (!resourceName.equals(element.getAttribute(RESOURCE_NAME))) {
-                element.setAttribute(RESOURCE_NAME, resourceName);
+            if (!attributeValue.equals(element.getAttribute(attributeKey))) {
+                element.setAttribute(attributeKey, attributeValue);
                 return true;
             }
             return false;
@@ -239,8 +277,8 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
 
     @Override
     public String getShortReport(String delimiter) {
-        return MessageFormat.format(BUNDLE.getString("upgrade.resourcenames.short"), serviceModifications.size())
-                + delimiter;
+        return MessageFormat.format(BUNDLE.getString("upgrade.schema.xml.attributes.short"),
+                serviceModifications.size()) + delimiter;
     }
 
     @Override
@@ -250,6 +288,6 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
         TreeSet<String> services = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         services.addAll(serviceModifications.keySet());
         tags.put("%SERVICES%", Joiner.on(delimiter).join(services));
-        return tagSwapReport(tags, "upgrade.resourcenames.long");
+        return tagSwapReport(tags, "upgrade.schema.xml.attributes.long");
     }
 }

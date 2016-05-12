@@ -29,8 +29,10 @@
 
 package com.sun.identity.sm;
 
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.xml.XMLUtils;
+import static com.sun.identity.sm.AttributeSchema.ListOrder.INSERTION;
+import static java.util.Collections.emptySet;
+import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
+
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,12 +41,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static com.sun.identity.sm.AttributeSchema.ListOrder.INSERTION;
-import static java.util.Collections.emptySet;
-import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.shared.xml.XMLUtils;
 
 
 /**
@@ -118,6 +120,8 @@ public class AttributeSchemaImpl {
 
     private boolean hasChoiceValues;
 
+    private Integer order;
+
     /**
      * Constructor used by ServiceSchema to instantiate AttributeSchema objects.
      */
@@ -172,6 +176,15 @@ public class AttributeSchemaImpl {
      */
     public String getI18NKey() {
         return (key);
+    }
+
+    /**
+     * Returns the order of this attribute.
+     *
+     * @return the order of this attribute, null if not defined
+     */
+    public Integer getOrder() {
+        return order;
     }
 
     /**
@@ -513,6 +526,12 @@ public class AttributeSchemaImpl {
 
         // Get I18N key
         key = XMLUtils.getNodeAttributeValue(n, SMSUtils.I18N_KEY);
+
+        try {
+            order = Integer.valueOf(XMLUtils.getNodeAttributeValue(n, SMSUtils.ORDER));
+        } catch (NumberFormatException e) {
+            order = null;
+        }
 
         // Get Attribute type
         String attrType = XMLUtils.getNodeAttributeValue(n,

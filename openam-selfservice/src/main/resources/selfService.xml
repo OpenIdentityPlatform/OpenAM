@@ -36,7 +36,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="encryptionKeyPairAlias"
-                                 i18nKey="encryption.key.pair.alias">
+                                 i18nKey="encryption.key.pair.alias"
+                                 order="0">
                     <DefaultValues>
                         <Value>selfserviceenctest</Value>
                     </DefaultValues>
@@ -46,7 +47,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="signingSecretKeyAlias"
-                                 i18nKey="signing.secret.key.alias">
+                                 i18nKey="signing.secret.key.alias"
+                                 order="10">
                     <DefaultValues>
                         <Value>selfservicesigntest</Value>
                     </DefaultValues>
@@ -56,7 +58,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSiteKey"
-                                 i18nKey="captcha.site.key">
+                                 i18nKey="captcha.site.key"
+                                 order="20">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -64,7 +67,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaSecretKey"
-                                 i18nKey="captcha.secret.key">
+                                 i18nKey="captcha.secret.key"
+                                 order="30">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -72,7 +76,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="captchaVerificationUrl"
-                                 i18nKey="captcha.verification.url">
+                                 i18nKey="captcha.verification.url"
+                                 order="40">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>https://www.google.com/recaptcha/api/siteverify</Value>
@@ -83,7 +88,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="kbaQuestions"
-                                 i18nKey="kba.questions">
+                                 i18nKey="kba.questions"
+                                 order="50">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>1|en|What is the name of your favourite restaurant?</Value>
@@ -97,7 +103,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="30"
                                  resourceName="minimumAnswersToDefine"
-                                 i18nKey="minimum.answers.to.define">
+                                 i18nKey="minimum.answers.to.define"
+                                 order="60">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>1</Value>
@@ -108,7 +115,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="50"
                                  resourceName="minimumAnswersToVerify"
-                                 i18nKey="minimum.answers.to.verify">
+                                 i18nKey="minimum.answers.to.verify"
+                                 order="70">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>1</Value>
@@ -119,7 +127,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="validQueryAttributes"
-                                 i18nKey="valid.query.attributes">
+                                 i18nKey="valid.query.attributes"
+                                 order="80">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>uid</Value>
@@ -135,7 +144,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationEnabled"
-                                 i18nKey="user.registration.enabled">
+                                 i18nKey="user.registration.enabled"
+                                 order="90">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -149,7 +159,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationCaptchaEnabled"
-                                 i18nKey="user.registration.captcha.enabled">
+                                 i18nKey="user.registration.captcha.enabled"
+                                 order="100">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -164,7 +175,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationEmailVerificationEnabled"
-                                 i18nKey="user.registration.email.verification.enabled">
+                                 i18nKey="user.registration.email.verification.enabled"
+                                 order="110">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -179,7 +191,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="userRegistrationKbaEnabled"
-                                 i18nKey="user.registration.kba.enabled">
+                                 i18nKey="user.registration.kba.enabled"
+                                 order="120">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -194,7 +207,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="userRegistrationTokenTTL"
-                                 i18nKey="user.registration.token.ttl">
+                                 i18nKey="user.registration.token.ttl"
+                                 order="130">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
@@ -205,7 +219,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationEmailSubject"
-                                 i18nKey="user.registration.email.subject">
+                                 i18nKey="user.registration.email.subject"
+                                 order="140">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|Registration email</Value>
@@ -216,7 +231,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationEmailBody"
-                                 i18nKey="user.registration.email.body">
+                                 i18nKey="user.registration.email.body"
+                                 order="150">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to register.&lt;/h2&gt;</Value>
@@ -227,7 +243,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="userRegistrationValidUserAttributes"
-                                 i18nKey="user.registration.valid.user.attributes">
+                                 i18nKey="user.registration.valid.user.attributes"
+                                 order="160">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>mail</Value>
@@ -246,7 +263,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordEnabled"
-                                 i18nKey="forgotten.password.enabled">
+                                 i18nKey="forgotten.password.enabled"
+                                 order="170">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -260,7 +278,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordCaptchaEnabled"
-                                 i18nKey="forgotten.password.captcha.enabled">
+                                 i18nKey="forgotten.password.captcha.enabled"
+                                 order="180">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -275,7 +294,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordEmailVerificationEnabled"
-                                 i18nKey="forgotten.password.email.verification.enabled">
+                                 i18nKey="forgotten.password.email.verification.enabled"
+                                 order="190">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -290,7 +310,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenPasswordKbaEnabled"
-                                 i18nKey="forgotten.password.kba.enabled">
+                                 i18nKey="forgotten.password.kba.enabled"
+                                 order="200">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -305,7 +326,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="forgottenPasswordTokenTTL"
-                                 i18nKey="forgotten.password.token.ttl">
+                                 i18nKey="forgotten.password.token.ttl"
+                                 order="210">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
@@ -316,7 +338,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenPasswordEmailSubject"
-                                 i18nKey="forgotten.password.email.subject">
+                                 i18nKey="forgotten.password.email.subject"
+                                 order="220">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|Forgotten password email</Value>
@@ -327,7 +350,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenPasswordEmailBody"
-                                 i18nKey="forgotten.password.email.body">
+                                 i18nKey="forgotten.password.email.body"
+                                 order="230">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Click on this &lt;a href=&quot;%link%&quot;&gt;link&lt;/a&gt; to reset your password.&lt;/h2&gt;</Value>
@@ -340,7 +364,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameEnabled"
-                                 i18nKey="forgotten.username.enabled">
+                                 i18nKey="forgotten.username.enabled"
+                                 order="240">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -354,7 +379,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameCaptchaEnabled"
-                                 i18nKey="forgotten.username.captcha.enabled">
+                                 i18nKey="forgotten.username.captcha.enabled"
+                                 order="250">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -369,7 +395,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameKbaEnabled"
-                                 i18nKey="forgotten.username.kba.enabled">
+                                 i18nKey="forgotten.username.kba.enabled"
+                                 order="260">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -384,7 +411,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameEmailUsernameEnabled"
-                                 i18nKey="forgotten.username.email.username.enabled">
+                                 i18nKey="forgotten.username.email.username.enabled"
+                                 order="270">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -399,7 +427,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="forgottenUsernameShowUsernameEnabled"
-                                 i18nKey="forgotten.username.show.username.enabled">
+                                 i18nKey="forgotten.username.show.username.enabled"
+                                 order="280">
                     <IsOptional/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -414,7 +443,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  resourceName="forgottenUsernameTokenTTL"
-                                 i18nKey="forgotten.username.token.ttl">
+                                 i18nKey="forgotten.username.token.ttl"
+                                 order="290">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>900</Value>
@@ -425,7 +455,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenUsernameEmailSubject"
-                                 i18nKey="forgotten.username.email.subject">
+                                 i18nKey="forgotten.username.email.subject"
+                                 order="300">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|Forgotten username email</Value>
@@ -436,7 +467,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="forgottenUsernameEmailBody"
-                                 i18nKey="forgotten.username.email.body">
+                                 i18nKey="forgotten.username.email.body"
+                                 order="310">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>en|&lt;h2&gt;Your username is &lt;span style=&quot;color:blue&quot;&gt;%username%&lt;/span&gt;.&lt;/h2&gt;</Value>
@@ -449,7 +481,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="profileProtectedUserAttributes"
-                                 i18nKey="profile.protected.user.attributes">
+                                 i18nKey="profile.protected.user.attributes"
+                                 order="320">
                     <IsOptional/>
                 </AttributeSchema>
 
@@ -459,7 +492,8 @@
                                  type="single"
                                  syntax="url"
                                  resourceName="userRegistrationConfirmationUrl"
-                                 i18nKey="user.registration.confirmation.url">
+                                 i18nKey="user.registration.confirmation.url"
+                                 order="330">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
@@ -470,7 +504,8 @@
                                  type="single"
                                  syntax="url"
                                  resourceName="forgottenPasswordConfirmationUrl"
-                                 i18nKey="forgotten.password.confirmation.url">
+                                 i18nKey="forgotten.password.confirmation.url"
+                                 order="340">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
@@ -481,7 +516,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="userRegistrationServiceConfigClass"
-                                 i18nKey="user.registration.service.config.class">
+                                 i18nKey="user.registration.service.config.class"
+                                 order="350">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.UserRegistrationConfigProvider</Value>
@@ -492,7 +528,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="forgottenPasswordServiceConfigClass"
-                                 i18nKey="forgotten.password.service.config.class">
+                                 i18nKey="forgotten.password.service.config.class"
+                                 order="360">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConfigProvider</Value>
@@ -503,7 +540,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="forgottenUsernameServiceConfigClass"
-                                 i18nKey="forgotten.username.service.config.class">
+                                 i18nKey="forgotten.username.service.config.class"
+                                 order="370">
                     <IsOptional/>
                     <DefaultValues>
                         <Value>org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConfigProvider</Value>

@@ -16,25 +16,16 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import static com.sun.identity.sm.AttributeSchema.Syntax.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
+import static org.forgerock.openam.rest.RestConstants.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
@@ -63,12 +55,19 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
-import static com.sun.identity.sm.AttributeSchema.Syntax.*;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.openam.rest.RestConstants.COLLECTION;
-import static org.forgerock.openam.rest.RestConstants.NAME;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -334,7 +333,6 @@ public abstract class SmsResourceProvider {
         List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
 
         ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), getLocale(context));
-        NumberFormat sectionFormat = new DecimalFormat("00");
 
         for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
@@ -348,15 +346,16 @@ public abstract class SmsResourceProvider {
                         result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
                         result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
                                 getTitle(consoleI18n, schemaI18n, sectionLabel));
-                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
-                                "z" + sectionFormat.format(sections.indexOf(section)));
+                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER), sections.indexOf(section));
                     }
                 }
+
+                Object propertyOrder = (attribute.getOrder() == null) ? i18NKey : attribute.getOrder();
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString
                         (i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
                         getSchemaDescription(schemaI18n, i18NKey));
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), i18NKey);
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), propertyOrder);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
                 addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, context);
                 addExampleValue(result, path, attribute, attributePath);
