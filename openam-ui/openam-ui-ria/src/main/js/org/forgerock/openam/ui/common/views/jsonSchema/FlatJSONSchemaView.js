@@ -56,7 +56,7 @@ define([
             if (!(options.schema instanceof JSONSchema)) {
                 throw new TypeError("[FlatJSONSchemaView] \"schema\" argument is not an instance of JSONSchema.");
             }
-            if (options.schema.isCollection()) {
+            if (options.schema.isCollection() && !options.schema.isWrappedByInheritance()) {
                 throw new Error("[FlatJSONSchemaView] JSONSchema collections are not supported by this view.");
             }
             if (!(options.values instanceof JSONValues)) {

@@ -62,19 +62,26 @@ define([
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(GRID_COLUMN_WIDTH_1, GRID_COLUMN_WIDTH_2);
 
+        let actualSchema = schema.raw;
+        let actualValues = values.raw;
+        if (schema.isWrappedByInheritance()) {
+            actualSchema = schema.getUnwrappedSchema();
+            actualValues = values.getUnwrappedValues();
+        }
+
         const editor = new JSONEditor(element[0], {
             "disable_collapse": true,
             "disable_edit_json": true,
             "disable_properties": true,
             "iconlib": "fontawesome4",
-            "schema": schema.raw,
+            "schema": actualSchema,
             "theme": "openam"
         });
 
         convertHelpBlocksToPopOvers(element);
         setPlaceholderOnPasswords(element);
 
-        editor.setValue(values.raw);
+        editor.setValue(actualValues);
 
         return editor;
     }
@@ -115,7 +122,12 @@ define([
                 }
             });
 
-            return valuesWithoutEmptyPasswords.raw;
+            let result = valuesWithoutEmptyPasswords;
+            if (this.options.schema.isWrappedByInheritance()) {
+                this.options.values = this.options.values.getWrappedValues(valuesWithoutEmptyPasswords.raw);
+                result = this.options.values;
+            }
+            return result.raw;
         }
     });
 

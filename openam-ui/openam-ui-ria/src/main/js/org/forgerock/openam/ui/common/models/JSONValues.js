@@ -96,4 +96,13 @@ define([
 
         return new JSONValues(values);
     }
+    getUnwrappedValues () {
+        return _.mapValues(this.raw, "value");
+    }
+    getWrappedValues (unwrappedValues) {
+        return new JSONValues(_.transform(this.raw, (result, value, key) => {
+            result[key] = this.raw[key];
+            result[key].value = unwrappedValues[key];
+        }));
+    }
 });

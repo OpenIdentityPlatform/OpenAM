@@ -118,8 +118,21 @@ define([
         setDefaultProperties (keys) {
             const schema = _.cloneDeep(this.raw);
             schema.defaultProperties = keys;
-
             return new JSONSchema(schema);
+        }
+        isWrappedByInheritance () {
+            return _.every(this.raw.properties, (property) =>
+                property.type === "object" &&
+                _.has(property, "properties.inherited")
+            );
+        }
+        getUnwrappedSchema () {
+            const properties = _.mapValues(this.raw.properties, "properties.value");
+            return {
+                properties,
+                title: this.raw.title,
+                type: this.raw.type
+            };
         }
     };
 });

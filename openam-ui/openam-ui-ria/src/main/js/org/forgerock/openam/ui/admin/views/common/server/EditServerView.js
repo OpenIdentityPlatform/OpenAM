@@ -98,7 +98,7 @@ define([
         },
         onSave () {
             this.updateData();
-            ServersService.servers.update(this.data.sectionId, this.data.values.raw)
+            ServersService.servers.update(this.data.sectionId, this.data.values.raw, this.data.serverId)
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
