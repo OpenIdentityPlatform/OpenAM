@@ -11,7 +11,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015-2016 ForgeRock AS.
+  ~ Copyright 2015 ForgeRock AS.
   ~ Portions Copyright 2016 Nomura Research Institute, Ltd.
   -->
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -19,42 +19,42 @@
 <propertysheet>
     <section name="resourcesets-common-section" defaultValue="amconfig.org.forgerock.services.resourcesets.store.common.section">
         <property required="true">
-            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.location" labelFor="cscorg-forgerock-services-resourcesets-store-location" />
+            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.store.location" labelFor="cscorg-forgerock-services-resourcesets-store-location" />
             <cc name="cscorg-forgerock-services-resourcesets-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
-                <option label="amconfig.org.forgerock.services.resourcesets.store.location.default" value="default" />
-                <option label="amconfig.org.forgerock.services.resourcesets.store.location.external" value="external" />
+                <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
+                <option label="amconfig.org.forgerock.services.store.location.external" value="external" />
                 <attribute name="onChange" value="toggleExternalConfig(fields.resourcesets, this);" />
             </cc>
         </property>
         <property required="true">
-            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.root.suffix" labelFor="cscorg-forgerock-services-resourcesets-store-root-suffix" />
+            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.store.root.suffix" labelFor="cscorg-forgerock-services-resourcesets-store-root-suffix" />
             <cc name="cscorg-forgerock-services-resourcesets-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
-            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.max.connections" labelFor="cscorg-forgerock-services-resourcesets-store-max-connections" />
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-resourcesets-store-max-connections" />
             <cc name="cscorg-forgerock-services-resourcesets-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
     <section name="resourcesets-external-section" defaultValue="amconfig.org.forgerock.services.resourcesets.store.external.section">
         <property required="true">
-            <label name="sslLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.ssl.enabled" labelFor="cscorg-forgerock-services-resourcesets-store-ssl-enabled" />
+            <label name="sslLabel" defaultValue="amconfig.org.forgerock.services.store.ssl.enabled" labelFor="cscorg-forgerock-services-resourcesets-store-ssl-enabled" />
             <cc name="cscorg-forgerock-services-resourcesets-store-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc>
         </property>
         <property required="true">
-            <label name="directoryNameLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.directory.name" labelFor="cscorg-forgerock-services-resourcesets-store-directory-name" />
+            <label name="directoryNameLabel" defaultValue="amconfig.org.forgerock.services.store.directory.name" labelFor="cscorg-forgerock-services-resourcesets-store-directory-name" />
             <cc name="cscorg-forgerock-services-resourcesets-store-directory-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
             <fieldhelp name="helpcscorg-forgerock-services-resourcesets-store-directory-name" defaultValue="amconfig.help.org.forgerock.services.store.directory.name" />
         </property>
         <property required="true">
-            <label name="loginIdLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.loginid" labelFor="cscorg-forgerock-services-resourcesets-store-loginid" />
+            <label name="loginIdLabel" defaultValue="amconfig.org.forgerock.services.store.loginid" labelFor="cscorg-forgerock-services-resourcesets-store-loginid" />
             <cc name="cscorg-forgerock-services-resourcesets-store-loginid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
-            <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.password" labelFor="cscorg-forgerock-services-resourcesets-store-password" />
+            <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.store.password" labelFor="cscorg-forgerock-services-resourcesets-store-password" />
             <cc name="cscorg-forgerock-services-resourcesets-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
         </property>
         <property required="true">
-            <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.resourcesets.store.heartbeat" labelFor="cscorg-forgerock-services-resourcesets-store-heartbeat" />
+            <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-resourcesets-store-heartbeat" />
             <cc name="cscorg-forgerock-services-resourcesets-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
