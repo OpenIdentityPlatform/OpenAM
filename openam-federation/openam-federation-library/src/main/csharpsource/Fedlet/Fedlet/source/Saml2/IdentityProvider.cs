@@ -265,12 +265,7 @@ namespace Sun.Identity.Saml2
                 string xpath = "/mdx:EntityConfig/mdx:IDPSSOConfig/mdx:Attribute[@name='requestedDigestMethod']/mdx:Value";
                 XmlNode root = this.extendedMetadata.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath.ToString(), this.extendedMetadataNsMgr);
-                if (node != null)
-                {
-                    return node.InnerText.Trim();
-                }
-
-                return null;
+                return (node == null ? null : node.InnerText.Trim());
             }
         }
 
@@ -303,7 +298,6 @@ namespace Sun.Identity.Saml2
                         {
                             return Saml2Constants.SignatureAlgorithmRsa256;
                         }
-
                     case Saml2Constants.SignatureAlgorithmRsa384:
                         {
                             return Saml2Constants.SignatureAlgorithmRsa384;
@@ -317,11 +311,9 @@ namespace Sun.Identity.Saml2
                             return Saml2Constants.SignatureAlgorithmRsa;
                         }
                     default:
-                        break;
-                }
-
-                // Unrecognised method
-                throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+                        // Unrecognised method
+                        throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+                }                
             }
         }
 

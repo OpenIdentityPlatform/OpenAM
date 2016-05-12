@@ -60,6 +60,7 @@
     <Compile Include="source\Common\FedletCertificateFactory.cs" />
     <Compile Include="source\Common\FedletLogger.cs" />
     <Compile Include="source\Common\FedletEncryptedXml.cs" />
+    <Compile Include="source\Common\FedletSignedSignature.cs" />
     <Compile Include="source\Saml2\Artifact.cs" />
     <Compile Include="source\Saml2\ArtifactResolve.cs" />
     <Compile Include="source\Saml2\ArtifactResponse.cs" />
