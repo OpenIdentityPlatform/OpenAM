@@ -232,7 +232,8 @@ public class SmsServerPropertiesResource {
 
     private void addDefaultSchema(JsonValue template, String sectionPath, SMSLabel label, int attributeOrder,
             Set<String> optionalAttributes) {
-        final String attributeName = label.getDefaultValue().replaceFirst("amconfig.", "");
+
+        final String attributeName = getAttributeNameFromCcName(label.getLabelFor());
         if (Constants.AM_SERVICES_SECRET.equals(attributeName)) {
             return;
         }
@@ -266,7 +267,7 @@ public class SmsServerPropertiesResource {
         final String title = label.getDisplayValue();
         final String type = label.getType();
         final String description = label.getDescription();
-        final String attributeName = label.getDefaultValue().replaceFirst("amconfig.", "");
+        final String attributeName = getAttributeNameFromCcName(label.getLabelFor());
         final List<String> attributeOptions = label.getOptions();
         final List<String> attributeOptionLabels = label.getOptionLabels();
         final String propertyPath = sectionPath + "/properties/" + attributeName;
@@ -343,8 +344,12 @@ public class SmsServerPropertiesResource {
         return optionalValues;
     }
 
-    private String getConvertedName(String defaultValueName) {
+    private String getCcNameFromAttributeName(String defaultValueName) {
         return "csc".concat(defaultValueName.replace('.', '-'));
+    }
+
+    private String getAttributeNameFromCcName(String ccName) {
+        return ccName.replaceFirst("csc", "").replaceAll("-", ".");
     }
 
     private Set<String> getTabNames() {
@@ -438,11 +443,10 @@ public class SmsServerPropertiesResource {
             String defaultHelpValue = defaultValue.replaceFirst("amconfig.", "amconfig.help.");
             String description = titleProperties.getProperty(defaultHelpValue);
 
-            final String convertedAttributeName = defaultValue.replaceFirst("amconfig.", "");
-            final String type = getType(convertedAttributeName);
-
-            final List<String> attributeOptions = getAttributeOptions(options, convertedAttributeName, type);
-            final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, convertedAttributeName, type);
+            final String attributeName = getAttributeNameFromCcName(labelFor);
+            final String type = getType(attributeName);
+            final List<String> attributeOptions = getAttributeOptions(options, attributeName, type);
+            final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, attributeName, type);
 
             allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue,
                     description, type, attributeOptions, attributeOptionLabels));
@@ -493,7 +497,7 @@ public class SmsServerPropertiesResource {
         return template;
     }
 
-    private List<String> getDefaultValueNames(String tabName) throws ParserConfigurationException, SAXException,
+    private List<String> getAttributeNames(String tabName) throws ParserConfigurationException, SAXException,
             IOException,
             XPathExpressionException {
         Document propertySheet = getPropertySheet(tabName);
@@ -559,9 +563,9 @@ public class SmsServerPropertiesResource {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
 
-            List<String> attributeNamesForTab = getDefaultValueNames(tabName);
-            for (String defaultValueName : attributeNamesForTab) {
-                String convertedName = getConvertedName(defaultValueName);
+            List<String> attributeNamesForTab = getAttributeNames(tabName);
+            for (String attributeName : attributeNamesForTab) {
+                String convertedName = getCcNameFromAttributeName(attributeName);
                 String expression = "//propertysheet/section/property/cc[@name='" + convertedName + "']/option/" +
                         expressionAttribute;
                 NodeList optionsList = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
@@ -571,7 +575,7 @@ public class SmsServerPropertiesResource {
                 }
 
                 if (!options.isEmpty()) {
-                    radioOptions.put(defaultValueName, options);
+                    radioOptions.put(attributeName, options);
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
@@ -671,7 +675,7 @@ public class SmsServerPropertiesResource {
     private List<String> getAttributeNamesForTab(ServiceConfig serverConfig, String tabName) throws
             ParserConfigurationException, SAXException, XPathExpressionException, IOException {
         return tabName.equalsIgnoreCase(ADVANCED_TAB_NAME) ?
-                getAdvancedTabAttributeNames(serverConfig) : getDefaultValueNames(tabName);
+                getAdvancedTabAttributeNames(serverConfig) : getAttributeNames(tabName);
     }
 
     private void addDirectoryConfiguration(JsonValue result, ServiceConfig serverConfig) throws IOException,
