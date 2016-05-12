@@ -221,7 +221,25 @@
                         <Value>ES512</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+                <AttributeSchema
+                        name="supportedIDTokenEncryptionAlgorithms"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a111a">
+                    <DefaultValues>
+                        <Value>RSA1_5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="supportedIDTokenEncryptionMethods"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a111b">
+                    <DefaultValues>
+                        <Value>A128CBC-HS256</Value>
+                        <Value>A256CBC-HS512</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema
                         name="forgerock-oauth2-provider-supported-claims"
                         type="list"
@@ -288,7 +306,6 @@
                         <Value>test</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
                 <AttributeSchema name="forgerock-oauth2-provider-claims-parameter-supported"
                                  type="single"
                                  syntax="boolean"

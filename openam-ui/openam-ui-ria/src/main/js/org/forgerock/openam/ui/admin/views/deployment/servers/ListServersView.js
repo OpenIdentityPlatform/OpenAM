@@ -23,7 +23,6 @@ define([
     "org/forgerock/openam/ui/admin/services/global/ServersService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
-
 ], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, ServersService, TemplateBasedView,
     ToggleCardListView) => {
 
@@ -36,7 +35,6 @@ define([
             "partials/util/_ButtonLink.html",
             "templates/admin/views/deployment/servers/_ServerCard.html"
         ],
-
         onDelete (event) {
             event.preventDefault();
             const id = $(event.currentTarget).data().deleteItem;
@@ -51,7 +49,6 @@ define([
                 });
             });
         },
-
         renderToggleView (data) {
             const tableData = {
                 "headers": [$.t("console.servers.list.table.0"), $.t("console.servers.list.table.1")],

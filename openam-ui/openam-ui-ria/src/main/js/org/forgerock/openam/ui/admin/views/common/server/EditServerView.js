@@ -46,12 +46,16 @@ define([
         getJSONSchemaView () {
             return this.subview.getBody();
         },
-        render (args) {
-            this.data.sectionId = args[0];
-
+        render ([serverId, sectionId]) {
+            if (serverId === "server-defaults") {
+                this.data.serverId = ServersService.servers.DEFAULT_SERVER;
+            } else {
+                this.data.serverId = serverId;
+            }
+            this.data.sectionId = sectionId;
             this.data.title = $.t(`console.common.navigation.${this.data.sectionId}`);
 
-            ServersService.servers.defaults.get(this.data.sectionId).then((response) => {
+            ServersService.servers.get(this.data.serverId, this.data.sectionId).then((response) => {
                 this.data.schema = response.schema;
                 this.data.values = response.values;
 
@@ -94,7 +98,7 @@ define([
         },
         onSave () {
             this.updateData();
-            ServersService.servers.defaults.update(this.data.sectionId, this.data.values.raw)
+            ServersService.servers.update(this.data.sectionId, this.data.values.raw)
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

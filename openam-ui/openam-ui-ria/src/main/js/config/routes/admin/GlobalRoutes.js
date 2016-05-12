@@ -20,7 +20,7 @@ define([
     const routes = {
         listAuthenticationSettings: {
             view: "org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView",
-            url: /configure\/authentication/,
+            url: /configure\/authentication$/,
             pattern: "configure/authentication",
             role: "ui-global-admin",
             navGroup: "admin"
@@ -34,21 +34,37 @@ define([
         },
         listGlobalServices: {
             view: "org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView",
-            url: /configure\/global-services/,
+            url: /configure\/global-services$/,
             pattern: "configure/global-services",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         editGlobalService: {
             view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceView",
-            url: /configure\/global-services\/([^\/]+)/,
+            url: /configure\/global-services\/([^\/]+)$/,
             pattern: "configure/global-services/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },
+        globalServiceSubSchemaNew: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/NewGlobalServiceSubSchemaView",
+            url: /configure\/global-services\/([^\/]+)\/([^\/]+)\/new/,
+            pattern: "configure/global-services/?/?/new",
+            role: "ui-realm-admin",
+            navGroup: "admin",
+            forceUpdate: true
+        },
+        globalServiceSubSchemaEdit: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceSubSchemaView",
+            url: /configure\/global-services\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)/,
+            pattern: "configure/global-services/?/?/edit/?",
+            role: "ui-realm-admin",
+            navGroup: "admin",
+            forceUpdate: true
+        },
         listSites: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
-            url: /deployment\/sites/,
+            url: /deployment\/sites$/,
             pattern: "deployment/sites",
             role: "ui-realm-admin",
             navGroup: "admin"
@@ -69,15 +85,22 @@ define([
         },
         listServers: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
-            url: /deployment\/servers/,
-            pattern: "deployment/servers$",
+            url: /deployment\/servers$/,
+            pattern: "deployment/servers",
             role: "ui-realm-admin",
             navGroup: "admin"
         },
         newServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
-            url: /deployment\/servers\/new/,
+            url: /deployment\/servers\/new$/,
             pattern: "deployment/servers/new",
+            role: "ui-realm-admin",
+            navGroup: "admin"
+        },
+        cloneServer: {
+            view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
+            url: /deployment\/servers\/([^\/]+)\/clone/,
+            pattern: "deployment/servers/?/clone",
             role: "ui-realm-admin",
             navGroup: "admin"
         }
@@ -87,7 +110,7 @@ define([
     _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directoryConfiguration"], (suffix) => {
         routes[`editServer${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerView",
+            page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
             url: new RegExp(`deployment/servers/([^\/]+)/(${suffix})`),
             pattern: `deployment/servers/?/${suffix}`,
             role: "ui-global-admin",
@@ -100,8 +123,8 @@ define([
     _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (suffix) => {
         routes[`editServerDefaults${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/configuration/server/ServerDefaultsView",
-            url: new RegExp(`configure/server-defaults/(${suffix})`),
+            page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
+            url: new RegExp(`configure/(server-defaults)/(${suffix})`),
             pattern: `configure/server-defaults/${suffix}`,
             role: "ui-global-admin",
             navGroup: "admin",

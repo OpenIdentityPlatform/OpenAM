@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -244,7 +245,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         OAuth2Uris oAuth2Uris = oauth2UrisFactory.get(request);
 
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
-        final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
+        String signingAlgorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
+        String encryptionAlgorithm = clientRegistration.getIDTokenEncryptionResponseAlgorithm();
+        String encryptionMethod = clientRegistration.getIDTokenEncryptionResponseMethod();
 
         final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
         final long exp = TimeUnit.MILLISECONDS.toSeconds(clientRegistration.getJwtTokenLifeTime(providerSettings)) +
@@ -262,14 +265,16 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
-        final KeyPair keyPair = providerSettings.getServerKeyPair();
+        final KeyPair signingKeyPair = providerSettings.getServerKeyPair();
+        final PublicKey encryptionPublicKey = clientRegistration.getIDTokenEncryptionPublicKey();
 
-        final String atHash = generateAtHash(algorithm, request, providerSettings);
-        final String cHash = generateCHash(algorithm, request, providerSettings);
+        final String atHash = generateAtHash(signingAlgorithm, request, providerSettings);
+        final String cHash = generateCHash(signingAlgorithm, request, providerSettings);
 
         final String acr = getAuthenticationContextClassReference(request);
 
-        final String kid = generateKid(providerSettings.getJWKSet(), algorithm);
+        final String signingKeyId = generateKid(providerSettings.getJWKSet(), signingAlgorithm);
+        final String encryptionKeyId = generateKid(providerSettings.getJWKSet(), signingAlgorithm);
 
         final long authTime = resourceOwner.getAuthTime();
 
@@ -290,9 +295,10 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             }
         }
 
-        final OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm,
-                iss, subId, clientId, authorizationParty, exp, currentTimeInSeconds,
-                authTime, nonce, opsId, atHash, cHash, acr, amr, realm);
+        final OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(signingKeyId, encryptionKeyId,
+                clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
+                encryptionMethod, clientRegistration.isIDTokenEncryptionEnabled(), iss, subId, clientId,
+                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr, realm);
         request.setSession(ops);
 
         //See spec section 5.4. - add claims to id_token based on 'response_type' parameter

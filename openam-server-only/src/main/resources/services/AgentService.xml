@@ -71,34 +71,6 @@
                             <Value>Confidential</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!--
-                     <AttributeSchema name="com.forgerock.openam.oauth2provider.tokenType"
-                                      type="single_choice"
-                                      syntax="string"
-                                      validator="RequiredValueValidator"
-                                      i18nKey="a709">
-                         <ChoiceValues>
-                             <ChoiceValue i18nKey="a710">Bearer</ChoiceValue>
-                             <ChoiceValue i18nKey="a711">MAC</ChoiceValue>
-                             <ChoiceValue i18nKey="a712">SAML 2.0</ChoiceValue>
-                         </ChoiceValues>
-                         <DefaultValues>
-                             <Value>Bearer</Value>
-                         </DefaultValues>
-                     </AttributeSchema>
-                     <AttributeSchema name="com.forgerock.openam.oauth2provider.autoGrant"
-                                      type="single"
-                                      syntax="boolean"
-                                      i18nKey="a713">
-                         <BooleanValues>
-                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                         </BooleanValues>
-                         <DefaultValues>
-                             <Value>false</Value>
-                         </DefaultValues>
-                     </AttributeSchema>
-                     -->
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.redirectionURIs"
                                      type="list"
                                      uitype="unorderedlist"
@@ -162,23 +134,6 @@
                             <Value>[0]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
-
-                    <!--
-                        <AttributeSchema
-                                name="com.forgerock.openam.oauth2provider.grantTypes"
-                                type="list"
-                                syntax="string"
-                                i18nKey="a714"
-                                validator="ListValueValidator"
-                                uitype="unorderedlist">
-                            <DefaultValues>
-                                <Value>[0]=authorization_code</Value>
-                                <Value>[1]=implicit</Value>
-                                <Value>[2]=refresh_token</Value>
-                                <Value>[3]=urn:ietf:params:oauth:grant-type:jwt-bearer</Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        -->
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.responseTypes"
                             type="list"
@@ -205,18 +160,6 @@
                             <Value>[0]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!--
-                        <AttributeSchema
-                                name="com.forgerock.openam.oauth2provider.logoURI"
-                                type="single"
-                                syntax="string"
-                                i18nKey="a718">
-                            <DefaultValues>
-                                <Value></Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        -->
-
                     <AttributeSchema name="com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod"
                                      type="single_choice"
                                      syntax="string"
@@ -231,26 +174,6 @@
                             <Value>client_secret_basic</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!--
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.policyURI"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a720">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.tosURI"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a721">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                                        -->
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.sectorIdentifierURI"
                             type="single"
@@ -275,44 +198,6 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <!--
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.requestObjectSigningAlg"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a727">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.userinfoSignedResponseAlg"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a728">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.userinfoEncryptedResponseAlg"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a729">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                      <AttributeSchema
-                                              name="com.forgerock.openam.oauth2provider.userinfoEncryptedResponseEnc"
-                                              type="single"
-                                              syntax="string"
-                                              i18nKey="a730">
-                                          <DefaultValues>
-                                              <Value></Value>
-                                          </DefaultValues>
-                                      </AttributeSchema>
-                                      -->
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg"
                             type="single"
@@ -320,6 +205,50 @@
                             i18nKey="a731">
                         <DefaultValues>
                             <Value>RS256</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="idTokenEncryptionEnabled"
+                            type="single"
+                            syntax="boolean"
+                            i18nKey="a731a">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="idTokenEncryptionAlgorithm"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a732">
+                        <DefaultValues>
+                            <Value>RSA1_5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="idTokenEncryptionMethod"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a733">
+                        <DefaultValues>
+                            <Value>A128CBC-HS256</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="idTokenPublicEncryptionKey"
+                            type="single"
+                            syntax="paragraph"
+                            i18nKey="a734">
+                        <DefaultValues>
+                            <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -345,58 +274,6 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <!--
-                    <AttributeSchema
-                            name="com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a732">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema
-                            name="com.forgerock.openam.oauth2provider.idTokenEncryptedResponseEnc"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a733">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="com.forgerock.openam.oauth2provider.requireAuthTime"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a735">
-                    <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>false</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    -->
-                    <!--
-                        <AttributeSchema
-                                name="com.forgerock.openam.oauth2provider.defaultACRValues"
-                                type="single"
-                                syntax="string"
-                                i18nKey="a736">
-                            <DefaultValues>
-                                <Value></Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        <AttributeSchema
-                                name="com.forgerock.openam.oauth2provider.initiateLoginUri"
-                                type="single"
-                                syntax="string"
-                                i18nKey="a737">
-                            <DefaultValues>
-                                <Value></Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        -->
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.postLogoutRedirectURI"
                             type="list"
@@ -407,18 +284,6 @@
                             <Value>[0]=</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!--
-                        <AttributeSchema
-                                name="com.forgerock.openam.oauth2provider.requestURIs"
-                                type="list"
-                                syntax="string"
-                                i18nKey="a739"
-                                uitype="unorderedlist">
-                            <DefaultValues>
-                                <Value>[0]=</Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        -->
                     <AttributeSchema
                             name="com.forgerock.openam.oauth2provider.accessToken"
                             type="single"

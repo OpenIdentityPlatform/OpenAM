@@ -11,13 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
 
 import java.net.URI;
+import java.security.PublicKey;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -36,6 +40,34 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
      * @return The OpenId token signed response algorithm.
      */
     String getIDTokenSignedResponseAlgorithm();
+
+    /**
+     * Determines if ID token encryption is enabled.
+     *
+     * @return {@code true} if ID token encryption is enabled.
+     */
+    boolean isIDTokenEncryptionEnabled();
+
+    /**
+     * Gets the algorithm used to encrypt OpenID Connect tokens.
+     *
+     * @return The OpenID Connect token encryption algorithm.
+     */
+    String getIDTokenEncryptionResponseAlgorithm();
+
+    /**
+     * Gets the encryption method used to encrypt OpenID Connect tokens.
+     *
+     * @return The OpenID Connect token encryption method.
+     */
+    String getIDTokenEncryptionResponseMethod();
+
+    /**
+     * Gets the encryption public key used to encrypt OpenID Connect tokens.
+     *
+     * @return The OpenID Connect token encryption public key.
+     */
+    PublicKey getIDTokenEncryptionPublicKey();
 
     /**
      * Gets the token_endpoint_auth_method configured for this client.

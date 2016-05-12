@@ -17,12 +17,7 @@
 
 package org.forgerock.openam.oauth2;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-
+import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -31,6 +26,7 @@ import java.net.URL;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
@@ -48,8 +44,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.crypto.SecretKey;
 
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
@@ -63,7 +63,6 @@ import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientType;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
@@ -571,6 +570,47 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return null;
     }
 
+    @Override
+    public boolean isIDTokenEncryptionEnabled() {
+        try {
+            Set<String> attribute = amIdentity.getAttribute("idTokenEncryptionEnabled");
+            if (attribute == null || attribute.isEmpty()) {
+                return false;
+            }
+            return Boolean.valueOf(attribute.iterator().next());
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", "idTokenEncryptionEnabled", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + "idTokenEncryptionEnabled" + " from repository");
+        }
+    }
+
+    @Override
+    public String getIDTokenEncryptionResponseAlgorithm() {
+        return getAttribute("idTokenEncryptionAlgorithm");
+    }
+
+    @Override
+    public String getIDTokenEncryptionResponseMethod() {
+        return getAttribute("idTokenEncryptionMethod");
+    }
+
+    @Override
+    public PublicKey getIDTokenEncryptionPublicKey() {
+        try {
+            Set<String> set = amIdentity.getAttribute("idTokenPublicEncryptionKey");
+            if (set == null || set.isEmpty()) {
+                return null;
+            }
+            String encodedCert = set.iterator().next();
+            return pemDecoder.decodeRSAPublicKey(encodedCert);
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", "idTokenPublicEncryptionKey", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + "idTokenPublicEncryptionKey" + " from repository");
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -842,5 +882,20 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
 
         return true;
+    }
+
+    private String getAttribute(String attributeName) {
+        final Set<String> set;
+        try {
+            set = amIdentity.getAttribute(attributeName);
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", attributeName, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + attributeName + " from repository");
+        }
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
     }
 }

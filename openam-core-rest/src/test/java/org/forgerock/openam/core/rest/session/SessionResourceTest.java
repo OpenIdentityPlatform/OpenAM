@@ -372,7 +372,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("maxtime").isEqualTo(TIME_LEFT);
+        assertThat(promise).succeeded().withContent().longAt("maxtime").isEqualTo(TIME_LEFT);
     }
 
     @Test
@@ -391,7 +391,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("maxtime").isEqualTo(-1);
+        assertThat(promise).succeeded().withContent().longAt("maxtime").isEqualTo(-1);
     }
 
     @Test
@@ -414,7 +414,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("idletime").isEqualTo(IDLE);
+        assertThat(promise).succeeded().withContent().longAt("idletime").isEqualTo(IDLE);
     }
 
     @Test
@@ -433,7 +433,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("idletime").isEqualTo(-1);
+        assertThat(promise).succeeded().withContent().longAt("idletime").isEqualTo(-1);
     }
 
     @Test

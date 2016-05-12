@@ -194,7 +194,7 @@
         <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
         <forgerock.license.version>1.0.0</forgerock.license.version>
         <checkstyleFailOnError>false</checkstyleFailOnError>
-
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <!-- Profiles -->
@@ -557,8 +557,8 @@
         <dependencies>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-bom</artifactId>
-                <version>7.0</version>
+                <artifactId>commons-bom</artifactId>
+                <version>20.0.0-alpha-1</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

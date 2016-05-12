@@ -253,6 +253,7 @@
             "save" : "Save",
             "create" : "Create",
             "cancel" : "Cancel",
+            "clone" : "Clone",
             "reset" : "Reset",
             "close" : "Close",
             "clear": "Clear",
@@ -760,6 +761,10 @@
             },
             "new": {
                 "title" : "New Server",
+                "serverUrl": "Server URL"
+            },
+            "clone": {
+                "title" : "Clone Server",
                 "serverUrl": "Server URL"
             }
         },

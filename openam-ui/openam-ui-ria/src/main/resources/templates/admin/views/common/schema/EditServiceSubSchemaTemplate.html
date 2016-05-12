@@ -1,0 +1,14 @@
+{{> headers/_TitleWithSubAndIcon title=id type=(tWithParams "console.services.subSchema.title" subSchema=subSchemaType) icon="plug" }}
+
+{{#if hasTabs}}
+    <form data-json-form></form>
+{{else}}
+    <div class="panel panel-default">
+        <div class="panel-body ">
+            <form data-json-form></form>
+        </div>
+        <div class="panel-footer clearfix">
+            {{> form/_JSONSchemaFooter}}
+        </div>
+    </div>
+{{/if}}

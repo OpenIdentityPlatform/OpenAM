@@ -94,6 +94,10 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("subject_types_supported", providerSettings.getSupportedSubjectTypes());
         configuration.put("id_token_signing_alg_values_supported",
                 providerSettings.getSupportedIDTokenSigningAlgorithms());
+        configuration.put("id_token_encryption_alg_values_supported",
+                providerSettings.getSupportedIDTokenEncryptionAlgorithms());
+        configuration.put("id_token_encryption_enc_values_supported",
+                providerSettings.getSupportedIDTokenEncryptionMethods());
         configuration.put("acr_values_supported", providerSettings.getAcrMapping().keySet());
         configuration.put("claims_parameter_supported", providerSettings.getClaimsParameterSupported());
         configuration.put("token_endpoint_auth_methods_supported", providerSettings.getEndpointAuthMethodsSupported());

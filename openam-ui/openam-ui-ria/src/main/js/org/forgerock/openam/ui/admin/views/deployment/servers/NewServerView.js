@@ -16,13 +16,24 @@
 
 define([
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/admin/services/global/ServersService",
     "org/forgerock/openam/ui/admin/views/common/Backlink"
-], ($, Messages, AbstractView, Router, ServersService, Backlink) => {
+], ($, _, Messages, AbstractView, Router, URIUtils, ServersService, Backlink) => {
     const getTrimmedValue = (field) => field.val().trim();
+    const sendErrorMessage = (response) => {
+        Messages.addMessage({ response, type: Messages.TYPE_DANGER });
+    };
+    const routeToEdit = (id) => {
+        Router.routeTo(Router.configuration.routes.editServerGeneral, {
+            args: [id],
+            trigger: true
+        });
+    };
 
     const NewServerView = AbstractView.extend({
         template: "templates/admin/views/deployment/servers/NewServerTemplate.html",
@@ -30,23 +41,31 @@ define([
             "click [data-create]": "createServer",
             "keyup [data-server-url]": "toggleCreateButton"
         },
-
-        render () {
+        render ([id]) {
+            this.data.id = id;
+            const fragments = URIUtils.getCurrentFragment().split("/");
+            this.isCloneView = _.last(fragments) === "clone";
+            if (this.isCloneView) {
+                this.data.title = "console.servers.clone.title";
+            } else {
+                this.data.title = "console.servers.new.title";
+            }
             this.parentRender(() => { new Backlink().render(); });
             return this;
         },
-
         createServer () {
             const serverUrl = getTrimmedValue(this.$el.find("[data-server-url]"));
 
-            ServersService.servers.create({ "_id": serverUrl })
-                .then(() => {
-                    Router.routeTo(Router.configuration.routes.editServerGeneral, { args: [serverUrl], trigger: true });
-                },
-                (response) => { Messages.addMessage({ response, type: Messages.TYPE_DANGER }); }
-            );
+            if (this.isCloneView) {
+                ServersService.servers.clone(this.data.id, serverUrl).then((response) => {
+                    routeToEdit(response.clonedId);
+                }, sendErrorMessage);
+            } else {
+                ServersService.servers.create({ "url": serverUrl }).then((response) => {
+                    routeToEdit(response._id);
+                }, sendErrorMessage);
+            }
         },
-
         toggleCreateButton (event) {
             const serverUrl = getTrimmedValue($(event.currentTarget));
             const valid = serverUrl !== "";

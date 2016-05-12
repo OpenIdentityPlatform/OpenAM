@@ -320,6 +320,22 @@ public interface OAuth2ProviderSettings {
     Set<String> getSupportedIDTokenSigningAlgorithms() throws ServerException;
 
     /**
+     * Gets the algorithms that the OAuth2 provider supports for encryptin OpenID tokens.
+     *
+     * @return A {@code Set} of the supported algorithms.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedIDTokenEncryptionAlgorithms() throws ServerException;
+
+    /**
+     * Gets the encryption methods that the OAuth2 provider supports for encryptin OpenID tokens.
+     *
+     * @return A {@code Set} of the supported algorithms.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedIDTokenEncryptionMethods() throws ServerException;
+
+    /**
      * Gets the supported version of the OpenID Connect specification.
      *
      * @return The OpenID Connect version.

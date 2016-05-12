@@ -131,7 +131,12 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
      * {@inheritDoc}
      */
     public KeyPair getServerKeyPair(String realm) throws SMSException, SSOException {
-        final String alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
+        return getServerKeyPair(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
+    }
+
+    @Override
+    public KeyPair getServerKeyPair(String realm, String attributeName) throws SMSException, SSOException {
+        final String alias = getStringSetting(realm, attributeName);
 
         //get keystore password from file
         final String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
