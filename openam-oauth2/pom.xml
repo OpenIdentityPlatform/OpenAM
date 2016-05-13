@@ -38,10 +38,6 @@
     <name>OpenAM OAuth2</name>
     <description>OpenAM OAuth2 integration</description>
 
-    <properties>
-        <maven.javadoc.skip>false</maven.javadoc.skip>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

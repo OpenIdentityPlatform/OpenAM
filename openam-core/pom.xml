@@ -39,10 +39,6 @@
     <artifactId>openam-core</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <maven.javadoc.skip>false</maven.javadoc.skip>
-    </properties>
-
     <!-- Build -->
     <build>
         <plugins>

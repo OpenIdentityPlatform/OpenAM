@@ -41,7 +41,6 @@
 
     <properties>
         <checkstyleFailOnError>true</checkstyleFailOnError>
-        <maven.javadoc.skip>false</maven.javadoc.skip>
     </properties>
 
     <!-- Build -->

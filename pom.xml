@@ -194,7 +194,6 @@
         <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
         <forgerock.license.version>1.0.0</forgerock.license.version>
         <checkstyleFailOnError>false</checkstyleFailOnError>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <!-- Profiles -->
@@ -291,7 +290,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <inherited>true</inherited>
+                        <inherited>false</inherited>
                         <configuration>
                             <charset>utf-8</charset>
                             <encoding>utf-8</encoding>
@@ -334,15 +333,6 @@
                                 <version>${javadoc-utils.version}</version>
                             </docletArtifact>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>aggregate-jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

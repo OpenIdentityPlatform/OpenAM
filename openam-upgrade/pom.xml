@@ -29,10 +29,6 @@
     <artifactId>openam-upgrade</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <maven.javadoc.skip>false</maven.javadoc.skip>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
