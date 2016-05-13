@@ -289,17 +289,6 @@
         </cc>
     </property>
     </section>
-    <section name="secFIPS" defaultValue="amconfig.header.fips" >
-    <property>
-        <label name="lblcsccom.sun.identity.security.fipsmode"
-            defaultValue="amconfig.com.sun.identity.security.fipsmode"
-            labelFor="csccom.sun.identity.security.fipsmode" />
-        <cc name="csccom.sun.identity.security.fipsmode"
-            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
-            <attribute name="label" value="amconfig.choice.yes" />
-        </cc>
-    </property>
-    </section>
     <section name="secDeserialisationWhitelist" defaultValue="amconfig.header.deserialisationwhitelist" >
         <property>
             <label name="deserialisationwhitelistLabel"

@@ -171,7 +171,6 @@
         <FastInfoset.version>2006-26-09</FastInfoset.version>
         <jdmk.version>2007-01-10</jdmk.version>
         <jsr173_api.version>2004-30-01</jsr173_api.version>
-        <jss4.version>2007-08-11</jss4.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
         <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
         <freemarker.version>2.3.19</freemarker.version>
@@ -1422,8 +1421,6 @@
                 <version>${jsr311-api.version}</version>
             </dependency>
 
-            <!-- TODO jss4 org/mozilla/jss -->
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
@@ -1605,11 +1602,6 @@
                 <groupId>external</groupId>
                 <artifactId>jsr173_api</artifactId>
                 <version>${jsr173_api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>jss4</artifactId>
-                <version>${jss4.version}</version>
             </dependency>
 
             <!-- Preferred JSON Data Binding API -->

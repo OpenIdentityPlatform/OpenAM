@@ -29,12 +29,29 @@
 
 package com.sun.identity.authentication.modules.cert;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.x500.X500Principal;
-import javax.servlet.http.HttpServletRequest;
+import com.iplanet.security.x509.CertUtils;
+import com.sun.identity.authentication.spi.AMLoginModule;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.X509CertificateCallback;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.cert.AMCRLStore;
+import com.sun.identity.security.cert.AMCertPath;
+import com.sun.identity.security.cert.AMCertStore;
+import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.encode.Base64;
+import sun.security.util.DerValue;
+import sun.security.util.ObjectIdentifier;
+import sun.security.x509.CertificateExtensions;
+import sun.security.x509.GeneralName;
+import sun.security.x509.GeneralNameInterface;
+import sun.security.x509.GeneralNames;
+import sun.security.x509.OtherName;
+import sun.security.x509.RFC822Name;
+import sun.security.x509.SubjectAlternativeNameExtension;
+import sun.security.x509.X509CertImpl;
+import sun.security.x509.X509CertInfo;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertificateFactory;
@@ -48,36 +65,15 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.x500.X500Principal;
+import javax.servlet.http.HttpServletRequest;
 
-import com.iplanet.am.util.JSSInit;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.security.x509.CertUtils;
-import com.sun.identity.authentication.spi.AMLoginModule;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.X509CertificateCallback;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.cert.AMCRLStore;
-import com.sun.identity.security.cert.AMCertPath;
-import com.sun.identity.security.cert.AMCertStore;
-import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.encode.Base64;
 import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.LDAPUrl;
-import org.mozilla.jss.CryptoManager;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.OtherName;
-import sun.security.x509.RFC822Name;
-import sun.security.x509.SubjectAlternativeNameExtension;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 
 public class Cert extends AMLoginModule {
 
@@ -148,8 +144,7 @@ public class Cert extends AMLoginModule {
     private static com.sun.identity.shared.debug.Debug debug = null;
 
     static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
-    static boolean usingJSSHandler = false;
-    
+
     private String amAuthCert_cacheCRL;
     private boolean doCRLCaching = true;
     
@@ -157,15 +152,6 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_updateCRL;
     private boolean doCRLUpdate = true;
     
-    
-    static {
-        String handler = SystemProperties.get(Constants.PROTOCOL_HANDLER,
-            Constants.JSSE_HANDLER);
-        usingJSSHandler = handler.equals(Constants.JSS_HANDLER);
-        if (usingJSSHandler) {
-            JSSInit.initialize();
-        }
-    }
 
     /**
      * Default module constructor does nothing
@@ -483,12 +469,7 @@ public class Cert extends AMLoginModule {
             }
         }
 
-        int ret;
-        if (usingJSSHandler) {
-            ret = doJSSRevocationValidation(thecert);
-        } else {
-            ret = doJCERevocationValidation(allCerts);
-        }
+        int ret = doJCERevocationValidation(allCerts);
 
         if (ret != ISAuthConstants.LOGIN_SUCCEED) {
             debug.error("X509Certificate:CRL / OCSP verify failed.");
@@ -497,62 +478,6 @@ public class Cert extends AMLoginModule {
         }
         
         return ISAuthConstants.LOGIN_SUCCEED;
-    }
-
-    private int doJSSRevocationValidation(X509Certificate cert) {
-        int ret = ISAuthConstants.LOGIN_IGNORE;
-        boolean validateCA = amAuthCert_validateCA.equalsIgnoreCase("true");
-
-        X509CRL crl = null;
-        
-        if (crlEnabled) {
-            crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
-        
-            if ((crl != null) && (!crl.isRevoked(cert))) {
-                ret = ISAuthConstants.LOGIN_SUCCEED;
-            }
-        }
-
-        /**
-         * OCSP validation, this will use the CryptoManager.isCertvalid()
-         * method to validate certificate, OCSP is one of the steps in
-         * this process. Here is the algorith to find OCSP responder:
-         * 1. use global OCSP responder if set
-         * 2. use the OCSP responder in user's certificate if presents
-         * 3. no OCSP responder
-         * The isCertValid() WON'T perform OCSP validation if no OCSP responder
-         * found in above process.
-         */
-        if (ocspEnabled) {
-            try {
-                CryptoManager cm = CryptoManager.getInstance();
-                if (cm.isCertValid(cert.getEncoded(), true,
-                    CryptoManager.CertUsage.SSLClient) == true) {
-                    debug.message("cert is valid");
-                    ret = ISAuthConstants.LOGIN_SUCCEED;
-                } else {
-                    ret = ISAuthConstants.LOGIN_IGNORE;
-                }
-            } catch (Exception e) {
-                debug.message("certValidation failed with exception",e);
-            }
-        }
-        if ((ret == ISAuthConstants.LOGIN_SUCCEED)
-                && (crlEnabled || ocspEnabled)
-                && validateCA
-                && !AMCertStore.isRootCA(cert)) {
-            /*
-            The trust anchor is not necessarily a certificate, but a public key (trusted) entry in the trust-store. Don't
-            march up the chain unless the AMCertStore can actually return a non-null issuer certificate. If the issuer
-            certificate is null, then the result of the previous doRevocationValidation invocation is the final answer.
-             */
-            X509Certificate issuerCertificate = AMCertStore.getIssuerCertificate(
-                    ldapParam, cert, amAuthCert_chkAttrCertInLDAP);
-            if (issuerCertificate != null) {
-                ret = doJSSRevocationValidation(issuerCertificate);
-            }
-        }
-        return ret;
     }
 
     private int doJCERevocationValidation(X509Certificate[] allCerts)
