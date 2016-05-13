@@ -468,7 +468,9 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the client's type.
+     *
+     * @return The client's type.
      */
     public ClientType getClientType() {
         final ClientType clientType;

@@ -21,27 +21,72 @@ import org.forgerock.json.JsonValue;
 import java.util.Map;
 
 /**
- * Base type for StatefulAccessToken and StatelessAccessToken.
+ * Models an OAuth2 access token.
+ *
+ * @supported.all.api
  */
 public interface AccessToken extends IntrospectableToken, Token {
 
+    /**
+     * Gets the token's nonce.
+     *
+     * @return The token's nonce.
+     */
     String getNonce();
 
+    /**
+     * Gets the token's associated session id.
+     *
+     * @return The token's session id.
+     */
     String getSessionId();
 
+    @Override
     String getTokenId();
 
+    /**
+     * Gets the token's claims.
+     *
+     * @return The token's claims.
+     */
     String getClaims();
 
+    /**
+     * Gets the token's type.
+     *
+     * @return The token's type.
+     */
     String getTokenType();
 
+    /**
+     * Gets the token's grant type.
+     *
+     * @return The token's grant type.
+     */
     String getGrantType();
 
+    @Override
     Map<String, Object> toMap();
 
+    /**
+     * Stores additional data inside the token.
+     *
+     * @param key   The key.
+     * @param value The value.
+     */
     void addExtraData(String key, String value);
 
+    /**
+     * Gets the token's audit tracking id.
+     *
+     * @return The token's audit tracking id.
+     */
     String getAuditTrackingId();
 
+    /**
+     * Gets the {@link JsonValue} representation of the token.
+     *
+     * @return The {@link JsonValue} representation of the token.
+     */
     JsonValue toJsonValue();
 }

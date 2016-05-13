@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -20,18 +20,50 @@ import java.util.Set;
 
 /**
  * An OAuth 2.0 token abstraction for introspection.
+ *
+ * @supported.all.api
  */
 public interface IntrospectableToken {
 
+    /**
+     * Gets the token's expiry time.
+     *
+     * @return The token's expiry time.
+     */
     long getExpiryTime();
 
+    /**
+     * Gets whether the token has expired.
+     *
+     * @return Whether the token has expired.
+     */
     boolean isExpired();
 
+    /**
+     * Gets the token's realm.
+     *
+     * @return The token's realm.
+     */
     String getRealm();
 
+    /**
+     * Gets the token's client id.
+     *
+     * @return The token's client id.
+     */
     String getClientId();
 
+    /**
+     * Gets the token's resource owner id.
+     *
+     * @return The token's resource owner id.
+     */
     String getResourceOwnerId();
 
+    /**
+     * Gets the token's scopes.
+     *
+     * @return The token's scopes.
+     */
     Set<String> getScope();
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * for OAuth2 client authentication.
  *
  * @since 12.0.0
+ * @supported.all.api
  */
 public class OAuth2Jwt {
 
@@ -78,6 +79,18 @@ public class OAuth2Jwt {
         return isSignatureValid && isContentValid();
     }
 
+    /**
+     * Verifies that the JWT is valid by:
+     * <ul>
+     * <li>ensuring the JWT contains the 'iss', 'sub', 'aud' and 'exp' claims</li>
+     * <li>ensuring the JWT expiry is not unreasonably far in the future</li>
+     * <li>ensuring the JWT has not expired</li>
+     * <li>ensuring the JWT is not being used before its 'not before time'</li>
+     * <li>ensuring the JWT issued at time is not unreasonably far in the past</li>
+     * </ul>
+     *
+     * @return {@code true} if the JWT meets all the expectations.
+     */
     public boolean isContentValid() {
 
         return contains("iss", "sub", "aud", "exp") &&
@@ -100,6 +113,11 @@ public class OAuth2Jwt {
         return jwt.getClaimsSet().getExpirationTime().getTime() > (timeService.now() + UNREASONABLE_LIFETIME_LIMIT);
     }
 
+    /**
+     * Checks that the JWT has not expired.
+     *
+     * @return {@code true} if the JWT has expired.
+     */
     public boolean isExpired() {
         return jwt.getClaimsSet().getExpirationTime().getTime() <= (timeService.now() - SKEW_ALLOWANCE);
     }
