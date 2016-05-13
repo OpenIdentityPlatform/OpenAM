@@ -1,14 +1,15 @@
 <nav id="backlink"></nav>
 <div class="container">
     {{#if newEntity}}
-    {{> headers/_Title title="console.realms.newRealm"}}
+        {{> headers/_Title title="console.realms.newRealm"}}
     {{else}}
-    {{> headers/_TitleWithSubAndIcon title=realmName type="console.realms.edit.title" icon="cloud" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
+        {{> headers/_TitleWithSubAndIcon title=realmName type="console.realms.edit.title" icon="cloud" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
     {{/if}}
 
     <div class="panel panel-default">
         <div class="panel-body ">
-            <div data-realm-form></div>
+            <form data-realm-form></form>
+            <form data-realm-stateless-session-form></form>
             <div data-realm-alert class="col-sm-offset-4 col-sm-6"></div>
         </div>
         <div class="panel-footer clearfix">
@@ -16,9 +17,9 @@
                 <button data-cancel class="btn btn-default">{{t "common.form.cancel"}}</button>
                 <button data-save class="btn btn-primary" type="button" disabled>
                     {{#if newEntity}}
-                    {{t "common.form.create"}}
+                        {{t "common.form.create"}}
                     {{else}}
-                    {{t "common.form.saveChanges"}}
+                        {{t "common.form.saveChanges"}}
                     {{/if}}
                 </button>
             </div>

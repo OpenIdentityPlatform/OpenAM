@@ -24,95 +24,102 @@ define([
         }
     }
 
-    function throwOnPropertiesDefaultsFound (schema) {
-        if (schema.properties && schema.properties.defaults) {
-            throw new Error("[JSONSchema] \"defaults\" attribute found in schema properties." +
-                                " This is probably a mistake and should be removed.");
+    return class JSONSchema {
+        constructor (schema) {
+            throwOnNoSchemaRootType(schema);
+
+            schema = cleanJSONSchema(schema);
+
+            this.raw = Object.freeze(schema);
         }
-    }
+        enableKey () {
+            const key = `${_.camelCase(this.raw.title)}Enabled`;
+            if (this.raw.properties[key]) {
+                return key;
+            }
+        }
+        getEnableProperty () {
+            return this.pick(this.enableKey());
+        }
+        getPropertiesAsSchemas () {
+            return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
+        }
+        getRequiredPropertyKeys () {
+            return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
+        }
+        /**
+         * Creates a new JSONSchema object converting from a Global and Organisation properties structure to a flatten
+         * properties structure that can be rendered.
+         *
+         *  The following transformations applied:
+         * * Top-level properties are wrapped into a group (using the title, key and property order specified)
+         * * The "defaults" property is flatten and it's properties applied to the top-level
+         * @param   {string} title                Title for wrapped top-level properties group
+         * @param   {string} key                  Key to use for wrapped top-level properties group
+         * @param   {number|string} propertyOrder Property order for wrapped top-level properties group
+         * @returns {JSONSchema}                  JSONSchema object with transforms applied
+         */
+        fromGlobalAndOrganisationProperties (title, key, propertyOrder) {
+            const schema = _.cloneDeep(this.raw);
+            const group = {
+                properties: _.omit(schema.properties, "defaults"),
+                propertyOrder,
+                title,
+                type: "object"
+            };
 
-    function JSONSchema (schema) {
-        throwOnNoSchemaRootType(schema);
-        throwOnPropertiesDefaultsFound(schema);
+            schema.properties = _.merge({
+                [key]: group
+            }, schema.properties.defaults);
 
-        schema = cleanJSONSchema(schema);
+            return new JSONSchema(schema);
+        }
+        hasEnableProperty () {
+            return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
+        }
+        /**
+         * Whether this schema objects' properties are all schemas in their own right.
+         * If true, this object is a simply a container for other schemas.
+         * @returns {Boolean} Whether this object is a collection
+         */
+        isCollection () {
+            return _.every(this.raw.properties, (property) => property.type === "object");
+        }
+        isEmpty () {
+            return _.isEmpty(this.raw.properties);
+        }
+        keys (sort) {
+            sort = typeof sort !== "undefined" ? sort : false;
 
-        this.raw = Object.freeze(schema);
-    }
+            if (sort) {
+                const sortedSchemas = _.sortBy(_.map(this.raw.properties), "propertyOrder");
+                return _.map(sortedSchemas, (schema) => _.findKey(this.raw.properties, schema));
+            } else {
+                return _.keys(this.raw.properties);
+            }
+        }
+        passwordKeys () {
+            const passwordProperties = _.pick(this.raw.properties, _.matches({ format: "password" }));
 
-    /**
-     * Whether this schema objects' properties are all schemas in their own right.
-     * If true, this object is a simply a container for other schemas.
-     * @returns {Boolean} Whether this object is a collection
-     */
-    JSONSchema.prototype.isCollection = function () {
-        return _.every(this.raw.properties, (property) => property.type === "object");
-    };
+            return _.keys(passwordProperties);
+        }
+        pick (predicate) {
+            const schema = _.cloneDeep(this.raw);
+            schema.properties = _.pick(this.raw.properties, predicate);
 
-    JSONSchema.prototype.enableKey = function () {
-        const key = `${_.camelCase(this.raw.title)}Enabled`;
-        if (this.raw.properties[key]) {
-            return key;
+            return new JSONSchema(schema);
+        }
+        omit (predicate) {
+            const schema = _.cloneDeep(this.raw);
+            schema.properties = _.omit(this.raw.properties, predicate);
+
+            return new JSONSchema(schema);
+        }
+        setDefaultProperties (keys) {
+            const schema = _.cloneDeep(this.raw);
+            schema.defaultProperties = keys;
+
+            return new JSONSchema(schema);
         }
     };
-
-    JSONSchema.prototype.hasEnableProperty = function () {
-        return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
-    };
-
-    JSONSchema.prototype.getEnableProperty = function () {
-        return this.pick(this.enableKey());
-    };
-
-    JSONSchema.prototype.isEmpty = function () {
-        return _.isEmpty(this.raw.properties);
-    };
-
-    JSONSchema.prototype.keys = function (sort) {
-        sort = typeof sort !== "undefined" ? sort : false;
-
-        if (sort) {
-            const sortedSchemas = _.sortBy(_.map(this.raw.properties), "propertyOrder");
-            return _.map(sortedSchemas, (schema) => _.findKey(this.raw.properties, schema));
-        } else {
-            return _.keys(this.raw.properties);
-        }
-    };
-
-    JSONSchema.prototype.passwordKeys = function () {
-        const passwordProperties = _.pick(this.raw.properties, _.matches({ format: "password" }));
-
-        return _.keys(passwordProperties);
-    };
-
-    JSONSchema.prototype.pick = function (predicate) {
-        const schema = _.cloneDeep(this.raw);
-        schema.properties = _.pick(this.raw.properties, predicate);
-
-        return new JSONSchema(schema);
-    };
-
-    JSONSchema.prototype.omit = function (predicate) {
-        const schema = _.cloneDeep(this.raw);
-        schema.properties = _.omit(this.raw.properties, predicate);
-
-        return new JSONSchema(schema);
-    };
-
-    JSONSchema.prototype.getPropertiesAsSchemas = function () {
-        return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
-    };
-
-    JSONSchema.prototype.getRequiredPropertyKeys = function () {
-        return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
-    };
-
-    JSONSchema.prototype.setDefaultProperties = function (keys) {
-        const schema = _.cloneDeep(this.raw);
-        schema.defaultProperties = keys;
-
-        return new JSONSchema(schema);
-    };
-
-    return JSONSchema;
 });

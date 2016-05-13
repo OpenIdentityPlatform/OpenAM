@@ -16,24 +16,14 @@
 
 define([
     "lodash"
-], (_) => {
-    function JSONValues (values) {
+], (_) => class JSONValues {
+    constructor (values) {
         this.raw = Object.freeze(values);
     }
-
-    JSONValues.prototype.extend = function (object) {
+    extend (object) {
         return new JSONValues(_.extend({}, this.raw, object));
-    };
-
-    JSONValues.prototype.pick = function (predicate) {
-        return new JSONValues(_.pick(this.raw, predicate));
-    };
-
-    JSONValues.prototype.omit = function (predicate) {
-        return new JSONValues(_.omit(this.raw, predicate));
-    };
-
-    JSONValues.prototype.getEmptyValueKeys = function () {
+    }
+    getEmptyValueKeys () {
         function isEmpty (value) {
             if (_.isNumber(value)) {
                 return false;
@@ -53,7 +43,57 @@ define([
         });
 
         return keys;
-    };
+    }
+    /**
+     * Creates a new JSONValues object converting from a Global and Organisation values structure to a flatten
+     * values structure that can be rendered.
+     *
+     *  The following transformations applied:
+     * * Top-level values are wrapped into a group (using the groupKey specified)
+     * * The "defaults" property is flatten and it's values applied to the top-level
+     * @param   {string} groupKey Key to use for wrapped top-level values group
+     * @returns {JSONValues}      JSONValues object with transforms applied
+     */
+    fromGlobalAndOrganisationProperties (groupKey) {
+        const values = _.transform(this.raw, (result, value, key) => {
+            if (key === "defaults") {
+                _.merge(result, value);
+            } else if (_.startsWith(key, "_")) {
+                result[key] = value;
+            } else {
+                result[groupKey][key] = value;
+            }
+        }, { [groupKey]: {} });
 
-    return JSONValues;
+        return new JSONValues(values);
+    }
+    omit (predicate) {
+        return new JSONValues(_.omit(this.raw, predicate));
+    }
+    pick (predicate) {
+        return new JSONValues(_.pick(this.raw, predicate));
+    }
+    /**
+     * Creates a new JSONValues object converting from a flatten values structure to a Global and Organisation values
+     * structure that can be transmitted to the server.
+     *
+     *  The following transformations applied:
+     * * Top-level values are wrapped into a "defaults" group
+     * * Values under the specifed group key are flatten and applied to the top-level
+     * @param   {string} groupKey Key of the group to flatten onto the top-level
+     * @returns {JSONValues}      JSONValues object with transforms applied
+     */
+    toGlobalAndOrganisationProperties (groupKey) {
+        const values = _.transform(this.raw, (result, value, key) => {
+            if (key === groupKey) {
+                _.merge(result, value);
+            } else if (_.startsWith(key, "_")) {
+                result[key] = value;
+            } else {
+                result["defaults"][key] = value;
+            }
+        }, { defaults: {} });
+
+        return new JSONValues(values);
+    }
 });

@@ -98,7 +98,7 @@ define([
             this.subviews = _(orderedSchemaValuePairs)
                 .map(createJSONEditorView)
                 .invoke("render")
-                .each((view) => { $(view.el).appendTo(this.$el); })
+                .each((view) => { view.$el.appendTo(this.$el); })
                 .value();
 
             invokeOnRenderedAfterTimeout(this.options.onRendered);

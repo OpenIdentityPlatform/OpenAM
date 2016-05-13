@@ -79,7 +79,7 @@ define([
             "partials/alerts/_Alert.html"
         ],
         events: {
-            "click [data-save]": "submitForm",
+            "click [data-save]": "handleSave",
             "click [data-cancel]": "returnBack",
             "click [data-delete]": "onDeleteClick",
             "keyup input[name=\"root[name]\"]": "onDataChange",
@@ -89,7 +89,8 @@ define([
         render (args) {
             let realmPromise;
             let authenticationPromise;
-            const allRealmsPromise = RealmsService.realms.all();
+
+            this.realmPath = args[0];
 
             if (args[0]) {
                 this.data.realmPath = args[0];
@@ -116,21 +117,9 @@ define([
             }
 
             this.parentRender(function () {
-                Promise.all([realmPromise, allRealmsPromise, authenticationPromise]).then((results) => {
-                    const data = results[0];
-                    const element = this.$el.find("[data-realm-form]");
-                    const allRealmPaths = [];
-                    const statelessSessionsEnabled = _.get(results[2],
-                        "schema.properties.general.properties.statelessSessionsEnabled");
-
-                    _.each(results[1][0].result, (realm) => {
-                        if (realm.path) {
-                            allRealmPaths.push(realm.path);
-                        }
-                    });
-
-                    data.schema.properties.statelessSessionsEnabled = _.omit(statelessSessionsEnabled, "propertyOrder");
-                    data.values.statelessSessionsEnabled = _.get(results[2], "values.general.statelessSessionsEnabled");
+                Promise.all([realmPromise, RealmsService.realms.all(), authenticationPromise]).then((response) => {
+                    const data = response[0];
+                    const allRealmPaths = _.map(response[1][0].result, "path");
 
                     if (this.data.newEntity) {
                         // Only create dropdowns if the field is editable
@@ -145,24 +134,34 @@ define([
                         this.toggleSubmitButton(true);
                     }
 
-                    if (this.jsonSchemaView) {
-                        this.jsonSchemaView.remove();
-                    }
+                    const generalPropertyPath = this.data.newEntity ? "schema.properties.defaults.general"
+                                                                    : "schema.properties.general";
 
-                    this.jsonSchemaView = new FlatJSONSchemaView({
-                        values: new JSONValues(data.values),
-                        schema: new JSONSchema(data.schema)
-                    }).render().$el.appendTo(element);
+                    this.subviews = [
+                        new FlatJSONSchemaView({
+                            schema: new JSONSchema(data.schema),
+                            values: new JSONValues(data.values)
+                        }),
+                        new FlatJSONSchemaView({
+                            schema: new JSONSchema(_.get(response[2], generalPropertyPath))
+                                        .setDefaultProperties(["statelessSessionsEnabled"]),
+                            values: new JSONValues({})
+                        })
+                    ];
 
-                    const FRAGMENT_INDEX = 0;
-                    new Backlink().render(FRAGMENT_INDEX);
+                    this.subviews[0].render().$el.appendTo(this.$el.find("[data-realm-form]"));
+                    // Turn off inline error messages as we display our own help on errors on this page
+                    this.subviews[0].subview.jsonEditor.options["show_errors"] = "never";
+
+                    this.subviews[1].render().$el.appendTo(this.$el.find("[data-realm-stateless-session-form]"));
+
+                    new Backlink().render(0);
                     setAutofocus();
                 }, (response) => {
                     Messages.addMessage({ type: Messages.TYPE_DANGER, response });
                 });
             });
         },
-
         returnBack () {
             if (this.data.newEntity) {
                 Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
@@ -173,22 +172,18 @@ define([
                 });
             }
         },
-
         onDataChange () {
-            if (this.jsonSchemaView.subview.jsonEditor) {
-                this.jsonSchemaView.subview.jsonEditor.options["show_errors"] = "never";
-            }
             this.toggleSubmitButton(validateRealmName());
         },
-
-        submitForm (event) {
+        handleSave (event) {
             event.preventDefault();
             this.toggleSubmitButton(false);
 
             const failCallback = (response) => { Messages.addMessage({ type: Messages.TYPE_DANGER, response }); };
-            const values = this.jsonSchemaView.getData();
+            const values = this.subviews[0].getData();
+            const statelessSessionsValues = this.subviews[1].getData();
             const savePromise = this.data.newEntity ? RealmsService.realms.create(values)
-                            : RealmsService.realms.update(values);
+                                                    : RealmsService.realms.update(values);
 
             savePromise.then((realm) => {
                 const isRootRealm = realm.name === "/";
@@ -203,9 +198,7 @@ define([
                     realmPath = `${realm.parentPath}/${realm.name}`;
                 }
 
-                RealmAuthenticationService.authentication.update(realmPath, {
-                    statelessSessionsEnabled: values.statelessSessionsEnabled
-                }).then(() => {
+                RealmAuthenticationService.authentication.update(realmPath, statelessSessionsValues).then(() => {
                     if (this.data.newEntity) {
                         this.data.newEntity = false;
                         Router.routeTo(Router.configuration.routes.realmDefault, {
@@ -229,9 +222,7 @@ define([
         },
 
         deleteRealm () {
-            const realmPath = this.jsonSchemaView.getData().name;
-
-            RealmsService.realms.remove(realmPath).then(() => {
+            RealmsService.realms.remove(this.realmPath).then(() => {
                 Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

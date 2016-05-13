@@ -18,6 +18,7 @@
  * @module org/forgerock/openam/ui/admin/services/global/AuthenticationService
  */
 define([
+    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -25,8 +26,9 @@ define([
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/Promise"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/authentication`);
+    const globalAttributesKey = "global";
 
     function getModuleUrl (id) {
         return id === "core" ? "" : `/modules/${id}`;
@@ -40,39 +42,46 @@ define([
                 type: "POST"
             }).then((data) => _.sortBy(data.result, "name"));
         },
-
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, "");
-        },
+            const serviceCall = (action) => obj.serviceCall({
+                url: `?_action=${action}`,
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST"
+            });
 
+            return Promise.all([serviceCall("schema"), serviceCall("template")]).then((response) => ({
+                schema: response[0][0],
+                values: response[1][0]
+            }));
+        },
         get: (id) => {
             const getSchema = () => obj.serviceCall({
                 url: `${getModuleUrl(id)}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then((response) => {
-                delete response.properties.defaults; // TODO: remove when OPENAM-8822 is fixed
-                return new JSONSchema(response);
-            });
+            }).then((response) => new JSONSchema(response).fromGlobalAndOrganisationProperties(
+                $.t("console.common.globalAttributes"), globalAttributesKey, -10
+            ));
 
             const getValues = () => obj.serviceCall({
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            });
+            }).then((response) => new JSONValues(response).fromGlobalAndOrganisationProperties(
+                globalAttributesKey
+            ));
 
             return Promise.all([getSchema(), getValues()]).then((response) => ({
                 schema: response[0],
-                values: new JSONValues(response[1][0]),
-                name: response[1][0]._type.name
+                values: response[1],
+                name: response[1].raw._type.name
             }));
         },
-
         update (id, data) {
             return obj.serviceCall({
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
-                data: JSON.stringify(data)
+                data: JSON.stringify(new JSONValues(data).toGlobalAndOrganisationProperties(globalAttributesKey).raw)
             });
         }
     };

@@ -729,7 +729,8 @@
             "confirmDeleteText": "Are you sure that you want to delete this __type__?",
             "confirmDeleteSelected": "Are you sure that you want to delete these items?",
             "configuration": "Configuration",
-            "secondaryConfigurations": "Secondary Configurations"
+            "secondaryConfigurations": "Secondary Configurations",
+            "globalAttributes": "Global Attributes"
         },
         "sites" : {
             "common" : {
