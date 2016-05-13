@@ -141,4 +141,11 @@ public interface ClientRegistration {
      * Verifies that the supplied jwt is signed by this client.
      */
     boolean verifyJwtIdentity(OAuth2Jwt jwt);
+
+    /**
+     * Gets whether or not the client wants the OAuth2 implementation to skip asking the resource owner for consent.
+     *
+     * @return true if the client is configured to skip resource owner consent.
+     */
+    boolean isConsentImplied();
 }

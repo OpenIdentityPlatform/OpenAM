@@ -522,6 +522,17 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
+                <AttributeSchema name="clientsCanSkipConsent" type="single" syntax="boolean" i18nKey="a132"
+                                 order="420">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
     </Service>

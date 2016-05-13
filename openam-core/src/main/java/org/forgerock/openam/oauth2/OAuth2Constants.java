@@ -877,6 +877,7 @@ public class OAuth2Constants {
         public static final String ADDRESS_MAPPING = "org-forgerock-oidc-address-attribute-mapping";
         public static final String PHONE_MAPPING = "org-forgerock-oidc-phone-attribute-mapping";
         public static final String STORE_OPS_TOKENS = "storeOpsTokens";
+        public static final String CLIENTS_CAN_SKIP_CONSENT = "clientsCanSkipConsent";
 
         public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
         public static final String DEFAULT_SCOPES = "forgerock-oauth2-provider-default-scopes";
@@ -944,6 +945,7 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
         public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
         public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
+        public static final String IS_CONSENT_IMPLIED = "isConsentImplied";
 
         public static final String JWKS_URI = "com.forgerock.openam.oauth2provider.jwksURI";
         public static final String JWKS = "com.forgerock.openam.oauth2provider.jwks";

@@ -945,6 +945,11 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return Boolean.parseBoolean(getStringSettingValue(OAuth2ProviderService.STORE_OPS_TOKENS));
     }
 
+    @Override
+    public boolean clientsCanSkipConsent() throws ServerException {
+        return Boolean.parseBoolean(getStringSettingValue(OAuth2ProviderService.CLIENTS_CAN_SKIP_CONSENT));
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

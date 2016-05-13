@@ -680,6 +680,11 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
     }
 
+    @Override
+    public boolean isConsentImplied() {
+        return Boolean.parseBoolean(getAttribute(OAuth2Constants.OAuth2Client.IS_CONSENT_IMPLIED));
+    }
+
     private boolean verifyJwtBySharedSecret(final OAuth2Jwt jwt) {
         final String issuer = jwt.getSignedJwt().getClaimsSet().getIssuer();
         OpenIdResolver resolver = resolverService.getResolverForIssuer(issuer);

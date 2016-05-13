@@ -398,6 +398,20 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
+
+                    <AttributeSchema
+                            name="isConsentImplied"
+                            type="single"
+                            syntax="boolean"
+                            i18nKey="a758">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
                 <SubSchema name="WebAgent" inheritance="multiple">
                     <AttributeSchema

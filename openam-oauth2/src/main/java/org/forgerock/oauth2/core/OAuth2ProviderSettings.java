@@ -510,4 +510,11 @@ public interface OAuth2ProviderSettings {
      */
     boolean shouldStoreOpsTokens() throws ServerException;
 
+    /**
+     * Whether clients can opt to skip resource owner consent during authorization flows.
+     * @return <code>true</code> if clients are allowed to opt to skip resource owner consent.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    boolean clientsCanSkipConsent() throws ServerException;
+
 }
