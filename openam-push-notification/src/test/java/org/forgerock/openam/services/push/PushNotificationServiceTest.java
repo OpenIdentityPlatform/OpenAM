@@ -16,9 +16,6 @@
 package org.forgerock.openam.services.push;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.times;
-import static org.mockito.BDDMockito.verify;
-import static org.mockito.BDDMockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.mock;
 
 import com.iplanet.sso.SSOException;
@@ -53,6 +50,7 @@ public class PushNotificationServiceTest {
                 .withGoogleEndpoint("googleEndpoint")
                 .withSecret("secret")
                 .withDelegateFactory("factoryClass")
+                .withRegion("us-west-2")
                 .build();
         this.mockDelegateFactory = mock(PushNotificationDelegateFactory.class);
         this.mockDelegate = mock(PushNotificationDelegate.class);
@@ -70,8 +68,8 @@ public class PushNotificationServiceTest {
         given(mockHelperFactory.getConfigHelperFor("realm4")).willThrow(new SMSException("Error reading service"));
 
         this.mockDebug = mock(Debug.class);
-        this.notificationService = new PushNotificationService(mockDebug, mockHelperFactory,
-                pushRealmMap, pushFactoryMap);
+        this.notificationService = new PushNotificationService(mockDebug, pushRealmMap, pushFactoryMap,
+                mockHelperFactory);
     }
 
     @Test
@@ -86,6 +84,19 @@ public class PushNotificationServiceTest {
         verify(mockDelegate, times(1)).send(pushMessage);
     }
 
+    @Test (expectedExceptions = PushNotificationException.class)
+    public void shouldErrorIfRealmNotInitiated() throws PushNotificationException {
+        //given
+        PushMessage pushMessage = new PushMessage("identity", "message", "subject", null);
+        given(mockHelper.getFactoryClass())
+                .willReturn("org.forgerock.openam.services.push.PushNotificationServiceTest$TestDelegateFactory");
+
+        //when
+        notificationService.send(pushMessage, "realm2");
+
+        //then
+    }
+
     @Test
     public void shouldLoadDelegateAndSendMessage() throws PushNotificationException {
         //given
@@ -94,6 +105,7 @@ public class PushNotificationServiceTest {
                 .willReturn("org.forgerock.openam.services.push.PushNotificationServiceTest$TestDelegateFactory");
 
         //when
+        notificationService.init("realm2");
         notificationService.send(pushMessage, "realm2");
 
         //then
@@ -158,7 +170,7 @@ public class PushNotificationServiceTest {
 
     public static class TestDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config)
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
                 throws PushNotificationException {
             return mockTestDelegate;
         }
@@ -166,7 +178,7 @@ public class PushNotificationServiceTest {
 
     public static class TestBrokenDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config)
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
                 throws PushNotificationException {
             throw new PushNotificationException("Broken implementation.");
         }

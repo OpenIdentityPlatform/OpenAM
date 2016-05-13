@@ -139,6 +139,8 @@ define([
             var submitContent,
                 expire;
 
+            clearTimeout(this.timeout);
+
             e.preventDefault();
             // disabled button before login
             $(e.currentTarget).prop("disabled", true);
@@ -321,7 +323,7 @@ define([
                 } else if (element.type === "PollingWaitCallback") {
                     waitTime = _.find(element.output, { object: { name: "waitTime" } }).object.value;
 
-                    window.setTimeout(function () {
+                    self.timeout = window.setTimeout(function () {
                         EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, { suppressSpinner: true });
                     }, waitTime);
                 }

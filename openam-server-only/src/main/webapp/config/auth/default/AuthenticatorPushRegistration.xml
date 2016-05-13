@@ -54,9 +54,10 @@
     <Callbacks length="3" order="4" timeout="120" header="Register your device with OpenAM">
         <TextOutputCallback>
             Scan the barcode image below with the ForgeRock Authenticator App to register your device with your login.
+            After scanning, please wait a few seconds for your device to register and authentication to continue.
         </TextOutputCallback>
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
-        <PollingWaitCallback waitTime="6000"/>
+        <PollingWaitCallback waitTime="10000"/>
     </Callbacks>
     <!-- CONFIRMATION -->
     <Callbacks length="2" order="5" timeout="120" header="Your device has been registered with OpenAM">

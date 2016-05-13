@@ -30,24 +30,43 @@
         </NameCallback>
     </Callbacks>
     <!-- AWAIT_STATE -->
-    <Callbacks length="2" order="3" timeout="9999" header="Authenticator Push">
+    <Callbacks length="3" order="3" timeout="9999" header="Authenticator Push">
         <TextOutputCallback>Please use your mobile device to authorise this log in.  There may be short wait as the server and your device communicate.</TextOutputCallback>
-        <PollingWaitCallback waitTime="6000"/>
-        <!-- TODO: VS3 - ADD REGISTER DEVICE OPTION ANBD PROBABLY A CANCEL OPTION -->
-        <!--<ConfirmationCallback>-->
-            <!--<OptionValues>-->
-                <!--<OptionValue>-->
-                    <!--<Value>Register Devcie</Value>-->
-                <!--</OptionValue>-->
-                <!--<OptionValue>-->
-                    <!--<Value>Cancel</Value>-->
-                <!--</OptionValue>-->
-            <!--</OptionValues>-->
-        <!--</ConfirmationCallback>-->
+        <PollingWaitCallback waitTime="10000"/>
+        <ChoiceCallback>
+            <Prompt>Lost Device</Prompt>
+            <ChoiceValues>
+                <ChoiceValue isDefault="false">
+                    <Value>Use Emergency Code</Value>
+                </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
     </Callbacks>
-    <Callbacks length="1" order="4" timeout="120" header="Authenticator Push" error="true">
+    <!-- For recovery code use -->
+    <Callbacks length="2" order="4" timeout="120" header="Use ForgeRock Authenticator (Push) Emergency Code">
         <NameCallback>
-            <Prompt>#THE DUMMY WILL NEVER BE SHOWN#</Prompt>
+            <Prompt>Emergency Code</Prompt>
         </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>OK</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For recovery code use -->
+    <Callbacks length="2" order="5" timeout="120" header="ForgeRock Authenticator (Push) Emergency Code Used">
+        <TextOutputCallback>
+            You have used one of your Emergency ForgeRock Authenticator (Push) Codes. Please make sure you have a note of
+            any remaining ForgeRock Authenticator (Push) Codes.
+        </TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Continue</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
     </Callbacks>
 </ModuleProperties>

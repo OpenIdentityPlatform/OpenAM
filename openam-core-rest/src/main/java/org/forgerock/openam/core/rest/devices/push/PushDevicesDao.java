@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.core.rest.devices.push;
 
-import javax.inject.Inject;
 import org.forgerock.openam.core.rest.devices.UserDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
 
 /**
  * A DAO instance for accessing Push user devices.
@@ -32,8 +32,7 @@ public class PushDevicesDao extends UserDevicesDao {
      *
      * @param serviceFactory Factory used to retrieve the Push Service for this dao.
      */
-    @Inject
-    public PushDevicesDao(AuthenticatorPushServiceFactory serviceFactory) {
+    public PushDevicesDao(AuthenticatorDeviceServiceFactory<AuthenticatorPushService> serviceFactory) {
         super(serviceFactory);
     }
 

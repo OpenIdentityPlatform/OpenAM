@@ -22,16 +22,13 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.utils.Time.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -39,8 +36,10 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.context.ClientContext;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -54,12 +53,14 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -81,7 +82,7 @@ public class OathDevicesResourceTest {
     @Mock
     private Debug debug;
     @Mock
-    private AuthenticatorOathServiceFactory oathServiceFactory;
+    private AuthenticatorDeviceServiceFactory oathServiceFactory;
     @Mock
     private AuthenticatorOathService oathService;
 
@@ -228,7 +229,7 @@ public class OathDevicesResourceTest {
     private static class OathDevicesResourceTestClass extends OathDevicesResource {
 
         public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
-                AuthenticatorOathServiceFactory oathServiceFactory) {
+                                AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory) {
             super(dao, helper, debug, oathServiceFactory);
         }
 

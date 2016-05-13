@@ -27,9 +27,11 @@ public interface PushNotificationDelegateFactory {
      * Produce a delegate for a given configuration. This delegate should be ready to use
      * as soon as the delegate has been produced.
      * @param config The config that will be used to configure the PushNotificationService.
+     * @param realm The realm in which this delegate will exist.
      * @return A valid PushNotificationService, ready to send (and receive if appropriate) messages.
      * @throws PushNotificationException in the case where we cannot generate an appropriate delegate.
      */
-    PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config) throws PushNotificationException;
+    PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
+            throws PushNotificationException;
 
 }

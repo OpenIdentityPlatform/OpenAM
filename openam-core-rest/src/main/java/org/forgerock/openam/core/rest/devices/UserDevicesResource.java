@@ -65,7 +65,6 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     public UserDevicesResource(T userDevicesDao, ContextHelper contextHelper) {
         this.userDevicesDao = userDevicesDao;
         this.contextHelper = contextHelper;
-
     }
 
     /**

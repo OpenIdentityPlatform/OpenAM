@@ -16,6 +16,7 @@
 package org.forgerock.openam.services.push;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
@@ -27,6 +28,7 @@ import com.sun.identity.sm.ServiceListener;
 /**
  * Decouples the PushNotificationService from its config to aid testing.
  */
+@Singleton
 public class PushNotificationServiceConfigHelperFactory {
 
     private final ServiceConfigManager serviceConfigManager;

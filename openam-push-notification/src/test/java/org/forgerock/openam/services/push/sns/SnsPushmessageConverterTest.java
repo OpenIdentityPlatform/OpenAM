@@ -39,7 +39,7 @@ public class SnsPushmessageConverterTest {
 
         JsonValue value = JsonValueBuilder.toJsonValue(result);
 
-        assertThat(value.get("default")).isString().contains("messageId :: body");
+        assertThat(value.get("default")).isString().contains("subject");
 
         //GCM FORMAT CHECK =====
 
@@ -66,7 +66,8 @@ public class SnsPushmessageConverterTest {
         JsonValue apnsDataValue = apnsValue.get("aps");
 
         assertThat(apnsDataValue.get("messageId")).isString().isEqualTo("messageId");
-        assertThat(apnsDataValue.get("alert")).isString().isEqualTo("body");
+        assertThat(apnsDataValue.get("alert")).isString().isEqualTo("subject");
+        assertThat(apnsDataValue.get("data")).isString().isEqualTo("body");
     }
 
 }

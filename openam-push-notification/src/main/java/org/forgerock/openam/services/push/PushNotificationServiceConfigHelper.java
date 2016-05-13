@@ -57,6 +57,7 @@ public class PushNotificationServiceConfigHelper {
         String appleEndpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_APPLE_ENDPOINT);
         String googleEndpoint = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_GOOGLE_ENDPOINT);
         String delegateFactory = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_FACTORY_CLASS);
+        String region = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_REGION);
 
         return new PushNotificationServiceConfig.Builder()
                 .withAccessKey(accessKey)
@@ -64,6 +65,7 @@ public class PushNotificationServiceConfigHelper {
                 .withAppleEndpoint(appleEndpoint)
                 .withGoogleEndpoint(googleEndpoint)
                 .withDelegateFactory(delegateFactory)
+                .withRegion(region)
                 .build();
     }
 

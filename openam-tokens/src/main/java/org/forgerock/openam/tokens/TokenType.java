@@ -80,5 +80,9 @@ public enum TokenType {
     /**
      * Stateless OAuth2 metadata token type.
      */
-    OAUTH_STATELESS
+    OAUTH_STATELESS,
+    /**
+     * Push Notification System token type.
+     */
+    PUSH
 }

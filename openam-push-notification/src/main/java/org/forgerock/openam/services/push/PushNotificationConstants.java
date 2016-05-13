@@ -58,8 +58,12 @@ public final class PushNotificationConstants {
     public static final JsonPointer DATA_JSON_POINTER = new JsonPointer(JWT);
     /** Claim set location of response. */
     public static final String RESPONSE_LOCATION = "response";
+    /** Claim set location of deny. */
+    public static final String DENY_LOCATION = "deny";
     /** General alg. */
     public static final String HMACSHA256 = "HmacSHA256";
+    /** Deny value. */
+    public static final int DENY_VALUE = 1;
 
 
     /**
@@ -76,6 +80,8 @@ public final class PushNotificationConstants {
     static final String DELEGATE_SECRET = "secret";
     /** Key to the service configuration factory field. */
     static final String DELEGATE_FACTORY_CLASS = "delegateFactory";
+    /** Key to the service configuration region field. */
+    static final String DELEGATE_REGION = "region";
 
     /**
      * DEFAULTS.
@@ -98,7 +104,7 @@ public final class PushNotificationConstants {
      */
 
     /** Name of the PushNotificationService. */
-    public static final String SERVICE_NAME = "PushNotificationService";
+    public static final String SERVICE_NAME = "iPlanetAMPushNotificationService";
     /** Version of the PushNotificationService. */
     public static final String SERVICE_VERSION = "1.0";
 

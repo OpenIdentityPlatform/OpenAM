@@ -30,10 +30,13 @@ public final class Constants {
     /**
      * KEYS.
      */
+
     /** The Name of the AuthenticatorPush authentication module for debug logging purposes. */
-    static final String AM_AUTH_AUTHENTICATOR_PUSH = "amAuthAuthenticatorPush";
+    public static final String AM_AUTH_AUTHENTICATOR_PUSH = "amAuthAuthenticatorPush";
     /** Module configuration key for push timeout. */
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-response-timeout";
+    /** Module configuration key for push timeout. */
+    static final String DEVICE_PUSH_ISSUER = "forgerock-am-auth-push-message-issuer";
     /** Module configuration key for authentication level of module. */
     static final String AUTH_LEVEL = "forgerock-am-auth-push-auth-level";
 
@@ -42,25 +45,50 @@ public final class Constants {
      * MESSAGE CODE KEYS.
      */
 
-    /** The key for the Message Id query component of the QR code. */
+    /** The key for the mechanism id. */
     static final String MECHANISM_ID_KEY = "u";
-    /** The key for the challenge inside the registration challenge. */
+    /** The key for the challenge. */
     static final String CHALLENGE_KEY = "c";
+    /** The key for the loadbalancer. */
+    static final String LOADBALANCER_KEY = "l";
+    /** The key for the time to live. */
+    static final String TIME_TO_LIVE_KEY = "t";
 
     /**
      * STATES.
      */
+
     /** State to gather username if not already supplied. */
     static final int USERNAME_STATE = 2;
     /** State to display please wait message to the  end-user. */
     static final int STATE_WAIT = 3;
+    /** State to use an emergency code. */
+    static final int STATE_EMERGENCY = 4;
+    /** State when an emergency code has been used. */
+    static final int STATE_EMERGENCY_USED = 5;
+
+    /**
+     * CALLBACKS.
+     */
 
     /** The Position of the Polling callback in the callbacks step in the xml for this module. */
     static final int POLLING_CALLBACK_POSITION = 1;
 
+
+    /** The return value submitted when the emergency button is pressed. */
+    static final int EMERGENCY_PRESSED = 0;
+    /** The default return for when we're auto-submitting the same page, rather than navigating away
+     * via the emergency code button. */
+    static final int EMERGENCY_NOT_PRESSED = 100;
+    /** Text for the emergency code button. */
+    static final String[] USE_EMERGENCY_CODE = new String[] { "Use Emergency Code" };
+    /** Location of the emergency button callback in XML. */
+    static final int EMERGENCY_CALLBACK_POSITION = 2;
+
     /**
      * CONFIG.
      */
+
     /** Length of a generic secret key (in bytes). */
     public static final int SECRET_BYTE_LENGTH = 32;
 

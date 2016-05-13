@@ -39,7 +39,7 @@ final class Constants {
      */
 
     /** The name of the AuthenticatorPush authentication registration module for debug logging purposes. */
-    static final String AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION = "amAuthAuthenticatorPushRegistration";
+    public static final String AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION = "amAuthAuthenticatorPushRegistration";
     /** Module configuration key for push timeout. */
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-registration-response-timeout";
     /** The name of the Auth Level key for the Authenticator Push registration. */
@@ -94,8 +94,12 @@ final class Constants {
     static final String AUTH_QR_CODE_KEY = "a";
     /** The key for the Issuer query component of the QR code. */
     static final String IMG_QR_CODE_KEY = "image";
+    /** The key for the loadbalancer information component of the QR code. */
+    static final String LOADBALANCER_DATA_QR_CODE_KEY = "l";
     /** The key for the challenge inside the registration challenge. */
     static final String CHALLENGE_QR_CODE_KEY = "c";
     /** The key for the total JWS challenge for registration. */
     static final String ISSUER_QR_CODE_KEY = "issuer";
+    /** The key for the time to live. */
+    static final String TIME_TO_LIVE_QR_CODE_KEY = "t";
 }

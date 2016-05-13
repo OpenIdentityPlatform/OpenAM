@@ -19,6 +19,8 @@ package org.forgerock.openam.authentication.modules.fr.oath;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -52,7 +54,9 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.GenerationUtils;
@@ -137,6 +141,10 @@ public class AuthenticatorOATH extends AMLoginModule {
 
     private final OathMaker oathDevices = InjectorHolder.getInstance(OathMaker.class);
 
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory =
+            InjectorHolder.getInstance(Key.get(AuthenticatorDeviceServiceFactory.class,
+                    Names.named(AuthenticatorOathServiceFactory.FACTORY_NAME)));
+
     private OathDeviceSettings newDevice = null;
 
 
@@ -196,7 +204,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             id = IdUtils.getIdentity(userName, realm);
-            realmOathService = new AuthenticatorOathService(id.getRealm());
+            realmOathService = oathServiceFactory.create(id.getRealm());
 
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
 

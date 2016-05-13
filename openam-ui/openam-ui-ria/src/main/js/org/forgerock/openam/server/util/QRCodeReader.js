@@ -25,7 +25,8 @@ define([
             qr.addData(options.text);
             qr.make();
 
-            return qr.createImgTag();
+            //3 is the size of the painted squares, 8 is the white border around the edge
+            return qr.createImgTag(3, 8);
         };
 
     /**

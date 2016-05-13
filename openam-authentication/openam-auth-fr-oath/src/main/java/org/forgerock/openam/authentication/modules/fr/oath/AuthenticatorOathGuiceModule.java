@@ -17,32 +17,19 @@
 package org.forgerock.openam.authentication.modules.fr.oath;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Guice bindings for the OATH two-step verification module.
  */
 @GuiceModule
 public class AuthenticatorOathGuiceModule extends AbstractModule {
+
     @Override
     protected void configure() {
-        // Auth module debug instances
         bind(Debug.class).annotatedWith(Names.named("amAuthOATH")).toInstance(Debug.getInstance("amAuthOATH"));
-
-        bind(AuthenticatorOathServiceFactory.class).in(Singleton.class);
-    }
-
-    @Provides @Inject
-    public OathDevicesDao getDevicesDao(AuthenticatorOathServiceFactory serviceFactory) {
-        return new OathDevicesDao(serviceFactory);
     }
 
 }

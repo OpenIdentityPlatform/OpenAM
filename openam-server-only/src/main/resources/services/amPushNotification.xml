@@ -20,10 +20,10 @@
         "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
-    <Service name="PushNotificationService" version="1.0">
+    <Service name="iPlanetAMPushNotificationService" version="1.0">
 
         <Schema
-                serviceHierarchy="/DSAMEConfig/PushNotificationService"
+                serviceHierarchy="/DSAMEConfig/iPlanetAMPushNotificationService"
                 i18nFileName="amPushNotification"
                 revisionNumber="1"
                 resourceName="pushNotification"
@@ -53,6 +53,30 @@
                 <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- http://docs.aws.amazon.com/general/latest/gr/rande.html for region list
+                     (or google 'amazon aws regions') -->
+
+                <AttributeSchema name="region" type="single_choice" syntax="string" i18nKey="a045"
+                                 validator="RequiredValueValidator">
+                    <ChoiceValues>
+                        <ChoiceValue>us-gov-west-1</ChoiceValue>
+                        <ChoiceValue>us-east-1</ChoiceValue>
+                        <ChoiceValue>us-west-1</ChoiceValue>
+                        <ChoiceValue>us-west-2</ChoiceValue>
+                        <ChoiceValue>eu-west-1</ChoiceValue>
+                        <ChoiceValue>eu-central-1</ChoiceValue>
+                        <ChoiceValue>ap-southeast-1</ChoiceValue>
+                        <ChoiceValue>ap-southeast-2</ChoiceValue>
+                        <ChoiceValue>ap-northeast-1</ChoiceValue>
+                        <ChoiceValue>ap-northeast-2</ChoiceValue>
+                        <ChoiceValue>sa-east-1</ChoiceValue>
+                        <ChoiceValue>cn-north-1</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>us-west-2</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

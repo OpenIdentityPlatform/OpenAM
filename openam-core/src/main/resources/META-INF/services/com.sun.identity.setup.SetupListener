@@ -1,2 +1,3 @@
 com.sun.identity.entitlement.opensso.SubRealmObserver
 org.forgerock.openam.sts.publish.rest.RestSTSSetupListener
+org.forgerock.openam.services.push.PushNotificationServiceSetupListener

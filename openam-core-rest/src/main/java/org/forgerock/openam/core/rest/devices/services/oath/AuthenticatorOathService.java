@@ -20,6 +20,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -35,14 +36,19 @@ import org.forgerock.util.Reject;
  */
 public class AuthenticatorOathService extends EncryptedDeviceStorage implements DeviceService {
 
-    static public final String SERVICE_NAME = "AuthenticatorOATH";
-    static public final String SERVICE_VERSION = "1.0";
+    /** Name of this service for reference purposes. */
+    public static final String SERVICE_NAME = "AuthenticatorOATH";
+    /** Version of this service. */
+    public static final String SERVICE_VERSION = "1.0";
 
-    static private final String DEBUG_LOCATION = "amAuthAuthenticatorOATH";
-
+    /** Value is not set in config. */
     public static final int NOT_SET = 0;
+    /** Value is set to allow skipping. */
     public static final int SKIPPABLE = 1;
+    /** Value is set to not allow skipping. */
     public static final int NOT_SKIPPABLE = 2;
+
+    private static final String DEBUG_LOCATION = "amAuthAuthenticatorOATH";
 
     private static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-authenticator-oath-attr-name";
     private static final String OATH_ENCRYPTION_SCHEME =
@@ -60,9 +66,17 @@ public class AuthenticatorOathService extends EncryptedDeviceStorage implements 
     private static final String OATH_SKIPPABLE_ATTRIBUTE_NAME =
             "iplanet-am-auth-authenticator-oath-skippable-name";
 
-
-    public AuthenticatorOathService(String realm) throws SMSException, SSOException {
-        super(SERVICE_NAME, SERVICE_VERSION, realm, DEBUG_LOCATION);
+    /**
+     * Basic constructor for the AuthenticatorOathService.
+     *
+     * @param configManager For communicating with the config datastore with listeners.
+     * @param realm The realm in which this service instance exists.
+     * @throws SMSException If we cannot talk to the config service.
+     * @throws SSOException If we do not have correct permissions.
+     */
+    public AuthenticatorOathService(ServiceConfigManager configManager, String realm)
+            throws SMSException, SSOException {
+        super(configManager, realm, DEBUG_LOCATION);
     }
 
     @Override

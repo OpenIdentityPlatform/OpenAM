@@ -73,4 +73,5 @@ public class PushGuiceModule extends AbstractModule {
         return new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
                 PushNotificationConstants.SERVICE_NAME, PushNotificationConstants.SERVICE_VERSION);
     }
+
 }

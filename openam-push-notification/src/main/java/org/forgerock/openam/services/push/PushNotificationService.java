@@ -66,7 +66,7 @@ public class PushNotificationService {
 
     private final Debug debug;
 
-    private PushNotificationServiceConfigHelperFactory configHelperFactory;
+    private final PushNotificationServiceConfigHelperFactory configHelperFactory;
 
     private final PushNotificationDelegateUpdater delegateUpdater;
 
@@ -74,21 +74,26 @@ public class PushNotificationService {
      * Constructor (called by Guice), registers a listener for this class against all
      * PushNotificationService changes in a realm.
      * @param debug A debugger for logging.
-     * @param configHelperFactory Factory used to produce config helpers, which in turn are used to generate
-     *                            delegates.
      * @param pushRealmMap Map holding all delegates mapped to the realm in which they belong.
      * @param pushFactoryMap Map holding all factories registered during the lifetime of this service.
+     * @param configHelperFactory Produces config helpers for the appropriate realms.
      */
     @Inject
     public PushNotificationService(@Named("frPush") Debug debug,
-                                   PushNotificationServiceConfigHelperFactory configHelperFactory,
                                    ConcurrentMap<String, PushNotificationDelegate> pushRealmMap,
-                                   ConcurrentMap<String, PushNotificationDelegateFactory> pushFactoryMap) {
+                                   ConcurrentMap<String, PushNotificationDelegateFactory> pushFactoryMap,
+                                   PushNotificationServiceConfigHelperFactory configHelperFactory) {
         this.debug = debug;
-        this.configHelperFactory = configHelperFactory;
         this.pushRealmMap = new ConcurrentHashMap<>(pushRealmMap); //just in case
         this.pushFactoryMap = new ConcurrentHashMap<>(pushFactoryMap);
         this.delegateUpdater = new PushNotificationDelegateUpdater();
+        this.configHelperFactory = configHelperFactory;
+    }
+
+    /**
+     * Registers the service listener to ensure that updates are caught and responded to.
+     */
+    public void registerServiceListener() {
         configHelperFactory.addListener(new PushNotificationServiceListener());
     }
 
@@ -101,8 +106,15 @@ public class PushNotificationService {
      * @throws PushNotificationException if there are problems initialising the service or sending the notification.
      */
     public void send(PushMessage message, String realm) throws PushNotificationException {
-        init(realm);
-        getDelegateForRealm(realm).send(message);
+
+        PushNotificationDelegate delegate = getDelegateForRealm(realm);
+
+        if (delegate == null) {
+            throw new PushNotificationException("No delegate for supplied realm. Check service exists and init has "
+                    + "been called.");
+        }
+
+        delegate.send(message);
     }
 
     /**
@@ -168,7 +180,8 @@ public class PushNotificationService {
         String factoryClass = configHelper.getFactoryClass();
         validateFactoryExists(factoryClass);
         PushNotificationServiceConfig config = configHelper.getConfig();
-        PushNotificationDelegate pushNotificationDelegate = pushFactoryMap.get(factoryClass).produceDelegateFor(config);
+        PushNotificationDelegate pushNotificationDelegate = pushFactoryMap.get(factoryClass)
+                .produceDelegateFor(config, realm);
 
         if (pushNotificationDelegate == null) {
             throw new PushNotificationException("PushNotificationFactory produced a null delegate. Aborting update.");

@@ -21,19 +21,29 @@ import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.sun.identity.shared.debug.Debug;
-import javax.inject.Inject;
+import java.util.Map;
 import javax.inject.Named;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -61,17 +71,24 @@ public class SnsMessageResource {
 
     private final MessageDispatcher messageDispatcher;
     private final Debug debug;
+    private final CTSPersistentStore coreTokenService;
+    private final JSONSerialisation jsonSerialisation;
 
     /**
      * Generate a new SnsMessageResource using the provided MessageDispatcher.
-     * @param messageDispatcher Used to deliver messages recieved at this endpoint to their appropriate locations
+     * @param coreTokenService A copy of the core token services - messages are dropped on to this for use in clustered
+     *                         environments.
+     * @param messageDispatcher Used to deliver messages received at this endpoint to their appropriate locations
      *                          within OpenAM.
+     * @param jsonSerialisation Used to perform the serialisation necessary for inserting tokens into the CTS.
      * @param debug For writing out debug messages.
      */
-    @Inject
-    public SnsMessageResource(MessageDispatcher messageDispatcher, @Named("frPush") Debug debug) {
+    public SnsMessageResource(CTSPersistentStore coreTokenService, MessageDispatcher messageDispatcher,
+                              JSONSerialisation jsonSerialisation, @Named("frPush") Debug debug) {
         this.messageDispatcher = messageDispatcher;
+        this.jsonSerialisation = jsonSerialisation;
         this.debug = debug;
+        this.coreTokenService = coreTokenService;
     }
 
     /**
@@ -109,18 +126,28 @@ public class SnsMessageResource {
         final JsonValue actionContent = actionRequest.getContent();
 
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        String messageId = actionContent.get(MESSAGE_ID_JSON_POINTER).asString();
+        JsonValue messageIdLoc = actionContent.get(MESSAGE_ID_JSON_POINTER);
+        String messageId;
 
-        if (messageId == null) {
+        if (messageIdLoc == null) {
             debug.warning("Received message in realm {} with invalid messageId.", realm);
             return RestUtils.generateBadRequestException();
+        } else {
+            messageId = messageIdLoc.asString();
         }
 
         try {
             messageDispatcher.handle(messageId, actionContent);
         } catch (NotFoundException e) {
             debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
-            return RestUtils.generateBadRequestException(); //drop down to CTS [?]
+            try {
+                attemptFromCTS(messageId, actionContent);
+            } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
+                    | CoreTokenException | NotFoundException ex) {
+                debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
+                return RestUtils.generateBadRequestException();
+            }
+            return RestUtils.generateBadRequestException();
         } catch (PredicateNotMetException e) {
             debug.warning("Unable to deliver message with messageId {} in realm {} as predicate not met.",
                     messageId, realm, e);
@@ -128,6 +155,50 @@ public class SnsMessageResource {
         }
 
         return newResultPromise(newActionResponse(json(object())));
+    }
+
+    /**
+     * For the in-memory equivalent, {@link MessageDispatcher#handle(String, JsonValue)}.
+     */
+    private boolean attemptFromCTS(String messageId, JsonValue actionContent)
+            throws CoreTokenException, ClassNotFoundException, IllegalAccessException, InstantiationException,
+            NotFoundException {
+        Token coreToken = coreTokenService.read(messageId);
+
+        if (coreToken == null) {
+            throw new NotFoundException("Unable to find token with id " + messageId + " in CTS.");
+        }
+
+        byte[] serializedBlob = coreToken.getBlob();
+        String fromBlob = new String(serializedBlob);
+
+        JsonValue jsonValue = JsonValueBuilder.toJsonValue(fromBlob);
+        Map<String, Object> predicates = jsonValue.asMap();
+
+        for (Map.Entry<String, Object> entry : predicates.entrySet()) {
+            String className = entry.getKey();
+            Predicate pred =
+                    (Predicate) jsonSerialisation.deserialise((String) entry.getValue(), Class.forName(className));
+            if (!pred.perform(actionContent)) {
+                return false;
+            }
+        }
+
+        addDeny(coreToken, actionContent);
+
+        coreTokenService.update(coreToken);
+
+        return true;
+    }
+
+    private void addDeny(Token coreToken, JsonValue actionContent) {
+
+        Jwt possibleDeny = new JwtReconstruction().reconstructJwt(actionContent.get(JWT).asString(), SignedJwt.class);
+
+        if (possibleDeny.getClaimsSet().getClaim(DENY_LOCATION) != null) {
+            coreToken.setAttribute(CoreTokenField.INTEGER_ONE, DENY_VALUE);
+        }
+
     }
 
 }

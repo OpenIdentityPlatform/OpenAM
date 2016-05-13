@@ -16,7 +16,6 @@
 package org.forgerock.openam.core.rest.devices.services;
 
 import com.iplanet.sso.SSOException;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -24,7 +23,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -55,22 +53,19 @@ public abstract class EncryptedDeviceStorage {
     /**
      * Generates a new EncryptedDeviceStorage for a given service.
      *
-     * @param serviceName Name of the service from which this class will read its options.
-     * @param serviceVersion Version of the service this class needs to talk to via the {@link ServiceConfigManager}
+     * @param configManager Version of the service this class needs to talk to via the {@link ServiceConfigManager}
      * @param realm Realm in which the service exists.
      * @param debugLocation Debug file handle.
      * @throws SMSException In case of exceptions communicating with the SMS.
      * @throws SSOException In case there was an issue retrieving an valid access token to get to the service.
      */
-    protected EncryptedDeviceStorage(String serviceName, String serviceVersion, String realm, String debugLocation)
+    protected EncryptedDeviceStorage(ServiceConfigManager configManager, String realm, String debugLocation)
             throws SMSException, SSOException {
 
         debug = Debug.getInstance(debugLocation);
 
         try {
-            ServiceConfigManager mgr = new ServiceConfigManager(
-                    AccessController.doPrivileged(AdminTokenAction.getInstance()), serviceName, serviceVersion);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            ServiceConfig scm = configManager.getOrganizationConfig(realm, null);
             options = scm.getAttributes();
         } catch (SMSException | SSOException e) {
             if (debug.errorEnabled()) {

@@ -17,14 +17,33 @@
 package org.forgerock.openam.core.rest.devices;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import java.security.AccessController;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesDao;
 import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
+import org.forgerock.openam.core.rest.devices.push.PushDevicesDao;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceService;
+import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
 
 /**
  * Guice module for binding the device REST endpoints.
  *
- * @since 14.0.0
+ * @since 13.5.0
  */
 public class CoreRestDevicesGuiceModule extends AbstractModule {
 
@@ -34,5 +53,71 @@ public class CoreRestDevicesGuiceModule extends AbstractModule {
                 .toInstance(new DeviceJsonUtils<>(OathDeviceSettings.class));
         bind(new TypeLiteral<DeviceJsonUtils<PushDeviceSettings>>() {})
                 .toInstance(new DeviceJsonUtils<>(PushDeviceSettings.class));
+    }
+
+    @Provides
+    @Inject
+    public TrustedDevicesDao getTrustedDevicesDao(
+            @Named(TrustedDeviceServiceFactory.FACTORY_NAME)
+            AuthenticatorDeviceServiceFactory<TrustedDeviceService> serviceFactory) {
+        return new TrustedDevicesDao(serviceFactory);
+    }
+
+    @Provides
+    @Inject
+    public PushDevicesDao getPushDevicesDao(
+            @Named(AuthenticatorPushServiceFactory.FACTORY_NAME)
+            AuthenticatorDeviceServiceFactory<AuthenticatorPushService> serviceFactory) {
+        return new PushDevicesDao(serviceFactory);
+    }
+
+    @Provides
+    @Inject
+    public OathDevicesDao getOathDevicesDao(
+            @Named(AuthenticatorOathServiceFactory.FACTORY_NAME)
+            AuthenticatorDeviceServiceFactory<AuthenticatorOathService> serviceFactory) {
+        return new OathDevicesDao(serviceFactory);
+    }
+
+    @Provides
+    @Named(AuthenticatorPushService.SERVICE_NAME)
+    ServiceConfigManager getAuthenticatorPushServiceManager() throws SMSException, SSOException {
+        return new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                AuthenticatorPushService.SERVICE_NAME, AuthenticatorPushService.SERVICE_VERSION);
+    }
+
+    @Provides
+    @Named(AuthenticatorOathService.SERVICE_NAME)
+    ServiceConfigManager getAuthenticatorOathServiceManager() throws SMSException, SSOException {
+        return new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                AuthenticatorOathService.SERVICE_NAME, AuthenticatorOathService.SERVICE_VERSION);
+    }
+
+    @Provides
+    @Named(AuthenticatorOathServiceFactory.FACTORY_NAME)
+    @Inject
+    AuthenticatorDeviceServiceFactory<AuthenticatorOathService> getAuthenticatorOathServiceFactory(
+            @Named("frRest") Debug debug,
+            @Named(AuthenticatorOathService.SERVICE_NAME) ServiceConfigManager serviceConfigManager) {
+        return new AuthenticatorDeviceServiceFactory<>(debug, serviceConfigManager,
+                new AuthenticatorOathServiceFactory());
+    }
+
+    @Provides
+    @Named(AuthenticatorPushServiceFactory.FACTORY_NAME)
+    @Inject
+    AuthenticatorDeviceServiceFactory<AuthenticatorPushService> getAuthenticatorPushServiceFactory(
+            @Named("frRest") Debug debug,
+            @Named(AuthenticatorPushService.SERVICE_NAME) ServiceConfigManager serviceConfigManager) {
+        return new AuthenticatorDeviceServiceFactory<>(debug, serviceConfigManager,
+                new AuthenticatorPushServiceFactory());
+    }
+
+    @Provides
+    @Named(TrustedDeviceServiceFactory.FACTORY_NAME)
+    @Inject
+    AuthenticatorDeviceServiceFactory<TrustedDeviceService> getTrustedDeviceServiceFactory(
+            @Named("frRest") Debug debug) {
+        return new AuthenticatorDeviceServiceFactory<>(debug, null, new TrustedDeviceServiceFactory());
     }
 }

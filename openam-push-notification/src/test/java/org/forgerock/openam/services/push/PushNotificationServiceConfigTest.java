@@ -30,6 +30,7 @@ public class PushNotificationServiceConfigTest {
             .withGoogleEndpoint("www.google.com")
             .withAccessKey("apiKey")
             .withSecret("secret")
+            .withRegion("region")
             .withDelegateFactory("classname");
 
         //when
@@ -42,21 +43,7 @@ public class PushNotificationServiceConfigTest {
         assertThat(config.getAccessKey()).isEqualTo("apiKey");
         assertThat(config.getSecret()).isEqualTo("secret");
         assertThat(config.getDelegateFactory()).isEqualTo("classname");
-    }
-
-    @Test (expectedExceptions = PushNotificationException.class)
-    public void shouldNotCreateConfigMissingBothEndpoints() throws PushNotificationException {
-
-        //given
-        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
-                .withAccessKey("accessKey")
-                .withSecret("secret")
-                .withDelegateFactory("classname");
-
-        //when
-        builder.build();
-
-        //then
+        assertThat(config.getRegion()).isEqualTo("region");
     }
 
     @Test (expectedExceptions = PushNotificationException.class)
@@ -67,6 +54,7 @@ public class PushNotificationServiceConfigTest {
                 .withAccessKey("accessKey")
                 .withAppleEndpoint("www.apple.com")
                 .withSecret("secret")
+                .withRegion("region")
                 .withDelegateFactory("classname");
 
         //when
@@ -83,6 +71,7 @@ public class PushNotificationServiceConfigTest {
                 .withAccessKey("accessKey")
                 .withGoogleEndpoint("www.google.com")
                 .withSecret("secret")
+                .withRegion("region")
                 .withDelegateFactory("classname");
 
         //when
@@ -97,8 +86,10 @@ public class PushNotificationServiceConfigTest {
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
                 .withAccessKey("accessKey")
+                .withAppleEndpoint("www.apple.com")
                 .withGoogleEndpoint("www.google.com")
-                .withDelegateFactory("classname");
+                .withDelegateFactory("classname")
+                .withRegion("region");
 
         //when
         builder.build();
@@ -114,7 +105,8 @@ public class PushNotificationServiceConfigTest {
                 .withSecret("secret")
                 .withGoogleEndpoint("www.google.com")
                 .withAppleEndpoint("www.apple.com")
-                .withDelegateFactory("classname");
+                .withDelegateFactory("classname")
+                .withRegion("region");
 
         //when
         builder.build();
@@ -127,9 +119,28 @@ public class PushNotificationServiceConfigTest {
 
         //given
         PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
+                .withAccessKey("accessKey")
                 .withSecret("secret")
                 .withGoogleEndpoint("www.google.com")
-                .withAppleEndpoint("www.apple.com");
+                .withAppleEndpoint("www.apple.com")
+                .withRegion("region");
+
+        //when
+        builder.build();
+
+        //then
+    }
+
+    @Test (expectedExceptions = PushNotificationException.class)
+    public void shouldNotCreateDelegateMissingRegion() throws PushNotificationException {
+
+        //given
+        PushNotificationServiceConfig.Builder builder = new PushNotificationServiceConfig.Builder()
+                .withAccessKey("accessKey")
+                .withSecret("secret")
+                .withGoogleEndpoint("www.google.com")
+                .withAppleEndpoint("www.apple.com")
+                .withDelegateFactory("classname");
 
         //when
         builder.build();

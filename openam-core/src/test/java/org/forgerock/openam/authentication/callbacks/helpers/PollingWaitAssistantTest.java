@@ -15,32 +15,29 @@
  */
 package org.forgerock.openam.authentication.callbacks.helpers;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.util.concurrent.Future;
 import org.forgerock.openam.utils.TimeTravelUtil;
 import org.mockito.Mockito;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import java.util.concurrent.Future;
 
 public class PollingWaitAssistantTest {
 
-    private static final int EXPECTED_LONG_POLL_WAIT_IN_MILLISECONDS = 20000;
-    private static final int EXPECTED_MEDIUM_POLL_WAIT_IN_MILLISECONDS = 10000;
-    private static final int EXPECTED_SHORT_POLL_WAIT_IN_MILLISECONDS = 4000;
+    private static final long LONG_POLL = 20000;
+    private static final long MEDIUM_POLL = 10000;
+    private static final long SHORT_POLL = 4000;
 
     private static final long TIMEOUT = 30000;
-    private Future<Object> mockFuture = Mockito.mock(Future.class);
-
-    private long longElapsedThreshold = TIMEOUT / 2;
-    private long mediumElapsedThreshold = TIMEOUT / 4;
+    private Future mockFuture = Mockito.mock(Future.class);
 
 
     @Test
     public void checkThatNotStartedStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
 
@@ -51,7 +48,7 @@ public class PollingWaitAssistantTest {
     @Test
     public void checkThatTooEarlyStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(false);
@@ -65,7 +62,7 @@ public class PollingWaitAssistantTest {
     @Test
     public void checkThatSpammedStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(false);
@@ -83,7 +80,7 @@ public class PollingWaitAssistantTest {
     @Test
     public void checkThatWaitingStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(false);
@@ -99,7 +96,7 @@ public class PollingWaitAssistantTest {
     @Test
     public void checkThatCompleteStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(true);
@@ -116,7 +113,7 @@ public class PollingWaitAssistantTest {
     @Test
     public void checkThatTimeoutStateIsReturnedWhenAppropriate() {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(false);
@@ -131,20 +128,23 @@ public class PollingWaitAssistantTest {
 
     @DataProvider
     public  Object[][] expectedWaitPeriods() {
+        long mediumElapsedThreshold = TIMEOUT / 4;
+        long longElapsedThreshold = TIMEOUT / 2;
+
         return new Object[][] {
-                {new Long(100), new Long(EXPECTED_SHORT_POLL_WAIT_IN_MILLISECONDS)},
-                {new Long(mediumElapsedThreshold - 100), new Long(EXPECTED_SHORT_POLL_WAIT_IN_MILLISECONDS)},
-                {new Long(mediumElapsedThreshold + 100), new Long(EXPECTED_MEDIUM_POLL_WAIT_IN_MILLISECONDS)},
-                {new Long(longElapsedThreshold - 100), new Long(EXPECTED_MEDIUM_POLL_WAIT_IN_MILLISECONDS)},
-                {new Long(longElapsedThreshold + 100), new Long(EXPECTED_LONG_POLL_WAIT_IN_MILLISECONDS)},
-                {new Long(longElapsedThreshold + 4000), new Long(EXPECTED_LONG_POLL_WAIT_IN_MILLISECONDS)},
+                {100L, SHORT_POLL},
+                {mediumElapsedThreshold - 100, SHORT_POLL},
+                {mediumElapsedThreshold + 100, MEDIUM_POLL},
+                {longElapsedThreshold - 100, MEDIUM_POLL},
+                {longElapsedThreshold + 100, LONG_POLL},
+                {longElapsedThreshold + 4000, LONG_POLL},
         };
     }
 
     @Test (dataProvider = "expectedWaitPeriods")
     public void checkThatCorrectWaitPeriodIsReturned(Long waitLength, Long expectedWaitPeriod) {
         // given
-        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT);
+        PollingWaitAssistant assistant = new PollingWaitAssistant(TIMEOUT, SHORT_POLL, MEDIUM_POLL, LONG_POLL);
 
         // when
         when(mockFuture.isDone()).thenReturn(false);

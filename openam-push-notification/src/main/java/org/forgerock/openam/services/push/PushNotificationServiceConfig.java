@@ -28,6 +28,7 @@ public final class PushNotificationServiceConfig {
     private String googleEndpoint;
     private String secret;
     private String delegateFactory;
+    private String region;
 
     /**
      * Only access is via the Builder.
@@ -56,12 +57,17 @@ public final class PushNotificationServiceConfig {
         this.delegateFactory = delegateFactory;
     }
 
+    private void setRegion(String region) {
+        this.region = region;
+    }
+
     private boolean isValid() {
         return StringUtils.isNotBlank(accessKey)
                 && StringUtils.isNotBlank(appleEndpoint)
                 && StringUtils.isNotBlank(googleEndpoint)
                 && StringUtils.isNotBlank(secret)
-                && StringUtils.isNotBlank(delegateFactory);
+                && StringUtils.isNotBlank(delegateFactory)
+                && StringUtils.isNotBlank(region);
     }
 
     /**
@@ -104,6 +110,14 @@ public final class PushNotificationServiceConfig {
         return delegateFactory;
     }
 
+    /**
+     * Get the region in which this client exists.
+     * @return the region for this client.
+     */
+    public String getRegion() {
+        return region;
+    }
+
     @Override
     public boolean equals(Object underTest) {
         if (underTest == null) {
@@ -123,6 +137,7 @@ public final class PushNotificationServiceConfig {
                 && Objects.equals(this.accessKey, that.accessKey)
                 && Objects.equals(this.secret, that.secret)
                 && Objects.equals(this.googleEndpoint, that.googleEndpoint)
+                && Objects.equals(this.region, that.region)
                 && Objects.equals(this.delegateFactory, that.delegateFactory);
     }
 
@@ -134,7 +149,7 @@ public final class PushNotificationServiceConfig {
     /**
      * Internal builder for the config to ease creation.
      */
-    static class Builder {
+    public static class Builder {
 
         private PushNotificationServiceConfig config;
 
@@ -153,6 +168,16 @@ public final class PushNotificationServiceConfig {
          */
         public Builder withAccessKey(String accessKey) {
             config.setAccessKey(accessKey);
+            return this;
+        }
+
+        /**
+         * Sets the region of the SNS configuration.
+         * @param region The region for the SNS client.
+         * @return The builder.
+         */
+        public Builder withRegion(String region) {
+            config.setRegion(region);
             return this;
         }
 
@@ -199,6 +224,7 @@ public final class PushNotificationServiceConfig {
         /**
          * Returns the constructed config, having checked that it is usable.
          * @return a constructed PushNotificationServiceConfig.
+         * @throws PushNotificationException if the config is invalid.
          */
         public PushNotificationServiceConfig build() throws PushNotificationException {
             if (!config.isValid()) {

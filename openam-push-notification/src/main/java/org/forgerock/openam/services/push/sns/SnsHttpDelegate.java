@@ -21,7 +21,6 @@ import static org.forgerock.json.resource.Router.*;
 
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
-import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -42,11 +41,11 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
 
     private RouteMatcher<org.forgerock.json.resource.Request> routeMatcher;
 
-    private final Debug debug;
     private final AmazonSNSClient client;
     private final Router router;
     private final SnsMessageResource messageEndpoint;
     private final SnsPushMessageConverter pushMessageConverter;
+    private final String realm;
 
     private PushNotificationServiceConfig config;
 
@@ -58,18 +57,18 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
      * @param config Necessary to configure this delegate.
      * @param router to attach a newly generate GcmMessageEndpoint upon this delegate's initialization.
      * @param messageEndpoint the endpoint to attach to the router upon initialisation.
-     * @param pushMessageConverter a mesage converter, to ensure the message sent is of the correct format.
-     * @param debug for logging purposes.
+     * @param pushMessageConverter a message converter, to ensure the message sent is of the correct format.
+     * @param realm the realm in which this delegate exists.
      */
     public SnsHttpDelegate(AmazonSNSClient client, PushNotificationServiceConfig config, Router router,
                            SnsMessageResource messageEndpoint, SnsPushMessageConverter pushMessageConverter,
-                           Debug debug) {
+                           String realm) {
         this.client = client;
         this.config = config;
         this.router = router;
         this.messageEndpoint = messageEndpoint;
         this.pushMessageConverter = pushMessageConverter;
-        this.debug = debug;
+        this.realm = realm;
     }
 
     @Override
@@ -95,8 +94,7 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public Set<Predicate> getRegistrationMessagePredicates() {
-        Predicate predicate = new SnsRegistrationPredicate(client,
-                config.getAppleEndpoint(), config.getGoogleEndpoint());
+        Predicate predicate = new SnsRegistrationPredicate(realm);
         return Collections.singleton(predicate);
     }
 
@@ -121,9 +119,6 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
     }
 
     private PublishRequest convertToSns(PushMessage message) {
-
-        debug.message("Transmitting Push Notification with messageId {} to {}", message.getMessageId(),
-                message.getRecipient());
 
         PublishRequest request = new PublishRequest()
                 .withTargetArn(message.getRecipient())

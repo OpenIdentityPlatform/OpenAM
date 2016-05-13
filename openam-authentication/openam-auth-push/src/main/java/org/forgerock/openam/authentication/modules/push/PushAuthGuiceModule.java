@@ -15,17 +15,10 @@
  */
 package org.forgerock.openam.authentication.modules.push;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.core.rest.devices.push.PushDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.GuiceModule;
 
 /**
  * The PushAuthGuiceModule class configures the guice framework for the Push Auth module.
@@ -36,18 +29,5 @@ public class PushAuthGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Debug.class).annotatedWith(Names.named("amAuthPush")).toInstance(Debug.getInstance("amAuthPush"));
-
-        bind(AuthenticatorPushServiceFactory.class).in(Singleton.class);
-    }
-
-    /**
-     * Gets the Guice isntantiated devices data access object.
-     * @param serviceFactory the AuthenticatorPushServiceFactory
-     * @return a PushDevicesDao
-     */
-    @Provides
-    @Inject
-    public PushDevicesDao getDevicesDao(AuthenticatorPushServiceFactory serviceFactory) {
-        return new PushDevicesDao(serviceFactory);
     }
 }

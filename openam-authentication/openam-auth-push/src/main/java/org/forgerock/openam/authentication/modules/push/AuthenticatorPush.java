@@ -18,8 +18,9 @@ package org.forgerock.openam.authentication.modules.push;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -29,47 +30,45 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.DNMapper;
-import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
 import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
+import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.services.push.PushMessage;
+import org.forgerock.openam.services.push.PushNotificationConstants;
 import org.forgerock.openam.services.push.PushNotificationException;
-import org.forgerock.openam.services.push.PushNotificationService;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.MessagePromise;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
 import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 /**
  * ForgeRock Authentication (Push) Authentication Module.
  */
-public class AuthenticatorPush extends AMLoginModule {
+public class AuthenticatorPush extends AbstractPushModule {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthPush");
-
-    private final PushNotificationService pushService =
-            InjectorHolder.getInstance(PushNotificationService.class);
-    private final MessageDispatcher messageDispatcher =
-            InjectorHolder.getInstance(MessageDispatcher.class);
 
     //From config
     private Map<String, String> sharedState;
@@ -78,16 +77,23 @@ public class AuthenticatorPush extends AMLoginModule {
     private String realm;
     private String username;
     private Principal principal;
+    private String lbCookieValue;
+    private String lbCookieName;
+    private long timeout;
+    private String messageId;
+    private MessagePromise messagePromise;
+    private String issuer;
+
+    private PushDeviceSettings device;
 
     private PollingWaitAssistant pollingWaitAssistant;
-    private UserPushDeviceProfileManager userPushDeviceProfileManager =
-            InjectorHolder.getInstance(UserPushDeviceProfileManager.class);
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
 
         this.sharedState = sharedState;
-        long timeoutInMilliSeconds = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
+        timeout = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
+        issuer = CollectionHelper.getMapAttr(options, DEVICE_PUSH_ISSUER);
 
         this.realm = DNMapper.orgNameToRealmName(getRequestOrg());
 
@@ -97,7 +103,15 @@ public class AuthenticatorPush extends AMLoginModule {
             DEBUG.error("AuthenticatorPush :: init() : Unable to init Push system.", e);
         }
 
-        pollingWaitAssistant = new PollingWaitAssistant(timeoutInMilliSeconds);
+        try {
+            lbCookieValue = sessionCookies.getLBCookie(getSessionId());
+        } catch (SessionException e) {
+            DEBUG.warning("AuthenticatorPush :: init() : Unable to determine loadbalancer bookie value", e);
+        }
+
+        lbCookieName = sessionCookies.getLBCookieName();
+
+        pollingWaitAssistant = new PollingWaitAssistant(timeout, 10000, 8000, 15000);
 
         String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
         if (authLevel != null) {
@@ -125,26 +139,67 @@ public class AuthenticatorPush extends AMLoginModule {
         case USERNAME_STATE:
             return usernameState(callbacks);
         case STATE_WAIT:
-            return awaitState();
+            return stateWait(callbacks);
+        case STATE_EMERGENCY:
+            return emergencyState(callbacks, username, realm);
+        case STATE_EMERGENCY_USED:
+            storeUsername(username);
+            return ISAuthConstants.LOGIN_SUCCEED;
         default:
             DEBUG.error("AuthenticatorPush :: process() : Invalid state.");
             throw failedAsLoginException();
         }
     }
 
-    private int awaitState() throws AuthLoginException {
+    private int stateWait(Callback[] callbacks) throws AuthLoginException {
+        checkDeviceExists();
+        if (emergencyPressed(callbacks)) {
+            return STATE_EMERGENCY;
+        } else {
+            return pollForResponse();
+        }
+    }
+
+
+    private boolean emergencyPressed(Callback[] callbacks) {
+        ConfirmationCallback callback = (ConfirmationCallback) callbacks[2];
+        return callback.getSelectedIndex() == EMERGENCY_PRESSED;
+    }
+
+    private void checkDeviceExists() throws AuthLoginException {
+        if (device == null) {
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        }
+    }
+
+    private int emergencyState(Callback[] callbacks, String username, String realm) throws AuthLoginException {
+
+        NameCallback emergencyCode = (NameCallback) callbacks[0];
+        String codeAttempt = emergencyCode.getName();
+
+        List<String> recoveryCodes = new ArrayList<>(Arrays.asList(device.getRecoveryCodes()));
+        if (recoveryCodes.contains(codeAttempt)) {
+            recoveryCodes.remove(codeAttempt);
+            device.setRecoveryCodes(recoveryCodes.toArray(new String[recoveryCodes.size()]));
+            userPushDeviceProfileManager.saveDeviceProfile(username, realm, device);
+
+            return STATE_EMERGENCY_USED;
+        }
+
+        throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+    }
+
+    private int pollForResponse() throws AuthLoginException {
 
         switch (pollingWaitAssistant.getPollingWaitState()) {
         case TOO_EARLY:
+            setEmergencyButton();
             return STATE_WAIT;
         case NOT_STARTED:
         case WAITING:
-            setPollbackTimePeriod(pollingWaitAssistant.getWaitPeriod());
-            pollingWaitAssistant.resetWait();
-            return STATE_WAIT;
+            return waitingChecks();
         case COMPLETE:
-            storeUsername(username);
-            return ISAuthConstants.LOGIN_SUCCEED;
+            return completeChecks();
         case TIMEOUT:
             DEBUG.warning("AuthenticatorPush :: timeout value exceeded while waiting for response.");
             throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
@@ -157,6 +212,47 @@ public class AuthenticatorPush extends AMLoginModule {
         }
     }
 
+    private int completeChecks() throws AuthLoginException {
+        try {
+            Jwt signedJwt = new JwtReconstruction().reconstructJwt(
+                    messagePromise.getPromise().get().get(JWT).asString(),  Jwt.class);
+            Boolean deny = (Boolean) signedJwt.getClaimsSet().getClaim(PushNotificationConstants.DENY_LOCATION);
+            if (deny != null && deny) { //denied
+                throw failedAsLoginException();
+            } else {
+                storeUsername(username);
+                return ISAuthConstants.LOGIN_SUCCEED;
+            }
+        } catch (Exception e) {
+            DEBUG.error("Reading JWT from local MessageDispatcher failed.", e);
+        }
+
+        throw failedAsLoginException();
+    }
+
+    private int waitingChecks() throws AuthLoginException {
+        try {
+            Boolean ctsValue = checkCTS(messageId);
+            if (ctsValue != null) {
+                messageDispatcher.forget(messageId);
+
+                if (ctsValue) {
+                    storeUsername(username);
+                    return ISAuthConstants.LOGIN_SUCCEED;
+                } else { //denied
+                    throw failedAsLoginException();
+                }
+            }
+        } catch (CoreTokenException e) {
+            DEBUG.warning("CTS threw exception, falling back to local MessageDispatcher.", e);
+        }
+
+        setPollbackTimePeriod(pollingWaitAssistant.getWaitPeriod());
+        pollingWaitAssistant.resetWait();
+        setEmergencyButton();
+        return STATE_WAIT;
+    }
+
     private int loginStart() throws AuthLoginException {
 
         if (username == null && sharedState != null) {
@@ -166,8 +262,9 @@ public class AuthenticatorPush extends AMLoginModule {
         if (username == null) {
             return USERNAME_STATE;
         } else {
-            PushDeviceSettings device = getDevice();
+            device = getDevice(username, realm);
             if (sendMessage(device)) {
+                setEmergencyButton();
                 return STATE_WAIT;
             } else {
                 DEBUG.warning("AuthenticatorPush :: sendState() : Failed to send message.");
@@ -175,7 +272,6 @@ public class AuthenticatorPush extends AMLoginModule {
             }
         }
     }
-
 
     private int usernameState(Callback[] callbacks) throws AuthLoginException {
         Reject.ifNull(callbacks);
@@ -210,49 +306,43 @@ public class AuthenticatorPush extends AMLoginModule {
 
         JwtClaimsSetBuilder jwtClaimsSetBuilder = new JwtClaimsSetBuilder()
                 .claim(Constants.MECHANISM_ID_KEY, mechanismId)
-                .claim(CHALLENGE_KEY, challenge);
+                .claim(LOADBALANCER_KEY,
+                        Base64.encode((lbCookieName + "=" + lbCookieValue).getBytes()))
+                .claim(CHALLENGE_KEY, challenge)
+                .claim(TIME_TO_LIVE_KEY, String.valueOf(timeout / 1000));
 
         String jwt = new SignedJwtBuilderImpl(new SigningManager()
                 .newHmacSigningHandler(Base64.decode(device.getSharedSecret())))
                 .claims(jwtClaimsSetBuilder.build())
                 .headers().alg(JwsAlgorithm.HS256).done().build();
 
-        PushMessage message = new PushMessage(communicationId, jwt, "Authentication");
+        PushMessage message = new PushMessage(communicationId, jwt,
+                "Login Attempt from " + username + " at " + issuer);
 
         Set<Predicate> servicePredicates = new HashSet<>();
         servicePredicates.add(
-                new SignedJwtVerificationPredicate(Base64.decode(device.getSharedSecret()), DATA_JSON_POINTER));
+                new SignedJwtVerificationPredicate(Base64.decode(device.getSharedSecret()), JWT));
         servicePredicates.add(
-                new PushMessageChallengeResponsePredicate(Base64.decode(device.getSharedSecret()), challenge,
-                        DATA_JSON_POINTER, DEBUG));
+                new PushMessageChallengeResponsePredicate(Base64.decode(device.getSharedSecret()), challenge, JWT));
 
         try {
+            messagePromise = messageDispatcher.expect(message.getMessageId(), servicePredicates);
+            pushService.send(message, realm);
+            pollingWaitAssistant.start(messagePromise.getPromise());
 
             servicePredicates.addAll(pushService.getAuthenticationMessagePredicatesFor(realm));
 
-            MessagePromise promise = messageDispatcher.expect(message.getMessageId(), servicePredicates);
-            pushService.send(message, realm);
-            pollingWaitAssistant.start(promise.getPromise());
-            return true;
+            storeInCTS(message.getMessageId(), servicePredicates, timeout);
+            messageId = message.getMessageId();
+
         } catch (PushNotificationException e) {
             DEBUG.error("AuthenticatorPush :: sendMessage() : Failed to transmit message through PushService.");
+            return false;
+        } catch (JsonProcessingException | CoreTokenException e) {
+            DEBUG.warning("Unable to persist token in core token service.", e);
         }
 
-        return false;
-    }
-
-    private PushDeviceSettings getDevice() throws AuthLoginException {
-
-        try {
-            PushDeviceSettings firstDevice
-                    = CollectionUtils.getFirstItem(userPushDeviceProfileManager.getDeviceProfiles(username, realm));
-            if (null == firstDevice) {
-                throw failedAsLoginException();
-            }
-            return firstDevice;
-        } catch (IOException e) {
-            throw failedAsLoginException();
-        }
+        return true;
     }
 
     @Override
@@ -262,7 +352,7 @@ public class AuthenticatorPush extends AMLoginModule {
 
     private AuthLoginException failedAsLoginException() throws AuthLoginException {
         setFailureID(username);
-        throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        return new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
     }
 
     private void setPollbackTimePeriod(long periodInMilliseconds) throws AuthLoginException {
@@ -272,5 +362,12 @@ public class AuthenticatorPush extends AMLoginModule {
                 .withWaitTime(String.valueOf(periodInMilliseconds))
                 .build();
         replaceCallback(STATE_WAIT, POLLING_CALLBACK_POSITION, newPollingWaitCallback);
+    }
+
+    private void setEmergencyButton() throws AuthLoginException {
+        ConfirmationCallback confirmationCallback =
+                new ConfirmationCallback(ConfirmationCallback.INFORMATION, USE_EMERGENCY_CODE, 0);
+        confirmationCallback.setSelectedIndex(EMERGENCY_NOT_PRESSED);
+        replaceCallback(STATE_WAIT, EMERGENCY_CALLBACK_POSITION, confirmationCallback);
     }
 }

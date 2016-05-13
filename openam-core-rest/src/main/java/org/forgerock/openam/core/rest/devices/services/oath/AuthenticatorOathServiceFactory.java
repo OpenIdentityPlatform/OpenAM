@@ -17,15 +17,23 @@ package org.forgerock.openam.core.rest.devices.services.oath;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import javax.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
 
 /**
  * Produces AuthenticatorOathService's for a specific realm.
  */
-public class AuthenticatorOathServiceFactory implements DeviceServiceFactory {
+@Singleton
+public class AuthenticatorOathServiceFactory implements DeviceServiceFactory<AuthenticatorOathService> {
+
+    /** Name of this factory for Guice purposes. */
+    public static final String FACTORY_NAME = "AuthenticatorOathServiceFactory";
 
     @Override
-    public AuthenticatorOathService create(String realm) throws SSOException, SMSException {
-        return new AuthenticatorOathService(realm);
+    public AuthenticatorOathService create(ServiceConfigManager serviceConfigManager, String realm)
+            throws SSOException, SMSException {
+        return new AuthenticatorOathService(serviceConfigManager, realm);
     }
+
 }

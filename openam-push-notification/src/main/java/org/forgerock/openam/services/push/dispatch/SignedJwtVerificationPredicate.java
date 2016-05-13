@@ -28,18 +28,18 @@ import org.forgerock.util.Reject;
  * user from whom it claims to be sent, by validating that the JWT sent in is
  * signed by the appropriate user (their shared secret is retrieved from the user store).
  */
-public class SignedJwtVerificationPredicate implements Predicate {
+public class SignedJwtVerificationPredicate extends AbstractPredicate {
 
-    private final byte[] secret;
-    private final JsonPointer location;
+    private byte[] secret;
+    private String location;
 
     /**
      * Create a new SNS Predicate, for use with the supplied secret and challenge.
      *
      * @param secret Used to verify JWT messages and content.
-     * @param location Used to locate the jwt within the JsonValue passed to perform().
+     * @param location JsonPointer String, used to locate the jwt within the JsonValue passed to perform().
      */
-    public SignedJwtVerificationPredicate(byte[] secret, JsonPointer location) {
+    public SignedJwtVerificationPredicate(byte[] secret, String location) {
         Reject.ifNull(secret);
         this.secret = secret;
         this.location = location;
@@ -49,9 +49,32 @@ public class SignedJwtVerificationPredicate implements Predicate {
     public boolean perform(JsonValue content) {
         SigningHandler signingHandler = new SigningManager().newHmacSigningHandler(secret);
 
-        SignedJwt signedJwt = new JwtReconstruction().reconstructJwt(content.get(location).asString(),
+        SignedJwt signedJwt = new JwtReconstruction().reconstructJwt(content.get(new JsonPointer(location)).asString(),
                 SignedJwt.class);
 
         return signedJwt.verify(signingHandler);
     }
+
+    /**
+     * Default constructor for the SignedJwtVerificationPredicate, used for serialization purposes.
+     */
+    public SignedJwtVerificationPredicate() {
+    }
+
+    /**
+     * Sets the secret for this predicate. Used when deserilialized from the CTS.
+     * @param secret The secret for this predicate.
+     */
+    public void setSecret(byte[] secret) {
+        this.secret = secret;
+    }
+
+    /**
+     * Sets the location for this predicate. Used when deserilialized from the CTS.
+     * @param location The location for this predicate.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
 }

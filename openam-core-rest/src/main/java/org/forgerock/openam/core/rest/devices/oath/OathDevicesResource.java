@@ -17,6 +17,7 @@
 package org.forgerock.openam.core.rest.devices.oath;
 
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
@@ -36,7 +37,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.rest.devices.TwoFADevicesResource;
 import org.forgerock.openam.core.rest.devices.UserDevicesResource;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -52,12 +53,22 @@ import org.forgerock.util.promise.Promise;
  */
 public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
-    private final AuthenticatorOathServiceFactory oathServiceFactory;
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory;
     private final Debug debug;
 
+    /**
+     * Constructor that sets up the data accessing object, context helpers and the factory from which to produce
+     * services appropriate to each realm.
+     *
+     * @param dao For communicating with the datastore.
+     * @param helper To understand the context of requests.
+     * @param debug For debug purposes.
+     * @param oathServiceFactory The factory used to generate appropriate services.
+     */
     @Inject
-    public OathDevicesResource(OathDevicesDao dao, ContextHelper helper,
-                               @Named("frRest") Debug debug, AuthenticatorOathServiceFactory oathServiceFactory) {
+    public OathDevicesResource(OathDevicesDao dao, ContextHelper helper,  @Named("frRest") Debug debug,
+                               @Named(FACTORY_NAME)
+                                   AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory) {
         super(dao, helper);
         this.debug = debug;
         this.oathServiceFactory = oathServiceFactory;

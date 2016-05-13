@@ -17,31 +17,24 @@ package org.forgerock.openam.services.push.dispatch;
 
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
-import com.sun.identity.shared.debug.Debug;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.util.encode.Base64;
+import org.forgerock.openam.services.push.utils.HS256Helper;
+import org.forgerock.util.Reject;
 
 /**
- *
  * Checks that the response to a message is appropriate for the
  * user from whom it claims to be sent, by asserting that the
  * contents is the correct response to the challenge (HmacSHA-256 encoded version
  * of the challenge sent out).
  */
-public class PushMessageChallengeResponsePredicate implements Predicate {
+public class PushMessageChallengeResponsePredicate extends AbstractPredicate {
 
-    private final byte[] secret;
-    private final String challenge;
-    private final JsonPointer location;
-    private final Debug debug;
+    private String answer;
+    private String location;
 
     /**
      * Create a new PushMessagePredicate that will ensure that the contents of the JsonValue found at the
@@ -49,36 +42,56 @@ public class PushMessageChallengeResponsePredicate implements Predicate {
      *
      * @param secret Secret used to generate the response value.
      * @param challenge Random challenge.
-     * @param location Location of the value expected to the the challenge response.
-     * @param debug Debug object for logging purposes.
+     * @param location Json Pointer string of the location of the value expected to the the challenge response.
      */
-    public PushMessageChallengeResponsePredicate(byte[] secret, String challenge, JsonPointer location, Debug debug) {
-        this.secret = secret;
-        this.challenge = challenge;
+    public PushMessageChallengeResponsePredicate(byte[] secret, String challenge, String location) {
+        Reject.ifNull(secret, challenge, location);
         this.location = location;
-        this.debug = debug;
+        this.answer = new HS256Helper(secret, challenge).answerAsString();
     }
 
     @Override
     public boolean perform(JsonValue content) {
-        Jwt signedJwt = new JwtReconstruction().reconstructJwt(content.get(location).asString(),
+        if (answer == null) {
+            return false;
+        }
+
+        Jwt signedJwt = new JwtReconstruction().reconstructJwt(content.get(new JsonPointer(location)).asString(),
                 Jwt.class);
 
         String response = (String) signedJwt.getClaimsSet().getClaim(RESPONSE_LOCATION);
 
-        Mac hmac;
-        SecretKey key = new SecretKeySpec(secret, 0, secret.length, HMACSHA256);
-
-        try {
-            hmac = Mac.getInstance(HMACSHA256);
-            hmac.init(key);
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            debug.error("SignedJwtVerificationPredicate :: perform() :: failed due to invalid use of Mac.", e);
-            return false;
-        }
-
-        byte[] output = hmac.doFinal(Base64.decode(challenge));
-
-        return Base64.encode(output).equals(response);
+        return MessageDigest.isEqual(answer.getBytes(), response.getBytes());
     }
+
+    /**
+     * Default constructor for the PushMessageChallengeResponsePredicate, used for serialization purposes.
+     */
+    public PushMessageChallengeResponsePredicate() {
+    }
+
+    /**
+     * Sets the answer for this predicate. Used when deserialized from the CTS.
+     * @param answer The answer for this predicate.
+     */
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    /**
+     * Sets the location for this predicate. Used when deserilialized from the CTS.
+     * @param location The location for this predicate.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * Reads the answer out. Used so the authenticator system doesn't have to duplicate the HMAC alg.
+     * @return The expected answer.
+     */
+    public String getAnswer() {
+        return answer;
+    }
+
 }

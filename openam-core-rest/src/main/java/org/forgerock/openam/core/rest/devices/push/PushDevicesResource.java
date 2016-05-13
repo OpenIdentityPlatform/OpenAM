@@ -33,8 +33,9 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.core.rest.devices.TwoFADevicesResource;
 import org.forgerock.openam.core.rest.devices.UserDevicesResource;
-import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
+import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
@@ -48,7 +49,7 @@ import org.forgerock.util.promise.Promise;
  */
 public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
 
-    private final AuthenticatorPushServiceFactory pushServiceFactory;
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorPushService> pushServiceFactory;
     private final Debug debug;
 
     /**
@@ -60,8 +61,9 @@ public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
      * @param pushServiceFactory The Push Service Factory used to get the push service for this realm.
      */
     @Inject
-    public PushDevicesResource(PushDevicesDao dao, ContextHelper helper,
-                               @Named("frRest") Debug debug, AuthenticatorPushServiceFactory pushServiceFactory) {
+    public PushDevicesResource(PushDevicesDao dao, ContextHelper helper, @Named("frRest") Debug debug,
+                               @Named(AuthenticatorPushServiceFactory.FACTORY_NAME)
+                                   AuthenticatorDeviceServiceFactory<AuthenticatorPushService> pushServiceFactory) {
         super(dao, helper);
         this.debug = debug;
         this.pushServiceFactory = pushServiceFactory;

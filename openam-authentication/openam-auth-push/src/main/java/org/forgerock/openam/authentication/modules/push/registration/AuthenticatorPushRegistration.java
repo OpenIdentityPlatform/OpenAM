@@ -20,8 +20,9 @@ import static org.forgerock.openam.authentication.modules.push.registration.Cons
 import static org.forgerock.openam.authentication.modules.push.registration.Constants.DEVICE_PUSH_WAIT_TIMEOUT;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -29,6 +30,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,24 +42,23 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
 import org.forgerock.openam.authentication.callbacks.helpers.QRCallbackBuilder;
+import org.forgerock.openam.authentication.modules.push.AbstractPushModule;
 import org.forgerock.openam.authentication.modules.push.AuthenticatorPushPrincipal;
-import org.forgerock.openam.authentication.modules.push.UserPushDeviceProfileManager;
 import org.forgerock.openam.core.rest.devices.DeviceSettings;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.services.push.PushNotificationException;
-import org.forgerock.openam.services.push.PushNotificationService;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
 import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.encode.Base64url;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.time.TimeService;
 
 /**
  * The Authenticator Push Registration Module is a registration module that does not authenticate a user but
@@ -85,15 +86,9 @@ import org.forgerock.util.promise.Promise;
  *
  * @see org.forgerock.openam.services.push.sns.SnsMessageResource
  */
-public class AuthenticatorPushRegistration extends AMLoginModule {
+public class AuthenticatorPushRegistration extends AbstractPushModule {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthPush");
-
-    private final MessageDispatcher messageResponseHandler = InjectorHolder.getInstance(MessageDispatcher.class);
-    private final UserPushDeviceProfileManager userDeviceHandler
-            = InjectorHolder.getInstance(UserPushDeviceProfileManager.class);
-    private final PushNotificationService pushMessageSendingService
-            = InjectorHolder.getInstance(PushNotificationService.class);
 
     private PollingWaitAssistant pollingWaitAssistant;
 
@@ -101,9 +96,13 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
     private PushDeviceSettings newDeviceRegistrationProfile;
     private Promise<JsonValue, Exception> deviceResponsePromise;
     private String issuer;
+    private long timeout;
 
     private String bgColour;
     private String imgUrl;
+
+    private String lbCookieValue;
+    private String lbCookieName;
 
     @Override
     public void init(final Subject subject, final Map sharedState, final Map options) {
@@ -114,10 +113,12 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
             try {
                 setAuthLevel(Integer.parseInt(authLevel));
             } catch (Exception e) {
-                DEBUG.error("{} :: init() : Unable to set auth level {}",
-                        AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, authLevel, e);
+                DEBUG.error("{} :: init() : Unable to set auth level {}", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION,
+                        authLevel, e);
             }
         }
+
+        this.timeout = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
         this.issuer = CollectionHelper.getMapAttr(options, ISSUER_OPTION_KEY);
         this.imgUrl = CollectionHelper.getMapAttr(options, IMG_URL);
         this.bgColour = CollectionHelper.getMapAttr(options, BGCOLOUR);
@@ -126,20 +127,28 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
             bgColour = bgColour.substring(1);
         }
 
+        try {
+            lbCookieValue = sessionCookies.getLBCookie(getSessionId());
+        } catch (SessionException e) {
+            DEBUG.warning("{} :: init() : Unable to determine loadbalancer bookie value",
+                    AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, e);
+        }
+
+        lbCookieName = sessionCookies.getLBCookieName();
         amIdentityPrincipal = establishPreauthenticatedUser(sharedState);
-        pollingWaitAssistant = setUpPollingWaitCallbackAssistant(options);
+        pollingWaitAssistant = setUpPollingWaitCallbackAssistant(timeout);
 
         try {
-            pushMessageSendingService.init(amIdentityPrincipal.getRealm());
+            pushService.init(amIdentityPrincipal.getRealm());
         } catch (PushNotificationException e) {
-            DEBUG.error("AuthenticatorPush :: initialiseService() : Unable to initialiseService Push system.", e);
+            DEBUG.error("{} :: init() : Unable to initialiseService Push system.",
+                    AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, e);
         }
 
     }
 
-    private PollingWaitAssistant setUpPollingWaitCallbackAssistant(final Map options) {
-        final long timeoutInMilliSeconds = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
-        return new PollingWaitAssistant(timeoutInMilliSeconds);
+    private PollingWaitAssistant setUpPollingWaitCallbackAssistant(long timeout) {
+        return new PollingWaitAssistant(timeout, 10000, 10000, 10000);
     }
 
     private AMIdentity establishPreauthenticatedUser(final Map sharedState) {
@@ -154,6 +163,16 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
 
         if (request == null) {
             DEBUG.error("{} :: process() : Request was null.", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION);
+            throw failedAsLoginException();
+        }
+
+        try {
+            if (!userPushDeviceProfileManager.getDeviceProfiles(amIdentityPrincipal.getName(),
+                    amIdentityPrincipal.getRealm()).isEmpty()) {
+                return ISAuthConstants.LOGIN_SUCCEED;
+            }
+        } catch (IOException e) {
+            DEBUG.error("{} :: process() : Unable to talk to datastore.", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION);
             throw failedAsLoginException();
         }
 
@@ -191,10 +210,10 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
 
     private int startRegistration() throws AuthLoginException {
 
-        newDeviceRegistrationProfile = userDeviceHandler.createDeviceProfile();
+        newDeviceRegistrationProfile = userPushDeviceProfileManager.createDeviceProfile();
 
-        String registrationConversationId = UUID.randomUUID().toString();
-        String challenge = userDeviceHandler.createRandomBytes(SECRET_BYTE_LENGTH);
+        String registrationConversationId = UUID.randomUUID().toString() + TimeService.SYSTEM.now();
+        String challenge = userPushDeviceProfileManager.createRandomBytes(SECRET_BYTE_LENGTH);
 
         paintRegisterDeviceCallback(amIdentityPrincipal, registrationConversationId, challenge);
 
@@ -202,19 +221,25 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
 
         Set<Predicate> servicePredicates = new HashSet<>();
 
-        servicePredicates.add(new SignedJwtVerificationPredicate(secret, DATA_JSON_POINTER));
-        servicePredicates.add(new PushMessageChallengeResponsePredicate(secret, challenge, DATA_JSON_POINTER, DEBUG));
+        servicePredicates.add(new SignedJwtVerificationPredicate(secret, JWT));
+        servicePredicates.add(new PushMessageChallengeResponsePredicate(secret, challenge, JWT));
         try {
-            servicePredicates.addAll(pushMessageSendingService.getRegistrationMessagePredicatesFor(
+            servicePredicates.addAll(pushService.getRegistrationMessagePredicatesFor(
                     amIdentityPrincipal.getRealm()));
         } catch (PushNotificationException e) {
             DEBUG.error("Unable to read service addresses for Push Notification Service.");
             throw failedAsLoginException();
         }
 
-        this.deviceResponsePromise = messageResponseHandler.expect(registrationConversationId,
+        this.deviceResponsePromise = messageDispatcher.expect(registrationConversationId,
                 servicePredicates).getPromise();
         pollingWaitAssistant.start(deviceResponsePromise);
+
+        try {
+            storeInCTS(registrationConversationId, servicePredicates, timeout);
+        } catch (JsonProcessingException | CoreTokenException e) {
+            DEBUG.warning("Unable to persist token in core token service.", e);
+        }
 
         return STATE_WAIT_FOR_RESPONSE_FROM_QR_SCAN;
     }
@@ -258,7 +283,7 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
             newDeviceRegistrationProfile.setDeviceId(deviceResponse.get(DEVICE_ID).asString());
             newDeviceRegistrationProfile.setRecoveryCodes(DeviceSettings.generateRecoveryCodes(NUM_RECOVERY_CODES));
 
-            userDeviceHandler.saveDeviceProfile(
+            userPushDeviceProfileManager.saveDeviceProfile(
                     amIdentityPrincipal.getName(), amIdentityPrincipal.getRealm(), newDeviceRegistrationProfile);
 
         } catch (InterruptedException | ExecutionException e) {
@@ -286,15 +311,18 @@ public class AuthenticatorPushRegistration extends AMLoginModule {
                     .withUriPath("forgerock")
                     .withUriPort(id.getName())
                     .withCallbackIndex(callbackIndex)
+                    .addUriQueryComponent(LOADBALANCER_DATA_QR_CODE_KEY,
+                            Base64url.encode((lbCookieValue + "=" + lbCookieName).getBytes()))
                     .addUriQueryComponent(ISSUER_QR_CODE_KEY, issuer)
                     .addUriQueryComponent(MESSAGE_ID_QR_CODE_KEY, messageId)
-                    .addUriQueryComponent(SHARED_SECRET_QR_CODE_KEY, deviceProfile.getSharedSecret())
+                    .addUriQueryComponent(SHARED_SECRET_QR_CODE_KEY,
+                            Base64url.encode(Base64.decode(deviceProfile.getSharedSecret())))
                     .addUriQueryComponent(BGCOLOUR_QR_CODE_KEY, bgColour)
-                    .addUriQueryComponent(CHALLENGE_QR_CODE_KEY, challenge)
+                    .addUriQueryComponent(CHALLENGE_QR_CODE_KEY, Base64url.encode(Base64.decode(challenge)))
                     .addUriQueryComponent(REG_QR_CODE_KEY,
-                            getMessageResponseUrl(pushMessageSendingService.getRegServiceAddress(id.getRealm())))
+                            getMessageResponseUrl(pushService.getRegServiceAddress(id.getRealm())))
                     .addUriQueryComponent(AUTH_QR_CODE_KEY,
-                            getMessageResponseUrl(pushMessageSendingService.getAuthServiceAddress(id.getRealm())));
+                            getMessageResponseUrl(pushService.getAuthServiceAddress(id.getRealm())));
 
             if (imgUrl != null) {
                 builder.addUriQueryComponent(IMG_QR_CODE_KEY, Base64url.encode(imgUrl.getBytes()));

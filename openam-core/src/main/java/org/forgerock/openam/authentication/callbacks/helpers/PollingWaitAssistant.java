@@ -29,10 +29,6 @@ import java.util.concurrent.Future;
  */
 public class PollingWaitAssistant {
 
-    private static final int DEFAULT_LONG_POLL_WAIT_IN_MILLISECONDS = 20000;
-    private static final int DEFAULT_MEDIUM_POLL_WAIT_IN_MILLISECONDS = 10000;
-    private static final int DEFAULT_SHORT_POLL_WAIT_IN_MILLISECONDS = 4000;
-
     private long timeoutInMilliSeconds;
 
     private long longElapsedThreshold;
@@ -45,15 +41,22 @@ public class PollingWaitAssistant {
     private Future<?> finishFutureEvent;
     private boolean started = false;
 
+    private long shortTimeout, medTimeout, longTimeout;
+
     /**
      * Create a new PollingWaitAssistant from the parent login module with a timeout value.
      *
      * @param timeoutInMilliSeconds the timeout period before throwing an exception
      */
-    public PollingWaitAssistant(final long timeoutInMilliSeconds) {
+    public PollingWaitAssistant(final long timeoutInMilliSeconds, final long shortTimeout, final long medTimeout,
+                                final long longTimeout) {
         this.timeoutInMilliSeconds = timeoutInMilliSeconds;
         this.longElapsedThreshold = timeoutInMilliSeconds / 2;
         this.mediumElapsedThreshold = timeoutInMilliSeconds / 4;
+
+        this.shortTimeout = shortTimeout;
+        this.medTimeout = medTimeout;
+        this.longTimeout = longTimeout;
     }
 
     /**
@@ -102,12 +105,12 @@ public class PollingWaitAssistant {
     public long getWaitPeriod() {
         long elapsed = Time.currentTimeMillis() - startTime;
         if (elapsed > longElapsedThreshold) {
-            return DEFAULT_LONG_POLL_WAIT_IN_MILLISECONDS;
+            return longTimeout;
         }
         if (elapsed > mediumElapsedThreshold) {
-            return DEFAULT_MEDIUM_POLL_WAIT_IN_MILLISECONDS;
+            return medTimeout;
         }
-        return DEFAULT_SHORT_POLL_WAIT_IN_MILLISECONDS;
+        return shortTimeout;
     }
 
     /**
@@ -121,19 +124,18 @@ public class PollingWaitAssistant {
      * The polling wait is used to indicate the current wait situation.
      */
     public enum PollingWaitState {
-        /** The Polling wait has not started */
+        /** The Polling wait has not started. */
         NOT_STARTED,
-        /** The Polling wait should continue waiting and send a new wait callback */
+        /** The Polling wait should continue waiting and send a new wait callback. */
         WAITING,
-        /** The wait is complete */
+        /** The wait is complete. */
         COMPLETE,
-        /** The wait has exceeded the maximum permitted timeout */
+        /** The wait has exceeded the maximum permitted timeout. */
         TIMEOUT,
-        /** The spam check has detected that too many requests have occured */
+        /** The spam check has detected that too many requests have occurred. */
         SPAMMED,
         /** The spam check has detected that it is too early to service a new request, but it has not had so many
-         * requests that it should fail the authentciation yet.
-         */
+         * requests that it should fail the authentication yet. */
         TOO_EARLY
     }
 }

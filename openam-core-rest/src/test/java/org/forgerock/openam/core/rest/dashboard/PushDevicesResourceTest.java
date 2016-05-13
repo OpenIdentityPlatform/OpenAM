@@ -51,7 +51,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesDao;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
-import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -79,7 +79,7 @@ public class PushDevicesResourceTest {
     @Mock
     private Debug debug;
     @Mock
-    private AuthenticatorPushServiceFactory pushServiceFactory;
+    private AuthenticatorDeviceServiceFactory pushServiceFactory;
     @Mock
     private AuthenticatorPushService pushService;
 
@@ -190,7 +190,7 @@ public class PushDevicesResourceTest {
     private static class PushDevicesResourceTestClass extends PushDevicesResource {
 
         public PushDevicesResourceTestClass(PushDevicesDao dao, ContextHelper helper, Debug debug,
-                                            AuthenticatorPushServiceFactory pushServiceFactory) {
+                                    AuthenticatorDeviceServiceFactory<AuthenticatorPushService> pushServiceFactory) {
             super(dao, helper, debug, pushServiceFactory);
         }
 

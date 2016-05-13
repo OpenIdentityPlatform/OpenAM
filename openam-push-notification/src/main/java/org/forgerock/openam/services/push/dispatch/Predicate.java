@@ -30,4 +30,11 @@ public interface Predicate {
      */
     boolean perform(JsonValue content);
 
+    /**
+     * Returns a jsonified representation of this object to be used when tranmitting across cluster.
+     *
+     * @return A jsonified representation of this class instance.
+     */
+    String jsonify();
+
 }

@@ -38,15 +38,17 @@ public class SnsPushMessageConverter implements PushMessageConverter {
     private final static String GCM_MESSAGE = "message";
 
     private final static String APNS = "APNS";
+    private final static String APNS_SANDBOX = "APNS_SANDBOX";
     private final static String APNS_APS = "aps";
     private final static String APNS_ALERT = "alert";
+    private final static String DATA = "data";
 
     private final static String DEFAULT = "default";
 
     @Override
     public String toTransferFormat(PushMessage message) {
 
-        JsonValue gcm =  json(object(
+        JsonValue gcm = json(object(
                 field(GCM_PRIORITY, GCM_HIGH_PRIORITY),
                 field(GCM_DATA, object(
                         field(GCM_MESSAGE, message.getBody()),
@@ -54,14 +56,15 @@ public class SnsPushMessageConverter implements PushMessageConverter {
 
         JsonValue apple = json(object(
                 field(APNS_APS, object(
-                        field(APNS_ALERT, message.getBody()),
-                        field(MESSAGE_ID, message.getMessageId())))));
+                        field(APNS_ALERT, message.getSubject()),
+                        field(MESSAGE_ID, message.getMessageId()),
+                        field(DATA, message.getBody())))));
 
         JsonValue toSend = json(object(
-                field(DEFAULT, message.getMessageId() + " :: " + message.getBody()),
+                field(DEFAULT, message.getSubject()),
                 field(GCM, gcm.toString()),
-                field(APNS, apple.toString()
-                )
+                field(APNS, apple.toString()),
+                field(APNS_SANDBOX, apple.toString())
         ));
 
         return toSend.toString();

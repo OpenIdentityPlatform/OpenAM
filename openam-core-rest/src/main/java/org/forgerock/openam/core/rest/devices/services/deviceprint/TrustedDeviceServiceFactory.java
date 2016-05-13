@@ -15,17 +15,22 @@
 */
 package org.forgerock.openam.core.rest.devices.services.deviceprint;
 
-import org.forgerock.openam.core.rest.devices.services.DeviceService;
+import com.sun.identity.sm.ServiceConfigManager;
+import javax.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
 
 /**
  * Produces new {@link TrustedDeviceService}s, conforming to the
  * {@link DeviceServiceFactory} interface.
  */
-public class TrustedDeviceServiceFactory implements DeviceServiceFactory {
+@Singleton
+public class TrustedDeviceServiceFactory implements DeviceServiceFactory<TrustedDeviceService> {
+
+    /** Name of this factory for Guice purposes. */
+    public static final String FACTORY_NAME = "AuthenticatorTrustedServiceFactory";
 
     @Override
-    public DeviceService create(String realm) {
+    public TrustedDeviceService create(ServiceConfigManager serviceConfigManager, String realm) {
         return new TrustedDeviceService();
     }
 

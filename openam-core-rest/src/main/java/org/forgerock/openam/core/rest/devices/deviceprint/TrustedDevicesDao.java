@@ -11,16 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.core.rest.devices.deviceprint;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.UserDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceService;
 
 /**
  * Dao for handling the retrieval and saving of a user's trusted devices.
@@ -30,8 +30,7 @@ import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDevice
 @Singleton
 public class TrustedDevicesDao extends UserDevicesDao {
 
-    @Inject
-    public TrustedDevicesDao(TrustedDeviceServiceFactory serviceFactory) {
+    public TrustedDevicesDao(AuthenticatorDeviceServiceFactory<TrustedDeviceService> serviceFactory) {
         super(serviceFactory);
     }
 

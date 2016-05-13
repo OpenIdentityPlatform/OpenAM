@@ -20,6 +20,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 import java.util.Collections;
 import javax.annotation.Nonnull;
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
@@ -33,9 +34,12 @@ import org.forgerock.util.Reject;
  */
 public class AuthenticatorPushService extends EncryptedDeviceStorage implements DeviceService {
 
-    static public final String SERVICE_NAME = "AuthenticatorPush";
-    static public final String SERVICE_VERSION = "1.0";
-    static public final String DEBUG_LOCATION = "amAuthAuthenticatorPush";
+    /** Name of this service for reference purposes. */
+    public static final String SERVICE_NAME = "AuthenticatorPush";
+    /** Version of this service. */
+    public static final String SERVICE_VERSION = "1.0";
+
+    private static final String DEBUG_LOCATION = "amAuthAuthenticatorPush";
 
     private static final String PUSH_ATTRIBUTE_NAME = "iplanet-am-auth-authenticator-push-attr-name";
     private static final String PUSH_ENCRYPTION_SCHEME =
@@ -55,12 +59,14 @@ public class AuthenticatorPushService extends EncryptedDeviceStorage implements 
      * Generates a new AuthenticatorPushStorage, used to encrypt and store device settings on a user's
      * profile under a config storage attribute provided by the service looked up on instance creation.
      *
+     * @param serviceConfigManager Used to communicate with the config store.
      * @param realm The realm in which to look up the AuthenticatorPush service.
-     * @throws IdRepoException If there were error communicating with the SMS.
+     * @throws SMSException If there were error communicating with the SMS.
      * @throws SSOException If there were invalid privileges to perform the requested operation.
      */
-    public AuthenticatorPushService(String realm) throws SMSException, SSOException {
-        super(SERVICE_NAME, SERVICE_VERSION, realm, DEBUG_LOCATION);
+    public AuthenticatorPushService(ServiceConfigManager serviceConfigManager, String realm)
+            throws SMSException, SSOException {
+        super(serviceConfigManager, realm, DEBUG_LOCATION);
     }
 
     @Override

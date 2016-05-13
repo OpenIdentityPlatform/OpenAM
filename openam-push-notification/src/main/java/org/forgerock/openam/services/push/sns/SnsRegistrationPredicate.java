@@ -15,39 +15,49 @@
 */
 package org.forgerock.openam.services.push.sns;
 
-import static org.forgerock.openam.services.push.PushNotificationConstants.*;
-
-import com.amazonaws.services.sns.AmazonSNSClient;
-import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
-import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.sm.SMSException;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.jose.common.JwtReconstruction;
-import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.services.push.dispatch.Predicate;
+import org.forgerock.openam.services.push.PushNotificationException;
+import org.forgerock.openam.services.push.PushNotificationServiceConfig;
+import org.forgerock.openam.services.push.PushNotificationServiceConfigHelper;
+import org.forgerock.openam.services.push.PushNotificationServiceConfigHelperFactory;
+import org.forgerock.openam.services.push.dispatch.AbstractPredicate;
+import org.forgerock.openam.services.push.sns.utils.SnsClientFactory;
+import org.forgerock.openam.services.push.sns.utils.SnsPushResponseUpdater;
 
 /**
  * Acts to register (via communication with SNS) the device that is currently talking to the server
  * from the mobile app.
+ *
+ * {@see org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration} for
+ * information on the format which the perform() method alters the data to fit.
+ *
+ * This predicate does NOT have a listener attached to its config reading subsystem, therefore it will
+ * use the values from the config at the point of time the message creates this class.
  */
-public class SnsRegistrationPredicate implements Predicate {
+public class SnsRegistrationPredicate extends AbstractPredicate {
 
-    private final AmazonSNSClient client;
-    private final String appleEndpoint;
-    private final String googleEndpoint;
+    @JsonIgnore
+    private PushNotificationServiceConfigHelperFactory configHelperFactory
+            = InjectorHolder.getInstance(PushNotificationServiceConfigHelperFactory.class);
+
+    @JsonIgnore
+    private final SnsPushResponseUpdater responseUpdater;
+
+    private String realm;
 
     /**
-     * Generate a new SnsRegistrationPredicate, which will use the supplied client and endpoint information
-     * to register devices with SNS.
+     * Generate a new SnsRegistrationPredicate, which will use the supplied realm to read the config
+     * to gather the information necessary to communicate with SNS.
      *
-     * @param client AmazonSNSClient used to communicate with Amazon.
-     * @param appleEndpoint The apple-registration ARN.
-     * @param googleEndpoint The google-registration ARN.
+     * @param realm The realm in which this predicate exists.
      */
-    public SnsRegistrationPredicate(AmazonSNSClient client, String appleEndpoint, String googleEndpoint) {
-        this.client = client;
-        this.appleEndpoint = appleEndpoint;
-        this.googleEndpoint = googleEndpoint;
+    public SnsRegistrationPredicate(String realm) {
+        this();
+        this.realm = realm;
     }
 
     /**
@@ -62,34 +72,32 @@ public class SnsRegistrationPredicate implements Predicate {
      */
     @Override
     public boolean perform(JsonValue content) {
-        Jwt jwt = new JwtReconstruction().reconstructJwt(content.get(DATA_JSON_POINTER).asString(), Jwt.class);
-
-        JwtClaimsSet claimsSet = jwt.getClaimsSet();
-        String communicationType = (String) claimsSet.getClaim(COMMUNICATION_TYPE);
-        String deviceId = (String) claimsSet.getClaim(DEVICE_ID);
-        String mechanismUid = (String) claimsSet.getClaim(MECHANISM_UID);
-        String deviceType = (String) claimsSet.getClaim(DEVICE_TYPE);
-
-        String platformApplicationArn;
-
-        if (communicationType.equals(APNS)) {
-            platformApplicationArn = appleEndpoint;
-        } else {
-            platformApplicationArn = googleEndpoint;
+        PushNotificationServiceConfigHelper configHelper;
+        PushNotificationServiceConfig config;
+        try {
+            configHelper = configHelperFactory.getConfigHelperFor(realm);
+            config = configHelper.getConfig();
+            responseUpdater.updateResponse(config, content);
+        } catch (SSOException | SMSException | PushNotificationException e) {
+            return false;
         }
 
-        CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest()
-                .withPlatformApplicationArn(platformApplicationArn)
-                .withToken(deviceId);
-
-        CreatePlatformEndpointResult communicationId = client.createPlatformEndpoint(request);
-
-        content.put(DEVICE_ID, deviceId);
-        content.put(COMMUNICATION_TYPE, communicationType);
-        content.put(COMMUNICATION_ID, communicationId.getEndpointArn());
-        content.put(MECHANISM_UID, mechanismUid);
-        content.put(DEVICE_TYPE, deviceType);
-
         return true;
+    }
+
+    /**
+     * Default constructor for the SnsRegistrationPredicate, used for serialization and deserialization
+     * purposes.
+     */
+    public SnsRegistrationPredicate() {
+        responseUpdater = new SnsPushResponseUpdater(new SnsClientFactory());
+    }
+
+    /**
+     * Sets the realm for this predicate. Used when deserilialized from the CTS.
+     * @param realm The location for this predicate.
+     */
+    public void setRealm(String realm) {
+        this.realm = realm;
     }
 }
