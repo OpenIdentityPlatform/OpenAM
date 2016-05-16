@@ -997,7 +997,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             return OAuth2ProviderService.NAME.equals(serviceName) &&
                     OAuth2ProviderService.VERSION.equals(version) &&
                     (orgName != null) &&
-                    orgName.equals(DNMapper.orgNameToDN(realm));
+                    orgName.equalsIgnoreCase(DNMapper.orgNameToDN(realm));
         }
     }
 }
