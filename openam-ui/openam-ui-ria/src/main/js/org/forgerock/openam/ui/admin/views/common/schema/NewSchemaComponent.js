@@ -86,7 +86,7 @@ define([
         },
 
         onSave () {
-            const formData = this.jsonSchemaView.getData();
+            const formData = _.cloneDeep(this.jsonSchemaView.getData());
             const instanceId = this.$el.find("[data-instance-id]").val();
 
             formData["_id"] = instanceId;
