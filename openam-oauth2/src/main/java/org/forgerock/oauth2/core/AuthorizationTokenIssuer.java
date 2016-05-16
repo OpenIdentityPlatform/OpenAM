@@ -17,6 +17,7 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ISS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -45,6 +47,12 @@ import org.slf4j.LoggerFactory;
 public class AuthorizationTokenIssuer {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final OAuth2UrisFactory urisFactory;
+
+    @Inject
+    public AuthorizationTokenIssuer(OAuth2UrisFactory urisFactory) {
+        this.urisFactory = urisFactory;
+    }
 
     /**
      * Issues tokens for the OAuth2 authorize request.
@@ -148,6 +156,8 @@ public class AuthorizationTokenIssuer {
             tokenMap.put(STATE, request.<String>getParameter(STATE));
         }
 
+        tokenMap.put(ISS, urisFactory.get(request).getIssuer());
+        tokenMap.put(CLIENT_ID, clientRegistration.getClientId());
         return new AuthorizationToken(tokenMap, returnAsFragment);
     }
 
