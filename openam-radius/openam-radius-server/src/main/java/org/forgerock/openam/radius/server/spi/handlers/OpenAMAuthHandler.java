@@ -822,7 +822,10 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             final ConfirmationCallback cc = (ConfirmationCallback) cb;
             final StringBuilder sb = new StringBuilder();
             sb.append(header);
-            sb.append(cc.getPrompt());
+            String prompt = cc.getPrompt();
+            if (prompt != null) {
+               sb.append(prompt);
+            }
             if (cc.getDefaultOption() >= 0) {
                 // ugh. ditto on above translation concern
                 sb.append(" (Default is ");
