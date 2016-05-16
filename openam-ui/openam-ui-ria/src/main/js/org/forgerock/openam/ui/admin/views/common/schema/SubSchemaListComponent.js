@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent
         FormHelper.showConfirmationBeforeDeleting({
             message: $.t("console.common.confirmDeleteSelected")
         }, () => {
-            this.deleteInstance(subSchemaType, subSchemaInstance).then(() => {
+            this.deleteSubSchemaInstance(subSchemaType, subSchemaInstance).then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 this.render();
             },
