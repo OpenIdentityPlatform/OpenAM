@@ -39,7 +39,7 @@ define([
             event.preventDefault();
             const id = $(event.currentTarget).data().deleteItem;
             showConfirmationBeforeDeleting({
-                message: $.t("console.common.confirmDeleteText", { type: $.t("console.sites.common.confirmType") })
+                message: $.t("console.common.confirmDeleteText", { type: $.t("console.servers.common.confirmType") })
             },
             () => {
                 ServersService.servers.remove(id).then(() => {

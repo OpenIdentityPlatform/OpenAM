@@ -99,8 +99,8 @@ define([
         },
         cloneServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
-            url: /deployment\/servers\/([^\/]+)\/clone/,
-            pattern: "deployment/servers/?/clone",
+            url: /deployment\/servers\/clone\/([^\/]+)/,
+            pattern: "deployment/servers/clone/?",
             role: "ui-realm-admin",
             navGroup: "admin"
         }

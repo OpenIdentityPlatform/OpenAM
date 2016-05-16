@@ -751,10 +751,13 @@
             }
         },
         "servers" : {
+            "common" : {
+                "confirmType": "server"
+            },
             "list" : {
                 "title" : "Servers",
                 "new" : "Add a Server",
-                "table" : ["Name", "Site Name"],
+                "table" : ["Url", "Site Name"],
                 "empty" : "No Servers found",
                 "clone" : "Clone",
                 "description": "Configure server-specific properties in OpenAM instances."

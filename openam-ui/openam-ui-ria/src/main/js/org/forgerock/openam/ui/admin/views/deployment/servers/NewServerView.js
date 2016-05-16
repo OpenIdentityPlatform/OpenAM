@@ -44,11 +44,13 @@ define([
         render ([id]) {
             this.data.id = id;
             const fragments = URIUtils.getCurrentFragment().split("/");
-            this.isCloneView = _.last(fragments) === "clone";
+            this.isCloneView = fragments.indexOf("clone") !== -1;
             if (this.isCloneView) {
                 this.data.title = "console.servers.clone.title";
+                this.data.buttonTitle = "common.form.clone";
             } else {
                 this.data.title = "console.servers.new.title";
+                this.data.buttonTitle = "common.form.create";
             }
             this.parentRender(() => { new Backlink().render(); });
             return this;
