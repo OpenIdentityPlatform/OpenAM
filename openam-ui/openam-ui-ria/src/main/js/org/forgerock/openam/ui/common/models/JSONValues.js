@@ -14,6 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
+ /**
+ * Refer to the following naming convention, when adding new functions to this class:
+ * <p/>
+ * For <strong>query</strong> methods, which do not return new instance of <code>JSONValues</code> class, use
+ * <code>get*</code>
+ * For <strong>transformation</strong> methods, which do not loose data, use <code>to*</code>\/<code>from*</code>
+ * For <strong>modification</strong> methods, which loose the data, use <code>add*</code>\/<code>remove*</code>
+ * For methods, which <strong>check the presense</strong>, use <code>has*</code>\/<code>is*</code>
+ * For <strong>utility</strong> methods use simple verbs, e.g. <code>omit</code>, <code>pick</code>, etc.
+ * @module org/forgerock/openam/ui/common/models/JSONValues
+ */
 define([
     "lodash"
 ], (_) => class JSONValues {
@@ -96,13 +107,13 @@ define([
 
         return new JSONValues(values);
     }
-    getUnwrappedValues () {
-        return _.mapValues(this.raw, "value");
+    removeInheritance () {
+        return new JSONValues(_.mapValues(this.raw, "value"));
     }
-    getWrappedValues (unwrappedValues) {
+    addInheritance (valuesWithoutInheritance) {
         return new JSONValues(_.transform(this.raw, (result, value, key) => {
             result[key] = this.raw[key];
-            result[key].value = unwrappedValues[key];
+            result[key].value = valuesWithoutInheritance[key];
         }));
     }
 });

@@ -79,7 +79,7 @@ define([
         render () {
             const schemas = this.options.schema.getPropertiesAsSchemas();
             const values = this.options.values.raw;
-            const orderedSchemaPropertyKeys = this.options.schema.keys(true);
+            const orderedSchemaPropertyKeys = this.options.schema.getKeys(true);
 
             // Create an array of objects which each contain the schema and values paired together
             let orderedSchemaValuePairs = _.map(orderedSchemaPropertyKeys, (key) => ({

@@ -25,6 +25,6 @@ define([
     const requiredAndEmptyKeys = _.intersection(requiredSchemaKeys, emptyValueKeys);
 
     return _.extend(schemaValuePair, {
-        schema: schemaValuePair.schema.setDefaultProperties(requiredAndEmptyKeys)
+        schema: schemaValuePair.schema.addDefaultProperties(requiredAndEmptyKeys)
     });
 });

@@ -56,8 +56,9 @@ define([
             if (!(options.schema instanceof JSONSchema)) {
                 throw new TypeError("[FlatJSONSchemaView] \"schema\" argument is not an instance of JSONSchema.");
             }
-            if (options.schema.isCollection() && !options.schema.isWrappedByInheritance()) {
-                throw new Error("[FlatJSONSchemaView] JSONSchema collections are not supported by this view.");
+            if (options.schema.isCollection() && !options.schema.hasInheritance()) {
+                throw new Error(
+                    "[FlatJSONSchemaView] JSONSchema collections with no inheritance are not supported by this view.");
             }
             if (!(options.values instanceof JSONValues)) {
                 throw new TypeError("[FlatJSONSchemaView] \"values\" argument is not an instance of JSONValues.");
@@ -74,7 +75,7 @@ define([
                 const requiredSchemaKeys = this.options.schema.getRequiredPropertyKeys();
                 const emptyValueKeys = this.options.values.getEmptyValueKeys();
                 const requiredAndEmptyKeys = _.intersection(requiredSchemaKeys, emptyValueKeys);
-                schema = schema.setDefaultProperties(requiredAndEmptyKeys);
+                schema = schema.addDefaultProperties(requiredAndEmptyKeys);
             }
 
             this.subview = new JSONEditorView({

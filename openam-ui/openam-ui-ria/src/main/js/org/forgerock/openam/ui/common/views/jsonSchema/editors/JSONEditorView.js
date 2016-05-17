@@ -62,12 +62,9 @@ define([
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(GRID_COLUMN_WIDTH_1, GRID_COLUMN_WIDTH_2);
 
-        let actualSchema = schema.raw;
-        let actualValues = values.raw;
-        if (schema.isWrappedByInheritance()) {
-            actualSchema = schema.getUnwrappedSchema();
-            actualValues = values.getUnwrappedValues();
-        }
+        const hasInheritance = schema.hasInheritance();
+        const actualSchema = (hasInheritance ? schema.removeInheritance() : schema).raw;
+        const actualValues = (hasInheritance ? values.removeInheritance() : values).raw;
 
         const editor = new JSONEditor(element[0], {
             "disable_collapse": true,
@@ -114,20 +111,20 @@ define([
             return this;
         },
         getData () {
-            const passwordKeys = this.options.schema.passwordKeys();
+            const passwordKeys = this.options.schema.getPasswordKeys();
             const values = new JSONValues(this.jsonEditor.getValue());
-            const valuesWithoutEmptyPasswords = values.omit((value, key) => {
+            let valuesWithoutEmptyPasswords = values.omit((value, key) => {
                 if (passwordKeys.indexOf(key) !== -1 && _.isEmpty(value)) {
                     return true;
                 }
             });
 
-            let result = valuesWithoutEmptyPasswords;
-            if (this.options.schema.isWrappedByInheritance()) {
-                this.options.values = this.options.values.getWrappedValues(valuesWithoutEmptyPasswords.raw);
-                result = this.options.values;
+            if (this.options.schema.hasInheritance()) {
+                valuesWithoutEmptyPasswords =
+                    this.options.values.addInheritance(valuesWithoutEmptyPasswords.raw);
             }
-            return result.raw;
+
+            return valuesWithoutEmptyPasswords.raw;
         }
     });
 

@@ -26,7 +26,7 @@ define([
         return _.extend(schemaValuePair, {
             schema: schemaValuePair.schema
                 .getEnableProperty()
-                .setDefaultProperties([schemaValuePair.schema.enableKey()])
+                .addDefaultProperties([schemaValuePair.schema.getEnableKey()])
         });
     }
 

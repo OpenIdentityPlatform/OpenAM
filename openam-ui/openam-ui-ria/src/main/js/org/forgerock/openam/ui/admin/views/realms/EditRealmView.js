@@ -144,7 +144,7 @@ define([
                         }),
                         new FlatJSONSchemaView({
                             schema: new JSONSchema(_.get(response[2], generalPropertyPath))
-                                        .setDefaultProperties(["statelessSessionsEnabled"]),
+                                        .addDefaultProperties(["statelessSessionsEnabled"]),
                             values: new JSONValues({})
                         })
                     ];

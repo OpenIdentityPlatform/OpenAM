@@ -14,6 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
+ /**
+ * Refer to the following naming convention, when adding new functions to this class:
+ * <p/>
+ * For <strong>query</strong> methods, which do not return new instance of <code>JSONSchema</code> class, use
+ * <code>get*</code>
+ * For <strong>transformation</strong> methods, which do not loose data, use <code>to*</code>\/<code>from*</code>
+ * For <strong>modification</strong> methods, which loose the data, use <code>add*</code>\/<code>remove*</code>
+ * For methods, which <strong>check the presense</strong>, use <code>has*</code>\/<code>is*</code>
+ * For <strong>utility</strong> methods use simple verbs, e.g. <code>omit</code>, <code>pick</code>, etc.
+ * @module org/forgerock/openam/ui/common/models/JSONSchema
+ */
 define([
     "lodash",
     "org/forgerock/openam/ui/common/models/cleanJSONSchema"
@@ -32,14 +43,14 @@ define([
 
             this.raw = Object.freeze(schema);
         }
-        enableKey () {
+        getEnableKey () {
             const key = `${_.camelCase(this.raw.title)}Enabled`;
             if (this.raw.properties[key]) {
                 return key;
             }
         }
         getEnableProperty () {
-            return this.pick(this.enableKey());
+            return this.pick(this.getEnableKey());
         }
         getPropertiesAsSchemas () {
             return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
@@ -88,7 +99,7 @@ define([
         isEmpty () {
             return _.isEmpty(this.raw.properties);
         }
-        keys (sort) {
+        getKeys (sort) {
             sort = typeof sort !== "undefined" ? sort : false;
 
             if (sort) {
@@ -98,7 +109,7 @@ define([
                 return _.keys(this.raw.properties);
             }
         }
-        passwordKeys () {
+        getPasswordKeys () {
             const passwordProperties = _.pick(this.raw.properties, _.matches({ format: "password" }));
 
             return _.keys(passwordProperties);
@@ -115,24 +126,29 @@ define([
 
             return new JSONSchema(schema);
         }
-        setDefaultProperties (keys) {
+        addDefaultProperties (keys) {
             const schema = _.cloneDeep(this.raw);
             schema.defaultProperties = keys;
             return new JSONSchema(schema);
         }
-        isWrappedByInheritance () {
+        hasInheritance () {
             return _.every(this.raw.properties, (property) =>
                 property.type === "object" &&
                 _.has(property, "properties.inherited")
             );
         }
-        getUnwrappedSchema () {
-            const properties = _.mapValues(this.raw.properties, "properties.value");
-            return {
+        removeInheritance () {
+            const properties = _.mapValues(this.raw.properties, (rawValue) => {
+                const value = rawValue.properties.value;
+                value.title = rawValue.title;
+                return value;
+            });
+
+            return new JSONSchema({
                 properties,
                 title: this.raw.title,
                 type: this.raw.type
-            };
+            });
         }
     };
 });

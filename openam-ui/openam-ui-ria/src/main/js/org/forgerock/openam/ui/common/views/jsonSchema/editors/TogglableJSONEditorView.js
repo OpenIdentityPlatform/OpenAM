@@ -34,7 +34,7 @@ define([
             }
 
             this.options = options;
-            this.options.enablePropertyKey = this.options.schema.enableKey();
+            this.options.enablePropertyKey = this.options.schema.getEnableKey();
             this.options.enablePropertyValue = this.options.values.raw[this.options.enablePropertyKey];
             this.options.schema = options.schema.omit(this.options.enablePropertyKey);
             this.options.values = options.values.omit(this.options.enablePropertyKey);
