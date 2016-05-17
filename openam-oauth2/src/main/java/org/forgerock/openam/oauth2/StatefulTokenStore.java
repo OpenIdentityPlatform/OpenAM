@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.jose.jws.JwsAlgorithm.getJwsAlgorithm;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
@@ -265,7 +266,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
-        final KeyPair signingKeyPair = providerSettings.getServerKeyPair();
+        final KeyPair signingKeyPair = providerSettings.getSigningKeyPair(
+                getJwsAlgorithm(signingAlgorithm.toUpperCase()));
         final PublicKey encryptionPublicKey = clientRegistration.getIDTokenEncryptionPublicKey();
 
         final String atHash = generateAtHash(signingAlgorithm, request, providerSettings);

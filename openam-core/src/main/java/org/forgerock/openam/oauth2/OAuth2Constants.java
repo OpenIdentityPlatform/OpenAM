@@ -865,7 +865,8 @@ public class OAuth2Constants {
         public static final String SUBJECT_TYPES_SUPPORTED = "forgerock-oauth2-provider-subject-types-supported";
         public static final String ID_TOKEN_SIGNING_ALGORITHMS =
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
-        public static final String KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
+        public static final String TOKEN_SIGNING_RSA_KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
+        public static final String TOKEN_SIGNING_ECDSA_KEYSTORE_ALIAS = "tokenSigningECDSAKeyAlias";
         public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED = "forgerock-oauth2-provider-allow-open-dynamic-registration";
         public static final String GENERATE_REGISTRATION_ACCESS_TOKENS = "forgerock-oauth2-provider-generate-registration-access-tokens";
         public static final String AMR_VALUE_MAPPING = "forgerock-oauth2-provider-amr-mappings";
