@@ -27,17 +27,20 @@ define([
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
 ], ($, _, AbstractView, BootstrapDialog, Messages, NavigationHelper, Router, RealmsService, TemplateBasedView,
     ToggleCardListView) => {
-    const ListRealmsView = AbstractView.extend({
-        template: "templates/admin/views/realms/ListRealmsTemplate.html",
-        events: {
-            "click [data-delete-realm]" : "deleteRealm",
-            "click [data-toogle-realm]" : "toggleRealmActive"
-        },
-        partials: [
-            "partials/util/_Status.html",
-            "partials/util/_ButtonLink.html",
-            "templates/admin/views/realms/_RealmCard.html"
-        ],
+    class ListRealmsView extends AbstractView {
+        constructor () {
+            super();
+            this.template = "templates/admin/views/realms/ListRealmsTemplate.html";
+            this.events = {
+                "click [data-delete-realm]" : "deleteRealm",
+                "click [data-toogle-realm]" : "toggleRealmActive"
+            };
+            this.partials = [
+                "partials/util/_Status.html",
+                "partials/util/_ButtonLink.html",
+                "templates/admin/views/realms/_RealmCard.html"
+            ];
+        }
         deleteRealm (event) {
             event.preventDefault();
 
@@ -88,15 +91,15 @@ define([
                 buttons: buttons
             });
 
-        },
+        }
         getRealmFromEvent (event) {
             var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
                 realm = _.find(this.data.realms, { path: path });
             return realm;
-        },
+        }
         getRealmFromList (path) {
             return _.find(this.data.realms, { path: path });
-        },
+        }
         performDeleteRealm (path) {
             var self = this;
 
@@ -113,10 +116,10 @@ define([
                     });
                 }
             });
-        },
+        }
         canRealmBeDeleted (realm) {
             return realm.path === "/" ? false : true;
-        },
+        }
         render (args, callback) {
             var self = this;
 
@@ -179,7 +182,7 @@ define([
                     response
                 })
             );
-        },
+        }
         toggleRealmActive (event) {
             event.preventDefault();
             var self = this,
@@ -193,7 +196,7 @@ define([
                 });
             }).always(() => self.render());
         }
-    });
+    }
 
     return new ListRealmsView();
 });

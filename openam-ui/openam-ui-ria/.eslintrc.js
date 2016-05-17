@@ -49,9 +49,11 @@ module.exports = {
         "no-alert": 2,
         "no-bitwise": 2,
         "no-catch-shadow": 2,
+        "no-class-assign": 2,
         "no-confusing-arrow": 2,
         "no-constant-condition": 2,
         "no-continue": 2,
+        "no-dupe-class-members": 2,
         "no-duplicate-case": 2,
         "no-empty-character-class": 2,
         "no-empty-pattern": 2,
@@ -115,7 +117,6 @@ module.exports = {
         // TODO: Need an abstraction for logging before we can enable this.
         //"no-console": 0
         //"no-param-reassign": 0
-
 
         /**
          * Disabled because these rules aren't available in ESLint 2.0.
