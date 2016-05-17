@@ -32,7 +32,7 @@ define([
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
-        AuthNService.getRequirements().then(function (requirements) {
+        AuthNService.getRequirements(params).then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
@@ -48,7 +48,7 @@ define([
                 });
             }
 
-            AuthNService.submitRequirements(populatedRequirements).then(function (result) {
+            AuthNService.submitRequirements(populatedRequirements, params).then(function (result) {
                 if (result.hasOwnProperty("tokenId")) {
                     obj.getLoggedUser(function (user) {
                         Configuration.setProperty("loggedUser", user);

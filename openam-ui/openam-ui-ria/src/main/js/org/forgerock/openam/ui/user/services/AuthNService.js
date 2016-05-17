@@ -24,15 +24,14 @@ define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Configuration, Constants, CookieHelper, EventManager, Messages, RealmHelper) {
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`),
-        requirementList = [],
-        knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
+], ($, _, AbstractDelegate, Configuration, Constants, CookieHelper, EventManager, Messages, RealmHelper) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    let requirementList = [];
+    // to be used to keep track of the attributes associated with whatever requirementList contains
+    let knownAuth = {};
 
-    obj.begin = function () {
-        var url,
-            args = {},
-            tokenCookie;
+    obj.begin = function (options) {
+        const args = {};
 
         knownAuth = _.clone(Configuration.globalData.auth);
 
@@ -45,52 +44,52 @@ define([
         }
 
         // In case user has logged in already update session
-        tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        const tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
         if (tokenCookie) {
             args.sessionUpgradeSSOTokenId = tokenCookie;
         }
 
-        url = RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate");
-
+        const url = RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate");
         if (RealmHelper.getOverrideRealm()) {
             args.realm = RealmHelper.getOverrideRealm();
         }
 
-        url = `${url}?${$.param(args)}`;
-
-        return obj.serviceCall({
+        const serviceCall = {
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: "",
-            url: url,
+            url: `${url}?${$.param(args)}`,
             errorsHandlers: {
                 "unauthorized": { status: "401" },
                 "bad request": { status: "400" }
             }
-        }).then(function (requirements) {
-            return requirements;
-        }, function (jqXHR) {
-            // some auth processes might throw an error fail immediately
-            var errorBody = $.parseJSON(jqXHR.responseText);
+        };
 
-            // if the error body contains an authId, then we might be able to
-            // continue on after this error to the next module in the chain
-            if (errorBody.hasOwnProperty("authId")) {
-                return obj.submitRequirements(errorBody).then(function (requirements) {
-                    obj.resetProcess();
-                    return requirements;
-                }, function () {
-                    return errorBody;
-                });
-            } else if (errorBody.code && errorBody.code === 400) {
-                return {
-                    message: errorBody.message,
-                    type: "error"
-                };
-            }
+        _.assign(serviceCall, options);
 
-            return errorBody;
-        });
+        return obj.serviceCall(serviceCall).then((requirements) => requirements,
+
+            (jqXHR) => {
+                // some auth processes might throw an error fail immediately
+                const errorBody = $.parseJSON(jqXHR.responseText);
+
+                // if the error body contains an authId, then we might be able to
+                // continue on after this error to the next module in the chain
+                if (errorBody.hasOwnProperty("authId")) {
+                    return obj.submitRequirements(errorBody)
+                        .then((requirements) => {
+                            obj.resetProcess();
+                            return requirements;
+                        }, () => errorBody
+                    );
+                } else if (errorBody.code && errorBody.code === 400) {
+                    return {
+                        message: errorBody.message,
+                        type: Messages.TYPE_DANGER
+                    };
+                }
+                return errorBody;
+            });
     };
 
     obj.handleRequirements = function (requirements) {
@@ -122,35 +121,39 @@ define([
         }
     };
 
-    obj.submitRequirements = function (requirements) {
-        var processSucceeded = function (requirements) {
-                obj.handleRequirements(requirements);
-                return requirements;
-            },
-            processFailed = function (reason) {
-                var failedStage = requirementList.length;
-                obj.resetProcess();
-                return [failedStage, reason];
-            },
-            goToFailureUrl = function (errorBody) {
-                if (errorBody.detail && errorBody.detail.failureUrl) {
-                    console.log(errorBody.detail.failureUrl);
-                    window.location.href = errorBody.detail.failureUrl;
-                }
-            },
-            url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
+    obj.submitRequirements = function (requirements, options) {
+        const processSucceeded = (requirements) => {
+            obj.handleRequirements(requirements);
+            return requirements;
+        };
+        const processFailed = (reason) => {
+            const failedStage = requirementList.length;
+            obj.resetProcess();
+            return [failedStage, reason];
+        };
+        const goToFailureUrl = (errorBody) => {
+            if (errorBody.detail && errorBody.detail.failureUrl) {
+                console.log(errorBody.detail.failureUrl);
+                window.location.href = errorBody.detail.failureUrl;
+            }
+        };
+        const url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
 
-        return obj.serviceCall({
+        const serviceCall = {
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: JSON.stringify(requirements),
-            url: url,
+            url,
             errorsHandlers: {
                 "unauthorized": { status: "401" },
                 "timeout": { status: "408" },
                 "Internal Server Error ": { status: "500" }
             }
-        }).then(processSucceeded, function (jqXHR) {
+        };
+
+        _.assign(serviceCall, options);
+
+        return obj.serviceCall(serviceCall).then(processSucceeded, (jqXHR) => {
             var oldReqs,
                 errorBody,
                 currentStage = requirementList.length,
@@ -160,7 +163,7 @@ define([
                 // we timed out, so let's try again with a fresh session
                 oldReqs = requirementList[0];
                 obj.resetProcess();
-                return obj.begin().then(function (requirements) {
+                return obj.begin().then((requirements) => {
                     obj.handleRequirements(requirements);
 
                     if (requirements.hasOwnProperty("authId")) {
@@ -190,11 +193,7 @@ define([
                 } else {
                     message = $.t("config.messages.CommonMessages.unknown");
                 }
-
-                Messages.addMessage({
-                    message: message,
-                    type: Messages.TYPE_DANGER
-                });
+                Messages.addMessage({ message, type: Messages.TYPE_DANGER });
             } else { // we have a 401 unauthorized response
                 errorBody = $.parseJSON(jqXHR.responseText);
 
@@ -225,15 +224,13 @@ define([
     };
 
     function hasRealmChanged () {
-        var auth = Configuration.globalData.auth;
-
+        const auth = Configuration.globalData.auth;
         return auth.subRealm !== knownAuth.subRealm ||
             _.get(auth, "urlParams.realm") !== _.get(knownAuth, "urlParams.realm");
     }
 
     function hasAuthIndexChanged () {
-        var auth = Configuration.globalData.auth;
-
+        const auth = Configuration.globalData.auth;
         return _.get(auth, "urlParams.authIndexType") !== _.get(knownAuth, "urlParams.authIndexType") ||
             _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
     }
@@ -241,19 +238,18 @@ define([
     obj.getRequirements = function (args) {
         if (CookieHelper.getCookie("authId")) {
             return obj.submitRequirements(_.extend({ "authId": CookieHelper.getCookie("authId") },
-                Configuration.globalData.auth.urlParams)).done(function () {
+                Configuration.globalData.auth.urlParams)).done(() => {
                     knownAuth = _.clone(Configuration.globalData.auth);
                     CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
                 });
         } else if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
             obj.resetProcess();
 
-            return obj.begin(args).then(function (requirements) {
-                obj.handleRequirements(requirements);
-                return requirements;
-            }, function (error) {
-                return error;
-            });
+            return obj.begin(args)
+                .then((requirements) => {
+                    obj.handleRequirements(requirements);
+                    return requirements;
+                }, (error) => error);
         } else {
             return $.Deferred().resolve(requirementList[requirementList.length - 1]);
         }
