@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.audit;
 
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.restlet.Request;
 import org.restlet.Restlet;
-
-import java.util.Set;
 
 import static org.forgerock.openam.audit.AuditConstants.Component;
 
@@ -36,13 +36,12 @@ public class OAuth2AccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
-     * @param providers The OAuth2 audit context providers, responsible for finding details which can be audit
-     *                  logged from various tokens which may be attached to requests and/or responses.
+     * @param requestFactory The factory that provides access to OAuth2Request.
      */
     public OAuth2AccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers,
+            AuditEventFactory auditEventFactory, OAuth2RequestFactory<?, Request> requestFactory,
             RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
-        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers, requestDetailCreator,
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, requestFactory, requestDetailCreator,
                 responseDetailCreator);
     }
 }

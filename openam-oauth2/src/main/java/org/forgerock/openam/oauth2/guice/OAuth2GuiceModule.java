@@ -144,10 +144,6 @@ import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
-import org.forgerock.openam.rest.audit.OAuth2AuditAccessTokenContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditRefreshTokenContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditSSOTokenContextProvider;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -457,21 +453,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
             //No need to validate the realm for the provided token.
         }
-    }
-
-    @Inject
-    @Provides
-    @Singleton
-    @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)
-    Set<OAuth2AuditContextProvider> getOAuth2AuditContextProviders(TokenStore tokenStore,
-            OAuth2RequestFactory<?, Request> requestFactory) {
-        Set<OAuth2AuditContextProvider> set = new HashSet<>();
-
-        set.add(new OAuth2AuditAccessTokenContextProvider(tokenStore, requestFactory));
-        set.add(new OAuth2AuditRefreshTokenContextProvider(tokenStore, requestFactory));
-        set.add(new OAuth2AuditSSOTokenContextProvider());
-
-        return set;
     }
 
     @Provides

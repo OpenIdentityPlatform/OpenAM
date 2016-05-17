@@ -25,6 +25,7 @@ import static org.forgerock.util.query.QueryFilter.or;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +46,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -78,6 +80,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.TransactionId;
 import org.forgerock.util.encode.Base64url;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
@@ -156,6 +159,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
+        final String auditId = (new TransactionId()).getValue();
 
         long expiryTime = 0;
         if (clientRegistration == null) {
@@ -176,7 +180,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
                 redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realm,
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
-                ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString());
+                ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString(), auditId);
 
         // Store in CTS
         try {

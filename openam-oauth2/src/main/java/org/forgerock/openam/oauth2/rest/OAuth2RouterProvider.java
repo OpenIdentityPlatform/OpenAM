@@ -30,11 +30,14 @@ import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
 import java.util.Set;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
@@ -48,7 +51,6 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
-import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -59,6 +61,7 @@ import org.forgerock.openidconnect.restlet.IdTokenInfo;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
+import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
@@ -74,7 +77,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
     private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final Set<OAuth2AuditContextProvider> contextProviders;
+    private final OAuth2RequestFactory<?, Request> requestFactory;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
@@ -83,19 +86,19 @@ public class OAuth2RouterProvider implements Provider<Router> {
      * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
-     * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can
+     * @param requestFactory The factory that provides access to OAuth2Request.
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
     public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders,
+            OAuth2RequestFactory<?, Request> requestFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
-        this.contextProviders = contextProviders;
+        this.requestFactory = requestFactory;
         this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
@@ -160,13 +163,13 @@ public class OAuth2RouterProvider implements Provider<Router> {
     }
 
     private Filter auditWithOAuthFilter(Restlet restlet) {
-        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders,
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, requestFactory,
                 noBodyAuditor(), noBodyAuditor());
     }
 
     private Filter auditWithOAuthFilter(Restlet restlet, RestletBodyAuditor<?> requestDetailCreator,
             RestletBodyAuditor<?> responseDetailCreator) {
-        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders,
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, requestFactory,
                 requestDetailCreator, responseDetailCreator);
     }
 }

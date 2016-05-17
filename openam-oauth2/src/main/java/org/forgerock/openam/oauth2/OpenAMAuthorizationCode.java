@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AuthorizationCode;
 import org.forgerock.openam.oauth2.OAuth2Constants;
@@ -63,12 +64,14 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
                             String claims, long expiryTime, String nonce, String realm, String authModules, String acr,
-                            String ssoTokenId, String codeChallenge, String codeChallengeMethod, String authGrantId) {
+                            String ssoTokenId, String codeChallenge, String codeChallengeMethod, String authGrantId,
+                            String auditId) {
         super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr, codeChallenge,
                 codeChallengeMethod, authGrantId);
         setRealm(realm);
         setSsoTokenId(ssoTokenId);
         setClaims(claims);
+        setAuditTrackingId(auditId);
     }
 
     /**
@@ -184,6 +187,24 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
         Set<String> issued = getParameter(ISSUED);
 
         return issued != null && Boolean.parseBoolean(issued.iterator().next());
+    }
+
+    /**
+     * Sets the audit id.
+     *
+     * @param auditId The audit id.
+     */
+    protected void setAuditTrackingId(String auditId) {
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
+    }
+
+    /**
+     * Gets the audit id.
+     *
+     * @return The audit id.
+     */
+    public String getAuditTrackingId() {
+        return getStringProperty(AUDIT_TRACKING_ID);
     }
 
     /**
