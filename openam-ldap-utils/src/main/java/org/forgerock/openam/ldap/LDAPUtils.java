@@ -550,24 +550,7 @@ public final class LDAPUtils {
      * @return The escaped string.
      */
     public static String escapeValue(String str) {
-        StringBuilder retbuf = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char currentChar = str.charAt(i);
-            if (shouldEscapeCharacter(currentChar)) {
-                retbuf.append('\\');
-            }
-            retbuf.append(currentChar);
-        }
-        return retbuf.toString();
-    }
-
-    private static boolean shouldEscapeCharacter(char c) {
-        for (char escaped : ESCAPED_CHAR) {
-            if (c == escaped) {
-                return true;
-            }
-        }
-        return false;
+        return DN.escapeAttributeValue(str);
     }
 
     /**
