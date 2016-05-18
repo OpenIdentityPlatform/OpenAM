@@ -131,7 +131,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
 
             if (authorizationCode.isExpired()) {
                 logger.error("Authorization code has expired, " + code);
-                throw new InvalidCodeException("Authorization code expired.");
+                throw new InvalidGrantException("Authorization code expired.");
             }
 
             if (providerSettings.isCodeVerifierRequired()) {
