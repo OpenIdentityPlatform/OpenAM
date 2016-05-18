@@ -168,6 +168,7 @@ define([
                                 properties: this.data.schema.raw.properties,
                                 onChange: (tabId, value) => {
                                     this.subview.setTabId(tabId);
+                                    debugger
                                     this.$el.find(`[data-schemapath="root.${value}"]`).find("input").focus();
                                 }
                             };

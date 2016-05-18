@@ -360,7 +360,8 @@
                 "emailExists" : "Email address already exists.",
                 "shouldBeLong" : "Should be long value",
                 "wrongDateFormat" : "Wrong format"
-            }
+            },
+            "inheritValue": "Inherit value"
         },
         "grid": {
             "pagination": {

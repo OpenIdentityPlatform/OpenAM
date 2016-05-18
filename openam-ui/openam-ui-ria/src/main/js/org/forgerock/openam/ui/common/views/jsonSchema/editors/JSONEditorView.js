@@ -83,6 +83,10 @@ define([
         return editor;
     }
 
+    function removeRootPrefix (key) {
+        return key.slice(5);
+    }
+
     const JSONEditorView = Backbone.View.extend({
         className: "jsoneditor-block",
         initialize (options) {
@@ -97,31 +101,22 @@ define([
                 displayTitle: true
             });
         },
+        toggleInheritance (event) {
+            const target = event.currentTarget;
+            const schemaKey = removeRootPrefix(target.getAttribute("data-schemapath"));
+            const valueIsInherited = target.getAttribute("data-inherit-value") === "true";
+
+            this.options.values = this.options.values.addInheritanceKey(schemaKey, !valueIsInherited);
+
+            this.$el.empty();
+            this.render();
+        },
         render () {
             this.jsonEditor = applyJSONEditorToElement(
                 this.$el,
                 this.options.schema,
                 this.options.values
             );
-
-            this.$el[0].addEventListener("click", (event) => {
-                const data = $(event.target).data();
-                const key = data.schemapath.slice(5); // remove "root." prefix
-                const isInherited = data.isinherited;
-
-                this.options.values = this.options.values.updateIsInherited(key, !isInherited);
-
-                this.$el.empty();
-                this.jsonEditor = applyJSONEditorToElement(
-                    this.$el,
-                    this.options.schema,
-                    this.options.values
-                );
-
-                if (!this.options.displayTitle) {
-                    this.$el.find("[data-header]").parent().hide();
-                }
-            });
 
             if (!this.options.displayTitle) {
                 this.$el.find("[data-header]").parent().hide();

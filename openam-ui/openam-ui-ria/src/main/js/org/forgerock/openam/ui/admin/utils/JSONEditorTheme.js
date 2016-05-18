@@ -18,7 +18,7 @@ define([
     "jquery",
     "lodash",
     "jsonEditor"
-], function ($, _, JSONEditor) {
+], ($, _, JSONEditor) => {
     var obj = {};
 
     const buildTitaToggle = (checkbox, gridColWidth1) => {
@@ -349,23 +349,24 @@ define([
                     return _.uniqueId();
                 },
 
-                getInheritanceButton: function (isInherited, path) {
+                getInheritanceButton: function (valueIsInherited, path) {
                     const button = document.createElement("button");
                     button.type = "button";
-                    button.className = "btn btn-inherit";
+                    button.className = "btn fr-btn-secondary am-btn-single-icon";
+                    button.setAttribute("data-inherit-value", valueIsInherited);
+                    button.setAttribute("data-schemapath", path);
                     button.dataToggle = "button";
-                    button.title = "Inherit value";
+                    button.title = $.t("common.form.inheritValue");
                     const icon = document.createElement("i");
                     icon.className = "fa fa-unlock";
-                    if (isInherited) {
-                        button.className = "btn btn-inherit active";
+                    if (valueIsInherited) {
+                        button.className = "btn fr-btn-secondary am-btn-single-icon active";
                         icon.className = "fa fa-lock";
                     }
                     button.appendChild(icon);
-                    button.setAttribute("data-schemapath", path);
-                    icon.setAttribute("data-schemapath", path);
-                    button.setAttribute("data-isinherited", isInherited);
-                    icon.setAttribute("data-isinherited", isInherited);
+                    // icon.setAttribute("data-schemapath", path);//TODO
+                    // button.setAttribute("data-isinherited", valueIsInherited);//TODO
+                    // icon.setAttribute("data-isinherited", valueIsInherited); //TODO
                     return button;
                 },
 

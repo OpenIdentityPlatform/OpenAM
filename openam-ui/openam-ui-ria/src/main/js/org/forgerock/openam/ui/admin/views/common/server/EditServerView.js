@@ -41,7 +41,8 @@ define([
     return AbstractView.extend({
         template: "templates/admin/views/common/HeaderFormTemplate.html",
         events: {
-            "click [data-save]": "onSave"
+            "click [data-save]": "onSave",
+            "click [data-inherit-value]": "toggleInheritance"
         },
         getJSONSchemaView () {
             return this.subview.getBody();
@@ -107,6 +108,9 @@ define([
                     type: Messages.TYPE_DANGER
                 });
             });
+        },
+        toggleInheritance (event) {
+            this.getJSONSchemaView().subview.toggleInheritance(event);
         }
     });
 });
