@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "properties": {
+    "directoryConfiguration": {
+      "type": "object",
+      "title": "amconfig.serverconfig.xml.server.header",
+      "minConnectionPool": {
+        "title": "amconfig.serverconfig.server.min.pool",
+        "propertyOrder": 0,
+        "type": "number"
+      },
+      "maxConnectionPool": {
+        "title": "amconfig.serverconfig.server.max.pool",
+        "propertyOrder": 1,
+        "type": "number"
+      },
+      "bindDn": {
+        "title": "amconfig.serverconfig.user.binddn",
+        "propertyOrder": 2,
+        "type": "string"
+      },
+      "bindPassword": {
+        "title": "amconfig.serverconfig.user.bindpwd",
+        "propertyOrder": 3,
+        "type": "string"
+      },
+      "servers": {
+        "title": "amconfig.serverconfig.xml.server.table.header",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "serverName": {
+              "title": "amconfig.serverconfig.xml.server.table.column.name",
+              "type": "string",
+              "propertyOrder": 0
+            },
+            "hostName": {
+              "title": "amconfig.serverconfig.xml.server.table.column.host",
+              "type": "string",
+              "propertyOrder": 1
+            },
+            "portNumber": {
+              "title": "amconfig.serverconfig.xml.server.table.column.port",
+              "type": "string",
+              "propertyOrder": 2
+            },
+            "connectionType": {
+              "title": "amconfig.serverconfig.xml.server.table.column.type",
+              "type": "string",
+              "propertyOrder": 3
+            }
+          }
+        }
+      }
+    }
+  }
+}

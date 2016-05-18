@@ -16,13 +16,16 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static com.sun.identity.common.configuration.ServerConfigXML.ServerObject;
 import static com.sun.identity.common.configuration.ServerConfiguration.*;
+import static com.sun.identity.setup.SetupConstants.CONFIG_VAR_DEFAULT_SHARED_KEY;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
 import static java.text.MessageFormat.format;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.utils.IOUtils.readStream;
 import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -32,7 +35,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -66,17 +68,19 @@ import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ConfigurationException;
+import com.sun.identity.common.configuration.ServerConfigXML;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
@@ -84,7 +88,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.xml.bind.StringInputStream;
 
 /**
  * A service to allow the modification of server properties
@@ -95,11 +98,10 @@ public class SmsServerPropertiesResource {
     private static final String SCHEMA_NAME = "com-sun-identity-servers";
     private static final String AM_CONSOLE_CONFIG_XML = "amConsoleConfig.xml";
     private static final String SERVER_CONFIG = "serverconfig";
-    private static final String DIRECTORY_CONFIG_XML = "/com/sun/identity/console/propertyServerConfigXML.xml";
+    private static final String DIRECTORY_CONFIG_SCHEMA = "/schema/json/server-directory-configuration.json";
     private static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryconfiguration";
     private static final String ADVANCED_TAB_NAME = "advanced";
     private static final String SERVER_DEFAULT_NAME = "server-default";
-    private static final String SERVER_TABLE_PROPERTY_PREFIX = "amconfig.serverconfig.xml.server.table.column.";
     private static final String SERVER_PARENT_SITE = "amconfig.header.site";
     private static final Map<String, String> syntaxRawToReal = new HashMap<>();
     //this list is to enable us to distinguish which attributes are in the "advanced" tab
@@ -113,9 +115,6 @@ public class SmsServerPropertiesResource {
     private final Debug logger;
     private final Properties syntaxProperties;
     private final Properties titleProperties;
-
-    private DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-    private DocumentBuilder dBuilder;
 
     static {
         syntaxRawToReal.put("true,false", "boolean");
@@ -139,55 +138,27 @@ public class SmsServerPropertiesResource {
 
     private JsonValue getDirectorySchema(Properties titleProperties, Debug logger) {
         try {
-            JsonValue directoryConfigSchema = json(object());
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            dBuilder = dbFactory.newDocumentBuilder();
-
-            Document document = dBuilder.parse(getClass().getResourceAsStream(DIRECTORY_CONFIG_XML));
-
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            final String sectionExpression = "//propertysheet/section/@defaultValue";
-            String sectionRawValue = (String) xPath.compile(sectionExpression).evaluate(document, XPathConstants.STRING);
-            String sectionTitle = titleProperties.getProperty(sectionRawValue);
-
-            final String baseExpression = "//propertysheet/section/property/label/@defaultValue";
-            NodeList attributes = (NodeList) xPath.compile(baseExpression).evaluate(document, XPathConstants.NODESET);
-
-            final String path = "/_schema/properties/directoryConfiguration/" + sectionRawValue;
-            directoryConfigSchema.putPermissive(new JsonPointer(path + "/title"), sectionTitle);
-            for (int i = 0; i < attributes.getLength(); i++) {
-                String attributeRawName = attributes.item(i).getNodeValue();
-                String attributePath = path + "/" + attributeRawName;
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/title"), titleProperties.getProperty(attributeRawName));
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/propertyOrder"), i);
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/type"), "string");
-            }
-
-            final String serverPath = path + "/servers";
-            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/title"), titleProperties.get("amconfig.serverconfig.xml.server.table.header"));
-            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/type"), "array");
-            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/items/type"), "object");
-
-            List<String> columnNames = new ArrayList<>();
-            columnNames.add("name");
-            columnNames.add("host");
-            columnNames.add("port");
-            columnNames.add("type");
-
-            for (String columnName : columnNames) {
-                final String attributePath = serverPath + "/items/properties/" + SERVER_TABLE_PROPERTY_PREFIX + columnName;
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/title"),
-                        titleProperties.getProperty(SERVER_TABLE_PROPERTY_PREFIX + columnName));
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/type"), "string");
-                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/propertyOrder"), columnNames.indexOf(columnName));
-            }
-
+            String schema = readStream(getClass().getResourceAsStream(DIRECTORY_CONFIG_SCHEMA));
+            JsonValue directoryConfigSchema = JsonValueBuilder.toJsonValue(schema);
+            replacePropertyRecursive(directoryConfigSchema, titleProperties, "title");
             return directoryConfigSchema;
-        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+        } catch (IOException e) {
             logger.error("Error creating document builder", e);
         }
         return null;
+    }
+
+    private void replacePropertyRecursive(JsonValue jsonValue, Properties properties, String property) {
+        if (jsonValue.isDefined(property) && jsonValue.get(property).isString()) {
+            String propValue = jsonValue.get(property).asString();
+            jsonValue.put(property, properties.getProperty(propValue, propValue));
+        }
+
+        for (JsonValue child : jsonValue) {
+            if (child.isMap()) {
+                replacePropertyRecursive(child, properties, property);
+            }
+        }
     }
 
     private JsonValue getSchema(Properties titleProperties, boolean isDefault) {
@@ -400,7 +371,7 @@ public class SmsServerPropertiesResource {
         if (ADVANCED_TAB_NAME.equals(tabName)) {
             schema = getAdvancedSchema(serverContext, serverUrl);
         } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
-            schema = directoryConfigSchema.get("_schema");
+            schema = directoryConfigSchema;
         } else if (isServerDefault) {
             schema = defaultSchema.get(tabPointer);
         } else {
@@ -642,7 +613,8 @@ public class SmsServerPropertiesResource {
         }
 
         try {
-            String serverUrl = getServerUrl(getSsoToken(serverContext), serverId);
+            SSOToken token = getSsoToken(serverContext);
+            String serverUrl = getServerUrl(token, serverId);
             ServiceConfig serverConfigs = getServerConfigs(serverContext);
             boolean isServerDefault = serverUrl.equalsIgnoreCase(SERVER_DEFAULT_NAME);
             ServiceConfig defaultConfig = serverConfigs.getSubConfig(SERVER_DEFAULT_NAME);
@@ -657,7 +629,7 @@ public class SmsServerPropertiesResource {
             if (isServerDefault) {
                 addDefaultAttributes(result, defaultConfig, tabName);
             } else if (tabName.equalsIgnoreCase(DIRECTORY_CONFIGURATION_TAB_NAME)) {
-                addDirectoryConfiguration(result, serverConfig);
+                addDirectoryConfiguration(result, token, serverUrl);
             } else {
                 addServerAttributes(result, defaultConfig, serverConfig, tabName);
             }
@@ -678,53 +650,30 @@ public class SmsServerPropertiesResource {
                 getAdvancedTabAttributeNames(serverConfig) : getAttributeNames(tabName);
     }
 
-    private void addDirectoryConfiguration(JsonValue result, ServiceConfig serverConfig) throws IOException,
-            SAXException, XPathExpressionException {
+    private void addDirectoryConfiguration(JsonValue result, SSOToken token, String serverUrl) throws SMSException {
+        ServerConfigXML serverConfig = getServerConfig(token, serverUrl);
+        result.put("minConnectionPool", serverConfig.getSMSServerGroup().minPool);
+        result.put("maxConnectionPool", serverConfig.getSMSServerGroup().maxPool);
 
-        final String serverConfigXml = getServerConfigXml(serverConfig);
+        List<ServerConfigXML.DirUserObject> bindInfo = serverConfig.getSMSServerGroup().dsUsers;
+        if (CollectionUtils.isNotEmpty(bindInfo)) {
+            result.put("bindDn", bindInfo.get(0).dn);
+            result.put("bindPassword", CONFIG_VAR_DEFAULT_SHARED_KEY);
+        }
 
-        if (serverConfigXml != null) {
-            InputStream resourceStream = new StringInputStream(serverConfigXml);
-
-            Document serverXml = dBuilder.parse(resourceStream);
-
-            XPath xPath = XPathFactory.newInstance().newXPath();
-
-            final String baseExpression = "//iPlanetDataAccessLayer/ServerGroup[@name='sms']/";
-            String minConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MIN_CONN_POOL).evaluate(
-                    serverXml, XPathConstants.STRING);
-            String maxConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MAX_CONN_POOL).evaluate(
-                    serverXml, XPathConstants.STRING);
-            String dirDN = (String) xPath.compile(baseExpression + "User/DirDN").evaluate(serverXml,
-                    XPathConstants.STRING);
-            String directoryPassword = (String) xPath.compile(baseExpression + "User/DirPassword").evaluate(
-                    serverXml, XPathConstants.STRING);
-
-            result.put("minConnections", minConnections);
-            result.put("maxConnections", maxConnections);
-            result.put("dirDN", dirDN);
-            result.put("directoryPassword", directoryPassword);
-
-            NodeList serverNames = (NodeList) xPath.compile(baseExpression + "Server/@name").evaluate(serverXml,
-                    XPathConstants.NODESET);
-
-            for (int i = 0; i < serverNames.getLength(); i++) {
-                final String directoryServerName = serverNames.item(i).getNodeValue();
-                final String serverExpression = baseExpression + "Server[@name='" + directoryServerName + "']";
-                String hostExpression = serverExpression + "/@host";
-                String portExpression = serverExpression + "/@port";
-                String typeExpression = serverExpression + "/@type";
-
-                NodeList serverAttributes = (NodeList) xPath.compile(hostExpression + "|" + portExpression + "|" +
-                        typeExpression).evaluate(serverXml, XPathConstants.NODESET);
-
-                for (int a = 0; a < serverAttributes.getLength(); a++) {
-                    final Node serverAttribute = serverAttributes.item(a);
-                    result.addPermissive(new JsonPointer("servers/" + directoryServerName + "/" +
-                            serverAttribute.getNodeName()), serverAttribute.getNodeValue());
-                }
+        List<Map<String, String>> servers = new ArrayList<>();
+        List<ServerConfigXML.ServerObject> serverHosts = serverConfig.getSMSServerGroup().hosts;
+        if (CollectionUtils.isNotEmpty(serverHosts)) {
+            for (ServerConfigXML.ServerObject hostInfo : serverHosts) {
+                Map<String, String> server = new HashMap<>();
+                server.put("serverName", hostInfo.name);
+                server.put("hostName", hostInfo.host);
+                server.put("portNumber", hostInfo.port);
+                server.put("connectionType", hostInfo.type);
+                servers.add(server);
             }
         }
+        result.addPermissive(new JsonPointer("servers"), servers);
     }
 
     private void addDefaultAttributes(JsonValue result, ServiceConfig defaultConfig, String tabName) throws SMSException,
@@ -813,15 +762,6 @@ public class SmsServerPropertiesResource {
         return attributeNameToSectionName;
     }
 
-    private String getServerConfigXml(ServiceConfig serverConfig) {
-        final Iterator serverconfigXml = ((Set) serverConfig.getAttributes().get("serverconfigxml")).iterator();
-        if (serverconfigXml.hasNext()) {
-            return (String) serverconfigXml.next();
-        } else {
-            return null;
-        }
-    }
-
     private List<String> getAdvancedTabAttributeNames(ServiceConfig serverConfig) {
         List<String> attributeNamesForTab;
         Set<String> allAttributeNames = (Set<String>) serverConfig.getAttributes().get(SERVER_CONFIG);
@@ -878,6 +818,8 @@ public class SmsServerPropertiesResource {
 
             if (isServerDefault) {
                 updateServerDefaults(updateRequest.toJsonValue().get("content"), token, isAdvancedTab);
+            } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equals(tabName)) {
+                updateDirectoryConfiguration(updateRequest.toJsonValue().get("content"), token, serverUrl);
             } else {
                 updateServerInstance(updateRequest.toJsonValue().get("content"), token, serverUrl, isAdvancedTab);
             }
@@ -917,6 +859,39 @@ public class SmsServerPropertiesResource {
         }
 
         setServerInstance(token, SERVER_DEFAULT_NAME, attributeValues);
+    }
+
+    private void updateDirectoryConfiguration(JsonValue content, SSOToken token, String serverUrl) throws SMSException,
+            ConfigurationException, SSOException {
+
+        ServerConfigXML serverConfig = getServerConfig(token, serverUrl);
+        ServerConfigXML.ServerGroup serverGroup = serverConfig.getSMSServerGroup();
+
+        serverGroup.minPool = content.get("minConnectionPool").asInteger();
+        serverGroup.maxPool = content.get("maxConnectionPool").asInteger();
+
+        List<ServerConfigXML.DirUserObject> bindInfo = serverGroup.dsUsers;
+        if (CollectionUtils.isNotEmpty(bindInfo)) {
+            bindInfo.get(0).dn = content.get("bindDn").asString();
+            String bindPassword = content.get("bindPassword").asString();
+            if (!CONFIG_VAR_DEFAULT_SHARED_KEY.equals(bindPassword)) {
+                bindInfo.get(0).password = Crypt.encode(bindPassword);
+            }
+        }
+
+        List<ServerObject> servers = new ArrayList<>();
+        if (content.isDefined("servers")) {
+            for (JsonValue server : content.get("servers")) {
+                ServerConfigXML.ServerObject serverObject = new ServerConfigXML.ServerObject();
+                serverObject.name = server.get("serverName").asString();
+                serverObject.host = server.get("hostName").asString();
+                serverObject.port = server.get("portNumber").asString();
+                serverObject.type = server.get("connectionType").asString();
+                servers.add(serverObject);
+            }
+        }
+        serverGroup.hosts = servers;
+        setServerConfigXML(token, serverUrl, serverConfig.toXML());
     }
 
     private void updateServerInstance(JsonValue content, SSOToken token, String serverUrl, boolean advancedConfig)
@@ -984,6 +959,14 @@ public class SmsServerPropertiesResource {
 
     private SSOToken getSsoToken(Context context) throws SSOException {
         return context.asContext(SSOTokenContext.class).getCallerSSOToken();
+    }
+
+    private ServerConfigXML getServerConfig(SSOToken token, String serverUrl) throws SMSException {
+        try {
+            return new ServerConfigXML(getServerConfigXML(token, serverUrl));
+        } catch (Exception e) {
+            throw new SMSException(e.getMessage());
+        }
     }
 
     private class SMSLabel {
