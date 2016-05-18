@@ -156,8 +156,10 @@ public class AuthorizationTokenIssuer {
             tokenMap.put(STATE, request.<String>getParameter(STATE));
         }
 
-        tokenMap.put(ISS, urisFactory.get(request).getIssuer());
-        tokenMap.put(CLIENT_ID, clientRegistration.getClientId());
+        if (!tokenMap.containsKey("id_token")) {
+            tokenMap.put(ISS, urisFactory.get(request).getIssuer());
+            tokenMap.put(CLIENT_ID, clientRegistration.getClientId());
+        }
         return new AuthorizationToken(tokenMap, returnAsFragment);
     }
 
