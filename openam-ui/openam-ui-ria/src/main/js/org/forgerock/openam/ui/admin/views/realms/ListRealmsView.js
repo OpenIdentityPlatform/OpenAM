@@ -33,7 +33,7 @@ define([
             this.template = "templates/admin/views/realms/ListRealmsTemplate.html";
             this.events = {
                 "click [data-delete-realm]" : "deleteRealm",
-                "click [data-toogle-realm]" : "toggleRealmActive"
+                "click [data-toggle-realm]" : "toggleRealmActive"
             };
             this.partials = [
                 "partials/util/_Status.html",
