@@ -52,6 +52,14 @@ public interface OAuth2ProviderSettings {
     boolean isStatelessTokensEnabled() throws ServerException;
 
     /**
+     * Determines whether idtokeninfo endpoint should require client authentication.
+     *
+     * @return {@code true} if idtokeninfo endpoint requires client authentication.
+     * @throws ServerException If any internal server error occurs.
+     */
+    boolean isIdTokenInfoClientAuthenticationEnabled() throws ServerException;
+
+    /**
      * Gets the signing algorithm used when issuing stateless access and refresh tokens.
      *
      * @return The signing algorithm.

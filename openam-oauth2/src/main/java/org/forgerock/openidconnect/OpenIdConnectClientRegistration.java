@@ -75,16 +75,6 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
     String getTokenEndpointAuthMethod();
 
     /**
-     * Gets the subject type of this client. PAIRWISE or PUBLIC.
-     */
-    String getSubjectType();
-
-    /**
-     * Verifies that the supplied jwt is signed by this client.
-     */
-    boolean verifyJwtIdentity(OAuth2Jwt jwt);
-
-    /**
      * Gets the subject identifier uri.
      */
     URI getSectorIdentifierUri();

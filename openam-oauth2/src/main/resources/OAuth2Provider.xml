@@ -351,6 +351,19 @@
                         <Value>HS256</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="idTokenInfoClientAuthenticationEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a133"
+                                 order="225">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="tokenSigningHmacSharedSecret"
                                  type="single"
                                  syntax="string"

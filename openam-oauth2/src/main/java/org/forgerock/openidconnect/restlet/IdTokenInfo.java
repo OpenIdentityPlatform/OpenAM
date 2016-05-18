@@ -16,6 +16,7 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 import javax.inject.Inject;
@@ -23,8 +24,14 @@ import javax.inject.Inject;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.ClientAuthenticator;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -44,6 +51,7 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 
 /**
  * OpenID Connect id_token validation and claim decoding endpoint. This is a non-standard endpoint that allows a
@@ -62,6 +70,10 @@ public class IdTokenInfo extends ServerResource {
     private final OAuth2RequestFactory<?, Request> requestFactory;
     private final ExceptionHandler exceptionHandler;
     private final SigningManager signingManager = new SigningManager();
+    private final OAuth2UrisFactory urisFactory;
+    private final ClientAuthenticator clientAuthenticator;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+
 
     /**
      * Constructs the idtokeninfo endpoint with the given client registration store
@@ -73,10 +85,14 @@ public class IdTokenInfo extends ServerResource {
     @Inject
     public IdTokenInfo(final OpenIdConnectClientRegistrationStore clientRegistrationStore,
             final OAuth2RequestFactory<?, Request> requestFactory,
-            final ExceptionHandler exceptionHandler) {
+            final ExceptionHandler exceptionHandler, final ClientAuthenticator clientAuthenticator,
+            final OAuth2UrisFactory urisFactory, OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.clientRegistrationStore = clientRegistrationStore;
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;
+        this.clientAuthenticator = clientAuthenticator;
+        this.urisFactory = urisFactory;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
@@ -128,6 +144,13 @@ public class IdTokenInfo extends ServerResource {
                                     .asString();
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId,
                 new ValidateIdTokenRequest(request, realm));
+
+        JwsAlgorithm algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm());
+        boolean requiresClientAuthentication =
+                providerSettingsFactory.get(request).isIdTokenInfoClientAuthenticationEnabled();
+        if (requiresClientAuthentication && algorithm.getAlgorithmType().equals(JwsAlgorithmType.HMAC)) {
+            clientAuthenticator.authenticate(request, urisFactory.get(request).getTokenEndpoint());
+        }
 
         if (idToken.isExpired()) {
             throw new BadRequestException("id_token has expired");

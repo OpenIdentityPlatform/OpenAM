@@ -20,7 +20,10 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
-import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.ID_TOKEN_INFO_CLIENT_AUTHENTICATION_ENABLED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_ECDSA_KEYSTORE_ALIAS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -170,6 +173,19 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     public boolean isStatelessTokensEnabled() throws ServerException {
         try {
             return getBooleanSetting(realm, STATELESS_TOKENS_ENABLED);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public boolean isIdTokenInfoClientAuthenticationEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, ID_TOKEN_INFO_CLIENT_AUTHENTICATION_ENABLED);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
