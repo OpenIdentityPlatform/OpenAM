@@ -136,10 +136,8 @@ define([
     };
 
     obj.filterUrlParams = function (params) {
-        var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
-            filteredParams = _.pick(params, paramsToSave);
-
-        return _.isEmpty(filteredParams) ? "" : `&${$.param(filteredParams)}`;
+        const filtered = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"];
+        return _.reduce(_.pick(params, filtered), (result, value, key) => result + `&${key}=${value}`, "");
     };
 
     obj.logout = function (successCallback, errorCallback) {
