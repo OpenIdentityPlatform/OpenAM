@@ -166,8 +166,8 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         // Expect InvalidGrantException
     }
 
-    @Test (expectedExceptions = InvalidCodeException.class)
-    public void handleShouldThrowInvalidCodeExceptionWhenAuthorizationCodeHasExpired() throws Exception {
+    @Test (expectedExceptions = InvalidGrantException.class)
+    public void handleShouldThrowInvalidGrantExceptionWhenAuthorizationCodeHasExpired() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
