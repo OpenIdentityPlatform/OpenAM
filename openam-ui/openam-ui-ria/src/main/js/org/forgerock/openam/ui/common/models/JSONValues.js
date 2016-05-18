@@ -54,7 +54,7 @@ define([
      * @param   {string} groupKey Key to use for wrapped top-level values group
      * @returns {JSONValues}      JSONValues object with transforms applied
      */
-    fromGlobalAndOrganisationProperties (groupKey) {
+    fromGlobalAndOrganisation (groupKey) {
         const values = _.transform(this.raw, (result, value, key) => {
             if (key === "defaults") {
                 _.merge(result, value);
@@ -83,7 +83,7 @@ define([
      * @param   {string} groupKey Key of the group to flatten onto the top-level
      * @returns {JSONValues}      JSONValues object with transforms applied
      */
-    toGlobalAndOrganisationProperties (groupKey) {
+    toGlobalAndOrganisation (groupKey) {
         const values = _.transform(this.raw, (result, value, key) => {
             if (key === groupKey) {
                 _.merge(result, value);

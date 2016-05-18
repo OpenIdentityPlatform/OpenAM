@@ -18,7 +18,7 @@ define([
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (JSONValues) => {
     describe("org/forgerock/openam/ui/common/models/JSONValues", () => {
-        describe("#fromGlobalAndOrganisationProperties", () => {
+        describe("#fromGlobalAndOrganisation", () => {
             const jsonValues = new JSONValues({
                 "topLevelProperty": "value",
                 "defaults": {
@@ -31,7 +31,7 @@ define([
             let values;
 
             beforeEach(() => {
-                values = jsonValues.fromGlobalAndOrganisationProperties(groupKey);
+                values = jsonValues.fromGlobalAndOrganisation(groupKey);
             });
 
             it("groups the top-level values under the specified group key", () => {
@@ -43,7 +43,7 @@ define([
                 expect(values.raw).to.contain.keys("defaultsProperty1", "defaultsProperty2");
             });
         });
-        describe("#toGlobalAndOrganisationProperties", () => {
+        describe("#toGlobalAndOrganisation", () => {
             const jsonValues = new JSONValues({
                 "topLevelProperty1": "value",
                 "topLevelProperty2": "value",
@@ -56,7 +56,7 @@ define([
             let values;
 
             beforeEach(() => {
-                values = jsonValues.toGlobalAndOrganisationProperties(groupKey);
+                values = jsonValues.toGlobalAndOrganisation(groupKey);
             });
 
             it("groups the top-level values under the \"defaults\" key", () => {

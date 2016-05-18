@@ -59,7 +59,7 @@ define([
          * @param   {number|string} propertyOrder Property order for wrapped top-level properties group
          * @returns {JSONSchema}                  JSONSchema object with transforms applied
          */
-        fromGlobalAndOrganisationProperties (title, key, propertyOrder) {
+        fromGlobalAndOrganisation (title, key, propertyOrder) {
             const schema = _.cloneDeep(this.raw);
             const group = {
                 properties: _.omit(schema.properties, "defaults"),

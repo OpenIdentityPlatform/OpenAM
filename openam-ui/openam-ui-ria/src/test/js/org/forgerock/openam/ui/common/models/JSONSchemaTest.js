@@ -18,7 +18,7 @@ define([
     "org/forgerock/openam/ui/common/models/JSONSchema"
 ], (JSONSchema) => {
     describe("org/forgerock/openam/ui/common/models/JSONSchema", () => {
-        describe("#fromGlobalAndOrganisationProperties", () => {
+        describe("#fromGlobalAndOrganisation", () => {
             const jsonSchema = new JSONSchema({
                 "type": "object",
                 "properties": {
@@ -36,7 +36,7 @@ define([
             let schema;
 
             beforeEach(() => {
-                schema = jsonSchema.fromGlobalAndOrganisationProperties(groupTitle, groupKey, groupPropertyOrder);
+                schema = jsonSchema.fromGlobalAndOrganisation(groupTitle, groupKey, groupPropertyOrder);
             });
 
             it("groups the top-level properties under the specified group key", () => {

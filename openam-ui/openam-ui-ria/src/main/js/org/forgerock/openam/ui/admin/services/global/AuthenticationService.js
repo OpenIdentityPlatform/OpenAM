@@ -59,14 +59,14 @@ define([
                 url: `${getModuleUrl(id)}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then((response) => new JSONSchema(response).fromGlobalAndOrganisationProperties(
+            }).then((response) => new JSONSchema(response).fromGlobalAndOrganisation(
                 $.t("console.common.globalAttributes"), globalAttributesKey, -10
             ));
 
             const getValues = () => obj.serviceCall({
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).then((response) => new JSONValues(response).fromGlobalAndOrganisationProperties(
+            }).then((response) => new JSONValues(response).fromGlobalAndOrganisation(
                 globalAttributesKey
             ));
 
@@ -81,7 +81,7 @@ define([
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
-                data: JSON.stringify(new JSONValues(data).toGlobalAndOrganisationProperties(globalAttributesKey).raw)
+                data: JSON.stringify(new JSONValues(data).toGlobalAndOrganisation(globalAttributesKey).raw)
             });
         }
     };
