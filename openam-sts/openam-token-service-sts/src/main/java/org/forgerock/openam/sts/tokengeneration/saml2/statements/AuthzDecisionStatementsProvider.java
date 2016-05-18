@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -35,6 +35,7 @@ import java.util.List;
  * consulted to determine the proper formatting and character escaping in the String returned from toXMLString in the
  * AuthzDecisionStatement implementations.
  * @see com.sun.identity.saml2.assertion.AuthzDecisionStatement
+ * @supported.all.api
  */
 public interface AuthzDecisionStatementsProvider {
     /**

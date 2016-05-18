@@ -11,22 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.provider;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenTypeId;
 
 /**
  * Interface defining token creators in the rest-sts. The generic type T corresponds to a class
  * which provides the state necessary to produce a token of the specified type. The creation of any
  * specific token (SAML2, OIDC) requires specific state which cannot be subsumed in a specific type.
+ *
+ * @supported.all.api
  */
 public interface RestTokenProvider<T> {
+
     /**
+     * Creates a token using the specified {@code RestTokenProviderParameters}
      *
      * @param restTokenProviderParameters the parameters necessary to create a token of a specific type
      * @return the JsonValue corresponding to the created token

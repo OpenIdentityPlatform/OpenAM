@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -27,6 +27,8 @@ import java.util.Date;
  *  Implementations of this interface will be consulted to obtain the Conditions object included in generated SAML2 assertions.
  *  If the published STS instance does not encapsulate a custom ConditionsProvider, then the DefaultConditionsProvider class
  *  will be referenced to obtain the Conditions statement.
+ *
+ * @supported.all.api
  */
 public interface ConditionsProvider {
     /**

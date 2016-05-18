@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.config.user;
@@ -45,15 +45,26 @@ import static org.forgerock.json.JsonValue.object;
  * The signatureAlias corresponds to the IDP's signing key, and the encryptionKeyAlias could correspond to the SP's
  * public key corresponding to the key used to encrypt the symmetric key used to encrypt assertion elements.
  *
- * TODO: Ambiguity in the context of setting the customAttributeStatementsProviderClassName
- * and the customAttributeMapperClassName. As it currently stands, the customAttributeStatementsProvider will be passed
- * an instance of the customAttributeMapper if both are specified. The usual case will simply to set the customAttributeMapper,
- * as this allows custom attributes to be set in the AttributeStatement.
- *
- * TODO: do I want a name-qualifier in addition to a nameIdFormat?
+ * @supported.all.api
  */
 public class SAML2Config {
+
+    /*
+    * TODO: Ambiguity in the context of setting the customAttributeStatementsProviderClassName
+    * and the customAttributeMapperClassName. As it currently stands, the customAttributeStatementsProvider will be passed
+    * an instance of the customAttributeMapper if both are specified. The usual case will simply to set the customAttributeMapper,
+    * as this allows custom attributes to be set in the AttributeStatement.
+    *
+    * TODO: do I want a name-qualifier in addition to a nameIdFormat?
+    */
+
     private static final String EQUALS = "=";
+
+    /**
+     * Builder used to programmatically create {@linkplain SAML2Config} objects
+     *
+     * @supported.all.api
+     */
     public static class SAML2ConfigBuilder {
         private String idpId;
         /*
@@ -95,102 +106,222 @@ public class SAML2Config {
 
         private SAML2ConfigBuilder() {}
 
+        /**
+         * Sets the name-id format on the SAML2ConfigBuilder.
+         *
+         * @param nameIdFormat the name-id format.
+         * @return the SAML2ConfigBuilder with the specified name-id format.
+         */
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?
             this.nameIdFormat = nameIdFormat;
             return this;
         }
 
+        /**
+         * Sets the Idenity Provider id on the SAML2ConfigBuilder.
+         *
+         * @param idpId the Identity Provider id.
+         * @return the SAML2ConfigBuilder with the specified Identity Provider id.
+         */
         public SAML2ConfigBuilder idpId(String idpId) {
             this.idpId = idpId;
             return this;
         }
 
+        /**
+         * Sets the attribute map on the SAML2ConfigBuilder.
+         *
+         * @param attributeMap the attribute map.
+         * @return the SAML2ConfigBuilder with the specified attribute map.
+         */
         public SAML2ConfigBuilder attributeMap(Map<String, String> attributeMap) {
             this.attributeMap = Collections.unmodifiableMap(attributeMap);
             return this;
         }
 
+        /**
+         * Sets the token lifetime (in seconds) on the SAML2ConfigBuilder.
+         *
+         * @param lifetimeInSeconds the token lifetime.
+         * @return the SAML2ConfigBuilder with the specified token lifetime.
+         */
         public SAML2ConfigBuilder tokenLifetimeInSeconds(long lifetimeInSeconds) {
             this.tokenLifetimeInSeconds = lifetimeInSeconds;
             return this;
         }
 
+        /**
+         * Sets the CustomConditionsProvider classname on the SAML2ConfigBuilder.
+         *
+         * @param customConditionsProviderClassName the CustomConditionsProvider classname.
+         * @return the SAML2ConfigBuilder with the specified CustomConditionsProvider classname.
+         */
         public SAML2ConfigBuilder customConditionsProviderClassName(String customConditionsProviderClassName) {
             this.customConditionsProviderClassName = customConditionsProviderClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomSubjectProvider classname on the SAML2ConfigBuilder.
+         *
+         * @param customSubjectProviderClassName the CustomSubjectProvider classname.
+         * @return the SAML2ConfigBuilder with the specified CustomSubjectProvider classname.
+         */
         public SAML2ConfigBuilder customSubjectProviderClassName(String customSubjectProviderClassName) {
             this.customSubjectProviderClassName = customSubjectProviderClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomAuthenticationStatementsProvider classname on the SAML2ConfigBuilder.
+         *
+         * @param customAuthenticationStatementsProviderClassName the CustomAuthenticationStatementsProvider classname.
+         * @return the SAML2ConfigBuilder with the specified CustomAuthenticationStatementsProvider classname.
+         */
         public SAML2ConfigBuilder customAuthenticationStatementsProviderClassName(String customAuthenticationStatementsProviderClassName) {
             this.customAuthenticationStatementsProviderClassName = customAuthenticationStatementsProviderClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomAttributeStatementsProvider classname on the SAML2ConfigBuilder.
+         *
+         * @param customAttributeStatementsProviderClassName the CustomAuthenticationStatementsProvider classname.
+         * @return the SAML2ConfigBuilder with the specified CustomAuthenticationStatementsProvider classname.
+         */
         public SAML2ConfigBuilder customAttributeStatementsProviderClassName(String customAttributeStatementsProviderClassName) {
             this.customAttributeStatementsProviderClassName = customAttributeStatementsProviderClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomAuthzDecisionStatementsProvider classname on the SAML2ConfigBuilder.
+         *
+         * @param customAuthzDecisionStatementsProviderClassName the CustomAuthzDecisionStatementsProvider classname.
+         * @return the SAML2ConfigBuilder with the specified CustomAuthzDecisionStatementsProvider classname.
+         */
         public SAML2ConfigBuilder customAuthzDecisionStatementsProviderClassName(String customAuthzDecisionStatementsProviderClassName) {
             this.customAuthzDecisionStatementsProviderClassName = customAuthzDecisionStatementsProviderClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomAttributeMapper classname on the SAML2ConfigBuilder.
+         *
+         * @param customAttributeMapperClassName the CustomAttributeMapper classname.
+         * @return the SAML2ConfigBuilder with the specified CustomAttributeMapper classname.
+         */
         public SAML2ConfigBuilder customAttributeMapperClassName(String customAttributeMapperClassName) {
             this.customAttributeMapperClassName = customAttributeMapperClassName;
             return this;
         }
 
+        /**
+         * Sets the CustomAuthNContextMapper classname on the SAML2ConfigBuilder.
+         *
+         * @param customAuthNContextMapperClassName the CustomAuthNContextMapper classname.
+         * @return the SAML2ConfigBuilder with the specified CustomAuthNContextMapper classname.
+         */
         public SAML2ConfigBuilder customAuthNContextMapperClassName(String customAuthNContextMapperClassName) {
             this.customAuthNContextMapperClassName = customAuthNContextMapperClassName;
             return this;
         }
 
+        /**
+         * Sets the SP entity id on the SAML2ConfigBuilder.
+         *
+         * @param spEntityId the SP entity id.
+         * @return the SAML2Config builder with the specified SP entity id.
+         */
         public SAML2ConfigBuilder spEntityId(String spEntityId) {
             this.spEntityId = spEntityId;
             return this;
         }
 
+        /**
+         * Sets the SP ACS url on the SAML2ConfigBuilder.
+         *
+         * @param spAcsUrl the SP ACS url.
+         * @return the SAML2Config builder with the specified SP ACS url.
+         */
         public SAML2ConfigBuilder spAcsUrl(String spAcsUrl) {
             this.spAcsUrl = spAcsUrl;
             return this;
         }
 
+        /**
+         * Sets the signature key alias on the SAML2ConfigBuilder.
+         *
+         * @param signatureKeyAlias the signature key alias.
+         * @return the SAML2Config builder with the specified signature key alias.
+         */
         public SAML2ConfigBuilder signatureKeyAlias(String signatureKeyAlias) {
             this.signatureKeyAlias = signatureKeyAlias;
             return this;
         }
 
+        /**
+         * Sets the signature key password on the SAML2ConfigBuilder.
+         *
+         * @param signatureKeyPassword the signature key password.
+         * @return the SAML2Config builder with the specified signature key password.
+         */
         public SAML2ConfigBuilder signatureKeyPassword(byte[] signatureKeyPassword) {
             this.signatureKeyPassword = signatureKeyPassword;
             return this;
         }
 
+        /**
+         * Sets the encryption key alias on the SAML2ConfigBuilder.
+         *
+         * @param encryptionKeyAlias the encryption key alias.
+         * @return the SAML2Config builder with the specified encryption key alias.
+         */
         public SAML2ConfigBuilder encryptionKeyAlias(String encryptionKeyAlias) {
             this.encryptionKeyAlias = encryptionKeyAlias;
             return this;
         }
 
+        /**
+         * Sets whether the SAML2Config assertion should be signed.
+         *
+         * @param signAssertion whether the assertion should be signed.
+         * @return the SAML2ConfigBuilder with the assertion signed flag set.
+         */
         public SAML2ConfigBuilder signAssertion(boolean signAssertion) {
             this.signAssertion = signAssertion;
             return this;
         }
 
+        /**
+         * Sets whether the SAML2Config name-id should be encrypted.
+         *
+         * @param encryptNameID whether the name-id should be encrypted.
+         * @return the SAML2ConfigBuilder with the name-id encryption flag set.
+         */
         public SAML2ConfigBuilder encryptNameID(boolean encryptNameID) {
             this.encryptNameID = encryptNameID;
             return this;
         }
 
+        /**
+         * Sets whether SAML2Config attributes should be encrypted.
+         *
+         * @param encryptAttributes whether the attributes should be encrypted.
+         * @return the SAML2ConfigBuilder with the attribute encryption flag set.
+         */
         public SAML2ConfigBuilder encryptAttributes(boolean encryptAttributes) {
             this.encryptAttributes = encryptAttributes;
             return this;
         }
 
+        /**
+         * Sets whether SAML2Config assertion should be encrypted.
+         *
+         * @param encryptAssertion whether the assertion should be encrypted.
+         * @return the SAML2ConfigBuilder with the assertion encryption flag set.
+         */
         public SAML2ConfigBuilder encryptAssertion(boolean encryptAssertion) {
             this.encryptAssertion = encryptAssertion;
             return this;
@@ -212,6 +343,12 @@ public class SAML2Config {
         The correct thing is done in FMEncProvider#generateSecretKey, where the http://www.w3.org/2001/04/xmlenc#tripledes-cbc
         is translated to 'TripleDES' before being passed to the XMLCipher - and this actually works.
          */
+        /**
+         * Sets the SAML2Config encryption algorithm.
+         *
+         * @param encryptionAlgorithm the encryption algorithm.
+         * @return the SAML2ConfigBuilder with the specified encryption algorithm.
+         */
         public SAML2ConfigBuilder encryptionAlgorithm(String encryptionAlgorithm) {
             this.encryptionAlgorithm = encryptionAlgorithm;
             return this;
@@ -231,21 +368,44 @@ public class SAML2Config {
         a customer wants to specify a custom value because they have implemented their own EncryptionProvider, then they
         can publish a rest-sts instance programmatically.
          */
+        /**
+         * Sets the SAML2Config encryption strength.
+         *
+         * @param encryptionAlgorithmStrength the encryption strength.
+         * @return the SAML2ConfigBuilder with the specified encryption strength.
+         */
         public SAML2ConfigBuilder encryptionAlgorithmStrength(int encryptionAlgorithmStrength) {
             this.encryptionAlgorithmStrength = encryptionAlgorithmStrength;
             return this;
         }
 
+        /**
+         * Sets the keystore filename on the SAML2ConfigBuilder.
+         *
+         * @param keystoreFileName the keystore filename.
+         * @return the SAML2Config builder with the specified keystore filename.
+         */
         public SAML2ConfigBuilder keystoreFile(String keystoreFileName) {
             this.keystoreFileName = keystoreFileName;
             return this;
         }
 
+        /**
+         * Sets the keystore password on the SAML2ConfigBuilder.
+         *
+         * @param keystorePassword the keystore password.
+         * @return the SAML2Config builder with the specified keystore password.
+         */
         public SAML2ConfigBuilder keystorePassword(byte[] keystorePassword) {
             this.keystorePassword = keystorePassword;
             return this;
         }
 
+        /**
+         * Builds a SAML2Config object.
+         * 
+         * @return a SAML2Config object.
+         */
         public SAML2Config build() {
             return new SAML2Config(this);
         }
@@ -383,106 +543,234 @@ public class SAML2Config {
         }
     }
 
+    /**
+     * Creates a new {@code SAML2ConfigBuilder}.
+     *
+     * @return a new {@code SAML2ConfigBuilder}.
+     */
     public static SAML2ConfigBuilder builder() {
         return new SAML2ConfigBuilder();
     }
 
+    /**
+     * Gets the name-id format.
+     *
+     * @return the name-id format.
+     */
     public String getNameIdFormat() {
         return nameIdFormat;
     }
 
+    /**
+     * Gets the token lifetime (in seconds).
+     *
+     * @return the token lifetime.
+     */
     public long getTokenLifetimeInSeconds() {
         return tokenLifetimeInSeconds;
     }
 
+    /**
+     * Gets the attribute map.
+     *
+     * @return the attribute map.
+     */
     public Map<String, String> getAttributeMap() {
         return attributeMap;
     }
 
+    /**
+     * Gets the classname of the CustomConditionsProvider.
+     *
+     * @return the classname of the CustomConditionsProvider.
+     */
     public String getCustomConditionsProviderClassName() {
         return customConditionsProviderClassName;
     }
 
+    /**
+     * Gets the classname of the CustomSubjectProvider.
+     *
+     * @return the classname of the CustomSubjectProvider.
+     */
     public String getCustomSubjectProviderClassName() {
         return customSubjectProviderClassName;
     }
 
+    /**
+     * Gets the classname of the CustomAuthenticationStatementsProvider.
+     *
+     * @return the classname of the CustomAuthenticationStatementsProvider.
+     */
     public String getCustomAuthenticationStatementsProviderClassName() {
         return customAuthenticationStatementsProviderClassName;
     }
 
+    /**
+     * Gets the classname of the CustomAttributeMapper.
+     *
+     * @return the classname of the CustomAttributeMapper.
+     */
     public String getCustomAttributeMapperClassName() {
         return customAttributeMapperClassName;
     }
 
+    /**
+     * Gets the classname of the CustomAuthNContextMapper.
+     *
+     * @return the classname of the CustomAuthNContextMapper.
+     */
     public String getCustomAuthNContextMapperClassName() {
         return customAuthNContextMapperClassName;
     }
 
+    /**
+     * Gets the classname of the CustomAttributeStatementsProvider.
+     *
+     * @return the classname of the CustomAttributeStatementsProvider.
+     */
     public String getCustomAttributeStatementsProviderClassName() {
         return customAttributeStatementsProviderClassName;
     }
 
+    /**
+     * Gets the classname of the CustomAuthzDecisionStatementsProvider.
+     *
+     * @return the classname of the CustomAuthzDecisionStatementsProvider.
+     */
     public String getCustomAuthzDecisionStatementsProviderClassName() {
         return customAuthzDecisionStatementsProviderClassName;
     }
 
+    /**
+     * Gets whether the assertion should be signed.
+     *
+     * @return whether the assertion should be signed.
+     */
     public boolean signAssertion() {
         return signAssertion;
     }
 
+    /**
+     * Gets whether the name-id should be encrypted.
+     *
+     * @return whether the name-id should be encrypted.
+     */
     public boolean encryptNameID() {
         return encryptNameID;
     }
 
+    /**
+     * Gets whether the attributes should be encrypted.
+     *
+     * @return whether the attributes should be encrypted.
+     */
     public boolean encryptAttributes() {
         return encryptAttributes;
     }
 
+    /**
+     * Gets whether the assertion should be encrypted.
+     *
+     * @return whether the assertion should be encrypted.
+     */
     public boolean encryptAssertion() {
         return encryptAssertion;
     }
 
+    /**
+     * Gets the encryption algorithm.
+     *
+     * @return the encryption algorithm.
+     */
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
 
+    /**
+     * Gets the encryption algorithm strength.
+     *
+     * @return the encryption algorithm strength.
+     */
     public int getEncryptionAlgorithmStrength() {
         return encryptionAlgorithmStrength;
     }
 
+    /**
+     * Gets the keystore filename.
+     *
+     * @return the keystore filename.
+     */
     public String getKeystoreFileName() {
         return keystoreFileName;
     }
 
+    /**
+     * Gets the keystore password.
+     *
+     * @return they keystore password.
+     */
     public byte[] getKeystorePassword() {
         return keystorePassword;
     }
 
+    /**
+     * Gets the SP entity id.
+     *
+     * @return the SP entity id.
+     */
     public String getSpEntityId() {
         return spEntityId;
     }
 
+    /**
+     * Gets the SP ACS url.
+     *
+     * @return the SP ACS url.
+     */
     public String getSpAcsUrl() {
         return spAcsUrl;
     }
 
+    /**
+     * Gets the encryption key alias.
+     *
+     * @return the encryption key alias.
+     */
     public String getEncryptionKeyAlias() {
         return encryptionKeyAlias;
     }
 
+    /**
+     * Gets the signature key alias.
+     *
+     * @return the signature key alias.
+     */
     public String getSignatureKeyAlias() {
         return signatureKeyAlias;
     }
 
+    /**
+     * Gets the signature key password.
+     *
+     * @return the signature key password.
+     */
     public byte[] getSignatureKeyPassword() {
         return signatureKeyPassword;
     }
 
+    /**
+     * Gets the Identity Provider id.
+     *
+     * @return the Identity Provider id.
+     */
     public String getIdpId() {
         return idpId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -513,6 +801,9 @@ public class SAML2Config {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof SAML2Config) {
@@ -545,17 +836,25 @@ public class SAML2Config {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return (nameIdFormat + attributeMap + spEntityId + Long.toString(tokenLifetimeInSeconds)).hashCode();
     }
 
-    /*
-    Because toJson will be used to produce the map that will also be used to marshal to the SMS attribute map format, and
-    because the SMS attribute map format represents all values as Set<String>, I need to represent all of the json values
-    as strings as well.
+    /**
+     * Gets the {@link JsonValue} representation of the SAML2Config.
+     *
+     * @return The {@link JsonValue} representation of the SAML2Config.
      */
     public JsonValue toJson() {
+        /*
+        Because toJson will be used to produce the map that will also be used to marshal to the SMS attribute map
+        format, and because the SMS attribute map format represents all values as Set<String>, I need to represent all
+        of the json values as strings as well.
+        */
         try {
             return json(object(
                     field(ISSUER_NAME, idpId),
@@ -589,6 +888,13 @@ public class SAML2Config {
         }
     }
 
+    /**
+     * Creates a SAML2Config object from a {@link JsonValue} representation
+     *
+     * @param json the {@link JsonValue} representation.
+     * @return a SAML2Config object
+     * @throws IllegalStateException
+     */
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
         try {
             return SAML2Config.builder()
@@ -626,12 +932,17 @@ public class SAML2Config {
         }
     }
 
-    /*
-    We need to marshal the SAML2Config instance to a Map<String, Object>. The JsonValue of toJson gets us there,
-    except for the complex types for the audiences and attribute map. These need to be marshaled into a Set<String>, and
-    these entries included in the top-level map, replacing the existing complex entries.
+    /**
+     * Marshals the SAML2Config into an attribute map
+     *
+     * @return a map containing the SAML2Config attributes.
      */
     public Map<String, Set<String>> marshalToAttributeMap() {
+        /*
+        We need to marshal the SAML2Config instance to a Map<String, Object>. The JsonValue of toJson gets us there,
+        except for the complex types for the audiences and attribute map. These need to be marshaled into aSet<String>,
+        and these entries included in the top-level map, replacing the existing complex entries.
+        */
         Map<String, Object> preMap = toJson().asMap();
         Map<String, Set<String>> finalMap = MapMarshallUtils.toSmsMap(preMap);
         Object attributesObject = preMap.get(ATTRIBUTE_MAP);
@@ -649,12 +960,18 @@ public class SAML2Config {
         return finalMap;
     }
 
-    /*
-    Here we have to modify the ATTRIBUTE_MAP and AUDIENCES entries to match the JsonValue format expected by
-    fromJson, and then call the static fromJson. This method must marshal between the Json representation of a complex
-    object, and the representation expected by the SMS
+    /**
+     * Marshals an attribute map into a SAML2Config
+     *
+     * @param smsAttributeMap the attribute map.
+     * @return a SAML2Config object.
      */
     public static SAML2Config marshalFromAttributeMap(Map<String, Set<String>> smsAttributeMap) {
+        /*
+        Here we have to modify the ATTRIBUTE_MAP and AUDIENCES entries to match the JsonValue format expected by
+        fromJson, and then call the static fromJson. This method must marshal between the Json representation of a
+        complex object, and the representation expected by the SMS
+        */
         Set<String> issuerName = smsAttributeMap.get(ISSUER_NAME);
         /*
         The STSInstanceConfig may not have SAML2Config, if there are no defined token transformations that result
@@ -677,13 +994,18 @@ public class SAML2Config {
         return fromJson(new JsonValue(jsonAttributes));
     }
 
-    /*
-    This method is called from Rest/SoapSTSInstanceConfig if the encapsulated SAML2Config reference is null. It should
-    return a Map<String,Set<String>> for each of the sms attributes defined for the SAML2Config object, with an empty
-    Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur in the AdminUI
-    when a sts instance goes from issuing SAML2 tokens, to not issuing these token types.
+    /**
+     * Returns an empty attribute map.
+     *
+     * @return an empty attribute map.
      */
     public static Map<String, Set<String>> getEmptySMSAttributeState() {
+        /*
+        This method is called from Rest/SoapSTSInstanceConfig if the encapsulated SAML2Config reference is null. It
+        should return a Map<String,Set<String>> for each of the sms attributes defined for the SAML2Config object, with
+        an empty Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur
+        in the AdminUI when a sts instance goes from issuing SAML2 tokens, to not issuing these token types.
+        */
         HashMap<String, Set<String>> emptyAttributeMap = new HashMap<>();
         emptyAttributeMap.put(NAME_ID_FORMAT, Collections.<String>emptySet());
         emptyAttributeMap.put(ATTRIBUTE_MAP, Collections.<String>emptySet());

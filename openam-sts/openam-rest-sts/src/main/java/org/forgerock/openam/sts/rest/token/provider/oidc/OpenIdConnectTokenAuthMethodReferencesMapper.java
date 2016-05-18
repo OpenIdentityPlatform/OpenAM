@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.provider.oidc;
@@ -24,6 +24,8 @@ import java.util.Set;
 /**
  * An interface which allows soap-sts publishers to generate the amr claim for issued OpenIdConnect tokens on the basis
  * of the validated input token. See the amr claim here: http://openid.net/specs/openid-connect-core-1_0.html#IDToken.
+ *
+ * @supported.all.api
  */
 public interface OpenIdConnectTokenAuthMethodReferencesMapper {
     /**

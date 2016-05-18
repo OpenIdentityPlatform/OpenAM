@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.oidc;
@@ -25,6 +25,8 @@ import java.util.Map;
  * An instance of this interface will be used to insert any custom claims into issued OpenIdConnect tokens.
  * STS instances will be published with state which will allow users to specify their own implementation of this
  * interface, and if so, an instance of the user-specified class will be consulted to perform the attribute mapping.
+ *
+ * @supported.all.api
  */
 public interface OpenIdConnectTokenClaimMapper {
     /**

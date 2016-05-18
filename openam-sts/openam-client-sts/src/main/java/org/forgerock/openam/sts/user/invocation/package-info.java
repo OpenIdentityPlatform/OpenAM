@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 /**
@@ -26,5 +26,6 @@
  * I want to limit the dependencies between the sts constituent components, so the classes used to invoke the various services,
  * if shared between services, should be located in this package.
  *
+ *  @supported.api
  */
 package org.forgerock.openam.sts.user.invocation;

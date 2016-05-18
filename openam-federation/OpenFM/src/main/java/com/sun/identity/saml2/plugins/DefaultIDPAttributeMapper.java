@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DefaultIDPAttributeMapper.java,v 1.1 2008/07/08 23:03:34 hengming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS
  */
 
 package com.sun.identity.saml2.plugins;

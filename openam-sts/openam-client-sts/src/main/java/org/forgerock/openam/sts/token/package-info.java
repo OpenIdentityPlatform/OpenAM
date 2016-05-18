@@ -11,16 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
-
-package org.forgerock.openam.sts.token;
 
 /**
- * Enum defining the SAML2 SubjectConfirmation values used in the REST-STS and the TokenGenerationService.
+ * This package contains classes pertaining to STS tokens.
  *
- * @supported.all.api
+ * @supported.api
  */
-public enum SAML2SubjectConfirmation {
-    BEARER, SENDER_VOUCHES, HOLDER_OF_KEY
-}
+package org.forgerock.openam.sts.token;

@@ -11,11 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 /**
  * Contains the classes which encapsulate the user-provided configuration state necessary to publish a STS instance.
  * This state includes the supported token operations, crypto context, and deployment information.
+ *
+ * @supported.api
  */
 package org.forgerock.openam.sts.config.user;

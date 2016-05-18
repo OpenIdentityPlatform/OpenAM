@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 /**
  * Base package for classes shared between the SOAP and REST STS.
+ *
+ * @supported.api
  */
 package org.forgerock.openam.sts;

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.user.invocation;
@@ -51,22 +51,39 @@ import static org.forgerock.json.JsonValue.object;
  * It may be that PublicKey based proof tokens need to be supported in the future. If so, this class will add a ctor
  * which takes a PublicKey, and encode which sort of proof-token-state has been provided (e.g. X509Certificate or PublicKey).
  *
+ * @supported.all.api
  */
 public class ProofTokenState {
+
+    /**
+     * Builder class for {@code ProofTokenState}
+     */
     public static class ProofTokenStateBuilder {
         private X509Certificate certificate;
 
         private ProofTokenStateBuilder() {}
 
+        /**
+         * Adds an {@code X509Certificate} to the builder.
+         *
+         * @param certificate the certificate to add.
+         * @return the builder encapsulating the specified {@code X509Certificate}
+         */
         public ProofTokenStateBuilder x509Certificate(X509Certificate certificate) {
             this.certificate = certificate;
             return this;
         }
 
+        /**
+         * Builds the {@code ProofTokenState}
+         * @return the {@code ProofTokenState}
+         * @throws TokenMarshalException
+         */
         public ProofTokenState build() throws TokenMarshalException {
             return new ProofTokenState(this);
         }
     }
+
     private static final String BASE_64_ENCODED_CERTIFICATE = "base64EncodedCertificate";
     private static final String X_509 = "X.509";
 
@@ -79,6 +96,10 @@ public class ProofTokenState {
         }
     }
 
+    /**
+     * Gets the {@code X509Certificate}
+     * @return the {@code X509Certificate}
+     */
     public X509Certificate getX509Certificate() {
         return certificate;
     }
@@ -102,10 +123,21 @@ public class ProofTokenState {
         return toJson().toString();
     }
 
+    /**
+     * Creates a {@code ProofTokenStateBuilder}
+     * @return a {@code ProofTokenStateBuilder}
+     */
     public static ProofTokenStateBuilder builder() {
         return new ProofTokenStateBuilder();
     }
 
+    /**
+     * Constructs a {@code ProofTokenState} from the specified {@code JsonValue} representation.
+     *
+     * @param jsonValue the {@code JsonValue} representation to construct the {@code ProofTokenState} from.
+     * @return a {@code ProofTokenState}
+     * @throws TokenMarshalException
+     */
     public static ProofTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
         final String certString = jsonValue.get(BASE_64_ENCODED_CERTIFICATE).asString();
         try {
@@ -121,6 +153,11 @@ public class ProofTokenState {
         }
     }
 
+    /**
+     * Gets the {@code JsonValue} representation of the {@code ProofTokenState}
+     * @return the {@code JsonValue} of the {@code ProofTokenState}
+     * @throws IllegalStateException
+     */
     public JsonValue toJson() throws IllegalStateException {
         try {
             String base64EncodedCertificate = Base64.encode(certificate.getEncoded());
