@@ -113,7 +113,7 @@ public class EmbeddedSearchResultIterator implements Iterator<SMSDataEntry> {
                     if (answer == null) {
                         answer = new CaseInsensitiveHashMap<>(10);
                     }
-                    answer.put(attr.getName(), strValues);
+                    answer.put(attr.getAttributeDescription().toString(), strValues);
                 }
             }
         }

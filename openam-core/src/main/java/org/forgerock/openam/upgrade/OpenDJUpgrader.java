@@ -263,7 +263,6 @@ public class OpenDJUpgrader {
     private int callDJUpgradeMechanism() {
 
         final String[] args = {
-                "--configClass", "org.opends.server.extensions.ConfigFileHandler",
                 "--configFile", installRoot + "/config/config.ldif",
                 "--acceptLicense",
                 "--force",
@@ -485,7 +484,6 @@ public class OpenDJUpgrader {
     private void rebuildAllIndexes(final DN baseDN) throws Exception {
         // @formatter:off
         final String[] args = {
-                "--configClass", "org.opends.server.extensions.ConfigFileHandler",
                 "--configFile", installRoot + "/config/config.ldif",
                 "--rebuildAll",
                 "--baseDN", baseDN.toString(),
