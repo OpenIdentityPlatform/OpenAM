@@ -1363,7 +1363,9 @@ public class LoginState {
         session.putProperty(ISAuthConstants.USER_PROFILE, userProfile);
 
         String defaultLoginURL = null;
-        if (loginURL != null) {
+        HttpServletRequest request = getHttpServletRequest();
+        if (request != null) {
+            loginURL = AuthUtils.constructLoginURL(request);
             int questionMark = loginURL.indexOf("?");
             defaultLoginURL = loginURL;
             if (questionMark != -1) {
