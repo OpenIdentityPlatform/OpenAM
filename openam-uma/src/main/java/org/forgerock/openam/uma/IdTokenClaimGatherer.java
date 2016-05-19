@@ -84,7 +84,7 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
             OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
             byte[] clientSecret = clientRegistrationStore.get(authorizationApiToken.getClientId(), oAuth2Request)
                     .getClientSecret().getBytes(Utils.CHARSET);
-            KeyPair keyPair = oAuth2ProviderSettings.getSigningKeyPair(idToken.getHeader().getAlgorithm());
+            KeyPair keyPair = oAuth2ProviderSettings.getServerKeyPair();
 
             if (!idToken.getClaimsSet().getIssuer().equals(oAuth2Uris.getIssuer())) {
                 logger.warn("Issuer of id token, {0}, does not match issuer of authorization server, {1}.",

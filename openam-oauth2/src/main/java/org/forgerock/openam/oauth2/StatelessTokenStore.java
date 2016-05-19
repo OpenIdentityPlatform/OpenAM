@@ -183,12 +183,11 @@ public class StatelessTokenStore implements TokenStore {
                             Base64.decode(providerSettings.getTokenHmacSharedSecret()));
                 }
                 case RSA: {
-                    return new SigningManager().newRsaSigningHandler(
-                            providerSettings.getSigningKeyPair(signingAlgorithm).getPrivate());
+                    return new SigningManager().newRsaSigningHandler(providerSettings.getServerKeyPair().getPrivate());
                 }
                 case ECDSA: {
                     return new SigningManager().newEcdsaSigningHandler(
-                            (ECPrivateKey) providerSettings.getSigningKeyPair(signingAlgorithm).getPrivate());
+                            (ECPrivateKey) providerSettings.getServerKeyPair().getPrivate());
                 }
                 default: {
                     throw new ServerException("Unsupported Token signing algorithm");
@@ -209,12 +208,11 @@ public class StatelessTokenStore implements TokenStore {
                             Base64.decode(providerSettings.getTokenHmacSharedSecret()));
                 }
                 case RSA: {
-                    return new SigningManager().newRsaSigningHandler(
-                            providerSettings.getSigningKeyPair(signingAlgorithm).getPublic());
+                    return new SigningManager().newRsaSigningHandler(providerSettings.getServerKeyPair().getPublic());
                 }
                 case ECDSA: {
                     return new SigningManager().newEcdsaVerificationHandler(
-                            (ECPublicKey) providerSettings.getSigningKeyPair(signingAlgorithm).getPublic());
+                            (ECPublicKey) providerSettings.getServerKeyPair().getPublic());
                 }
                 default: {
                     throw new ServerException("Unsupported Token signing algorithm");

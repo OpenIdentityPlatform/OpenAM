@@ -28,10 +28,9 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.utils.OpenAMSettings;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;
@@ -131,30 +130,14 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
     /**
      * {@inheritDoc}
      */
-    public KeyPair getSigningKeyPair(String realm, JwsAlgorithm algorithm) throws SMSException, SSOException {
-        if (JwsAlgorithmType.RSA.equals(algorithm.getAlgorithmType())) {
-            String alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
-            return getServerKeyPair(realm, alias);
-        } else if (JwsAlgorithmType.ECDSA.equals(algorithm.getAlgorithmType())) {
-            Set<String> algorithmAliases = getSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
-            for (String algorithmAlias : algorithmAliases) {
-                if (StringUtils.isEmpty(algorithmAlias)) {
-                    logger.warning("Empty signing key alias");
-                    continue;
-                }
-                String[] aliasSplit = algorithmAlias.split("\\|");
-                if (aliasSplit.length != 2) {
-                    logger.warning("Invalid signing key alias mapping: " + algorithmAlias);
-                    continue;
-                }
-                return getServerKeyPair(realm, aliasSplit[1]);
-            }
-        }
-        return new KeyPair(null, null);
+    public KeyPair getServerKeyPair(String realm) throws SMSException, SSOException {
+        return getServerKeyPair(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
     }
 
     @Override
-    public KeyPair getServerKeyPair(String realm, String alias) throws SMSException, SSOException {
+    public KeyPair getServerKeyPair(String realm, String attributeName) throws SMSException, SSOException {
+        final String alias = getStringSetting(realm, attributeName);
+
         //get keystore password from file
         final String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
         String keystorePass = null;

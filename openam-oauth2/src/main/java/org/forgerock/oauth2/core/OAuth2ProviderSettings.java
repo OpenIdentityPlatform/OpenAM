@@ -23,7 +23,6 @@ import java.util.Set;
 
 import freemarker.template.Template;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -257,13 +256,12 @@ public interface OAuth2ProviderSettings {
     long getRefreshTokenLifetime() throws ServerException;
 
     /**
-     * Gets the signing key pair of the OAuth2 provider.
+     * Gets the key pair of the OAuth2 provider.
      *
-     * @param algorithm The signing algorithm.
      * @return The KeyPair.
      * @throws ServerException If any internal server error occurs.
      */
-    KeyPair getSigningKeyPair(JwsAlgorithm algorithm) throws ServerException;
+    KeyPair getServerKeyPair() throws ServerException;
 
     /**
      * Gets the attributes of the resource owner that are used for authenticating resource owners.

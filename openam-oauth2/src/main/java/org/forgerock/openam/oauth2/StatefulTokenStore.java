@@ -265,8 +265,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
-        final KeyPair signingKeyPair = providerSettings.getSigningKeyPair(
-                JwsAlgorithm.valueOf(signingAlgorithm.toUpperCase()));
+        final KeyPair signingKeyPair = providerSettings.getServerKeyPair();
         final PublicKey encryptionPublicKey = clientRegistration.getIDTokenEncryptionPublicKey();
 
         final String atHash = generateAtHash(signingAlgorithm, request, providerSettings);
