@@ -12,6 +12,9 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ */
+
+/*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -24,14 +27,11 @@ import javax.inject.Singleton;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
@@ -43,9 +43,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.util.Reject;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * Authenticates OAuth2 clients by extracting the client's identifier and secret from the request.
@@ -136,15 +133,11 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * @throws InvalidClientException If the authentication configured for the client is not completed by the
      *          specified client credentials.
      */
-    private boolean authenticate(OAuth2Request request, String clientId, char[] clientSecret, String realm)
-            throws InvalidClientException {
+    private boolean authenticate(OAuth2Request request, String clientId, char[] clientSecret, String realm) throws InvalidClientException {
+
         try {
             AuthContext lc = new AuthContext(realm);
-            HttpServletRequest httpRequest = ServletUtils.getRequest(Request.getCurrent());
-            httpRequest.setAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR, "true");
-            lc.login(AuthContext.IndexType.MODULE_INSTANCE, "Application", null, httpRequest,
-                    ServletUtils.getResponse(Response.getCurrent()));
-
+            lc.login(AuthContext.IndexType.MODULE_INSTANCE, "Application");
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 List<Callback> missing = new ArrayList<Callback>();
@@ -162,6 +155,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 }
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
+                    lc.logout();
                     throw failureFactory.getException(request, "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
@@ -169,6 +163,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
 
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
+                lc.logout();
                 return true;
             } else {
                 throw failureFactory.getException(request, "Client authentication failed");
