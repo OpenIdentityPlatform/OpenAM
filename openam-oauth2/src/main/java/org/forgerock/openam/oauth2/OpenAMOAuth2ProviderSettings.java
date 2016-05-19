@@ -18,7 +18,6 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.jose.jws.JwsAlgorithm.getJwsAlgorithm;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
@@ -744,7 +743,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             if (jwks.isEmpty()) {
                 try {
                     Key key = getSigningKeyPair(realm, JwsAlgorithm.RS256).getPublic();
-                    if ("RSA".equals(key.getAlgorithm())) {
+                    if (key != null && "RSA".equals(key.getAlgorithm())) {
                         jwks.add(createRSAJWK(getTokenSigningRSAKeyAlias(), (RSAPublicKey) key, KeyUse.SIG,
                                 JwsAlgorithm.RS256.name()));
                     } else {
@@ -763,7 +762,10 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                             continue;
                         }
                         String alias = aliasSplit[1];
-                        key = getSigningKeyPair(realm, getJwsAlgorithm(alias.toUpperCase())).getPublic();
+                        key = getSigningKeyPair(realm, JwsAlgorithm.valueOf(aliasSplit[0].toUpperCase())).getPublic();
+                        if (key == null) {
+                            continue;
+                        }
                         if ("EC".equals(key.getAlgorithm())) {
                             jwks.add(createECJWK(alias, (ECPublicKey) key, KeyUse.SIG));
                         } else {

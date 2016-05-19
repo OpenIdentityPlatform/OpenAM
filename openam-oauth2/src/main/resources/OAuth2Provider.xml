@@ -339,9 +339,9 @@
                                  order="241">
                     <IsOptional/>
                     <DefaultValues>
-                        <Value>EC256|test</Value>
-                        <Value>EC384|test</Value>
-                        <Value>EC512|test</Value>
+                        <Value>ES256|test</Value>
+                        <Value>ES384|test</Value>
+                        <Value>ES512|test</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-claims-parameter-supported"
