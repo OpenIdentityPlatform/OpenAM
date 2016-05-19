@@ -31,29 +31,16 @@ define([
     constructor (values) {
         this.raw = Object.freeze(values);
     }
+    addInheritance (inheritance) {
+        const valuesWithInheritance = _.mapValues(this.raw, (value, key) => ({
+            value,
+            inherited: inheritance[key].inherited
+        }));
+
+        return new JSONValues(valuesWithInheritance);
+    }
     extend (object) {
         return new JSONValues(_.extend({}, this.raw, object));
-    }
-    getEmptyValueKeys () {
-        function isEmpty (value) {
-            if (_.isNumber(value)) {
-                return false;
-            } else if (_.isBoolean(value)) {
-                return false;
-            }
-
-            return _.isEmpty(value);
-        }
-
-        const keys = [];
-
-        _.forIn(this.raw, (value, key) => {
-            if (isEmpty(value)) {
-                keys.push(key);
-            }
-        });
-
-        return keys;
     }
     /**
      * Creates a new JSONValues object converting from a Global and Organisation values structure to a flatten
@@ -78,11 +65,35 @@ define([
 
         return new JSONValues(values);
     }
+    getEmptyValueKeys () {
+        function isEmpty (value) {
+            if (_.isNumber(value)) {
+                return false;
+            } else if (_.isBoolean(value)) {
+                return false;
+            }
+
+            return _.isEmpty(value);
+        }
+
+        const keys = [];
+
+        _.forIn(this.raw, (value, key) => {
+            if (isEmpty(value)) {
+                keys.push(key);
+            }
+        });
+
+        return keys;
+    }
     omit (predicate) {
         return new JSONValues(_.omit(this.raw, predicate));
     }
     pick (predicate) {
         return new JSONValues(_.pick(this.raw, predicate));
+    }
+    removeInheritance () {
+        return new JSONValues(_.mapValues(this.raw, "value"));
     }
     /**
      * Creates a new JSONValues object converting from a flatten values structure to a Global and Organisation values
@@ -106,14 +117,5 @@ define([
         }, { defaults: {} });
 
         return new JSONValues(values);
-    }
-    removeInheritance () {
-        return new JSONValues(_.mapValues(this.raw, "value"));
-    }
-    addInheritance (valuesWithoutInheritance) {
-        return new JSONValues(_.transform(this.raw, (result, value, key) => {
-            result[key] = this.raw[key];
-            result[key].value = valuesWithoutInheritance[key];
-        }));
     }
 });

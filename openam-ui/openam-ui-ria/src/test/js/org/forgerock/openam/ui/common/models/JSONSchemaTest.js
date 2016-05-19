@@ -56,5 +56,76 @@ define([
                 expect(schema.raw.properties[groupKey].propertyOrder).eq(groupPropertyOrder);
             });
         });
+        describe("#hasInheritance", () => {
+            context("schema has inheritance", () => {
+                it("returns true", () => {
+                    const jsonSchema = new JSONSchema({
+                        type: "object",
+                        properties: {
+                            property: {
+                                type: "object",
+                                properties: {
+                                    inherited: {}
+                                }
+                            }
+                        }
+                    });
+
+                    expect(jsonSchema.hasInheritance()).to.be.true;
+                });
+            });
+
+            it("returns true when the schema has all inherited properties", () => {
+                const jsonSchema = new JSONSchema({
+                    type: "object",
+                    properties: {
+                        property: {
+                            type: "object",
+                            properties: {
+                                property: {}
+                            }
+                        }
+                    }
+                });
+
+                expect(jsonSchema.hasInheritance()).to.be.false;
+            });
+        });
+        describe("#removeInheritance", () => {
+            const jsonSchema = new JSONSchema({
+                "type": "object",
+                "properties": {
+                    "propertyKey": {
+                        type: "object",
+                        title: "Title",
+                        properties: {
+                            value: {
+                                type: "string",
+                                required: true
+                            },
+                            inherited: {
+                                type: "boolean",
+                                required: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            let schema;
+
+            beforeEach(() => {
+                schema = jsonSchema.removeInheritance();
+            });
+
+            it("flattens inherited property values onto the top-level properties", () => {
+                expect(schema.raw.properties).to.have.keys("propertyKey");
+                expect(schema.raw.properties.propertyKey).to.contain.keys("type", "required");
+            });
+
+            it("sets the title on the flattened properties", () => {
+                expect(schema.raw.properties.propertyKey.title).eq("Title");
+            });
+        });
     });
 });

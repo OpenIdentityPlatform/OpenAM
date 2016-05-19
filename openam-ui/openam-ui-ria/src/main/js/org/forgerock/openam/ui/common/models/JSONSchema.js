@@ -43,20 +43,10 @@ define([
 
             this.raw = Object.freeze(schema);
         }
-        getEnableKey () {
-            const key = `${_.camelCase(this.raw.title)}Enabled`;
-            if (this.raw.properties[key]) {
-                return key;
-            }
-        }
-        getEnableProperty () {
-            return this.pick(this.getEnableKey());
-        }
-        getPropertiesAsSchemas () {
-            return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
-        }
-        getRequiredPropertyKeys () {
-            return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
+        addDefaultProperties (keys) {
+            const schema = _.cloneDeep(this.raw);
+            schema.defaultProperties = keys;
+            return new JSONSchema(schema);
         }
         /**
          * Creates a new JSONSchema object converting from a Global and Organisation properties structure to a flatten
@@ -85,19 +75,14 @@ define([
 
             return new JSONSchema(schema);
         }
-        hasEnableProperty () {
-            return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
+        getEnableKey () {
+            const key = `${_.camelCase(this.raw.title)}Enabled`;
+            if (this.raw.properties[key]) {
+                return key;
+            }
         }
-        /**
-         * Whether this schema objects' properties are all schemas in their own right.
-         * If true, this object is a simply a container for other schemas.
-         * @returns {Boolean} Whether this object is a collection
-         */
-        isCollection () {
-            return _.every(this.raw.properties, (property) => property.type === "object");
-        }
-        isEmpty () {
-            return _.isEmpty(this.raw.properties);
+        getEnableProperty () {
+            return this.pick(this.getEnableKey());
         }
         getKeys (sort) {
             sort = typeof sort !== "undefined" ? sort : false;
@@ -114,6 +99,32 @@ define([
 
             return _.keys(passwordProperties);
         }
+        getPropertiesAsSchemas () {
+            return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
+        }
+        getRequiredPropertyKeys () {
+            return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
+        }
+        hasEnableProperty () {
+            return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
+        }
+        hasInheritance () {
+            return _.every(this.raw.properties, (property) =>
+                property.type === "object" &&
+                _.has(property, "properties.inherited")
+            );
+        }
+        /**
+         * Whether this schema objects' properties are all schemas in their own right.
+         * If true, this object is a simply a container for other schemas.
+         * @returns {Boolean} Whether this object is a collection
+         */
+        isCollection () {
+            return _.every(this.raw.properties, (property) => property.type === "object");
+        }
+        isEmpty () {
+            return _.isEmpty(this.raw.properties);
+        }
         pick (predicate) {
             const schema = _.cloneDeep(this.raw);
             schema.properties = _.pick(this.raw.properties, predicate);
@@ -126,29 +137,15 @@ define([
 
             return new JSONSchema(schema);
         }
-        addDefaultProperties (keys) {
-            const schema = _.cloneDeep(this.raw);
-            schema.defaultProperties = keys;
-            return new JSONSchema(schema);
-        }
-        hasInheritance () {
-            return _.every(this.raw.properties, (property) =>
-                property.type === "object" &&
-                _.has(property, "properties.inherited")
-            );
-        }
         removeInheritance () {
-            const properties = _.mapValues(this.raw.properties, (rawValue) => {
+            const schema = _.cloneDeep(this.raw);
+            schema.properties = _.mapValues(this.raw.properties, (rawValue) => {
                 const value = rawValue.properties.value;
                 value.title = rawValue.title;
                 return value;
             });
 
-            return new JSONSchema({
-                properties,
-                title: this.raw.title,
-                type: this.raw.type
-            });
+            return new JSONSchema(schema);
         }
     };
 });

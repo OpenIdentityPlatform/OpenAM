@@ -18,12 +18,41 @@ define([
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (JSONValues) => {
     describe("org/forgerock/openam/ui/common/models/JSONValues", () => {
+        describe("#addInheritance", () => {
+            const jsonValues = new JSONValues({
+                propertyKey: "value"
+            });
+
+            let values;
+
+            beforeEach(() => {
+                values = jsonValues.addInheritance({
+                    propertyKey: {
+                        inherited: true
+                    }
+                });
+            });
+
+            it("creates an object for each property key", () => {
+                expect(values.raw.propertyKey).to.be.an("object");
+            });
+
+            it("creates a \"value\" attribute on the property object", () => {
+                expect(values.raw.propertyKey.value).to.exist;
+                expect(values.raw.propertyKey.value).eq("value");
+            });
+
+            it("creates a \"inherited\" attribute on the property object", () => {
+                expect(values.raw.propertyKey.inherited).to.exist;
+                expect(values.raw.propertyKey.inherited).to.be.true;
+            });
+        });
         describe("#fromGlobalAndOrganisation", () => {
             const jsonValues = new JSONValues({
-                "topLevelProperty": "value",
-                "defaults": {
-                    "defaultsProperty1": "value",
-                    "defaultsProperty2": "value"
+                topLevelProperty: "value",
+                defaults: {
+                    defaultsProperty1: "value",
+                    defaultsProperty2: "value"
                 }
             });
             const groupKey = "defaultGroupKey";
@@ -41,6 +70,20 @@ define([
 
             it("flatten values in \"defaults\" onto the top-level values", () => {
                 expect(values.raw).to.contain.keys("defaultsProperty1", "defaultsProperty2");
+            });
+        });
+        describe("#removeInheritance", () => {
+            it("flattens each inherited property into a single value", () => {
+                const jsonValues = new JSONValues({
+                    propertyKey: {
+                        value: "value",
+                        inherited: true
+                    }
+                });
+
+                const values = jsonValues.removeInheritance();
+
+                expect(values.raw.propertyKey).eq("value");
             });
         });
         describe("#toGlobalAndOrganisation", () => {

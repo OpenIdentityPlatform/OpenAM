@@ -120,8 +120,7 @@ define([
             });
 
             if (this.options.schema.hasInheritance()) {
-                valuesWithoutEmptyPasswords =
-                    this.options.values.addInheritance(valuesWithoutEmptyPasswords.raw);
+                valuesWithoutEmptyPasswords = valuesWithoutEmptyPasswords.addInheritance(this.options.values.raw);
             }
 
             return valuesWithoutEmptyPasswords.raw;
