@@ -638,7 +638,8 @@ public class AMLoginContext {
                             loginState.logSuccess();
                             auditor.auditLoginSuccess(loginState);
                             if (amAccountLockout.isLockoutEnabled()) {
-                                amAccountLockout.resetPasswdLockout(loginState.getUserDN(), true);
+                                amAccountLockout.resetPasswdLockout(loginState.getUserUniversalId(
+                                        loginState.getUserDN()), true);
                             }
                             loginStatus.setStatus(LoginStatus.AUTH_SUCCESS);
                             loginState.updateSessionForFailover();

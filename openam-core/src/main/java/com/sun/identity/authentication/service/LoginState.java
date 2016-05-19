@@ -2584,8 +2584,8 @@ public class LoginState {
                     DEBUG.message("tokenset empty");
                     throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
                 } else if (tokenSet.size() == 1) {
-                    if (isAccountLocked(token)) {
-                        DEBUG.message(String.format("User account \"%s\" locked", token));
+                    if (isAccountLocked(getUserUniversalId(token))) {
+                        DEBUG.message("User account \"{}\" locked", token);
                         throw new AuthException(AMAuthErrorCode.AUTH_USER_LOCKED, null);
                     }
                     DEBUG.message("tokenset size is 1");
