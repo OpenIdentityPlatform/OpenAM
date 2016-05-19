@@ -1486,7 +1486,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             synchronized(REALM_SERVICECONFIG_MAP) {
                 serviceConfig = REALM_SERVICECONFIG_MAP.get(realm);
                 if (serviceConfig == null) {
-                    ServiceConfigManager configManager = new ServiceConfigManager(AUTH_SERVICE_NAME, admin);
+                    ServiceConfigManager configManager = new ServiceConfigManager(AUTH_SERVICE_NAME, RestUtils.getToken());
                     serviceConfig = configManager.getOrganizationConfig(realm, null);
                     REALM_SERVICECONFIG_MAP.put(realm, serviceConfig);
                 }
