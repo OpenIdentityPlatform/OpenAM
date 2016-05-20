@@ -72,8 +72,7 @@ public class OpenIDConnectProviderConfiguration {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final OAuth2Uris uris = urisFactory.get(request);
 
-        if (!providerSettings.exists() || providerSettings.getSupportedScopes() == null ||
-                !providerSettings.getSupportedScopes().contains("openid")) {
+        if (!providerSettings.exists()) {
             throw new NotFoundException("Invalid URL");
         }
 
