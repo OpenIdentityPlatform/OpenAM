@@ -1455,7 +1455,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     // Delegate to the organisation configuration for this realm to get the answer.
                     try {
                         result = ISAuthConstants.IGNORE.equals(CollectionHelper.getMapAttr(
-                                getServiceConfig(realm, admin).getAttributes(), PROFILE_ATTRIBUTE));
+                                getServiceConfig(realm).getAttributes(), PROFILE_ATTRIBUTE));
                         if (debug.messageEnabled()) {
                             debug.message("IdentityResource.isIgnoredProfile: for realm {} was {}", realm, result);
                         }
@@ -1479,7 +1479,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     /**
      * Retrieve cached realm's ServiceConfig instance
      **/
-    private ServiceConfig getServiceConfig(final String realm, SSOToken admin) throws SMSException, SSOException {
+    private ServiceConfig getServiceConfig(final String realm) throws SMSException, SSOException {
 
         ServiceConfig serviceConfig = REALM_SERVICECONFIG_MAP.get(realm);
         if (serviceConfig == null) {
