@@ -75,20 +75,49 @@ module.exports = function (grunt) {
             "css/bootstrap-3.3.5-custom.css",
             "themes/**/*.*"
         ],
-        transpiledFiles = [
-            "**/*.js"
-        ],
         serverDeployDirectory = process.env.OPENAM_HOME + "/XUI";
 
     grunt.initConfig({
         babel: {
+            options: {
+                babelrc: false,
+                env: {
+                    development: {
+                        sourceMaps: true
+                    }
+                },
+                presets: ["es2015"]
+            },
             transpile: {
                 files: [{
                     expand: true,
                     cwd: compositionDirectory,
-                    src: transpiledFiles,
+                    src: ["**/*.js"],
                     dest: transpiledDirectory
-                }]
+                }],
+                options: {
+                    only: [
+                        "main-authorize.js",
+                        "main-device.js",
+                        "main.js",
+                        "config/**/*.js",
+                        "org/forgerock/openam/**/*.js"
+                    ]
+                }
+            },
+            transpileModules: {
+                files: [{
+                    expand: true,
+                    cwd: compositionDirectory,
+                    src: "**/*.jsm",
+                    dest: transpiledDirectory,
+                    rename: function (dest, src) {
+                        return dest + "/" + src.replace(".jsm", ".js");
+                    }
+                }],
+                options: {
+                    plugins: ["transform-es2015-modules-amd"]
+                }
             }
         },
         copy: {
@@ -129,9 +158,10 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: transpiledDirectory,
-                    src: transpiledFiles.concat([
+                    src: [
+                        "**/*.js",
                         "!main.js" // Output by r.js
-                    ]),
+                    ],
                     dest: compiledDirectory
                 }]
             }
@@ -143,6 +173,7 @@ module.exports = function (grunt) {
             lint: {
                 src: [
                     "." + mavenSrcPath + "/**/*.js",
+                    "." + mavenSrcPath + "/**/*.jsm",
                     "!." + mavenSrcPath + "/libs/**/*.js",
                     "." + mavenTestPath + "/**/*.js"
                 ],
@@ -262,9 +293,10 @@ module.exports = function (grunt) {
             transpiled: {
                 files: [{
                     cwd: transpiledDirectory,
-                    src: transpiledFiles.concat([
+                    src: [
+                        "**/*.js",
                         "**/*.js.map"
-                    ]),
+                    ],
                     dest: compiledDirectory
                 }],
                 compareUsing: "md5"
@@ -349,7 +381,7 @@ module.exports = function (grunt) {
         "karma:build"
     ]);
 
-    grunt.registerTask("dev", ["copy:compose", "deploy", "watch"]);
+    grunt.registerTask("dev", ["copy:compose", "babel", "deploy", "watch"]);
     grunt.registerTask("prod", ["build"]);
 
     grunt.registerTask("default", ["dev"]);

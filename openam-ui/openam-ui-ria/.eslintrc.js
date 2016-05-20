@@ -33,6 +33,7 @@ module.exports = {
             "after": true
         }],
         "comma-style": 2,
+        "constructor-super": 2,
         "dot-location": [2, "property"],
         "eol-last": 2,
         "guard-for-in": 2,
@@ -77,6 +78,7 @@ module.exports = {
         "no-whitespace-before-property": 2,
         "object-curly-spacing": [2, "always"],
         "operator-linebreak": 2,
+        "sort-imports": 2,
         "prefer-const": 2,
         "quotes": [2, "double", "avoid-escape"],
         "semi-spacing": [2, {
