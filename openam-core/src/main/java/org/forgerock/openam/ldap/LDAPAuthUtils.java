@@ -25,7 +25,7 @@
  * $Id: LDAPAuthUtils.java,v 1.21 2009/12/28 03:01:26 222713 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.ldap;
@@ -1460,22 +1460,30 @@ public class LDAPAuthUtils {
         expiryTime = null;
         StringBuilder expTime = new StringBuilder();
 
-        int days = sec / (24*60*60);
-        int hours = (sec%(24*60*60)) / 3600;
-        int minutes = (sec%3600) / 60;
-        int seconds = sec%60;
+        int days = sec / (24 * 60 * 60);
+        int hours = (sec % (24 * 60 * 60)) / 3600;
+        int minutes = (sec % 3600) / 60;
+        int seconds = sec % 60;
 
-        if (hours <= 0 && minutes <= 0 && seconds <= 0) {
-            expTime.append(days).append(" days: ");
-            expiryTime = expTime.toString();
+        if (days > 0) {
+            expTime.append(days).append(SPACE).append(bundle.getString("days"));
+            if (hours > 0) {
+                expTime.append(SPACE).append(hours).append(SPACE).append(bundle.getString("hours"));
+            }
+        } else if (hours > 0) {
+            expTime.append(hours).append(SPACE).append(bundle.getString("hours"));
+            if (minutes > 0) {
+                expTime.append(SPACE).append(minutes).append(SPACE).append(bundle.getString("minutes"));
+            }
+        } else if (minutes > 0) {
+            expTime.append(minutes).append(SPACE).append(bundle.getString("minutes"));
+            if (seconds > 0) {
+                expTime.append(SPACE).append(seconds).append(SPACE).append(bundle.getString("seconds"));
+            }
         } else {
-            expTime.append(days).append(SPACE).append(bundle.getString("days")).append(COLON).append(SPACE);
-            expTime.append(hours).append(SPACE).append(bundle.getString("hours")).append(COLON).append(SPACE);
-            expTime.append(minutes).append(SPACE).append(bundle.getString("minutes")).append(COLON).append(SPACE);
             expTime.append(seconds).append(SPACE).append(bundle.getString("seconds"));
-
-            expiryTime = expTime.toString();
         }
+        expiryTime = expTime.toString();
     }
 
     /**
