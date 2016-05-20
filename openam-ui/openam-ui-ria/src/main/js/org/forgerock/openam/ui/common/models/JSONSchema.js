@@ -140,7 +140,7 @@ define([
             schema.properties = _.mapValues(this.raw.properties, (rawValue, propName) => {
                 const property = rawValue.properties.value;
                 property.title = rawValue.title;
-                property.hasInheritance = true; // TODO why?
+                property.description = rawValue.description;
 
                 const valueIsInherited = jsonValues[propName] && jsonValues[propName].inherited;
                 property.isInherited = !!valueIsInherited;

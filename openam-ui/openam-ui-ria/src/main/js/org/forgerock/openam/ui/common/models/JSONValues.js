@@ -39,6 +39,19 @@ define([
 
         return new JSONValues(valuesWithInheritance);
     }
+    /**
+     * Adds value for the property.
+     *
+     * @param   {string} path Property key
+     * @param   {string} key Key of the property value object
+     * @param   {string} value Value to be set
+     * @returns {JSONValues} JSONValues object with new value set
+     */
+    addValueForKey (path, key, value) {
+        const clone = _.clone(this.raw);
+        clone[path][key] = value;
+        return new JSONValues(clone);
+    }
     extend (object) {
         return new JSONValues(_.extend({}, this.raw, object));
     }
@@ -117,10 +130,5 @@ define([
         }, { defaults: {} });
 
         return new JSONValues(values);
-    }
-    addInheritanceKey (schemaKey, isInherited) {
-        const clone = _.clone(this.raw);
-        clone[schemaKey].inherited = isInherited;
-        return new JSONValues(clone);
     }
 });

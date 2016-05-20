@@ -79,12 +79,6 @@ define([
                     }
                 },
 
-                getInlineButton: function (text, icon, title) {
-                    var el = this._super(text, icon, title);
-                    el.className += "btn btn-link delete-row-item";
-                    return el;
-                },
-
                 getTextareaInput: function (placeholder) {
                     var el = document.createElement("textarea");
                     el.className = "form-control";
@@ -183,6 +177,12 @@ define([
                 getButton: function (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += "btn btn-default";
+                    return el;
+                },
+
+                getInlineButton: function (text, icon, title) {
+                    var el = this._super(text, icon, title);
+                    el.className += "btn btn-link delete-row-item";
                     return el;
                 },
 
@@ -352,7 +352,7 @@ define([
                 getInheritanceButton: function (valueIsInherited, path) {
                     const button = document.createElement("button");
                     button.type = "button";
-                    button.className = "btn fr-btn-secondary am-btn-single-icon";
+                    button.className = "btn fr-btn-secondary am-btn-single-icon inheritance-button";
                     button.setAttribute("data-inherit-value", valueIsInherited);
                     button.setAttribute("data-schemapath", path);
                     button.dataToggle = "button";
@@ -360,13 +360,10 @@ define([
                     const icon = document.createElement("i");
                     icon.className = "fa fa-unlock";
                     if (valueIsInherited) {
-                        button.className = "btn fr-btn-secondary am-btn-single-icon active";
+                        button.className += " active";
                         icon.className = "fa fa-lock";
                     }
                     button.appendChild(icon);
-                    // icon.setAttribute("data-schemapath", path);//TODO
-                    // button.setAttribute("data-isinherited", valueIsInherited);//TODO
-                    // icon.setAttribute("data-isinherited", valueIsInherited); //TODO
                     return button;
                 },
 

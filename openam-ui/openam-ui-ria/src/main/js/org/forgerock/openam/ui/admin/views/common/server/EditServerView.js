@@ -28,9 +28,10 @@ define([
     "org/forgerock/openam/ui/common/components/table/InlineEditTable",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
 ], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PanelComponent, PartialBasedView,
-    TabComponent, InlineEditTable, JSONSchema, JSONValues, FlatJSONSchemaView) => {
+    TabComponent, InlineEditTable, JSONSchema, JSONValues, Promise, FlatJSONSchemaView) => {
     function createTabs (schema) {
         return _(schema.raw.properties)
             .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
@@ -47,36 +48,64 @@ define([
         getJSONSchemaView () {
             return this.subview.getBody();
         },
-        render ([serverId, sectionId]) {
-            if (serverId === "server-defaults") {
-                this.data.serverId = ServersService.servers.DEFAULT_SERVER;
-            } else {
-                this.data.serverId = serverId;
-            }
-            this.data.sectionId = sectionId;
-            this.data.title = $.t(`console.common.navigation.${this.data.sectionId}`);
+        /**
+         * Returns an array of promises, where the first item will always be a promise for server defaults
+         * schema/values. The array will also contain a second item, which will be the server instance schema/values
+         * promise if we are on the edit server instance view.
+         *
+         * @param   {Boolean} isDefaultServer Is it the server defaults view.
+         * @returns {Promise[]}               Array of server promises.
+         */
+        getServerPromises (isDefaultServer) {
+            const promises = [ServersService.servers.get(ServersService.servers.DEFAULT_SERVER, this.sectionId)];
 
-            ServersService.servers.get(this.data.serverId, this.data.sectionId).then((response) => {
-                this.data.schema = response.schema;
-                this.data.values = response.values;
+            if (!isDefaultServer) {
+                promises.push(ServersService.servers.get(this.serverId, this.sectionId));
+            }
+
+            return promises;
+        },
+        render ([serverId, sectionId]) {
+            const isDefaultServer = serverId === "server-defaults";
+
+            this.sectionId = sectionId;
+            this.serverId = isDefaultServer ? ServersService.servers.DEFAULT_SERVER : serverId;
+
+            this.data.title = $.t(`console.common.navigation.${this.sectionId}`);
+
+            Promise.all(this.getServerPromises(isDefaultServer)).then((response) => {
+                const serverDefaults = response[0];
+                const server = response[1];
+
+                if (isDefaultServer) {
+                    this.schema = serverDefaults.schema;
+                    this.values = serverDefaults.values;
+                } else {
+                    this.schema = server.schema;
+                    this.values = server.values;
+
+                    this.defaultValues = serverDefaults.values;
+                }
+
+                const clonedValues = _.cloneDeep(this.values.raw);
 
                 this.parentRender(() => {
-                    if (this.data.sectionId === ServersService.servers.ADVANCED_SECTION) {
+                    if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
                             createBody: () => new InlineEditTable({
-                                values: this.data.values.raw
+                                values: clonedValues
                             }),
                             createFooter: () => new PartialBasedView({
                                 partial: "form/_JSONSchemaFooter"
                             })
                         });
                     } else {
-                        const tabs = createTabs(response.schema);
+                        const tabs = createTabs(this.schema);
                         this.subview = new TabComponent({
                             tabs,
                             createBody: (id) => new FlatJSONSchemaView({
-                                schema: new JSONSchema(this.data.schema.raw.properties[id]),
-                                values: new JSONValues(this.data.values.raw[id])
+                                schema: new JSONSchema(this.schema.raw.properties[id]),
+                                values: new JSONValues(clonedValues[id])
                             }),
                             createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                         });
@@ -89,17 +118,17 @@ define([
             });
         },
         updateData () {
-            const section = this.data.sectionId === ServersService.servers.ADVANCED_SECTION
-                ? this.data.sectionId
+            const section = this.sectionId === ServersService.servers.ADVANCED_SECTION
+                ? this.sectionId
                 : this.subview.getTabId();
 
-            this.data.values = this.data.values.extend({
+            this.values = this.values.extend({
                 [section]: this.getJSONSchemaView().getData()
             });
         },
         onSave () {
             this.updateData();
-            ServersService.servers.update(this.data.sectionId, this.data.values.raw, this.data.serverId)
+            ServersService.servers.update(this.sectionId, this.values.raw, this.serverId)
             .then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
@@ -110,7 +139,19 @@ define([
             });
         },
         toggleInheritance (event) {
-            this.getJSONSchemaView().subview.toggleInheritance(event);
+            const target = event.currentTarget;
+            const removeRootPrefix = (key) => key.slice(5);
+            const propertySchemaPath = removeRootPrefix(target.getAttribute("data-schemapath"));
+            const isInherited = target.getAttribute("data-inherit-value") === "true";
+            let propValue;
+
+            if (isInherited) {
+                propValue = this.values.raw[this.subview.getTabId()][propertySchemaPath].value;
+            } else {
+                propValue = this.defaultValues.raw[this.subview.getTabId()][propertySchemaPath];
+            }
+
+            this.getJSONSchemaView().subview.toggleInheritance(propertySchemaPath, propValue, !isInherited);
         }
     });
 });
