@@ -50,11 +50,11 @@ require.config({
 
         "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
-        "form2js"     : "libs/form2js-2.0-769718a",
+        "form2js"     : "libs/form2js-2.0",
         "handlebars"  : "libs/handlebars-4.0.5",
         "i18next"     : "libs/i18next-1.7.3-min",
         "jquery"      : "libs/jquery-2.1.1-min",
-        "js2form"     : "libs/js2form-2.0-769718a",
+        "js2form"     : "libs/js2form-2.0",
         "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
         "lodash"      : "libs/lodash-3.10.1-min",
         "moment"      : "libs/moment-2.8.1-min",
@@ -120,7 +120,7 @@ require.config({
         },
         "i18next": {
             deps: ["jquery", "handlebars"],
-            exports: "i18n"
+            exports: "i18next"
         },
         "js2form": {
             exports: "js2form"
@@ -171,6 +171,6 @@ require([
     "org/forgerock/openam/ui/main",
     "config/main"
 
-], (Constants, EventManager) => {
+], function (Constants, EventManager) {
     EventManager.sendEvent(Constants.EVENT_DEPENDENCIES_LOADED);
 });
