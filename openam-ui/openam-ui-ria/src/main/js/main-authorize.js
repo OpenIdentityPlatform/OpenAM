@@ -23,7 +23,6 @@
  */
 
 require.config({
-
     map: {
         "*" : {
             "ThemeManager" : "org/forgerock/openam/ui/common/util/ThemeManager",
@@ -32,7 +31,6 @@ require.config({
             "underscore"   : "lodash"
         }
     },
-
     paths: {
         "lodash":       "libs/lodash-3.10.1-min",
         "handlebars":   "libs/handlebars-4.0.5",
@@ -40,14 +38,13 @@ require.config({
         "jquery":       "libs/jquery-2.1.1-min",
         "text":         "libs/text"
     },
-
     shim: {
         "handlebars": {
             exports: "handlebars"
         },
         "i18next": {
             deps: ["jquery", "handlebars"],
-            exports: "i18next"
+            exports: "i18n"
         },
         "lodash": {
             exports: "_"
