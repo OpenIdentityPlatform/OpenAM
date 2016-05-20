@@ -18,6 +18,7 @@ package org.forgerock.openam.utils;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 
 import java.security.KeyPair;
 import java.util.Map;
@@ -93,11 +94,12 @@ public interface OpenAMSettings {
      * Gets the key pair that OpenAM is configured to use for the specified realm.
      *
      * @param realm The realm.
+     * @param algorithm The signing algorithm.
      * @return The key pair.
      * @throws SSOException If there is a problem getting the setting value.
      * @throws SMSException If there is a problem getting the setting value.
      */
-    KeyPair getServerKeyPair(String realm) throws SMSException, SSOException;
+    KeyPair getSigningKeyPair(String realm, JwsAlgorithm algorithm) throws SMSException, SSOException;
 
     /**
      * Gets the key pair that OpenAM is configured to use for the specified realm.

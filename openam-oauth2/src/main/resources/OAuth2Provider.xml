@@ -331,6 +331,19 @@
                         <Value>test</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="tokenSigningECDSAKeyAlias"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a114a"
+                                 order="241">
+                    <IsOptional/>
+                    <DefaultValues>
+                        <Value>ES256|test</Value>
+                        <Value>ES384|test</Value>
+                        <Value>ES512|test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-claims-parameter-supported"
                                  type="single"
                                  syntax="boolean"

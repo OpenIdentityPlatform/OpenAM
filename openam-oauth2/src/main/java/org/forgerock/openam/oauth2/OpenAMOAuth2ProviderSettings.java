@@ -20,14 +20,14 @@ package org.forgerock.openam.oauth2;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
-import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.STATELESS_TOKENS_ENABLED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.AccessController;
+import java.security.Key;
 import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -527,9 +527,9 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public KeyPair getServerKeyPair() throws ServerException {
+    public KeyPair getSigningKeyPair(JwsAlgorithm algorithm) throws ServerException {
         try {
-            return getServerKeyPair(realm);
+            return getSigningKeyPair(realm, algorithm);
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -741,11 +741,40 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     public JsonValue getJWKSet() throws ServerException {
         synchronized (jwks) {
             if (jwks.isEmpty()) {
-                PublicKey key = getServerKeyPair().getPublic();
-                if (key instanceof RSAPublicKey) {
-                    jwks.add(createRSAJWK(getKeyAlias(), (RSAPublicKey) key, KeyUse.SIG, JwsAlgorithm.RS256.name()));
-                } else if (key instanceof ECPublicKey) {
-                    jwks.add(createECJWK(getKeyAlias(), (ECPublicKey) key, KeyUse.SIG));
+                try {
+                    Key key = getSigningKeyPair(realm, JwsAlgorithm.RS256).getPublic();
+                    if (key != null && "RSA".equals(key.getAlgorithm())) {
+                        jwks.add(createRSAJWK(getTokenSigningRSAKeyAlias(), (RSAPublicKey) key, KeyUse.SIG,
+                                JwsAlgorithm.RS256.name()));
+                    } else {
+                        logger.error("Incorrect Public Key type for RSA signing algorithm");
+                    }
+
+                    Set<String> ecdsaAlgorithmAliases = getSetting(realm, TOKEN_SIGNING_ECDSA_KEYSTORE_ALIAS);
+                    for (String algorithmAlias : ecdsaAlgorithmAliases) {
+                        if (StringUtils.isEmpty(algorithmAlias)) {
+                            logger.warning("Empty ECDSA signing key alias");
+                            continue;
+                        }
+                        String[] aliasSplit = algorithmAlias.split("\\|");
+                        if (aliasSplit.length != 2) {
+                            logger.warning("Invalid ECDSA signing key alias mapping: " + algorithmAlias);
+                            continue;
+                        }
+                        String alias = aliasSplit[1];
+                        key = getSigningKeyPair(realm, JwsAlgorithm.valueOf(aliasSplit[0].toUpperCase())).getPublic();
+                        if (key == null) {
+                            continue;
+                        }
+                        if ("EC".equals(key.getAlgorithm())) {
+                            jwks.add(createECJWK(alias, (ECPublicKey) key, KeyUse.SIG));
+                        } else {
+                            logger.error("Incorrect Public Key type for ECDSA signing algorithm. Alias: "
+                                    + algorithmAlias);
+                        }
+                    }
+                } catch (SMSException | SSOException e) {
+                    throw new ServerException(e);
                 }
             }
         }
@@ -775,19 +804,19 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 field("crv", curve.getStandardName()))).asMap();
     }
 
-    private String getKeyAlias() throws ServerException {
-        String alias = null;
+    private String getTokenSigningRSAKeyAlias() throws ServerException {
+        String alias;
         try {
-            alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
+            alias = getStringSetting(realm, TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
         } catch (SSOException | SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
         }
         if (StringUtils.isBlank(alias)) {
-            logger.error("Alias of ID Token Signing Key not set.");
-            throw new ServerException("Alias of ID Token Signing Key not set.");
+            logger.error("Alias of Token Signing Key not set.");
+            throw new ServerException("Alias of Token Signing Key not set.");
         } else if ("test".equals(alias)) {
-            logger.warning("Alias of ID Token Signing Key should be changed from default, 'test'.");
+            logger.warning("Alias of Token Signing Key should be changed from default, 'test'.");
         }
         return alias;
     }

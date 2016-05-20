@@ -92,7 +92,7 @@ public class IdTokenClaimGathererTest {
         given(oAuth2ProviderSettingsFactory.get(oAuth2Request)).willReturn(oAuth2ProviderSettings);
         PublicKey publicKey = mock(PublicKey.class);
         KeyPair keyPair = new KeyPair(publicKey, null);
-        given(oAuth2ProviderSettings.getServerKeyPair()).willReturn(keyPair);
+        given(oAuth2ProviderSettings.getSigningKeyPair(any(JwsAlgorithm.class))).willReturn(keyPair);
         return oAuth2ProviderSettingsFactory;
     }
 
@@ -101,7 +101,7 @@ public class IdTokenClaimGathererTest {
         given(oAuth2UrisFactory.get(oAuth2Request)).willReturn(oAuth2Uris);
         PublicKey publicKey = mock(PublicKey.class);
         KeyPair keyPair = new KeyPair(publicKey, null);
-        given(oAuth2ProviderSettings.getServerKeyPair()).willReturn(keyPair);
+        given(oAuth2ProviderSettings.getSigningKeyPair(any(JwsAlgorithm.class))).willReturn(keyPair);
         return oAuth2UrisFactory;
     }
 
