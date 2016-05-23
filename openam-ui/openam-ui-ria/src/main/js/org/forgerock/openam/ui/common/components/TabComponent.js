@@ -35,7 +35,8 @@ define([
     }
 
     const TabComponent = Backbone.View.extend({
-        template: "templates/admin/views/realms/services/TabComponentTemplate.html",
+        template: "templates/common/components/tab/TabComponentTemplate.html",
+        bodyTemplate: "templates/common/components/tab/TabComponentBodyTemplate.html",
         events: {
             "show.bs.tab ul.nav.nav-tabs a": "handleTabClick"
         },
@@ -60,7 +61,7 @@ define([
             return this.$el.find("[data-tab-panel]");
         },
         getFooter () {
-            return this.tabFooter;
+            return this.options.tabFooter;
         },
         getFooterElement () {
             return this.$el.find("[data-tab-footer]");
@@ -75,22 +76,25 @@ define([
         handleTabClick (event) {
             this.currentTabId = $(event.currentTarget).data("tab-id");
 
-            this.getBodyElement().empty();
+            this.options.tabFooter = this.options.createFooter(this.currentTabId);
             this.tabBody = this.options.createBody(this.currentTabId);
-            if (this.tabBody) {
-                this.tabBody.setElement(this.getBodyElement());
-                this.tabBody.render();
-            }
 
-            this.getFooterElement().empty();
-            this.tabFooter = this.options.createFooter(this.currentTabId);
-            if (this.tabFooter) {
-                this.tabFooter.setElement(this.getFooterElement());
-                this.tabFooter.render();
-            }
+            UIUtils.compileTemplate(this.bodyTemplate, this.options).then((html) => {
+                this.$el.find("[data-tab-component-panel]").html(html);
+
+                if (this.tabBody) {
+                    this.tabBody.setElement(this.getBodyElement());
+                    this.tabBody.render();
+                }
+
+                if (this.options.tabFooter) {
+                    this.options.tabFooter.setElement(this.getFooterElement());
+                    this.options.tabFooter.render();
+                }
+            });
         },
         render () {
-            UIUtils.fillTemplateWithData(this.template, this.options, (html) => {
+            UIUtils.compileTemplate(this.template, this.options).then((html) => {
                 this.$el.html(html);
                 this.$el.find(".tab-menu .nav-tabs").tabdrop();
                 this.setTabId(this.options.tabs[0].id);
