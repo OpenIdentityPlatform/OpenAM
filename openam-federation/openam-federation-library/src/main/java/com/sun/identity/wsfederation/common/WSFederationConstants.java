@@ -327,6 +327,16 @@ public final class WSFederationConstants {
      */
     public static final String METADATA_URL_SUFFIX = "/FederationMetadata.xml";
 
+    /**
+     * The URL prefix for WS-Fed MEX requests.
+     */
+    public static final String MEX_ENDPOINT_PREFIX = "/WSFederationServlet/ws-trust/mex";
+
+    /**
+     * The URL prefix for WS-Fed STS requests.
+     */
+    public static final String STS_ENDPOINT_PREFIX = "/WSFederationServlet/sts";
+
      /**
      * WS-Policy URI.
      */
@@ -338,4 +348,45 @@ public final class WSFederationConstants {
      */
     public static String WREPLY_URL_LIST = "wreplyList";
 
+    /**
+     * The XML namespace for WS-Addressing.
+     */
+    public static final String WSA_NAMESPACE = "http://www.w3.org/2005/08/addressing";
+
+    /**
+     * The XML namespace for WS-Security.
+     */
+    public static final String WSSE_NAMESPACE =
+            "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+
+    /**
+     * The XML namespace for WS-Trust.
+     */
+    public static final String WST_NAMESPACE = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+
+    /**
+     * The XML namespace for WS-Security Utility.
+     */
+    public static final String WSU_NAMESPACE =
+            "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+
+    /**
+     * Configuration attribute for Active Requestor Profile Enabled setting.
+     */
+    public static String ACTIVE_REQUESTOR_PROFILE_ENABLED = "activeRequestorProfileEnabled";
+
+    /**
+     * Configuration attribute for Endpoint Base URL setting.
+     */
+    public static String ENDPOINT_BASE_URL = "endpointBaseUrl";
+
+    /**
+     * Configuration attribute for Trusted Addresses setting.
+     */
+    public static String TRUSTED_ADDRESSES = "trustedAddresses";
+
+    /**
+     * Configuration attribute for Authenticator Class setting.
+     */
+    public static String AUTHENTICATOR_CLASS = "authenticatorClass";
 }

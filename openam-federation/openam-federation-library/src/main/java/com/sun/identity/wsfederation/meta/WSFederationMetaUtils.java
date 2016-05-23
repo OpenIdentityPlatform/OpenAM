@@ -24,9 +24,7 @@
  *
  * $Id: WSFederationMetaUtils.java,v 1.5 2009/10/28 23:58:59 exu Exp $
  *
- */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.wsfederation.meta;
 
@@ -44,11 +42,13 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Node;
 
 import com.sun.identity.shared.debug.Debug;
@@ -56,6 +56,8 @@ import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
+
 import org.xml.sax.InputSource;
 
 /**
@@ -236,7 +238,18 @@ public final class WSFederationMetaUtils {
 
         return attrMap;
     }
-    
+
+    /**
+     * Returns all attribute values associated with they key provided.
+     *
+     * @param config The configuration object.
+     * @param key The attribute key.
+     * @return All attribute values associated with the key provided.
+     */
+    public static List<String> getAttributes(BaseConfigType config, String key) {
+        return getAttributes(config).get(key);
+    }
+
     /**
      * Sets attribute value pairs in <code>BaseConfigType</code>. NOTE - 
      * existing AVPs are discarded! The key is 
@@ -286,6 +299,45 @@ public final class WSFederationMetaUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Gets a single attribute value from <code>BaseConfigType</code>.
+     *
+     * @param config The <code>BaseConfigType</code> object.
+     * @param key Attribute key.
+     * @param defaultValue The defaultValue to return if the attribute was not set.
+     * @return The attribute value.
+     */
+    public static String getAttribute(BaseConfigType config, String key, String defaultValue) {
+        String value = getAttribute(config, key);
+        return StringUtils.isNotEmpty(value) ? value : defaultValue;
+    }
+
+    /**
+     * Gets the int value stored in the configuration under the provided key, or the default value if it was not defined
+     * or if it was malformed.
+     *
+     * @param config The configuration object to investigate.
+     * @param key The configuration key.
+     * @param defaultValue The default value to return if the config is missing or malformed.
+     * @return The int value associated with the requested configuration key.
+     */
+    public static int getIntAttribute(BaseConfigType config, String key, int defaultValue) {
+        final String attribute = getAttribute(config, key);
+        if (attribute != null) {
+            try {
+                int value = Integer.parseInt(attribute);
+                if (debug.messageEnabled()) {
+                    debug.message("Retrieved {} attribute from config: {}", key, value);
+                }
+                return value;
+            } catch (NumberFormatException nfe) {
+                debug.error("Failed to get {} attribute from IDP SSO config", key, nfe);
+            }
+        }
+
+        return defaultValue;
     }
 
     /**
@@ -366,5 +418,22 @@ public final class WSFederationMetaUtils {
             valueSet.add(value);
             attrMap.put(key, valueSet);
         }
+    }
+
+    /**
+     * Returns the endpoint baseURL as stored in the configuration, or if absent, generates the base URL based on the
+     * incoming HTTP request.
+     *
+     * @param idpConfig The configuration object.
+     * @param request The HTTP request corresponding to the current WS-Fed action.
+     * @return The Base URL of the OpenAM deployment.
+     */
+    public static String getEndpointBaseUrl(IDPSSOConfigElement idpConfig, HttpServletRequest request) {
+        String endpointBaseUrl = getAttribute(idpConfig, WSFederationConstants.ENDPOINT_BASE_URL);
+        if (StringUtils.isEmpty(endpointBaseUrl)) {
+            endpointBaseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                    + request.getContextPath();
+        }
+        return endpointBaseUrl;
     }
 }

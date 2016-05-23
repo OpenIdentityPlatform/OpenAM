@@ -39,6 +39,7 @@ import com.sun.identity.saml.assertion.Conditions;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Statement;
 import com.sun.identity.saml.assertion.Subject;
+import com.sun.identity.saml.assertion.SubjectConfirmation;
 import com.sun.identity.saml.assertion.SubjectStatement;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLException;
@@ -152,7 +153,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
     /**
      * Creates a SAML11RequestedSecurityToken.
      * @param realm the realm of the entities.
-     * @param spEntityId service provider entity ID - consumer of the token.
+     * @param spTokenIssuerName The name of the SP Token Issuer.
      * @param idpEntityId identity provifer entity ID - issuer of the token.
      * @param notBeforeSkew number of seconds to subtract from current time
      * to form Assertion notBefore time.
@@ -170,7 +171,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
      * @throws com.sun.identity.wsfederation.common.WSFederationException in 
      * case of error.
      */
-    public SAML11RequestedSecurityToken(String realm, String spEntityId, 
+    public SAML11RequestedSecurityToken(String realm, String spTokenIssuerName,
         String idpEntityId, int notBeforeSkew, int effectiveTime,
         String certAlias, String authMethod, Date authInstant, 
         NameIdentifier ni, List attributes)
@@ -181,10 +182,9 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
         
         try {
             Subject sub = new Subject(ni);
-            Set<Statement> statements = 
-                new HashSet<Statement>();
-            statements.add(new AuthenticationStatement(authMethod, authInstant,
-                            sub, null, null));
+            sub.setSubjectConfirmation(new SubjectConfirmation(SAMLConstants.CONFIRMATION_METHOD_BEARER));
+            Set<Statement> statements = new HashSet<Statement>();
+            statements.add(new AuthenticationStatement(authMethod, authInstant, sub, null, null));
 
             if ((attributes != null) && (!attributes.isEmpty())) {
                 statements.add(new AttributeStatement(sub, attributes));
@@ -200,13 +200,11 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
                 WSFederationUtils.getMetaManager();
             FederationElement idp = 
                 metaManager.getEntityDescriptor(realm, idpEntityId);
-            FederationElement sp = 
-                metaManager.getEntityDescriptor(realm, spEntityId);
-            
+
             String issuer = metaManager.getTokenIssuerName(idp);
-        
+
             List<String> targets = new ArrayList<String>();
-            targets.add(metaManager.getTokenIssuerName(sp));
+            targets.add(spTokenIssuerName);
             
             AudienceRestrictionCondition arc = 
                 new AudienceRestrictionCondition(targets);
