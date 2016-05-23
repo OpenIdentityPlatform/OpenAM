@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.http;
 
 import static org.forgerock.json.JsonValue.*;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
@@ -48,6 +50,7 @@ import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException
 import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Post;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
@@ -121,6 +124,12 @@ public class AuthenticationServiceV1 {
         final String sessionUpgradeSSOTokenId = urlQueryString.getFirst("sessionUpgradeSSOTokenId");
 
         try {
+
+            // We check the session upgrade token first
+            if (!StringUtils.isEmpty(sessionUpgradeSSOTokenId)) {
+                // Return Bad Request if not a valid upgrade token
+                SSOTokenManager.getInstance().createSSOToken(sessionUpgradeSSOTokenId);
+            }
             JsonValue jsonContent;
             try {
                 jsonContent = getJsonContent(httpRequest);
@@ -151,6 +160,8 @@ public class AuthenticationServiceV1 {
         } catch (RestAuthException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
             return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
+        } catch (SSOException e) {
+            return handleErrorResponse(httpRequest, Status.BAD_REQUEST, e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             return handleErrorResponse(httpRequest, Status.INTERNAL_SERVER_ERROR, e);
