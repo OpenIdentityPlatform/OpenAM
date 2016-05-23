@@ -329,7 +329,7 @@
                                  i18nKey="a129"
                                  resourceName="lockoutWarnUserCount">
                     <DefaultValues>
-                        <Value>4</Value>
+                        <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-lockout-attribute-name"
