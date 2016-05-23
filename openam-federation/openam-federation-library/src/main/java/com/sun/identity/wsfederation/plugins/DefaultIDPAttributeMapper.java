@@ -24,7 +24,7 @@
  *
  * $Id: DefaultIDPAttributeMapper.java,v 1.4 2008/08/29 02:29:17 superpat7 Exp $
  *
- * Portions Copyrighted 2016 ForgeRock AS
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.StringTokenizer;
 
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
@@ -154,7 +155,13 @@ public class DefaultIDPAttributeMapper extends DefaultAttributeMapper implements
 
             for (Map.Entry<String, String> entry : configMap.entrySet()) {
 
+                String namespace = null;
                 String samlAttribute = entry.getKey();
+                StringTokenizer tokenizer = new StringTokenizer(samlAttribute, "|");
+                if (tokenizer.countTokens() > 1) {
+                    namespace = tokenizer.nextToken();
+                    samlAttribute = tokenizer.nextToken();
+                }
                 String localAttribute = entry.getValue();
 
                 Set<String> attributeValues = null;
@@ -187,7 +194,7 @@ public class DefaultIDPAttributeMapper extends DefaultAttributeMapper implements
                         debug.message("DefaultIDPAttributeMapper.getAttribute: user does not have " + localAttribute);
                     }
                 } else {
-                    attributes.add(getSAMLAttribute(samlAttribute, attributeValues));
+                    attributes.add(getSAMLAttribute(namespace, samlAttribute, attributeValues));
                 }
             }
 
@@ -208,10 +215,14 @@ public class DefaultIDPAttributeMapper extends DefaultAttributeMapper implements
      * @param values attribute values.
      * @exception WSFederationException if any failure.
      */
-    protected Attribute getSAMLAttribute(String name, Set<String> values) throws WSFederationException {
+    protected Attribute getSAMLAttribute(String namespace, String name, Set<String> values) throws WSFederationException {
 
         if (name == null) {
             throw new WSFederationException(bundle.getString("nullInput"));
+        }
+
+        if (namespace == null) {
+            namespace = WSFederationConstants.CLAIMS_URI;
         }
 
         Attribute attribute = null;
@@ -228,7 +239,7 @@ public class DefaultIDPAttributeMapper extends DefaultAttributeMapper implements
                 list.add(XMLUtils.toDOMDocument(attrValueString, debug).getDocumentElement());
             }
             try {
-                attribute = new Attribute(name, WSFederationConstants.CLAIMS_URI, list);
+                attribute = new Attribute(name, namespace, list);
             } catch (SAMLException se) {
                 throw new WSFederationException(se);
             }
