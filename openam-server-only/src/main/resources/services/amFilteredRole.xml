@@ -26,6 +26,7 @@
 
    $Id: amFilteredRole.xml,v 1.4 2008/06/25 05:46:12 qcheng Exp $
 
+   Portions Copyrighted 2016 ForgeRock AS.
 -->
 
 
@@ -38,7 +39,8 @@
     <Service name="sunIdentityFilteredRoleService" version="1.0">
 	<Schema
            i18nFileName="amEntrySpecific"
-            revisionNumber="20">
+            revisionNumber="20"
+			resourceName="EMPTY">
             <Dynamic>
                 <AttributeSchema name="nsRoleFilter"
                     type="single"
