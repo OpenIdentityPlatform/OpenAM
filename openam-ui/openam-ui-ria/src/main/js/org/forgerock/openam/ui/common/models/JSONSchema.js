@@ -109,10 +109,8 @@ define([
             return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
         }
         hasInheritance () {
-            return _.every(this.raw.properties, (property) =>
-                property.type === "object" &&
-                _.has(property, "properties.inherited")
-            );
+            return !_.isEmpty(this.raw.properties) && _.every(this.raw.properties, (property) =>
+                property.type === "object" && _.has(property, "properties.inherited"));
         }
         /**
          * Whether this schema objects' properties are all schemas in their own right.
