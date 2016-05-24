@@ -86,7 +86,10 @@ module.exports = function (grunt) {
                         sourceMaps: true
                     }
                 },
-                presets: ["es2015"]
+                presets: ["es2015"],
+                plugins: [["transform-es2015-classes", {
+                    "loose": true
+                }]]
             },
             transpile: {
                 files: [{
@@ -116,7 +119,9 @@ module.exports = function (grunt) {
                     }
                 }],
                 options: {
-                    plugins: ["transform-es2015-modules-amd"]
+                    plugins: [["transform-es2015-classes", {
+                        "loose": true
+                    }], "transform-es2015-modules-amd"]
                 }
             }
         },
