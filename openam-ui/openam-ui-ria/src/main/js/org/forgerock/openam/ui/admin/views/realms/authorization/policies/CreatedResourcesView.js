@@ -82,18 +82,16 @@ define([
         validate (inputs) {
             // This is very simple native validation for supporting browsers for now.
             // More complexity to come later.
-            var self = this;
-            self.valid = true;
+            let allInputsValid = true;
 
-            _.find(inputs, function (input) {
-                // unsupporting browsers will return undefined not false
-                if (input.checkValidity() === false) {
-                    self.valid = false;
+            _.find(inputs, (input) => {
+                if (_.isFunction(input.checkValidity) && !input.checkValidity()) {
+                    allInputsValid = false;
                     return;
                 }
             });
 
-            return self.valid;
+            return allInputsValid;
         },
 
         addResource (e) {
