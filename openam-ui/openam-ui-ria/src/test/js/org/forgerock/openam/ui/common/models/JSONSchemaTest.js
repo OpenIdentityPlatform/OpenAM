@@ -15,8 +15,9 @@
  */
 
 define([
-    "org/forgerock/openam/ui/common/models/JSONSchema"
-], (JSONSchema) => {
+    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "org/forgerock/openam/ui/common/models/JSONValues"
+], (JSONSchema, JSONValues) => {
     describe("org/forgerock/openam/ui/common/models/JSONSchema", () => {
         describe("#fromGlobalAndOrganisation", () => {
             const jsonSchema = new JSONSchema({
@@ -91,7 +92,7 @@ define([
                 expect(jsonSchema.hasInheritance()).to.be.false;
             });
         });
-        describe("#removeInheritance", () => {
+        describe("#toFlatWithInheritanceMeta", () => {
             const jsonSchema = new JSONSchema({
                 "type": "object",
                 "properties": {
@@ -108,23 +109,58 @@ define([
                                 required: true
                             }
                         }
+                    },
+                    "anotherPropertyKey": {
+                        type: "object",
+                        title: "Title",
+                        properties: {
+                            value: {
+                                type: "string",
+                                required: true
+                            },
+                            inherited: {
+                                type: "boolean",
+                                required: true
+                            }
+                        }
                     }
+                }
+            });
+
+            const jsonValues = new JSONValues({
+                "propertyKey": {
+                    "value": "someValue",
+                    "inherited": true
+                },
+                "anotherPropertyKey": {
+                    "value": "anotherValue",
+                    "inherited": false
                 }
             });
 
             let schema;
 
             beforeEach(() => {
-                schema = jsonSchema.removeInheritance();
+                schema = jsonSchema.toFlatWithInheritanceMeta(jsonValues);
             });
 
             it("flattens inherited property values onto the top-level properties", () => {
-                expect(schema.raw.properties).to.have.keys("propertyKey");
+                expect(schema.raw.properties).to.contain.keys("propertyKey");
                 expect(schema.raw.properties.propertyKey).to.contain.keys("type", "required");
             });
 
             it("sets the title on the flattened properties", () => {
                 expect(schema.raw.properties.propertyKey.title).eq("Title");
+            });
+
+            it("adds 'isInherited' key to each property of the schema", () => {
+                expect(schema.raw.properties).to.contain.keys("propertyKey");
+                expect(schema.raw.properties.propertyKey).to.contain.keys("isInherited");
+                expect(schema.raw.properties.propertyKey.isInherited).eq(true);
+
+                expect(schema.raw.properties).to.contain.keys("anotherPropertyKey");
+                expect(schema.raw.properties.anotherPropertyKey).to.contain.keys("isInherited");
+                expect(schema.raw.properties.anotherPropertyKey.isInherited).eq(false);
             });
         });
     });

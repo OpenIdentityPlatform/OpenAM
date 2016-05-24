@@ -135,15 +135,21 @@ define([
 
             return new JSONSchema(schema);
         }
-        removeInheritance (jsonValues) {
+        /**
+         * Flattens schema properties to enable schema to be renderable. Adds inheritance metadata to each property of
+         * the schema, so JSONEditor knows whether to enable or disable the input field.
+         * @param {JSONValues} values JSONValues object to take inheritance metadata from.
+         * @returns {JSONSchema} Flattened JSONSchema object with inheritance metadata.
+         */
+        toFlatWithInheritanceMeta (values) {
             const schema = _.cloneDeep(this.raw);
-            schema.properties = _.mapValues(this.raw.properties, (rawValue, propName) => {
-                const property = rawValue.properties.value;
-                property.title = rawValue.title;
-                property.description = rawValue.description;
+            schema.properties = _.mapValues(this.raw.properties, (originalValue, propName) => {
+                const property = originalValue.properties.value;
+                property.title = originalValue.title;
+                property.description = originalValue.description;
 
-                const valueIsInherited = jsonValues[propName] && jsonValues[propName].inherited;
-                property.isInherited = !!valueIsInherited;
+                const valueIsInherited = Boolean(values.raw[propName] && values.raw[propName].inherited);
+                property.isInherited = valueIsInherited;
                 return property;
             });
 

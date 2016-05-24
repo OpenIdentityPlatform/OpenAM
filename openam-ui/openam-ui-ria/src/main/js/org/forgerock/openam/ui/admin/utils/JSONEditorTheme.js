@@ -352,7 +352,7 @@ define([
                 getInheritanceButton: function (valueIsInherited, path) {
                     const button = document.createElement("button");
                     button.type = "button";
-                    button.className = "btn fr-btn-secondary am-btn-single-icon inheritance-button";
+                    button.className = "btn fr-btn-secondary am-btn-single-icon";
                     button.setAttribute("data-inherit-value", valueIsInherited);
                     button.setAttribute("data-schemapath", path);
                     button.dataToggle = "button";

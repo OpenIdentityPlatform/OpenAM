@@ -29,6 +29,10 @@ define([
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/servers`);
     const DEFAULT_SERVER = "server-default";
     const ADVANCED_SECTION = "advanced";
+    const isDefaultServer = (serverId) => serverId === "server-defaults";
+    const normalizeServerId = (serverId) => {
+        return isDefaultServer(serverId) ? DEFAULT_SERVER : serverId;
+    };
 
     const objectToArray = (valuesObject) => _.map(valuesObject, (value, key) => ({ key, value }));
     const arrayToObject = (valuesArray) => _.reduce(valuesArray, (result, item) => {
@@ -72,13 +76,30 @@ define([
             type: "POST",
             data: JSON.stringify({ clonedUrl })
         }),
-        get: (server, section) => Promise.all([
-            getSchema(server, section),
-            getValues(server, section)
-        ]).then((response) => ({
-            schema: response[0],
-            values: response[1]
-        })),
+        get: (server, section) => {
+            return Promise.all([
+                getSchema(server, section),
+                getValues(server, section)
+            ]).then((response) => ({
+                schema: response[0],
+                values: response[1]
+            }));
+        },
+        getWithDefaults: (server, section) => {
+            const normalizedServerId = normalizeServerId(server);
+            const promises = [obj.servers.get(normalizedServerId, section)];
+
+            if (!isDefaultServer(server)) {
+                promises.push(getValues(DEFAULT_SERVER, section));
+            }
+            return Promise.all(promises).then(([instance, defaultValues = {}]) => {
+                return {
+                    schema: instance.schema,
+                    values: instance.values,
+                    defaultValues
+                };
+            });
+        },
         getAll: () => obj.serviceCall({
             url: "?_queryFilter=true",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -94,7 +115,7 @@ define([
             type: "POST",
             data: JSON.stringify(data)
         }),
-        update: (section, data, id) => updateServer(section, data, id),
+        update: (section, data, id) => updateServer(section, data, normalizeServerId(id)),
         ADVANCED_SECTION,
         DEFAULT_SERVER
     };

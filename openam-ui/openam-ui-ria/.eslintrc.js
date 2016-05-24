@@ -20,7 +20,6 @@ module.exports = {
          * --------------------------------------------------------------------------------
          */
         "array-bracket-spacing": [2, "never"],
-        "arrow-body-style": [2, "as-needed"],
         "arrow-parens": [2, "always"],
         "arrow-spacing": 2,
         "block-spacing": [2, "always"],
@@ -120,6 +119,10 @@ module.exports = {
         //"no-console": 0
         //"no-param-reassign": 0
 
+        /**
+         * Disabled rules
+         */
+        "arrow-body-style": 0,
         /**
          * Disabled because these rules aren't available in ESLint 2.0.
          * TODO: Remove them from eslint-config-forgerock

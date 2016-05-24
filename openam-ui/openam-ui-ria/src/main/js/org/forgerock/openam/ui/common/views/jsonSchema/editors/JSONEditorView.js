@@ -63,8 +63,18 @@ define([
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(GRID_COLUMN_WIDTH_1, GRID_COLUMN_WIDTH_2);
 
         const hasInheritance = schema.hasInheritance();
-        const actualSchema = (hasInheritance ? schema.removeInheritance(values.raw) : schema).raw;
-        const actualValues = (hasInheritance ? values.removeInheritance() : values).raw;
+        let actualSchema;
+        let actualValues;
+
+        if (hasInheritance) {
+            actualSchema = schema.toFlatWithInheritanceMeta(values);
+            actualValues = values.removeInheritance();
+        } else {
+            actualSchema = schema;
+            actualValues = values;
+        }
+        actualSchema = actualSchema.raw;
+        actualValues = actualValues.raw;
 
         const editor = new JSONEditor(element[0], {
             "disable_collapse": true,
@@ -101,10 +111,11 @@ define([
             this.options.values = this.options.values.addValueForKey(propertySchemaPath, "inherited", isInherited);
             this.options.values = this.options.values.addValueForKey(propertySchemaPath, "value", propValue);
 
-            this.$el.empty();
             this.render();
         },
         render () {
+            this.$el.empty();
+
             this.jsonEditor = applyJSONEditorToElement(
                 this.$el,
                 this.options.schema,
