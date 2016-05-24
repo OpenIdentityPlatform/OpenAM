@@ -65,8 +65,8 @@ import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.openam.oauth2.OAuth2RealmResolver;
+import org.forgerock.openam.oauth2.OAuthTokenStore;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -123,13 +123,13 @@ public class TokenResource implements CollectionResourceProvider {
     public static final String INDEFINITE_TOKEN_STRING_PROPERTY_NAME = "indefiniteTokenString";
     private final ClientDAO clientDao;
 
-    private final TokenStore tokenStore;
+    private final OAuthTokenStore tokenStore;
     private final OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final Debug debug;
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
     private static AMIdentity adminUserId = null;
-    private final OAuth2RealmResolver realmResolver;
+    private final OpenAMSettings authServiceSettings;
 
     static {
         if (adminUser != null) {
@@ -141,14 +141,14 @@ public class TokenResource implements CollectionResourceProvider {
     private final IdentityManager identityManager;
 
     @Inject
-    public TokenResource(TokenStore tokenStore, ClientDAO clientDao, IdentityManager identityManager,
-            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
-             OAuth2RealmResolver realmResolver, @Named("frRest") Debug debug) {
+    public TokenResource(OAuthTokenStore tokenStore, ClientDAO clientDao, IdentityManager identityManager,
+            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, OpenAMSettings authServiceSettings,
+            @Named("frRest") Debug debug) {
         this.tokenStore = tokenStore;
         this.clientDao = clientDao;
         this.identityManager = identityManager;
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
-        this.realmResolver = realmResolver;
+        this.authServiceSettings = authServiceSettings;
         this.debug = debug;
     }
 
@@ -173,7 +173,7 @@ public class TokenResource implements CollectionResourceProvider {
                         }
                     });
         } else if ("revokeTokens".equalsIgnoreCase(actionId)) {
-            return revokeTokens(resourceId, context, request)
+            return revokeTokens(resourceId, request)
                     .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
                         @Override
                         public Promise<ActionResponse, ResourceException> apply(Void value) {
@@ -206,7 +206,6 @@ public class TokenResource implements CollectionResourceProvider {
     private Promise<Void, ResourceException> deleteToken(Context context, String tokenId, boolean deleteRefreshToken) {
         try {
             AMIdentity uid = getUid(context);
-            String realm = realmResolver.resolveFrom(context);
 
             JsonValue token = getToken(tokenId);
             String username = getAttributeValue(token, USERNAME);
@@ -222,17 +221,17 @@ public class TokenResource implements CollectionResourceProvider {
 
             if (grantType != null && grantType.equalsIgnoreCase(CLIENT_CREDENTIALS)) {
                 if (deleteRefreshToken) {
-                    deleteAccessTokensRefreshToken(realm, token);
+                    deleteAccessTokensRefreshToken(token);
                 }
-                tokenStore.delete(realm, tokenId);
+                tokenStore.delete(tokenId);
             } else {
-                realm = getAttributeValue(token, REALM);
+                String realm = getAttributeValue(token, REALM);
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(uid2) || uid.equals(adminUserId)) {
                     if (deleteRefreshToken) {
-                        deleteAccessTokensRefreshToken(realm, token);
+                        deleteAccessTokensRefreshToken(token);
                     }
-                    tokenStore.delete(realm, tokenId);
+                    tokenStore.delete(tokenId);
                 } else {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: DELETE : Only the resource owner or an administrator may perform "
@@ -244,7 +243,7 @@ public class TokenResource implements CollectionResourceProvider {
 
             return newResultPromise(null);
 
-        } catch (ServerException | org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+        } catch (CoreTokenException e) {
             return new ServiceUnavailableException(e.getMessage(), e).asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
@@ -263,14 +262,12 @@ public class TokenResource implements CollectionResourceProvider {
     /**
      * Deletes an access token and its associated refresh token or just the provided refresh token.
      * @param tokenId The token id.
-     * @param context The context.
      * @param request The action request.
      * @return {@code true} if the token has been deleted.
      */
-    private Promise<Void, ResourceException> revokeTokens(final String tokenId, Context context , ActionRequest request)  {
+    private Promise<Void, ResourceException> revokeTokens(final String tokenId, ActionRequest request) {
         try {
             JsonValue token = getToken(tokenId);
-            String realm = realmResolver.resolveFrom(context);
 
             String username = getAttributeValue(token, USERNAME);
             if (StringUtils.isEmpty(username)) {
@@ -291,25 +288,20 @@ public class TokenResource implements CollectionResourceProvider {
                 debug.error("TokenResource :: revokeTokens : clientIds do not match");
                 throw new ForbiddenException("Unauthorized", null);
             } else {
-                deleteAccessTokensRefreshToken(realm, token);
-                tokenStore.delete(realm, tokenId);
+                deleteAccessTokensRefreshToken(token);
+                tokenStore.delete(tokenId);
             }
 
             return newResultPromise(null);
-        } catch (ServerException | org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+        } catch (CoreTokenException e) {
             return new ServiceUnavailableException(e.getMessage(), e).asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
         }
     }
 
-    private JsonValue getToken(String tokenId) throws ServerException, NotFoundException {
-        JsonValue token;
-        try {
-            token = tokenStore.read(tokenId);
-        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-            throw new NotFoundException("Token Not Found", null);
-        }
+    private JsonValue getToken(String tokenId) throws CoreTokenException, NotFoundException {
+        JsonValue token = tokenStore.read(tokenId);
         if (token == null) {
             debug.error("TokenResource :: No token with ID, " + tokenId + " found");
             throw new NotFoundException("Token Not Found", null);
@@ -320,15 +312,14 @@ public class TokenResource implements CollectionResourceProvider {
     /**
      * Deletes the provided access token's refresh token.
      *
-     * @param realm The Realm.
      * @param token The access token.
-     * @throws ServerException If there was a problem deleting the refresh token.
+     * @throws CoreTokenException If there was a problem deleting the refresh token.
      */
-    private void deleteAccessTokensRefreshToken(String  realm, JsonValue token) throws ServerException, org.forgerock.oauth2.core.exceptions.NotFoundException {
+    private void deleteAccessTokensRefreshToken(JsonValue token) throws CoreTokenException {
         if (OAUTH_ACCESS_TOKEN.equals(getAttributeValue(token, TOKEN_NAME))) {
             String refreshTokenId = getAttributeValue(token, REFRESH_TOKEN);
             if (refreshTokenId != null) {
-                tokenStore.delete(realm, refreshTokenId);
+                tokenStore.delete(refreshTokenId);
             }
         }
     }
@@ -433,14 +424,13 @@ public class TokenResource implements CollectionResourceProvider {
             } else if (userNamePresent) {
                 return new BadRequestException("userName field MUST NOT be set in _queryId").asPromise();
             }
-            String realm = realmResolver.resolveFrom(context);
-            response = tokenStore.queryForToken(realm, QueryFilter.and(query));
+            response = tokenStore.query(QueryFilter.and(query));
             return handleResponse(handler, response, context);
 
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the client is not authorized.", e);
             return new PermanentException(401, e.getMessage(), e).asPromise();
-        } catch (CoreTokenException | ServerException | org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+        } catch (CoreTokenException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the token store is not available.", e);
             return new ServiceUnavailableException(e.getMessage(), e).asPromise();
         } catch (InternalServerErrorException e) {
@@ -461,9 +451,8 @@ public class TokenResource implements CollectionResourceProvider {
         throw new IllegalArgumentException("I don't understand the OAuth 2.0 field called " + fieldname);
     }
 
-    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response,
-            Context context) throws UnauthorizedClientException,
-            CoreTokenException, InternalServerErrorException, NotFoundException, ServerException {
+    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response, Context context) throws UnauthorizedClientException,
+            CoreTokenException, InternalServerErrorException, NotFoundException {
         ResourceResponse resource = newResourceResponse("result", "1", response);
         JsonValue value = resource.getContent();
         String acceptLanguage = context.asContext(HttpContext.class).getHeaderAsString("accept-language");
@@ -611,8 +600,6 @@ public class TokenResource implements CollectionResourceProvider {
             }
         } catch (ServerException | SMSException | SSOException e) {
             throw new InternalServerErrorException(e);
-        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-            throw new NotFoundException("Refresh Token Not Found", null);
         }
     }
 
@@ -632,7 +619,7 @@ public class TokenResource implements CollectionResourceProvider {
             ResourceResponse resource;
             try {
                 response = tokenStore.read(resourceId);
-            } catch (ServerException | org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+            } catch (CoreTokenException e) {
                 if (debug.errorEnabled()) {
                     debug.error("TokenResource :: READ : No token found with ID, " + resourceId);
                 }
