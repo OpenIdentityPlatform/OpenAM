@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CreateFedletViewBean.java,v 1.4 2008/07/24 18:16:55 veiming Exp $
  *
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.console.task;
@@ -205,7 +206,12 @@ public class CreateFedletViewBean
             if ((realm != null) && (realm.trim().length() > 0)) {
                 Map mapCots = (Map)map.get(realm);
                 Set cots = new TreeSet();
-                cots.addAll(mapCots.keySet());
+                if (mapCots != null) {
+                    cots.addAll(mapCots.keySet());
+                } else {
+                    CreateFedletWarningViewBean vb = (CreateFedletWarningViewBean) getViewBean(CreateFedletWarningViewBean.class);
+                    vb.forwardTo(getRequestContext());
+                }
                 CCDropDownMenu menuCOT = (CCDropDownMenu)getChild("choiceCOT");
                 menuCOT.setOptions(createOptionList(cots));
                 
