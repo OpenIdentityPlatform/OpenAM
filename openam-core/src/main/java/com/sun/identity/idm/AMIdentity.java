@@ -52,6 +52,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
@@ -178,7 +179,7 @@ public class AMIdentity {
             univIdWithoutDN = univIdWithoutDN.substring(0, index);
             universalId = DN.valueOf(univIdWithoutDN);
         }
-        name = LDAPUtils.rdnValue(universalId.rdn());
+        name = LDAPUtils.unescapeValue(LDAPUtils.rdnValue(universalId.rdn()));
         type = new IdType(LDAPUtils.rdnValue(universalId.parent().rdn()));
         orgName = universalId.parent().parent().toString();
     }
@@ -204,6 +205,10 @@ public class AMIdentity {
     }
 
     public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type, String orgName) {
+        // escaped name will come in from xxx
+        // but escaped name fails if used in search.
+        name = LDAPUtils.unescapeValue(name);
+
         this.name = name;
         this.type = type;
         this.orgName = DNMapper.orgNameToDN(orgName);
@@ -212,14 +217,15 @@ public class AMIdentity {
             this.univDN = amsdkdn.toString();
         }
 
-        if (LDAPUtils.isDN(name)) {
+        // check if name is DN with more than one RDN
+        if (LDAPUtils.isDN(name, 1)) {
             name = LDAPUtils.rdnValueFromDn(name);
         }
 
         try {
             univIdWithoutDN = LDAPUtils.newDN(this.orgName)
                     .child(new RDN("ou", type.getName()))
-                    .child(new RDN("id", name))
+                    .child(new RDN("id", LDAPUtils.escapeValue(name)))
                     .toString();
         } catch (LocalizedIllegalArgumentException e) {
             throw new IllegalArgumentException("Cannot parse orgName: " + orgName, e);

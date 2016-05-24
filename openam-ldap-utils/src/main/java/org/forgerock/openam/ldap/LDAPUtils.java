@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+
 import javax.naming.InvalidNameException;
 
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
@@ -71,7 +72,7 @@ import org.forgerock.util.time.Duration;
  */
 public final class LDAPUtils {
 
-    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
+    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';', '='};
     private static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
     private static final String LDAP_SCOPE_ONE = "SCOPE_ONE";
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
@@ -535,8 +536,18 @@ public final class LDAPUtils {
      * @return {@code true} if the string is a DN.
      */
     public static boolean isDN(String candidateDN) {
+        return isDN(candidateDN, 0);
+    }
+
+    /**
+     * Tests whether the supplied string is a DN, and is not the root DN.
+     * @param candidateDN The possible DN.
+     * @param minNumComponent Check if dn has more than minimum components
+     * @return {@code true} if the string is a DN.
+     */
+    public static boolean isDN(String candidateDN, int minNumComponent) {
         try {
-            return newDN(candidateDN).size() > 0;
+            return newDN(candidateDN).size() > minNumComponent;
         } catch (LocalizedIllegalArgumentException e) {
             DEBUG.error("LDAPUtils.isDN: Invalid DN", e);
         }
@@ -551,6 +562,37 @@ public final class LDAPUtils {
      */
     public static String escapeValue(String str) {
         return DN.escapeAttributeValue(str);
+    }
+
+    /**
+     * Unescape characters that should be unescaped.
+     *
+     * @param str The string to unescape.
+     * @return The unescaped string.
+     */
+    public static String unescapeValue(String str) {
+        StringBuilder retbuf = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char currentChar = str.charAt(i);
+            if (currentChar == '\\') {
+                char nextChar = str.charAt(i + 1);
+                if (isEscapeCharacter(nextChar)) {
+                    currentChar = nextChar;
+                    i++;
+                }
+            }
+            retbuf.append(currentChar);
+        }
+        return retbuf.toString();
+    }
+
+    private static boolean isEscapeCharacter(char c) {
+        for (char escaped : ESCAPED_CHAR) {
+            if (c == escaped) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
