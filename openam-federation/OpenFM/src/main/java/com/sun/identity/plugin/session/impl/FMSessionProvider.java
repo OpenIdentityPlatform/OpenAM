@@ -213,7 +213,7 @@ public class FMSessionProvider implements SessionProvider {
         AuthContext ac = null;
         try {
             if (oldSession != null) {
-                ac = new AuthContext((SSOToken) oldSession, true);
+                ac = new AuthContext((SSOToken) oldSession);
             } else {
                 ac = new AuthContext(realm);
             }
