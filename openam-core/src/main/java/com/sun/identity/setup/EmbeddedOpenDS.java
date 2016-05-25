@@ -32,12 +32,9 @@ package com.sun.identity.setup;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
-
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -67,10 +64,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
 
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
 import org.forgerock.guava.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.ldap.LDAPRequests;
@@ -92,7 +91,9 @@ import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownPriority;
 import org.forgerock.util.time.Duration;
 import org.opends.quicksetup.TempLogFile;
+import org.opends.server.api.Backend;
 import org.opends.server.core.DirectoryServer;
+import org.opends.server.core.LockFileManager;
 import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
 import org.opends.server.tools.InstallDS;
 import org.opends.server.tools.RebuildIndex;
@@ -101,6 +102,7 @@ import org.opends.server.types.DirectoryEnvironmentConfig;
 import org.opends.server.util.EmbeddedUtils;
 import org.opends.server.util.ServerConstants;
 import org.opends.server.util.TimeThread;
+import org.opends.server.workflowelement.localbackend.LocalBackendWorkflowElement;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -1352,6 +1354,23 @@ public class EmbeddedOpenDS {
             }
             debug.message("EmbeddedOpenDS:rebuildIndex:Result:" +
                     outStr);
+        }
+        for (Backend<?> backend : DirectoryServer.getBackends()) {
+            try {
+                LocalBackendWorkflowElement.removeAll();
+                backend.finalizeBackend();
+                try {
+                    String lockFile = LockFileManager.getBackendLockFileName(backend);
+                    StringBuilder failureReason = new StringBuilder();
+                    LockFileManager.releaseLock(lockFile, failureReason);
+                } catch (Exception e) {
+                    debug.error("Failed to unlock DJ file locks", e);
+                    throw new Exception("Failed to unlock DJ file locks", e);
+                }
+            } catch (Exception e) {
+                debug.error("Failed to clean up DJ backends", e);
+                throw new Exception("Failed to clean up DJ backends", e);
+            }
         }
         startServer(getOpenDJBaseDir(map));
         return ret;
