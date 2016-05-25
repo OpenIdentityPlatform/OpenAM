@@ -11,18 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.selfservice.config.beans;
 
-import org.forgerock.openam.sm.config.ConfigAttribute;
-import org.forgerock.openam.sm.config.ConfigSource;
-import org.forgerock.util.Reject;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import org.forgerock.openam.sm.config.ConfigAttribute;
+import org.forgerock.openam.sm.config.ConfigSource;
+import org.forgerock.util.Reject;
 
 /**
  * Represents forgotten password console configuration.
@@ -42,6 +42,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
     private final Map<Locale, String> messageTranslations;
     private final boolean captchaEnabled;
     private final boolean kbaEnabled;
+    private final RegistrationDestination userRegistrationDestination;
 
     private UserRegistrationConsoleConfig(UserRegistrationBuilder builder) {
         super(builder);
@@ -55,6 +56,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         kbaEnabled = builder.kbaEnabled;
         subjectTranslations = builder.subjectTranslations;
         messageTranslations = builder.messageTranslations;
+        userRegistrationDestination = builder.userRegistrationDestination;
     }
 
     @Override
@@ -144,6 +146,15 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
     }
 
     /**
+     * Gets the user registration destination.
+     *
+     * @return user registration destination
+     */
+    public RegistrationDestination getUserRegistrationDestination() {
+        return userRegistrationDestination;
+    }
+
+    /**
      * Builder for {@link UserRegistrationConsoleConfig}.
      */
     @ConfigSource({"MailServer", "selfService"})
@@ -160,6 +171,7 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         private final Map<Locale, String> messageTranslations;
         private boolean captchaEnabled;
         private boolean kbaEnabled;
+        private RegistrationDestination userRegistrationDestination;
 
         /**
          * Constructs a new builder.
@@ -279,6 +291,17 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
         @ConfigAttribute("selfServiceMinimumAnswersToDefine")
         public void setMinimumAnswersToDefine(int minimumAnswersToDefine) {
             this.minimumAnswersToDefine = minimumAnswersToDefine;
+        }
+
+        /**
+         * Sets the user registration destination.
+         *
+         * @param userRegistrationDestination
+         *         user registration destination
+         */
+        @ConfigAttribute(value = "selfServiceUserRegistrationDestination", transformer = DestinationTransformer.class)
+        public void setUserRegistrationDestination(RegistrationDestination userRegistrationDestination) {
+            this.userRegistrationDestination = userRegistrationDestination;
         }
 
         @Override

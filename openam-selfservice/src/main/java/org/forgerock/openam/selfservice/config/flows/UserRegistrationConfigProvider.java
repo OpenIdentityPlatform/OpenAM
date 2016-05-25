@@ -16,8 +16,12 @@
 
 package org.forgerock.openam.selfservice.config.flows;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.forgerock.openam.selfservice.KeyStoreJwtTokenConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
+import org.forgerock.openam.selfservice.config.beans.RegistrationDestination;
 import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
 import org.forgerock.selfservice.core.StorageType;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
@@ -29,9 +33,6 @@ import org.forgerock.selfservice.stages.kba.SecurityAnswerDefinitionConfig;
 import org.forgerock.selfservice.stages.registration.UserRegistrationConfig;
 import org.forgerock.selfservice.stages.user.UserDetailsConfig;
 import org.forgerock.services.context.Context;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The default user registration configuration definition.
@@ -83,6 +84,11 @@ public final class UserRegistrationConfigProvider
 
         stages.add(new UserRegistrationConfig()
                 .setIdentityServiceUrl("/users"));
+
+        if (config.getUserRegistrationDestination() == RegistrationDestination.AUTO_LOGIN) {
+            stages.add(new AutoLoginStageConfig()
+                    .setRealm(realm));
+        }
 
         KeyStoreJwtTokenConfig extendedJwtTokenConfig = new KeyStoreJwtTokenConfig()
                 .withEncryptionKeyPairAlias(config.getEncryptionKeyPairAlias())

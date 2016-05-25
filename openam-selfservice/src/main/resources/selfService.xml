@@ -257,6 +257,22 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="selfServiceUserRegistrationDestination"
+                                 type="single_choice"
+                                 syntax="string"
+                                 resourceName="userRegisteredDestination"
+                                 i18nKey="user.registration.destination"
+                                 order="161">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="user.registration.destination.default">default</ChoiceValue>
+                        <ChoiceValue i18nKey="user.registration.destination.login">login</ChoiceValue>
+                        <ChoiceValue i18nKey="user.registration.destination.auto-login">auto-login</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>default</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- Forgotten password -->
 
                 <AttributeSchema name="selfServiceForgottenPasswordEnabled"

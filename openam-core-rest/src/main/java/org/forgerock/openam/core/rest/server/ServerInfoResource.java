@@ -155,7 +155,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("kbaEnabled", String.valueOf(selfServiceInfo.isKbaEnabled()));
             result.put("selfRegistration", String.valueOf(selfServiceInfo.isUserRegistrationEnabled()));
             result.put("lang", getJsLocale(localeContext.getLocale()));
-            result.put("successfulUserRegistrationDestination", "default");
+            result.put("successfulUserRegistrationDestination", selfServiceInfo.getUserRegistrationDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
             result.put("referralsEnabled", Boolean.FALSE.toString());
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
