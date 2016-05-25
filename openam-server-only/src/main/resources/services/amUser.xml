@@ -26,7 +26,7 @@
   
    $Id: amUser.xml,v 1.5 2009/01/13 06:50:17 mahesh_prasad_r Exp $
   
-    Portions Copyrighted 2015 ForgeRock AS.
+    Portions Copyrighted 2015-2016 ForgeRock AS.
 
 -->
 
@@ -83,6 +83,7 @@
                     any="display"
                     i18nKey="d104"
                     resourceName="adminDNStartingView">
+				<IsOptional/>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-user-login-status"
                     type="single_choice"

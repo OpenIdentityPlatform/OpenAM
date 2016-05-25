@@ -17,31 +17,24 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -50,14 +43,18 @@ import org.forgerock.json.resource.annotations.Delete;
 import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
-import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
@@ -76,6 +73,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     final ServiceSchema dynamicSchema;
     private final SmsJsonConverter dynamicConverter;
+    private AMIdentityRepositoryFactory idRepoFactory;
 
     @Inject
     SmsSingletonProvider(@Assisted SmsJsonConverter converter,  @Assisted("schema") ServiceSchema schema,
@@ -83,7 +81,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
             @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug,
             @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
-            @Named("DefaultLocale") Locale defaultLocale) {
+            @Named("DefaultLocale") Locale defaultLocale, AMIdentityRepositoryFactory idRepoFactory) {
         super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug, resourceBundleCache,
                 defaultLocale);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
@@ -93,6 +91,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         } else {
             this.dynamicConverter = null;
         }
+        this.idRepoFactory = idRepoFactory;
     }
 
     /**
@@ -106,16 +105,23 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             String realm = realmFor(serverContext);
             JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
+            if (serviceNotAssignedToRealm(config, result)) {
+                throw new NotFoundException();
+            }
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
-        } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException | InternalServerErrorException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+        } catch (SMSException | SSOException | InternalServerErrorException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Read", e.getClass().getSimpleName(), e);
+            return new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()).asPromise();
         } catch (NotFoundException  e) {
             return e.asPromise();
         }
+    }
+
+    private boolean serviceNotAssignedToRealm(ServiceConfig config, JsonValue response) {
+        return (type != SchemaType.GLOBAL)
+                && (config == null || !config.exists())
+                && dynamicSchema != null
+                && (response.get(new JsonPointer("/dynamic")).asMap().isEmpty());
     }
 
     protected Map<String, Set<String>> getDynamicAttributes(String realm) {
@@ -154,35 +160,22 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         String resourceId = resourceId();
-        if (dynamicSchema != null) {
-            try {
-                updateDynamicAttributes(serverContext, updateRequest.getContent());
-            } catch (SMSException e) {
-                debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
-            } catch (SSOException e) {
-                debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
-            } catch (IdRepoException e) {
-                debug.warning("::SmsCollectionProvider:: IdRepoException on create", e);
-                return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
-            } catch (ResourceException e) {
-                return e.asPromise();
-            }
-        }
         try {
+            if (dynamicSchema != null) {
+                updateDynamicAttributes(serverContext, updateRequest.getContent());
+            }
+
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             String realm = realmFor(serverContext);
             saveConfigAttributes(config, convertFromJson(updateRequest.getContent(), realm));
+
             JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
-        } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+        } catch (SMSException | SSOException | IdRepoException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Update", e.getClass().getSimpleName(), e);
+            return new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()).asPromise();
         } catch (ResourceException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Update", e.getClass().getSimpleName(), e);
             return e.asPromise();
         }
     }
@@ -199,6 +192,14 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 if (type == SchemaType.GLOBAL) {
                     scm.removeGlobalConfiguration(null);
                 } else {
+                    if (dynamicSchema != null) {
+                        SSOToken ssoToken = getSsoToken(serverContext);
+
+                        AMIdentity realmIdentity = getRealmIdentity(realmFor(serverContext), ssoToken);
+                        if (isAssignedIdentityService(serviceName, realmIdentity)) {
+                            realmIdentity.unassignService(serviceName);
+                        }
+                    }
                     scm.deleteOrganizationConfig(realmFor(serverContext));
                 }
             } else {
@@ -206,13 +207,20 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 parent.removeSubConfig(resourceId());
             }
             return newResultPromise(newResourceResponse(resourceId(), "0", json(object(field("success", true)))));
-        } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
+        } catch (SMSException | SSOException | IdRepoException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Delete", e.getClass().getSimpleName(), e);
+            return new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()).asPromise();
         }
+    }
+
+    private boolean isAssignedIdentityService(String serviceName, AMIdentity realmIdentity) throws IdRepoException, SSOException {
+        Set servicesFromIdRepo = realmIdentity.getAssignedServices();
+        return servicesFromIdRepo.contains(serviceName);
+    }
+
+    private AMIdentity getRealmIdentity(String realm, SSOToken ssoToken) throws IdRepoException, SSOException {
+        AMIdentityRepository repo = idRepoFactory.create(realm, ssoToken);
+        return repo.getRealmIdentity();
     }
 
     /**
@@ -223,39 +231,63 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
         final String realm = realmFor(serverContext);
+        SSOToken ssoToken = getSsoToken(serverContext);
         try {
-            Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent(), realm);
+            JsonValue content = createRequest.getContent();
+
+            Map<String, Set<String>> attrsDynamic = convertFromJsonDynamic(content, realm);
+            Map<String, Set<String>> attrsDefaultAndGlobal = convertFromJson(content, realm);
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
-                                          ServiceConfig config;
+            ServiceConfig config;
             if (subSchemaPath.isEmpty()) {
                 if (type == SchemaType.GLOBAL) {
-                    config = scm.createGlobalConfig(attrs);
+                    config = scm.createGlobalConfig(attrsDefaultAndGlobal);
                 } else {
-                    config = scm.createOrganizationConfig(realm, attrs);
+                    if (dynamicSchema != null) {
+                        AMIdentity realmIdentity = getRealmIdentity(realm, ssoToken);
+                        if (isAssignableIdentityService(serviceName, realmIdentity)) {
+                            realmIdentity.assignService(serviceName, attrsDynamic);
+                        }
+                    }
+
+                    if (serviceHasDefaultOrGlobalSchema()) {
+                        config = scm.createOrganizationConfig(realm, attrsDefaultAndGlobal);
+                    }
+                    else {
+                        config = null;
+                    }
                 }
             } else {
                 ServiceConfig parent = parentSubConfigFor(serverContext, scm);
-                parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
+                parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrsDefaultAndGlobal);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
             JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
-        } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
-        } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
+        } catch (SMSException | SSOException | IdRepoException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Create", e.getClass().getSimpleName(), e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();
         } catch (ResourceException e) {
+            debug.warning("::SmsSingletonProvider:: {} on Create", e.getClass().getSimpleName(), e);
             return e.asPromise();
         }
+    }
+
+    private boolean isAssignableIdentityService(String serviceName, AMIdentity realmIdentity)
+            throws IdRepoException, SSOException {
+        Set servicesFromIdRepo = realmIdentity.getAssignableServices();
+        return servicesFromIdRepo.contains(serviceName);
+    }
+
+    private SSOToken getSsoToken(Context serverContext) {
+        return serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
     }
 
     @Override
     protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
-            addAttributeSchema(result, "/properties/", dynamicSchema, context);
+            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
         }
         return result;
     }
@@ -322,6 +354,13 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     private Map<String, Set<String>> convertFromJson(JsonValue value, String realm) throws ResourceException {
         preprocessJsonValue(value);
         return converter.fromJson(realm, value);
+    }
+
+    private Map<String, Set<String>> convertFromJsonDynamic(JsonValue value, String realm) throws ResourceException {
+        if (dynamicSchema == null) {
+            return Collections.emptyMap();
+        }
+        return dynamicConverter.fromJson(realm, value.get("dynamic"));
     }
 
     protected void saveConfigAttributes(ServiceConfig config, Map<String, Set<String>> attributes) throws SSOException,

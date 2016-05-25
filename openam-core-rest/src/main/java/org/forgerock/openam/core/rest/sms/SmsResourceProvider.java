@@ -275,7 +275,10 @@ public abstract class SmsResourceProvider {
 
     protected JsonValue createSchema(Context context) {
         JsonValue result = json(object(field("type", "object")));
-        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
+        if (serviceHasDefaultOrGlobalSchema()) {
+            addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
+        }
+        // Dynamic attributes will be added to the JSON response in the child class SmsSingletonProvider
         return result;
     }
 
@@ -292,41 +295,36 @@ public abstract class SmsResourceProvider {
      * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
      * property for the name of the config.
      */
-    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context, String authModuleResourceName,
-                                     boolean autoCreatedAuthModule) throws InternalServerErrorException {
-        if (config == null) {
-            return json(object());
-        } else {
-            JsonValue value = converter.toJson(realm, config.getAttributes(), true);
+    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context,
+            String authModuleResourceName, boolean autoCreatedAuthModule) throws InternalServerErrorException {
+        JsonValue value = json(object());
 
-            String id = config.getName();
-            if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
-                id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
+        if (serviceHasDefaultOrGlobalSchema()) {
+            if (config == null) {
+                return value;
             }
-            value.add("_id", id);
-            try {
-                value.add("_type", getTypeValue(context).getObject());
-            } catch (SSOException | SMSException e) {
-                debug.error("Error reading type for " + authModuleResourceName, e);
-                throw new InternalServerErrorException();
-            }
-            return value;
+            value = converter.toJson(realm, config.getAttributes(), true);
         }
+
+        String id = (null != config) ? config.getName() : "";
+        if (autoCreatedAuthModule && StringUtils.isEmpty(id)) {
+            id = AUTO_CREATED_AUTHENTICATION_MODULES.inverse().get(authModuleResourceName);
+        }
+        value.add("_id", id);
+        try {
+            value.add("_type", getTypeValue(context).getObject());
+        } catch (SSOException | SMSException e) {
+            debug.error("Error reading type for " + authModuleResourceName, e);
+            throw new InternalServerErrorException();
+        }
+        return value;
+    }
+
+    protected boolean serviceHasDefaultOrGlobalSchema() {
+        return !schema.getServiceType().equals(SchemaType.DYNAMIC);
     }
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
-        if (schemas.getServiceType().equals(SchemaType.DYNAMIC)) {
-            path = path.concat("dynamic/");
-            if (result.get(new JsonPointer(path)) != null) {
-                return;
-            }
-
-            result.putPermissive(new JsonPointer(path + TYPE), OBJECT_TYPE);
-            result.putPermissive(new JsonPointer(path + TITLE), "Dynamic");
-            result.putPermissive(new JsonPointer(path + PROPERTY_ORDER), 0);
-            path = path.concat("properties/");
-        }
-
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
         ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
         String serviceType = schemas.getServiceType().getType();

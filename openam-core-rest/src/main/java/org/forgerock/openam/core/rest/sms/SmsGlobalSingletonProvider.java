@@ -39,6 +39,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
@@ -61,9 +62,9 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
             @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
             @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug,
             @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
-            @Named("DefaultLocale") Locale defaultLocale) {
+            @Named("DefaultLocale") Locale defaultLocale, AMIdentityRepositoryFactory idRepoFactory) {
         super(globalConverter, globalSchema, dynamicSchema, type, subSchemaPath, uriPath, serviceHasInstanceName, debug,
-                resourceBundleCache, defaultLocale);
+                resourceBundleCache, defaultLocale, idRepoFactory);
         this.organizationSchema = organizationSchema;
         if (organizationSchema != null) {
             this.organizationConverter = new SmsJsonConverter(organizationSchema);
