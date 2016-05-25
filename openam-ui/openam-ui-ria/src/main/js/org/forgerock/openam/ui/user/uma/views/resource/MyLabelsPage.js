@@ -37,18 +37,18 @@ define([
         events: {
             "click button#deleteLabel": "deleteLabel"
         },
-        deleteLabel: function () {
+        deleteLabel () {
             var self = this,
                 buttons = [{
                     label: $.t("common.form.cancel"),
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.close();
                     }
                 }, {
                     id: "ok",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("ok").text($.t("common.form.working"));
 
@@ -74,13 +74,13 @@ define([
                 title: $.t("uma.resources.myLabels.deleteLabel.dialog.title"),
                 message: $.t("uma.resources.myLabels.deleteLabel.dialog.message"),
                 closable: false,
-                buttons: buttons
+                buttons
             });
         },
-        recordsPresent: function () {
+        recordsPresent () {
             this.$el.find("button#deleteLabel").prop("disabled", false);
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var labelId = args[0],
                 self = this;
 

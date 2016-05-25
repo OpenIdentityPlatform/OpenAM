@@ -23,7 +23,7 @@ define([
     "org/forgerock/commons/ui/common/main/Router"
 ], function (Router) {
     return {
-        filter: function (links) {
+        filter (links) {
             if (Router.currentRoute.navGroup) {
                 return links[Router.currentRoute.navGroup];
             }

@@ -32,16 +32,16 @@ define([
         events: {
             "click button#unshareAllResources": "unshareAllResources"
         },
-        recordsPresent: function () {
+        recordsPresent () {
             this.$el.find("button#unshareAllResources").prop("disabled", false);
         },
-        render: function (args, callback) {
+        render (args, callback) {
 
             this.data.labelId = args[1];
             this.data.topLevel = args[1] === "";
             this.renderResources(callback);
         },
-        renderResources: function (callback) {
+        renderResources (callback) {
             var self = this,
                 columns;
 
@@ -60,18 +60,18 @@ define([
             }
 
         },
-        unshareAllResources: function () {
+        unshareAllResources () {
             var self = this,
                 buttons = [{
                     label: $.t("common.form.cancel"),
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.close();
                     }
                 }, {
                     id: "ok",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("ok").text($.t("common.form.working"));
 
@@ -95,7 +95,7 @@ define([
                 title: $.t("uma.resources.myresources.unshareAllResources.dialog.title"),
                 message: $.t("uma.resources.myresources.unshareAllResources.dialog.message"),
                 closable: false,
-                buttons: buttons
+                buttons
             });
         }
     });

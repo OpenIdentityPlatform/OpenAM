@@ -36,7 +36,7 @@ define([
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
 
             this.data.realmLocation = args[0];
@@ -57,11 +57,11 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        renderTab: function (event) {
+        renderTab (event) {
             this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr("href").slice(1),
@@ -71,10 +71,10 @@ define([
             this.data.form = new Form(element, schema, this.data.formData.values[id]);
             this.$el.find("[data-header]").parent().hide();
         },
-        revert: function () {
+        revert () {
             this.data.form.reset();
         },
-        save: function () {
+        save () {
             var formData = this.data.form.data(),
                 self = this;
 
@@ -85,7 +85,7 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         }

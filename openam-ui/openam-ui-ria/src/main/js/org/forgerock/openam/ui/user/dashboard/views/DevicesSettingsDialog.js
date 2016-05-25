@@ -40,26 +40,26 @@ define([
             }, {
                 label: $.t("common.form.save"),
                 cssClass: "btn-primary",
-                action: function (dialog) {
+                action (dialog) {
                     authSkip = !dialog.$modalBody.find("#oathStatus").is(":checked");
                     DeviceManagementService.setDevicesOathSkippable(authSkip).then(function () {
                         dialog.close();
                     }, function (response) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: response
+                            response
                         });
                     });
                 }
             }
             ],
-            onshown: function (dialog) {
+            onshown (dialog) {
                 $.when(authSkip).then(function (skip) {
                     return UIUtils.compileTemplate(template, { authNeeded: !skip });
                 }, function (response) {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
-                        response: response
+                        response
                     });
                 }).then(function (tpl) {
                     dialog.$modalBody.append(tpl);

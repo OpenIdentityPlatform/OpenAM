@@ -26,7 +26,7 @@ define([
 ], function ($, _, AbstractView, DeviceManagementView, MyApplicationsView, OAuthTokensView, TrustedDevicesView) {
     var Dashboard = AbstractView.extend({
         template: "templates/user/dashboard/DashboardTemplate.html",
-        render: function () {
+        render () {
             this.parentRender(function () {
                 MyApplicationsView.render();
                 TrustedDevicesView.render();

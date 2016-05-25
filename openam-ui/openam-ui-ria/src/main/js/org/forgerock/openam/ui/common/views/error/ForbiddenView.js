@@ -21,7 +21,7 @@ define([
     var ForbiddenView = AbstractView.extend({
         template: "templates/common/error/403.html",
         data: {},
-        render: function () {
+        render () {
             if (!Configuration.loggedUser) {
                 this.baseTemplate = "templates/common/LoginBaseTemplate.html";
             }

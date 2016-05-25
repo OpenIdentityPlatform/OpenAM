@@ -44,16 +44,16 @@ define([
             "click [data-delete]": "onDeleteClick"
         },
 
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
 
-        onModelSync: function () {
+        onModelSync () {
             this.renderAfterSyncModel();
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var policySetName = args[1];
 
             this.realmPath = args[0];
@@ -87,7 +87,7 @@ define([
             }
         },
 
-        renderAfterSyncModel: function () {
+        renderAfterSyncModel () {
             this.data.entity = this.model.attributes;
             this.data.displayName = this.model.displayName;
 
@@ -98,7 +98,7 @@ define([
             this.renderApplication();
         },
 
-        renderApplication: function () {
+        renderApplication () {
             var self = this,
                 parentRenderCallback = function () {
                     self.parentRender(function () {
@@ -157,7 +157,7 @@ define([
             }
         },
 
-        populateResourceTypes: function () {
+        populateResourceTypes () {
             var self = this;
 
             this.resTypesSelection = this.$el.find("#resTypesSelection").selectize({
@@ -166,20 +166,20 @@ define([
                 labelField: "name",
                 searchField: "name",
                 options: this.data.options.allResourceTypes,
-                onChange: function (value) {
+                onChange (value) {
                     self.data.entity.resourceTypeUuids = value;
                 }
             });
         },
 
-        processConditions: function (data, envConditions, subjConditions) {
+        processConditions (data, envConditions, subjConditions) {
             if (!data.entityId) {
                 data.entity.conditions = this.populateConditions(envConditions, envConditions);
                 data.entity.subjects = this.populateConditions(subjConditions, subjConditions);
             }
         },
 
-        populateConditions: function (selected, available) {
+        populateConditions (selected, available) {
             var result = [];
             _.each(available, function (cond) {
                 result.push(cond.title);
@@ -187,7 +187,7 @@ define([
             return result;
         },
 
-        submitForm: function (e) {
+        submitForm (e) {
             e.preventDefault();
 
             var self = this,
@@ -218,14 +218,14 @@ define([
             }
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.policySet") },
                 _.bind(this.deletePolicySet, this));
         },
 
-        deletePolicySet: function () {
+        deletePolicySet () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySets, {
@@ -236,7 +236,7 @@ define([
                 },
                 onError = function (model, response) {
                     Messages.addMessage({
-                        response: response,
+                        response,
                         type: Messages.TYPE_DANGER
                     });
                 };

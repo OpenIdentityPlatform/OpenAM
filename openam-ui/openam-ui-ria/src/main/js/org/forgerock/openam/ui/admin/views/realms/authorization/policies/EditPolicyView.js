@@ -196,7 +196,7 @@ define([
                 labelField: "name",
                 searchField: "name",
                 options: self.data.options.availableResourceTypes,
-                onChange: function (value) {
+                onChange (value) {
                     self.changeResourceType(value);
                 }
             });

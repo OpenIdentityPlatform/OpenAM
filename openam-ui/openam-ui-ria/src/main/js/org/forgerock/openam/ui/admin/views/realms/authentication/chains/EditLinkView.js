@@ -28,7 +28,7 @@ define([
     var EditLinkView = AbstractView.extend({
         editLinkTemplate: "templates/admin/views/realms/authentication/chains/EditLinkTemplate.html",
         editLinkTableTemplate: "templates/admin/views/realms/authentication/chains/EditLinkTableTemplate.html",
-        show: function (view) {
+        show (view) {
             this.data = view.data;
             var self = this,
                 newLink = !self.data.linkConfig,
@@ -38,24 +38,24 @@ define([
                     : $.t("console.authentication.editChains.newModule");
 
             UIUtils.fillTemplateWithData(self.editLinkTemplate, {
-                linkConfig: linkConfig,
+                linkConfig,
                 allModules: formData.allModules,
                 allCriteria: formData.allCriteria
             }, function (template) {
                 UIUtils.fillTemplateWithData(self.editLinkTableTemplate, {
-                    linkConfig: linkConfig
+                    linkConfig
                 }, function (tableTemplate) {
                     BootstrapDialog.show({
-                        message: function () {
+                        message () {
                             var $template = $("<div></div>").append(template);
                             $template.find("#editLinkOptions").append(tableTemplate);
                             return $template;
                         },
-                        title: title,
+                        title,
                         closable: false,
                         buttons: [{
                             label: $.t("common.form.cancel"),
-                            action: function (dialog) {
+                            action (dialog) {
                                 view.parent.validateChain();
                                 dialog.close();
                             }
@@ -63,7 +63,7 @@ define([
                             label: $.t("common.form.ok"),
                             cssClass: "btn-primary",
                             id: "saveBtn",
-                            action: function (dialog) {
+                            action (dialog) {
                                 var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize;
 
                                 linkConfig.module = moduleSelectize.getValue();
@@ -83,31 +83,31 @@ define([
                                 dialog.close();
                             }
                         }],
-                        onshow: function (dialog) {
+                        onshow (dialog) {
                             dialog.getButton("saveBtn").disable();
                             dialog.getModalBody().find("#selectModule").selectize({
                                 options: formData.allModules,
                                 searchField: ["_id", "typeDescription"],
                                 render: {
-                                    item: function (item) {
+                                    item (item) {
                                         return `<div>${item._id} - <span class='text-muted'><em>${
                                             item.typeDescription
                                             }</em></span></div>`;
                                     },
-                                    option: function (item) {
+                                    option (item) {
                                         return `<div><div>${item._id}</div><div class='small text-muted'><em>${
                                             item.typeDescription
                                             }</em></div></div>`;
                                     }
                                 },
-                                onChange: function () {
+                                onChange () {
                                     dialog.options.validateDialog(dialog);
                                 }
 
                             });
 
                             dialog.getModalBody().find("#selectCriteria").selectize({
-                                onChange: function () {
+                                onChange () {
                                     dialog.options.validateDialog(dialog);
                                 }
                             });
@@ -136,7 +136,7 @@ define([
                                 dialog.options.validateDialog(dialog);
                             });
                         },
-                        validateDialog: function (dialog) {
+                        validateDialog (dialog) {
                             var moduleValue = dialog.getModalBody().find("#selectModule")[0].selectize.getValue(),
                                 criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
                             if (moduleValue.length === 0 || criteriaValue.length === 0) {
@@ -145,9 +145,9 @@ define([
                                 dialog.getButton("saveBtn").enable();
                             }
                         },
-                        refreshOptionsTab: function (dialog) {
+                        refreshOptionsTab (dialog) {
                             UIUtils.fillTemplateWithData(self.editLinkTableTemplate, {
-                                linkConfig: linkConfig
+                                linkConfig
                             }, function (tableTemplate) {
                                 dialog.getModalBody().find("#editLinkOptions").html(tableTemplate);
                             });

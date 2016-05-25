@@ -29,7 +29,7 @@ define([
         partials: [
             "partials/util/_Status.html"
         ],
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 realmPromise = RealmsService.realms.get(args[0]),
                 tasksPromise = DashboardService.dashboard.commonTasks.all(args[0]);

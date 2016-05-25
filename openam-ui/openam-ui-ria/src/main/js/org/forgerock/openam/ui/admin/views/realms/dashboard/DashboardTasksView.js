@@ -28,12 +28,12 @@ define([
             "click [data-panel-card] a" : "cardClick",
             "click [data-common-tasks]" : "commonTasksBtnClick"
         },
-        render: function (args, callback) {
+        render (args, callback) {
             this.realmPath = args[0];
             this.parentRender(callback);
         },
 
-        cardClick: function (e) {
+        cardClick (e) {
             var dataset = $(e.currentTarget).data();
             if (!dataset.taskLink || dataset.taskLink.indexOf("http") !== 0) {
                 e.preventDefault();
@@ -46,7 +46,7 @@ define([
             }
         },
 
-        commonTasksBtnClick: function (e) {
+        commonTasksBtnClick (e) {
             e.preventDefault();
             this.data.taskGroup = {};
             this.data.taskGroup.tasks = this.data.allTasks;

@@ -167,7 +167,7 @@ define([
          * clear out any previous theme.
          * @returns {Promise} a promise that is resolved when the theme has been applied.
          */
-        getTheme: function () {
+        getTheme () {
             validateConfig();
 
             var themeName = findMatchingTheme(Configuration.globalData.realm, getAuthenticationChainName()),

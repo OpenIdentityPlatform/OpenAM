@@ -69,7 +69,7 @@ define([
                         }),
                         parseState: BackgridUtils.parseState,
                         parseRecords: BackgridUtils.parseRecords,
-                        sync: function (method, model, options) {
+                        sync (method, model, options) {
                             options.beforeSend = function (xhr) {
                                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
                             };
@@ -98,7 +98,7 @@ define([
         renderTable (callback) {
             const self = this;
             const ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.parents().hasClass("fr-col-btn-2")) {

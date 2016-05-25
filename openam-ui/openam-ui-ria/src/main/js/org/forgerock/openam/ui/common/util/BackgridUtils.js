@@ -38,11 +38,11 @@ define([
     obj.DatetimeAgoCell = Backgrid.Cell.extend({
         className: "date-time-ago-cell",
         formatter: {
-            fromRaw: function (rawData) {
+            fromRaw (rawData) {
                 return moment(rawData).fromNow();
             }
         },
-        render: function () {
+        render () {
             obj.DatetimeAgoCell.__super__.render.apply(this);
             this.$el.attr("title", moment(this.model.get(this.column.get("name"))).format("Do MMMM YYYY, h:mm:ssa"));
             return this;
@@ -57,7 +57,7 @@ define([
     obj.ArrayCell = Backgrid.Cell.extend({
         className: "array-formatter-cell",
 
-        buildHtml: function (arrayVal) {
+        buildHtml (arrayVal) {
             var result = "<ul>",
                 i = 0;
 
@@ -73,7 +73,7 @@ define([
             return result;
         },
 
-        render: function () {
+        render () {
             this.$el.empty();
 
             var arrayVal = this.model.get(this.column.attributes.name);
@@ -92,7 +92,7 @@ define([
     obj.ObjectCell = Backgrid.Cell.extend({
         className: "object-formatter-cell",
 
-        render: function () {
+        render () {
             this.$el.empty();
 
             var object = this.model.get(this.column.attributes.name),
@@ -117,11 +117,11 @@ define([
 
     obj.UniversalIdToUsername = Backgrid.Cell.extend({
         formatter: {
-            fromRaw: function (rawData) {
+            fromRaw (rawData) {
                 return rawData.substring(3, rawData.indexOf(",ou=user"));
             }
         },
-        render: function () {
+        render () {
             obj.UniversalIdToUsername.__super__.render.apply(this);
             this.$el.attr("title", this.model.get(this.column.get("name")));
             return this;
@@ -142,7 +142,7 @@ define([
             "click": "onClick"
         },
 
-        onClick: function (e) {
+        onClick (e) {
             if (this.callback) {
                 this.callback(e);
             }
@@ -160,7 +160,7 @@ define([
      */
     obj.TemplateCell = Backgrid.Cell.extend({
         className: "template-cell",
-        render: function () {
+        render () {
             var self = this;
 
             UIUtils.fillTemplateWithData(this.template, this.model, function (content) {
@@ -178,7 +178,7 @@ define([
 
     obj.ClassHeaderCell = Backgrid.HeaderCell.extend({
         className: "",
-        render: function () {
+        render () {
             obj.ClassHeaderCell.__super__.render.apply(this);
             this.delegateEvents();
             return this;
@@ -189,7 +189,7 @@ define([
         events: {
             "click": "gotoUrl"
         },
-        render: function () {
+        render () {
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
                 formattedValue = this.formatter.fromRaw(rawValue, this.model),
@@ -210,7 +210,7 @@ define([
             return this;
         },
 
-        gotoUrl: function (e) {
+        gotoUrl (e) {
             e.preventDefault();
             var href = $(e.currentTarget).data("href");
             Router.navigate(href, { trigger: true });
@@ -220,7 +220,7 @@ define([
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
         className: "filter-header-cell enable-pointer",
-        render: function () {
+        render () {
             var filter = new Backgrid.Extension.ThemeableServerSideFilter({
                 name: this.column.get("name"),
                 placeholder: $.t("common.form.filter"),
@@ -313,7 +313,7 @@ define([
         options.error = function (response) {
             Messages.addMessage({
                 type: Messages.TYPE_DANGER,
-                response: response
+                response
             });
         };
 
@@ -329,7 +329,7 @@ define([
 
         return {
             _sortKeys: this.sortKeys,
-            _queryFilter: function () {
+            _queryFilter () {
                 return obj.queryFilter.call(this, data);
             },
             pageSize: "_pageSize",

@@ -24,7 +24,7 @@ define([
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/policies"),
 
-        defaults: function () {
+        defaults () {
             return {
                 name: null,
                 description: "",
@@ -33,7 +33,7 @@ define([
             };
         },
 
-        validate: function (attrs) {
+        validate (attrs) {
             if (attrs.name.trim() === "") {
                 return "errorNoName";
             }
@@ -48,7 +48,7 @@ define([
             }
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");

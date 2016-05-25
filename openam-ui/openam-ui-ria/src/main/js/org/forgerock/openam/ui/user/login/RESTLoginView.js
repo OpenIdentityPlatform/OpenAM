@@ -61,13 +61,13 @@ define([
                 cssClass: "login-dialog",
                 closable: false,
                 message: $("<div></div>"),
-                onshow: function () {
+                onshow () {
                     var dialog = this;
                     // change the target element of the view
                     self.noBaseTemplate = true;
                     self.element = dialog.message;
                 },
-                onshown: function () {
+                onshown () {
                     // return back to the default state
                     delete self.noBaseTemplate;
                     self.element = "#content";
@@ -105,7 +105,7 @@ define([
             "click input[type=submit]": "formSubmit"
         },
 
-        autoLogin: function () {
+        autoLogin () {
             var index,
                 submitContent = {},
                 auth = Configuration.globalData.auth;
@@ -120,7 +120,7 @@ define([
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
 
-        isZeroPageLoginAllowed: function () {
+        isZeroPageLoginAllowed () {
             var referer = document.referrer,
                 whitelist = Configuration.globalData.zeroPageLogin.refererWhitelist;
 
@@ -135,7 +135,7 @@ define([
             return !whitelist || !whitelist.length || whitelist.indexOf(referer) > -1;
         },
 
-        formSubmit: function (e) {
+        formSubmit (e) {
             var submitContent,
                 expire;
 
@@ -161,8 +161,8 @@ define([
             // END CUSTOM STAGE-SPECIFIC LOGIC HERE
 
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {
-                submitContent:submitContent,
-                failureCallback: function () {
+                submitContent,
+                failureCallback () {
                     // enabled the login button if login failure
                     $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
@@ -179,7 +179,7 @@ define([
             });
         },
 
-        render: function (args) {
+        render (args) {
             var urlParams = {}, // Deserialized querystring params
                 auth = Configuration.globalData.auth;
 
@@ -283,7 +283,7 @@ define([
         },
 
 
-        renderForm: function (reqs, urlParams) {
+        renderForm (reqs, urlParams) {
             var requirements = _.clone(reqs),
                 promise = $.Deferred(),
                 usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
@@ -381,7 +381,7 @@ define([
             }
             return promise;
         },
-        prefillLoginData: function () {
+        prefillLoginData () {
             var login = CookieHelper.getCookie("login");
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
@@ -394,7 +394,7 @@ define([
             }
         },
 
-        handleUrlParams: function () {
+        handleUrlParams () {
             var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
 
             // Rest does not accept the params listed in the array below as is
@@ -441,7 +441,7 @@ define([
             id: generateId(this.input.name),
             index: this.input.index,
             value: this.input.value,
-            prompt: prompt
+            prompt
         };
 
         function renderPartial (name, context) {
@@ -482,9 +482,9 @@ define([
                     _.each(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
                         result += renderPartial("Confirmation", {
-                            btnClass: btnClass,
-                            key: key,
-                            option: option
+                            btnClass,
+                            key,
+                            option
                         });
                     });
                 }
@@ -497,7 +497,7 @@ define([
                         values: _.map(options.value, function (option, key) {
                             return {
                                 active: self.input.value === key,
-                                key: key,
+                                key,
                                 value: option
                             };
                         })

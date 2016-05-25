@@ -33,7 +33,7 @@ define([
     var ListRequest = AbstractView.extend({
         template: "templates/user/uma/views/request/ListRequestTemplate.html",
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 columns,
                 grid,
@@ -82,7 +82,7 @@ define([
                     className: "col-xs-7 col-md-6"
                 }),
                 cell: PermissionsCell.extend({
-                    onChange: function (value) {
+                    onChange (value) {
                         this.model.set("permissions", value, { silent: true });
 
                         var anySelected = value !== null;
@@ -103,13 +103,13 @@ define([
                         "click button[data-permission=allow]": "allow",
                         "click button[data-permission=deny]": "deny"
                     },
-                    allow: function () {
+                    allow () {
                         UMAService.approveRequest(this.model.get("_id"), this.model.get("permissions"))
                         .done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
                     },
-                    deny: function () {
+                    deny () {
                         UMAService.denyRequest(this.model.get("_id")).done(function () {
                             self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
                         });
@@ -122,7 +122,7 @@ define([
             this.data.requests.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 className: "backgrid table",
                 collection: self.data.requests,
                 emptyText: $.t("console.common.noResults")

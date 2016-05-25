@@ -69,7 +69,7 @@ define([
         });
     }
     var ResourcePage = AbstractView.extend({
-        initialize: function () {
+        initialize () {
             // TODO: AbstarctView.prototype.initialize.call(this);
             this.model = null;
         },
@@ -84,15 +84,15 @@ define([
             "click button#saveLabels": "submitLabelsChanges",
             "click button#discardLabels": "discardLabelsChanges"
         },
-        onModelError: function (model, response) {
+        onModelError (model, response) {
             console.error(`Unrecoverable load failure UMAResourceSetWithPolicy. ${response.responseJSON.code} (${
                 response.responseJSON.reason
                 })${response.responseJSON.message}`);
         },
-        onModelChange: function (model) {
+        onModelChange (model) {
             this.render([undefined, model.get("_id")]);
         },
-        onUnshare: function (event) {
+        onUnshare (event) {
             if ($(event.currentTarget).hasClass("disabled")) { return false; }
             event.preventDefault();
 
@@ -105,14 +105,14 @@ define([
                 closable: false,
                 buttons: [{
                     label: $.t("common.form.cancel"),
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.close();
                     }
                 }, {
                     id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
-                    action: function (dialog) {
+                    action (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
                         self.model.get("policy").destroy().then(function () {
@@ -121,7 +121,7 @@ define([
                             self.model.toBeCreated = true;
                         }, function (response) {
                             Messages.addMessage({
-                                response: response,
+                                response,
                                 type: Messages.TYPE_DANGER
                             });
                         }).always(function () {
@@ -131,7 +131,7 @@ define([
                 }]
             });
         },
-        onShare: function () {
+        onShare () {
             var shareView = new CommonShare();
             shareView.renderDialog({
                 _id: this.model.id,
@@ -142,7 +142,7 @@ define([
                 }
             });
         },
-        onToggleStarred: function () {
+        onToggleStarred () {
             var self = this,
                 starredLabelId = _.find(this.allLabels, { type: "STAR" })._id,
                 starButton = self.$el.find("#starred"),
@@ -160,7 +160,7 @@ define([
                 starIcon.addClass(isStarred ? "fa-star" : "fa-star-o");
             });
         },
-        renderLabelsOptions: function () {
+        renderLabelsOptions () {
             var self = this,
                 labelsSelect = this.$el.find("#labels select").selectize({
                     plugins: ["restore_on_backspace"],
@@ -168,11 +168,11 @@ define([
                     persist: false,
                     create: true,
                     hideSelected: true,
-                    onChange: function () {
+                    onChange () {
                         self.$el.find("button#saveLabels").prop("disabled", false);
                     },
                     render: {
-                        item: function (item) {
+                        item (item) {
                             return `<div data-value=\"${item.name}\" class=\"item\">${item.name}</div>\"`;
                         }
                     },
@@ -184,7 +184,7 @@ define([
             this.updateLabelOptions();
             this.$el.find(".page-toolbar .btn-group").hide();
         },
-        updateLabelOptions: function () {
+        updateLabelOptions () {
             var labelsSelectize = this.getLabelSelectize(),
                 userLabels = _.filter(this.allLabels, isUserLabel),
                 resourceUserLabelNames = _(this.model.get("labels"))
@@ -200,14 +200,14 @@ define([
                 labelsSelectize.addItem(item);
             });
         },
-        renderSelectizeCell: function () {
+        renderSelectizeCell () {
             var promise = $.Deferred(),
                 SelectizeCell;
 
             UIUtils.fillTemplateWithData(this.selectizeTemplate, {}, function (template) {
                 SelectizeCell = Backgrid.Cell.extend({
                     className: "selectize-cell",
-                    render: function () {
+                    render () {
                         var select;
 
                         this.$el.html(template);
@@ -260,7 +260,7 @@ define([
             return promise;
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var id = _.last(args), self = this;
 
             if (this.model && this.id === id) {
@@ -284,7 +284,7 @@ define([
             }
             this.id = id;
         },
-        renderWithModel: function (callback) {
+        renderWithModel (callback) {
             var collection, grid, RevokeCell, self = this;
 
             /**
@@ -309,7 +309,7 @@ define([
                 events: {
                     "click #revoke": "revoke"
                 },
-                revoke: function () {
+                revoke () {
                     self.model.get("policy").get("permissions").remove(this.model);
                     self.model.get("policy").save().done(function () {
                         self.onModelChange(self.model);
@@ -350,7 +350,7 @@ define([
                             className: "fr-col-btn-1"
                         })
                     }],
-                    collection: collection,
+                    collection,
                     emptyText: $.t("console.common.noResults"),
                     className: "backgrid table"
                 });
@@ -386,17 +386,17 @@ define([
                 });
             });
         },
-        getLabelSelectize: function () {
+        getLabelSelectize () {
             return this.$el.find("#labels select")[0].selectize;
         },
-        stopEditingLabels: function () {
+        stopEditingLabels () {
             var labelsSelect = this.getLabelSelectize();
             labelsSelect.disable();
             this.$el.find(".page-toolbar .btn-group").hide();
             this.$el.find("#editLabels").show();
             this.$el.find("#labels .selectize-control").addClass("pull-left");
         },
-        editLabels: function () {
+        editLabels () {
             var labelsSelect = this.getLabelSelectize();
             labelsSelect.enable();
             labelsSelect.focus();
@@ -406,19 +406,19 @@ define([
             this.$el.find("button#discardLabels").prop("disabled", false);
             this.$el.find(".page-toolbar .btn-group").show();
         },
-        disableLabelControls: function () {
+        disableLabelControls () {
             var labelsSelect = this.getLabelSelectize();
             labelsSelect.disable();
             this.$el.find("button#saveLabels").prop("disabled", true);
             this.$el.find("button#discardLabels").prop("disabled", true);
         },
-        enableLabelControls: function () {
+        enableLabelControls () {
             var labelsSelect = this.getLabelSelectize();
             labelsSelect.enable();
             this.$el.find("button#saveLabels").prop("disabled", false);
             this.$el.find("button#discardLabels").prop("disabled", false);
         },
-        submitLabelsChanges: function () {
+        submitLabelsChanges () {
             var self = this,
                 labelsSelectize = this.getLabelSelectize(),
                 selectedUserLabelNames = labelsSelectize.getValue(),
@@ -451,11 +451,11 @@ define([
                 self.enableLabelControls();
             });
         },
-        discardLabelsChanges: function () {
+        discardLabelsChanges () {
             this.stopEditingLabels();
             this.updateLabelOptions();
         },
-        updateUnshareButton: function () {
+        updateUnshareButton () {
             if (this.model.has("policy") && this.model.get("policy").get("permissions").length > 0) {
                 this.$el.find("li#unshare").removeClass("disabled").find("a").attr("aria-disabled", false);
             }

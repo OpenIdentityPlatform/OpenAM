@@ -71,14 +71,14 @@ define([
                 vertical: true,
                 placeholder: "<li class='placeholder'><div class='placeholder-inner'></div></i>",
 
-                onDrag: function (item, position) {
+                onDrag (item, position) {
                     item.css({
                         left: position.left - self.adjustment.left,
                         top: position.top - self.adjustment.top
                     });
                 },
 
-                onDragStart: function (item, container) {
+                onDragStart (item, container) {
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer;
 
@@ -92,7 +92,7 @@ define([
                     $("body").addClass("dragging");
                 },
 
-                onDrop: function (item, container, _super) {
+                onDrop (item, container, _super) {
                     self.sortChainData(self.originalIndex, item.index());
                     self.validateChain();
                     _super(item, container);
@@ -112,21 +112,21 @@ define([
             "partials/alerts/_Alert.html"
         ],
 
-        addItemToList: function (element) {
+        addItemToList (element) {
             this.$el.find("ol#sortableAuthChain").append(element);
         },
 
-        addNewModule: function () {
+        addNewModule () {
             var index = this.data.form.chainData.authChainConfiguration.length,
                 linkView = createLinkView(index, this);
             this.editItem(linkView);
         },
 
-        editItem: function (linkview) {
+        editItem (linkview) {
             EditLinkView.show(linkview);
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
             if ($(e.currentTarget).hasClass("disabled")) { return false; }
 
@@ -134,7 +134,7 @@ define([
                 _.bind(this.deleteChain, this));
         },
 
-        deleteChain: function () {
+        deleteChain () {
             var self = this;
 
             AuthenticationService.authentication.chains.remove(
@@ -152,12 +152,12 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        render: function (args) {
+        render (args) {
             var self = this;
 
             AuthenticationService.authentication.chains.get(args[0], args[1]).then((data) => {
@@ -213,12 +213,12 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        saveSettings: function () {
+        saveSettings () {
             var self = this,
                 chainData = this.data.form.chainData;
 
@@ -238,13 +238,13 @@ define([
                 }, (response) => {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
-                        response: response
+                        response
                     });
                 });
             });
         },
 
-        saveChain: function () {
+        saveChain () {
             var chainData = this.data.form.chainData,
                 savedData = {
                     authChainConfiguration: chainData.authChainConfiguration
@@ -256,17 +256,17 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        sortChainData: function (from, to) {
+        sortChainData (from, to) {
             var addItem = this.data.form.chainData.authChainConfiguration.splice(from, 1)[0];
             this.data.form.chainData.authChainConfiguration.splice(to, 0, addItem);
         },
 
-        validateChain: function () {
+        validateChain () {
             var invalid = false,
                 alert = "",
                 firstRequiredIndex,

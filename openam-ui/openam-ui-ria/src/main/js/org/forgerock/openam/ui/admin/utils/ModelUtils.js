@@ -33,7 +33,7 @@ define([
         } else {
             Messages.addMessage({
                 "type": Messages.TYPE_DANGER,
-                "response": response
+                response
             });
         }
     };

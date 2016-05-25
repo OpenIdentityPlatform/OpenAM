@@ -33,7 +33,7 @@ define([
             "click [data-save]"            : "save",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
 
             this.data.realmPath = args[0];
@@ -65,7 +65,7 @@ define([
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "notFoundError");
             });
         },
-        save: function () {
+        save () {
             AuthenticationService.authentication.modules
             .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
             .then(() => {
@@ -73,14 +73,14 @@ define([
             }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        revert: function () {
+        revert () {
             this.data.form.reset();
         },
-        renderTab: function (event) {
+        renderTab (event) {
             var id = $(event.target).attr("href").slice(1),
                 schema = this.data.schema.properties[id],
                 element = this.$el.find("#tabpanel").empty().get(0);

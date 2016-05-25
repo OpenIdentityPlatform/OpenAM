@@ -45,13 +45,13 @@ class ListRealmsView extends AbstractView {
             realm = this.getRealmFromEvent(event),
             buttons = [{
                 label: $.t("common.form.cancel"),
-                action: function (dialog) {
+                action: (dialog) => {
                     dialog.close();
                 }
             }, {
                 label: $.t("common.form.delete"),
                 cssClass: "btn-danger",
-                action: function (dialog) {
+                action: (dialog) => {
                     self.performDeleteRealm(realm.path).always(function () {
                         dialog.close();
                     });
@@ -65,12 +65,12 @@ class ListRealmsView extends AbstractView {
         if (realm.active) {
             buttons.splice(1, 0, {
                 label: $.t("common.form.deactivate"),
-                action: function (dialog) {
+                action: (dialog) => {
                     realm.active = false;
                     RealmsService.realms.update(realm).then(null, function (response) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: response
+                            response
                         });
                     }).always(function () {
                         self.render();
@@ -85,17 +85,17 @@ class ListRealmsView extends AbstractView {
             type: BootstrapDialog.TYPE_DANGER,
             message: realm.active ? $.t("console.realms.warningDialog.activateMessage")
                 : $.t("console.realms.warningDialog.deactivateMessage"),
-            buttons: buttons
+            buttons
         });
 
     }
     getRealmFromEvent (event) {
         var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
-            realm = _.find(this.data.realms, { path: path });
+            realm = _.find(this.data.realms, { path });
         return realm;
     }
     getRealmFromList (path) {
-        return _.find(this.data.realms, { path: path });
+        return _.find(this.data.realms, { path });
     }
     performDeleteRealm (path) {
         var self = this;
@@ -108,7 +108,7 @@ class ListRealmsView extends AbstractView {
                 });
             } else {
                 Messages.addMessage({
-                    response: response,
+                    response,
                     type: Messages.TYPE_DANGER
                 });
             }

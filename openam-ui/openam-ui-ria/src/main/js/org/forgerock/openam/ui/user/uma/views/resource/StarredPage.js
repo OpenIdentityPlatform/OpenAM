@@ -21,7 +21,7 @@ define([
 ], function (_, BasePage, UMAService) {
     var StarredPage = BasePage.extend({
         template: "templates/user/uma/views/resource/StarredPageTemplate.html",
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
 
             UMAService.labels.all().done(function (data) {

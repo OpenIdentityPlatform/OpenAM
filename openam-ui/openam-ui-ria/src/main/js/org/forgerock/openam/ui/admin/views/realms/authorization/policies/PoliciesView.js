@@ -43,7 +43,7 @@ define([
         events: {
             "click [data-add-entity]": "addNewPolicy"
         },
-        render: function (data, callback) {
+        render (data, callback) {
             var self = this,
                 Policies,
                 columns,
@@ -63,7 +63,7 @@ define([
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
-                sync: function (method, model, options) {
+                sync (method, model, options) {
                     options.beforeSend = function (xhr) {
                         xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
                     };
@@ -72,7 +72,7 @@ define([
             });
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.parents().hasClass("fr-col-btn-2")) {
@@ -94,7 +94,7 @@ define([
                     cell: BackgridUtils.TemplateCell.extend({
                         iconClass: "fa-gavel",
                         template: "templates/admin/backgrid/cell/IconAndNameCell.html",
-                        rendered: function () {
+                        rendered () {
                             this.$el.find("i.fa").addClass(this.iconClass);
                         }
                     }),
@@ -120,14 +120,14 @@ define([
                             "click [data-edit-item]": "editItem",
                             "click [data-delete-item]": "deleteItem"
                         },
-                        editItem: function () {
+                        editItem () {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
                                     encodeURIComponent),
                                 trigger: true
                             });
                         },
-                        deleteItem: function (e) {
+                        deleteItem (e) {
                             self.onDeleteClick(e, { type: $.t("console.authorization.common.policy") },
                                 this.model.id,
                                 function () {
@@ -148,7 +148,7 @@ define([
             this.data.items = new Policies();
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 row: ClickableRow,
                 collection: self.data.items,
                 className: "backgrid table table-hover",
@@ -178,7 +178,7 @@ define([
             });
         },
 
-        addNewPolicy: function () {
+        addNewPolicy () {
             Router.routeTo(Router.configuration.routes.realmsPolicyNew, {
                 args: _.map([this.data.realmPath, this.data.policySetModel.id], encodeURIComponent),
                 trigger: true

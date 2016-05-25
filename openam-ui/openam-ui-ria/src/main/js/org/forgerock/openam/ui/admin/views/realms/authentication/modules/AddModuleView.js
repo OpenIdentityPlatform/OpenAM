@@ -50,7 +50,7 @@ define([
             "change [data-module-type]": "onValidateModuleProps",
             "click [data-save]"        : "save"
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
             this.data.realmPath = args[0];
 
@@ -65,7 +65,7 @@ define([
                 });
             });
         },
-        save: function () {
+        save () {
             var self = this,
                 moduleName = self.$el.find("#newModuleName").val(),
                 moduleType = self.$el.find("#newModuleType").val(),
@@ -88,18 +88,18 @@ define([
                     }, function (response) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: response
+                            response
                         });
                     });
                 }
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        onValidateModuleProps: function () {
+        onValidateModuleProps () {
             validateModuleProps.call(this);
         }
     });

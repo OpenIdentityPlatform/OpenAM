@@ -25,10 +25,10 @@ define([
     }
 
     var Component = Footer.extend({
-        getVersion: function () {
+        getVersion () {
             return ServerService.getVersion();
         },
-        showVersion: function () {
+        showVersion () {
             return isAdmin();
         }
     });

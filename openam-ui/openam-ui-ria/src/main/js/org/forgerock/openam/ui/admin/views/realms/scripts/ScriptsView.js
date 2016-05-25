@@ -47,7 +47,7 @@ define([
             "click [data-delete-scripts]": "onDeleteClick"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 columns,
                 grid,
@@ -119,7 +119,7 @@ define([
             }];
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.is("input") || $target.is(".select-row-cell")) {
@@ -142,7 +142,7 @@ define([
             this.data.scripts.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 row: ClickableRow,
                 collection: self.data.scripts,
                 className: "backgrid table table-hover",
@@ -175,13 +175,13 @@ define([
             });
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             var msg = { message: $.t("console.scripts.list.confirmDeleteText") };
             e.preventDefault();
             FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecords, this));
         },
 
-        deleteRecords: function () {
+        deleteRecords () {
             var self = this,
                 i = 0,
                 item,
@@ -205,7 +205,7 @@ define([
             }
         },
 
-        onRowSelect: function (model, selected) {
+        onRowSelect (model, selected) {
             if (selected) {
                 if (!_.contains(this.data.selectedUUIDs, model.id)) {
                     this.data.selectedUUIDs.push(model.id);
@@ -217,7 +217,7 @@ define([
             this.renderToolbar();
         },
 
-        renderToolbar: function () {
+        renderToolbar () {
             var self = this;
 
             UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
@@ -225,7 +225,7 @@ define([
             });
         },
 
-        addNewScript: function () {
+        addNewScript () {
             Router.routeTo(Router.configuration.routes.realmsScriptNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
@@ -233,7 +233,7 @@ define([
         },
 
         // TODO: server side fix is needed instead of this function
-        createMapBySchema: function (schema) {
+        createMapBySchema (schema) {
             var map, i, length;
 
             if (schema && schema["enum"]) {

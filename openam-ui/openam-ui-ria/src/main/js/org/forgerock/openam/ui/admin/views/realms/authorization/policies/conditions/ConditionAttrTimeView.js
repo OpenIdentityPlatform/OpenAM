@@ -24,12 +24,12 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrTime.html",
 
-        clickClockPicker: function (e) {
+        clickClockPicker (e) {
             e.stopPropagation();
             $(e.currentTarget).prev("input").clockpicker("show");
         },
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
             this.events["click [data-clock]"] = _.bind(this.clickClockPicker, this);
@@ -43,14 +43,14 @@ define([
             });
         },
 
-        initClockPickers: function () {
+        initClockPickers () {
             this.$el.find(".clockpicker").each(function () {
 
                 var clock = $(this);
                 clock.clockpicker({
                     placement: "top",
                     autoclose: true,
-                    afterDone: function () {
+                    afterDone () {
                         clock.trigger("change");
                     }
                 });

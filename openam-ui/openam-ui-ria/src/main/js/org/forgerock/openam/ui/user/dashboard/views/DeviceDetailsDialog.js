@@ -35,7 +35,7 @@ define([
                     label: $.t("common.form.close"),
                     action: closeDialog
                 }],
-                onshown: function (dialog) {
+                onshown (dialog) {
                     dialog.$modalBody.find(".recovery-codes-download").click(function () {
                         location.href = `data:text/plain,${encodeURIComponent(device.recoveryCodes.join("\r\n"))}`;
                     });

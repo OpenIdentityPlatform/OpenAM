@@ -35,7 +35,7 @@ define([
             "click button[data-permission=deny]": "denyRequest"
         },
 
-        allowRequest: function () {
+        allowRequest () {
             UMAService.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function () {
                 Router.routeTo(Router.configuration.routes.umaRequestList, {
                     args: [],
@@ -44,7 +44,7 @@ define([
             });
         },
 
-        denyRequest: function () {
+        denyRequest () {
             UMAService.denyRequest(this.model.get("_id")).done(function () {
                 Router.routeTo(Router.configuration.routes.umaRequestList, {
                     args: [],
@@ -53,7 +53,7 @@ define([
             });
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 id = null,
                 columns,
@@ -90,7 +90,7 @@ define([
                     className: "col-xs-7 col-md-6"
                 }),
                 cell: PermissionsCell.extend({
-                    onChange: function (value) {
+                    onChange (value) {
                         this.model.set("permissions", value, { silent: true });
                         var anySelected = value !== null;
                         this.$el.parent().find("[data-permission=allow]").prop("disabled", !anySelected);
@@ -102,7 +102,7 @@ define([
             this.data.requests = new RequestCollection();
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 className: "backgrid table",
                 collection: this.data.requests,
                 emptyText: $.t("console.common.noResults")

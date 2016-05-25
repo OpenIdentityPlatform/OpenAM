@@ -29,7 +29,7 @@ define([
     function getLocalizedResponse (response) {
         Messages.addMessage({
             type: Messages.TYPE_DANGER,
-            response: response
+            response
         });
     }
 

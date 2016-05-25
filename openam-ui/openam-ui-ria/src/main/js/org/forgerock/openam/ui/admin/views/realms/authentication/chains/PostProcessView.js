@@ -36,7 +36,7 @@ define([
             "partials/alerts/_Alert.html"
         ],
 
-        add: function () {
+        add () {
             var newProcessClass = this.$el.find("[data-new-process-class]").val().trim(),
                 invalidName = _.find(this.data.chainData.loginPostProcessClass, function (className) {
                     return className === newProcessClass;
@@ -52,17 +52,17 @@ define([
             }
         },
 
-        remove: function (e) {
+        remove (e) {
             var index = $(e.currentTarget).closest("tr").index();
             this.data.chainData.loginPostProcessClass[index] = "";
             this.render(this.data.chainData);
         },
 
-        change: function (e) {
+        change (e) {
             this.$el.find("[data-add-process-class]").prop("disabled", (e.currentTarget.value.length === 0));
         },
 
-        addClassNameDialog: function () {
+        addClassNameDialog () {
             var self = this,
                 promise = $.Deferred(),
                 newProcessClass = this.$el.find("[data-new-process-class]").val().trim();
@@ -77,7 +77,7 @@ define([
                     closable: false,
                     buttons: [{
                         label: $.t("common.form.cancel"),
-                        action: function (dialog) {
+                        action (dialog) {
                             self.$el.find("[data-new-process-class]").val("");
                             dialog.close();
                             promise.resolve();
@@ -86,7 +86,7 @@ define([
                         id: "btnOk",
                         label: $.t("common.form.ok"),
                         cssClass: "btn-primary",
-                        action: function (dialog) {
+                        action (dialog) {
                             self.add();
                             dialog.close();
                             promise.resolve();
@@ -97,7 +97,7 @@ define([
             return promise;
         },
 
-        render: function (chainData) {
+        render (chainData) {
             this.data.chainData = chainData;
             this.parentRender();
         }

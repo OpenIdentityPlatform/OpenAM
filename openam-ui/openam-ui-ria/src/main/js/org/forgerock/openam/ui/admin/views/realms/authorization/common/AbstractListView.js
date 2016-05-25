@@ -30,17 +30,17 @@ define([
     return AbstractView.extend({
         toolbarTemplateID: "[data-grid-toolbar]",
 
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
         },
 
-        onDeleteClick: function (e, msg, id, callback) {
+        onDeleteClick (e, msg, id, callback) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecord, this, id, callback));
         },
 
-        deleteRecord: function (id, callback) {
+        deleteRecord (id, callback) {
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function () {
@@ -59,7 +59,7 @@ define([
             });
         },
 
-        editRecord: function (e, id, route) {
+        editRecord (e, id, route) {
             var self = this;
 
             Router.routeTo(route, {
@@ -68,11 +68,11 @@ define([
             });
         },
 
-        bindDefaultHandlers: function () {
+        bindDefaultHandlers () {
             this.data.items.on("backgrid:sort", BackgridUtils.doubleSortFix);
         },
 
-        renderToolbar: function () {
+        renderToolbar () {
             var self = this;
 
             UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {

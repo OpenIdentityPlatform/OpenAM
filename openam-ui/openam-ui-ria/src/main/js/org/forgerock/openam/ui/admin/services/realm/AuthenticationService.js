@@ -38,10 +38,10 @@ define([
     }
 
     obj.authentication = {
-        get: function (realm) {
+        get (realm) {
             return SMSServiceUtils.schemaWithValues(obj, scopedByRealm(realm, "authentication"));
         },
-        update: function (realm, data) {
+        update (realm, data) {
             return obj.serviceCall({
                 url: scopedByRealm(realm, "authentication"),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -50,7 +50,7 @@ define([
             });
         },
         chains: {
-            all: function (realm) {
+            all (realm) {
                 var url = scopedByRealm(realm, "authentication");
 
                 return $.when(
@@ -59,7 +59,7 @@ define([
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url: url,
+                        url,
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     })
                 ).then(function (chainsData, authenticationData) {
@@ -81,7 +81,7 @@ define([
                     };
                 });
             },
-            create: function (realm, data) {
+            create (realm, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains?_action=create"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -89,13 +89,13 @@ define([
                     data: JSON.stringify(data)
                 });
             },
-            get: function (realm, name) {
+            get (realm, name) {
                 var moduleName,
                     url = scopedByRealm(realm, "authentication");
 
                 return $.when(
                     obj.serviceCall({
-                        url: url,
+                        url,
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
@@ -132,14 +132,14 @@ define([
                     };
                 });
             },
-            remove: function (realm, name) {
+            remove (realm, name) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/chains/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
-            update: function (realm, name, data) {
+            update (realm, name, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/chains/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -149,13 +149,13 @@ define([
             }
         },
         modules: {
-            all: function (realm) {
+            all (realm) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules?_queryFilter=true"),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).done(SMSServiceUtils.sortResultBy("_id"));
             },
-            create: function (realm, data, type) {
+            create (realm, data, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/modules/${type}?_action=create`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -163,7 +163,7 @@ define([
                     data: JSON.stringify(data)
                 });
             },
-            get: function (realm, name, type) {
+            get (realm, name, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -171,7 +171,7 @@ define([
                     return data;
                 });
             },
-            exists: function (realm, name) {
+            exists (realm, name) {
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
                         url: scopedByRealm(realm, `authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`),
@@ -183,14 +183,14 @@ define([
                 });
                 return promise;
             },
-            remove: function (realm, name, type) {
+            remove (realm, name, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
-            update: function (realm, name, type, data) {
+            update (realm, name, type, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -199,21 +199,21 @@ define([
                 });
             },
             types: {
-                all: function (realm) {
+                all (realm) {
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "authentication/modules?_action=getAllTypes"),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).done(SMSServiceUtils.sortResultBy("name"));
                 },
-                get: function (realm, type) {
+                get (realm, type) {
                     // TODO: change this to a proper server-side call when OPENAM-7242 is implemented
                     return obj.authentication.modules.types.all(realm).then(function (data) {
                         return _.findWhere(data.result, { "_id": type });
                     });
                 }
             },
-            schema: function (realm, type) {
+            schema (realm, type) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, `authentication/modules/${type}?_action=schema`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },

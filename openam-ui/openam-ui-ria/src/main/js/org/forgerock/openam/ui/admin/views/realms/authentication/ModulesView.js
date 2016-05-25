@@ -53,7 +53,7 @@ define([
             "partials/alerts/_Alert.html"
         ],
         data: {},
-        moduleSelected: function (event) {
+        moduleSelected (event) {
             var hasModuleSelected = this.$el.find("input[type=checkbox]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
@@ -65,21 +65,21 @@ define([
                 row.removeClass("selected");
             }
         },
-        editModule: function (event) {
+        editModule (event) {
             event.preventDefault();
             var data = $(event.currentTarget).closest("tr").data(),
                 href = event.currentTarget.href;
 
             EditModuleDialog(data.moduleName, data.moduleChains, href);
         },
-        onDeleteSingle: function (event) {
+        onDeleteSingle (event) {
             event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 type: $.t("console.authentication.common.module")
             }, _.bind(this.deleteModule, this, event));
         },
-        onDeleteMultiple: function (event) {
+        onDeleteMultiple (event) {
             event.preventDefault();
 
             var selectedModules = this.$el.find("input[type=checkbox]:checked");
@@ -88,7 +88,7 @@ define([
                 message: $.t("console.authentication.modules.confirmDeleteSelected", { count: selectedModules.length })
             }, _.bind(this.deleteModules, this, event, selectedModules));
         },
-        deleteModule: function (event) {
+        deleteModule (event) {
             var self = this,
                 element = event.currentTarget,
                 moduleInfo = getModuleInfoFromElement(element);
@@ -100,12 +100,12 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        deleteModules: function (event, selectedModules) {
+        deleteModules (event, selectedModules) {
             var self = this,
                 element = event.currentTarget,
                 moduleInfos = _(selectedModules).toArray().map(getModuleInfoFromElement).value();
@@ -117,12 +117,12 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 chainsPromise,
                 modulesPromise;
@@ -166,7 +166,7 @@ define([
                 });
             });
         },
-        save: function (event) {
+        save (event) {
             var promise = AuthenticationService.authentication.update(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.currentTarget);

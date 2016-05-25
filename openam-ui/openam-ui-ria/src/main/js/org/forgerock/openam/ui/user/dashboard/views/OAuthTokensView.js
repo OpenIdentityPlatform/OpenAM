@@ -29,7 +29,7 @@ define([
             "click a.deleteToken": "deleteToken"
         },
 
-        render: function () {
+        render () {
             var self = this;
 
             OAuthTokensService.getApplications().then(function (data) {
@@ -49,7 +49,7 @@ define([
             });
         },
 
-        deleteToken: function (event) {
+        deleteToken (event) {
             event.preventDefault();
             var self = this;
 

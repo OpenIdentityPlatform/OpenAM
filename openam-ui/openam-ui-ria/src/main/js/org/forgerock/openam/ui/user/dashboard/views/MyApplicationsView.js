@@ -25,7 +25,7 @@ define([
         template: "templates/user/dashboard/MyApplicationsTemplate.html",
         noBaseTemplate: true,
         element: "#myApplicationsSection",
-        render: function () {
+        render () {
             var self = this;
 
             MyApplicationsService.getMyApplications().then(function (apps) {

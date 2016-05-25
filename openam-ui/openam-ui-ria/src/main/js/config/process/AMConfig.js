@@ -32,7 +32,7 @@ define([
             "org/forgerock/commons/ui/common/main/SessionManager",
             "org/forgerock/openam/ui/common/sessions/SessionValidator"
         ],
-        processDescription: function (event, router, conf, sessionManager, SessionValidator) {
+        processDescription (event, router, conf, sessionManager, SessionValidator) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
                 urlParams = URIUtils.parseQueryString(argsURLFragment),
                 gotoURL = urlParams.goto;
@@ -75,7 +75,7 @@ define([
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/commons/ui/common/main/Configuration"
         ],
-        processDescription: function (event, router, conf) {
+        processDescription (event, router, conf) {
             if (event.error.responseJSON.message.indexOf("Invalid realm") > -1) {
                 if (conf.baseTemplate) {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
@@ -91,7 +91,7 @@ define([
         dependencies: [
             "org/forgerock/commons/ui/common/main/Configuration"
         ],
-        processDescription: function (event, conf) {
+        processDescription (event, conf) {
             var subRealm = conf.globalData.auth.subRealm || "/";
             window.location.href = `/${Constants.context}/realm/RMRealm?RMRealm.tblDataActionHref=${
                 encodeURIComponent(subRealm)
@@ -103,7 +103,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.global.configuration();
         }
     }, {
@@ -112,7 +112,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.global.federation();
         }
     }, {
@@ -121,7 +121,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.global.sessions();
         }
     }, {
@@ -130,7 +130,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.dataStores(event);
         }
     }, {
@@ -139,7 +139,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.privileges(event);
         }
     }, {
@@ -148,7 +148,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.subjects(event);
         }
     }, {
@@ -157,7 +157,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.agents(event);
         }
     }, {
@@ -166,7 +166,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.realm.sts(event);
         }
     }, {
@@ -175,7 +175,7 @@ define([
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
-        processDescription: function (event, RedirectToLegacyConsole) {
+        processDescription (event, RedirectToLegacyConsole) {
             RedirectToLegacyConsole.serverSite();
         }
     }, {
@@ -185,7 +185,7 @@ define([
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/main/Router"
         ],
-        processDescription: function (event, Configuration, Router) {
+        processDescription (event, Configuration, Router) {
             if (!Configuration.loggedUser) {
                 Router.routeTo(Router.configuration.routes.login, { trigger: true });
             } else if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
@@ -204,7 +204,7 @@ define([
             "Footer",
             "org/forgerock/commons/ui/common/components/LoginHeader"
         ],
-        processDescription: function (event, Footer, LoginHeader) {
+        processDescription (event, Footer, LoginHeader) {
             Footer.render();
             LoginHeader.render();
         }
@@ -219,8 +219,14 @@ define([
             "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
             "org/forgerock/openam/ui/common/util/NavigationHelper"
         ],
-        processDescription: function (event, Configuration, CookieHelper, RealmsService, SessionValidator,
-                                      MaxIdleTimeLeftStrategy, NavigationHelper) {
+        processDescription (
+            event,
+            Configuration,
+            CookieHelper,
+            RealmsService,
+            SessionValidator,
+            MaxIdleTimeLeftStrategy,
+            NavigationHelper) {
             var queueName = "loginDialogAuthCallbacks",
                 authenticatedCallback,
                 token;
@@ -253,7 +259,7 @@ define([
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/openam/ui/common/RouteTo"
         ],
-        processDescription: function (event, Configuration, RouteTo) {
+        processDescription (event, Configuration, RouteTo) {
             var loggedIn = Configuration.loggedUser;
 
             if (!loggedIn) {
@@ -277,7 +283,7 @@ define([
             "org/forgerock/commons/ui/common/util/Queue",
             "org/forgerock/openam/ui/common/RouteTo"
         ],
-        processDescription: function (event, LoginDialog, Configuration, Queue, RouteTo) {
+        processDescription (event, LoginDialog, Configuration, Queue, RouteTo) {
             var queueName = "loginDialogAuthCallbacks";
             if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
                 /**

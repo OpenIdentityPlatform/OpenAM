@@ -32,7 +32,7 @@ define([
          * @example
          *   RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
          */
-        populateRealmsDropdown: function (data) {
+        populateRealmsDropdown (data) {
             var maxRealms = 4,
                 name;
 
@@ -53,7 +53,7 @@ define([
                 Navigation.addLink({
                     "url": `#${Router.getLink(Router.configuration.routes.realmDefault,
                         [encodeURIComponent(realm.path)])}`,
-                    "name": name,
+                    name,
                     "cssClass": "dropdown-sub",
                     "dynamicLink": true
                 }, "admin", "realms");

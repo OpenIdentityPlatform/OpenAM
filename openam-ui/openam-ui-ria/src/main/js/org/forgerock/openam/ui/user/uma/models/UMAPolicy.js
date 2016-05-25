@@ -30,14 +30,14 @@ define([
             key: "permissions",
             relatedModel: UMAPolicyPermission
         }],
-        parse: function (response) {
+        parse (response) {
             if (!_.isEmpty(response.permissions)) {
                 this.toBeCreated = false;
             }
 
             return response;
         },
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");

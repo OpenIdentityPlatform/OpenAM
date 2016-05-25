@@ -31,7 +31,7 @@ define([
             "keyup [data-list-filter]": "filterItems"
         },
 
-        render: function (data, el, callback) {
+        render (data, el, callback) {
             this.data = data;
             this.element = el;
             this.items = data.items ? _.cloneDeep(data.items).sort() : [];
@@ -49,11 +49,11 @@ define([
             });
         },
 
-        setItems: function (items) {
+        setItems (items) {
             this.items = _.cloneDeep(items).sort();
         },
 
-        renderItems: function () {
+        renderItems () {
             var self = this;
             this.data.items = this.filter ? this.getFilteredItems() : this.getAllItems();
             UIUtils.fillTemplateWithData(this.data.itemTpl, this.data, function (tpl) {
@@ -61,7 +61,7 @@ define([
             });
         },
 
-        clickItem: function (e) {
+        clickItem (e) {
             if (e.type === "keyup") {
                 switch (e.keyCode) {
                     case 38: // arrow down
@@ -96,7 +96,7 @@ define([
             }
         },
 
-        filterItems: function (e) {
+        filterItems (e) {
             if (e.type === "keyup" && e.keyCode === 40) {
                 $(e.target).parent().next().find("li:first-child").focus();
                 return;
@@ -106,21 +106,21 @@ define([
             this.renderItems();
         },
 
-        emptyFilter: function () {
+        emptyFilter () {
             this.setFilter("");
 
             this.$el.find("[data-list-filter]").val("");
         },
 
-        setFilter: function (filter) {
+        setFilter (filter) {
             this.filter = filter.toString().toLowerCase();
         },
 
-        getAllItems: function () {
+        getAllItems () {
             return this.items;
         },
 
-        getFilteredItems: function () {
+        getFilteredItems () {
             var filter = this.filter;
 
             return _.filter(this.items, function (item) {
@@ -128,11 +128,11 @@ define([
             });
         },
 
-        removeItem: function (item) {
+        removeItem (item) {
             this.items = _.without(this.items, item);
         },
 
-        addItem: function (item) {
+        addItem (item) {
             this.items.push(item);
             this.items.sort();
         }

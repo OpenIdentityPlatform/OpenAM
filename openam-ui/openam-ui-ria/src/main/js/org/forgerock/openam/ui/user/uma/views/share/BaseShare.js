@@ -23,7 +23,7 @@ define([
     var BaseShare = AbstractView.extend({
         template: "templates/user/uma/views/share/BaseShare.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        render: function (args, callback) {
+        render (args, callback) {
 
             var self = this;
             self.shareView = new CommonShare();

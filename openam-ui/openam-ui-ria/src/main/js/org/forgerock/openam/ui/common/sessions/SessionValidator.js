@@ -53,7 +53,7 @@ define([
          * @param {org/forgerock/openam/ui/common/sessions/SessionValidator~Strategy} strategy Strategy to use to
          * perform validation
          */
-        start: function (token, strategy) {
+        start (token, strategy) {
             if (delay) { throw new Error("Validator has already been started"); }
 
             validate(strategy, token, 0);
@@ -61,7 +61,7 @@ define([
         /**
          * Stops the periodic session validation progress.
          */
-        stop: stop
+        stop
     };
 });
 

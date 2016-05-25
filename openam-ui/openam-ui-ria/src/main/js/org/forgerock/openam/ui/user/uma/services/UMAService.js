@@ -71,7 +71,7 @@ define([
 
     // FIXME: Mutiple calls to #all end-point throughout this section. Optimize
     obj.labels = {
-        all: function () {
+        all () {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
@@ -79,7 +79,7 @@ define([
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
-        create: function (name, type) {
+        create (name, type) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
@@ -87,12 +87,12 @@ define([
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify({
-                    name: name,
-                    type: type
+                    name,
+                    type
                 })
             });
         },
-        get: function (id) {
+        get (id) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
@@ -102,7 +102,7 @@ define([
                 return _.find(data.result, { _id: id });
             });
         },
-        getByName: function (name) {
+        getByName (name) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
@@ -112,7 +112,7 @@ define([
                 data = !_.any(data.result, function (label) { return label.name.toLowerCase() === name; });
             });
         },
-        remove: function (id) {
+        remove (id) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))

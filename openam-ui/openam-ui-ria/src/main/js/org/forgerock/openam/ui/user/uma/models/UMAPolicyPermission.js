@@ -28,7 +28,7 @@ define([
             includeInJSON: Backbone.Model.prototype.idAttribute,
             parse: true
         }],
-        validate: function (attributes) {
+        validate (attributes) {
             if (!attributes.subject) { return "no subject"; } // FIXME i18n
             if (!attributes.scopes || !attributes.scopes.length) { return "no scopes"; } // FIXME i18n
         }

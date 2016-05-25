@@ -43,7 +43,7 @@ define([
             "disable_collapse": true,
             "disable_edit_json": true,
             "iconlib": "fontawesome4",
-            "schema": schema,
+            schema,
             "theme": "openam"
         });
 

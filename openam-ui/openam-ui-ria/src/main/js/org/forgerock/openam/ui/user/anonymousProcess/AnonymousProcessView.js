@@ -25,7 +25,7 @@ define([
 ], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
 
     return AnonymousProcessView.extend({
-        render: function () {
+        render () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
                 subRealm = RealmHelper.getSubRealm(),
@@ -68,7 +68,7 @@ define([
             this.parentRender();
         },
 
-        returnToLoginPage: function (e) {
+        returnToLoginPage (e) {
             e.preventDefault();
             location.href = e.target.href + RealmHelper.getSubRealm();
         }

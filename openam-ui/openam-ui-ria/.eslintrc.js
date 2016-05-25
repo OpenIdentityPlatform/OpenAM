@@ -76,6 +76,7 @@ module.exports = {
         "no-void": 2,
         "no-whitespace-before-property": 2,
         "object-curly-spacing": [2, "always"],
+        "object-shorthand": 2,
         "operator-linebreak": 2,
         "sort-imports": 2,
         "prefer-const": 2,
@@ -112,7 +113,6 @@ module.exports = {
         "no-var": 1,
         "prefer-arrow-callback": 1,
         "prefer-template": 1,
-        "object-shorthand": 1,
         "prefer-spread": 1,
 
         // TODO: Need an abstraction for logging before we can enable this.

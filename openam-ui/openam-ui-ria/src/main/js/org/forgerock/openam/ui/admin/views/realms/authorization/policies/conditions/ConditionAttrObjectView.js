@@ -26,7 +26,7 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrObject.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "field-float-selectize data-obj");
 
             this.parentRender(function () {
@@ -38,7 +38,7 @@ define([
             });
         },
 
-        initSelectize: function () {
+        initSelectize () {
             var view = this,
                 title = "",
                 itemData,
@@ -53,13 +53,13 @@ define([
                 options = {
                     persist: false,
                     delimiter: ";",
-                    onItemRemove: function (value) {
+                    onItemRemove (value) {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(":");
                         delete itemData[title][keyValPair[0]];
                     },
-                    onItemAdd: function (value) {
+                    onItemAdd (value) {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(":");
@@ -72,17 +72,17 @@ define([
 
                         itemData[title][propName] = _.union(_.compact(propVal.split(",")), itemData[title][propName]);
                     },
-                    create: function (input) {
+                    create (input) {
                         return {
                             value: input,
                             text: input
                         };
                     },
-                    onChange: function () {
+                    onChange () {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                     },
-                    createFilter: function (text) {
+                    createFilter (text) {
                         return (/^\w+:(?:\w+,?)+$/).test(text);
                     }
                 };

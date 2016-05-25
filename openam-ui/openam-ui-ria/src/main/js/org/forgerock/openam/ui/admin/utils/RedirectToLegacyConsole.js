@@ -28,10 +28,10 @@ define([
         };
 
     obj.global = {
-        accessControl: function () { obj.global.redirectToTab(1); },
-        federation   : function () { obj.global.redirectToTab(2); },
-        sessions     : function () { obj.global.redirectToTab(5); },
-        redirectToTab: function (tabIndex) {
+        accessControl () { obj.global.redirectToTab(1); },
+        federation () { obj.global.redirectToTab(2); },
+        sessions () { obj.global.redirectToTab(5); },
+        redirectToTab (tabIndex) {
             obj.getJATOPageSession("/").done(function (session) {
                 if (session) {
                     window.location.href = `/${Constants.context}/task/Home?Home.tabCommon.TabHref=${
@@ -42,7 +42,7 @@ define([
                 }
             });
         },
-        configuration: function () {
+        configuration () {
             obj.getJATOPageSession("/").done(function (session) {
                 if (session) {
                     window.location.href = `/${
@@ -72,7 +72,7 @@ define([
         subjects      : redirector(17),
         agents        : redirector(18),
         sts           : redirector(19),
-        redirectToTab : function (tabIndex, realm) {
+        redirectToTab (tabIndex, realm) {
             obj.getJATOPageSession(realm).done(function (session) {
                 if (session) {
                     window.location.href = `/${Constants.context}/realm/RealmProperties?RMRealm.tblDataActionHref=${

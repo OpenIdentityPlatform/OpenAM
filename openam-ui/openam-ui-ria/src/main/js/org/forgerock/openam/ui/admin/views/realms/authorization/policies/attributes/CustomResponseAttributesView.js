@@ -22,7 +22,7 @@ define([
         template: "templates/admin/views/realms/authorization/policies/attributes/CustomAttributesTemplate.html",
         noBaseTemplate: true,
 
-        render: function (customAttributes, callback) {
+        render (customAttributes, callback) {
             this.data.customAttributes = customAttributes;
 
             this.parentRender(function () {
@@ -32,7 +32,7 @@ define([
             });
         },
 
-        getAttrs: function () {
+        getAttrs () {
             return this.data.customAttributes;
         }
     });

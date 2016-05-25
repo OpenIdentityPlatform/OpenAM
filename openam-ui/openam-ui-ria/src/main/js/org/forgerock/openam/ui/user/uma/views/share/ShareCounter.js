@@ -23,7 +23,7 @@ define([
         template: "templates/user/uma/views/share/ShareCounter.html",
         element: "#shareCounter",
 
-        render: function (count, callback) {
+        render (count, callback) {
 
             this.data.shareCount = count;
             this.data.shareInfo = this.getShareInfo(count);
@@ -35,12 +35,12 @@ define([
         },
 
 
-        getShareInfo: function (count) {
-            var options = count ? { count: count } : { context: "none" };
+        getShareInfo (count) {
+            var options = count ? { count } : { context: "none" };
             return $.t("uma.share.info", options);
         },
 
-        getShareIcon: function (count) {
+        getShareIcon (count) {
             var shareIcon = "fa fa-lock";
             if (count === 1) {
                 shareIcon = "fa fa-user";

@@ -45,11 +45,11 @@ define([
             { name: "settings", attr: ["name", "description"] }
         ],
 
-        onModelSync: function () {
+        onModelSync () {
             this.renderAfterSyncModel();
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var uuid;
 
             this.data.realmPath = args[0];
@@ -69,7 +69,7 @@ define([
                     { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
                     { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }
                 ];
-                this.model = new ResourceTypeModel({ uuid: uuid });
+                this.model = new ResourceTypeModel({ uuid });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
@@ -84,7 +84,7 @@ define([
             }
         },
 
-        renderAfterSyncModel: function () {
+        renderAfterSyncModel () {
             var self = this,
                 data = this.data;
             this.data.entity = _.cloneDeep(this.model.attributes);
@@ -118,7 +118,7 @@ define([
             });
         },
 
-        renderSettings: function () {
+        renderSettings () {
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/resourceTypes/ResourceTypeSettingsTemplate.html",
@@ -129,7 +129,7 @@ define([
                 });
         },
 
-        updateFields: function () {
+        updateFields () {
             var app = this.data.entity,
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
@@ -147,7 +147,7 @@ define([
             });
         },
 
-        submitForm: function (e) {
+        submitForm (e) {
             e.preventDefault();
 
             var self = this,
@@ -186,14 +186,14 @@ define([
             }
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.resourceType") },
                 _.bind(this.deleteResourceType, this));
         },
 
-        deleteResourceType: function () {
+        deleteResourceType () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsResourceTypes, {
@@ -203,7 +203,7 @@ define([
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response) {
-                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
+                    Messages.addMessage({ response, type: Messages.TYPE_DANGER });
                 };
 
             this.model.destroy({

@@ -20,7 +20,7 @@ define([
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (Configuration, Constants, RealmHelper) {
     return {
-        substitute: function (url) {
+        substitute (url) {
             return function () {
                 var replacedUrl = url.replace("__api__", `${Constants.host}/${Constants.context}/json`)
                     .replace("__host__", Constants.host)

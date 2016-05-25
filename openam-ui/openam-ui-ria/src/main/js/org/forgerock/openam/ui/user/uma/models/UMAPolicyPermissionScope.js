@@ -21,7 +21,7 @@ define([
     "backbone-relational"
 ], function ($, _, Backbone) {
     return Backbone.RelationalModel.extend({
-        parse: function (response) {
+        parse (response) {
             if (_.isUrl(response.id)) {
                 response = this.resolve(response.id);
             } else {
@@ -30,7 +30,7 @@ define([
 
             return response;
         },
-        resolve: function (url) {
+        resolve (url) {
             var resolved = {
                 id: url,
                 name: url
@@ -40,16 +40,16 @@ define([
             $.ajax({
                 async: false,
                 dataType: "json",
-                success: function (data) {
+                success (data) {
                     resolved.name = data.name;
                     resolved["icon_uri"] = data.icon_uri;
                 },
-                url: url
+                url
             });
 
             return resolved;
         },
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };

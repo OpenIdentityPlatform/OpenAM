@@ -36,7 +36,7 @@ define([
 
         operatorI18nKey: "console.authorization.policies.edit.operators.",
 
-        render: function (args, element, itemID, firstChild, callback) {
+        render (args, element, itemID, firstChild, callback) {
             var self = this;
 
             this.data = $.extend(true, {}, args);
@@ -68,15 +68,15 @@ define([
             });
         },
 
-        setValue: function (value) {
+        setValue (value) {
             this.select.focus().val(value).trigger("change");
         },
 
-        rebindElement: function () {
+        rebindElement () {
             this.delegateEvents();
         },
 
-        onSelect: function (e) {
+        onSelect (e) {
             var item = $(e.currentTarget).parent(),
                 value = e.currentTarget.value,
                 itemData = {},
@@ -97,7 +97,7 @@ define([
             item.addClass(value.toLowerCase());
         },
 
-        checkOptions: function (e) {
+        checkOptions (e) {
             var parent = $(e.target).parent(),
                 dropbox = parent.children("ol.dropbox"),
                 select = dropbox.parent().children("select"),

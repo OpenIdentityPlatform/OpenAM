@@ -26,20 +26,20 @@ define([
 ], function ($, _, Backbone, BackboneRelational, UMAPolicy, UMAPolicyPermissionScope, URLHelper) {
     return Backbone.RelationalModel.extend({
         // Promise version of fetch
-        fetch: function () {
+        fetch () {
             var d = $.Deferred();
             Backbone.RelationalModel.prototype.fetch.call(this, {
-                success: function (model) {
+                success (model) {
                     d.resolve(model);
                 },
-                error: function (model, response) {
+                error (model, response) {
                     d.reject(response);
                 }
             });
             return d.promise();
         },
         idAttribute: "_id",
-        parse: function (response) {
+        parse (response) {
             // Hardwiring the id across to the UMAPolicy object as the server doesn't provide it
             if (!response.policy) {
                 response.policy = {};
@@ -65,7 +65,7 @@ define([
             includeInJSON: Backbone.Model.prototype.idAttribute,
             parse: true
         }],
-        toggleStarred: function (starredLabelId) {
+        toggleStarred (starredLabelId) {
             var isStarred = _.contains(this.get("labels"), starredLabelId);
 
             if (isStarred) {

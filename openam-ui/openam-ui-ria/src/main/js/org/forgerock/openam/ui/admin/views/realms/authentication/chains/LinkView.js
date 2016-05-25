@@ -39,17 +39,17 @@ define([
             "focusout   [data-auth-criteria-info]": "hidePopover"
         },
 
-        deleteItem: function () {
+        deleteItem () {
             this.parent.data.form.chainData.authChainConfiguration.splice(this.$el.index(), 1);
             this.parent.validateChain();
             this.remove();
         },
 
-        editItem: function () {
+        editItem () {
             this.parent.editItem(this);
         },
 
-        showPopover: function () {
+        showPopover () {
             var self = this,
                 popover = this.$el.find("[data-auth-criteria-info]").data("bs.popover"),
                 selected = this.$el.find("[data-select-criteria] option:selected"),
@@ -68,11 +68,11 @@ define([
 
         },
 
-        hidePopover: function () {
+        hidePopover () {
             this.$el.find("[data-auth-criteria-info]").popover("hide");
         },
 
-        renderArrows: function () {
+        renderArrows () {
             var html = Handlebars.compile(
                 `{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='${
                     this.data.linkConfig.criteria
@@ -81,13 +81,13 @@ define([
             this.$el.find(".criteria-view").html(html);
         },
 
-        selectCriteria: function () {
+        selectCriteria () {
             this.data.linkConfig.criteria = this.$el.find("[data-select-criteria] option:selected").val();
             this.parent.validateChain();
             this.renderArrows();
         },
 
-        render: function () {
+        render () {
             var self = this;
 
             this.data.optionsLength = _.keys(this.data.linkConfig.options).length;
@@ -107,7 +107,7 @@ define([
             });
         },
 
-        getModuleDesciption: function () {
+        getModuleDesciption () {
             // The server allows for deletion of modules that are in use within a chain.
             // The chain itself will still have a reference to the deleetd module.
             // Below we are checking if the module is present. If it isn't the typeDescription is left blank;

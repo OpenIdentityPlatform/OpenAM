@@ -36,7 +36,7 @@ define([
         },
         IDENTITY_RESOURCE: "Identity",
 
-        render: function (schema, element, itemID, itemData, callback) {
+        render (schema, element, itemID, itemData, callback) {
             var self = this;
             this.setElement(element);
 
@@ -74,7 +74,7 @@ define([
             });
         },
 
-        createListItem: function (allSubjects, item) {
+        createListItem (allSubjects, item) {
             var self = this,
                 itemToDisplay = null,
                 itemData = item.data().itemData,
@@ -122,7 +122,7 @@ define([
                 });
         },
 
-        changeType: function (e) {
+        changeType (e) {
             e.stopPropagation();
             var self = this,
                 itemData = {},
@@ -159,7 +159,7 @@ define([
             }
         },
 
-        buildHTML: function (itemData, hiddenData, schema) {
+        buildHTML (itemData, hiddenData, schema) {
             var self = this,
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
@@ -169,8 +169,8 @@ define([
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
                     new ArrayAttr().render({
-                        itemData: itemData,
-                        hiddenData: hiddenData,
+                        itemData,
+                        hiddenData,
                         data: hiddenData[identityType],
                         title: identityType,
                         i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
@@ -184,20 +184,20 @@ define([
                     switch (value.type) {
                         case "string":
                             new StringAttr().render({
-                                itemData: itemData,
-                                hiddenData: hiddenData,
+                                itemData,
+                                hiddenData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         case "array":
                             new ArrayAttr().render({
-                                itemData: itemData,
-                                hiddenData: hiddenData,
+                                itemData,
+                                hiddenData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         default:
@@ -214,7 +214,7 @@ define([
             return htmlBuiltPromise;
         },
 
-        setDefaultJsonValues: function (schema) {
+        setDefaultJsonValues (schema) {
             var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
 
@@ -234,7 +234,7 @@ define([
             return itemData;
         },
 
-        animateOut: function () {
+        animateOut () {
             // hide all items except the title selector
             this.$el.find(".no-float").fadeOut(500);
             this.$el.find(".clear-left").fadeOut(500);
@@ -245,7 +245,7 @@ define([
             this.$el.removeClass("invalid-rule");
         },
 
-        animateIn: function () {
+        animateIn () {
             var self = this;
             setTimeout(function () {
                 self.$el.find(".field-float-pattern, .field-float-selectize")
@@ -254,7 +254,7 @@ define([
             }, 10);
         },
 
-        getUIDsFromUniversalValues: function (values) {
+        getUIDsFromUniversalValues (values) {
             var returnObj = { users: {}, groups: {} },
                 endIndex = -1,
                 startIndex = String("id=").length;

@@ -24,7 +24,7 @@ define([
     var LabelTreeNavigationView = TreeNavigation.extend({
         template: "templates/user/uma/views/resource/LabelTreeNavigationTemplate.html",
         partials: ["templates/user/uma/views/resource/_NestedList.html"],
-        findActiveNavItem: function (fragment) {
+        findActiveNavItem (fragment) {
             var myLabelsRoute = Router.configuration.routes.umaResourcesMyLabelsResource,
                 isCurrentRouteForResource = Router.currentRoute === myLabelsRoute,
                 subFragment = (isCurrentRouteForResource) ? _.initial(fragment.split("/")).join("/") : fragment,
@@ -43,12 +43,12 @@ define([
                 }
             }
         },
-        navigateToPage: function (event) {
+        navigateToPage (event) {
             this.$el.find(".sidenav li").removeClass("active");
             $(event.currentTarget).addClass("active");
             this.nextRenderPage = true;
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 userLabels,
                 sortedUserLabels;
@@ -81,7 +81,7 @@ define([
             });
         },
 
-        addToParent: function (collection, label) {
+        addToParent (collection, label) {
             if (label.name.indexOf("/") === -1) {
                 label.title = label.name;
                 label.children = [];
@@ -101,7 +101,7 @@ define([
             }
         },
 
-        addUserLabels: function (userLabels) {
+        addUserLabels (userLabels) {
             var self = this;
 
             this.data.nestedLabels = [];

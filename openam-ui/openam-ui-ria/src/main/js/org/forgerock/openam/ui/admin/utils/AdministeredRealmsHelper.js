@@ -22,7 +22,7 @@ define([
          * Extracts from the URI hash fragment and returns realm which is being currently edited by administrator
          * @returns {String} current realm decoded
          */
-        getCurrentRealm: function () {
+        getCurrentRealm () {
             return decodeURIComponent(URIUtils.getCurrentFragment().split("/")[1]);
         }
     };

@@ -19,7 +19,7 @@ define([
 ], function (BasePage) {
     var SharedWithMePage = BasePage.extend({
         template: "templates/user/uma/views/resource/SharedWithMePageTemplate.html",
-        render: function (args, callback) {
+        render (args, callback) {
             this.renderGrid(this.createSetCollection(true), this.createColumns("sharedwithme"), callback);
         }
     });

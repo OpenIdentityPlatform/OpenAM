@@ -54,7 +54,7 @@ define([
             }
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
 
             this.idPrefix = "Sub_";
             this.property = "subject";

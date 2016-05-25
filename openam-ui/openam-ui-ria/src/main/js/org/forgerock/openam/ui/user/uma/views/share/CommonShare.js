@@ -48,26 +48,26 @@ define([
     });
 
     CommonShare = AbstractView.extend({
-        initialize: function () {
+        initialize () {
             this.parentModel = null;
         },
         template: "templates/user/uma/views/share/CommonShare.html",
         events: {
             "click input#shareButton": "save"
         },
-        enableOrDisableShareButton: function () {
+        enableOrDisableShareButton () {
             var subjectValid = this.$el.find("#selectUser select")[0].selectize.getValue().length > 0,
                 permissionsValid = this.$el.find("#selectPermission select")[0].selectize.getValue().length > 0;
 
             this.$el.find("input#shareButton").prop("disabled", !(subjectValid && permissionsValid));
         },
-        onParentModelError: function (model, response) {
+        onParentModelError (model, response) {
             console.error(`Unrecoverable load failure UMAResourceSetWithPolicy. ${response.responseJSON.code} (${
                 response.responseJSON.reason
                 }) ${response.responseJSON.message}`);
             // TODO : Fire and event message
         },
-        onParentModelSync: function (model) {
+        onParentModelSync (model) {
             // Hardwire the policyID into the policy as it's ID
             model.get("policy").set("policyId", this.parentModel.id);
 
@@ -77,7 +77,7 @@ define([
         /*
          * @returns Boolean whether the parent model required sync'ing
          */
-        syncParentModel: function (id) {
+        syncParentModel (id) {
             var syncRequired = !this.parentModel || (id && this.parentModel.id !== id);
 
             if (syncRequired) {
@@ -92,7 +92,7 @@ define([
             return syncRequired;
         },
 
-        renderDialog: function (args, callback) {
+        renderDialog (args, callback) {
             var self = this,
                 $div = $("<div></div>"),
                 modelId = args._id || args,
@@ -105,16 +105,16 @@ define([
                     buttons: [{
                         label: $.t("common.form.close"),
                         cssClass: "btn-default",
-                        action: function (dialog) {
+                        action (dialog) {
                             dialog.close();
                         }
                     }],
-                    onshow: function () {
+                    onshow () {
                         self.element = $div;
                         self.render(modelId, callback);
                     },
 
-                    onshown: function () {
+                    onshown () {
                         self.renderShareCounter(callback);
                     }
                 };
@@ -124,7 +124,7 @@ define([
             BootstrapDialog.show(options);
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 collection,
                 grid;
@@ -165,7 +165,7 @@ define([
                     name: "scopes",
                     label: $.t("uma.resources.show.grid.2"),
                     cell: Backgrid.Cell.extend({
-                        render: function () {
+                        render () {
                             var formatted = this.model.get("scopes").pluck("name").join(", ");
                             this.$el.empty();
                             this.$el.append(formatted);
@@ -179,7 +179,7 @@ define([
                         className: "col-md-6"
                     })
                 }],
-                collection: collection,
+                collection,
                 emptyText: $.t("console.common.noResults"),
                 className:"backgrid table"
             });
@@ -194,7 +194,7 @@ define([
                 });
             });
         },
-        renderPermissionOptions: function () {
+        renderPermissionOptions () {
             var self = this;
 
             this.$el.find("#selectPermission select").selectize({
@@ -203,12 +203,12 @@ define([
                 persist: false,
                 create: false,
                 hideSelected: true,
-                onChange: function () {
+                onChange () {
                     self.enableOrDisableShareButton();
                 }
             });
         },
-        renderUserOptions: function () {
+        renderUserOptions () {
             var self = this;
 
             this.$el.find("#selectUser select").selectize({
@@ -234,7 +234,7 @@ define([
                 //         callback();
                 //     });
                 // },
-                onChange: function (value) {
+                onChange (value) {
                     // Look for existing share and populate permissions if there one already exists
 
                     var existing = self.parentModel.get("policy").get("permissions").findWhere({ subject: value }),
@@ -251,14 +251,14 @@ define([
                 }
             });
         },
-        reset: function () {
+        reset () {
             this.$el.find("#selectUser select")[0].selectize.clear();
             this.$el.find("#selectPermission select")[0].selectize.clear();
             this.$el.find("input#shareButton").prop("disabled", true);
 
             this.renderShareCounter();
         },
-        save: function () {
+        save () {
             var permissions = this.parentModel.get("policy").get("permissions"),
                 subjects = this.$el.find("#selectUser select")[0].selectize.getValue(),
                 scopes = _.each(this.$el.find("#selectPermission select")[0].selectize.getValue(), function (scope) {
@@ -268,8 +268,8 @@ define([
                 policy;
             _.forEach(subjects, function (subject) {
                 var permission = UMAPolicyPermission.findOrCreate({
-                    subject: subject,
-                    scopes: scopes
+                    subject,
+                    scopes
                 });
                 permissions.add(permission);
                 newPermissions.push(permission);
@@ -297,7 +297,7 @@ define([
             });
         },
 
-        renderShareCounter: function (callback) {
+        renderShareCounter (callback) {
             var policy = this.parentModel.get("policy"),
                 permissionCount = policy ? policy.get("permissions").length : 0;
             ShareCounter.render(permissionCount, callback);

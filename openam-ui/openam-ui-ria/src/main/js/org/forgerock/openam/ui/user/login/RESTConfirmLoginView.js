@@ -33,13 +33,13 @@ define([
             "click button#continueLogin": "continueLogin",
             "click button#logout": "logout"
         },
-        render: function () {
+        render () {
             this.parentRender(function () {
                 $("#menu").hide();
                 $("#user-nav").hide();
             });
         },
-        continueLogin: function () {
+        continueLogin () {
             var href = "#login/";
 
             $("#menu").show();
@@ -51,7 +51,7 @@ define([
             location.href = href;
             return false;
         },
-        logout: function () {
+        logout () {
             var tokenCookie = cookieHelper.getCookie(Configuration.globalData.auth.cookieName);
             SessionService.logout(tokenCookie).then(function () {
                 restLoginHelper.removeSessionCookie();

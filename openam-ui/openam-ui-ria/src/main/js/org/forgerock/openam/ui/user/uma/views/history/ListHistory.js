@@ -35,7 +35,7 @@ define([
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {},
 
-        render: function () {
+        render () {
             var self = this,
                 collection,
                 grid,
@@ -74,7 +74,7 @@ define([
                     label: $.t("uma.history.grid.header.1"),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     cell: BackgridUtils.UriExtCell,
-                    href: function (rawValue, formattedValue, model) {
+                    href (rawValue, formattedValue, model) {
                         return `#uma/resources/myresources/all/${encodeURIComponent(model.get("resourceSetId"))}`;
                     },
                     editable: false,
@@ -84,7 +84,7 @@ define([
                     label: $.t("uma.history.grid.header.2"),
                     cell: "string",
                     formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
-                        fromRaw: function (rawValue) {
+                        fromRaw (rawValue) {
                             return $.t(`uma.history.grid.types.${rawValue.toLowerCase()}`);
                         }
                     }),
@@ -99,13 +99,13 @@ define([
                 }],
                 emptyText: $.t("console.common.noResults"),
                 className:"backgrid table",
-                collection: collection
+                collection
             });
 
             collection.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             paginator = new Backgrid.Extension.ThemeablePaginator({
-                collection: collection,
+                collection,
                 windowSize: 3
             });
 

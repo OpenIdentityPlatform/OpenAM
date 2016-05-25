@@ -23,7 +23,7 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrEnum.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "field-float-select data-obj");
 
             this.parentRender(function () {

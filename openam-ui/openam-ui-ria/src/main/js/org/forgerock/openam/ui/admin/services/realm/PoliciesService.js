@@ -112,7 +112,7 @@ define([
             url: RealmHelper.decorateURLWithOverrideRealm(`/xacml${getCurrentAdministeredRealm()}/policies`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
-            data: data
+            data
         });
     };
 

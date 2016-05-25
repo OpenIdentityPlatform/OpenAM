@@ -21,7 +21,7 @@ define([
         "validPhoneFormat": {
             "name": "Valid Phone Number",
             "dependencies": [],
-            "validator": function (el, input, callback) {
+            "validator": (el, input, callback) => {
                 var phonePattern = /^\+?([0-9\- \(\)])*$/,
                     value = input.val();
 
@@ -35,7 +35,7 @@ define([
         "validEmailAddressFormat": {
             "name": "Valid Email Address",
             "dependencies": [],
-            "validator": function (el, input, callback) {
+            "validator": (el, input, callback) => {
                 var emailPattern = /^([A-Za-z0-9_\-\.])+@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
                     value = input.val();
 

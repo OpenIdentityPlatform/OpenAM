@@ -23,7 +23,7 @@ define([
     return Backbone.Model.extend({
         idAttribute: "_id",
         urlRoot: URLHelper.substitute("__api__/scripts"),
-        defaults: function () {
+        defaults () {
             return {
                 _id: null,
                 name: "",
@@ -33,7 +33,7 @@ define([
             };
         },
 
-        validate: function (attrs) {
+        validate (attrs) {
             if (attrs.name.trim() === "") {
                 return "scriptErrorNoName";
             }
@@ -43,14 +43,14 @@ define([
             }
         },
 
-        parse: function (resp) {
+        parse (resp) {
             if (resp && resp.script) {
                 resp.script = Base64.decodeUTF8(resp.script);
             }
             return resp;
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");

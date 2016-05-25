@@ -21,7 +21,7 @@ define([
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (Configuration, AdministeredRealmsHelper, Constants, RealmHelper) {
     return {
-        substitute: function (url) {
+        substitute (url) {
             return function () {
                 var realm = AdministeredRealmsHelper.getCurrentRealm(),
                     apiUrlBase = `${Constants.host}/${Constants.context}/json${

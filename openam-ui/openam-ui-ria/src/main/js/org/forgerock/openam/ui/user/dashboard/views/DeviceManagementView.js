@@ -36,7 +36,7 @@ define([
             "click .devices-settings-btn" : "showDevicesSettings"
         },
 
-        deleteDevice: function (event) {
+        deleteDevice (event) {
             event.preventDefault();
 
             var target = $(event.currentTarget),
@@ -48,26 +48,26 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        showDeviceDetails: function (event) {
+        showDeviceDetails (event) {
             event.preventDefault();
 
             var uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
-                device = _.find(this.data.devices, { uuid: uuid });
+                device = _.find(this.data.devices, { uuid });
 
             DeviceDetailsDialog(uuid, device);
         },
 
-        showDevicesSettings: function (event) {
+        showDevicesSettings (event) {
             event.preventDefault();
             DevicesSettingsDialog();
         },
 
-        render: function (callback) {
+        render (callback) {
             var self = this;
             DeviceManagementService.getDevices().then(function (devicesData) {
                 self.data.devices = devicesData.result;
@@ -79,7 +79,7 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         }

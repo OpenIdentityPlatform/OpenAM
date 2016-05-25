@@ -28,7 +28,7 @@ define([
         noBaseTemplate: true,
         attrType: "User",
 
-        render: function (args, callback) {
+        render (args, callback) {
 
             var self = this,
                 attr;
@@ -54,7 +54,7 @@ define([
             });
         },
 
-        getAttrs: function () {
+        getAttrs () {
             var data = [],
                 attr,
                 self = this;
@@ -71,7 +71,7 @@ define([
             return data;
         },
 
-        initSelectize: function () {
+        initSelectize () {
             var self = this;
 
             this.$el.find(".selectize").each(function () {
@@ -81,7 +81,7 @@ define([
                     persist: false,
                     create: false,
                     hideSelected: true,
-                    onChange: function (value) {
+                    onChange (value) {
                         self.data.selectedUserAttributes = value;
                     }
                 });

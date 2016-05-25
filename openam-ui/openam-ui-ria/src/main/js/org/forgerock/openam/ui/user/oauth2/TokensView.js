@@ -43,11 +43,11 @@ define([
             "click input[type=submit]": "formSubmit"
         },
 
-        select: function (event) {
+        select (event) {
             event.stopPropagation();
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             this.parentRender(function () {
                 this.reloadData();
 
@@ -57,12 +57,12 @@ define([
             });
         },
 
-        reloadData: function () {
+        reloadData () {
 
             $("#tokensTable").dataTable({
                 "bProcessing": true,
                 "sAjaxSource": "",
-                "fnServerData": function (sUrl, aoData, fnCallback) {
+                "fnServerData": (sUrl, aoData, fnCallback) => {
                     tokensService.getAllTokens(function (tokens) {
                         var data = { aaData: tokens }, i, cleanScope, cleanDate;
 
@@ -117,12 +117,12 @@ define([
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",
-                "fnInitComplete": function () {
+                "fnInitComplete": () => {
                     $(".deleteSelected").html(`<input type="submit" class="button orange floatRight" value="${
                         $.t("common.form.deleteSelected")
                         }" >`);
                 },
-                "fnRowCallback": function (row, data) {
+                "fnRowCallback": (row, data) => {
                     $(row).children().not(":first").click(function () {
                         var id = data.id[0], htmlCode, table, temp = row, td;
                         tokensService.getTokenByID(function (tokenInfo) {
@@ -177,7 +177,7 @@ define([
             });
         },
 
-        formSubmit: function (event) {
+        formSubmit (event) {
             event.preventDefault();
             event.stopPropagation();
 

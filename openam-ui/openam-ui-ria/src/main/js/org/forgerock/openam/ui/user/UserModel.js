@@ -34,11 +34,11 @@ define([
             defaults: {
                 kbaInfo: []
             },
-            silentReset: function () {
+            silentReset () {
                 var previousAttributes = this.previousAttributes();
                 this.set(previousAttributes, { silent: true });
             },
-            sync: function (method, model, options) {
+            sync (method, model, options) {
                 var clearPassword = _.bind(function () {
                         delete this.currentPassword;
                         this.unset("password");
@@ -48,7 +48,7 @@ define([
                     errorCallback = function (response) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: response
+                            response
                         });
                         model.silentReset();
                     };
@@ -119,7 +119,7 @@ define([
                     });
                 }
             },
-            parse: function (response) {
+            parse (response) {
                 delete response.userPassword;
 
                 /**
@@ -154,7 +154,7 @@ define([
 
                 return user;
             },
-            getProfile: function () {
+            getProfile () {
                 return ServiceInvoker.restCall({
                     url: RealmHelper.decorateURIWithRealm(`${baseUrl}?_action=idFromSession`),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
@@ -175,10 +175,10 @@ define([
                     }, this)
                 );
             },
-            getProtectedAttributes: function () {
+            getProtectedAttributes () {
                 return ["password"].concat(Configuration.globalData.protectedUserAttributes);
             },
-            setCurrentPassword: function (currentPassword) {
+            setCurrentPassword (currentPassword) {
                 this.currentPassword = currentPassword;
             },
             /**
@@ -186,7 +186,7 @@ define([
              * @param   {string|array} roles Roles as either a string or array of roles
              * @returns {Boolean}      Whether this model has any of the roles specified
              */
-            hasRole: function (roles) {
+            hasRole (roles) {
                 return _.spread(_.partial(_.contains, this.uiroles))(arrayify(roles));
             }
         });

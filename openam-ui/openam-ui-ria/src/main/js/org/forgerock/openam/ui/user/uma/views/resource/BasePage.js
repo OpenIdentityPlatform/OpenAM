@@ -30,11 +30,11 @@ define([
 ], function ($, AbstractView, Backbone, BackbonePaginator, Backgrid, BackgridFilter,
             BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
     var BasePage = AbstractView.extend({
-        createCollection: function (url, queryFilters) {
+        createCollection (url, queryFilters) {
             var self = this;
 
             return Backbone.PageableCollection.extend({
-                url: url,
+                url,
                 queryParams: BackgridUtils.getQueryParams({
                     _sortKeys: BackgridUtils.sortKeys,
                     _queryFilter: queryFilters,
@@ -42,7 +42,7 @@ define([
                 }),
                 state: BackgridUtils.getState(),
                 parseState: BackgridUtils.parseState,
-                parseRecords: function (data) {
+                parseRecords (data) {
                     if (data.result.length) {
                         self.recordsPresent();
                     }
@@ -52,7 +52,7 @@ define([
                 sync: BackgridUtils.sync
             });
         },
-        createLabelCollection: function (labelId) {
+        createLabelCollection (labelId) {
             var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
 
             if (labelId) {
@@ -66,7 +66,7 @@ define([
                 filters
             );
         },
-        createSetCollection: function (notResourceOwner) {
+        createSetCollection (notResourceOwner) {
             var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
 
             if (notResourceOwner) {
@@ -80,13 +80,13 @@ define([
                 filters
             );
         },
-        createColumns: function (pathToResource) {
+        createColumns (pathToResource) {
             return [{
                 name: "name",
                 label: $.t("uma.resources.grid.header.0"),
                 cell: BackgridUtils.UriExtCell,
                 headerCell: BackgridUtils.FilterHeaderCell,
-                href: function (rawValue, formattedValue, model) {
+                href (rawValue, formattedValue, model) {
                     return `#uma/resources/${pathToResource}/${model.get("_id")}`;
                 },
                 editable: false
@@ -108,7 +108,7 @@ define([
                 cell: Backgrid.Cell.extend({
                     className: "fr-col-btn-1 fa fa-share",
                     events: { "click": "share" },
-                    share: function () {
+                    share () {
                         var shareView = new CommonShare();
                         shareView.renderDialog({
                             _id: this.model.get("_id"),
@@ -118,7 +118,7 @@ define([
                             }
                         });
                     },
-                    render: function () {
+                    render () {
                         this.$el.attr({ "title": $.t("uma.share.shareResource") });
                         this.delegateEvents();
                         return this;
@@ -129,17 +129,17 @@ define([
                 headerCell: BackgridUtils.ClassHeaderCell
             }];
         },
-        recordsPresent: function () {
+        recordsPresent () {
             // Override in child
         },
-        renderGrid: function (Collection, columns, callback) {
+        renderGrid (Collection, columns, callback) {
             var self = this, grid, paginator;
 
             this.data.collection = new Collection();
             this.data.collection.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 className: "backgrid table",
                 collection: this.data.collection,
                 emptyText: $.t("console.common.noResults")

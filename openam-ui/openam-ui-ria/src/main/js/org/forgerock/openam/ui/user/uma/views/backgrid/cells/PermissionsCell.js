@@ -24,8 +24,8 @@ define([
     return BackgridUtils.TemplateCell.extend({
         className: "permissions-cell",
         template: "templates/user/uma/backgrid/cell/PermissionsCell.html",
-        onChange: function () {},
-        rendered: function () {
+        onChange () {},
+        rendered () {
             this.$el.find("select").selectize({
                 dropdownParent: "body",
                 onChange: this.onChange.bind(this)

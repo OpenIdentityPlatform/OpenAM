@@ -41,7 +41,7 @@ define([
             "click  [data-delete-chains]"   : "onDeleteMultiple",
             "click  [data-select-all]"      : "selectAll"
         },
-        chainSelected: function (event) {
+        chainSelected (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
@@ -55,7 +55,7 @@ define([
                 this.$el.find("[data-select-all]").prop("checked", false);
             }
         },
-        selectAll: function (event) {
+        selectAll (event) {
             var checked = $(event.currentTarget).is(":checked");
             this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:not(:disabled)")
                 .prop("checked", checked);
@@ -66,14 +66,14 @@ define([
             }
             this.$el.find("[data-delete-chains]").prop("disabled", !checked);
         },
-        onDeleteSingle: function (event) {
+        onDeleteSingle (event) {
             event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 type: $.t("console.authentication.common.chain")
             }, _.bind(this.deleteChain, this, event));
         },
-        onDeleteMultiple: function (event) {
+        onDeleteMultiple (event) {
             event.preventDefault();
 
             var selectedChains = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked");
@@ -82,7 +82,7 @@ define([
                 message: $.t("console.authentication.chains.confirmDeleteSelected", { count: selectedChains.length })
             }, _.bind(this.deleteChains, this, event, selectedChains));
         },
-        deleteChain: function (event) {
+        deleteChain (event) {
             var self = this,
                 element = event.currentTarget,
                 name = getChainNameFromElement(event.currentTarget);
@@ -94,12 +94,12 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        deleteChains: function (event, selectedChains) {
+        deleteChains (event, selectedChains) {
             var self = this,
                 element = event.currentTarget,
                 names = _(selectedChains).toArray().map(getChainNameFromElement).value();
@@ -111,12 +111,12 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 sortedChains = [];
 
@@ -140,7 +140,7 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         }

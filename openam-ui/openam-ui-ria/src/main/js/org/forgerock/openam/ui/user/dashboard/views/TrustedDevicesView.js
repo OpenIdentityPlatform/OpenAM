@@ -29,7 +29,7 @@ define([
             "click  a.deleteDevice" : "deleteDevice"
         },
 
-        render: function () {
+        render () {
             var self = this;
 
             TrustedDevicesService.getTrustedDevices().then(function (data) {
@@ -40,7 +40,7 @@ define([
             });
         },
 
-        deleteDevice: function (event) {
+        deleteDevice (event) {
             event.preventDefault();
             var self = this;
 

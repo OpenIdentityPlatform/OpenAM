@@ -42,14 +42,14 @@ define([
         var gridColWidth3 = 12 - gridColWidth2,
             theme = JSONEditor.AbstractTheme.extend({
 
-                getSelectInput: function (options) {
+                getSelectInput (options) {
                     var input = this._super(options);
                     input.className += "form-control";
 
                     return input;
                 },
 
-                setSelectOptions: function (selectGroup, options, titles) {
+                setSelectOptions (selectGroup, options, titles) {
                     var select = selectGroup.getElementsByTagName("select")[0] || selectGroup,
                         option = null,
                         i;
@@ -65,11 +65,11 @@ define([
                     }
                 },
 
-                setGridColumnSize: function () {
+                setGridColumnSize () {
                     // JSONEditor grid system not used, so overridden here.
                 },
 
-                afterInputReady: function (input) {
+                afterInputReady (input) {
                     if (input.controlgroup) {
                         return;
                     }
@@ -79,7 +79,7 @@ define([
                     }
                 },
 
-                getTextareaInput: function (placeholder) {
+                getTextareaInput (placeholder) {
                     var el = document.createElement("textarea");
                     el.className = "form-control";
                     if (placeholder) {
@@ -99,14 +99,14 @@ define([
                     return input;
                 },
 
-                getFormInputLabel: function (text) {
+                getFormInputLabel (text) {
                     var el = document.createElement("label");
                     el.appendChild(document.createTextNode(text));
                     el.className += ` control-label col-sm-${gridColWidth2}`;
                     return el;
                 },
 
-                getFormControl: function (label, input, description, inheritanceButton) {
+                getFormControl (label, input, description, inheritanceButton) {
                     var group = document.createElement("div"),
                         div = document.createElement("div");
 
@@ -141,19 +141,19 @@ define([
                     return group;
                 },
 
-                getCheckboxLabel: function (text) {
+                getCheckboxLabel (text) {
                     return this.getFormInputLabel(text);
                 },
 
-                getIndentedPanel: function () {
+                getIndentedPanel () {
                     return document.createElement("div");
                 },
 
-                getFormInputDescription: function (text) {
+                getFormInputDescription (text) {
                     return this.getDescription(text);
                 },
 
-                getDescription: function (text) {
+                getDescription (text) {
                     var el = document.createElement("div"),
                         parseHtml = document.implementation.createHTMLDocument("");
 
@@ -164,29 +164,29 @@ define([
                     return el;
                 },
 
-                getHeaderButtonHolder: function () {
+                getHeaderButtonHolder () {
                     return this.getButtonHolder();
                 },
 
-                getButtonHolder: function () {
+                getButtonHolder () {
                     var el = document.createElement("div");
                     el.className = "btn-group";
                     return el;
                 },
 
-                getButton: function (text, icon, title) {
+                getButton (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += "btn btn-default";
                     return el;
                 },
 
-                getInlineButton: function (text, icon, title) {
+                getInlineButton (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += "btn btn-link delete-row-item";
                     return el;
                 },
 
-                getTable: function () {
+                getTable () {
                     var el = document.createElement("table");
                     el.className = "table table-bordered";
                     el.style.width = "auto";
@@ -194,13 +194,13 @@ define([
                     return el;
                 },
 
-                getGridRow: function () {
+                getGridRow () {
                     var el = document.createElement("div");
                     el.className = "form-horizontal";
                     return el;
                 },
 
-                addInputError: function (input, text) {
+                addInputError (input, text) {
                     if (!input.controlgroup) {
                         return;
                     }
@@ -216,7 +216,7 @@ define([
                     input.errmsg.textContent = text;
                 },
 
-                removeInputError: function (input) {
+                removeInputError (input) {
                     if (!input.errmsg) {
                         return;
                     }
@@ -224,14 +224,14 @@ define([
                     input.controlgroup.className = input.controlgroup.className.replace(/\s?has-error/g, "");
                 },
 
-                getTabHolder: function () {
+                getTabHolder () {
                     var el = document.createElement("div");
                     el.innerHTML = "<div class=tabs 'list-group col-md-2'></div><div class='col-md-10'></div>";
                     el.className = "rows";
                     return el;
                 },
 
-                getTab: function (text) {
+                getTab (text) {
                     var el = document.createElement("a");
                     el.className = "list-group-item";
                     el.setAttribute("href", "#");
@@ -239,15 +239,15 @@ define([
                     return el;
                 },
 
-                markTabActive: function (tab) {
+                markTabActive (tab) {
                     tab.className += " active";
                 },
 
-                markTabInactive: function (tab) {
+                markTabInactive (tab) {
                     tab.className = tab.className.replace(/\s?active/g, "");
                 },
 
-                getProgressBar: function () {
+                getProgressBar () {
                     var min = 0,
                         max = 100,
                         start = 0,
@@ -266,7 +266,7 @@ define([
                     return container;
                 },
 
-                updateProgressBar: function (progressBar, progress) {
+                updateProgressBar (progressBar, progress) {
                     if (!progressBar) {
                         return;
                     }
@@ -278,7 +278,7 @@ define([
                     bar.innerHTML = percentage;
                 },
 
-                updateProgressBarUnknown: function (progressBar) {
+                updateProgressBarUnknown (progressBar) {
                     if (!progressBar) {
                         return;
                     }
@@ -290,32 +290,32 @@ define([
                     bar.innerHTML = "";
                 },
 
-                getFirstColumnWrapper: function () {
+                getFirstColumnWrapper () {
                     var wrapper = document.createElement("div");
                     wrapper.className = `col-sm-${gridColWidth1}`;
                     return wrapper;
                 },
 
-                getSecondColumnWrapper: function () {
+                getSecondColumnWrapper () {
                     var wrapper = document.createElement("div");
                     wrapper.className = `col-sm-offset-1 col-sm-${(gridColWidth2 - 1)}`;
                     return wrapper;
                 },
 
-                addError: function (element) {
+                addError (element) {
                     $(element).addClass("has-error");
                 },
 
-                removeError: function (element) {
+                removeError (element) {
                     $(element).removeClass("has-error");
                 },
 
-                addBorder: function (element) {
+                addBorder (element) {
                     element.style.border = "solid 1px rgb(204, 204, 204)";
                     element.style.marginBottom = "15px";
                 },
 
-                getHeader: function (text) {
+                getHeader (text) {
                     const el = document.createElement("h3");
 
                     el.className = "block-header";
@@ -326,7 +326,7 @@ define([
                     return el;
                 },
 
-                getMapHeader: function (text) {
+                getMapHeader (text) {
                     var el = document.createElement("div"), header = document.createElement("label");
                     el.appendChild(header);
                     if (typeof text === "string") {
@@ -337,19 +337,19 @@ define([
                     return el;
                 },
 
-                getKeyFormInputField: function () {
+                getKeyFormInputField () {
                     return this.getFormInputField("text", $.t("common.form.key"));
                 },
 
-                getValueFormInputField: function () {
+                getValueFormInputField () {
                     return this.getFormInputField("text", $.t("common.form.value"));
                 },
 
-                getInputId: function () {
+                getInputId () {
                     return _.uniqueId();
                 },
 
-                getInheritanceButton: function (valueIsInherited, path) {
+                getInheritanceButton (valueIsInherited, path) {
                     const button = document.createElement("button");
                     button.type = "button";
                     button.className = "btn fr-btn-secondary am-btn-single-icon";
@@ -367,7 +367,7 @@ define([
                     return button;
                 },
 
-                getModal: function () {
+                getModal () {
                     var el = document.createElement("div");
                     el.className = "form-group";
                     return el;

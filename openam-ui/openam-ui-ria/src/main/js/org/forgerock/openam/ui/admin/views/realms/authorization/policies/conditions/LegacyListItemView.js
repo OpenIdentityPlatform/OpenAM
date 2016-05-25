@@ -24,7 +24,7 @@ define([
     return AbstractView.extend({
         data: {},
         mode: "append",
-        render: function (itemData, callback, element, itemID) {
+        render (itemData, callback, element, itemID) {
             this.setElement(element);
             this.data.itemID = itemID;
             this.data.itemData = itemData;

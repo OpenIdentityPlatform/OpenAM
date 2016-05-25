@@ -28,7 +28,7 @@ define([
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
-        render: function () {
+        render () {
             /*
             The RESTLoginHelper.filterUrlParams returns a filtered list of the parameters from the value set within the
             Configuration.globalData.auth.fullLoginURL which is populated by the server upon successful login.

@@ -24,7 +24,7 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrString.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             var cssClass = "";
 
             if (data.title === "startIp" || data.title === "endIp") {
@@ -51,7 +51,7 @@ define([
             });
         },
 
-        attrSpecificChangeInput: function () {
+        attrSpecificChangeInput () {
             if (this.data.title === "authenticateToRealm") {
                 var itemData = this.data.itemData;
                 if (itemData.authenticateToRealm.indexOf("/") !== 0) {

@@ -24,7 +24,7 @@ define([
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/applications"),
 
-        defaults: function () {
+        defaults () {
             return {
                 name: null,
                 displayName: null,
@@ -34,7 +34,7 @@ define([
             };
         },
 
-        parse: function (response) {
+        parse (response) {
             if (_.isEmpty(response.displayName)) {
                 this.displayName = response.name;
             } else {
@@ -44,7 +44,7 @@ define([
             return response;
         },
 
-        validate: function (attrs) {
+        validate (attrs) {
             if (attrs.name.trim() === "") {
                 return "errorNoId";
             }
@@ -59,7 +59,7 @@ define([
             }
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");

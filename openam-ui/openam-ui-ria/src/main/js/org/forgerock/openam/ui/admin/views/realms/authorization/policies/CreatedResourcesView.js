@@ -56,7 +56,7 @@ define([
                         field: "text",
                         direction: "asc"
                     },
-                    onChange: function (value) {
+                    onChange (value) {
                         self.data.options.newPattern = value;
 
                         UIUtils.fillTemplateWithData(

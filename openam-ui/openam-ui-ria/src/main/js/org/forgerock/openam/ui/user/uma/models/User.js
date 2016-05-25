@@ -18,7 +18,7 @@ define([
     "backbone"
 ], function (Backbone) {
     var User = Backbone.Model.extend({
-        initialize: function (username) {
+        initialize (username) {
             this.username = username;
         }
     });

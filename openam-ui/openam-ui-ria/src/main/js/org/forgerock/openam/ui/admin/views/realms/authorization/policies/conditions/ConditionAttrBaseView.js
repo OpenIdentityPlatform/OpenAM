@@ -29,7 +29,7 @@ define([
             "dp.change input": "changeInput"
         },
 
-        initBasic: function (data, el, cssClasses) {
+        initBasic (data, el, cssClasses) {
             var elWrapper = $(`<div class="condition-attr form-inline ${cssClasses}"></div>`);
             el.append(elWrapper);
 
@@ -37,7 +37,7 @@ define([
             this.element = el.find(elWrapper);
         },
 
-        changeInput: function (e) {
+        changeInput (e) {
             e.stopPropagation();
 
             var target = $(e.currentTarget),
@@ -59,7 +59,7 @@ define([
             }
         },
 
-        populateInputGroup: function (target) {
+        populateInputGroup (target) {
             var group = target.closest(".attr-group"),
                 inputs = group.find(":input"),
                 populated = _.find(inputs, function (el) {
@@ -71,7 +71,7 @@ define([
             });
         },
 
-        populateAutoFillGroup: function (target) {
+        populateAutoFillGroup (target) {
             var group = target.closest("li").find("div.auto-fill-group"),
                 first = group.eq(0),
                 second = group.eq(1),

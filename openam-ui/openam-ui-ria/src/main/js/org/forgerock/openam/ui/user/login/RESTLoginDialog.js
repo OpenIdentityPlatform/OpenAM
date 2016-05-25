@@ -33,7 +33,7 @@ define([
         template: "templates/common/DefaultBaseTemplate.html",
         data : {},
         actions: [],
-        render: function () {
+        render () {
             Configuration.backgroundLogin = true;
             // The session cookie does not expire until the browser is closed. So if the server session expires and
             // the browser remains, the XUI will attempt to login sending the old cookie and the server will assume

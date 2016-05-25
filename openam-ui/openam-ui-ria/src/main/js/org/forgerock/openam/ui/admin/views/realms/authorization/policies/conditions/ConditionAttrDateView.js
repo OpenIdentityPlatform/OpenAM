@@ -24,7 +24,7 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrDate.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
             this.parentRender(function () {
@@ -36,7 +36,7 @@ define([
             });
         },
 
-        initDatePickers: function () {
+        initDatePickers () {
             var options = {
                     format: "YYYY:MM:DD",
                     useCurrent: false,

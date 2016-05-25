@@ -46,7 +46,7 @@ define([
         },
         SCRIPT_RESOURCE: "Script",
 
-        render: function (schema, element, itemID, itemData, callback) {
+        render (schema, element, itemID, itemData, callback) {
             var self = this,
                 hiddenData = {};
 
@@ -90,7 +90,7 @@ define([
             });
         },
 
-        createListItem: function (allEnvironments, item) {
+        createListItem (allEnvironments, item) {
             var self = this,
                 itemToDisplay = null,
                 itemData = item.data().itemData,
@@ -128,7 +128,7 @@ define([
             }
         },
 
-        setListItemHtml: function (item, itemToDisplay) {
+        setListItemHtml (item, itemToDisplay) {
             var self = this;
 
             UIUtils.fillTemplateWithData(
@@ -141,7 +141,7 @@ define([
                 });
         },
 
-        changeType: function (e) {
+        changeType (e) {
             e.stopPropagation();
             var self = this,
                 itemData = {},
@@ -189,7 +189,7 @@ define([
             }
         },
 
-        getHelperText: function (schema) {
+        getHelperText (schema) {
             var helperText = {};
             switch (schema.title) {
                 case "IPv4": // fall through
@@ -213,7 +213,7 @@ define([
             return helperText;
         },
 
-        buildHTML: function (itemData, hiddenData, schema) {
+        buildHTML (itemData, hiddenData, schema) {
             var self = this,
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
@@ -223,7 +223,7 @@ define([
 
             function buildScriptAttr () {
                 new ArrayAttr().render({
-                    itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]],
+                    itemData, hiddenData, data: [hiddenData[itemData.type]],
                     title: "scriptId", dataSource: "scripts", multiple: false,
                     i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}scriptId`
                 }, itemDataEl, htmlBuiltPromise.resolve);
@@ -231,15 +231,15 @@ define([
 
             if (itemData.type === "SimpleTime") {
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
-                new TimeAttr().render({ itemData: itemData }, itemDataEl);
-                new DayAttr().render({ itemData: itemData }, itemDataEl);
-                new DateAttr().render({ itemData: itemData }, itemDataEl);
+                new TimeAttr().render({ itemData }, itemDataEl);
+                new DayAttr().render({ itemData }, itemDataEl);
+                new DateAttr().render({ itemData }, itemDataEl);
 
                 if (!itemData.enforcementTimeZone) {
                     itemData.enforcementTimeZone = "GMT";
                 }
                 new ArrayAttr().render({
-                    itemData: itemData,
+                    itemData,
                     data: [itemData.enforcementTimeZone],
                     title: "enforcementTimeZone",
                     i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}enforcementTimeZone`,
@@ -268,37 +268,37 @@ define([
                         case "number": // fall through
                         case "integer":
                             new StringAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey,
-                                schema: schema,
-                                value: value
+                                i18nKey,
+                                schema,
+                                value
                             }, itemDataEl);
                             break;
                         case "boolean":
                             new BooleanAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: value,
                                 title: key,
-                                i18nKey: i18nKey,
+                                i18nKey,
                                 selected: itemData[key]
                             }, itemDataEl);
                             break;
                         case "array":
                             new ArrayAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         case "object":
                             new ObjectAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         default:
@@ -315,7 +315,7 @@ define([
             return htmlBuiltPromise;
         },
 
-        setDefaultJsonValues: function (schema) {
+        setDefaultJsonValues (schema) {
             var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
                 switch (value.type) {
@@ -349,7 +349,7 @@ define([
             return itemData;
         },
 
-        animateOut: function () {
+        animateOut () {
             // hide all items except the title selector
             this.$el.find(".no-float").fadeOut(500);
             this.$el.find(".clear-left").fadeOut(500);
@@ -363,7 +363,7 @@ define([
             this.$el.removeClass("invalid-rule");
         },
 
-        animateIn: function () {
+        animateIn () {
             var self = this;
             setTimeout(function () {
                 self.$el.find(".field-float-pattern, .field-float-selectize, .timezone-field")

@@ -27,7 +27,7 @@ define([
         },
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
             this.data.weekdays = this.getWeekDays();
@@ -38,7 +38,7 @@ define([
             });
         },
 
-        getWeekDays: function () {
+        getWeekDays () {
             var weekdays = [], i = 0, self = this;
             _.invoke(self.days, function () {
                 weekdays[i] = {};

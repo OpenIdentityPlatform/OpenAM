@@ -35,7 +35,7 @@ define([
      */
     obj.getAllTokens = function (successCallback, errorCallback) {
 
-        obj.serviceCall({ url: "/?_queryid=*", success: function (data) {
+        obj.serviceCall({ url: "/?_queryid=*", success (data) {
             if (successCallback) {
                 successCallback(data.result);
             }
@@ -50,7 +50,7 @@ define([
      * @param {String} id TokenID
      */
     obj.deleteToken = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ type: "DELETE", url: `/${id}`, success: function () {
+        obj.serviceCall({ type: "DELETE", url: `/${id}`, success () {
             if (successCallback) {
                 successCallback(id);
             }
@@ -64,7 +64,7 @@ define([
      * @param {String} id TokenID
      */
     obj.getTokenByID = function (successCallback, errorCallback, id) {
-        obj.serviceCall({ url: `/${id}`, success: function (data) {
+        obj.serviceCall({ url: `/${id}`, success (data) {
             if (successCallback) {
                 successCallback(data);
             }

@@ -22,7 +22,7 @@ define([
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrBoolean.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "field-float-pattern data-obj button-field");
 
             this.events["click [data-btn]"] = _.bind(this.buttonControlClick, this);
@@ -35,7 +35,7 @@ define([
             });
         },
 
-        buttonControlClick: function (e) {
+        buttonControlClick (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }

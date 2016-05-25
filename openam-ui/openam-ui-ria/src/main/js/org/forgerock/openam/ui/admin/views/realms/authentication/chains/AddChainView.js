@@ -44,7 +44,7 @@ define([
             "change [data-chain-name]": "onValidateChainProps",
             "click [data-save]"       : "save"
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 chainsData = [];
             this.data.realmPath = args[0];
@@ -62,7 +62,7 @@ define([
                 });
             });
         },
-        save: function () {
+        save () {
             var self = this,
                 name = this.$el.find("[data-chain-name]").val().trim();
 
@@ -77,11 +77,11 @@ define([
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        onValidateChainProps: function () {
+        onValidateChainProps () {
             validateChainProps.call(this);
         }
     });

@@ -36,7 +36,7 @@ define([
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },
-        render: function (data, el, callback) {
+        render (data, el, callback) {
             var self = this;
             _.extend(this.data, data);
             this.element = el;
@@ -46,7 +46,7 @@ define([
             });
         },
 
-        renderActionsTable: function (callback) {
+        renderActionsTable (callback) {
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
@@ -59,7 +59,7 @@ define([
                 });
         },
 
-        updateEntity: function () {
+        updateEntity () {
             var actions = null;
 
             if (this.data.actions.length) {
@@ -72,11 +72,11 @@ define([
             this.data.entity.actions = actions;
         },
 
-        isExistingItem: function (itemPending, itemFromCollection) {
+        isExistingItem (itemPending, itemFromCollection) {
             return itemPending.name === itemFromCollection.name;
         },
 
-        addItem: function (e) {
+        addItem (e) {
             const actionName = this.$el.find("[data-editing-input]").val();
 
             if (e.type === "keyup" && e.keyCode !== 13) {
@@ -113,7 +113,7 @@ define([
             }
         },
 
-        deleteItem: function (e) {
+        deleteItem (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -126,7 +126,7 @@ define([
             this.renderActionsTable();
         },
 
-        toggleRadio: function (e) {
+        toggleRadio (e) {
             var $target = $(e.target),
                 permitted,
                 actionName;

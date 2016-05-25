@@ -41,7 +41,7 @@ define([
              Constants, UIUtils, Script, RealmScriptsService, GlobalScriptsService, FormHelper, Promise) {
 
     return AbstractView.extend({
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
@@ -62,7 +62,7 @@ define([
             "keyup [data-field]": "checkChanges"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var uuid = null;
 
             this.data.realmPath = args[0];
@@ -106,7 +106,7 @@ define([
          * In the first case we should to create a new model, in second case is not create.
          * So the render function is divided into two parts, so as not to cause a re-check and avoid the second case.
          */
-        renderAfterSyncModel: function () {
+        renderAfterSyncModel () {
             var self = this;
 
             this.data.entity = _.pick(this.model.attributes,
@@ -130,7 +130,7 @@ define([
             }
         },
 
-        renderScript: function () {
+        renderScript () {
             var self = this,
                 context;
 
@@ -152,7 +152,7 @@ define([
                         element: this.$el.find(".script-changes-pending"),
                         watchedObj: this.data.entity,
                         undo: !this.newEntity,
-                        undoCallback: function (changes) {
+                        undoCallback (changes) {
                             _.extend(self.data.entity, changes);
                             var context = _.find(self.data.contexts, {
                                 "_id": self.data.entity.context
@@ -174,7 +174,7 @@ define([
             });
         },
 
-        reRenderView: function () {
+        reRenderView () {
             this.parentRender(function () {
                 this.showUploadButton();
                 this.initScriptEditor();
@@ -184,7 +184,7 @@ define([
             });
         },
 
-        checkChanges: function () {
+        checkChanges () {
             this.updateFields();
             if (this.newEntity) {
                 this.toggleSaveButton(this.checkRequiredFields());
@@ -193,7 +193,7 @@ define([
             }
         },
 
-        updateFields: function () {
+        updateFields () {
             var self = this,
                 app = this.data.entity,
                 previousContext = app.context,
@@ -224,11 +224,11 @@ define([
             }
         },
 
-        checkRequiredFields: function () {
+        checkRequiredFields () {
             return this.data.entity.name && this.data.entity.context && this.data.entity.language;
         },
 
-        submitForm: function (e) {
+        submitForm (e) {
             e.preventDefault();
 
             var self = this,
@@ -257,7 +257,7 @@ define([
             }
         },
 
-        validateScript: function () {
+        validateScript () {
             var scriptText = this.scriptEditor.getValue(),
                 language = this.data.entity.language,
                 script,
@@ -265,7 +265,7 @@ define([
 
             script = {
                 script: Base64.encodeUTF8(scriptText),
-                language: language
+                language
             };
 
             RealmScriptsService.validateScript(script).done(function (result) {
@@ -277,16 +277,16 @@ define([
             }).fail(function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        uploadScript: function () {
+        uploadScript () {
             this.$el.find("[name=upload]").trigger("click");
         },
 
-        readUploadedFile: function (e) {
+        readUploadedFile (e) {
             var self = this,
                 file = e.target.files[0],
                 reader = new FileReader();
@@ -300,7 +300,7 @@ define([
             reader.readAsText(file);
         },
 
-        openDialog: function () {
+        openDialog () {
             var self = this;
 
             if (!this.data.defaultContext) {
@@ -313,11 +313,11 @@ define([
             }
         },
 
-        renderDialog: function () {
+        renderDialog () {
             BootstrapDialog.show(this.constructDialogOptions());
         },
 
-        constructDialogOptions: function () {
+        constructDialogOptions () {
             var self = this,
                 footerButtons = [],
                 options = {
@@ -325,7 +325,7 @@ define([
                     title: $.t("console.scripts.edit.dialog.title"),
                     cssClass: "script-change-context",
                     message: $("<div></div>"),
-                    onshow: function () {
+                    onshow () {
                         var dialog = this;
                         UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ChangeContextTemplate.html",
                             self.data,
@@ -338,13 +338,13 @@ define([
             footerButtons.push({
                 label: $.t("common.form.cancel"),
                 cssClass: "btn-default",
-                action: function (dialog) {
+                action (dialog) {
                     dialog.close();
                 }
             }, {
                 label: $.t("common.form.change"),
                 cssClass: "btn-danger",
-                action: function (dialog) {
+                action (dialog) {
                     var checkedItem = dialog.$modalContent.find("[name=changeContext]:checked"),
                         newContext = checkedItem.val(),
                         newContextName = checkedItem.parent().text().trim();
@@ -362,7 +362,7 @@ define([
             return options;
         },
 
-        changeContext: function () {
+        changeContext () {
             var self = this,
                 selectedContext = _.find(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
@@ -397,7 +397,7 @@ define([
             return promise;
         },
 
-        initScriptEditor: function () {
+        initScriptEditor () {
             this.scriptEditor = CodeMirror.fromTextArea(this.$el.find("#script")[0], {
                 lineNumbers: true,
                 autofocus: true,
@@ -409,16 +409,16 @@ define([
             this.scriptEditor.on("update", _.bind(this.checkChanges, this));
         },
 
-        onChangeLanguage: function (e) {
+        onChangeLanguage (e) {
             this.changeLanguage(e.target.value);
         },
 
-        changeLanguage: function (lang) {
+        changeLanguage (lang) {
             this.data.entity.language = lang;
             this.scriptEditor.setOption("mode", lang.toLowerCase());
         },
 
-        showUploadButton: function () {
+        showUploadButton () {
             // Show the Upload button for modern browsers only. Documented feature.
             // File: Chrome 13; Firefox (Gecko) 3.0 (1.9) (non standard), 7 (7) (standard); Internet Explorer 10.0;
             //       Opera 11.5; Safari (WebKit) 6.0
@@ -433,7 +433,7 @@ define([
          * @param  {Array} contexts Array with script contexts
          * @param  {Object} schema Script schema with translations
          */
-        addContextNames: function (contexts, schema) {
+        addContextNames (contexts, schema) {
             var i,
                 index,
                 length = contexts.length;
@@ -450,7 +450,7 @@ define([
          * @param  {Array} languages Language IDs from Context
          * @returns {Array} result combined array
          */
-        addLanguageNames: function (languages) {
+        addLanguageNames (languages) {
             var result,
                 i,
                 length = languages.length,
@@ -469,14 +469,14 @@ define([
             return result;
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.scripts.edit.script") },
                 _.bind(this.deleteScript, this));
         },
 
-        deleteScript: function () {
+        deleteScript () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsScripts, {
@@ -492,20 +492,20 @@ define([
             });
         },
 
-        editFullScreen: function () {
+        editFullScreen () {
             this.toggleFullScreen(true);
         },
 
-        exitFullScreen: function () {
+        exitFullScreen () {
             this.toggleFullScreen(false);
         },
 
-        toggleFullScreen: function (fullScreen) {
+        toggleFullScreen (fullScreen) {
             this.scriptEditor.setOption("fullScreen", fullScreen);
             this.$el.find(".full-screen-bar").toggle(fullScreen);
         },
 
-        toggleSaveButton: function (flag) {
+        toggleSaveButton (flag) {
             this.$el.find("[data-save]").prop("disabled", !flag);
         }
     });
