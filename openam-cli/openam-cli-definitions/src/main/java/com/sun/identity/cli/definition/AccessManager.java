@@ -943,14 +943,14 @@ public class AccessManager {
           webSupport="true",
           mandatoryOptions={
                   "servicename|s|s|Name of service.",
-                  "subconfigname|g|s|Name of (or path to) sub configuration."},
+                  "subconfigname|g|s|Sub-schema name of (or path to) the type of sub-configuration being added."},
           optionAliases={},
           macro="authentication",
           optionalOptions={
                   "attributevalues|a|m|Attribute values e.g. homeaddress=here.",
                   "datafile|D|s|Name of file that contains attribute values data.",
                   "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided).",
-                  "subconfigid|b|s|ID of parent configuration(Sub Configuration shall be added to root configuration if this option is not provided).",
+                  "subconfigid|b|s|User-specfieid ID of (or path to) the sub-configuration.",
                   "priority|p|s|Priority of the sub configuration."},
           resourceStrings={
                   "add-sub-configuration-succeed=Sub Configuration {1} was added.",
