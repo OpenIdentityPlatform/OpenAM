@@ -80,6 +80,7 @@ module.exports = {
         "operator-linebreak": 2,
         "sort-imports": 2,
         "prefer-const": 2,
+        "prefer-template": 2,
         "quotes": [2, "double", "avoid-escape"],
         "semi-spacing": [2, {
             "before": false,
@@ -112,7 +113,6 @@ module.exports = {
          */
         "no-var": 1,
         "prefer-arrow-callback": 1,
-        "prefer-template": 1,
         "prefer-spread": 1,
 
         // TODO: Need an abstraction for logging before we can enable this.

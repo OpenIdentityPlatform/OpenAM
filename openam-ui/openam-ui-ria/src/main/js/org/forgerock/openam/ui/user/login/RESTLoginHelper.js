@@ -137,7 +137,7 @@ define([
 
     obj.filterUrlParams = function (params) {
         const filtered = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"];
-        return _.reduce(_.pick(params, filtered), (result, value, key) => result + `&${key}=${value}`, "");
+        return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
     obj.logout = function (successCallback, errorCallback) {
