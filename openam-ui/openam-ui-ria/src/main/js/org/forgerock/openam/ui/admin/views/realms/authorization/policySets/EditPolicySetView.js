@@ -211,8 +211,6 @@ define([
                         } else {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
-
-
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
@@ -250,20 +248,18 @@ define([
             });
         },
 
-        updateFields: function () {
-            var app = this.data.entity,
-                dataFields = this.$el.find("[data-field]"),
-                dataField;
+        updateFields () {
+            const dataFields = this.$el.find("[data-field]");
 
-            _.each(dataFields, function (field) {
-                dataField = field.getAttribute("data-field");
+            _.each(dataFields, (field) => {
+                const dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
                     if (field.checked) {
-                        app[dataField].push(field.value);
+                        this.data.entity[dataField].push(field.value);
                     }
                 } else {
-                    app[dataField] = field.value;
+                    this.data.entity[dataField] = _.trim(field.value);
                 }
             });
         }
