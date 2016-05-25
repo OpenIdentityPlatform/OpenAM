@@ -636,6 +636,8 @@ public class SmsServerPropertiesResource {
 
             return newResultPromise(newResourceResponse(serverId + "/properties/" + tabName, valueOf(result
                     .hashCode()), result));
+        } catch (NotFoundException e) {
+            return new NotFoundException("Cannot find server with ID: " + serverId).asPromise();
         } catch (SMSException | SSOException | ParserConfigurationException | SAXException | IOException
                 | XPathExpressionException e) {
             logger.error("Error reading property sheet for tab " + tabName, e);
