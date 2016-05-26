@@ -31,6 +31,7 @@
  */
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -166,7 +167,11 @@ public class ServerSiteViewBean
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException
     {
-        super.beginDisplay(event);
+        if (isXuiAdminConsoleEnabled()) {
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.DEPLOYMENT_SERVERS);
+        } else {
+            super.beginDisplay(event);
+        }
         resetButtonState(TBL_SERVER_BUTTON_DELETE);
         resetButtonState(TBL_SERVER_BUTTON_CLONE);
         resetButtonState(TBL_SITE_BUTTON_DELETE);
@@ -522,8 +527,6 @@ public class ServerSiteViewBean
     public void handleBtnDefaultSettingsRequest(RequestInvocationEvent event) {
         redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION);
     }
-
-    
 
     protected String getBreadCrumbDisplayName() {
         return "breadcrumbs.server.config";
