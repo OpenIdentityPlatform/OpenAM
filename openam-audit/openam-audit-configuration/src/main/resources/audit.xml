@@ -546,6 +546,136 @@
                     </AttributeSchema>
                 </SubSchema>
 
+                <SubSchema name="JMS" inheritance="multiple" i18nKey="handler.name.jms" i18nFileName="audit">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled"
+                                     order="10">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics"
+                                     order="20">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deliveryMode" type="single_choice" i18nKey="audit.handlers.jms.deliveryMode"
+                                     order="30">
+                        <ChoiceValues>
+                            <ChoiceValue>PERSISTENT</ChoiceValue>
+                            <ChoiceValue>NON_PERSISTENT</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>NON_PERSISTENT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sessionMode" type="single_choice" i18nKey="audit.handlers.jms.sessionMode"
+                                     order="40">
+                        <ChoiceValues>
+                            <ChoiceValue>AUTO</ChoiceValue>
+                            <ChoiceValue>CLIENT</ChoiceValue>
+                            <ChoiceValue>DUPS_OK</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>AUTO</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiContextProperties" uitype="maplist" order="50"
+                                     i18nKey="audit.handlers.jms.jndi.contextProperties">
+                        <DefaultValues>
+                            <Value>[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory</Value>
+                            <Value>[java.naming.provider.url]=tcp://localhost:61616</Value>
+                            <Value>[topic.audit]=audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiTopicName" type="single" i18nKey="audit.handlers.jms.jndi.topicName"
+                                     validator="RequiredValueValidator" order="60">
+                        <DefaultValues>
+                            <Value>audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiConnectionFactoryName" type="single"
+                                     i18nKey="audit.handlers.jms.jndi.connectionFactoryName"
+                                     validator="RequiredValueValidator" order="70">
+                        <DefaultValues>
+                            <Value>ConnectionFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchEnabled" type="single" syntax="boolean" order="80"
+                                     i18nKey="audit.handlers.jms.publisher.batch.batchEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchCapacity" type="single" syntax="number" order="90"
+                                     i18nKey="audit.handlers.jms.publisher.batch.capacity"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxBatchedEvents" type="single" syntax="number" order="100"
+                                     i18nKey="audit.handlers.jms.publisher.batch.maxBatchedEvents"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>100</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchThreadCount" type="single" syntax="number" order="110"
+                                     i18nKey="audit.handlers.jms.publisher.batch.threadCount"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>3</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="insertTimeoutSec" type="single" syntax="number" order="120"
+                                     i18nKey="audit.handlers.jms.publisher.batch.insertTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="pollTimeoutSec" type="single" syntax="number" order="130"
+                                     i18nKey="audit.handlers.jms.publisher.batch.pollTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="shutdownTimeoutSec" type="single" syntax="number" order="140"
+                                     i18nKey="audit.handlers.jms.publisher.batch.shutdownTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory"
+                                     validator="RequiredValueValidator" order="150">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JmsAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
             </Global>
 
             <Organization>
@@ -1069,6 +1199,136 @@
                     </AttributeSchema>
                 </SubSchema>
 
+                <SubSchema name="JMS" inheritance="multiple" i18nKey="handler.name.jms" i18nFileName="audit">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled"
+                                     order="10">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics"
+                                     order="20">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deliveryMode" type="single_choice" i18nKey="audit.handlers.jms.deliveryMode"
+                                     order="30">
+                        <ChoiceValues>
+                            <ChoiceValue>PERSISTENT</ChoiceValue>
+                            <ChoiceValue>NON_PERSISTENT</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>NON_PERSISTENT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sessionMode" type="single_choice" i18nKey="audit.handlers.jms.sessionMode"
+                                     order="40">
+                        <ChoiceValues>
+                            <ChoiceValue>AUTO</ChoiceValue>
+                            <ChoiceValue>CLIENT</ChoiceValue>
+                            <ChoiceValue>DUPS_OK</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>AUTO</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiContextProperties" uitype="maplist" order="50"
+                                     i18nKey="audit.handlers.jms.jndi.contextProperties">
+                        <DefaultValues>
+                            <Value>[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory</Value>
+                            <Value>[java.naming.provider.url]=tcp://localhost:61616</Value>
+                            <Value>[topic.audit]=audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiTopicName" type="single" i18nKey="audit.handlers.jms.jndi.topicName"
+                                     validator="RequiredValueValidator" order="60">
+                        <DefaultValues>
+                            <Value>audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiConnectionFactoryName" type="single"
+                                     i18nKey="audit.handlers.jms.jndi.connectionFactoryName"
+                                     validator="RequiredValueValidator" order="70">
+                        <DefaultValues>
+                            <Value>ConnectionFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchEnabled" type="single" syntax="boolean" order="80"
+                                     i18nKey="audit.handlers.jms.publisher.batch.batchEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchCapacity" type="single" syntax="number" order="90"
+                                     i18nKey="audit.handlers.jms.publisher.batch.capacity"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxBatchedEvents" type="single" syntax="number" order="100"
+                                     i18nKey="audit.handlers.jms.publisher.batch.maxBatchedEvents"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>100</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchThreadCount" type="single" syntax="number" order="110"
+                                     i18nKey="audit.handlers.jms.publisher.batch.threadCount"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>3</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="insertTimeoutSec" type="single" syntax="number" order="120"
+                                     i18nKey="audit.handlers.jms.publisher.batch.insertTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="pollTimeoutSec" type="single" syntax="number" order="130"
+                                     i18nKey="audit.handlers.jms.publisher.batch.pollTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="shutdownTimeoutSec" type="single" syntax="number" order="140"
+                                     i18nKey="audit.handlers.jms.publisher.batch.shutdownTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory"
+                                     validator="RequiredValueValidator" order="150">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JmsAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
             </Organization>
         </Schema>
 

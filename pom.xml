@@ -178,6 +178,7 @@
         <json.version>20090211</json.version>
         <hikaricp.version>2.4.1</hikaricp.version>
         <h2database.version>1.4.188</h2database.version>
+        <activemq.version>5.13.3</activemq.version>
         <javax.inject.version>1_2</javax.inject.version>
         <fastinfoset.version>1.2.13</fastinfoset.version>
 
@@ -1939,6 +1940,12 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2database.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>${activemq.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

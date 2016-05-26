@@ -1248,6 +1248,9 @@ Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights rese
 Version: grizzly-http-servlet-2.3.23.jar
 Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
 
+Version: javax.jms:javax.jms-api:2.0.1.jar
+Copyright: Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights reserved.
+
 Version: jaxb-impl-1.0.6.jar
 Copyright:
 
