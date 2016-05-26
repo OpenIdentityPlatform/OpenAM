@@ -52,8 +52,6 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
-import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -429,7 +427,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
      */
     private static boolean isSessionUpgrade(IDPAuthnContextInfo idpAuthnContextInfo, Object session) {
 
-        String classMethod = "IDPSSOFederate.isSessionUpgrade: ";
+        String classMethod = "UtilProxySAMLAuthenticator.isSessionUpgrade: ";
 
         if (session != null) {
             // Get the Authentication Context required
@@ -465,7 +463,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
 
     private void generateAssertionResponse(IDPSSOFederateRequest data) throws ServerFaultException {
 
-        final String classMethod = "IDPSSOFederate.generateAssertionResponse";
+        final String classMethod = "UtilProxySAMLAuthenticator.generateAssertionResponse";
 
         // IDP Adapter invocation, to be sure that we can execute the logic
         // even if there is a new request with the same session
@@ -512,7 +510,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                                 IDPAuthnContextInfo idpAuthnContextInfo, IDPSSOFederateRequest data)
             throws IOException, ServerFaultException {
 
-        String classMethod = "IDPSSOFederate.redirectToAuth";
+        String classMethod = "UtilProxySAMLAuthenticator.redirectToAuth";
         String preferredIDP;
 
         // TODO: need to verify the signature of the AuthnRequest
@@ -607,8 +605,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             try {
                 authnReq = ProtocolFactory.getInstance().createAuthnRequest(outputString);
             } catch (SAML2Exception se) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest(): cannot construct a AuthnRequest object from " +
-                        "the SAMLRequest value:", se);
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest(): cannot construct a AuthnRequest "
+                        + "object from the SAMLRequest value:", se);
             }
         }
         return authnReq;
@@ -625,17 +623,17 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 Element elem = SOAPCommunicator.getInstance().getSamlpElement(msg, SAML2Constants.AUTHNREQUEST);
                 return ProtocolFactory.getInstance().createAuthnRequest(elem);
             } catch (Exception ex) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:", ex);
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest:", ex);
             }
             return null;
         } else {
             String samlRequest = request.getParameter(SAML2Constants.SAML_REQUEST);
             if (samlRequest == null) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: SAMLRequest is null");
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest: SAMLRequest is null");
                 return null;
             }
             if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
-                SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: saml request = {}", samlRequest);
+                SAML2Utils.debug.message("UtilProxySAMLAuthenticator.getAuthnRequest: saml request = {}", samlRequest);
                 return getAuthnRequest(samlRequest);
             } else if (binding.equals(SAML2Constants.HTTP_POST)) {
                 ByteArrayInputStream bis = null;
@@ -646,16 +644,17 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                         bis = new ByteArrayInputStream(raw);
                         Document doc = XMLUtils.toDOMDocument(bis, SAML2Utils.debug);
                         if (doc != null) {
-                            SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: decoded SAML2 Authn Request: {}",
+                            SAML2Utils.debug.message("UtilProxySAMLAuthenticator.getAuthnRequest: decoded SAML2 Authn "
+                                    + "Request: {}",
                                     XMLUtils.print(doc.getDocumentElement()));
                             authnRequest = ProtocolFactory.getInstance().createAuthnRequest(doc.getDocumentElement());
                         } else {
-                            SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: Unable to parse SAMLRequest: " +
-                                    samlRequest);
+                            SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest: Unable to parse "
+                                    + "SAMLRequest: " + samlRequest);
                         }
                     }
                 } catch (Exception ex) {
-                    SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:", ex);
+                    SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest:", ex);
                     return null;
                 } finally {
                     IOUtils.closeIfNotNull(bis);
@@ -687,7 +686,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                                                boolean isSessionUpgrade)
             throws SAML2Exception, IOException {
 
-        String classMethod = "IDPSSOFederate.redirectAuthentication: ";
+        String classMethod = "UtilProxySAMLAuthenticator.redirectAuthentication: ";
         // get the authentication service url
         String authService = IDPSSOUtil.getAuthenticationServiceURL(data.getRealm(), data.getIdpEntityID(), request);
         StringBuilder appliRootUrl = getAppliRootUrl(request);
