@@ -570,7 +570,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         String status = CollectionHelper.getMapAttr(attrMap, userStatusAttr);
         if (status != null) {
-            return helper.isActive(status, inactiveValue);
+            return helper.isActive(status, activeValue);
         } else {
             return true;
         }
@@ -814,7 +814,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 }
                 result.put(attribute.getAttributeDescriptionAsString(), function.apply(attribute));
                 if (attrName.equalsIgnoreCase(userStatusAttr) && attrs.contains(DEFAULT_USER_STATUS_ATTR)) {
-                    String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), inactiveValue);
+                    String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), activeValue);
                     result.put(DEFAULT_USER_STATUS_ATTR,
                             function.apply(new LinkedAttribute(DEFAULT_USER_STATUS_ATTR, converted)));
                 }
