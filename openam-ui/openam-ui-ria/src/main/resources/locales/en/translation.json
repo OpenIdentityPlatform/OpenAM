@@ -374,6 +374,7 @@
         "user" : {
             "userQuery" : {
                 "mainEnterPromptUsername": "Enter your $t(common.user.username)",
+                "mainEnterPromptEmailAddress": "Enter your $t(common.user.emailAddress)",
                 "optionalEnterPromptEmail": "or your $t(common.user.emailAddress)",
                 "orAllEnterPrompt" : "or all of the following information",
                 "title" : "Enter details to find your account",
