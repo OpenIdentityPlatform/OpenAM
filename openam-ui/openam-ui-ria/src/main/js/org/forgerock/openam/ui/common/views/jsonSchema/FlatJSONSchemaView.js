@@ -93,6 +93,11 @@ define([
             if (this.subview) {
                 return this.subview.getData();
             }
+        },
+        setData (data) {
+            if (this.subview) {
+                return this.subview.setData(data);
+            }
         }
     });
 

@@ -142,6 +142,9 @@ define([
             }
 
             return valuesWithoutEmptyPasswords.raw;
+        },
+        setData (data) {
+            this.options.values = this.options.values.extend(data);
         }
     });
 

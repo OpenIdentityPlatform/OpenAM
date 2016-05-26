@@ -103,6 +103,7 @@ define([
             this.updateData();
             ServersService.servers.update(this.sectionId, this.values.raw, this.serverId)
             .then(() => {
+                this.getJSONSchemaView().setData(_.cloneDeep(this.values.raw[this.subview.getTabId()]));
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({
