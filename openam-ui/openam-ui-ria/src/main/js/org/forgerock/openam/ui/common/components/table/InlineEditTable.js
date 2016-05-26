@@ -20,91 +20,118 @@ define([
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/components/table/InlineEditRow"
-], ($, _, Backbone, UIUtils, InlineEditRow) => Backbone.View.extend({
-    template: "templates/common/components/table/InlineEditTable.html",
+], ($, _, Backbone, UIUtils, EditRow) => {
 
-    /**
-     * Initializes the table with editables rows. Only single row is allowed to be in edit mode at a time.
-     *
-     * @param {object[]} [values=[]] Data array to be passed to the rows. Format of individual object is dictated by the
-     *                              row view.
-     */
-    initialize ({ values = [] }) {
-        this.values = values;
-        this.rows = [];
-    },
+    const defaultKeyValueSchema = {
+        required: ["key"],
+        properties: {
+            key: { title: $.t("common.form.propertyName"), propertyOrder: 0 },
+            value: { title: $.t("common.form.propertyValue"), propertyOrder: 1 }
+        }
+    };
 
-    render () {
-        UIUtils.compileTemplate(this.template).then((template) => {
-            this.$el.html(template);
+    return Backbone.View.extend({
+        template: "templates/common/components/table/InlineEditTable.html",
 
-            this.tBody = this.$el.find("tbody");
+        /**
+         * Initializes the table with editables rows. Only single row is allowed to be in edit mode at a time.
+         *
+         * @param {object[]} values=[] Data array to be passed to the rows
+         * @param {object} rowSchema The Schema of an item. Should be valid JSON Schema.
+         */
+        initialize ({ values = [], rowSchema = defaultKeyValueSchema }) {
+            this.values = values;
+            this.rowSchema = rowSchema;
+            this.rows = [];
+        },
 
-            _.each(this.values, (value) => {
-                const row = this.initRow(value);
-                this.tBody.append(row.renderInReadOnlyMode().$el);
-                this.rows.push(row);
+        getHeaders () {
+            const headers = [];
+            _.each(this.rowSchema.properties, (item) => {
+                headers[item.propertyOrder] = item.title;
+            });
+            return headers;
+        },
+
+        getRenderData () {
+            return { headers: this.getHeaders() };
+        },
+
+        render () {
+            UIUtils.compileTemplate(this.template, this.getRenderData()).then((template) => {
+                this.$el.html(template);
+
+                this.tBody = this.$el.find("tbody");
+
+                _.each(this.values, (value) => {
+                    const row = this.initRow(value);
+                    this.tBody.append(row.renderInReadOnlyMode().$el);
+                    this.rows.push(row);
+                });
+
+                this.appendEmptyNewRowToTheBottom();
             });
 
-            this.appendEmptyNewRowToTheBottom();
-        });
+            return this;
+        },
 
-        return this;
-    },
+        initRow (rowData = {}) {
+            const row = new EditRow(rowData, this.rowSchema);
 
-    initRow (rowData = {}) {
-        const row = new InlineEditRow(rowData);
+            const enterEditMode = (row) => {
+                if (row === this.currentlyEditedRow || row === this.newRow) {
+                    return;
+                }
 
-        const enterEditMode = (row) => {
-            if (row === this.currentlyEditedRow) {
-                return;
-            }
-
-            if (this.currentlyEditedRow) {
-                if (this.currentlyEditedRow === this.newEmptyRow) {
-                    this.currentlyEditedRow.delete();
-                } else {
+                if (this.currentlyEditedRow) {
                     this.currentlyEditedRow.renderInReadOnlyMode();
                 }
-            }
 
-            row.renderInEditMode().focus();
-            this.currentlyEditedRow = row;
-        };
+                row.renderInEditMode().focus();
+                this.currentlyEditedRow = row;
+                this.newRow.$el.hide();
+            };
 
-        const exitEditMode = (row) => {
-            this.currentlyEditedRow.renderInReadOnlyMode();
+            const exitEditMode = () => {
+                if (this.currentlyEditedRow) {
+                    this.currentlyEditedRow.renderInReadOnlyMode();
+                    this.currentlyEditedRow = undefined;
+                }
+                this.newRow.$el.show();
+            };
 
-            const newRowAddedToTheTable = (row === this.newEmptyRow);
-            this.appendEmptyNewRowToTheBottom();
-
-            if (newRowAddedToTheTable) {
+            const addRow = (row) => {
                 this.rows.push(row);
-                this.newEmptyRow.focus();
-            }
-        };
+                row.renderInReadOnlyMode();
+                this.appendEmptyNewRowToTheBottom();
+            };
 
-        const deleteRow = (row) => {
-            this.rows = _.without(this.rows, row);
-            row.remove();
-        };
+            const deleteRow = (row) => {
+                this.rows = _.without(this.rows, row);
+                row.remove();
+            };
 
-        row.on("edit", enterEditMode);
-        row.on("exitEditMode", exitEditMode);
-        row.on("delete", deleteRow);
+            row.on("edit", enterEditMode);
+            row.on("exitEditMode", exitEditMode);
+            row.on("delete", deleteRow);
+            row.on("add", addRow);
 
-        return row;
-    },
+            return row;
+        },
 
-    appendEmptyNewRowToTheBottom () {
-        const row = this.initRow();
-        this.tBody.append(row.renderInEditMode().$el);
+        appendEmptyNewRowToTheBottom () {
+            const row = this.initRow();
+            this.tBody.append(row.renderInNewMode().$el);
+            this.newRow = row;
+        },
 
-        this.currentlyEditedRow = row;
-        this.newEmptyRow = row;
-    },
+        getData () {
+            return _.map(this.rows, (row) => row.getData());
+        },
 
-    getData () {
-        return _.map(this.rows, (row) => row.getData());
-    }
-}));
+        setData (data) {
+            this.values = data;
+            this.rows = [];
+        }
+    });
+});

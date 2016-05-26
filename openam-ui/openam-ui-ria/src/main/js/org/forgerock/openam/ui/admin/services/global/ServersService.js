@@ -89,7 +89,7 @@ define([
             const normalizedServerId = normalizeServerId(server);
             const promises = [obj.servers.get(normalizedServerId, section)];
 
-            if (!isDefaultServer(server)) {
+            if (!isDefaultServer(server) && section !== "directoryConfiguration") {
                 promises.push(getValues(DEFAULT_SERVER, section));
             }
             return Promise.all(promises).then(([instance, defaultValues = {}]) => {

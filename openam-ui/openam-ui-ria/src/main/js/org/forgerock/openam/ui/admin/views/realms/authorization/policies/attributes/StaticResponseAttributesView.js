@@ -32,7 +32,9 @@ define([
                     _.map(attribute.propertyValues, (value) => ({ key: attribute.propertyName, value }))
                 ));
 
-            this.inlineEditList = new InlineEditTable({ values: getFlattenedStaticAttributes() });
+            this.inlineEditList = new InlineEditTable({
+                values: getFlattenedStaticAttributes()
+            });
             this.$el.append(this.inlineEditList.render().$el);
 
             return this;

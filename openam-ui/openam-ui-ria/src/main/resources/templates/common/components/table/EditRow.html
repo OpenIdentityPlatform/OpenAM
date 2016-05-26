@@ -1,0 +1,21 @@
+{{#each columns}}
+{{#if this.selectOptions}}
+<td class="form-group">
+    <select class="form-control" data-save-row data-row-{{@index}}>
+        {{#each this.selectOptions}}
+        <option value="{{this.value}}" {{#if this.isSelected}}selected{{/if}}>{{this.value}}</option>
+        {{/each}}
+    </select>
+</td>
+{{else}}
+<td class="form-group">
+    <input class="form-control" data-save-row type="text" value="{{this.data}}" placeholder="{{t 'common.form.addValue'}}" data-row-{{@index}} data-validator="{{this.required}}">
+</td>
+{{/if}}
+{{/each}}
+<td class="fr-col-btn-2">
+    <div class="btn-group">
+        <button class="btn btn-link" data-save-row title="{{t 'common.form.update'}}"><i class="fa fa-check"></i></button>
+        <button class="btn btn-link" data-undo-edit-row title="{{t 'common.form.cancel'}}"><i class="fa fa-undo"></i></button>
+    </div>
+</td>

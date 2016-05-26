@@ -54,46 +54,56 @@ define([
 
             this.data.title = $.t(`console.common.navigation.${this.sectionId}`);
 
-            ServersService.servers.getWithDefaults(this.serverId, this.sectionId)
-                .then(({ defaultValues, schema, values }) => {
-                    this.schema = schema;
-                    this.values = values;
-                    this.defaultValues = defaultValues;
+            ServersService.servers.getWithDefaults(this.serverId, this.sectionId).then(({ defaultValues, schema,
+                values }) => {
+                this.schema = schema;
+                this.values = values;
+                this.defaultValues = defaultValues;
 
-                    const clonedValues = _.cloneDeep(this.values.raw);
+                const clonedValues = _.cloneDeep(values.raw);
 
-                    this.parentRender(() => {
-                        if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
-                            this.subview = new PanelComponent({
-                                createBody: () => new InlineEditTable({
-                                    values: clonedValues
-                                }),
-                                createFooter: () => new PartialBasedView({
-                                    partial: "form/_JSONSchemaFooter"
-                                })
-                            });
-                        } else {
-                            const tabs = createTabs(this.schema);
-                            this.subview = new TabComponent({
-                                tabs,
-                                createBody: (id) => new FlatJSONSchemaView({
-                                    schema: new JSONSchema(this.schema.raw.properties[id]),
-                                    values: new JSONValues(clonedValues[id])
-                                }),
-                                createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
-                            });
-                        }
-                        this.subview.setElement("[data-json-form]");
-                        this.subview.render();
-                    });
-                }, (response) => {
-                    Messages.addMessage({ type: Messages.TYPE_DANGER, response });
+                this.parentRender(() => {
+                    if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
+                        this.subview = new PanelComponent({
+                            createBody: () => new InlineEditTable({
+                                values: clonedValues
+                            }),
+                            createFooter: () => new PartialBasedView({
+                                partial: "form/_JSONSchemaFooter"
+                            })
+                        });
+                    } else {
+                        const tabs = createTabs(schema);
+                        this.subview = new TabComponent({
+                            tabs,
+                            createBody: (id) => {
+                                if (schema.raw.properties[id].type === "array") {
+                                    return new InlineEditTable({
+                                        values: clonedValues[id],
+                                        rowSchema: schema.raw.properties[id].items
+                                    });
+                                } else {
+                                    return new FlatJSONSchemaView({
+                                        schema: new JSONSchema(schema.raw.properties[id]),
+                                        values: new JSONValues(clonedValues[id])
+                                    });
+                                }
+                            },
+                            createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
+                        });
+                    }
+                    this.subview.setElement("[data-json-form]");
+                    this.subview.render();
                 });
+            });
         },
-        updateData () {
-            const section = this.sectionId === ServersService.servers.ADVANCED_SECTION
+        getSection () {
+            return this.sectionId === ServersService.servers.ADVANCED_SECTION
                 ? this.sectionId
                 : this.subview.getTabId();
+        },
+        updateData () {
+            const section = this.getSection();
 
             this.values = this.values.extend({
                 [section]: this.getJSONSchemaView().getData()
@@ -103,7 +113,7 @@ define([
             this.updateData();
             ServersService.servers.update(this.sectionId, this.values.raw, this.serverId)
             .then(() => {
-                this.getJSONSchemaView().setData(_.cloneDeep(this.values.raw[this.subview.getTabId()]));
+                this.getJSONSchemaView().setData(_.cloneDeep(this.values.raw[this.getSection()]));
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({

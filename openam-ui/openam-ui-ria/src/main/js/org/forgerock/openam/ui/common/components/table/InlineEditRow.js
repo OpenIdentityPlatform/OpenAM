@@ -25,68 +25,103 @@ define([
 ], ($, _, Backbone, EventManager, ValidatorsManager, Constants, UIUtils) => {
 
     const READ_ONLY_TEMPLATE = "templates/common/components/table/ReadOnlyRow.html";
-    const EDIT_ROW_TEMPLATE = "templates/common/components/table/InlineEditRow.html";
+    const EDIT_ROW_TEMPLATE = "templates/common/components/table/EditRow.html";
+    const NEW_ROW_TEMPLATE = "templates/common/components/table/NewRow.html";
+
+    const getSelectOptions = (options, selectedValue) => {
+        return _.map(options, (value) => ({ value, isSelected: value === selectedValue }));
+    };
+
+    const getColumns = (rowData, rowSchema) => {
+        const columns = [];
+        _.each(rowSchema.properties, (property, propertyName) => {
+            columns[property.propertyOrder] = {
+                data: rowData[propertyName],
+                required: _.includes(rowSchema.required, propertyName) ? "required" : false
+            };
+            if (property.enum) {
+                columns[property.propertyOrder].selectOptions = getSelectOptions(property.enum, rowData[propertyName]);
+            }
+        });
+        return columns;
+    };
+
+    const getRenderData = (rowData, rowSchema) => {
+        return { columns: getColumns(rowData, rowSchema) };
+    };
+
+    const getRowDataFromDom = (rowSchema, domElement) => {
+        const rowData = {};
+        _.each(rowSchema.properties, (property, propertyName) => {
+            let element = "input";
+            if (property.enum) {
+                element = "select";
+            }
+            const domValue = domElement.find(`${element}[data-row-${property.propertyOrder}]`).val();
+            rowData[propertyName] = domValue ? domValue.trim() : domValue;
+        });
+        return rowData;
+    };
 
     return Backbone.View.extend({
         events: {
-            "click [data-save-row]": "save",
-            "keyup input.form-control": "save",
-            "dblclick td": "edit",
+            "click button[data-add-row]": "addRow",
+            "keyup [data-add-row]": "addRow",
+            "click button[data-save-row]": "saveRow",
+            "blur [data-save-row]" : "stopEvent",
+            "keyup [data-save-row]": "saveRow",
+            "dblclick td": "editRow",
             /* The event handler for the [data-edit-row] is attached to the "keyup" event instead of a "click",
             because inside this handler we are changing the focus to the input element and if the orignal event handler
             is attached to "click", then by the time the focus has changed the key is still pressed and when it is
             finally released, it triggers the "keyup" event handler of the input, which tries to save the row */
-            "keyup [data-edit-row]": "edit",
-            "mouseup [data-edit-row]": "edit",
-            "click [data-delete-row]": "delete",
-            "click [data-undo-edit-row]": "undoEdit"
+            "keyup [data-edit-row]": "editRow",
+            "mouseup [data-edit-row]": "editRow",
+            "click [data-delete-row]": "deleteRow",
+            "click [data-undo-edit-row]": "exitEditMode"
         },
         tagName: "tr",
 
-        /**
-         * Initializes the row with the data.
-         *
-         * @param {object} rowData a key-value pair
-         * @param {string} rowData.key key
-         * @param {string} rowData.value value
-         */
-        initialize (rowData) {
-            this.data = { rowData };
+        initialize (rowData, rowSchema) {
+            this.rowData = rowData;
+            this.rowSchema = rowSchema;
+        },
+
+        renderTemplate (template) {
+            UIUtils.compileTemplate(template, getRenderData(this.rowData, this.rowSchema)).then((compiledTemplate) => {
+                this.$el.html(compiledTemplate);
+                ValidatorsManager.bindValidators(this.$el);
+            });
         },
 
         renderInReadOnlyMode () {
-            this.template = READ_ONLY_TEMPLATE;
-
-            UIUtils.compileTemplate(this.template, this.data).then((template) => {
-                this.$el.html(template);
-                this.$el.removeClass("am-inline-edit-table-row");
-            });
-
+            this.$el.removeClass("am-inline-edit-table-row");
+            this.renderTemplate(READ_ONLY_TEMPLATE);
             return this;
         },
 
         renderInEditMode () {
-            this.template = EDIT_ROW_TEMPLATE;
-
-            UIUtils.compileTemplate(this.template, this.data).then((template) => {
-                this.$el.html(template);
-                this.$el.addClass("am-inline-edit-table-row");
-                ValidatorsManager.bindValidators(this.$el);
-            });
-
+            this.$el.addClass("am-inline-edit-table-row");
+            this.renderTemplate(EDIT_ROW_TEMPLATE);
             return this;
         },
 
-        edit (event) {
+        renderInNewMode () {
+            this.$el.addClass("am-inline-edit-table-row");
+            this.renderTemplate(NEW_ROW_TEMPLATE);
+            return this;
+        },
+
+        editRow (event) {
             if (event.type === "keyup" && event.keyCode !== 13) { return; }
             this.trigger("edit", this);
         },
 
-        delete () {
+        deleteRow () {
             this.trigger("delete", this);
         },
 
-        undoEdit () {
+        exitEditMode () {
             this.trigger("exitEditMode", this);
         },
 
@@ -94,24 +129,35 @@ define([
             this.$el.find("input:first").focus();
         },
 
-        save (event) {
-            event.preventDefault();
+        addRow (event) {
             if (event.type === "keyup" && event.keyCode !== 13) { return; }
+            ValidatorsManager.validateAllFields(this.$el);
+            const domData = getRowDataFromDom(this.rowSchema, this.$el);
+            if (this.isDataValid(domData, this.rowSchema)) {
+                this.rowData = domData;
+                this.trigger("add", this);
+            }
+        },
 
-            const getInputValue = (dataAttr) => this.$el.find(`input[${dataAttr}]`).val().trim();
-            const key = getInputValue("data-row-key");
-            const value = getInputValue("data-row-value");
-
-            if (!key) {
-                return;
-            } else {
-                this.data.rowData = { key, value };
+        saveRow (event) {
+            if (event.type === "keyup" && event.keyCode !== 13) { return; }
+            ValidatorsManager.validateAllFields(this.$el);
+            const domData = getRowDataFromDom(this.rowSchema, this.$el);
+            if (this.isDataValid(domData, this.rowSchema)) {
+                this.rowData = domData;
                 this.trigger("exitEditMode", this);
             }
         },
 
+        isDataValid (data, schema) {
+            return _.every(data, (propertyValue, propertyName) => {
+                return (propertyValue !== undefined && propertyValue.length > 0) ||
+                    !_.includes(schema.required, propertyName);
+            });
+        },
+
         getData () {
-            return this.data.rowData;
+            return this.rowData;
         }
     });
 });

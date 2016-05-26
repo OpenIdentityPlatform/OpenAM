@@ -72,7 +72,8 @@ define([
             configuration: {
                 templateUrls: [
                     "templates/common/components/table/ReadOnlyRow.html",
-                    "templates/common/components/table/InlineEditRow.html"
+                    "templates/common/components/table/NewRow.html",
+                    "templates/common/components/table/EditRow.html"
                 ],
                 partialUrls: [
                     "partials/form/_JSONSchemaFooter.html",

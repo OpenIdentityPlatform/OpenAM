@@ -2,8 +2,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>{{t "common.form.propertyName"}}</th>
-                <th>{{t "common.form.propertyValue"}}</th>
+                {{#each headers}}<th>{{this}}</th>{{/each}}
                 <th class="fr-col-btn-2"></th>
             </tr>
         </thead>

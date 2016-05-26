@@ -727,13 +727,14 @@ public class SmsServerPropertiesResource {
 
     private void addDirectoryConfiguration(JsonValue result, SSOToken token, String serverUrl) throws SMSException {
         ServerConfigXML serverConfig = getServerConfig(token, serverUrl);
-        result.put("minConnectionPool", serverConfig.getSMSServerGroup().minPool);
-        result.put("maxConnectionPool", serverConfig.getSMSServerGroup().maxPool);
+        String path = "directoryConfiguration/";
+        result.addPermissive(new JsonPointer(path + "minConnectionPool"), serverConfig.getSMSServerGroup().minPool);
+        result.addPermissive(new JsonPointer(path + "maxConnectionPool"), serverConfig.getSMSServerGroup().maxPool);
 
         List<ServerConfigXML.DirUserObject> bindInfo = serverConfig.getSMSServerGroup().dsUsers;
         if (CollectionUtils.isNotEmpty(bindInfo)) {
-            result.put("bindDn", bindInfo.get(0).dn);
-            result.put("bindPassword", CONFIG_VAR_DEFAULT_SHARED_KEY);
+            result.addPermissive(new JsonPointer(path + "bindDn"), bindInfo.get(0).dn);
+            result.addPermissive(new JsonPointer(path + "bindPassword"), CONFIG_VAR_DEFAULT_SHARED_KEY);
         }
 
         List<Map<String, String>> servers = new ArrayList<>();
@@ -748,7 +749,7 @@ public class SmsServerPropertiesResource {
                 servers.add(server);
             }
         }
-        result.addPermissive(new JsonPointer("servers"), servers);
+        result.addPermissive(new JsonPointer("directoryServers"), servers);
     }
 
     private void addDefaultAttributes(JsonValue result, ServiceConfig defaultConfig, String tabName)
@@ -952,21 +953,24 @@ public class SmsServerPropertiesResource {
         ServerConfigXML serverConfig = getServerConfig(token, serverUrl);
         ServerConfigXML.ServerGroup serverGroup = serverConfig.getSMSServerGroup();
 
-        serverGroup.minPool = content.get("minConnectionPool").asInteger();
-        serverGroup.maxPool = content.get("maxConnectionPool").asInteger();
+        if (content.isDefined("directoryConfiguration")) {
+            JsonValue config = content.get("directoryConfiguration");
+            serverGroup.minPool = config.get("minConnectionPool").asInteger();
+            serverGroup.maxPool = config.get("maxConnectionPool").asInteger();
 
-        List<ServerConfigXML.DirUserObject> bindInfo = serverGroup.dsUsers;
-        if (CollectionUtils.isNotEmpty(bindInfo)) {
-            bindInfo.get(0).dn = content.get("bindDn").asString();
-            String bindPassword = content.get("bindPassword").asString();
-            if (!CONFIG_VAR_DEFAULT_SHARED_KEY.equals(bindPassword)) {
-                bindInfo.get(0).password = Crypt.encode(bindPassword);
+            List<ServerConfigXML.DirUserObject> bindInfo = serverGroup.dsUsers;
+            if (CollectionUtils.isNotEmpty(bindInfo)) {
+                bindInfo.get(0).dn = config.get("bindDn").asString();
+                String bindPassword = config.get("bindPassword").asString();
+                if (!CONFIG_VAR_DEFAULT_SHARED_KEY.equals(bindPassword)) {
+                    bindInfo.get(0).password = Crypt.encode(bindPassword);
+                }
             }
         }
 
         List<ServerObject> servers = new ArrayList<>();
-        if (content.isDefined("servers")) {
-            for (JsonValue server : content.get("servers")) {
+        if (content.isDefined("directoryServers")) {
+            for (JsonValue server : content.get("directoryServers")) {
                 ServerConfigXML.ServerObject serverObject = new ServerConfigXML.ServerObject();
                 serverObject.name = server.get("serverName").asString();
                 serverObject.host = server.get("hostName").asString();
