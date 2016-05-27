@@ -120,10 +120,26 @@ body, .modal-open {
 }
 
 // removes extra space below control
-.selectize-control.multi {
-    font-size: 0;
-    .selectize-dropdown, div {
-        font-size: 14px;
+.selectize-control {
+    &.multi {
+        font-size: 0;
+        .selectize-dropdown, div {
+            font-size: 14px;
+        }
+    }
+
+    .selectize-input.disabled {
+        background-color: #eee;
+        cursor: not-allowed!important; // library's style is thoughtfully written as "cursor: default!important"
+        opacity: inherit;
+
+        &:after {
+            opacity: 0.5;
+        }
+
+        .item {
+            color: #555;
+        }
     }
 }
 
