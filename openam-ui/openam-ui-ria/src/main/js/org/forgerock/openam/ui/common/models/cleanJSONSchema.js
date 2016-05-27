@@ -86,7 +86,8 @@ define([
         const possiblePassword = name.toLowerCase().indexOf("password", name.length - 8) !== -1;
         const hasFormat = property.format === "password";
         if (property.type === "string" && possiblePassword && !hasFormat) {
-            console.warn("JSON schema password property detected (inferred) without format of \"password\"");
+            console.error(`[cleanJSONSchema] Detected (inferred) a password property \"${name}\" ` +
+                "without format attribute of \"password\"");
         }
     }
 
