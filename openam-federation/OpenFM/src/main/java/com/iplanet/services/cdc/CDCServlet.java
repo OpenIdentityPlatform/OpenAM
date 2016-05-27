@@ -98,6 +98,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.owasp.esapi.ESAPI;
 
 /**
  * The <code>CDCServlet</code> is the heart of the Cross Domain Single
@@ -882,8 +883,8 @@ public class CDCServlet extends HttpServlet {
             response.setHeader("Pragma", "no-cache");
             response.setHeader(RESPONSE_HEADER_ALERT, RESPONSE_HEADER_ALERT_VALUE);
 
-            request.setAttribute("destURL", destURL);
-            request.setAttribute("authnResponse", b64Resp);
+            request.setAttribute("destURL", ESAPI.encoder().encodeForHTML(destURL));
+            request.setAttribute("authnResponse", ESAPI.encoder().encodeForHTML(b64Resp));
             RequestDispatcher rd
                     = request.getRequestDispatcher("config/federation/default/cdclogin.jsp");
             rd.forward(request, response);
