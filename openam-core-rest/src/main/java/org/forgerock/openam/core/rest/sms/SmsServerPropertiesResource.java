@@ -193,7 +193,7 @@ public class SmsServerPropertiesResource {
                         attributeOrder++;
                     }
                 }
-            } catch (ParserConfigurationException | IOException | XPathExpressionException | SAXException e) {
+            } catch (InternalServerErrorException | NotFoundException | XPathExpressionException e) {
                 logger.error("Error reading property sheet for tab " + tabName, e);
             }
         }
@@ -356,7 +356,8 @@ public class SmsServerPropertiesResource {
         } catch (SSOException | SMSException e) {
             logger.error("Error getting server config", e);
         } catch (NotFoundException e) {
-            return new NotFoundException("Cannot find server with ID: " + serverId).asPromise();
+            logger.warning("Error getting server schema", e);
+            return e.asPromise();
         }
 
         final String tabName = getTabName(uriVariables);
@@ -385,7 +386,7 @@ public class SmsServerPropertiesResource {
         return newResultPromise(newActionResponse(schema));
     }
 
-    private Properties getAttributes(ServiceConfig serverConfig) throws IOException, SMSException, SSOException {
+    private Properties getAttributes(ServiceConfig serverConfig) throws InternalServerErrorException {
         Set<String> rawValues = (Set<String>) serverConfig.getAttributes().get(SERVER_CONFIG);
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -395,14 +396,18 @@ public class SmsServerPropertiesResource {
         }
 
         Properties properties = new Properties();
-        properties.load(new StringReader(stringBuilder.toString()));
+        try {
+            properties.load(new StringReader(stringBuilder.toString()));
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Unable to load server attributes", e);
+        }
         return properties;
     }
 
     private List<SMSLabel> getLabels(String sectionName, Document propertySheet, Properties titleProperties,
-                                     Map<String, List<String>> options, Map<String, List<String>> optionLabels)
-            throws IOException, SAXException,
-            ParserConfigurationException, XPathExpressionException {
+            Map<String, List<String>> options, Map<String, List<String>> optionLabels)
+            throws XPathExpressionException {
+
         String expression = "/propertysheet/section[@defaultValue='" + sectionName + "']/property/label/@*[name()='defaultValue' or name()='labelFor']";
         XPath xPath = XPathFactory.newInstance().newXPath();
         NodeList labels = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
@@ -468,24 +473,25 @@ public class SmsServerPropertiesResource {
         return template;
     }
 
-    private List<String> getAttributeNames(String tabName) throws ParserConfigurationException, SAXException,
-            IOException,
-            XPathExpressionException {
+    private List<String> getAttributeNames(String tabName) throws NotFoundException, InternalServerErrorException {
         Document propertySheet = getPropertySheet(tabName);
         return getValues("/propertysheet/section/property/cc/@name", propertySheet);
     }
 
-    List<String> getAttributeNamesForSection(String sectionName, Document propertySheet) throws
-            ParserConfigurationException,
-            SAXException,
-            IOException, XPathExpressionException {
+    List<String> getAttributeNamesForSection(String sectionName, Document propertySheet)
+            throws InternalServerErrorException {
         return getValues("/propertysheet/section[@defaultValue='" + sectionName + "']/property/cc/@name", propertySheet);
     }
 
-    private List<String> getValues(String expression, Document propertySheet) throws XPathExpressionException {
+    private List<String> getValues(String expression, Document propertySheet) throws InternalServerErrorException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         List<String> defaultValueNames = new ArrayList<>();
-        NodeList defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+        NodeList defaultValues;
+        try {
+            defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            throw new InternalServerErrorException("Failed to compile xpath: " + expression, e);
+        }
         for (int i = 0; i < defaultValues.getLength(); i++) {
             String nodeValue = defaultValues.item(i).getNodeValue().replace('-', '.');
             if (nodeValue.substring(0, 3).equals("csc")) {
@@ -496,13 +502,16 @@ public class SmsServerPropertiesResource {
         return defaultValueNames;
     }
 
-    private List<String> getSectionNames(Document propertySheet) throws ParserConfigurationException, SAXException,
-            IOException,
-            XPathExpressionException {
+    private List<String> getSectionNames(Document propertySheet) throws InternalServerErrorException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         String expression = "//propertysheet/section/@defaultValue";
         List<String> sectionNames = new ArrayList<>();
-        NodeList defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+        NodeList defaultValues;
+        try {
+            defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            throw new InternalServerErrorException("Failed to compile xpath: " + expression, e);
+        }
         for (int i = 0; i < defaultValues.getLength(); i++) {
             final String nodeValue = defaultValues.item(i).getNodeValue();
             sectionNames.add(nodeValue);
@@ -549,13 +558,13 @@ public class SmsServerPropertiesResource {
                     radioOptions.put(attributeName, options);
                 }
             }
-        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+        } catch (XPathExpressionException | NotFoundException | InternalServerErrorException e) {
             logger.error("Error reading property sheet", e);
         }
         return radioOptions;
     }
 
-    private Document getPropertySheet(String tabName) throws ParserConfigurationException, SAXException, IOException {
+    private Document getPropertySheet(String tabName) throws NotFoundException, InternalServerErrorException {
         InputStream resourceStream = getInputStream(tabName);
 
         if (resourceStream == null) {
@@ -569,15 +578,18 @@ public class SmsServerPropertiesResource {
         }
 
         if (resourceStream == null) {
-            throw new IOException("Unable to locate propertySheet for " + tabName);
+            throw new NotFoundException("Unrecognised server properties section " + tabName);
         }
 
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        return dBuilder.parse(resourceStream);
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            return dBuilder.parse(resourceStream);
+        } catch (IOException | SAXException | ParserConfigurationException e) {
+            throw new InternalServerErrorException("Unable to parse propertySheet for " + tabName, e);
+        }
     }
 
     private InputStream getInputStream(String tabName) {
@@ -636,18 +648,22 @@ public class SmsServerPropertiesResource {
 
             return newResultPromise(newResourceResponse(serverId + "/properties/" + tabName, valueOf(result
                     .hashCode()), result));
+
+        } catch (InternalServerErrorException e) {
+            logger.error("Error reading properties for server " + serverId + " and tab " + tabName, e);
+            return e.asPromise();
         } catch (NotFoundException e) {
-            return new NotFoundException("Cannot find server with ID: " + serverId).asPromise();
-        } catch (SMSException | SSOException | ParserConfigurationException | SAXException | IOException
-                | XPathExpressionException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
+            logger.warning("Error reading properties for server " + serverId + " and tab " + tabName, e);
+            return e.asPromise();
+        } catch (SMSException | SSOException e) {
+            logger.error("Error reading properties for server " + serverId + " and tab " + tabName, e);
         }
 
         return new BadRequestException("Error reading properties file for " + tabName).asPromise();
     }
 
-    private List<String> getAttributeNamesForTab(ServiceConfig serverConfig, String tabName) throws
-            ParserConfigurationException, SAXException, XPathExpressionException, IOException {
+    private List<String> getAttributeNamesForTab(ServiceConfig serverConfig, String tabName)
+            throws NotFoundException, InternalServerErrorException {
         return tabName.equalsIgnoreCase(ADVANCED_TAB_NAME) ?
                 getAdvancedTabAttributeNames(serverConfig) : getAttributeNames(tabName);
     }
@@ -678,8 +694,8 @@ public class SmsServerPropertiesResource {
         result.addPermissive(new JsonPointer("servers"), servers);
     }
 
-    private void addDefaultAttributes(JsonValue result, ServiceConfig defaultConfig, String tabName) throws SMSException,
-            IOException, SSOException, XPathExpressionException, SAXException, ParserConfigurationException {
+    private void addDefaultAttributes(JsonValue result, ServiceConfig defaultConfig, String tabName)
+            throws InternalServerErrorException, NotFoundException {
 
         Properties defaultAttributes = getAttributes(defaultConfig);
         List<String> attributeNamesForTab = getAttributeNamesForTab(defaultConfig, tabName);
@@ -697,8 +713,7 @@ public class SmsServerPropertiesResource {
     }
 
     private void addServerAttributes(JsonValue result, ServiceConfig defaultConfig, ServiceConfig serverConfig,
-            String tabName) throws SMSException, IOException, SSOException, XPathExpressionException, SAXException,
-            ParserConfigurationException {
+            String tabName) throws InternalServerErrorException, NotFoundException {
 
         Properties defaultAttributes = getAttributes(defaultConfig);
         Properties serverAttributes = getAttributes(serverConfig);
@@ -749,8 +764,8 @@ public class SmsServerPropertiesResource {
         return syntaxRawToReal.get(syntaxProperty);
     }
 
-    private Map<String, String> getAttributeNamesToSections(String tabName) throws IOException, SAXException,
-            ParserConfigurationException, XPathExpressionException {
+    private Map<String, String> getAttributeNamesToSections(String tabName) throws NotFoundException,
+            InternalServerErrorException {
 
         Map<String, String> attributeNameToSectionName = new HashMap<>();
         Document propertySheet = getPropertySheet(tabName);
@@ -827,28 +842,27 @@ public class SmsServerPropertiesResource {
             }
 
             return read(serverContext);
-        } catch (SSOException e) {
-            logger.error("Error getting SSOToken", e);
-        } catch (SMSException e) {
-            logger.error("Error getting service config manager", e);
+        } catch (SSOException | SMSException e) {
+            logger.error("Error updating properties for server " + serverId + " and tab " + tabName, e);
+        } catch (InternalServerErrorException e) {
+            logger.error("Error updating properties for server " + serverId + " and tab " + tabName, e);
+            return e.asPromise();
         } catch (NotFoundException e) {
-            return new NotFoundException("Cannot find server with ID: " + serverId).asPromise();
+            logger.warning("Error updating properties for server " + serverId + " and tab " + tabName, e);
+            return e.asPromise();
         } catch (ConfigurationException e) {
             logger.error("Invalid property", e);
         } catch (UnknownPropertyNameException e) {
             logger.warning("Unknown property found.", e);
             return new BadRequestException(
                     format(titleProperties.getProperty(UNKNOWN_PROPS), e.getMessage())).asPromise();
-        } catch (IOException e) {
-            logger.error("IO exception", e);
-            return new InternalServerErrorException(e.getMessage()).asPromise();
         }
 
         return new BadRequestException("Error updating values for " + tabName).asPromise();
     }
 
     private void updateServerDefaults(JsonValue content, SSOToken token, boolean advancedConfig) throws SMSException,
-            SSOException, UnknownPropertyNameException, ConfigurationException, IOException {
+            InternalServerErrorException, SSOException, UnknownPropertyNameException, ConfigurationException {
 
         Map<String, String> attributeValues = new HashMap<>();
         if (advancedConfig) {
@@ -860,7 +874,11 @@ public class SmsServerPropertiesResource {
             }
         }
 
-        setServerInstance(token, SERVER_DEFAULT_NAME, attributeValues);
+        try {
+            setServerInstance(token, SERVER_DEFAULT_NAME, attributeValues);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Failed to update server properties", e);
+        }
     }
 
     private void updateDirectoryConfiguration(JsonValue content, SSOToken token, String serverUrl) throws SMSException,
@@ -897,7 +915,8 @@ public class SmsServerPropertiesResource {
     }
 
     private void updateServerInstance(JsonValue content, SSOToken token, String serverUrl, boolean advancedConfig)
-            throws SMSException, IOException, SSOException, UnknownPropertyNameException, ConfigurationException {
+            throws SMSException, SSOException, UnknownPropertyNameException, ConfigurationException,
+            InternalServerErrorException {
 
         Map<String, String> attributeValues = new HashMap<>();
         Set<String> inheritedAttributeNames = new HashSet<>();
@@ -910,11 +929,14 @@ public class SmsServerPropertiesResource {
                 addAttributesAndInheritanceValues(content.get(sectionName), attributeValues, inheritedAttributeNames);
             }
         }
-
-        if (!inheritedAttributeNames.isEmpty()) {
-            removeServerConfiguration(token, serverUrl, inheritedAttributeNames);
+        try {
+            if (!inheritedAttributeNames.isEmpty()) {
+                removeServerConfiguration(token, serverUrl, inheritedAttributeNames);
+            }
+            setServerInstance(token, serverUrl, attributeValues);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Failed to update server properties", e);
         }
-        setServerInstance(token, serverUrl, attributeValues);
     }
 
     private void addAttributeValues(JsonValue attributes, Map<String, String> attributeValues) {
@@ -937,12 +959,16 @@ public class SmsServerPropertiesResource {
     }
 
     private void removeUnusedAdvancedAttributes(SSOToken token, Set<String> newAttributeNames, String serverName)
-            throws SSOException, SMSException, IOException {
+            throws SSOException, SMSException, InternalServerErrorException {
 
         ServiceConfig serviceConfig = getServerConfigs(token).getSubConfig(serverName);
         List<String> attributesToRemove = getAdvancedTabAttributeNames(serviceConfig);
         attributesToRemove.removeAll(newAttributeNames);
-        removeServerConfiguration(token, serverName, attributesToRemove);
+        try {
+            removeServerConfiguration(token, serverName, attributesToRemove);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Failed to remove server configuration", e);
+        }
     }
 
     private String getServerUrl(SSOToken token, String serverId) throws NotFoundException, SSOException, SMSException {
@@ -956,7 +982,7 @@ public class SmsServerPropertiesResource {
                 return serverUrl;
             }
         }
-        throw new NotFoundException();
+        throw new NotFoundException("Cannot find server with ID: " + serverId);
     }
 
     private SSOToken getSsoToken(Context context) throws SSOException {
