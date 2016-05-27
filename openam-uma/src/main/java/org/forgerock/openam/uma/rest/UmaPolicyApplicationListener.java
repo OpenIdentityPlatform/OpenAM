@@ -29,6 +29,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -40,6 +43,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -52,6 +56,7 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.AdminSubjectContext;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.services.context.Context;
@@ -97,6 +102,11 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final ResourceSetStoreFactory resourceSetStoreFactory;
     private final SessionCache sessionCache;
 
+
+    private static final int NO_ACTION =  1;
+    private static final int CREATE_UMA_APPLICATION = 2;
+    private static final int REMOVE_UMA_APPLICATION = 3;
+
     /**
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
      * @param idRepoFactory An instance of the {@code AMIdentityRepositoryFactory}.
@@ -135,12 +145,21 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                 return;
             }
 
-            if (isResourceServer(identity)) {
-                createApplication(identity.getRealm(), identity.getName());
-            } else {
-                removeApplication(identity.getRealm(), identity.getName());
-            }
+            switch (getIdentityAction(identity)) {
 
+            case NO_ACTION:
+                logger.message("Identity is not an OAuth agent no action needed");
+                break;
+            case CREATE_UMA_APPLICATION:
+                createApplication(identity.getRealm(), identity.getName());
+                break;
+            case REMOVE_UMA_APPLICATION:
+                removeApplication(identity.getRealm(), identity.getName());
+                break;
+
+            default:
+                logger.error("Failed to handle identity action");
+            }
         } catch (IdRepoException e) {
             logger.error("Failed to get identity", e);
         } catch (SSOException e) {
@@ -204,7 +223,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     @SuppressWarnings("unchecked")
     private Map<String, Set<String>> getIdentityAttributes(AMIdentity identity) throws IdRepoException, SSOException {
         IdSearchControl searchControl = new IdSearchControl();
-        searchControl.setAllReturnAttributes(true);
+        searchControl.setReturnAttributes(CollectionUtils.asSet(IdConstants.AGENT_TYPE, OAuth2Constants.OAuth2Client.SCOPES));
         searchControl.setMaxResults(0);
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         IdSearchResults searchResults = idRepoFactory.create(identity.getRealm(), adminToken)
@@ -215,13 +234,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         return new HashMap<String, Set<String>>((Map) searchResults.getResultAttributes().values().iterator().next());
     }
 
-    private Set<String> getScopes(Map<String, Set<String>> identity) {
-        return identity.get("com.forgerock.openam.oauth2provider.scopes");
-    }
-
-    private boolean isResourceServer(AMIdentity identity) throws IdRepoException, SSOException {
-
-        Set<String> scopes = getScopes(getIdentityAttributes(identity));
+    private boolean isResourceServer(Map<String, Set<String>> attrValues ) {
+        Set<String> scopes = attrValues.get(OAuth2Constants.OAuth2Client.SCOPES);
         if (scopes != null) {
             for (String scope : scopes) {
                 String[] scopeParts = scope.split("\\|");
@@ -336,4 +350,17 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             resourceSetStore.delete(resourceSet.getId(), resourceSet.getResourceOwnerId());
         }
     }
+
+    private int getIdentityAction(AMIdentity identity) throws IdRepoException, SSOException {
+        Map<String, Set<String>> attrValues = getIdentityAttributes(identity);
+        String agentType =  CollectionHelper.getMapAttr(attrValues, IdConstants.AGENT_TYPE, "NO_TYPE");
+        if (!AgentConfiguration.AGENT_TYPE_OAUTH2.equalsIgnoreCase(agentType)) {
+            return NO_ACTION;
+        } else if (isResourceServer(attrValues)) {
+            return CREATE_UMA_APPLICATION;
+        } else {
+            return REMOVE_UMA_APPLICATION;
+        }
+    }
+
 }
