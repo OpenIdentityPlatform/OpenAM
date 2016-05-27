@@ -18,11 +18,14 @@ package org.forgerock.openam.cli.entitlement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.ExitCodes;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.RequestContext;
+import com.sun.identity.shared.Constants;
+
 import org.forgerock.http.Client;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -111,7 +114,7 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
         }
 
         String ssoToken = getAdminSSOToken().getTokenID().toString();
-        request.getHeaders().put("iplanetDirectoryPro", ssoToken);
+        request.getHeaders().put(SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"), ssoToken);
         request.getHeaders().put("Content-Type", "application/json");
         Promise<Response, NeverThrowsException> promise = client.send(request);
         return promise.getOrThrowUninterruptibly();
