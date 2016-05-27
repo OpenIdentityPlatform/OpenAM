@@ -97,18 +97,15 @@ abstract class JsonResourceCommand extends AuthenticatedCommand {
             serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
         }
 
-        if (!realm.endsWith("/")) {
-            realm += "/";
-        }
-
         if (endpoint.startsWith("/")) {
             endpoint = endpoint.substring(1);
         }
 
-        String restUrl = serverUrl + "/json" + realm + endpoint;
+        StringBuilder restUrl = new StringBuilder(serverUrl).append("/json/").append(endpoint);
+        restUrl.append(restUrl.indexOf("?") == -1 ? '?' : '&').append("realm=").append(realm);
 
         try {
-            request.setUri(restUrl);
+            request.setUri(restUrl.toString());
         } catch (URISyntaxException urisE) {
             throw new CLIException(urisE, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
