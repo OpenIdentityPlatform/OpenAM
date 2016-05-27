@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -64,9 +64,11 @@ public class IPv4ConditionTest extends IPvXConditionTest<Long> {
     @DataProvider(name = "validIpAddresses")
     public Object[][] validIpAddresses() {
         return new Object[][]{
-                {"0.0.0.0"},         // minimum
-                {"255.255.255.255"}, // maximum
-                {"127.0.0.1"}        // loop-back
+                {"0.0.0.0", "0.0.0.0"},                 // minimum
+                {"255.255.255.255", "255.255.255.255"}, // maximum
+                {"127.0.0.1", "127.0.0.1"},             // loop-back
+                {"192.168.0.99", "192.168.0.100"},      // random example
+                {"192.168.9.1", "192.168.10.1"}         // random example
         };
     }
 
