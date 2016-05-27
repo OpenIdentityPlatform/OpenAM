@@ -28,7 +28,7 @@ require.config({
         "handlebars":   "libs/handlebars-4.0.5",
         "i18next":      "libs/i18next-1.7.3-min",
         "jquery":       "libs/jquery-2.1.1-min",
-        "text":         "libs/text"
+        "text":         "libs/text-2.0.15"
     },
     shim: {
         "handlebars": {
