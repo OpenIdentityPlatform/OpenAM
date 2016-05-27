@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -46,7 +44,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
@@ -108,19 +105,14 @@ import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
-import org.forgerock.openam.blacklist.*;
 import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
 import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
 import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.openam.oauth2.OAuth2GlobalSettings;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
@@ -132,9 +124,6 @@ import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
 import org.forgerock.openam.oauth2.StatelessCheck;
-import org.forgerock.openam.oauth2.StatelessToken;
-import org.forgerock.openam.oauth2.StatelessTokenCtsAdapter;
-import org.forgerock.openam.oauth2.StatelessTokenMetadata;
 import org.forgerock.openam.oauth2.StatelessTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
@@ -150,9 +139,7 @@ import org.forgerock.openam.rest.audit.OAuth2AuditRefreshTokenContextProvider;
 import org.forgerock.openam.rest.audit.OAuth2AuditSSOTokenContextProvider;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
-import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
-import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -273,7 +260,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
         bind(new TypeLiteral<OAuth2UrisFactory<RealmInfo>>() {}).to(OpenAMOAuth2UrisFactory.class);
         bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessCheck.class);
-        bind(new TypeLiteral<TokenAdapter<StatelessTokenMetadata>>(){}).to(StatelessTokenCtsAdapter.class);
+
     }
 
     public static class DefaultStatelessCheck implements StatelessCheck<Boolean> {
@@ -369,15 +356,13 @@ public class OAuth2GuiceModule extends AbstractModule {
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
-            ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder,
-            Blacklist<Blacklistable> tokenBlacklist, CTSPersistentStore cts,
-            TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
+            ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder) {
         StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
                 providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
                 cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
         StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
                 realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
-                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter);
+                realmNormaliser, oauth2UrisFactory);
         return new OpenAMTokenStore(realmAgnosticStatefulTokenStore,
                 realmAgnosticStatelessTokenStore, new DefaultStatelessCheck(providerSettingsFactory));
     }
@@ -447,10 +432,9 @@ public class OAuth2GuiceModule extends AbstractModule {
         public RealmAgnosticStatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
                 OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
+                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory) {
             super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
-                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter);
+                    realmNormaliser, oAuth2UrisFactory);
         }
 
         @Override
@@ -474,37 +458,4 @@ public class OAuth2GuiceModule extends AbstractModule {
         return set;
     }
 
-    @Provides
-    public CTSBlacklist<Blacklistable> getCtsStatelessTokenBlacklist(CTSPersistentStore cts,
-            @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduler,
-            ThreadMonitor threadMonitor, WebtopNamingQuery webtopNamingQuery,OAuth2GlobalSettings globalSettings) {
-        long purgeDelayMs = globalSettings.getBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
-        long pollIntervalMs = globalSettings.getBlacklistPollInterval(TimeUnit.MILLISECONDS);
-        return new CTSBlacklist<>(cts, TokenType.OAUTH_BLACKLIST, scheduler, threadMonitor, webtopNamingQuery,
-                purgeDelayMs, pollIntervalMs);
-    }
-
-    @Provides @Singleton @Inject
-    public static Blacklist<Blacklistable> getStatelessTokenBlacklist(CTSBlacklist<Blacklistable> ctsBlacklist,
-            OAuth2GlobalSettings globalSettings) {
-
-        if (!globalSettings.isSessionBlacklistingEnabled()) {
-            return new NoOpBlacklist<>();
-        }
-
-        long purgeDelayMs = globalSettings.getBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
-        int cacheSize = globalSettings.getBlacklistCacheSize();
-        long pollIntervalMs = globalSettings.getBlacklistPollInterval(TimeUnit.MILLISECONDS);
-
-        Blacklist<Blacklistable> blacklist = ctsBlacklist;
-        if (cacheSize > 0) {
-            blacklist = new CachingBlacklist<>(blacklist, cacheSize, purgeDelayMs);
-        }
-
-        if (pollIntervalMs > 0) {
-            blacklist = new BloomFilterBlacklist<>(blacklist, purgeDelayMs);
-        }
-
-        return blacklist;
-    }
 }

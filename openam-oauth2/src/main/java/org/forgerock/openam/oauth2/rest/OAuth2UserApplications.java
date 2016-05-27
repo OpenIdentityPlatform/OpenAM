@@ -199,7 +199,7 @@ public class OAuth2UserApplications {
         Map<String, String> scopeDescriptions = clientRegistration.getScopeDescriptions(getLocale(context));
         Map<String, String> scopes = new HashMap<>();
         for (JsonValue token : tokens) {
-            for (String scope : getAttributeValueSet(token, SCOPE.getOAuthField())) {
+            for (String scope : token.get(SCOPE.getOAuthField()).asSet(String.class)) {
                 if (scopeDescriptions.containsKey(scope)) {
                     scopes.put(scope, scopeDescriptions.get(scope));
                 } else {
@@ -248,27 +248,11 @@ public class OAuth2UserApplications {
     }
 
     private String getAttributeValue(JsonValue token, String attributeName) {
-        String value = null;
-        JsonValue jsonValue = token.get(attributeName);
-        if (jsonValue.isString()) {
-            value = jsonValue.asString();
-        } else if (jsonValue.isSet()) {
-            value = (String)jsonValue.asSet().iterator().next();
-        } else {
-            value = jsonValue.toString();
+        Set<String> value = token.get(attributeName).asSet(String.class);
+        if (CollectionUtils.isNotEmpty(value)) {
+            return value.iterator().next();
         }
-        return value;
-    }
-
-    private Set<String> getAttributeValueSet(JsonValue token, String attributeName) {
-        Set<String> value = new HashSet<>();
-        JsonValue jsonValue = token.get(attributeName);
-        if (jsonValue.isString()) {
-            value.add(jsonValue.asString());
-        } else if (jsonValue.isSet()) {
-            value = jsonValue.asSet(String.class);
-        }
-        return value;
+        return null;
     }
 
     private Locale getLocale(Context context) {

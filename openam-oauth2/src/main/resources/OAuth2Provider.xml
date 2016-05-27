@@ -28,48 +28,7 @@
                 revisionNumber="1"
                 i18nKey="forgerock-oauth2-provider-description"
                 resourceName="oauth-oidc">
-            <Global>
-                <AttributeSchema name="blacklistingEnabled"
-                                 type="single"
-                                 syntax="boolean">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="blacklistCacheSize"
-                                 type="single"
-                                 syntax="number_range"
-                                 rangeStart="0"
-                                 rangeEnd="2147483647"
-                                 i18nKey="a134">
-                    <DefaultValues>
-                        <Value>10000</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="blacklistPollInterval"
-                                 type="single"
-                                 syntax="number_range"
-                                 rangeStart="0"
-                                 rangeEnd="2147483647"
-                                 i18nKey="a135">
-                    <DefaultValues>
-                        <Value>60</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="blacklistPurgeDelay"
-                                 type="single"
-                                 syntax="number_range"
-                                 rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a136">
-                    <DefaultValues>
-                        <Value>1</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-            </Global>
+
             <Organization>
                 <AttributeSchema name="statelessTokensEnabled"
                                  type="single"

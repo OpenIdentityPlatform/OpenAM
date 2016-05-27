@@ -740,6 +740,25 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
+    public JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException {
+
+        JsonValue results;
+
+        try {
+            results = tokenStore.query(or(
+                    equalTo(OAuthTokenField.PARENT.getField(), tokenId),
+                    equalTo(OAuthTokenField.REFRESH_TOKEN.getField(), tokenId)));
+        } catch (CoreTokenException e) {
+            logger.error("Unable to query refresh token corresponding to id: " + tokenId, e);
+            throw new InvalidRequestException();
+        }
+
+        return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void deleteAccessToken(OAuth2Request request, String accessTokenId) throws ServerException {
         logger.message("Deleting access token");
 
@@ -1023,4 +1042,5 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not read token in CTS: " + e.getMessage());
         }
     }
+
 }

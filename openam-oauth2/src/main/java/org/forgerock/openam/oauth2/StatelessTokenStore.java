@@ -34,10 +34,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -67,20 +65,13 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BlacklistException;
-import org.forgerock.openam.blacklist.Blacklistable;
 import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.Duration;
@@ -97,9 +88,6 @@ public class StatelessTokenStore implements TokenStore {
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final RealmNormaliser realmNormaliser;
     private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
-    private final Blacklist<Blacklistable> tokenBlacklist;
-    private final CTSPersistentStore cts;
-    private final TokenAdapter<StatelessTokenMetadata> tokenAdapter;
 
 
     /**
@@ -112,16 +100,12 @@ public class StatelessTokenStore implements TokenStore {
      * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param oAuth2UrisFactory An instance of the OAuth2UrisFactory.
-     * @param tokenBlacklist An instance of the token blacklist.
-     * @param cts An instance of the CTSPersistentStoreImpl
-     * @param tokenAdapter An instance of the StatelessTokenCtsAdapter
      */
     @Inject
     public StatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
             OAuth2ProviderSettingsFactory providerSettingsFactory, @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
+            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory) {
         this.statefulTokenStore = statefulTokenStore;
         this.jwtBuilder = jwtBuilder;
         this.providerSettingsFactory = providerSettingsFactory;
@@ -129,9 +113,6 @@ public class StatelessTokenStore implements TokenStore {
         this.clientRegistrationStore = clientRegistrationStore;
         this.realmNormaliser = realmNormaliser;
         this.oAuth2UrisFactory = oAuth2UrisFactory;
-        this.tokenBlacklist = tokenBlacklist;
-        this.cts = cts;
-        this.tokenAdapter = tokenAdapter;
     }
 
     @Override
@@ -189,28 +170,7 @@ public class StatelessTokenStore implements TokenStore {
                 .asJwt();
         StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwt.build());
         request.setToken(AccessToken.class, accessToken);
-        createStatelessTokenMetadata(jwtId, accessToken);
         return accessToken;
-    }
-
-    private void createStatelessTokenMetadata(String id, StatelessToken token) throws ServerException {
-
-        try {
-            String resourceOwnerId = token.getResourceOwnerId();
-            long expiryTime = token.getExpiryTime();
-            String grantId = token.getAuthGrantId();
-            String clientId = token.getClientId();
-            Set<String> scope = token.getScope();
-            String realm = token.getRealm();
-            String name = token.getTokenName();
-            String grantType = token.getTokenType();
-            StatelessTokenMetadata meta = new StatelessTokenMetadata(id, resourceOwnerId, expiryTime, grantId,
-                    clientId, scope, realm, name, grantType);
-            cts.create(tokenAdapter.toToken(meta));
-        } catch (CoreTokenException e) {
-            logger.error("Failed to add stateless token metadata to CTS", e);
-            throw new ServerException(e);
-        }
     }
 
     private OpenIdConnectClientRegistration getClientRegistration(String clientId, OAuth2Request request)
@@ -379,6 +339,7 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, authGrantId);
 
+
         String authModules = null;
         String acr = null;
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
@@ -412,7 +373,6 @@ public class StatelessTokenStore implements TokenStore {
 
         StatelessRefreshToken refreshToken = new StatelessRefreshToken(jwt, jwt.build());
         request.setToken(RefreshToken.class, refreshToken);
-        createStatelessTokenMetadata(jwtId, refreshToken);
         return refreshToken;
     }
 
@@ -438,47 +398,22 @@ public class StatelessTokenStore implements TokenStore {
         statefulTokenStore.deleteAuthorizationCode(request, authorizationCode);
     }
 
-    private boolean isBlacklisted(String jwtId) throws BlacklistException {
-        return tokenBlacklist.isBlacklisted(new BlacklistItem(jwtId));
-    }
+    @Override
+    public JsonValue queryForToken(OAuth2Request request, String tokenId) throws InvalidRequestException {
 
-    private JsonValue query(QueryFilter<CoreTokenField> query) throws ServerException {
-        Collection<Token> tokens = null;
-        try {
-            tokens = cts.query(new TokenFilterBuilder().withQuery(query).build());
-        } catch (CoreTokenException e) {
-            throw new ServerException("Token not found in CTS");
-        }
-        Set<Map<String, Object>> results = new HashSet<>();
-        for (Token token : tokens) {
-            results.add(tokenAdapter.fromToken(token).asMap());
-        }
-        return new JsonValue(results);
-    }
-
-    private void blacklist(String tokenId, long expiryTime) throws BlacklistException {
-        BlacklistItem item = new BlacklistItem(tokenId, expiryTime);
-        tokenBlacklist.blacklist(item);
+        return json(set());
     }
 
     @Override
     public void deleteAccessToken(OAuth2Request request, String tokenId) throws ServerException {
         try {
-            if (!isBlacklisted(tokenId)) {
-                SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-                verifySignature(request, jwt);
-                verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
-                validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
-                blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
-                cts.delete(tokenId);
-            } else {
-                logger.warning("Token " + tokenId + " has been blacklisted");
-            }
-        } catch (InvalidJwtException | NotFoundException | InvalidGrantException | CoreTokenException e) {
-            throw new ServerException("Token id is not a JWT");
-        } catch (BlacklistException e) {
-            logger.error("Could not delete token", e);
-            throw new ServerException("Could not delete token");
+            SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
+            verifySignature(request, jwt);
+            verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
+            validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
+            // No-op
+        } catch (InvalidJwtException | NotFoundException | InvalidGrantException e) {
+            throw new ServerException("token id is not a JWT");
         }
     }
 
@@ -486,21 +421,13 @@ public class StatelessTokenStore implements TokenStore {
     public void deleteRefreshToken(OAuth2Request request, String tokenId) throws InvalidRequestException,
             ServerException {
         try {
-            if (!isBlacklisted(tokenId)) {
-                SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-                verifySignature(request, jwt);
-                verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
-                validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
-                blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
-                cts.delete(tokenId);
-            } else {
-                logger.warning("Token " + tokenId + " has been blacklisted");
-            }
-        } catch (InvalidJwtException | NotFoundException | InvalidGrantException | CoreTokenException e) {
-            throw new InvalidRequestException("Token id is not a JWT");
-        } catch (BlacklistException e) {
-            logger.error("Could not delete token", e);
-            throw new InvalidRequestException("Could not delete token");
+            SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
+            verifySignature(request, jwt);
+            verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
+            validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
+            // No-op
+        } catch (InvalidJwtException | NotFoundException | InvalidGrantException e) {
+            throw new InvalidRequestException("token id is not a JWT");
         }
     }
 
@@ -509,21 +436,14 @@ public class StatelessTokenStore implements TokenStore {
             InvalidGrantException, NotFoundException {
         try {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-            if (!isBlacklisted(jwt.getClaimsSet().getJwtId())) {
-                verifySignature(request, jwt);
-                verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
-                validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
-                StatelessAccessToken accessToken = new StatelessAccessToken(jwt, tokenId);
-                request.setToken(AccessToken.class, accessToken);
-                return accessToken;
-            } else {
-                throw new InvalidGrantException("Token has been blacklisted");
-            }
+            verifySignature(request, jwt);
+            verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
+            validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
+            StatelessAccessToken accessToken = new StatelessAccessToken(jwt, tokenId);
+            request.setToken(AccessToken.class, accessToken);
+            return accessToken;
         } catch (InvalidJwtException e) {
-            throw new InvalidGrantException("Token id is not a JWT");
-        } catch (BlacklistException e) {
-            logger.error("Could not read token", e);
-            throw new InvalidGrantException("Could not read token");
+            throw new InvalidGrantException("token id is not a JWT");
         }
     }
 
@@ -532,21 +452,12 @@ public class StatelessTokenStore implements TokenStore {
             InvalidGrantException, NotFoundException {
         try {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-            if (!isBlacklisted(jwt.getClaimsSet().getJwtId())) {
-                verifySignature(request, jwt);
-                verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
-                validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
-                StatelessRefreshToken refreshToken = new StatelessRefreshToken(jwt, tokenId);
-                request.setToken(RefreshToken.class, refreshToken);
-                return refreshToken;
-            } else {
-                throw new InvalidGrantException("Token has been blacklisted");
-            }
+            verifySignature(request, jwt);
+            verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
+            validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
+            return new StatelessRefreshToken(jwt, tokenId);
         } catch (InvalidJwtException e) {
-            throw new InvalidGrantException("Token id is not a JWT");
-        } catch (BlacklistException e) {
-            logger.error("Could not read token", e);
-            throw new InvalidGrantException("Could not read token");
+            throw new InvalidGrantException("token id is not a JWT");
         }
     }
 
@@ -585,65 +496,31 @@ public class StatelessTokenStore implements TokenStore {
 
     @Override
     public JsonValue queryForToken(String realm, QueryFilter<CoreTokenField> queryFilter) throws ServerException, NotFoundException {
-        return query(queryFilter);
+        return json(set());
     }
 
     @Override
     public void delete(String realm, String tokenId) throws ServerException, NotFoundException {
-        String metaDataId = tokenId;
-        if (isJwt(tokenId)) {
-            SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-            metaDataId = jwt.getClaimsSet().getJwtId();
-        }
-        try {
-            if (!isBlacklisted(metaDataId)) {
-                StatelessTokenMetadata metadata = tokenAdapter.fromToken(cts.read(metaDataId));
-                blacklist(metaDataId, metadata.getExpiryTime());
-                cts.delete(metaDataId);
-            } else {
-                logger.warning("Token " + tokenId + " has been blacklisted");
-            }
-        } catch (BlacklistException e) {
-            logger.error("Could not delete token", e);
-            throw new ServerException("Could not delete token");
-        } catch (CoreTokenException e) {
-            throw new ServerException("Token id not found in CTS");
-        }
+        // No-op
     }
 
     @Override
     public JsonValue read(String tokenId) throws ServerException {
+
         try {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-            if (!isBlacklisted(jwt.getClaimsSet().getJwtId())) {
-                String tokenName = jwt.getClaimsSet().getClaim(TOKEN_NAME, String.class);
-                StatelessToken token;
-                if (OAUTH_ACCESS_TOKEN.equals(tokenName)) {
-                    token = new StatelessAccessToken(jwt, tokenId);
-                } else if (OAUTH_REFRESH_TOKEN.equals(tokenName)) {
-                    token = new StatelessRefreshToken(jwt, tokenId);
-                } else {
-                    throw new ServerException("Unrecognised token type");
-                }
-                return convertToken(token);
+            String tokenName = jwt.getClaimsSet().getClaim(TOKEN_NAME, String.class);
+            StatelessToken token;
+            if(OAUTH_ACCESS_TOKEN.equals(tokenName)) {
+                token = new StatelessAccessToken(jwt, tokenId);
+            } else if(OAUTH_REFRESH_TOKEN.equals(tokenName)) {
+                token = new StatelessRefreshToken(jwt, tokenId);
             } else {
-                logger.warning("Token " + tokenId + " has been blacklisted");
-                return null;
+                throw new ServerException("Unrecognised token type");
             }
+            return convertToken(token);
         } catch (InvalidJwtException e) {
-            throw new ServerException("Token id is not a JWT");
-        } catch (BlacklistException e) {
-            logger.error("Could not read token", e);
-            throw new ServerException("Could not read token");
-        }
-    }
-
-    private Boolean isJwt(String tokenId) {
-        try {
-            new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-            return true;
-        } catch (InvalidJwtException e) {
-            return false;
+            throw new ServerException("token id is not a JWT");
         }
     }
 
@@ -690,7 +567,6 @@ public class StatelessTokenStore implements TokenStore {
         map.put(ID, token.getJwtId());
         map.put(TOKEN_NAME, token.getTokenName());
         map.put(AUTH_GRANT_ID, token.getAuthGrantId());
-        map.put(SCOPE, token.getScope());
         return json(map);
     }
 }
