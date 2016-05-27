@@ -547,7 +547,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>commons-bom</artifactId>
-                <version>20.0.0-alpha-3</version>
+                <version>20.0.0-alpha-4</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
