@@ -49,7 +49,7 @@ import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
@@ -1551,7 +1551,7 @@ public class AuthClientUtils {
             utilDebug.message("hostName is : " + hostName);
         }
 
-        boolean retVal = FQDNUtils.getInstance().isHostnameValid(hostName);
+        boolean retVal = FqdnValidator.getInstance().isHostnameValid(hostName);
         if (utilDebug.messageEnabled()) {
             if (retVal) {
                 utilDebug.message("hostname  and fqdnDefault match returning true");
@@ -1577,7 +1577,7 @@ public class AuthClientUtils {
 
         // get mapping from table
         String validHostName =
-            FQDNUtils.getInstance().getFullyQualifiedHostName(partialHostName);
+            FqdnValidator.getInstance().getFullyQualifiedHostName(partialHostName);
 
         if (validHostName == null) {
             validHostName = partialHostName;

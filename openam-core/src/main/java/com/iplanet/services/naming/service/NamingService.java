@@ -24,7 +24,7 @@
  *
  * $Id: NamingService.java,v 1.13 2009/04/07 22:30:07 beomsuk Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.naming.service;
@@ -45,7 +45,7 @@ import com.iplanet.services.naming.share.NamingRequest;
 import com.iplanet.services.naming.share.NamingResponse;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
@@ -580,7 +580,7 @@ public class NamingService implements RequestHandler {
             }
         }
         
-        FQDNUtils.getInstance().init();
+        FqdnValidator.getInstance().initialize();
     }
 
     private static Set getSites(Map platformAttrs) throws Exception {

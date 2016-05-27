@@ -28,7 +28,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
@@ -164,7 +164,7 @@ public class CoreWrapper {
      * @return {@code true} if the FQDN is valid.
      */
     public boolean isValidFQDN(String hostname) {
-        return FQDNUtils.getInstance().isHostnameValid(hostname);
+        return FqdnValidator.getInstance().isHostnameValid(hostname);
     }
 
     /**

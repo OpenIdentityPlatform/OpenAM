@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +115,7 @@ import com.sun.identity.authentication.internal.server.SMSAuthModule;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.ConfigMonitoring;
 import com.sun.identity.common.DebugPropertiesObserver;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.common.configuration.ServerConfigXML;
 import com.sun.identity.common.configuration.ServerConfigXML.DirUserObject;
@@ -599,7 +598,7 @@ public class AMSetupServlet extends HttpServlet {
 
             isConfiguredFlag = configure(request, map, userRepo);
             if (isConfiguredFlag) {
-                FQDNUtils.getInstance().init();
+                FqdnValidator.getInstance().initialize();
                 //postInitialize was called at the end of configure????
                 postInitialize(getAdminSSOToken());
             }
