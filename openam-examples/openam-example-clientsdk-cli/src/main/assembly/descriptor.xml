@@ -16,7 +16,7 @@
             <outputDirectory>lib</outputDirectory>
             <scope>provided</scope>
             <includes>
-                <include>javax.servlet:servlet-api</include>
+                <include>javax.servlet:javax.servlet-api</include>
             </includes>
         </dependencySet>
     </dependencySets>

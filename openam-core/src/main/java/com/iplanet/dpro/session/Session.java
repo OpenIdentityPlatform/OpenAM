@@ -1240,7 +1240,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     public void addInternalSessionListener() {
         try {
             if (SessionNotificationHandler.handler == null) {
-                SessionNotificationHandler.handler = new SessionNotificationHandler();
+                SessionNotificationHandler.handler = new SessionNotificationHandler(SessionCache.getInstance());
                 PLLClient.addNotificationHandler(SESSION_SERVICE,
                         SessionNotificationHandler.handler);
             }

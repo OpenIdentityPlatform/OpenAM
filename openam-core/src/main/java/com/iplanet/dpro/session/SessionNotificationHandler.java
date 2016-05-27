@@ -25,7 +25,7 @@
  * $Id: SessionNotificationHandler.java,v 1.5 2008/07/23 18:13:55 ww203982 Exp $
  *
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session;
 
@@ -53,11 +53,6 @@ public class SessionNotificationHandler implements NotificationHandler {
 
     private final SessionCache sessionCache;
 
-    public SessionNotificationHandler() {
-        sessionCache = InjectorHolder.getInstance(SessionCache.class);
-    }
-
-    @VisibleForTesting
     SessionNotificationHandler(SessionCache sessionCache) {
         this.sessionCache = sessionCache;
     }

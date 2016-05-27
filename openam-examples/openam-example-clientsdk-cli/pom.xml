@@ -114,5 +114,9 @@
             <groupId>external</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
     </dependencies>
 </project>

@@ -111,6 +111,7 @@
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
                             <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                            <include>org.forgerock.openam:openam-ldap-utils</include>
                             <include>org.forgerock.openam:openam-liberty-schema</include>
                             <include>org.forgerock.openam:openam-saml2-schema</include>
                             <include>org.forgerock.openam:openam-xacml3-schema</include>
@@ -121,6 +122,12 @@
                             <include>org.forgerock.opendj:opendj-core</include>
                             <include>org.forgerock.opendj:opendj-grizzly</include>
                             <include>org.forgerock.commons:i18n-core</include>
+                            <include>org.forgerock.commons:i18n-slf4j</include>
+                            <include>org.forgerock.commons.guava:forgerock-guava-base</include>
+                            <include>org.forgerock.commons.guava:forgerock-guava-collect</include>
+                            <include>org.forgerock.http:chf-http-core</include>
+                            <include>joda-time:joda-time</include>
+                            <include>org.slf4j:slf4j-api</include>
                         </includes>
                     </artifactSet>
                     <filters>
@@ -611,6 +618,26 @@
         <dependency>
             <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-grizzly</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.guava</groupId>
+            <artifactId>forgerock-guava-collect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.guava</groupId>
+            <artifactId>forgerock-guava-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 </project>
