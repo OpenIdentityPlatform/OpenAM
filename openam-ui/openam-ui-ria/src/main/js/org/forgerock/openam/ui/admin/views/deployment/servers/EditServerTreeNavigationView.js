@@ -18,8 +18,9 @@ define([
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
     "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation",
-    "org/forgerock/commons/ui/common/main/Router"
-], (TreeNavigation, createBreadcrumbs, createTreeNavigation, Router) => {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/services/global/ServersService"
+], (TreeNavigation, createBreadcrumbs, createTreeNavigation, Router, ServersService) => {
 
     const navData = [{
         title: "console.common.navigation.general",
@@ -58,10 +59,13 @@ define([
     const EditServerTreeNavigationView = TreeNavigation.extend({
         render (args, callback) {
             const serverName = args[0];
-            this.data.treeNavigation = createTreeNavigation(navData, args);
-            this.data.title = serverName;
-            this.data.home = `#${Router.getLink(Router.configuration.routes.editServerGeneral, [args[0]])}`;
-            TreeNavigation.prototype.render.call(this, args, callback);
+            ServersService.servers.getUrl(serverName).always((url) => {
+                this.data.treeNavigation = createTreeNavigation(navData, args);
+                this.data.title = url || serverName;
+                this.data.home = `#${Router.getLink(Router.configuration.routes.editServerGeneral, [serverName])}`;
+                this.data.icon = "fa-server";
+                TreeNavigation.prototype.render.call(this, args, callback);
+            });
         }
     });
 

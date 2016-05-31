@@ -119,7 +119,7 @@ define([
             this.data.title = this.data.realmName;
             this.data.home = `#${Router.getLink(
                 Router.configuration.routes.realmDefault, [encodeURIComponent(this.data.realmPath)])}`;
-
+            this.data.icon = "fa-cloud";
             this.realmExists(this.data.realmPath).then(() => {
                 TreeNavigation.prototype.render.call(this, args, callback);
             }, (xhr) => {

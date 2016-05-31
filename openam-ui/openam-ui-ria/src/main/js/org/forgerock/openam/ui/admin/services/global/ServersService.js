@@ -100,6 +100,10 @@ define([
                 };
             });
         },
+        getUrl: (id) => obj.serviceCall({
+            url: `/${id}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+        }).then((response) => response.url, () => undefined),
         getAll: () => obj.serviceCall({
             url: "?_queryFilter=true",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
