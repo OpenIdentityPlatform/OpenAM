@@ -72,5 +72,13 @@ public enum TokenType {
     /**
      * STS token type.
      */
-    STS
+    STS,
+    /**
+     * OAuth blacklist token type.
+     */
+    OAUTH_BLACKLIST,
+    /**
+     * Stateless OAuth2 metadata token type.
+     */
+    OAUTH_STATELESS
 }

@@ -17,7 +17,10 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -31,9 +34,10 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.oauth2.core.Token;
+import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.blacklist.Blacklistable;
 
-public abstract class StatelessToken implements Token {
+public class StatelessToken {
 
     protected final Jwt jwt;
 
@@ -120,7 +124,6 @@ public abstract class StatelessToken implements Token {
     public String getAuditTrackingId() {
         return jwt.getClaimsSet().getClaim(AUDIT_TRACKING_ID, String.class);
     }
-
 
     public String getAuthGrantId() {
         return jwt.getClaimsSet().getClaim(AUTH_GRANT_ID, String.class);
