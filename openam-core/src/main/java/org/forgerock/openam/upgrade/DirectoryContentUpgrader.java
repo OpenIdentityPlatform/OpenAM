@@ -15,10 +15,6 @@
  */
 package org.forgerock.openam.upgrade;
 
-import com.google.inject.Key;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.shared.debug.Debug;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,6 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
@@ -44,12 +43,22 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.ChangeRecordReader;
 import org.forgerock.opendj.ldif.ChangeRecordWriter;
 import org.forgerock.opendj.ldif.ConnectionChangeRecordWriter;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
+
+import com.google.inject.Key;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is aiming to upgrade the content of the configuration store. The possible changes may involve directory
@@ -115,6 +124,8 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddPushDeviceSchema());
             upgraders.add(new OATH2FASchema());
             upgraders.add(new AddKBAInformationSchema());
+            upgraders.add(new LiftUserPasswordRestriction());
+            upgraders.add(new RemoveBlanketDenyAll());
         }
         Connection conn = null;
         try {
@@ -171,6 +182,36 @@ public class DirectoryContentUpgrader {
             ret.add(upgrader.getLDIFPath());
         }
         return ret;
+    }
+
+    private boolean containsAci(Connection conn, Pattern aciPattern) throws UpgradeException {
+        SearchRequest aciRequest = Requests
+                .newSingleEntrySearchRequest(baseDN, SearchScope.WHOLE_SUBTREE, "(aci=*)", "aci");
+
+        try (ConnectionEntryReader result = conn.search(aciRequest)) {
+            if (!result.isEntry()) {
+                DEBUG.warning("Expected LDAP ACI query to return an entry");
+                return false;
+            }
+
+            SearchResultEntry entry = result.readEntry();
+            Set<String> aciValues = entry.parseAttribute("aci").asSetOfString();
+
+            for (String aciValue : aciValues) {
+                if (aciPattern.matcher(aciValue).matches()) {
+                    return true;
+                }
+            }
+
+        } catch (LdapException | SearchResultReferenceIOException e) {
+            throw new UpgradeException("Failed searching for LDAP ACI entries", e);
+        }
+
+        return false;
+    }
+
+    private boolean doesNotContainAci(Connection conn, Pattern aciPattern) throws UpgradeException {
+        return !containsAci(conn, aciPattern);
     }
 
     /**
@@ -482,4 +523,45 @@ public class DirectoryContentUpgrader {
             return !schema.hasObjectClass(PUSH_DEVICE_OC);
         }
     }
+
+    /*
+     * Adds an ACI entry to the root suffix to allow users to modify the user password attribute.
+     */
+    private final class LiftUserPasswordRestriction implements Upgrader {
+
+        private final Pattern aciPattern = Pattern
+                .compile("^.*targetattr\\s*!=\\s*\"userPassword\".*deny\\s*\\(all\\).*$");
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_aci_lift_user_password_restriction.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return doesNotContainAci(conn, aciPattern);
+        }
+
+    }
+
+    /*
+     * Removes the ACI entry against the root suffix to blanket deny users the ability to modify any attributes.
+     */
+    private final class RemoveBlanketDenyAll implements Upgrader {
+
+        private final Pattern aciPattern = Pattern
+                .compile("^.*targetattr\\s*=\\s*\"\\*\".*deny\\s*\\(all\\).*$");
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_aci_remove_blanket_deny_all.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return containsAci(conn, aciPattern);
+        }
+
+    }
+
 }
