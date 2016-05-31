@@ -119,7 +119,7 @@ public class OpenAMAccessToken extends StatefulAccessToken {
      */
     @Override
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(USERNAME, stringToSet(resourceOwnerId));
+        put(USERNAME, CollectionUtils.asSet(resourceOwnerId));
     }
 
     /**
