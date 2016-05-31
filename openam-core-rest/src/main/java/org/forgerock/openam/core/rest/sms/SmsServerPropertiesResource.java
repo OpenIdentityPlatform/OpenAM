@@ -73,6 +73,7 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -170,6 +171,7 @@ public class SmsServerPropertiesResource {
                 Map<String, List<String>> optionLabels = getOptionLabels(propertySheet, tabName, titleProperties);
                 List<String> sectionNames = getSectionNames(propertySheet);
                 Set<String> optionalAttributes = getOptionalAttributes(propertySheet, tabName);
+                Set<String> passwordFields = getPasswordFields(propertySheet);
 
                 template.putPermissive(new JsonPointer("/properties/" + tabName + "/type"), "object");
                 int sectionOrder = 0;
@@ -184,7 +186,9 @@ public class SmsServerPropertiesResource {
 
                     int attributeOrder = 0;
 
-                    for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels)) {
+                    for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels,
+                            passwordFields)) {
+
                         if (isDefault) {
                             addDefaultSchema(template, sectionPath, label, attributeOrder, optionalAttributes);
                         } else {
@@ -231,6 +235,10 @@ public class SmsServerPropertiesResource {
             template.putPermissive(new JsonPointer(path + "/description"), description);
         }
 
+        if (label.isPasswordField()) {
+            template.putPermissive(new JsonPointer(path + "/format"), "password");
+        }
+
         allAttributeNamesInNamedTabs.add(attributeName);
     }
 
@@ -259,6 +267,10 @@ public class SmsServerPropertiesResource {
             template.putPermissive(new JsonPointer(valuePath + "/type"), type);
         }
         template.putPermissive(new JsonPointer(valuePath + "/required"), false);
+
+        if (label.isPasswordField()) {
+            template.putPermissive(new JsonPointer(valuePath + "/format"), "password");
+        }
 
         template.putPermissive(new JsonPointer(inheritedPath + "/type"), "boolean");
         template.putPermissive(new JsonPointer(inheritedPath + "/required"), true);
@@ -405,7 +417,7 @@ public class SmsServerPropertiesResource {
     }
 
     private List<SMSLabel> getLabels(String sectionName, Document propertySheet, Properties titleProperties,
-            Map<String, List<String>> options, Map<String, List<String>> optionLabels)
+            Map<String, List<String>> options, Map<String, List<String>> optionLabels, Set<String> passwordFields)
             throws XPathExpressionException {
 
         String expression = "/propertysheet/section[@defaultValue='" + sectionName + "']/property/label/@*[name()='defaultValue' or name()='labelFor']";
@@ -423,9 +435,10 @@ public class SmsServerPropertiesResource {
             final String type = getType(attributeName);
             final List<String> attributeOptions = getAttributeOptions(options, attributeName, type);
             final List<String> attributeOptionLabels = getAttributeOptionsLabels(optionLabels, attributeName, type);
+            final boolean isPasswordField = passwordFields.contains(attributeName);
 
             allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue,
-                    description, type, attributeOptions, attributeOptionLabels));
+                    description, type, attributeOptions, attributeOptionLabels, isPasswordField));
 
         }
 
@@ -441,7 +454,7 @@ public class SmsServerPropertiesResource {
 
             List<SMSLabel> labels = new ArrayList<>();
             for (String attributeName : advancedAttributeNames) {
-                labels.add(new SMSLabel(null, attributeName, attributeName, null, "string", null, null));
+                labels.add(new SMSLabel(null, attributeName, attributeName, null, "string", null, null, false));
             }
 
             template.putPermissive(new JsonPointer("/type"), "object");
@@ -562,6 +575,27 @@ public class SmsServerPropertiesResource {
             logger.error("Error reading property sheet", e);
         }
         return radioOptions;
+    }
+
+    private Set<String> getPasswordFields(Document propertySheet) {
+        Set<String> passwordFields = new HashSet<>();
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            String expression = "//propertysheet/section/property/cc";
+            NodeList ccList = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
+
+            for (int i = 0; i < ccList.getLength(); i++) {
+                NamedNodeMap attributes = ccList.item(i).getAttributes();
+                String ccName = attributes.getNamedItem("name").getNodeValue();
+                String tagClass = attributes.getNamedItem("tagclass").getNodeValue();
+                if ("com.sun.web.ui.taglib.html.CCPasswordTag".equals(tagClass)) {
+                    passwordFields.add(getAttributeNameFromCcName(ccName));
+                }
+            }
+        } catch (XPathExpressionException e) {
+            logger.error("Error reading property sheet", e);
+        }
+        return passwordFields;
     }
 
     private Document getPropertySheet(String tabName) throws NotFoundException, InternalServerErrorException {
@@ -1005,9 +1039,10 @@ public class SmsServerPropertiesResource {
         private final String type;
         private final List<String> optionLabels;
         private final List<String> options;
+        private final boolean isPasswordField;
 
         public SMSLabel(String defaultValue, String labelFor, String displayValue, String description, String type,
-                List<String> options, List<String> optionLabels) {
+                List<String> options, List<String> optionLabels, boolean isPasswordField) {
             this.defaultValue = defaultValue;
             this.labelFor = labelFor;
             this.displayValue = displayValue;
@@ -1015,6 +1050,7 @@ public class SmsServerPropertiesResource {
             this.type = type;
             this.options = options;
             this.optionLabels = optionLabels;
+            this.isPasswordField = isPasswordField;
         }
 
         public List<String> getOptions() {
@@ -1043,6 +1079,10 @@ public class SmsServerPropertiesResource {
 
         public String getLabelFor() {
             return labelFor;
+        }
+
+        public boolean isPasswordField() {
+            return isPasswordField;
         }
     }
 }

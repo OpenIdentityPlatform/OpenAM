@@ -22,7 +22,8 @@
       "bindPassword": {
         "title": "amconfig.serverconfig.user.bindpwd",
         "propertyOrder": 3,
-        "type": "string"
+        "type": "string",
+        "format": "password"
       },
       "servers": {
         "title": "amconfig.serverconfig.xml.server.table.header",
