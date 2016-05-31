@@ -52,13 +52,8 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.oauth2.OAuth2RealmResolver;
-import org.forgerock.openam.oauth2.OAuthTokenStore;
-import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -109,6 +104,7 @@ public class OAuth2UserApplications {
     @Query
     public Promise<QueryResponse, ResourceException> query(Context context, QueryResourceHandler queryHandler,
             QueryRequest request) {
+
         String userId = contextHelper.getUserId(context);
         String realm = contextHelper.getRealm(context);
 
@@ -121,12 +117,15 @@ public class OAuth2UserApplications {
 
             for (JsonValue token : tokens) {
                 String clientId = getAttributeValue(token, CLIENT_ID.getOAuthField());
-                Set<JsonValue> applicationTokens = applicationTokensMap.get(clientId);
-                if (applicationTokens == null) {
-                    applicationTokens = new HashSet<>();
-                    applicationTokensMap.put(clientId, applicationTokens);
+                realm = getAttributeValue(token, REALM.getOAuthField());
+                if(tokenClientExists(clientId, realm, context)) {
+                    Set<JsonValue> applicationTokens = applicationTokensMap.get(clientId);
+                    if (applicationTokens == null) {
+                        applicationTokens = new HashSet<>();
+                        applicationTokensMap.put(clientId, applicationTokens);
+                    }
+                    applicationTokens.add(token);
                 }
-                applicationTokens.add(token);
             }
 
             for (Map.Entry<String, Set<JsonValue>> applicationTokens : applicationTokensMap.entrySet()) {
@@ -144,6 +143,18 @@ public class OAuth2UserApplications {
             debug.message("Failed to query OAuth2 clients for user {}", userId, e);
             return e.asPromise();
         }
+    }
+
+    /**
+     * Checks if the client to which the access token is issued exists
+     */
+    private boolean tokenClientExists(String clientId, String relam, Context context) {
+        try {
+            clientRegistrationStore.get(clientId, relam, context);
+        } catch (InvalidClientException | NotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
