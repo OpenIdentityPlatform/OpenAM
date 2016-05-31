@@ -50,6 +50,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.query.QueryFilter;
+import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -127,7 +128,7 @@ public class TokenRevocationResource extends ServerResource {
                         throw new InvalidRequestException("Invalid token name: " + tokenName);
                 }
             }
-            return new JsonRepresentation(new HashMap<>());
+            return new JsonRepresentation(new JSONObject());
         } catch (InvalidClientAuthZHeaderException e) {
             getResponse().setChallengeRequests(singletonList(
                     new ChallengeRequest(
