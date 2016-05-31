@@ -33,9 +33,19 @@ import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
-import static org.forgerock.openam.utils.StringUtils.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -49,12 +59,10 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.security.AccessController;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,34 +78,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.license.License;
-import org.forgerock.openam.license.LicenseLocator;
-import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.license.ServletContextLicenseLocator;
-import org.forgerock.openam.upgrade.OpenDJUpgrader;
-import org.forgerock.openam.upgrade.UpgradeDirectoryUtils;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.VersionUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.config.ConfigurationFramework;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -152,6 +132,20 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseLocator;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.license.ServletContextLicenseLocator;
+import org.forgerock.openam.setup.EmbeddedOpenDJManager;
+import org.forgerock.openam.setup.ZipUtils;
+import org.forgerock.openam.upgrade.EmbeddedOpenDJBackupManager;
+import org.forgerock.openam.upgrade.OpenDJUpgrader;
+import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.config.ConfigurationFramework;
 
 /**
  * This class is the first class to get loaded by the Servlet container.
@@ -281,114 +275,16 @@ public class AMSetupServlet extends HttpServlet {
      * Checks if the embedded directory (if present) needs to be upgraded
      */
     private static void checkOpenDJUpgrade() throws ServletException {
-        // check for embedded directory
-        if (!isEmbeddedDS()) {
-            return;
-        }
-        
-        // check if upgrade is required
-        OpenDJUpgrader upgrader = new OpenDJUpgrader(getBaseDir() + OPENDS_DIR, servletCtx);
-        if (!upgrader.isUpgradeRequired()) {
-            return;
-        }
-        
-        // backup embedded directory
-        createOpenDJBackup();
-                
-        // initiate upgrade
-        try {
-            upgrader.upgrade();
-        } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("OpenDJ upgrade exception: ", ex);
-            throw new ServletException("An error occurred while upgrading embedded OpenDJ", ex);
-        }
-        isOpenDJUpgraded = true;
-    }
-    
-    private static void createOpenDJBackup() {
-        try {
-            UpgradeDirectoryUtils.createUpgradeDirectories(getBaseDir());
-        } catch (UpgradeException ue) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot create backup directory", ue);
-            return;
-        }
-        
-        ZipOutputStream zOut = null;
-        String baseDir = getBaseDir();
-        String backupDir = baseDir + "/backups/";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String dateStamp = dateFormat.format(newDate());
-        File backupFile = new File(backupDir + "opendj.backup." + dateStamp + ".zip");
-  
-        if (backupFile.exists()) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot continue as backup file exists! "
-                    + backupFile.getName());
-            return;
-        }
-       
-        File opendjDirectory = new File(baseDir + OPENDS_DIR);
-        if (opendjDirectory.exists() && opendjDirectory.isDirectory()) {
-            final String[] filenames = opendjDirectory.list();
-            
-            try {
-                zOut = new ZipOutputStream(new FileOutputStream(backupFile));
-                
-                // Compress the files
-                for (String filename : filenames) {
-                    zipDir(new File(baseDir + OPENDS_DIR + File.separator + filename),
-                                    baseDir + OPENDS_DIR + File.separator, zOut, (baseDir + File.separator).length());
-                }
-
-                zOut.close();
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error("IOException", ioe);
-            } finally {
-                if (zOut != null) {
-                    try {
-                        zOut.close();
-                    } catch (IOException ioe) {
-                        // do nothing
-                    }
-                }
-            }
+        String baseDirectory = getBaseDir();
+        Debug logger = Debug.getInstance(SetupConstants.DEBUG_NAME);
+        ZipUtils zipUtils = new ZipUtils(logger);
+        OpenDJUpgrader upgrader = new OpenDJUpgrader(new EmbeddedOpenDJBackupManager(logger, zipUtils, baseDirectory), baseDirectory, servletCtx);
+        EmbeddedOpenDJManager embeddedOpenDJManager = new EmbeddedOpenDJManager(logger, baseDirectory, upgrader);
+        if (embeddedOpenDJManager.getState() == EmbeddedOpenDJManager.State.UPGRADE_REQUIRED) {
+            isOpenDJUpgraded = embeddedOpenDJManager.upgrade() == EmbeddedOpenDJManager.State.UPGRADED;
         }
     }
     
-    private static void zipDir(File filename, String dirName, ZipOutputStream zOut, int stripLen) {
-        try {
-            if (!filename.exists()) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error("file not found");
-            }
-            
-            if (!filename.isDirectory()) {
-                zOut.putNextEntry(new ZipEntry((dirName + filename.getName()).replace('\\','/').substring(stripLen)));
-                FileInputStream fileIn = new FileInputStream(filename);
-                byte[] buffer =new byte[(int)filename.length()];
-                int inLen = fileIn.read(buffer);
- 
-                if (inLen != filename.length()) {
-                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("Short read: " + (filename.length() - inLen));
-                }
-            
-                zOut.write(buffer, 0, buffer.length);
-                zOut.closeEntry();
-                fileIn.close();
-            } else {
-                String subdirname = dirName + filename.getName() + File.separator;
-                zOut.putNextEntry(new ZipEntry(subdirname.replace('\\','/').substring(stripLen)));
-                zOut.closeEntry();
-                
-                String[] dirlist = new File(subdirname).list();
-
-                for (String dir : dirlist) {
-                    zipDir(new File(subdirname + dir), subdirname, zOut, stripLen);
-                }
-            }
-        } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to create zip file", ex);
-        }        
-    }
-
     /**
      * Checks if the product is already configured. This is required 
      * when the container on which WAR is deployed is restarted. If  
