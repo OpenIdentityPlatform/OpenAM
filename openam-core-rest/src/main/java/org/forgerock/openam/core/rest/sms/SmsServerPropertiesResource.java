@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.common.configuration.ServerConfigXML.ServerObject;
 import static com.sun.identity.common.configuration.ServerConfiguration.*;
+import static com.sun.identity.common.configuration.SiteConfiguration.getSites;
 import static com.sun.identity.setup.SetupConstants.CONFIG_VAR_DEFAULT_SHARED_KEY;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -102,12 +103,15 @@ public class SmsServerPropertiesResource {
     private static final String DIRECTORY_CONFIG_SCHEMA = "/schema/json/server-directory-configuration.json";
     private static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryconfiguration";
     private static final String ADVANCED_TAB_NAME = "advanced";
+    private static final String GENERAL_TAB_NAME = "general";
+    private static final String PARENT_SITE_PROPERTY = "singleChoiceSite";
     private static final String SERVER_DEFAULT_NAME = "server-default";
     private static final String SERVER_PARENT_SITE = "amconfig.header.site";
     private static final Map<String, String> syntaxRawToReal = new HashMap<>();
     //this list is to enable us to distinguish which attributes are in the "advanced" tab
     private static final List<String> allAttributeNamesInNamedTabs = new ArrayList<>();
     private static final String UNKNOWN_PROPS = "serverconfig.updated.with.invalid.properties";
+    private static final String EMPTY_SELECTION = "[Empty]";
 
     private static JsonValue defaultSchema;
     private static JsonValue nonDefaultSchema;
@@ -188,9 +192,9 @@ public class SmsServerPropertiesResource {
 
                     for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels,
                             passwordFields)) {
-
-                        if (isDefault) {
-                            addDefaultSchema(template, sectionPath, label, attributeOrder, optionalAttributes);
+                        String attributeName = getAttributeNameFromCcName(label.getLabelFor());
+                        if (isDefault || isParentSiteAttribute(tabName, attributeName)) {
+                            addDefaultSchema(template, sectionPath, label, attributeOrder, optionalAttributes, tabName);
                         } else {
                             addServerSchema(template, sectionPath, label, attributeOrder);
                         }
@@ -206,7 +210,7 @@ public class SmsServerPropertiesResource {
     }
 
     private void addDefaultSchema(JsonValue template, String sectionPath, SMSLabel label, int attributeOrder,
-            Set<String> optionalAttributes) {
+            Set<String> optionalAttributes, String tabName) {
 
         final String attributeName = getAttributeNameFromCcName(label.getLabelFor());
         if (Constants.AM_SERVICES_SECRET.equals(attributeName)) {
@@ -217,10 +221,11 @@ public class SmsServerPropertiesResource {
         final String description = label.getDescription();
         final List<String> attributeOptions = label.getOptions();
         final List<String> attributeOptionLabels = label.getOptionLabels();
-        final boolean isOptional = optionalAttributes.contains(attributeName);
+        final boolean isParentSiteAttribute = isParentSiteAttribute(tabName, attributeName);
+        final boolean isOptional = optionalAttributes.contains(attributeName) || isParentSiteAttribute;
 
         final String path = sectionPath + "/properties/" + attributeName;
-        if (attributeOptions != null && !attributeOptions.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(attributeOptions) || isParentSiteAttribute) {
             template.putPermissive(new JsonPointer(path + "/enum"), attributeOptions);
             template.putPermissive(new JsonPointer(path + "/options/enum_titles"), attributeOptionLabels);
         } else {
@@ -260,7 +265,7 @@ public class SmsServerPropertiesResource {
             template.putPermissive(new JsonPointer(propertyPath + "/description"), description);
         }
 
-        if (attributeOptions != null && !attributeOptions.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(attributeOptions)) {
             template.putPermissive(new JsonPointer(valuePath + "/enum"), attributeOptions);
             template.putPermissive(new JsonPointer(valuePath + "/options/enum_titles"), attributeOptionLabels);
         } else {
@@ -389,6 +394,7 @@ public class SmsServerPropertiesResource {
             schema = defaultSchema.get(tabPointer);
         } else {
             schema = nonDefaultSchema.get(tabPointer);
+            addSiteOptions(tabName, serverContext, schema);
         }
 
         if (schema == null) {
@@ -396,6 +402,23 @@ public class SmsServerPropertiesResource {
         }
 
         return newResultPromise(newActionResponse(schema));
+    }
+
+    private void addSiteOptions(String tabName, Context serverContext, JsonValue schema) {
+        if (GENERAL_TAB_NAME.equals(tabName)) {
+            try {
+                List<String> sites = new ArrayList<>(getSites(getSsoToken(serverContext)));
+                List<String> siteTitles = new ArrayList<>(sites);
+                sites.add(0, EMPTY_SELECTION);
+                siteTitles.add(0, titleProperties.getProperty(EMPTY_SELECTION));
+                JsonValue parentSite = schema.get("properties").get(SERVER_PARENT_SITE).get("properties")
+                        .get(PARENT_SITE_PROPERTY);
+                parentSite.put("enum", sites);
+                parentSite.get("options").put("enum_titles", siteTitles);
+            } catch (SSOException | SMSException e) {
+                logger.error("Error getting available sites", e);
+            }
+        }
     }
 
     private Properties getAttributes(ServiceConfig serverConfig) throws InternalServerErrorException {
@@ -677,7 +700,7 @@ public class SmsServerPropertiesResource {
             } else if (tabName.equalsIgnoreCase(DIRECTORY_CONFIGURATION_TAB_NAME)) {
                 addDirectoryConfiguration(result, token, serverUrl);
             } else {
-                addServerAttributes(result, defaultConfig, serverConfig, tabName);
+                addServerAttributes(result, defaultConfig, serverConfig, tabName, token, serverUrl);
             }
 
             return newResultPromise(newResourceResponse(serverId + "/properties/" + tabName, valueOf(result
@@ -747,7 +770,7 @@ public class SmsServerPropertiesResource {
     }
 
     private void addServerAttributes(JsonValue result, ServiceConfig defaultConfig, ServiceConfig serverConfig,
-            String tabName) throws InternalServerErrorException, NotFoundException {
+            String tabName, SSOToken token, String serverUrl) throws InternalServerErrorException, NotFoundException {
 
         Properties defaultAttributes = getAttributes(defaultConfig);
         Properties serverAttributes = getAttributes(serverConfig);
@@ -759,6 +782,14 @@ public class SmsServerPropertiesResource {
 
             if (ADVANCED_TAB_NAME.equals(tabName)) {
                 result.putPermissive(new JsonPointer(attributeName), serverAttribute);
+            } else if (isParentSiteAttribute(tabName, attributeName)) {
+                try {
+                    String site = getServerSite(token, serverUrl);
+                    result.putPermissive(new JsonPointer(SERVER_PARENT_SITE + "/" + attributeName),
+                            isEmpty(site) ? EMPTY_SELECTION : site);
+                } catch (SMSException | SSOException e) {
+                    throw new InternalServerErrorException("Unable to read site for server " + serverUrl, e);
+                }
             } else {
                 Object defaultAttribute = getValue(defaultAttributes, attributeName);
                 String sectionName = attributeNamesToSections.get(attributeName);
@@ -872,7 +903,7 @@ public class SmsServerPropertiesResource {
             } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equals(tabName)) {
                 updateDirectoryConfiguration(updateRequest.toJsonValue().get("content"), token, serverUrl);
             } else {
-                updateServerInstance(updateRequest.toJsonValue().get("content"), token, serverUrl, isAdvancedTab);
+                updateServerInstance(updateRequest.toJsonValue().get("content"), token, serverUrl, tabName);
             }
 
             return read(serverContext);
@@ -948,14 +979,14 @@ public class SmsServerPropertiesResource {
         setServerConfigXML(token, serverUrl, serverConfig.toXML());
     }
 
-    private void updateServerInstance(JsonValue content, SSOToken token, String serverUrl, boolean advancedConfig)
+    private void updateServerInstance(JsonValue content, SSOToken token, String serverUrl, String tabName)
             throws SMSException, SSOException, UnknownPropertyNameException, ConfigurationException,
             InternalServerErrorException {
 
         Map<String, String> attributeValues = new HashMap<>();
         Set<String> inheritedAttributeNames = new HashSet<>();
 
-        if (advancedConfig) {
+        if (ADVANCED_TAB_NAME.equals(tabName)) {
             addAttributeValues(content, attributeValues);
             removeUnusedAdvancedAttributes(token, attributeValues.keySet(), serverUrl);
         } else {
@@ -971,6 +1002,13 @@ public class SmsServerPropertiesResource {
         } catch (IOException e) {
             throw new InternalServerErrorException("Failed to update server properties", e);
         }
+
+        if (GENERAL_TAB_NAME.equals(tabName) && content.isDefined(SERVER_PARENT_SITE)
+                && content.get(SERVER_PARENT_SITE).isDefined(PARENT_SITE_PROPERTY)) {
+
+            String site = content.get(SERVER_PARENT_SITE).get(PARENT_SITE_PROPERTY).asString();
+            setServerSite(token, serverUrl, EMPTY_SELECTION.equals(site) ? "" : site);
+        }
     }
 
     private void addAttributeValues(JsonValue attributes, Map<String, String> attributeValues) {
@@ -983,6 +1021,9 @@ public class SmsServerPropertiesResource {
             Set<String> inheritedAttributeNames) {
 
         for (String attributeName : attributes.keys()) {
+            if (PARENT_SITE_PROPERTY.equals(attributeName)) {
+                continue;
+            }
             JsonValue attribute = attributes.get(attributeName);
             if (attribute.get("inherited").asBoolean()) {
                 inheritedAttributeNames.add(attributeName);
@@ -1029,6 +1070,10 @@ public class SmsServerPropertiesResource {
         } catch (Exception e) {
             throw new SMSException(e.getMessage());
         }
+    }
+
+    private boolean isParentSiteAttribute(String tabName, String attributeName) {
+        return GENERAL_TAB_NAME.equals(tabName) && PARENT_SITE_PROPERTY.equals(attributeName);
     }
 
     private class SMSLabel {
