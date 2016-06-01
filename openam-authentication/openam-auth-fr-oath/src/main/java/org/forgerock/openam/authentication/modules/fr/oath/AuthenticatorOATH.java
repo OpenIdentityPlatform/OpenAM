@@ -20,6 +20,7 @@ package org.forgerock.openam.authentication.modules.fr.oath;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -142,12 +143,12 @@ public class AuthenticatorOATH extends AMLoginModule {
     private final OathMaker oathDevices = InjectorHolder.getInstance(OathMaker.class);
 
     private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory =
-            InjectorHolder.getInstance(Key.get(AuthenticatorDeviceServiceFactory.class,
+            InjectorHolder.getInstance(Key.get(
+                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorOathService>>(){},
                     Names.named(AuthenticatorOathServiceFactory.FACTORY_NAME)));
 
     private OathDeviceSettings newDevice = null;
-
-
+    
     /**
      * Standard constructor sets-up the debug logging module.
      */

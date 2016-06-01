@@ -38,21 +38,35 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- configuration settings -->
 
-                <AttributeSchema name="accessKey" type="single" i18nKey="a010" validator="RequiredValueValidator"/>
+                <AttributeSchema name="accessKey" type="single" i18nKey="a010" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>Access Key</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
-                <AttributeSchema name="secret" type="single" i18nKey="a020" validator="RequiredValueValidator"/>
+                <AttributeSchema name="secret" type="single" i18nKey="a020" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>Secret</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>Apple Endpoint</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>Google Endpoint</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

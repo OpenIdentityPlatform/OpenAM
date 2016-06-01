@@ -35,11 +35,14 @@
                 resourceName="authPushReg">
 
             <Organization>
-                <AttributeSchema name="UrlValidator"
-                                 type="validator"
-                                 syntax="string">
+                <AttributeSchema name="UrlValidator" type="validator" syntax="string">
                     <DefaultValues>
                         <Value>org.forgerock.openam.sm.validation.URLValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-am-auth-push-reg-auth-level"
