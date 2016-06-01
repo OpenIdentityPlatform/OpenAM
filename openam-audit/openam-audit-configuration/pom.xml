@@ -52,6 +52,10 @@
             <artifactId>forgerock-audit-handler-jdbc</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-audit-handler-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>

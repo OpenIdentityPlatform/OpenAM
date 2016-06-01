@@ -454,6 +454,98 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
+
+                <SubSchema name="Elasticsearch" inheritance="multiple" i18nKey="handler.name.elasticsearch"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="index" type="single" i18nKey="audit.handlers.elasticsearch.index"
+                                     order="40"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.elasticsearch.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.elasticsearch.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="username" type="single" i18nKey="audit.handlers.elasticsearch.username"
+                                     order="50"/>
+                    <AttributeSchema name="password" type="single" syntax="password"
+                                     i18nKey="audit.handlers.elasticsearch.password" order="60"/>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingEnabled" order="70">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.ElasticsearchAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
             </Global>
 
             <Organization>
@@ -885,6 +977,98 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
+
+                <SubSchema name="Elasticsearch" inheritance="multiple" i18nKey="handler.name.elasticsearch"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="index" type="single" i18nKey="audit.handlers.elasticsearch.index"
+                                     order="40"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.elasticsearch.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.elasticsearch.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="username" type="single" i18nKey="audit.handlers.elasticsearch.username"
+                                     order="50"/>
+                    <AttributeSchema name="password" type="single" syntax="password"
+                                     i18nKey="audit.handlers.elasticsearch.password" order="60"/>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingEnabled" order="70">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.ElasticsearchAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
             </Organization>
         </Schema>
 
