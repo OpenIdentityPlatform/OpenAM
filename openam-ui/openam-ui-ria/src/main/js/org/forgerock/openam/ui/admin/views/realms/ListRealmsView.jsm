@@ -160,7 +160,10 @@ class ListRealmsView extends AbstractView {
                     new TemplateBasedView({
                         data: tableData,
                         el: toggleView.getElementA(),
-                        template: "templates/admin/views/realms/RealmsCardsTemplate.html"
+                        template: "templates/admin/views/realms/RealmsCardsTemplate.html",
+                        callback: () => {
+                            this.$el.find('[data-toggle="popover"]').popover();
+                        }
                     }).render();
                     new TemplateBasedView({
                         data: tableData,

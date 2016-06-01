@@ -77,7 +77,10 @@ define([
                 new TemplateBasedView({
                     data: tableData,
                     el: toggleView.getElementA(),
-                    template: "templates/admin/views/deployment/sites/SitesCardsTemplate.html"
+                    template: "templates/admin/views/deployment/sites/SitesCardsTemplate.html",
+                    callback: () => {
+                        this.$el.find('[data-toggle="popover"]').popover();
+                    }
                 }).render();
                 new TemplateBasedView({
                     data: tableData,

@@ -15,19 +15,28 @@
  */
 
 define([
+    "lodash",
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], (Backbone, UIUtils) =>
+], (_, Backbone, UIUtils) =>
     Backbone.View.extend({
-        initialize (options) {
-            this.options = options;
+        initialize ({ template, data = {}, callback = _.noop }) {
+            if (!template) {
+                throw new Error("[TemplateBasedView] No \"template\" found.");
+            }
+            this.template = template;
+            this.callback = callback;
+            this.data = data;
         },
         render () {
-            UIUtils.fillTemplateWithData(
-                this.options.template,
-                this.options.data,
-                (html) => this.$el.html(html)
-            );
+            UIUtils.compileTemplate(
+                this.template,
+                this.data
+            ).then((html) => {
+                this.$el.html(html);
+                this.callback();
+            });
+            return this;
         }
     })
 );
