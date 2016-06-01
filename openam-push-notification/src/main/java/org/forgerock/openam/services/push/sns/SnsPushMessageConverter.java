@@ -41,7 +41,9 @@ public class SnsPushMessageConverter implements PushMessageConverter {
     private final static String APNS_SANDBOX = "APNS_SANDBOX";
     private final static String APNS_APS = "aps";
     private final static String APNS_ALERT = "alert";
-    private final static String DATA = "data";
+    private final static String APNS_CONTENT_AVAILABLE = "content-available";
+    private final static String APNS_CONTENT_AVAILABLE_TRUE = "1";
+    private final static String APNS_DATA = "data";
 
     private final static String DEFAULT = "default";
 
@@ -58,7 +60,8 @@ public class SnsPushMessageConverter implements PushMessageConverter {
                 field(APNS_APS, object(
                         field(APNS_ALERT, message.getSubject()),
                         field(MESSAGE_ID, message.getMessageId()),
-                        field(DATA, message.getBody())))));
+                        field(APNS_DATA, message.getBody()),
+                        field(APNS_CONTENT_AVAILABLE, APNS_CONTENT_AVAILABLE_TRUE)))));
 
         JsonValue toSend = json(object(
                 field(DEFAULT, message.getSubject()),
