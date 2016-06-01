@@ -113,9 +113,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>3.5.0-M1</opendj.server.version>
-        <opendj.sdk.version>3.5.0-M1</opendj.sdk.version>
-        <opendj.server.legacy>3.5.0-M1</opendj.server.legacy>
+        <opendj.server.version>3.0.0</opendj.server.version>
+        <opendj.sdk.version>3.0.0</opendj.sdk.version>
+        <opendj.server.legacy>3.0.0</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
@@ -508,15 +508,6 @@
             <id>oracle-repository</id>
             <name>Oracle Repository</name>
             <url>http://download.oracle.com/maven</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>forgerock-private-releases</id>
-            <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/private-releases</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

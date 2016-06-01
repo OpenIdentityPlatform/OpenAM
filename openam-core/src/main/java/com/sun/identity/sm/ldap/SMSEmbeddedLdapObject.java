@@ -64,7 +64,6 @@ import javax.naming.directory.ModificationItem;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -79,7 +78,6 @@ import org.opends.server.protocols.internal.SearchRequest;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.protocols.ldap.LDAPModification;
 import org.opends.server.types.DirectoryException;
-import org.opends.server.types.SearchFilter;
 import org.opends.server.types.SearchResultEntry;
 /**
  * This object represents an LDAP entry in the directory server. The UMS have an
@@ -219,8 +217,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         }
 
         try {
-            SearchRequest request = Requests.newSearchRequest(DN.valueOf(dn), SearchScope.BASE_OBJECT,
-                    SearchFilter.createFilterFromString("(objectclass=*)"),
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.BASE_OBJECT, "(objectclass=*)",
                     smsAttributes.toArray(new String[smsAttributes.size()]));
             InternalSearchOperation iso = icConn.processSearch(request);
             ResultCode resultCode = iso.getResultCode();
@@ -312,7 +309,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         throws SMSException, SSOException {
         SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
         List modList = copyModItemsToLDAPModList(mods);
-        ModifyOperation mo = icConn.processModify(ByteString.valueOfUtf8(dn), modList);
+        ModifyOperation mo = icConn.processModify(dn, modList);
         ResultCode resultCode = mo.getResultCode();
         if (resultCode == ResultCode.SUCCESS) {
             if (debug.messageEnabled()) {
@@ -412,8 +409,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         // Get the sub entries
         try {
-            SearchRequest request = Requests.newSearchRequest(DN.valueOf(dn), SearchScope.SINGLE_LEVEL,
-                    SearchFilter.createFilterFromString(filter), orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
+            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL, filter,
+                    orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
             InternalSearchOperation iso = icConn.processSearch(request);
 
             ResultCode resultCode = iso.getResultCode();
@@ -445,7 +442,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 if (!edn.toLowerCase().startsWith("ou=")) {
                     continue;
                 }
-                String rdn = entry.getName().rdn().getFirstAVA().getAttributeValue().toString();
+                String rdn = entry.getName().getRDN(0).getAttributeValue(0)
+                    .toString();
                 answer.add(rdn);
             }
             if (debug.messageEnabled()) {
