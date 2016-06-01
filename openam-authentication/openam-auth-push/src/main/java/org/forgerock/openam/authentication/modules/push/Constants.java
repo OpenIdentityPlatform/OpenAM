@@ -35,8 +35,6 @@ public final class Constants {
     public static final String AM_AUTH_AUTHENTICATOR_PUSH = "amAuthAuthenticatorPush";
     /** Module configuration key for push timeout. */
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-response-timeout";
-    /** Module configuration key for push timeout. */
-    static final String DEVICE_PUSH_ISSUER = "forgerock-am-auth-push-message-issuer";
     /** Module configuration key for authentication level of module. */
     static final String AUTH_LEVEL = "forgerock-am-auth-push-auth-level";
 

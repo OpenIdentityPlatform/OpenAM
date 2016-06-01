@@ -35,6 +35,7 @@ public final class PushDeviceSettings extends DeviceSettings {
     private String communicationId; // the device id for this comms. (may be higher level than gcm / apns e.g. asns)
     private String deviceMechanismUID; // identifier for the mechanism on the remote device
     private String deviceId; // the device id as known to the final delivery mechanism (gcm / apns)
+    private String issuer; //the name of the issuer as originally advertised to this client
 
     /**
      * Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
@@ -124,6 +125,15 @@ public final class PushDeviceSettings extends DeviceSettings {
     }
 
     /**
+     * The name of the issuer when this device profile was issued.
+     * @param issuer The name of the issuer.
+     */
+    public void setIssuer(String issuer) {
+        Reject.ifNull(deviceType, "issuer can not be null");
+        this.issuer = issuer;
+    }
+
+    /**
      * Get the secret value which is shared between the OATH device and an authenticating module.
      *
      * @return The shared secret.
@@ -178,6 +188,15 @@ public final class PushDeviceSettings extends DeviceSettings {
     }
 
     /**
+     * Get the issuer of the Push device.
+     *
+     * @return The issuer.
+     */
+    public String getIssuer() {
+        return issuer;
+    }
+
+    /**
      * Get the communication ID for the Push device on the communication network..
      *
      * @return The communication identifier.
@@ -205,13 +224,14 @@ public final class PushDeviceSettings extends DeviceSettings {
                 && Objects.equals(communicationType, that.communicationType)
                 && Objects.equals(deviceMechanismUID, that.deviceMechanismUID)
                 && Objects.equals(deviceId, that.deviceId)
+                && Objects.equals(issuer, that.issuer)
                 && Arrays.equals(recoveryCodes, recoveryCodes);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(sharedSecret, deviceName, uuid, communicationId, communicationType, deviceType,
-                recoveryCodes, deviceMechanismUID, deviceId);
+                recoveryCodes, deviceMechanismUID, deviceId, issuer);
     }
 
     @Override
@@ -225,6 +245,7 @@ public final class PushDeviceSettings extends DeviceSettings {
                 ", deviceType='" + deviceType + '\'' +
                 ", communicationType='"+ communicationType + '\'' +
                 ", deviceId='"+ deviceId + '\'' +
+                ", issuer='"+ issuer + '\'' +
                 ", recoveryCodes='"+ Arrays.toString(recoveryCodes) + '\'' +
                 '}';
     }

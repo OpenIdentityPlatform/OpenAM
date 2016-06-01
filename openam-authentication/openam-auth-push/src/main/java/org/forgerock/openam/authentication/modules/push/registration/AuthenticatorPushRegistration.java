@@ -282,6 +282,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
             newDeviceRegistrationProfile.setDeviceType(deviceResponse.get(DEVICE_TYPE).asString());
             newDeviceRegistrationProfile.setDeviceId(deviceResponse.get(DEVICE_ID).asString());
             newDeviceRegistrationProfile.setRecoveryCodes(DeviceSettings.generateRecoveryCodes(NUM_RECOVERY_CODES));
+            newDeviceRegistrationProfile.setIssuer(issuer);
 
             userPushDeviceProfileManager.saveDeviceProfile(
                     amIdentityPrincipal.getName(), amIdentityPrincipal.getRealm(), newDeviceRegistrationProfile);

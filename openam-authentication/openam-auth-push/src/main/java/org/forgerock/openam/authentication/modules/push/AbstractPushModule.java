@@ -46,8 +46,8 @@ import org.forgerock.openam.utils.Time;
  */
 public abstract class AbstractPushModule extends AMLoginModule {
 
-    private final CTSPersistentStore coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
-    private final JSONSerialisation jsonSerialization = InjectorHolder.getInstance(JSONSerialisation.class);
+    /** Used to store tokens which may be updated by other machines in the cluster. **/
+    protected final CTSPersistentStore coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
 
     /** Necessary to read data from the appropriate user's attribute. **/
     protected final UserPushDeviceProfileManager userPushDeviceProfileManager =
@@ -62,6 +62,8 @@ public abstract class AbstractPushModule extends AMLoginModule {
 
     /** Used to understand what loadbalancer cookie we should inform the remote device of. */
     protected final SessionCookies sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
+
+    private final JSONSerialisation jsonSerialization = InjectorHolder.getInstance(JSONSerialisation.class);
 
     /**
      * Stores the message information in the CTS, to be used across the cluster.

@@ -82,7 +82,6 @@ public class AuthenticatorPush extends AbstractPushModule {
     private long timeout;
     private String messageId;
     private MessagePromise messagePromise;
-    private String issuer;
 
     private PushDeviceSettings device;
 
@@ -93,7 +92,6 @@ public class AuthenticatorPush extends AbstractPushModule {
 
         this.sharedState = sharedState;
         timeout = Long.valueOf(CollectionHelper.getMapAttr(options, DEVICE_PUSH_WAIT_TIMEOUT));
-        issuer = CollectionHelper.getMapAttr(options, DEVICE_PUSH_ISSUER);
 
         this.realm = DNMapper.orgNameToRealmName(getRequestOrg());
 
@@ -235,6 +233,7 @@ public class AuthenticatorPush extends AbstractPushModule {
             Boolean ctsValue = checkCTS(messageId);
             if (ctsValue != null) {
                 messageDispatcher.forget(messageId);
+                coreTokenService.delete(messageId);
 
                 if (ctsValue) {
                     storeUsername(username);
@@ -317,7 +316,7 @@ public class AuthenticatorPush extends AbstractPushModule {
                 .headers().alg(JwsAlgorithm.HS256).done().build();
 
         PushMessage message = new PushMessage(communicationId, jwt,
-                "Login Attempt from " + username + " at " + issuer);
+                "Login attempt from " + username + " at " + device.getIssuer());
 
         Set<Predicate> servicePredicates = new HashSet<>();
         servicePredicates.add(
