@@ -25,13 +25,14 @@ define([
     "org/forgerock/openam/ui/common/components/PanelComponent",
     "org/forgerock/openam/ui/common/components/PartialBasedView",
     "org/forgerock/openam/ui/common/components/TabComponent",
+    "org/forgerock/openam/ui/admin/views/common/TabSearch",
     "org/forgerock/openam/ui/common/components/table/InlineEditTable",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
 ], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PanelComponent, PartialBasedView,
-    TabComponent, InlineEditTable, JSONSchema, JSONValues, Promise, FlatJSONSchemaView) => {
+    TabComponent, TabSearch, InlineEditTable, JSONSchema, JSONValues, Promise, FlatJSONSchemaView) => {
     function createTabs (schema) {
         return _(schema.raw.properties)
             .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
@@ -65,12 +66,8 @@ define([
                 this.parentRender(() => {
                     if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
-                            createBody: () => new InlineEditTable({
-                                values: clonedValues
-                            }),
-                            createFooter: () => new PartialBasedView({
-                                partial: "form/_JSONSchemaFooter"
-                            })
+                            createBody: () => new InlineEditTable({ values: clonedValues }),
+                            createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                         });
                     } else {
                         const tabs = createTabs(schema);
@@ -91,6 +88,24 @@ define([
                             },
                             createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                         });
+                        const options = {
+                            properties: this.schema.raw.properties,
+                            onChange: (id, value) => {
+                                this.subview.setTabId(id);
+                                const input = this.$el.find(`[data-schemapath="root.${value}"]`).find("input");
+                                const inheritedInput = input.prop("disabled") === true;
+                                if (inheritedInput) {
+                                    // The input is disabled because the value is being inherited. However we are
+                                    // still able to scroll to the correct row by focusing on the inherit button
+                                    // first.
+                                    input.closest(".form-group").find("button").focus().blur();
+                                } else {
+                                    input.focus();
+                                }
+
+                            }
+                        };
+                        this.$el.find("[data-tab-search]").append(new TabSearch(options).render().$el);
                     }
                     this.subview.setElement("[data-json-form]");
                     this.subview.render();
