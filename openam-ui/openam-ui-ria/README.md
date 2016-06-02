@@ -6,7 +6,7 @@
 	- [Updating](#updating)
 - [Building](#building)
 - [Development](#development)
-	- [ES6 Transpiling](#es6-transpiling)
+	- [ES6 Support](#es6-support)
 	- [Unit Tests](#unit-tests)
 
 <!-- /TOC -->
@@ -51,34 +51,24 @@ then do:
 
 ```
 $ npm install
-$ grunt
+$ npm start
 ```
 
 Grunt will then start watching the source and sync any changed files over to your server's webapp directory.
 
-### ES6 Transpiling
-* ✅Phase 0 - Babel support (no-op)
-* ✅Phase 1 - Arrow functions, `const` and `let`
-* ✅Phase 2 - Enhanced object literals, template literals, tagged template literals
-* ✅Phase 3 - Destructuring, spread and rest
-
-ES6 is supported via [Babel](https://babeljs.io) transpiling. The following files and directories are transpiled:
-* `main-authorize.js`
-* `main-device.js`
-* `main.js`
-* `org/forgerock/openam/**/*`
+### ES6 Support
+ES6 is supported via [Babel](https://babeljs.io) transpiling. All `.js` and `.jsm` files are transpiled *except* for `libs` and any commons source (layer on afterwards at build time).
 
 Ensure you have `Enable JavaScript source maps` enabled in Chrome or your preferred browser so see the original source before it was transpiled.
 
 ### Unit Tests
-
 To get the unit tests to run automatically when you change source files, do:
 
 ```
-$ grunt karma:dev
+npm test
 ```
 
-This will run karma and show test output as tests are run. _You should run this in addition to running grunt as shown
+This will run karma and show test output as tests are run. _You should run this in addition to running `npm start` as shown
 above_.
 
 If you need to debug test failures, open [http://localhost:9876/debug.html](http://localhost:9876/debug.html) in your
