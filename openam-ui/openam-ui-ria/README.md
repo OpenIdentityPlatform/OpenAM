@@ -3,7 +3,7 @@
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Dependencies](#dependencies)
-	- [Update Process](#update-process)
+	- [Updating](#updating)
 - [Building](#building)
 - [Development](#development)
 	- [ES6 Transpiling](#es6-transpiling)
@@ -18,17 +18,15 @@ NPM dependencies for this project are "locked" to specific versions through two 
 
 Updates to dependency versions are performed manually in a periodic manner. Interim version updates are allowed but must still follow the update process described below.
 
-### Update Process
-1. Explicitly bump dependency versions within `package.json`
-  * Use a tool such as [npm-check-updates](https://www.npmjs.com/package/npm-check-updates) to automate this task
+### Updating
+1. Ensure you have [npm-check-updates](https://www.npmjs.com/package/npm-check-updates) installed globally. e.g. `npm i -g npm-check-updates`
+2. Run `ncu` and observe the updates availalble
   * ***Be mindful of breaking changes!***. Major version changes will most likely require code changes to align with changes in a dependency's API. A major dependency version update should be performed in a separate task.
-2. Run `npm shrinkwrap --dev` to regenerate `npm-shrinkwrap.json`
-  * Watch out for errors and warnings from executing the shrinkwrapping command.
-  * Sometimes a dependencies version requirements are broken making it impossible to perform the operation and an error will occur. In this instance you should identity the problem and contact the dependency author to fix the issue before updating.
-3. Commit it!
+3. Run `npm run deps` to automatically update ***all*** dependencies
+    * Using this automated process, ***all dependencies will be updated***. If you wish to update only a subset of the dependencies, perform the automated steps manually instead (as listed in `package.json`).
+4. Commit it!
 
 ## Building
-
 You can build the package using Maven:
 
 ```
