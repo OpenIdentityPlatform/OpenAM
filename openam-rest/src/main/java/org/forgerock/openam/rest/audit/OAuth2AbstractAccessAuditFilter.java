@@ -11,33 +11,22 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015-2016 ForgeRock AS.
+* Copyright 2015 ForgeRock AS.
 */
 package org.forgerock.openam.rest.audit;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AuthorizationCode;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.oauth2.core.Token;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 
-import com.sun.identity.idm.AMIdentity;
-
 import java.util.Set;
 
 import static org.forgerock.openam.audit.AuditConstants.USER_ID;
-import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACCESS;
 
 /**
  * Responsible for logging access audit events for all OAuth2-based filters. Common functionality is here, a filter
@@ -47,8 +36,7 @@ import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACC
  */
 public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAccessAuditFilter {
 
-    OAuth2RequestFactory<?, Request> requestFactory;
-    Class<?>[] TOKEN_CLASS = { AccessToken.class, RefreshToken.class, AuthorizationCode.class };
+    Set<OAuth2AuditContextProvider> providers;
 
     /**
      * Create a new filter for the given component and restlet.
@@ -57,14 +45,14 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
-     * @param requestFactory The factory that provides access to OAuth2Request
+     * @param providers
      */
     public OAuth2AbstractAccessAuditFilter(AuditConstants.Component component, Restlet restlet,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
-            OAuth2RequestFactory<?, Request> requestFactory, RestletBodyAuditor requestDetailCreator,
+            Set<OAuth2AuditContextProvider> providers, RestletBodyAuditor requestDetailCreator,
             RestletBodyAuditor responseDetailCreator) {
         super(component, restlet, auditEventPublisher, auditEventFactory, requestDetailCreator, responseDetailCreator);
-        this.requestFactory = requestFactory;
+        this.providers = providers;
     }
 
     /**
@@ -118,80 +106,24 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
     }
 
     private void putUserIdInAuditRequestContext(Request request) {
-        String userId = getUserId(request);
-        if (userId != null) {
-            AuditRequestContext.putProperty(USER_ID, userId);
+        for (OAuth2AuditContextProvider provider : providers) {
+            String userId = provider.getUserId(request);
+            if (userId != null) {
+                AuditRequestContext.putProperty(USER_ID, userId);
+                break;
+            }
         }
+
+        return;
     }
 
     private void putTrackingIdsIntoAuditRequestContext(Request request) {
-        String trackingId = getTrackingId(request);
-        if (trackingId != null) {
-            AuditRequestContext.putProperty(OAUTH2_ACCESS.toString(), trackingId);
-        }
-    }
+        for (OAuth2AuditContextProvider provider : providers) {
+            String trackingId = provider.getTrackingId(request);
 
-    private String getUserId(Request request) {
-        for (Class clazz : TOKEN_CLASS) {
-            JsonValue token = null; 
-            token = (JsonValue) retrieveTokenFromRequest(request, clazz);
-            if (token != null) {
-                String userId = getUserIdFromToken(token);
-                if (userId != null) {
-                    return userId;
-                }
+            if (trackingId != null) {
+                AuditRequestContext.putProperty(provider.getTrackingIdKey().toString(), trackingId);
             }
         }
-
-        return null;
-    }
-
-    private String getUserIdFromToken(JsonValue token) {
-        String username = getTokenProperty(OAuth2Constants.CoreTokenParams.USERNAME, token);
-        String realm = getTokenProperty(OAuth2Constants.CoreTokenParams.REALM, token);
-        
-        if (username == null || realm == null) {
-            return null;
-        }
-
-        CoreWrapper cw = new CoreWrapper();
-        AMIdentity identity = cw.getIdentity(username, realm);
-        return (identity == null) ? null : identity.getUniversalId();
-    }
-
-    private String getTrackingId(Request request) {
-        for (Class clazz : TOKEN_CLASS) {
-            JsonValue token = null; 
-            token = (JsonValue) retrieveTokenFromRequest(request, clazz);
-            if (token != null) {
-                String trackingId = getTokenProperty(OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID, token);
-                if (trackingId != null) {
-                    return trackingId;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private <T extends Token> T retrieveTokenFromRequest(Request request, Class<T> clazz) {
-        return requestFactory.create(request).getToken(clazz);
-    }
-
-    private String getTokenProperty(String propertyName, JsonValue token) {
-        if (!token.isDefined(propertyName)) {
-            return null;
-        }
-
-        if (token.get(propertyName).isNotNull()) {
-            if (token.get(propertyName).isCollection()) {
-                return (String) token.get(propertyName).asList().get(0);
-            }
-            
-            if (token.get(propertyName).isString()) {
-                return token.get(propertyName).asString(); // TODO: Return this value?
-            }
-        }
-        return null;
     }
 }

@@ -11,35 +11,37 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import static org.forgerock.openam.uma.UmaConstants.*;
 import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.audit.UMAAccessAuditFilter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
-import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import java.util.Set;
 
 /**
  * Guice Provider from getting the UMA HTTP router.
@@ -52,7 +54,7 @@ public class UmaRouterProvider implements Provider<Router> {
     private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final Set<OAuth2AuditContextProvider> contextProviders;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -61,17 +63,18 @@ public class UmaRouterProvider implements Provider<Router> {
      * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
-     * @param requestFactory The factory that provides access to OAuth2Request.
+     * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can be audit
+     *                         logged from various tokens which may be attached to requests and/or responses.
      */
     @Inject
     public UmaRouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            OAuth2RequestFactory<?, Request> requestFactory) {
+            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
-        this.requestFactory = requestFactory;
+        this.contextProviders = contextProviders;
     }
 
     @Override
@@ -93,7 +96,7 @@ public class UmaRouterProvider implements Provider<Router> {
 
     private Filter auditWithUmaFilter(Restlet restlet, RestletBodyAuditor<?> requestDetailCreator,
             RestletBodyAuditor<?> responseDetailCreator) {
-        return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, requestFactory, requestDetailCreator,
+        return new UMAAccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders, requestDetailCreator,
                 responseDetailCreator);
     }
 }
