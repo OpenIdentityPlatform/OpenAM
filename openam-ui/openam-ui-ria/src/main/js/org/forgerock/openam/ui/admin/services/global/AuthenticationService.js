@@ -18,7 +18,6 @@
  * @module org/forgerock/openam/ui/admin/services/global/AuthenticationService
  */
 define([
-    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -26,9 +25,8 @@ define([
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/Promise"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
+], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/authentication`);
-    const globalAttributesKey = "global";
 
     function getModuleUrl (id) {
         return id === "core" ? "" : `/modules/${id}`;
@@ -59,16 +57,12 @@ define([
                 url: `${getModuleUrl(id)}?_action=schema`,
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
-            }).then((response) => new JSONSchema(response).fromGlobalAndOrganisation(
-                $.t("console.common.globalAttributes"), globalAttributesKey, -10
-            ));
+            }).then((response) => new JSONSchema(response));
 
             const getValues = () => obj.serviceCall({
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).then((response) => new JSONValues(response).fromGlobalAndOrganisation(
-                globalAttributesKey
-            ));
+            }).then((response) => new JSONValues(response));
 
             return Promise.all([getSchema(), getValues()]).then((response) => ({
                 schema: response[0],
@@ -81,7 +75,7 @@ define([
                 url: getModuleUrl(id),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
-                data: JSON.stringify(new JSONValues(data).toGlobalAndOrganisation(globalAttributesKey).raw)
+                data: new JSONValues(data).toJSON()
             });
         }
     };

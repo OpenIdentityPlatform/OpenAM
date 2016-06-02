@@ -18,6 +18,46 @@ define([
     "org/forgerock/openam/ui/common/models/JSONValues"
 ], (JSONValues) => {
     describe("org/forgerock/openam/ui/common/models/JSONValues", () => {
+        describe("#constructor", () => {
+            let values;
+
+            beforeEach(() => {
+                values = new JSONValues({
+                    "globalValue": {},
+                    "defaults": {
+                        "defaultsValue": {}
+                    },
+                    "dynamic": {
+                        "dynamicValue": {}
+                    }
+                });
+            });
+
+            it("groups the top-level values under a \"global\" value", () => {
+                expect(values.raw).to.contain.keys("global");
+                expect(values.raw.global).to.have.keys("globalValue");
+            });
+
+            it("flatten values in \"defaults\" onto the top-level values", () => {
+                expect(values.raw).to.contain.keys("defaultsValue");
+            });
+
+            it("flatten values in \"dynamic\" onto the top-level values", () => {
+                expect(values.raw).to.contain.keys("dynamicValue");
+            });
+
+            context("when there is no \"defaults\" or \"dynamic\" properties", () => {
+                beforeEach(() => {
+                    values = new JSONValues({
+                        "globalValue": {}
+                    });
+                });
+
+                it("does not group the top-level properties under a \"global\" property", () => {
+                    expect(values.raw).to.have.keys("globalValue");
+                });
+            });
+        });
         describe("#addInheritance", () => {
             const jsonValues = new JSONValues({
                 propertyKey: "value"
@@ -47,31 +87,6 @@ define([
                 expect(values.raw.propertyKey.inherited).to.be.true;
             });
         });
-        describe("#fromGlobalAndOrganisation", () => {
-            const jsonValues = new JSONValues({
-                topLevelProperty: "value",
-                defaults: {
-                    defaultsProperty1: "value",
-                    defaultsProperty2: "value"
-                }
-            });
-            const groupKey = "defaultGroupKey";
-
-            let values;
-
-            beforeEach(() => {
-                values = jsonValues.fromGlobalAndOrganisation(groupKey);
-            });
-
-            it("groups the top-level values under the specified group key", () => {
-                expect(values.raw).to.contain.keys(groupKey);
-                expect(values.raw[groupKey]).to.have.keys("topLevelProperty");
-            });
-
-            it("flatten values in \"defaults\" onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("defaultsProperty1", "defaultsProperty2");
-            });
-        });
         describe("#removeInheritance", () => {
             it("flattens each inherited property into a single value", () => {
                 const jsonValues = new JSONValues({
@@ -86,29 +101,48 @@ define([
                 expect(values.raw.propertyKey).eq("value");
             });
         });
-        describe("#toGlobalAndOrganisation", () => {
-            const jsonValues = new JSONValues({
-                "topLevelProperty1": "value",
-                "topLevelProperty2": "value",
-                "groupKey": {
-                    "groupProperty": "value"
-                }
-            });
-            const groupKey = "groupKey";
-
+        describe("#toJSON", () => {
             let values;
 
             beforeEach(() => {
-                values = jsonValues.toGlobalAndOrganisation(groupKey);
+                values = new JSONValues({
+                    "_id": {},
+                    "_type": {},
+                    "globalValue": {},
+                    "defaults": {
+                        "defaultsValue": {}
+                    },
+                    "dynamic": {
+                        "dynamicValue": {}
+                    }
+                }).toJSON();
             });
 
-            it("groups the top-level values under the \"defaults\" key", () => {
-                expect(values.raw).to.contain.keys("defaults");
-                expect(values.raw["defaults"]).to.have.keys("topLevelProperty1", "topLevelProperty2");
+            it("returns an JSON string", () => {
+                expect(values).to.be.a("string");
+                expect(JSON.parse(values)).to.not.throw;
             });
 
-            it("flatten values in specified group key onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("groupProperty");
+            it("returns global values at the top-level", () => {
+                expect(JSON.parse(values)).to.contain.keys("globalValue");
+            });
+
+            it("returns defaults values under a \"defaults\" property", () => {
+                expect(JSON.parse(values)).to.contain.keys("defaults");
+                expect(JSON.parse(values).defaults).to.have.keys("defaultsValue");
+            });
+
+            it("returns dynamic values under a \"dynamic\" property", () => {
+                expect(JSON.parse(values)).to.contain.keys("dynamic");
+                expect(JSON.parse(values).dynamic).to.have.keys("dynamicValue");
+            });
+
+            it("returns \"_id\" at the top-level", () => {
+                expect(JSON.parse(values)).to.contain.keys("_id");
+            });
+
+            it("returns \"_type\" at the top-level", () => {
+                expect(JSON.parse(values)).to.contain.keys("_type");
             });
         });
     });
