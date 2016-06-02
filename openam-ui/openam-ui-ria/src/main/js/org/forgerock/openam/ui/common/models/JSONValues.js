@@ -17,13 +17,25 @@
  /**
  * Refer to the following naming convention, when adding new functions to this class:
  * <p/>
- * For <strong>query</strong> methods, which do not return new instance of <code>JSONValues</code> class, use
- * <code>get*</code>
- * For <strong>transformation</strong> methods, which do not loose data, use <code>to*</code>\/<code>from*</code>
- * For <strong>modification</strong> methods, which loose the data, use <code>add*</code>\/<code>remove*</code>
- * For methods, which <strong>check the presense</strong>, use <code>has*</code>\/<code>is*</code>
- * For <strong>utility</strong> methods use simple verbs, e.g. <code>omit</code>, <code>pick</code>, etc.
- * @module org/forgerock/openam/ui/common/models/JSONValues
+ * <h2>Function naming conventions</h2>
+ * Refer to the following naming convention, when adding new functions to this class:
+ * <ul>
+ *   <li>For <strong>query</strong> functions, which do not return a new instance of <code>JSONSchema</code>, use <code>#get*</code></li>
+ *   <li>For <strong>transform</strong> functions, which do not loose data, use <code>#to*</code> and <code>#from*</code></li>
+ *   <li>For <strong>modification</strong> functions, which loose the data, use <code>add*</code> and <code>#remove*</code></li>
+ *   <li>For functions, which <strong>check for presense</strong>, use <code>#has*</code> and <code>#is*</code></li>
+ *   <li>For <strong>utility</strong> functions use simple verbs, e.g. <code>#omit</code>, <code>#pick</code>, etc.</li>
+ * </ul>
+ * @module
+ * @example
+ * // The structure of JSON Value documents emitted from OpenAM is expected to be the following:
+ * {
+ *   {
+ *     globalProperty: true, // Global values (OpenAM wide) are listed at the top-level
+ *     default: { ... }, // Default values are organisation (Realm) level values and are nested under "default"
+ *     dynamic: { ... } // Dynamic values are user level values (OpenAM wide) and are nested under "dynamic"
+ *   }
+ * }
  */
 define([
     "lodash"
