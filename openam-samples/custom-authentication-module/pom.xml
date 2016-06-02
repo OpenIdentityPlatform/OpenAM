@@ -27,11 +27,11 @@
 
     <groupId>org.forgerock.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
+    <version>13.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
-        <openam.version>14.0.0-SNAPSHOT</openam.version>
+        <openam.version>13.5.0-SNAPSHOT</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
