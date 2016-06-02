@@ -41,16 +41,29 @@ define([
     function createSelectize (element, callback) {
 
         element.selectize({
-            sortField: "text",
+            searchField: ["text", "value"],
             onChange (value) {
                 const optgroup = this.options[value].optgroup;
                 callback(optgroup, value);
                 this.clear(true);
+            },
+            render: {
+                item (item) {
+                    return `<div>${item.text}</div>`;
+                },
+                option (item) {
+                    return `<div><div>${item.text}</div><span class="text-muted small"><em>${
+                        item.value}</em></span></div></div>`;
+                },
+                optgroup_header (item) { // eslint-disable-line camelcase
+                    return `<div class="optgroup-header"><span class="text-primary">${item.label}</span></div>`;
+                }
             }
         });
 
         return element[0].selectize;
     }
+
 
     function populateOptionsFromJsonSchemaGroup (properties, selectize) {
 
