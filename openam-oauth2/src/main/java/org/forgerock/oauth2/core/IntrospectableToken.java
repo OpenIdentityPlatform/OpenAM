@@ -23,7 +23,7 @@ import java.util.Set;
  *
  * @supported.all.api
  */
-public interface IntrospectableToken {
+public interface IntrospectableToken extends Token {
 
     /**
      * Gets the token's expiry time.

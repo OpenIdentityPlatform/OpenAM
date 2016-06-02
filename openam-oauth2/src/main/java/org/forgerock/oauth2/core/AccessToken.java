@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @supported.all.api
  */
-public interface AccessToken extends IntrospectableToken, Token {
+public interface AccessToken extends IntrospectableToken {
 
     /**
      * Gets the token's nonce.

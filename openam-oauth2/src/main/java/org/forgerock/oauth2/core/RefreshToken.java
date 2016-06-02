@@ -23,25 +23,67 @@ import java.util.Map;
 /**
  * Base type for StatefulRefreshToken and StatelessRefreshToken.
  */
-public interface RefreshToken extends IntrospectableToken, Token {
+public interface RefreshToken extends IntrospectableToken {
 
+    /**
+     * Gets the token's redirect uri.
+     *
+     * @return The token's redirect uri.
+     */
     String getRedirectUri();
 
+    @Override
     String getTokenId();
 
+    /**
+     * Gets the token's claims.
+     *
+     * @return The token's claims.
+     */
     String getClaims();
 
+    /**
+     * Gets the token's Authentication Context Class reference.
+     *
+     * @return The token's Authentication Context Class reference.
+     */
     String getAuthenticationContextClassReference();
 
+    /**
+     * Gets the token's type.
+     *
+     * @return The token's type.
+     */
     String getTokenType();
 
+    /**
+     * Gets the token's Auth Modules.
+     *
+     * @return The token's Auth Modules.
+     */
     String getAuthModules();
 
+    @Override
     Map<String, Object> toMap();
 
+    /**
+     * Gets the token's audit tracking id.
+     *
+     * @return The token's audit tracking id.
+     */
     String getAuditTrackingId();
 
+    /**
+     * Gets the {@link JsonValue} representation of the token.
+     *
+     * @return The {@link JsonValue} representation of the token.
+     */
     JsonValue toJsonValue();
 
+    /**
+     * Gets the token's Auth Grant id.
+     *
+     * @return The token's Auth Grant id.
+     */
     String getAuthGrantId();
 }
