@@ -23,6 +23,7 @@ import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -137,7 +138,7 @@ public final class ServersResourceProvider {
         }
         try {
             SSOToken token = getSsoToken(context);
-            Set<String> serverUrls = getServers(token);
+            Set<String> serverUrls = new TreeSet<>(getServers(token));
 
             for (String serverUrl : serverUrls) {
                 handler.handleResource(getServer(token, serverUrl));
