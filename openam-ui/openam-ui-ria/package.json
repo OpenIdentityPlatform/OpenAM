@@ -3,11 +3,16 @@
   "version": "14.0.0",
   "private": true,
   "scripts": {
-    "predocs": "rimraf docs",
+    "clean:deps": "rimraf rimraf npm-shrinkwrap.json && rimraf node_modules",
+    "clean:docs": "rimraf docs",
+    "predocs": "npm run clean:docs",
     "docs": "jsdoc -P package.json -d docs -r src/main/js",
     "start": "grunt",
     "build:production": "cross-env NODE_ENV=production grunt prod",
-    "test": "grunt karma:dev"
+    "test": "grunt karma:dev",
+    "predeps": "npm run clean:deps",
+    "deps": "ncu -u && mvn clean install",
+    "postdeps": "npm shrinkwrap --dev"
   },
   "devDependencies": {
     "babel-eslint": "6.0.4",
