@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "clean:deps": "rimraf rimraf npm-shrinkwrap.json && rimraf node_modules",
-    "clean:docs": "rimraf docs",
-    "predocs": "npm run clean:docs",
-    "docs": "jsdoc -P package.json -d docs -r src/main/js",
+    "clean:jsdoc": "rimraf jsdoc",
+    "prejsdoc": "npm run clean:jsdoc -s",
+    "jsdoc": "jsdoc --configure config/jsdoc/configuration.json",
     "start": "grunt",
     "build:production": "cross-env NODE_ENV=production grunt prod",
     "test": "grunt karma:dev",
-    "predeps": "npm run clean:deps",
+    "predeps": "npm run clean:deps -s",
     "deps": "ncu -u && mvn clean install",
     "postdeps": "npm shrinkwrap --dev"
   },
