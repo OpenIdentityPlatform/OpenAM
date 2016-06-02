@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -42,12 +41,12 @@ public class UMAAccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
-     * @param requestFactory The factory that provides access to OAuth2Request.
+     * @param providers The OAuth2 audit context providers, responsible for finding details which can be audit
      */
     public UMAAccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory, OAuth2RequestFactory<?, Request> requestFactory,
+            AuditEventFactory auditEventFactory, Set<OAuth2AuditContextProvider> providers,
             RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
-        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, requestFactory, requestDetailCreator,
+        super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, providers, requestDetailCreator,
                 responseDetailCreator);
     }
 
