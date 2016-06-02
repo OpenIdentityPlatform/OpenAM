@@ -232,8 +232,21 @@ public abstract class SmsResourceProvider {
 
     @Action
     public Promise<ActionResponse, ResourceException> template() {
-        //when retrieving the template we don't want to validate the attributes
-        return newActionResponse(converter.toJson(schema.getAttributeDefaults(), false)).asPromise();
+        return newActionResponse(createTemplate()).asPromise();
+    }
+
+    /**
+     * Creates json response with attribute defaults when the service has global or default/realm schema.
+     *
+     * @return json response data; empty json if the service has only dynamic schema
+     */
+    protected JsonValue createTemplate() {
+        if (serviceHasDefaultOrGlobalSchema()) {
+            //when retrieving the template we don't want to validate the attributes
+            return converter.toJson(schema.getAttributeDefaults(), false);
+        }
+        // Dynamic attributes default values will be added to the JSON response in the child class SmsSingletonProvider
+        return json(object());
     }
 
     @Action

@@ -293,6 +293,21 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     }
 
     /**
+     * Enriches the json response received from the super class with dynamic attribute defaults.
+     *
+     * @return json response data
+     */
+    @Override
+    protected final JsonValue createTemplate() {
+        JsonValue result = super.createTemplate();
+        if (dynamicSchema != null) {
+            //when retrieving the template we don't want to validate the attributes
+            result.add("dynamic",  dynamicConverter.toJson(dynamicSchema.getAttributeDefaults(), false).getObject());
+        }
+        return result;
+    }
+
+    /**
      * Gets the referenced {@link ServiceConfig} for the current request.
      * @param serverContext The request context.
      * @param resourceId The name of the config. If this is root Schema config, this will be null. Otherwise, it will
