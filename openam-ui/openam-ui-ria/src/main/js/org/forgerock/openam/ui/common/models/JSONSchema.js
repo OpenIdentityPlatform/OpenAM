@@ -39,13 +39,48 @@
  * }
  */
 define([
+    "i18next",
     "lodash",
     "org/forgerock/openam/ui/common/models/cleanJSONSchema"
-], (_, cleanJSONSchema) => {
+], (i18next, _, cleanJSONSchema) => {
+    function groupTopLevelProperties (raw) {
+        if (_.isEmpty(_.omit(raw.properties, "defaults", "dynamic"))) {
+            return raw;
+        }
+
+        const schema = _.cloneDeep(raw);
+
+        schema.properties = {
+            global: {
+                properties: _.omit(raw.properties, "defaults", "dynamic"),
+                propertyOrder: -10,
+                title: i18next.t("console.common.global"),
+                type: "object"
+            }
+        };
+        if (raw.properties.defaults) {
+            schema.properties.defaults = raw.properties.defaults;
+        }
+        if (raw.properties.dynamic) {
+            schema.properties.dynamic = raw.properties.dynamic;
+        }
+
+        return schema;
+    }
+
     function throwOnNoSchemaRootType (schema) {
         if (!schema.type) {
             throw new Error("[JSONSchema] No \"type\" attribute found on schema root object.");
         }
+    }
+
+    function ungroupProperty (raw, propertyKey) {
+        const schema = _.cloneDeep(raw);
+
+        schema.properties = _.merge(schema.properties, schema.properties[propertyKey]);
+        delete schema.properties[propertyKey];
+
+        return schema;
     }
 
     return class JSONSchema {
@@ -54,38 +89,21 @@ define([
 
             schema = cleanJSONSchema(schema);
 
+            const hasDefaults = _.has(schema, "properties.defaults");
+            const hasDynamic = _.has(schema, "properties.dynamic");
+
+            if (hasDefaults || hasDynamic) {
+                schema = groupTopLevelProperties(schema);
+
+                if (hasDefaults) { schema = ungroupProperty(schema, "defaults"); }
+                if (hasDynamic) { schema = ungroupProperty(schema, "dynamic"); }
+            }
+
             this.raw = Object.freeze(schema);
         }
         addDefaultProperties (keys) {
             const schema = _.cloneDeep(this.raw);
             schema.defaultProperties = keys;
-            return new JSONSchema(schema);
-        }
-        /**
-         * Creates a new JSONSchema object converting from a Global and Organisation properties structure to a flatten
-         * properties structure that can be rendered.
-         *
-         *  The following transformations applied:
-         * * Top-level properties are wrapped into a group (using the title, key and property order specified)
-         * * The "defaults" property is flatten and it's properties applied to the top-level
-         * @param   {string} title                Title for wrapped top-level properties group
-         * @param   {string} key                  Key to use for wrapped top-level properties group
-         * @param   {number|string} propertyOrder Property order for wrapped top-level properties group
-         * @returns {JSONSchema}                  JSONSchema object with transforms applied
-         */
-        fromGlobalAndOrganisation (title, key, propertyOrder) {
-            const schema = _.cloneDeep(this.raw);
-            const group = {
-                properties: _.omit(schema.properties, "defaults"),
-                propertyOrder,
-                title,
-                type: "object"
-            };
-
-            schema.properties = _.merge({
-                [key]: group
-            }, schema.properties.defaults);
-
             return new JSONSchema(schema);
         }
         getEnableKey () {

@@ -39,108 +39,132 @@
  */
 define([
     "lodash"
-], (_) => class JSONValues {
-    constructor (values) {
-        this.raw = Object.freeze(values);
-    }
-    addInheritance (inheritance) {
-        const valuesWithInheritance = _.mapValues(this.raw, (value, key) => ({
-            value,
-            inherited: inheritance[key].inherited
-        }));
+], (_) => {
+    function groupTopLevelValues (raw) {
+        const globalPropertiesToIngore = ["_id", "_type", "defaults", "dynamic"];
 
-        return new JSONValues(valuesWithInheritance);
-    }
-    /**
-     * Adds value for the property.
-     *
-     * @param   {string} path Property key
-     * @param   {string} key Key of the property value object
-     * @param   {string} value Value to be set
-     * @returns {JSONValues} JSONValues object with new value set
-     */
-    addValueForKey (path, key, value) {
-        const clone = _.clone(this.raw);
-        clone[path][key] = value;
-        return new JSONValues(clone);
-    }
-    extend (object) {
-        return new JSONValues(_.extend({}, this.raw, object));
-    }
-    /**
-     * Creates a new JSONValues object converting from a Global and Organisation values structure to a flatten
-     * values structure that can be rendered.
-     *
-     *  The following transformations applied:
-     * * Top-level values are wrapped into a group (using the groupKey specified)
-     * * The "defaults" property is flatten and it's values applied to the top-level
-     * @param   {string} groupKey Key to use for wrapped top-level values group
-     * @returns {JSONValues}      JSONValues object with transforms applied
-     */
-    fromGlobalAndOrganisation (groupKey) {
-        const values = _.transform(this.raw, (result, value, key) => {
-            if (key === "defaults") {
-                _.merge(result, value);
-            } else if (_.startsWith(key, "_")) {
-                result[key] = value;
-            } else {
-                result[groupKey][key] = value;
-            }
-        }, { [groupKey]: {} });
-
-        return new JSONValues(values);
-    }
-    getEmptyValueKeys () {
-        function isEmpty (value) {
-            if (_.isNumber(value)) {
-                return false;
-            } else if (_.isBoolean(value)) {
-                return false;
-            }
-
-            return _.isEmpty(value);
+        if (_.isEmpty(_.omit(raw, ...globalPropertiesToIngore))) {
+            return raw;
         }
 
-        const keys = [];
+        const values = {
+            _id: raw._id,
+            _type: raw._type,
+            global: _.omit(raw, ...globalPropertiesToIngore)
+        };
+        if (raw.defaults) {
+            values.defaults = raw.defaults;
+        }
+        if (raw.dynamic) {
+            values.dynamic = raw.dynamic;
+        }
 
-        _.forIn(this.raw, (value, key) => {
-            if (isEmpty(value)) {
-                keys.push(key);
+        return values;
+    }
+
+    function ungroupValue (raw, propertyKey) {
+        const values = _.merge(raw, raw[propertyKey]);
+        values[`_${propertyKey}Properties`] = _.keys(raw[propertyKey]);
+        delete values[propertyKey];
+
+        return values;
+    }
+
+    return class JSONValues {
+        constructor (values) {
+            const hasDefaults = _.has(values, "defaults");
+            const hasDynamic = _.has(values, "dynamic");
+
+            if (hasDefaults || hasDynamic) {
+                values = groupTopLevelValues(values);
+
+                if (hasDefaults) { values = ungroupValue(values, "defaults"); }
+                if (hasDynamic) { values = ungroupValue(values, "dynamic"); }
             }
-        });
 
-        return keys;
-    }
-    omit (predicate) {
-        return new JSONValues(_.omit(this.raw, predicate));
-    }
-    pick (predicate) {
-        return new JSONValues(_.pick(this.raw, predicate));
-    }
-    removeInheritance () {
-        return new JSONValues(_.mapValues(this.raw, "value"));
-    }
-    /**
-     * Creates a new JSONValues object converting from a flatten values structure to a Global and Organisation values
-     * structure that can be transmitted to the server.
-     *
-     *  The following transformations applied:
-     * * Top-level values are wrapped into a "defaults" group
-     * * Values under the specifed group key are flatten and applied to the top-level
-     * @param   {string} groupKey Key of the group to flatten onto the top-level
-     * @returns {JSONValues}      JSONValues object with transforms applied
-     */
-    toGlobalAndOrganisation (groupKey) {
-        const values = _.transform(this.raw, (result, value, key) => {
-            if (key === groupKey) {
-                _.merge(result, value);
-            } else if (_.startsWith(key, "_")) {
-                result[key] = value;
-            } else {
-                result["defaults"][key] = value;
+            this.raw = Object.freeze(values);
+        }
+        addInheritance (inheritance) {
+            const valuesWithInheritance = _.mapValues(this.raw, (value, key) => ({
+                value,
+                inherited: inheritance[key].inherited
+            }));
+
+            return new JSONValues(valuesWithInheritance);
+        }
+        /**
+         * Adds value for the property.
+         *
+         * @param   {string} path Property key
+         * @param   {string} key Key of the property value object
+         * @param   {string} value Value to be set
+         * @returns {JSONValues} JSONValues object with new value set
+         */
+        addValueForKey (path, key, value) {
+            const clone = _.clone(this.raw);
+            clone[path][key] = value;
+            return new JSONValues(clone);
+        }
+        extend (object) {
+            return new JSONValues(_.extend({}, this.raw, object));
+        }
+        getEmptyValueKeys () {
+            function isEmpty (value) {
+                if (_.isNumber(value)) {
+                    return false;
+                } else if (_.isBoolean(value)) {
+                    return false;
+                }
+
+                return _.isEmpty(value);
             }
-        }, { defaults: {} });
 
-        return new JSONValues(values);
-    }
+            const keys = [];
+
+            _.forIn(this.raw, (value, key) => {
+                if (isEmpty(value)) {
+                    keys.push(key);
+                }
+            });
+
+            return keys;
+        }
+        omit (predicate) {
+            return new JSONValues(_.omit(this.raw, predicate));
+        }
+        pick (predicate) {
+            return new JSONValues(_.pick(this.raw, predicate));
+        }
+        removeInheritance () {
+            return new JSONValues(_.mapValues(this.raw, "value"));
+        }
+        toJSON () {
+            let json = _.clone(this.raw);
+
+            if (json._defaultsProperties) {
+                json.defaults = {};
+
+                _.each(this.raw._defaultsProperties, (property) => {
+                    json.defaults[property] = json[property];
+                    delete json[property];
+                });
+                delete json._defaultsProperties;
+            }
+
+            if (json._dynamicProperties) {
+                json.dynamic = {};
+
+                _.each(this.raw._dynamicProperties, (property) => {
+                    json.dynamic[property] = json[property];
+                    delete json[property];
+                });
+                delete json._dynamicProperties;
+            }
+
+            json = _.merge(json, json.global);
+            delete json.global;
+
+            return JSON.stringify(json);
+        }
+    };
 });

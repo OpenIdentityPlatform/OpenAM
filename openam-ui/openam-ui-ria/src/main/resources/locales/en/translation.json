@@ -732,7 +732,7 @@
             "confirmDeleteSelected": "Are you sure that you want to delete these items?",
             "configuration": "Configuration",
             "secondaryConfigurations": "Secondary Configurations",
-            "globalAttributes": "Global Attributes"
+            "global": "Global"
         },
         "sites" : {
             "common" : {
