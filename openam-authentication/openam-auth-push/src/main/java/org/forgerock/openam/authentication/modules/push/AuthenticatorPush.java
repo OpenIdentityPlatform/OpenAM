@@ -212,6 +212,8 @@ public class AuthenticatorPush extends AbstractPushModule {
             Jwt signedJwt = new JwtReconstruction().reconstructJwt(
                     messagePromise.getPromise().get().get(JWT).asString(),  Jwt.class);
             Boolean deny = (Boolean) signedJwt.getClaimsSet().getClaim(PushNotificationConstants.DENY_LOCATION);
+            coreTokenService.deleteAsync(messageId);
+            
             if (deny != null && deny) { //denied
                 throw failedAsLoginException();
             } else {
@@ -230,7 +232,7 @@ public class AuthenticatorPush extends AbstractPushModule {
             Boolean ctsValue = checkCTS(messageId);
             if (ctsValue != null) {
                 messageDispatcher.forget(messageId);
-                coreTokenService.delete(messageId);
+                coreTokenService.deleteAsync(messageId);
 
                 if (ctsValue) {
                     storeUsername(username);
