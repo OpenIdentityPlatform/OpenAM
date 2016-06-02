@@ -19,8 +19,9 @@ define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], ($, _, AbstractView, ModuleLoader, URIUtils) => {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/util/es6/normaliseModule"
+], ($, _, AbstractView, ModuleLoader, URIUtils, normaliseModule) => {
     const TreeNavigation = AbstractView.extend({
         template: "templates/admin/views/common/navigation/TreeNavigationTemplate.html",
         partials: [
@@ -79,10 +80,8 @@ define([
             });
         },
         renderPage (Module, args, callback) {
-            // For ES6 modules, we require that the view is the default export.
-            if (Module.__esModule) {
-                Module = Module.default;
-            }
+            Module = normaliseModule.default(Module);
+
             const page = new Module();
             this.nextRenderPage = false;
             page.element = "#sidePageContent";
