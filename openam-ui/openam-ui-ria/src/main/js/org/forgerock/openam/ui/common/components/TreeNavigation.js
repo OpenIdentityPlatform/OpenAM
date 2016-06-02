@@ -79,6 +79,10 @@ define([
             });
         },
         renderPage (Module, args, callback) {
+            // For ES6 modules, we require that the view is the default export.
+            if (Module.__esModule) {
+                Module = Module.default;
+            }
             const page = new Module();
             this.nextRenderPage = false;
             page.element = "#sidePageContent";
