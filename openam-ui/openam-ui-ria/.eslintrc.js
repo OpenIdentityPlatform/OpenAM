@@ -41,7 +41,9 @@ module.exports = {
             "VariableDeclarator": 1
         }],
         "keyword-spacing": 2,
-        "max-len": [2, 120, 4],
+        "max-len": [2, 120, 4, {
+            "ignoreComments": true
+        }],
         "new-cap": [2, {
             "capIsNew": false
         }],
