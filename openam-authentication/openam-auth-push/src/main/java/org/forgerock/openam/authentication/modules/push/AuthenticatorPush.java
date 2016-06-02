@@ -78,7 +78,6 @@ public class AuthenticatorPush extends AbstractPushModule {
     private String username;
     private Principal principal;
     private String lbCookieValue;
-    private String lbCookieName;
     private long timeout;
     private String messageId;
     private MessagePromise messagePromise;
@@ -106,8 +105,6 @@ public class AuthenticatorPush extends AbstractPushModule {
         } catch (SessionException e) {
             DEBUG.warning("AuthenticatorPush :: init() : Unable to determine loadbalancer bookie value", e);
         }
-
-        lbCookieName = sessionCookies.getLBCookieName();
 
         pollingWaitAssistant = new PollingWaitAssistant(timeout, 10000, 8000, 15000);
 
@@ -305,8 +302,7 @@ public class AuthenticatorPush extends AbstractPushModule {
 
         JwtClaimsSetBuilder jwtClaimsSetBuilder = new JwtClaimsSetBuilder()
                 .claim(Constants.MECHANISM_ID_KEY, mechanismId)
-                .claim(LOADBALANCER_KEY,
-                        Base64.encode((lbCookieName + "=" + lbCookieValue).getBytes()))
+                .claim(LOADBALANCER_KEY, Base64.encode((lbCookieValue).getBytes()))
                 .claim(CHALLENGE_KEY, challenge)
                 .claim(TIME_TO_LIVE_KEY, String.valueOf(timeout / 1000));
 

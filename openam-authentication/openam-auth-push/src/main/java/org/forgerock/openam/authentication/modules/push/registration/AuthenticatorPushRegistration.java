@@ -102,7 +102,6 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
     private String imgUrl;
 
     private String lbCookieValue;
-    private String lbCookieName;
 
     @Override
     public void init(final Subject subject, final Map sharedState, final Map options) {
@@ -134,7 +133,6 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
                     AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, e);
         }
 
-        lbCookieName = sessionCookies.getLBCookieName();
         amIdentityPrincipal = establishPreauthenticatedUser(sharedState);
         pollingWaitAssistant = setUpPollingWaitCallbackAssistant(timeout);
 
@@ -313,8 +311,8 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
                     .withUriPort(id.getName())
                     .withCallbackIndex(callbackIndex)
                     .addUriQueryComponent(LOADBALANCER_DATA_QR_CODE_KEY,
-                            Base64url.encode((lbCookieValue + "=" + lbCookieName).getBytes()))
-                    .addUriQueryComponent(ISSUER_QR_CODE_KEY, issuer)
+                            Base64url.encode((lbCookieValue).getBytes()))
+                    .addUriQueryComponent(ISSUER_QR_CODE_KEY, Base64url.encode(issuer.getBytes()))
                     .addUriQueryComponent(MESSAGE_ID_QR_CODE_KEY, messageId)
                     .addUriQueryComponent(SHARED_SECRET_QR_CODE_KEY,
                             Base64url.encode(Base64.decode(deviceProfile.getSharedSecret())))
