@@ -1,6 +1,6 @@
 {
   "name": "openam-ui-ria",
-  "version": "14.0.0",
+  "version": "13.5.0",
   "private": true,
   "scripts": {
     "clean:deps": "rimraf rimraf npm-shrinkwrap.json && rimraf node_modules",
