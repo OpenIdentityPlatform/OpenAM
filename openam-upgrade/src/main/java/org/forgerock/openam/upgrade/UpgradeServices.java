@@ -28,18 +28,7 @@
 package org.forgerock.openam.upgrade;
 
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
-import static org.forgerock.openam.utils.Time.newDate;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.AMEncryption;
@@ -54,10 +43,22 @@ import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.license.License;
 import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.setup.ZipUtils;
 import org.forgerock.openam.upgrade.steps.UpgradeStep;
 
 /**
@@ -84,14 +85,11 @@ public class UpgradeServices {
     private final SimpleDateFormat dateFormat;
     private final String createdDate;
     private final String existingVersion = VersionUtils.getCurrentVersion();
-    private final EmbeddedOpenDJBackupManager openDJBackupManager;
     private boolean rebuildIndexes = false;
 
     private UpgradeServices() throws UpgradeException {
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
         createdDate = dateFormat.format(newDate());
-        this.openDJBackupManager = new EmbeddedOpenDJBackupManager(debug, new ZipUtils(debug),
-                SystemProperties.get(SystemProperties.CONFIG_PATH));
         for (String className : UpgradeUtils.getPropertyValues("upgradesteps", "upgrade.step.order")) {
             try {
                 UpgradeStep step = getUpgradeStep(className);
@@ -141,8 +139,7 @@ public class UpgradeServices {
             throw new UpgradeException("License terms have not been accepted");
         }
 
-        openDJBackupManager.createBackupDirectories();
-
+        UpgradeDirectoryUtils.createUpgradeDirectories(SystemProperties.get(SystemProperties.CONFIG_PATH));
         if (debug.messageEnabled()) {
             debug.message("Upgrade startup.");
         }
