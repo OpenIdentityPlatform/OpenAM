@@ -389,6 +389,9 @@ Copyright: Copyright 2004-2015 The Apache Software Foundation
 Version: joda-time-2.7.jar
 Copyright 2001-2016 Stephen Colebourne
 
+Version: jcip-annotations-1.0-1.jar
+Copyright: Copyright 2013 Stephen Connolly.
+
 ==================
 Full license text:
 ==================
@@ -946,6 +949,9 @@ Copyright: Copyright 2004-2007 QOS.ch
 Version: log4j-over-slf4j-1.7.5.jar
 Copyright: Copyright 2004-2013 QOS.ch
 
+Version: jul-to-slf4j-1.7.12.jar
+Copyright: Copyright 2004-2015 QOS.ch
+
 Version: text.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
@@ -1236,17 +1242,14 @@ Copyright:
 Version: cc_zh_TW-2008-08-08.jar
 Copyright:
 
-Version: grizzly-framework-2.3.23.jar
-Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+Version: grizzly-framework-2.3.24.jar
+Copyright: Copyright (c) 2007-2016 Oracle and/or its affiliates. All rights reserved.
 
-Version: grizzly-http-2.3.23.jar
-Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+Version: grizzly-http-2.3.24.jar
+Copyright: Copyright (c) 2007-2016 Oracle and/or its affiliates. All rights reserved.
 
-Version: grizzly-http-server-2.3.23.jar
-Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
-
-Version: grizzly-http-servlet-2.3.23.jar
-Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
+Version: grizzly-http-server-2.3.24.jar
+Copyright: Copyright (c) 2007-2016 Oracle and/or its affiliates. All rights reserved.
 
 Version: jaxb-impl-1.0.6.jar
 Copyright:
