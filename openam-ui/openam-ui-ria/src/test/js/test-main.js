@@ -50,8 +50,13 @@
         }
     });
 
-    require(["chai", "sinon-chai"].concat(allTestFiles), function (chai, chaiSinon) {
+    require(["chai", "i18next", "sinon-chai"].concat(allTestFiles), function (chai, i18next, chaiSinon) {
         chai.use(chaiSinon);
+
+        i18next.init({
+            resGetPath: require.toUrl("locales/__lng__/__ns__.json")
+        });
+
         window.expect = chai.expect;
         window.__karma__.start();
     });

@@ -42,10 +42,9 @@ define([
                 expect(schema.raw.properties.global.properties).to.have.keys("globalProperty");
             });
 
-            // FIXME: Results of calling i18#t are always empty string
-            // it("groups the top-level properties with title", () => {
-            //     expect(schema.raw.properties.global.title).eq("Global");
-            // });
+            it("groups the top-level properties with title", () => {
+                expect(schema.raw.properties.global.title).eq("Global");
+            });
 
             it("groups the top-level properties with property order", () => {
                 expect(schema.raw.properties.global.propertyOrder).eq(-10);
