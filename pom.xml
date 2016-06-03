@@ -526,14 +526,14 @@
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
         <repository>
-            <id>maven.forgerock.org</id>
+            <id>forgerock-private-releases</id>
             <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
+            <url>http://maven.forgerock.org/repo/private-releases</url>
         </repository>
         <snapshotRepository>
-            <id>maven.forgerock.org</id>
+            <id>forgerock-private-snapshots</id>
             <name>maven.forgerock.org-snapshots</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <url>http://maven.forgerock.org/repo/private-snapshots</url>
         </snapshotRepository>
         <site>
             <id>forgerock.org</id>
