@@ -121,6 +121,13 @@ public class TokenResource implements CollectionResourceProvider {
     public static final CoreTokenField REALM_FIELD = OAuthTokenField.REALM.getField();
     public static final String INDEFINITELY = "Indefinitely";
     public static final String INDEFINITE_TOKEN_STRING_PROPERTY_NAME = "indefiniteTokenString";
+    private static final String[] RESOURCE_OWNER_HIDDEN_FIELDS = new String[] {
+            OAuth2Constants.CoreTokenParams.ID,
+            OAuth2Constants.CoreTokenParams.PARENT,
+            OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID,
+            OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID,
+            OAuth2Constants.CoreTokenParams.REFRESH_TOKEN,
+    };
     private final ClientDAO clientDao;
 
     private final OAuthTokenStore tokenStore;
@@ -150,6 +157,49 @@ public class TokenResource implements CollectionResourceProvider {
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.authServiceSettings = authServiceSettings;
         this.debug = debug;
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context,
+            CreateRequest createRequest) {
+        return RestUtils.generateUnsupportedOperation();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
+            ReadRequest request) {
+        return readToken(context, resourceId);
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> deleteInstance(final Context context, final String resourceId,
+            DeleteRequest request) {
+        return readToken(context, resourceId)
+                .thenAsync(new AsyncFunction<ResourceResponse, ResourceResponse, ResourceException>() {
+                    @Override
+                    public Promise<ResourceResponse, ResourceException> apply(final ResourceResponse resourceResponse)
+                            throws ResourceException {
+                        return deleteToken(context, resourceId, false)
+                                .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
+                                    @Override
+                                    public Promise<ResourceResponse, ResourceException> apply(Void value) {
+                                        return newResultPromise(resourceResponse);
+                                    }
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
@@ -183,16 +233,10 @@ public class TokenResource implements CollectionResourceProvider {
         } else {
             if (debug.errorEnabled()) {
                 debug.error("TokenResource :: ACTION : Unsupported action request performed, " + actionId + " on " +
-                    resourceId);
+                        resourceId);
             }
             return RestUtils.generateUnsupportedOperation();
         }
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context,
-            CreateRequest createRequest) {
-        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -356,24 +400,6 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
-            DeleteRequest request) {
-        return deleteToken(context, resourceId, false)
-                .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
-                    @Override
-                    public Promise<ResourceResponse, ResourceException> apply(Void value) {
-                        return newResultPromise(newResourceResponse(resourceId, "1", json(object(field("success", "true")))));
-                    }
-                });
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest queryRequest,
             QueryResourceHandler handler) {
         try {
@@ -425,7 +451,7 @@ public class TokenResource implements CollectionResourceProvider {
                 return new BadRequestException("userName field MUST NOT be set in _queryId").asPromise();
             }
             response = tokenStore.query(QueryFilter.and(query));
-            return handleResponse(handler, response, context);
+            return handleResponse(handler, response, context, uid);
 
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the client is not authorized.", e);
@@ -451,20 +477,19 @@ public class TokenResource implements CollectionResourceProvider {
         throw new IllegalArgumentException("I don't understand the OAuth 2.0 field called " + fieldname);
     }
 
-    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response, Context context) throws UnauthorizedClientException,
-            CoreTokenException, InternalServerErrorException, NotFoundException {
+    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response,
+            Context context, AMIdentity uid)
+            throws UnauthorizedClientException, CoreTokenException, InternalServerErrorException, NotFoundException {
         ResourceResponse resource = newResourceResponse("result", "1", response);
         JsonValue value = resource.getContent();
         String acceptLanguage = context.asContext(HttpContext.class).getHeaderAsString("accept-language");
         Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) value.getObject();
 
-        ResourceResponse res;
         JsonValue val;
 
         if (list != null && !list.isEmpty()) {
             for (HashMap<String, Set<String>> entry : list) {
                 val = new JsonValue(entry);
-                res = newResourceResponse("result", "1", val);
                 Client client = getClient(val);
 
                 val.put(EXPIRE_TIME_KEY, getExpiryDate(json(entry), context));
@@ -472,7 +497,7 @@ public class TokenResource implements CollectionResourceProvider {
                 val.put(OAuth2Constants.ShortClientAttributeNames.SCOPES.getType(), getScopes(client, val,
                         acceptLanguage));
 
-                handler.handleResource(res);
+                handler.handleResource(resource(val, uid));
             }
         }
         return newResultPromise(newQueryResponse());
@@ -608,15 +633,11 @@ public class TokenResource implements CollectionResourceProvider {
                         DateFormat.SHORT, getLocale(context));
     }
 
-    @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
-            ReadRequest request) {
-
+    private Promise<ResourceResponse, ResourceException> readToken(Context context, String resourceId) {
         try {
             AMIdentity uid = getUid(context);
 
             JsonValue response;
-            ResourceResponse resource;
             try {
                 response = tokenStore.read(resourceId);
             } catch (CoreTokenException e) {
@@ -648,9 +669,7 @@ public class TokenResource implements CollectionResourceProvider {
             String grantType = getAttributeValue(response, GRANT_TYPE);
 
             if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
-                resource =
-                        newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(currentTimeMillis()), response);
-                return newResultPromise(resource);
+                return newResultPromise(resource(response, uid));
             } else {
                 String realm = getAttributeValue(response, REALM);
 
@@ -663,9 +682,7 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(adminUserId) || uid.equals(uid2)) {
-                    resource =
-                            newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(currentTimeMillis()), response);
-                    return newResultPromise(resource);
+                    return newResultPromise(resource(response, uid));
                 } else {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: READ : Only the resource owner or an administrator may perform "
@@ -690,10 +707,16 @@ public class TokenResource implements CollectionResourceProvider {
         }
     }
 
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
-            UpdateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
+    private ResourceResponse resource(JsonValue response, AMIdentity uid) {
+        String tokenId = response.get(OAuth2Constants.CoreTokenParams.ID).asList(String.class).get(0);
+        if (!adminUserId.equals(uid)) {
+            tokenId = null;
+            for (String field : RESOURCE_OWNER_HIDDEN_FIELDS) {
+                response.remove(field);
+            }
+        }
+        return newResourceResponse(tokenId, String.valueOf(response.getObject().hashCode()),
+                response);
     }
 
     /**
