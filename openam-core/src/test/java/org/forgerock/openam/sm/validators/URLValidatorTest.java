@@ -24,9 +24,10 @@ import org.testng.annotations.Test;
 
 public class URLValidatorTest {
 
-    @DataProvider(name = "urlValdiatorData")
-    private Object[][] urlValdiatorData() {
+    @DataProvider(name = "urlValidatorData")
+    private Object[][] urlValidatorData() {
         return new Object[][]{
+                {"", true},
                 {"http://www.forgerock.org", true},
                 {"Invalid URL", false},
                 {"/folder", false},
@@ -36,7 +37,7 @@ public class URLValidatorTest {
         };
     }
 
-    @Test(dataProvider = "urlValdiatorData")
+    @Test(dataProvider = "urlValidatorData")
     public void shouldValidateURLs(String underTest, boolean expected) {
         //given
         URLValidator validator = new URLValidator();
@@ -46,6 +47,18 @@ public class URLValidatorTest {
 
         //then
         assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void validateEmpty() {
+        //given
+        URLValidator validator = new URLValidator();
+
+        //when
+        boolean result = validator.validate(Collections.<String>emptySet());
+
+        //then
+        assertThat(true).isEqualTo(result);
     }
 
 }

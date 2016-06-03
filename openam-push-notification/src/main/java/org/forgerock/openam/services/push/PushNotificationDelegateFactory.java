@@ -15,6 +15,8 @@
 */
 package org.forgerock.openam.services.push;
 
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+
 /**
  * Defines how PushNotificationDelegates should be created. This acts as a plugin point for
  * customers to ensure they can configure their own PushNotificationDelegates if desired.
@@ -28,10 +30,12 @@ public interface PushNotificationDelegateFactory {
      * as soon as the delegate has been produced.
      * @param config The config that will be used to configure the PushNotificationService.
      * @param realm The realm in which this delegate will exist.
+     * @param messageDispatcher The message dispatcher for this delegate.
      * @return A valid PushNotificationService, ready to send (and receive if appropriate) messages.
      * @throws PushNotificationException in the case where we cannot generate an appropriate delegate.
      */
-    PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
+    PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm,
+                                                MessageDispatcher messageDispatcher)
             throws PushNotificationException;
 
 }

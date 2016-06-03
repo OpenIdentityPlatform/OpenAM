@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcherFactory;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 
 /**
@@ -70,6 +72,8 @@ public class PushNotificationService {
 
     private final PushNotificationDelegateUpdater delegateUpdater;
 
+    private final MessageDispatcherFactory messageDispatcherFactory;
+
     /**
      * Constructor (called by Guice), registers a listener for this class against all
      * PushNotificationService changes in a realm.
@@ -77,17 +81,20 @@ public class PushNotificationService {
      * @param pushRealmMap Map holding all delegates mapped to the realm in which they belong.
      * @param pushFactoryMap Map holding all factories registered during the lifetime of this service.
      * @param configHelperFactory Produces config helpers for the appropriate realms.
+     * @param messageDispatcherFactory Produces MessageDispatchers according to the configured options.
      */
     @Inject
     public PushNotificationService(@Named("frPush") Debug debug,
                                    ConcurrentMap<String, PushNotificationDelegate> pushRealmMap,
                                    ConcurrentMap<String, PushNotificationDelegateFactory> pushFactoryMap,
-                                   PushNotificationServiceConfigHelperFactory configHelperFactory) {
+                                   PushNotificationServiceConfigHelperFactory configHelperFactory,
+                                   MessageDispatcherFactory messageDispatcherFactory) {
         this.debug = debug;
-        this.pushRealmMap = new ConcurrentHashMap<>(pushRealmMap); //just in case
+        this.pushRealmMap = new ConcurrentHashMap<>(pushRealmMap);
         this.pushFactoryMap = new ConcurrentHashMap<>(pushFactoryMap);
         this.delegateUpdater = new PushNotificationDelegateUpdater();
         this.configHelperFactory = configHelperFactory;
+        this.messageDispatcherFactory = messageDispatcherFactory;
     }
 
     /**
@@ -153,6 +160,21 @@ public class PushNotificationService {
     }
 
     /**
+     * Retrieve the MessageDispatcher message return-route object for this realm's delegate.
+     *
+     * @param realm The realm whose delegate's MessageDispatcher to return.
+     * @return The MessageDispatcher belonging to the delegate associated with the realm requested.
+     * @throws PushNotificationException If there was no delegate configured for the given realm.
+     */
+    public MessageDispatcher getMessageDispatcher(String realm) throws PushNotificationException {
+        if (pushRealmMap.containsKey(realm)) {
+            return pushRealmMap.get(realm).getMessageDispatcher();
+        }
+
+        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
+    }
+
+    /**
      * Returns the relative location of the authentication service endpoint in this realm.
      * @param realm The realm of the service to check.
      * @return The relative location of the service.
@@ -181,7 +203,7 @@ public class PushNotificationService {
         validateFactoryExists(factoryClass);
         PushNotificationServiceConfig config = configHelper.getConfig();
         PushNotificationDelegate pushNotificationDelegate = pushFactoryMap.get(factoryClass)
-                .produceDelegateFor(config, realm);
+                .produceDelegateFor(config, realm, buildDispatcher(configHelper));
 
         if (pushNotificationDelegate == null) {
             throw new PushNotificationException("PushNotificationFactory produced a null delegate. Aborting update.");
@@ -189,6 +211,15 @@ public class PushNotificationService {
 
         delegateUpdater.replaceDelegate(realm, pushNotificationDelegate, config);
         init(realm);
+    }
+
+    private MessageDispatcher buildDispatcher(PushNotificationServiceConfigHelper configHelper)
+            throws PushNotificationException {
+        long maxSize = configHelper.getConfig().getMessageDispatcherSize();
+        int concurrency = configHelper.getConfig().getMessageDispatcherConcurrency();
+        long duration = configHelper.getConfig().getMessageDispatcherDuration();
+
+        return messageDispatcherFactory.build(maxSize, concurrency, duration, debug);
     }
 
     private void deleteService(String realm) throws PushNotificationException {

@@ -18,6 +18,7 @@ package org.forgerock.openam.services.push;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 
 /**
@@ -25,15 +26,23 @@ import com.sun.identity.sm.ServiceConfig;
  */
 public class PushNotificationServiceConfigHelper {
 
+    private final static long DEFAULT_SIZE = 10000L;
+    private final static long DEFAULT_DURATION = 120L;
+    private final static int DEFAULT_CONCURRENCY = 16;
+
     private ServiceConfig serviceConfig;
+
+    private final Debug debug;
 
     /**
      * Produce a new PushNotificationServiceConfigHelper for the provided ServiceConfig.
      *
      * @param serviceConfig The realm-specific service config to read.
+     * @param debug The debug writer, in case of errors reading the config.
      */
-    public PushNotificationServiceConfigHelper(ServiceConfig serviceConfig) {
+    public PushNotificationServiceConfigHelper(ServiceConfig serviceConfig, Debug debug) {
         this.serviceConfig = serviceConfig;
+        this.debug = debug;
     }
 
     /**
@@ -59,6 +68,13 @@ public class PushNotificationServiceConfigHelper {
         String delegateFactory = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_FACTORY_CLASS);
         String region = CollectionHelper.getMapAttr(serviceConfig.getAttributes(), DELEGATE_REGION);
 
+        long maxSize = CollectionHelper.getLongMapAttr(serviceConfig.getAttributes(), MESSAGE_DISPATCHER_CACHE_SIZE,
+                DEFAULT_SIZE, debug);
+        long duration = CollectionHelper.getLongMapAttr(serviceConfig.getAttributes(), MESSAGE_DISPATCHER_DURATION,
+                DEFAULT_DURATION, debug);
+        int concurrency = CollectionHelper.getIntMapAttr(serviceConfig.getAttributes(), MESSAGE_DISPATCHER_CONCURRENCY,
+                DEFAULT_CONCURRENCY, debug);
+
         return new PushNotificationServiceConfig.Builder()
                 .withAccessKey(accessKey)
                 .withSecret(secret)
@@ -66,6 +82,9 @@ public class PushNotificationServiceConfigHelper {
                 .withGoogleEndpoint(googleEndpoint)
                 .withDelegateFactory(delegateFactory)
                 .withRegion(region)
+                .withMessageDispatcherSize(maxSize)
+                .withMessageDispatcherDuration(duration)
+                .withMessageDispatcherConcurrency(concurrency)
                 .build();
     }
 

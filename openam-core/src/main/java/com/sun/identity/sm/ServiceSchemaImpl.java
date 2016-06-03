@@ -330,7 +330,7 @@ class ServiceSchemaImpl {
             }
             if (!attrName.equalsIgnoreCase(SMSUtils.COSPRIORITY)) {
                 Set vals = (Set) attributeSet.get(attrName);
-                validateAttrValues(ssoToken, attrName, vals, 
+                validateAttrValues(ssoToken, attrName, vals,
                     encodePassword, orgName);
             }
         }
@@ -471,7 +471,25 @@ class ServiceSchemaImpl {
         subSchemas = newSubSchemas;
         valid = true;
     }
-    
+
+    /**
+     * Default and Example values merged together. Default takes priority over Example.
+     */
+    public Map<String, Set<String>> groupDefaultExampleAttrs() {
+        Map<String, Set<String>> attributeDefaults = getAttributeDefaults();
+
+        for (Map.Entry<String, Set<String>> entry :
+                (Set<Map.Entry<String, Set<String>>>) getAttributeExamples().entrySet()) {
+
+            if (attributeDefaults.get(entry.getKey()) == null || ((Set) attributeDefaults.get(entry.getKey())).isEmpty()
+                    && !entry.getValue().isEmpty()) {
+                attributeDefaults.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return attributeDefaults;
+    }
+
     synchronized void clear() {
         // org attr-schema
         if (orgAttrSchema != null) {
@@ -588,11 +606,9 @@ class ServiceSchemaImpl {
      *         registered to the attribute; false otherwise
      * @throws SMSException
      *             error during instantiating the Java class
-     * @throws InvalidAttributeNameException
-     *             the attribute does not appear in the schema
      */
     boolean validatePlugin(SSOToken token, String attrName, Set values
-    ) throws SMSException, InvalidAttributeNameException {
+    ) throws SMSException {
 
         AttributeSchemaImpl as = getAttributeSchema(attrName);
         if (as == null) {
@@ -608,22 +624,31 @@ class ServiceSchemaImpl {
             return true;
         }
 
-        AttributeSchemaImpl validatorAttrSchema = 
-           getAttributeSchema(validatorName);
-        if (validatorAttrSchema != null) {
-            boolean isServerMode = SystemProperties.isServerMode();
-            Set javaClasses = validatorAttrSchema.getDefaultValues();
-            for (Iterator it = javaClasses.iterator(); it.hasNext();) {
-                String javaClass = (String) it.next();
-                try {
-                    serverEndAttrValidation(as, attrName, values, javaClass);
-                } catch (SMSException e) {
-                    if (!isServerMode) {
-                        clientEndAttrValidation(
-                            token, as, attrName, values, javaClass);
+        //if we are a pointer to the empty set and required, and we have an example value rather than a default one
+        //use that example value for now. Once submitted that empty set should be a new empty set not equal to the
+        //EMPTY_SET - see ServiceConfig#getAttributes
+        if (values == Collections.EMPTY_SET && !as.getExampleValues().isEmpty()) {
+            values = as.getExampleValues();
+        }
 
-                    } else {
-                        throw e;
+        String[] validators = validatorName.split(" ");
+        for (String validator : validators) {
+
+            AttributeSchemaImpl validatorAttrSchema = getAttributeSchema(validator);
+            if (validatorAttrSchema != null) {
+                boolean isServerMode = SystemProperties.isServerMode();
+                Set javaClasses = validatorAttrSchema.getDefaultValues();
+
+                for (Object jClass : javaClasses) {
+                    String javaClass = (String) jClass;
+                    try {
+                        serverEndAttrValidation(as, attrName, values, javaClass);
+                    } catch (SMSException e) {
+                        if (!isServerMode) {
+                            clientEndAttrValidation(token, as, attrName, values, javaClass);
+                        } else {
+                            throw e;
+                        }
                     }
                 }
             }

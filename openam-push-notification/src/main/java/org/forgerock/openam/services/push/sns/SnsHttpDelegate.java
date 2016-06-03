@@ -29,6 +29,7 @@ import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.services.push.PushNotificationDelegate;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.services.routing.RouteMatcher;
 
@@ -46,6 +47,7 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
     private final SnsMessageResource messageEndpoint;
     private final SnsPushMessageConverter pushMessageConverter;
     private final String realm;
+    private final MessageDispatcher messageDispatcher;
 
     private PushNotificationServiceConfig config;
 
@@ -59,16 +61,18 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
      * @param messageEndpoint the endpoint to attach to the router upon initialisation.
      * @param pushMessageConverter a message converter, to ensure the message sent is of the correct format.
      * @param realm the realm in which this delegate exists.
+     * @param messageDispatcher the MessageDispatcher used to redirect incoming messages to their caller.
      */
     public SnsHttpDelegate(AmazonSNSClient client, PushNotificationServiceConfig config, Router router,
                            SnsMessageResource messageEndpoint, SnsPushMessageConverter pushMessageConverter,
-                           String realm) {
+                           String realm, MessageDispatcher messageDispatcher) {
         this.client = client;
         this.config = config;
         this.router = router;
         this.messageEndpoint = messageEndpoint;
         this.pushMessageConverter = pushMessageConverter;
         this.realm = realm;
+        this.messageDispatcher = messageDispatcher;
     }
 
     @Override
@@ -111,6 +115,11 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
     @Override
     public void startServices() throws PushNotificationException {
         routeMatcher = router.addRoute(EQUALS, uriTemplate(ROUTE), newAnnotatedRequestHandler(messageEndpoint));
+    }
+
+    @Override
+    public MessageDispatcher getMessageDispatcher() {
+        return messageDispatcher;
     }
 
     @Override

@@ -15,7 +15,6 @@
 */
 package org.forgerock.openam.services.push.dispatch;
 
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Set;
@@ -44,7 +43,6 @@ import org.forgerock.util.promise.PromiseImpl;
  *          then the MessagePromise will NOT be completed, and the MessageDispatcher will continue to await
  *          a valid message in response to that messageId.
  */
-@Singleton
 public class MessageDispatcher {
 
     private final Cache<String, MessagePromise> cache;

@@ -22,7 +22,7 @@ import org.forgerock.openam.services.push.PushMessage;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.Test;
 
-public class SnsPushmessageConverterTest {
+public class SnsPushMessageConverterTest {
 
     SnsPushMessageConverter converter = new SnsPushMessageConverter();
 
@@ -58,16 +58,13 @@ public class SnsPushmessageConverterTest {
         //APNS FORMAT CHECK =====
 
         assertThat(value.get("APNS")).isString();
-
         JsonValue apnsValue = JsonValueBuilder.toJsonValue(value.get("APNS").asString());
-
         assertThat(apnsValue.get("aps")).isNotNull();
-
         JsonValue apnsDataValue = apnsValue.get("aps");
-
         assertThat(apnsDataValue.get("messageId")).isString().isEqualTo("messageId");
         assertThat(apnsDataValue.get("alert")).isString().isEqualTo("subject");
         assertThat(apnsDataValue.get("data")).isString().isEqualTo("body");
+        assertThat(apnsDataValue.get("sound")).isString().isEqualTo("default");
     }
 
 }

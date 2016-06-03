@@ -77,6 +77,6 @@ public class PushNotificationServiceConfigHelperFactory {
             throw new SMSException("Unable to retrieve instance of the ServiceConfig.");
         }
 
-        return new PushNotificationServiceConfigHelper(serviceConfig);
+        return new PushNotificationServiceConfigHelper(serviceConfig, debug);
     }
 }

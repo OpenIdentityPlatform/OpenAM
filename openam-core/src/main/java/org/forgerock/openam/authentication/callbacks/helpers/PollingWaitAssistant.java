@@ -47,6 +47,9 @@ public class PollingWaitAssistant {
      * Create a new PollingWaitAssistant from the parent login module with a timeout value.
      *
      * @param timeoutInMilliSeconds the timeout period before throwing an exception
+     * @param shortTimeout the period for which we are considered 'short' frequency polling.
+     * @param medTimeout the period for which we are considered 'medium' frequency polling.
+     * @param longTimeout the period for which we are considered 'long'frequency  polling.
      */
     public PollingWaitAssistant(final long timeoutInMilliSeconds, final long shortTimeout, final long medTimeout,
                                 final long longTimeout) {
@@ -57,6 +60,16 @@ public class PollingWaitAssistant {
         this.shortTimeout = shortTimeout;
         this.medTimeout = medTimeout;
         this.longTimeout = longTimeout;
+    }
+
+    /**
+     * Create a new PollingWaitAssistant from the parent login module with a timeout value. Uses the default
+     * polling timeout frequency within this timeout.
+     *
+     * @param timeoutInMilliSeconds the timeout period before throwing an exception
+     */
+    public PollingWaitAssistant(final long timeoutInMilliSeconds) {
+        this(timeoutInMilliSeconds, 5000L, 4000L, 8000L);
     }
 
     /**

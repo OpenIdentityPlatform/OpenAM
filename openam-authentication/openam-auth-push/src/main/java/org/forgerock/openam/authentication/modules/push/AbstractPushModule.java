@@ -32,7 +32,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.services.push.PushNotificationConstants;
 import org.forgerock.openam.services.push.PushNotificationService;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -46,15 +45,15 @@ import org.forgerock.openam.utils.Time;
  */
 public abstract class AbstractPushModule extends AMLoginModule {
 
+    /** Used to make the polling occur every second. Not recommended to be set in production. **/
+    protected final String nearInstantProperty = "com.forgerock.openam.authentication.push.nearinstant";
+
     /** Used to store tokens which may be updated by other machines in the cluster. **/
     protected final CTSPersistentStore coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
 
     /** Necessary to read data from the appropriate user's attribute. **/
     protected final UserPushDeviceProfileManager userPushDeviceProfileManager =
             InjectorHolder.getInstance(UserPushDeviceProfileManager.class);
-
-    /** Used to communicate messages back into OpenAM from the Push Delegate's response service/endpoint. */
-    protected final MessageDispatcher messageDispatcher = InjectorHolder.getInstance(MessageDispatcher.class);
 
     /** Used to communicate messages out from OpenAM through a configurable Push delegate. */
     protected final PushNotificationService pushService

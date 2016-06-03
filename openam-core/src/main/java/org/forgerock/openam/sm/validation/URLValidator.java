@@ -19,22 +19,26 @@ import com.sun.identity.sm.ServiceAttributeValidator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Attempts to create a URL from each provided attributed. If any element in the
  * provided set throws an error, the validation fails.
+ *
+ * Empty values ARE allowed. To enforce a field as required, use the RequiredValueValidator
+ * in addition to this validator.
  */
 public class URLValidator implements ServiceAttributeValidator {
 
     @Override
     public boolean validate(Set<String> values) {
 
-        if (values.isEmpty()) {
-            return false;
-        }
-
         try {
             for (String value : values) {
+                if (StringUtils.isEmpty(value)) {
+                    continue;
+                }
+
                 new URL(value);
             }
         } catch (MalformedURLException e) {

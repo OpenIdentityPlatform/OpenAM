@@ -18,6 +18,7 @@ package org.forgerock.openam.authentication.modules.push;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -109,7 +111,11 @@ public class AuthenticatorPush extends AbstractPushModule {
             DEBUG.warning("AuthenticatorPush :: init() : Unable to determine loadbalancer bookie value", e);
         }
 
-        pollingWaitAssistant = new PollingWaitAssistant(timeout, 10000, 8000, 15000);
+        if (Boolean.parseBoolean(SystemPropertiesManager.get("com.forgerock.openam.authentication.push.nearinstant"))) {
+            pollingWaitAssistant = new PollingWaitAssistant(timeout, 1000, 1000, 1000);
+        } else {
+            pollingWaitAssistant = new PollingWaitAssistant(timeout);
+        }
 
         String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
         if (authLevel != null) {
@@ -223,8 +229,10 @@ public class AuthenticatorPush extends AbstractPushModule {
                 storeUsername(username);
                 return ISAuthConstants.LOGIN_SUCCEED;
             }
-        } catch (Exception e) {
-            DEBUG.error("Reading JWT from local MessageDispatcher failed.", e);
+        } catch (InterruptedException | ExecutionException e) {
+            DEBUG.error("Unable to verify JWT claims did or did not contain a DENY value.", e);
+        } catch (CoreTokenException e) {
+            DEBUG.warning("Removing token from CTS failed.", e);
         }
 
         throw failedAsLoginException();
@@ -234,7 +242,7 @@ public class AuthenticatorPush extends AbstractPushModule {
         try {
             Boolean ctsValue = checkCTS(messageId);
             if (ctsValue != null) {
-                messageDispatcher.forget(messageId);
+                pushService.getMessageDispatcher(realm).forget(messageId);
                 coreTokenService.deleteAsync(messageId);
 
                 if (ctsValue) {
@@ -246,6 +254,9 @@ public class AuthenticatorPush extends AbstractPushModule {
             }
         } catch (CoreTokenException e) {
             DEBUG.warning("CTS threw exception, falling back to local MessageDispatcher.", e);
+        } catch (PushNotificationException e) {
+            DEBUG.error("Could not find local MessageDispatcher for realm.", e);
+            throw failedAsLoginException();
         }
 
         setPollbackTimePeriod(pollingWaitAssistant.getWaitPeriod());
@@ -326,7 +337,7 @@ public class AuthenticatorPush extends AbstractPushModule {
                 new PushMessageChallengeResponsePredicate(Base64.decode(device.getSharedSecret()), challenge, JWT));
 
         try {
-            messagePromise = messageDispatcher.expect(message.getMessageId(), servicePredicates);
+            messagePromise = pushService.getMessageDispatcher(realm).expect(message.getMessageId(), servicePredicates);
             pushService.send(message, realm);
             pollingWaitAssistant.start(messagePromise.getPromise());
 

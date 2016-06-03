@@ -24,6 +24,8 @@ import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcherFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -35,6 +37,7 @@ public class PushNotificationServiceTest {
     private PushNotificationDelegateFactory mockDelegateFactory;
     private PushNotificationDelegate mockDelegate;
     private PushNotificationDelegate mockOldDelegate;
+    private MessageDispatcherFactory mockMessageDispatcherFactory;
     private static PushNotificationDelegate mockTestDelegate;
 
     private Debug mockDebug;
@@ -55,6 +58,7 @@ public class PushNotificationServiceTest {
         this.mockDelegateFactory = mock(PushNotificationDelegateFactory.class);
         this.mockDelegate = mock(PushNotificationDelegate.class);
         this.mockOldDelegate = mock(PushNotificationDelegate.class);
+        this.mockMessageDispatcherFactory = mock(MessageDispatcherFactory.class);
         mockTestDelegate = mock(PushNotificationDelegate.class);
 
         ConcurrentMap<String, PushNotificationDelegate> pushRealmMap = new ConcurrentHashMap<>();
@@ -69,7 +73,7 @@ public class PushNotificationServiceTest {
 
         this.mockDebug = mock(Debug.class);
         this.notificationService = new PushNotificationService(mockDebug, pushRealmMap, pushFactoryMap,
-                mockHelperFactory);
+                mockHelperFactory, mockMessageDispatcherFactory);
     }
 
     @Test
@@ -170,16 +174,16 @@ public class PushNotificationServiceTest {
 
     public static class TestDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
-                throws PushNotificationException {
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm,
+                                               MessageDispatcher messageDispatcher) throws PushNotificationException {
             return mockTestDelegate;
         }
     }
 
     public static class TestBrokenDelegateFactory implements PushNotificationDelegateFactory {
         @Override
-        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
-                throws PushNotificationException {
+        public PushNotificationDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm,
+                                               MessageDispatcher messageDispatcher) throws PushNotificationException {
             throw new PushNotificationException("Broken implementation.");
         }
     }

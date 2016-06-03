@@ -1181,29 +1181,11 @@ public class ServiceManager {
             Node childNode = XMLUtils.getChildNode(schemaRoot, schemaName);
             if (childNode != null) {
                 ServiceSchemaImpl ssi = new ServiceSchemaImpl(null, childNode);
-                Map<String, Set<String>> attrs = groupDefaultExampleAttrs(ssi);
+                Map<String, Set<String>> attrs = ssi.groupDefaultExampleAttrs();
                 ssi.validateAttributes(attrs, false);
             }
         }
         return (true);
-    }
-
-    /**
-     * Default and Example values merged together. Default takes priority over Example.
-     */
-    private static Map<String, Set<String>> groupDefaultExampleAttrs(ServiceSchemaImpl ssi) {
-        Map<String, Set<String>> attributeDefaults = ssi.getAttributeDefaults();
-
-        for (Map.Entry<String, Set<String>> entry :
-                (Set<Map.Entry<String, Set<String>>>) ssi.getAttributeExamples().entrySet()) {
-
-            if (attributeDefaults.get(entry.getKey()) == null || ((Set) attributeDefaults.get(entry.getKey())).isEmpty()
-                    && !entry.getValue().isEmpty()) {
-                attributeDefaults.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return attributeDefaults;
     }
 
     // Gets called by OrganizationConfigManager when service schema has changed

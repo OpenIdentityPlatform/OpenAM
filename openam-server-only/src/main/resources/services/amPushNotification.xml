@@ -32,12 +32,6 @@
 
                 <!-- validators -->
 
-                <AttributeSchema name="EndpointValidator" type="validator" syntax="string">
-                    <DefaultValues>
-                        <Value>org.forgerock.openam.sm.validation.EndpointValidator</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
                     <DefaultValues>
                         <Value>com.sun.identity.sm.RequiredValueValidator</Value>
@@ -96,9 +90,31 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="delegateFactory" type="single" i18nKey="a050" validator="RequiredValueValidator">
+                <AttributeSchema name="delegateFactory" type="single" syntax="string" i18nKey="a050"
+                                 validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>org.forgerock.openam.services.push.sns.SnsHttpDelegateFactory</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdDuration" type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a060" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdConcurrency" type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a070" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>16</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdCacheSize" type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a080" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>10000</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

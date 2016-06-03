@@ -17,6 +17,7 @@ package org.forgerock.openam.services.push;
 
 import java.io.Closeable;
 import java.util.Set;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 
 /**
@@ -99,5 +100,11 @@ public interface PushNotificationDelegate extends Closeable {
      */
     Set<Predicate> getAuthenticationMessagePredicates();
 
+    /**
+     * Returns the MessageDispatcher for this delegate. Used to get messages back to the originator when
+     * returned through a different medium.
+     * @return The MessageDispatcher for this delegate.
+     */
+    MessageDispatcher getMessageDispatcher();
 
 }

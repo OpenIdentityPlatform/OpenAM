@@ -30,7 +30,6 @@ public class SnsMessageResourceFactory {
 
     private final CTSPersistentStore coreTokenService;
     private final JSONSerialisation jsonSerialisation;
-    private final MessageDispatcher messageDispatcher;
     private final Debug debug;
 
     /**
@@ -38,24 +37,23 @@ public class SnsMessageResourceFactory {
      *
      * @param coreTokenService The CTS instance to utilise.
      * @param jsonSerialisation For serializing down to the CTS.
-     * @param messageDispatcher For transmitting in-memory messages.
      * @param debug For logging purposes.
      */
     @Inject
     public SnsMessageResourceFactory(CTSPersistentStore coreTokenService, JSONSerialisation jsonSerialisation,
-                                     MessageDispatcher messageDispatcher, @Named("frRest") Debug debug) {
+                                     @Named("frRest") Debug debug) {
         this.coreTokenService = coreTokenService;
         this.jsonSerialisation = jsonSerialisation;
-        this.messageDispatcher = messageDispatcher;
         this.debug = debug;
     }
 
     /**
      * Generates a new SnsMessageResource.
      *
+     * @param messageDispatcher The MessageDispatcher which backs this message resource.
      * @return a new SnsMessageResource.
      */
-    public SnsMessageResource produce() {
+    public SnsMessageResource produce(MessageDispatcher messageDispatcher) {
         return new SnsMessageResource(coreTokenService, messageDispatcher, jsonSerialisation, debug);
     }
 }

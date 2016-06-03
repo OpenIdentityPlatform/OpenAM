@@ -147,7 +147,6 @@ public class SnsMessageResource {
                 debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
                 return RestUtils.generateBadRequestException();
             }
-            return RestUtils.generateBadRequestException();
         } catch (PredicateNotMetException e) {
             debug.warning("Unable to deliver message with messageId {} in realm {} as predicate not met.",
                     messageId, realm, e);
@@ -197,6 +196,8 @@ public class SnsMessageResource {
 
         if (possibleDeny.getClaimsSet().getClaim(DENY_LOCATION) != null) {
             coreToken.setAttribute(CoreTokenField.INTEGER_ONE, DENY_VALUE);
+        } else {
+            coreToken.setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
         }
 
     }

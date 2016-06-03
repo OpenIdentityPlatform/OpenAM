@@ -29,6 +29,9 @@ public final class PushNotificationServiceConfig {
     private String secret;
     private String delegateFactory;
     private String region;
+    private long messageDispatcherSize;
+    private int messageDispatcherConcurrency;
+    private long messageDispatcherDuration;
 
     /**
      * Only access is via the Builder.
@@ -61,13 +64,29 @@ public final class PushNotificationServiceConfig {
         this.region = region;
     }
 
+    private void setMessageDispatcherSize(long messageDispatcherSize) {
+        this.messageDispatcherSize = messageDispatcherSize;
+    }
+
+    private void setMessageDispatcherConcurrency(int messageDispatcherConcurrency) {
+        this.messageDispatcherConcurrency = messageDispatcherConcurrency;
+    }
+
+    private void setMessageDispatcherDuration(long messageDispatcherDuration) {
+        this.messageDispatcherDuration = messageDispatcherDuration;
+    }
+
+
     private boolean isValid() {
         return StringUtils.isNotBlank(accessKey)
                 && StringUtils.isNotBlank(appleEndpoint)
                 && StringUtils.isNotBlank(googleEndpoint)
                 && StringUtils.isNotBlank(secret)
                 && StringUtils.isNotBlank(delegateFactory)
-                && StringUtils.isNotBlank(region);
+                && StringUtils.isNotBlank(region)
+                && messageDispatcherConcurrency >= 0
+                && messageDispatcherDuration >= 0
+                && messageDispatcherSize >= 0;
     }
 
     /**
@@ -118,6 +137,30 @@ public final class PushNotificationServiceConfig {
         return region;
     }
 
+    /**
+     * Get the message dispatcher size from this config.
+     * @return The number of entries the message dispatcher should hold.
+     */
+    public long getMessageDispatcherSize() {
+        return messageDispatcherSize;
+    }
+
+    /**
+     * Get the duration the message dispatcher should hold messages for.
+     * @return The time (in seconds) message inboxes should be open for.
+     */
+    public long getMessageDispatcherDuration() {
+        return messageDispatcherDuration;
+    }
+
+    /**
+     * Gets the level of concurrency to use when accessing the message dispatcher cache.
+     * @return The level of concurrency for this service's message dispatcher.
+     */
+    public int getMessageDispatcherConcurrency() {
+        return messageDispatcherConcurrency;
+    }
+
     @Override
     public boolean equals(Object underTest) {
         if (underTest == null) {
@@ -138,12 +181,16 @@ public final class PushNotificationServiceConfig {
                 && Objects.equals(this.secret, that.secret)
                 && Objects.equals(this.googleEndpoint, that.googleEndpoint)
                 && Objects.equals(this.region, that.region)
-                && Objects.equals(this.delegateFactory, that.delegateFactory);
+                && Objects.equals(this.delegateFactory, that.delegateFactory)
+                && Objects.equals(this.messageDispatcherConcurrency, that.messageDispatcherConcurrency)
+                && Objects.equals(this.messageDispatcherDuration, that.messageDispatcherDuration)
+                && Objects.equals(this.messageDispatcherSize, that.messageDispatcherSize);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessKey, secret, appleEndpoint, googleEndpoint);
+        return Objects.hash(accessKey, secret, appleEndpoint, googleEndpoint, messageDispatcherConcurrency,
+                messageDispatcherDuration, messageDispatcherSize);
     }
 
     /**
@@ -222,6 +269,36 @@ public final class PushNotificationServiceConfig {
         }
 
         /**
+         * The size of the internal message dispatcher cache.
+         * @param maxSize The size of the cache.
+         * @return The builder.
+         */
+        public Builder withMessageDispatcherSize(long maxSize) {
+            config.setMessageDispatcherSize(maxSize);
+            return this;
+        }
+
+        /**
+         * The level of concurrency to use for the internal message dispatcher cache.
+         * @param concurrency The level of concurrency.
+         * @return The builder.
+         */
+        public Builder withMessageDispatcherConcurrency(int concurrency) {
+            config.setMessageDispatcherConcurrency(concurrency);
+            return this;
+        }
+
+        /**
+         * The maximum duration (in seconds) to keep items in the cache.
+         * @param duration The maximum duration (in seconds) items should exist in the cache.
+         * @return The builder.
+         */
+        public Builder withMessageDispatcherDuration(long duration) {
+            config.setMessageDispatcherDuration(duration);
+            return this;
+        }
+
+        /**
          * Returns the constructed config, having checked that it is usable.
          * @return a constructed PushNotificationServiceConfig.
          * @throws PushNotificationException if the config is invalid.
@@ -233,7 +310,6 @@ public final class PushNotificationServiceConfig {
             }
             return config;
         }
-
     }
 
 }

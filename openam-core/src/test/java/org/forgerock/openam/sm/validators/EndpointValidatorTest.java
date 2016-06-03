@@ -24,8 +24,8 @@ import org.testng.annotations.Test;
 
 public class EndpointValidatorTest {
 
-    @DataProvider(name = "endpointValdiatorData")
-    private Object[][] urlValdiatorData() {
+    @DataProvider(name = "endpointValidatorData")
+    private Object[][] endpointValidatorData() {
         return new Object[][]{
                 {"http://www.forgerock.org", true},
                 {"Invalid Hostname", false},
@@ -36,7 +36,7 @@ public class EndpointValidatorTest {
         };
     }
 
-    @Test(dataProvider = "endpointValdiatorData")
+    @Test(dataProvider = "endpointValidatorData")
     public void shouldValidateEndpoints(String underTest, boolean expected) {
         //given
         EndpointValidator validator = new EndpointValidator();

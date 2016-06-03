@@ -23,6 +23,7 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.openam.services.push.PushNotificationDelegateFactory;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
+import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.sns.utils.SnsClientFactory;
 import org.forgerock.openam.services.push.sns.utils.SnsMessageResourceFactory;
 
@@ -47,11 +48,13 @@ public class SnsHttpDelegateFactory implements PushNotificationDelegateFactory {
     }
 
     @Override
-    public SnsHttpDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm)
+    public SnsHttpDelegate produceDelegateFor(PushNotificationServiceConfig config, String realm,
+                                              MessageDispatcher messageDispatcher)
             throws PushNotificationException {
         AmazonSNSClient service = new SnsClientFactory().produce(config);
-        SnsMessageResource messageResource = messageResourceFactory.produce();
-        return new SnsHttpDelegate(service, config, router, messageResource, pushMessageConverter, realm);
+        SnsMessageResource messageResource = messageResourceFactory.produce(messageDispatcher);
+        return new SnsHttpDelegate(service, config, router, messageResource, pushMessageConverter, realm,
+                messageDispatcher);
     }
 
 }
