@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  */
 public class HostnameValidator implements ServiceAttributeValidator {
 
-    private static final Pattern VALID_HOSTNAME_CHARACTERS = Pattern.compile("^[a-zA-Z0-9.\\-]*$");
+    private static final Pattern VALID_HOSTNAME_CHARACTERS = Pattern.compile("^[a-zA-Z0-9.\\-]+$");
 
     /**
      * Validates the {@link Set} of values to ensure that all of them conform to the regular

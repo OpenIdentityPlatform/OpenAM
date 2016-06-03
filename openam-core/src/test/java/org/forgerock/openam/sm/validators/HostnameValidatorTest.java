@@ -32,7 +32,8 @@ public class HostnameValidatorTest {
                 {"/folder", false},
                 {"www.forgerock.org", true},
                 {"symbol-subrealm.forgerock.org", true},
-                {"symbol-subrealm.forgerock.org/endpoint", false}
+                {"symbol-subrealm.forgerock.org/endpoint", false},
+                {"", false}
         };
     }
 
