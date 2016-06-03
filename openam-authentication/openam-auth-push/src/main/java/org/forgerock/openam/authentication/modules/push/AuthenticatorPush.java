@@ -18,18 +18,6 @@ package org.forgerock.openam.authentication.modules.push;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.sm.DNMapper;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,12 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
 import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -62,6 +52,19 @@ import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponseP
 import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.DNMapper;
 
 /**
  * ForgeRock Authentication (Push) Authentication Module.
@@ -213,7 +216,7 @@ public class AuthenticatorPush extends AbstractPushModule {
                     messagePromise.getPromise().get().get(JWT).asString(),  Jwt.class);
             Boolean deny = (Boolean) signedJwt.getClaimsSet().getClaim(PushNotificationConstants.DENY_LOCATION);
             coreTokenService.deleteAsync(messageId);
-            
+
             if (deny != null && deny) { //denied
                 throw failedAsLoginException();
             } else {
