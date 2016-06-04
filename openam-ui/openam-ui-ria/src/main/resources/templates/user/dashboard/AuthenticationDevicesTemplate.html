@@ -1,0 +1,47 @@
+<div class="panel panel-default">
+    <div class="panel-heading fr-panel-heading-with-button" role="tab" id="deviceManagementCollapseHeading">
+        <h4 class="panel-title collapse-title">
+            <a data-toggle="collapse" href="#deviceManagementCollapse" aria-expanded="true" aria-controls="deviceManagementCollapseHeading" class="">{{t "openam.authDevices.header"}}</a>
+        </h4>
+        <div class="dropdown pull-right">
+            <button type="button" class="btn btn-link panel-button-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-v fa-lg"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li><a data-settings href="#" role="button" aria-haspopup="true"><i class="fa fa-cog"></i> {{t "common.form.settings" }}</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="deviceManagementCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="deviceManagementCollapse" aria-expanded="true">
+        <div class="panel-body">
+            {{#if devices}}
+                {{#each devices}}
+                    <div class="col-sm-6 col-md-3">
+                        <div class="panel-default panel am-panel-card am-device-card" data-device-uuid="{{uuid}}" data-device-type="{{type}}">
+                            <div class="btn-group card-menu" role="group">
+                                <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v fa-lg"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-left" role="menu">
+                                    <li><a data-recovery-codes href="#" role="button" aria-haspopup="true"><i class="fa fa-list"></i> {{ t "openam.authDevices.menu.recoveryCodes" }}</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a data-delete href="#" role="button" aria-haspopup="true"><i class="fa fa-times"></i> {{ t "common.form.delete" }}</a></li>
+                                </ul>
+                            </div>
+                            <a data-details href="#">
+                                <div class="card-body card-body-with-menu">
+                                    <div class="card-icon-circle bg-primary">
+                                        <i class="fa fa-{{icon}}"></i>
+                                    </div>
+                                    <h3 class="card-name text-primary">{{deviceName}}</h3>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                {{t "openam.authDevices.noneFound"}}
+            {{/if}}
+        </div>
+    </div>
+</div>

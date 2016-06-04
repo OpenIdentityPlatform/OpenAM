@@ -34,7 +34,7 @@ define([
      * @param {String} uuid The unique device id
      * @returns {Promise} promise that will contain the response
      */
-    obj.deleteDevice = function (uuid) {
+    obj.remove = function (uuid) {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(getPath() + uuid),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -78,12 +78,12 @@ define([
      * Get array of oath devices
      * @returns {Promise} promise that will contain the response
      */
-    obj.getDevices = function () {
+    obj.getAll = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(`${getPath()}?_queryFilter=true`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true
-        });
+        }).then((value) => value.result);
     };
 
     return obj;

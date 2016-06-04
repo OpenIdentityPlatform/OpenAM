@@ -21,17 +21,17 @@ define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService"
-], function ($, _, BootstrapDialog, Messages, UIUtils, DeviceManagementService) {
+], ($, _, BootstrapDialog, Messages, UIUtils, DeviceManagementService) => {
     function closeDialog (dialog) {
         dialog.close();
     }
 
     return function () {
-        var template = "templates/user/dashboard/DevicesSettingsDialogTemplate.html",
-            authSkip = DeviceManagementService.checkDevicesOathSkippable();
+        const template = "templates/user/dashboard/DevicesSettingsDialogTemplate.html";
+        let authSkip = DeviceManagementService.checkDevicesOathSkippable();
 
         BootstrapDialog.show({
-            title: $.t("openam.deviceManagement.devicesSettingDialog.title"),
+            title: $.t("openam.authDevices.devicesSettingDialog.title"),
             cssClass: "devices-settings",
             message: $("<div></div>"),
             buttons: [{
@@ -42,9 +42,9 @@ define([
                 cssClass: "btn-primary",
                 action (dialog) {
                     authSkip = !dialog.$modalBody.find("#oathStatus").is(":checked");
-                    DeviceManagementService.setDevicesOathSkippable(authSkip).then(function () {
+                    DeviceManagementService.setDevicesOathSkippable(authSkip).then(() => {
                         dialog.close();
-                    }, function (response) {
+                    }, (response) => {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
                             response
@@ -54,14 +54,14 @@ define([
             }
             ],
             onshown (dialog) {
-                $.when(authSkip).then(function (skip) {
+                $.when(authSkip).then((skip) => {
                     return UIUtils.compileTemplate(template, { authNeeded: !skip });
-                }, function (response) {
+                }, (response) => {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
                         response
                     });
-                }).then(function (tpl) {
+                }).then((tpl) => {
                     dialog.$modalBody.append(tpl);
                 });
             }

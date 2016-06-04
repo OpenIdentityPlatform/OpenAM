@@ -544,7 +544,7 @@
             },
             "unavailable": "Unable to login to OpenAM"
         },
-        "deviceManagement": {
+        "authDevices": {
             "header": "Authentication Devices",
             "noneFound": "You have not registered any devices",
             "menu": {
@@ -559,9 +559,7 @@
             },
             "deviceDetailsDialog": {
                 "recoveryCodes": "Recovery codes",
-                "deviceName": "Device name",
-                "skip": "Skip if appropriate",
-                "help": "If checked, you will not be challenged for 2nd factor authentication unless the administrator has enforced its requirement."
+                "deviceName": "Device name"
             }
         }
     },

@@ -19,27 +19,25 @@ define([
     "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, BootstrapDialog, UIUtils) {
-    function closeDialog (dialog) {
-        dialog.close();
-    }
-
+], ($, _, BootstrapDialog, UIUtils) => {
     return function (uuid, device) {
-        UIUtils.compileTemplate("templates/user/dashboard/EditDeviceDialogTemplate.html", device)
-        .then(function (tpl) {
+        const data = {
+            deviceName: device.deviceName,
+            recoveryCodes: device.recoveryCodes,
+            recoveryCodesHref: `data:text/plain,${encodeURIComponent(device.recoveryCodes.join("\r\n"))}`
+        };
+
+        UIUtils.compileTemplate("templates/user/dashboard/EditDeviceDialogTemplate.html", data).then((tpl) => {
             BootstrapDialog.show({
                 title: device.deviceName,
                 message: $(tpl),
                 cssClass: "device-details",
                 buttons: [{
                     label: $.t("common.form.close"),
-                    action: closeDialog
-                }],
-                onshown (dialog) {
-                    dialog.$modalBody.find(".recovery-codes-download").click(function () {
-                        location.href = `data:text/plain,${encodeURIComponent(device.recoveryCodes.join("\r\n"))}`;
-                    });
-                }
+                    action: (dialog) => {
+                        dialog.close();
+                    }
+                }]
             });
         });
     };
