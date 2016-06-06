@@ -41,8 +41,12 @@
 define([
     "i18next",
     "lodash",
-    "org/forgerock/openam/ui/common/models/cleanJSONSchema"
-], (i18next, _, cleanJSONSchema) => {
+    "org/forgerock/openam/ui/common/models/schemaTransforms/transformBooleanTypeToCheckboxFormat",
+    "org/forgerock/openam/ui/common/models/schemaTransforms/transformEnumTypeToString",
+    "org/forgerock/openam/ui/common/models/schemaTransforms/transformPropertyOrderAttributeToInt",
+    "org/forgerock/openam/ui/common/models/schemaTransforms/warnOnInferredPasswordWithoutFormat"
+], (i18next, _, transformBooleanTypeToCheckboxFormat, transformEnumTypeToString, transformPropertyOrderAttributeToInt,
+    warnOnInferredPasswordWithoutFormat) => {
     function groupTopLevelProperties (raw) {
         if (_.isEmpty(_.omit(raw.properties, "defaults", "dynamic"))) {
             return raw;
@@ -79,6 +83,48 @@ define([
 
         schema.properties = _.merge(schema.properties, schema.properties[propertyKey]);
         delete schema.properties[propertyKey];
+
+        return schema;
+    }
+
+    /**
+     * Determines whether the specified object is of type <code>object</code>
+     * @param   {Object}  object Object to determine the type of
+     * @returns {Boolean}        Whether the object is of type <code>object</code>
+     */
+    function isObjectType (object) {
+        return object.type === "object";
+    }
+
+    /**
+     * Recursively invokes the specified functions over each object's properties
+     * @param {Object} object   Object with properties
+     * @param {Array} callbacks Array of functions
+     */
+    function eachProperty (object, callbacks) {
+        if (isObjectType(object)) {
+            _.forEach(object.properties, (property, key) => {
+                _.forEach(callbacks, (callback) => {
+                    callback(property, key);
+                });
+
+                if (isObjectType(property)) {
+                    eachProperty(property, callbacks);
+                }
+            });
+        }
+    }
+
+    /**
+     * Iterates over a scheam, transforming adding appropriate warnings.
+     * @param {Object} schema the schema to be transformed
+     * @returns {Object} the transformed schema
+     */
+    function cleanJSONSchema (schema) {
+        eachProperty(schema, [transformPropertyOrderAttributeToInt,
+                              transformBooleanTypeToCheckboxFormat,
+                              transformEnumTypeToString,
+                              warnOnInferredPasswordWithoutFormat]);
 
         return schema;
     }
