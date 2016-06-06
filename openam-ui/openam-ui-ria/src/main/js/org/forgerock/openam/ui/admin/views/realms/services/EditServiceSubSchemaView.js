@@ -28,6 +28,7 @@ define([
                 serviceType,
                 subSchemaType,
                 id,
+                title: decodeURIComponent(id),
                 headerActions: [
                     { actionPartial: "form/_Button", data: "delete", title: "common.form.delete", icon:"fa-times" }
                 ]
