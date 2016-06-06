@@ -15,10 +15,27 @@
  */
 
 define([
-    "org/forgerock/openam/ui/common/models/JSONSchema",
+    "sinon",
+    "squire",
     "org/forgerock/openam/ui/common/models/JSONValues"
-], (JSONSchema, JSONValues) => {
+], (sinon, Squire, JSONValues) => {
+    let i18next;
+    let JSONSchema;
     describe("org/forgerock/openam/ui/common/models/JSONSchema", () => {
+        beforeEach((done) => {
+            const injector = new Squire();
+
+            i18next = {
+                t: sinon.stub().withArgs("console.common.global").returns("Global")
+            };
+
+            injector.mock("i18next", i18next)
+                .require(["org/forgerock/openam/ui/common/models/JSONSchema"], (subject) => {
+                    JSONSchema = subject;
+                    done();
+                });
+        });
+
         describe("#constructor", () => {
             let schema;
 
@@ -43,6 +60,7 @@ define([
             });
 
             it("groups the top-level properties with title", () => {
+                expect(i18next.t).to.be.calledWith("console.common.global");
                 expect(schema.raw.properties.global.title).eq("Global");
             });
 
@@ -109,40 +127,6 @@ define([
             });
         });
         describe("#toFlatWithInheritanceMeta", () => {
-            const jsonSchema = new JSONSchema({
-                "type": "object",
-                "properties": {
-                    "propertyKey": {
-                        type: "object",
-                        title: "Title",
-                        properties: {
-                            value: {
-                                type: "string",
-                                required: true
-                            },
-                            inherited: {
-                                type: "boolean",
-                                required: true
-                            }
-                        }
-                    },
-                    "anotherPropertyKey": {
-                        type: "object",
-                        title: "Title",
-                        properties: {
-                            value: {
-                                type: "string",
-                                required: true
-                            },
-                            inherited: {
-                                type: "boolean",
-                                required: true
-                            }
-                        }
-                    }
-                }
-            });
-
             const jsonValues = new JSONValues({
                 "propertyKey": {
                     "value": "someValue",
@@ -157,6 +141,39 @@ define([
             let schema;
 
             beforeEach(() => {
+                const jsonSchema = new JSONSchema({
+                    "type": "object",
+                    "properties": {
+                        "propertyKey": {
+                            type: "object",
+                            title: "Title",
+                            properties: {
+                                value: {
+                                    type: "string",
+                                    required: true
+                                },
+                                inherited: {
+                                    type: "boolean",
+                                    required: true
+                                }
+                            }
+                        },
+                        "anotherPropertyKey": {
+                            type: "object",
+                            title: "Title",
+                            properties: {
+                                value: {
+                                    type: "string",
+                                    required: true
+                                },
+                                inherited: {
+                                    type: "boolean",
+                                    required: true
+                                }
+                            }
+                        }
+                    }
+                });
                 schema = jsonSchema.toFlatWithInheritanceMeta(jsonValues);
             });
 

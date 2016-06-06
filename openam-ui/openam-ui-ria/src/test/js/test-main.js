@@ -32,7 +32,6 @@
         paths: {
             chai: "/base/node_modules/chai/chai",
             handlebars: "/base/target/dependencies/libs/handlebars-4.0.5",
-            i18next: "/base/target/dependencies/libs/i18next-1.7.3-min",
             jquery: "/base/target/dependencies/libs/jquery-2.1.1-min",
             lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
             sinon: "/base/target/test-classes/libs/sinon-1.15.4",
@@ -40,22 +39,14 @@
             squire: "/base/target/test-classes/libs/squire-0.2.0"
         },
         shim: {
-            "i18next": {
-                deps: ["jquery", "handlebars"],
-                exports: "i18n"
-            },
             "lodash": {
                 exports: "_"
             }
         }
     });
 
-    require(["chai", "i18next", "sinon-chai"].concat(allTestFiles), function (chai, i18next, chaiSinon) {
+    require(["chai", "sinon-chai"].concat(allTestFiles), function (chai, chaiSinon) {
         chai.use(chaiSinon);
-
-        i18next.init({
-            resGetPath: require.toUrl("locales/__lng__/__ns__.json")
-        });
 
         window.expect = chai.expect;
         window.__karma__.start();

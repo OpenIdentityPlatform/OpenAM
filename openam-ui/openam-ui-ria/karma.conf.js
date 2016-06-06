@@ -16,7 +16,6 @@ module.exports = function (config) {
             { pattern: "target/test-classes/org/**/*.js", included: false },
             { pattern: "target/compiled/org/**/*.js", included: false },
             { pattern: "target/compiled/config/**/*.js", included: false },
-            { pattern: "target/compiled/locales/**/*.json", included: false },
             { pattern: "target/dependencies/libs/**/*.js", included: false },
             { pattern: "target/test-classes/**/*.js", included: false },
             { pattern: "node_modules/chai/chai.js", included: false },
