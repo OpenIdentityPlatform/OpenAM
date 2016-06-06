@@ -22,6 +22,19 @@ package org.forgerock.openam.selfservice.config.beans;
  */
 public enum RegistrationDestination {
 
-    DEFAULT, LOGIN, AUTO_LOGIN
+    /**
+     * Default displays a successful registration message.
+     */
+    DEFAULT,
+
+    /**
+     * Login takes the user to the login page.
+     */
+    LOGIN,
+
+    /**
+     * Auto login automatically authenticates the user.
+     */
+    AUTO_LOGIN
 
 }
