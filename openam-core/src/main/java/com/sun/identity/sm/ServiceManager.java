@@ -1177,15 +1177,33 @@ public class ServiceManager {
                 SMSUtils.DYNAMIC_SCHEMA, SMSUtils.USER_SCHEMA,
                 SMSUtils.POLICY_SCHEMA, SMSUtils.GROUP_SCHEMA,
                 SMSUtils.DOMAIN_SCHEMA };
-        for (int i = 0; i < schemaNames.length; i++) {
-            Node childNode = XMLUtils.getChildNode(schemaRoot, schemaNames[i]);
+        for (String schemaName : schemaNames) {
+            Node childNode = XMLUtils.getChildNode(schemaRoot, schemaName);
             if (childNode != null) {
                 ServiceSchemaImpl ssi = new ServiceSchemaImpl(null, childNode);
-                Map attrs = ssi.getAttributeDefaults();
+                Map<String, Set<String>> attrs = groupDefaultExampleAttrs(ssi);
                 ssi.validateAttributes(attrs, false);
             }
         }
         return (true);
+    }
+
+    /**
+     * Default and Example values merged together. Default takes priority over Example.
+     */
+    private static Map<String, Set<String>> groupDefaultExampleAttrs(ServiceSchemaImpl ssi) {
+        Map<String, Set<String>> attributeDefaults = ssi.getAttributeDefaults();
+
+        for (Map.Entry<String, Set<String>> entry :
+                (Set<Map.Entry<String, Set<String>>>) ssi.getAttributeExamples().entrySet()) {
+
+            if (attributeDefaults.get(entry.getKey()) == null || ((Set) attributeDefaults.get(entry.getKey())).isEmpty()
+                    && !entry.getValue().isEmpty()) {
+                attributeDefaults.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return attributeDefaults;
     }
 
     // Gets called by OrganizationConfigManager when service schema has changed

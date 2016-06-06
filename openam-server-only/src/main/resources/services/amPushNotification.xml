@@ -46,28 +46,30 @@
 
                 <!-- configuration settings -->
 
+                <!-- https://aws.amazon.com/developers/access-keys/ source of example key values -->
+
                 <AttributeSchema name="accessKey" type="single" i18nKey="a010" validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>Access Key</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>AKIAIOSFODNN7EXAMPLE</Value>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="secret" type="single" i18nKey="a020" validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>Secret</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</Value>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>Apple Endpoint</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>arn:aws:sns:us-west-2:1234567890:app/APNS/production</Value>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>Google Endpoint</Value>
-                    </DefaultValues>
+                    <ExampleValue>
+                        <Value>arn:aws:sns:us-west-2:1234567890:app/GCM/production</Value>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <!-- http://docs.aws.amazon.com/general/latest/gr/rande.html for region list
