@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.openam.utils.MappingUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
@@ -92,7 +93,11 @@ public class OAuthConf {
         clientId = CollectionHelper.getMapAttr(config, KEY_CLIENT_ID);
         clientSecret = CollectionHelper.getMapAttr(config, KEY_CLIENT_SECRET);
         scope = CollectionHelper.getMapAttr(config, KEY_SCOPE);
-        openIDConnect = Arrays.asList(scope.split(SCOPE_SEPARATOR)).contains(OIDC_SCOPE);
+        if (StringUtils.isNotEmpty(scope)){
+            openIDConnect = Arrays.asList(scope.split(SCOPE_SEPARATOR)).contains(OIDC_SCOPE);
+        } else {
+            openIDConnect = false;
+        }
         authServiceUrl = CollectionHelper.getMapAttr(config, KEY_AUTH_SERVICE);
         tokenServiceUrl = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE);
         profileServiceUrl = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE);
@@ -238,24 +243,24 @@ public class OAuthConf {
     public String getAuthServiceUrl(String originalUrl, String state) throws
             AuthLoginException {
 
-        if (!authServiceUrl.contains("?")) {
-            authServiceUrl = authServiceUrl + "?"
-                    + PARAM_CLIENT_ID + "=" + clientId;
-        } else {
-            authServiceUrl = authServiceUrl + "&"
-                    + PARAM_CLIENT_ID + "=" + clientId;
-        }
         try {
-            return authServiceUrl
-                    + param(PARAM_SCOPE, OAuthUtil.oAuthEncode(scope))
-                    + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl))
-                    + param("response_type", "code")
-                    + param("state", state);
+            StringBuilder sb = new StringBuilder(authServiceUrl);
+            addParam(sb, PARAM_CLIENT_ID, clientId);
+            addParam(sb, PARAM_SCOPE, OAuthUtil.oAuthEncode(scope));
+            addParam(sb, PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl));
+            addParam(sb, "response_type", "code");
+            addParam(sb, "state", state);
+            return sb.toString();
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);
             throw new AuthLoginException("Problem to build the Auth Service URL", ex);
         }
+    }
+
+    private void addParam(StringBuilder url, String key, String value) {
+            url.append(url.toString().contains("?") ? "&" : "?")
+                    .append(key).append("=").append(value);
     }
 
     public String getTokenServiceUrl(){
@@ -293,10 +298,6 @@ public class OAuthConf {
 
     public Map<String, String> getProfileServiceGetParameters() {
         return Collections.<String, String>emptyMap();
-    }
-
-    private String param(String key, String value) {
-        return "&" + key + "=" + value;
     }
     
     public void validateConfiguration() throws AuthLoginException {
