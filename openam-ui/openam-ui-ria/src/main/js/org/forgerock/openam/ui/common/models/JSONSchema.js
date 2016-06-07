@@ -213,6 +213,13 @@ define([
             return new JSONSchema(schema);
         }
         /**
+         * Returns a new JSONSchema with all non-required properties removed.
+         * @returns {JSONSchema} JSONSchema object with non-required properties removed.
+         */
+        removeUnrequiredProperties () {
+            return this.omit((property) => property.required === false);
+        }
+        /**
          * Flattens schema properties to enable schema to be renderable. Adds inheritance metadata to each property of
          * the schema, so JSONEditor knows whether to enable or disable the input field.
          * @param {JSONValues} values JSONValues object to take inheritance metadata from.

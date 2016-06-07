@@ -75,7 +75,7 @@ define([
                 const requiredSchemaKeys = this.options.schema.getRequiredPropertyKeys();
                 const emptyValueKeys = this.options.values.getEmptyValueKeys();
                 const requiredAndEmptyKeys = _.intersection(requiredSchemaKeys, emptyValueKeys);
-                schema = schema.addDefaultProperties(requiredAndEmptyKeys);
+                schema = schema.removeUnrequiredProperties().addDefaultProperties(requiredAndEmptyKeys);
             }
 
             this.subview = new JSONEditorView({

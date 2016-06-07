@@ -110,7 +110,7 @@ define([
                 url: scopedByRealm(realm, `/${type}?_action=create`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
-                data: JSON.stringify(data)
+                data: new JSONValues(data).toJSON()
             });
         }
     };

@@ -126,6 +126,28 @@ define([
                 expect(jsonSchema.hasInheritance()).to.be.false;
             });
         });
+        describe("#removeUnrequiredProperties", () => {
+            let schema;
+
+            beforeEach(() => {
+                const jsonSchema = new JSONSchema({
+                    "type": "object",
+                    "properties": {
+                        "propertyKeyRequired": {
+                            required: true
+                        },
+                        "propertyKeyUnRequired": {
+                            required: false
+                        }
+                    }
+                });
+                schema = jsonSchema.removeUnrequiredProperties();
+            });
+
+            it("removes properties where \"required\" is \"false\"", () => {
+                expect(schema.raw.properties).to.have.keys("propertyKeyRequired");
+            });
+        });
         describe("#toFlatWithInheritanceMeta", () => {
             const jsonValues = new JSONValues({
                 "propertyKey": {
