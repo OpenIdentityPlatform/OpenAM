@@ -538,8 +538,6 @@ public class SmsRealmProvider implements RequestHandler {
         final JsonValue realmDetails = request.getContent();
 
         try {
-            hasPermission(context);
-
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
             realmManager.setAttributes(IdConstants.REPO_SERVICE, getAttributeMap(realmDetails));
 
@@ -555,9 +553,6 @@ public class SmsRealmProvider implements RequestHandler {
         } catch (SMSException e) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
             return configureErrorMessage(e).asPromise();
-        } catch (SSOException | ForbiddenException | IdRepoException e) {
-            debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
-            return new PermanentException(401, "Access Denied", null).asPromise();
         }
     }
 
