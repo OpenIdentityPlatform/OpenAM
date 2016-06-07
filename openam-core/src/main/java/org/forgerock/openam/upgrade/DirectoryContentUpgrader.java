@@ -35,7 +35,11 @@ import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.UmaAuditDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.UmaPendingRequestDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.LabelsDataLayerConfiguration;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -71,6 +75,7 @@ import com.sun.identity.shared.debug.Debug;
  *  <li>Creating the indexes for CTSv2 if embedded configstore is used.</li>
  *  <li>Adding the schema for the dashboard service to the embedded user store.</li>
  *  <li>Adding the schema for deviceprint module to the embedded user store.</li>
+ *  <li>Adding the UMA containers and UMA Labels schema if not present in versions less than 13.5.0.</li>
  * </ul>
  */
 public class DirectoryContentUpgrader {
@@ -84,6 +89,7 @@ public class DirectoryContentUpgrader {
 
     // Knowledge Based Authentication information container - the object class for kbaInfo
     private static final String KBA_INFO_OC = "kbaInfoContainer";
+    private static final int VERSION_1350 = 1350;
 
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final ConnectionFactory<Connection> connFactory;
@@ -91,6 +97,11 @@ public class DirectoryContentUpgrader {
     private final String baseDN;
     private final boolean isEmbedded;
     private final LdapDataLayerConfiguration ctsConfig;
+    private final LdapDataLayerConfiguration umaAuditConfig;
+    private final LdapDataLayerConfiguration umaResourceSetConfig;
+    private final LdapDataLayerConfiguration umaPendingConfig;
+    private final LdapDataLayerConfiguration umaLabelsConfig;
+
 
     /**
      * This constructor will initialize the different directory content upgraders and ensures that each of them are
@@ -105,21 +116,27 @@ public class DirectoryContentUpgrader {
         this.baseDN = baseDN;
         isEmbedded = EmbeddedOpenDS.isStarted();
         ctsConfig = InjectorHolder.getInstance(CTSDataLayerConfiguration.class);
+        umaAuditConfig = InjectorHolder.getInstance(UmaAuditDataLayerConfiguration.class);
+        umaResourceSetConfig = InjectorHolder.getInstance(ResourceSetDataLayerConfiguration.class);
+        umaPendingConfig = InjectorHolder.getInstance(UmaPendingRequestDataLayerConfiguration.class);
+        umaLabelsConfig = InjectorHolder.getInstance(LabelsDataLayerConfiguration.class);
 
         Key<ConnectionFactory> key = Key.get(ConnectionFactory.class, DataLayer.Types.typed(ConnectionType.DATA_LAYER));
         connFactory = InjectorHolder.getInstance(key);
 
         upgraders.add(new AddCTSSchema());
         upgraders.add(new CreateCTSContainer());
+        upgraders.add(new AddUmaAuditSchema());
+        upgraders.add(new AddResourceSetsSchema());
+        upgraders.add(new AddUmaPendingRequestsSchema());
+        upgraders.add(new AddUmaResourceSetLabelsContainer());
+        upgraders.add(new AddUmaResourceSetLabelsSchema());
         if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
             upgraders.add(new UpdateCTSDate01Index());
             upgraders.add(new DeleteUnusedCTSIndices());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
-            upgraders.add(new AddUmaAuditSchema());
-            upgraders.add(new AddResourceSetsSchema());
-            upgraders.add(new AddUmaPendingRequestsSchema());
             upgraders.add(new AddOATHDeviceSchema());
             upgraders.add(new AddPushDeviceSchema());
             upgraders.add(new OATH2FASchema());
@@ -156,7 +173,7 @@ public class DirectoryContentUpgrader {
      * @param conn The connection to use when searching for the entry.
      * @param dn The DN of the entry that we are looking for.
      * @return <code>false</code> if the entry does not exist yet, <code>true</code> otherwise.
-     * @throws UpgradeException If there was a problem while checking the existance of the entry.
+     * @throws UpgradeException If there was a problem while checking the existence of the entry.
      */
     private boolean entryExists(Connection conn, DN dn) throws UpgradeException {
         try {
@@ -284,6 +301,22 @@ public class DirectoryContentUpgrader {
                 throw new UpgradeException(ex);
             }
         }
+    }
+
+    /**
+     * Depending on version check, if the default RootSuffix is the same as the configured token store RootSuffix and that the entry exists.
+     *
+     * @param conn   The connection to use when searching for the entry.
+     * @param config The LDAP configuration.
+     * @return true if default root suffix is equal to token store root suffix and the entry does not exist.
+     * @throws UpgradeException If there was a problem whilst checking the existence of the entry.
+     */
+    private boolean isDefaultRootSuffixNeeded(Connection conn, LdapDataLayerConfiguration config) throws UpgradeException {
+        if (VersionUtils.isCurrentVersionLessThan(VERSION_1350, false)) {
+            return config.getDefaultRootSuffix().equals(config.getTokenStoreRootSuffix()) && !entryExists(conn,
+                    config.getDefaultRootSuffix());
+        }
+        return false;
     }
 
     /**
@@ -468,7 +501,13 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, DN.valueOf("ou=uma_audit," + baseDN));
+
+            boolean defaultRootSuffixNeeded = isDefaultRootSuffixNeeded(conn, umaAuditConfig);
+            if (isEmbedded) {
+                return defaultRootSuffixNeeded;
+            } else {
+                return StoreMode.DEFAULT.equals(umaAuditConfig.getStoreMode()) && defaultRootSuffixNeeded;
+            }
         }
     }
 
@@ -481,7 +520,13 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, DN.valueOf("ou=resource_sets," + baseDN));
+
+            boolean defaultRootSuffixNeeded = isDefaultRootSuffixNeeded(conn, umaResourceSetConfig);
+            if (isEmbedded) {
+                return defaultRootSuffixNeeded;
+            } else {
+                return StoreMode.DEFAULT.equals(umaResourceSetConfig.getStoreMode()) && defaultRootSuffixNeeded;
+            }
         }
     }
 
@@ -494,7 +539,48 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, DN.valueOf("ou=uma_pending_requests," + baseDN));
+
+            boolean defaultRootSuffixNeeded = isDefaultRootSuffixNeeded(conn, umaPendingConfig);
+            if (isEmbedded) {
+                return defaultRootSuffixNeeded;
+            } else {
+                return StoreMode.DEFAULT.equals(umaPendingConfig.getStoreMode()) && defaultRootSuffixNeeded;
+            }
+        }
+    }
+
+    private class AddUmaResourceSetLabelsContainer implements Upgrader {
+
+        @Override
+        public String getLDIFPath() { return "/WEB-INF/template/ldif/opendj/opendj_uma_resource_set_labels.ldif"; }
+
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+
+            boolean defaultRootSuffixNeeded = isDefaultRootSuffixNeeded(conn, umaLabelsConfig);
+            if (isEmbedded) {
+                return defaultRootSuffixNeeded;
+            } else {
+                return StoreMode.DEFAULT.equals(umaLabelsConfig.getStoreMode()) && defaultRootSuffixNeeded;
+            }
+        }
+    }
+
+    private class AddUmaResourceSetLabelsSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() { return "/WEB-INF/template/ldif/opendj/opendj_uma_labels_schema.ldif"; }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+
+            boolean defaultRootSuffixNeeded = isDefaultRootSuffixNeeded(conn, umaLabelsConfig);
+            if (isEmbedded) {
+                return defaultRootSuffixNeeded;
+            } else {
+                return StoreMode.DEFAULT.equals(umaLabelsConfig.getStoreMode()) && defaultRootSuffixNeeded;
+            }
         }
     }
 

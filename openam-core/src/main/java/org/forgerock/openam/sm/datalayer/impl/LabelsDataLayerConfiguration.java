@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2.resources.labels;
+package org.forgerock.openam.sm.datalayer.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +35,15 @@ import com.iplanet.am.util.SystemProperties;
  */
 public class LabelsDataLayerConfiguration extends LdapDataLayerConfiguration {
 
+    private static final String STORE_LOCATION = "org.forgerock.services.uma.labels.store.location";
+    private static final String STORE_HOSTNAME = "org.forgerock.services.uma.labels.store.directory.name";
+    private static final String STORE_USERNAME = "org.forgerock.services.uma.labels.store.loginid";
+    private static final String STORE_PASSWORD = "org.forgerock.services.uma.labels.store.password";
+    private static final String STORE_MAX_CONNECTIONS = "org.forgerock.services.uma.labels.store.max.connections";
+    private static final String STORE_SSL_ENABLED = "org.forgerock.services.uma.labels.store.ssl.enabled";
+    private static final String ROOT_SUFFIX = "org.forgerock.services.uma.labels.store.root.suffix";
+    private static final String STORE_HEARTBEAT = "org.forgerock.services.uma.labels.store.heartbeat";
+
     @Inject
     public LabelsDataLayerConfiguration(@Named(DataLayerConstants.ROOT_DN_SUFFIX) String rootDnSuffix) {
         super(rootDnSuffix);
@@ -42,7 +51,7 @@ public class LabelsDataLayerConfiguration extends LdapDataLayerConfiguration {
 
     @Override
     public StoreMode getStoreMode() {
-        String mode = SystemProperties.get(LabelsConstants.STORE_LOCATION);
+        String mode = SystemProperties.get(STORE_LOCATION);
         if (StringUtils.isNotEmpty(mode)) {
             return StoreMode.valueOf(mode.toUpperCase());
         } else {
@@ -54,12 +63,12 @@ public class LabelsDataLayerConfiguration extends LdapDataLayerConfiguration {
     public void updateExternalLdapConfiguration(ModifiedProperty<String> hosts, ModifiedProperty<String> username,
             ModifiedProperty<String> password, ModifiedProperty<String> maxConnections,
             ModifiedProperty<Boolean> sslMode, ModifiedProperty<Integer> heartbeat) {
-        hosts.set(SystemProperties.get(LabelsConstants.STORE_HOSTNAME));
-        username.set(SystemProperties.get(LabelsConstants.STORE_USERNAME));
-        password.set(AMPasswordUtil.decrypt(SystemProperties.get(LabelsConstants.STORE_PASSWORD)));
-        maxConnections.set(SystemProperties.get(LabelsConstants.STORE_MAX_CONNECTIONS));
-        sslMode.set(SystemProperties.getAsBoolean(LabelsConstants.STORE_SSL_ENABLED, false));
-        heartbeat.set(SystemProperties.getAsInt(LabelsConstants.STORE_HEARTBEAT, -1));
+        hosts.set(SystemProperties.get(STORE_HOSTNAME));
+        username.set(SystemProperties.get(STORE_USERNAME));
+        password.set(AMPasswordUtil.decrypt(SystemProperties.get(STORE_PASSWORD)));
+        maxConnections.set(SystemProperties.get(STORE_MAX_CONNECTIONS));
+        sslMode.set(SystemProperties.getAsBoolean(STORE_SSL_ENABLED, false));
+        heartbeat.set(SystemProperties.getAsInt(STORE_HEARTBEAT, -1));
     }
 
     @Override
@@ -73,6 +82,6 @@ public class LabelsDataLayerConfiguration extends LdapDataLayerConfiguration {
 
     @Override
     protected String getCustomTokenRootSuffixProperty() {
-        return LabelsConstants.ROOT_SUFFIX;
+        return ROOT_SUFFIX;
     }
 }
