@@ -68,26 +68,19 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     }
 
     @Override
-    protected AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+    protected AccessToken handle(OAuth2Request request, ClientRegistration client,
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException,
             InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException,
             InvalidScopeException, NotFoundException, InvalidClientException, AuthorizationDeclinedException,
             ExpiredTokenException, BadRequestException, AuthorizationPendingException {
 
-        // Client ID, Secret and code are required, all other parameters are optional
-        final String clientId = request.getParameter(CLIENT_ID);
-        final String clientSecret = request.getParameter(CLIENT_SECRET);
         final String code = request.getParameter(CODE);
 
-        if (isEmpty(clientId) || isEmpty(clientSecret) || isEmpty(code)) {
-            throw new BadRequestException("client_id, client_secret and code are required parameters");
+        if (isEmpty(code)) {
+            throw new BadRequestException("code is a required parameter");
         }
 
-        ClientRegistration client = clientRegistrationStore.get(clientId, request);
-        if (!clientSecret.equals(client.getClientSecret())) {
-            throw failureFactory.getException();
-        }
-
+        String clientId = client.getClientId();
         DeviceCode deviceCode = tokenStore.readDeviceCode(clientId, code, request);
 
         if (deviceCode == null ||
