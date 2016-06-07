@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_GRANT;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
@@ -39,10 +41,13 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.identity.shared.Constants;
 
 /**
  * Handles access token requests from OAuth2 clients to the OAuth2 provider to grant access tokens for the requested
@@ -114,6 +119,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             logger.error("Refresh token does not exist for id: " + tokenId);
             throw new InvalidRequestException("RefreshToken does not exist");
         }
+
+        AuditRequestContext.putProperty(OAUTH2_GRANT.toString(), refreshToken.getAuditTrackingId());
 
         if (!refreshToken.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
             logger.error("Refresh Token was issued to a different client id: " + clientRegistration.getClientId());

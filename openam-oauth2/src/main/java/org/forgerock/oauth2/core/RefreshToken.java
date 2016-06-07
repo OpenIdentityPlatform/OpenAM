@@ -74,13 +74,6 @@ public interface RefreshToken extends IntrospectableToken {
     String getAuditTrackingId();
 
     /**
-     * Gets the {@link JsonValue} representation of the token.
-     *
-     * @return The {@link JsonValue} representation of the token.
-     */
-    JsonValue toJsonValue();
-
-    /**
      * Gets the token's Auth Grant id.
      *
      * @return The token's Auth Grant id.

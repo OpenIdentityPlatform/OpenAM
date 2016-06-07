@@ -21,6 +21,9 @@ import static org.forgerock.oauth2.core.Utils.*;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.List;
+
+import org.forgerock.json.jose.jws.JwsHeader;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 
@@ -62,10 +65,20 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
             KeyPair signingKeyPair, PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm,
             String encryptionMethod, boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp,
             long exp, long iat, long authTime, String nonce, String ops, String atHash, String cHash, String acr,
-            List<String> amr, String realm) {
-        super(signingKeyId, encryptionKeyId, clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
-                encryptionMethod, isIDTokenEncryptionEnabled, iss, sub, aud, azp, exp, iat, authTime, nonce, ops, atHash, cHash, acr, amr);
+            List<String> amr, String realm, String auditTrackingId) {
+        super(signingKeyId, encryptionKeyId, clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm,
+                encryptionAlgorithm, encryptionMethod, isIDTokenEncryptionEnabled, iss, sub, aud, azp, exp, iat,
+                authTime, nonce, ops, atHash, cHash, acr, amr, auditTrackingId);
         setRealm(realm);
+    }
+
+    /**
+     * Constructs a new OpenAMOpenIdConnectToken.
+     * @param claims The claims set for the token.
+     */
+    public OpenAMOpenIdConnectToken(JwtClaimsSet claims) {
+        super(claims);
+        setClaims(claims, OAuth2Constants.CoreTokenParams.REALM);
     }
 
     /**

@@ -21,9 +21,11 @@ import javax.inject.Inject;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +52,13 @@ public class OpenIDConnectEndSession {
     /**
      * Ends an OpenId Connect session.
      *
+     *
+     * @param request The request.
      * @param idToken The OpenId Token.
      * @throws BadRequestException If the request is malformed.
      * @throws ServerException If any internal server error occurs.
      */
-    public void endSession(String idToken) throws BadRequestException, ServerException {
+    public void endSession(OAuth2Request request, String idToken) throws BadRequestException, ServerException {
 
         if (idToken == null || idToken.isEmpty()) {
             logger.warn("No id_token_hint parameter supplied to the endSession endpoint");
@@ -68,6 +72,8 @@ public class OpenIDConnectEndSession {
         if (opsId == null) {
             opsId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.LEGACY_OPS);
         }
+
+        request.setToken(OpenIdConnectToken.class, new OpenAMOpenIdConnectToken(claims));
 
         openIDConnectProvider.destroySession(opsId);
     }

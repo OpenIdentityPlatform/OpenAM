@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.openam.audit.AuditConstants;
 
 /**
  * Models a OAuth2 access token.
@@ -195,6 +196,11 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         tokenInfo.put(getResourceString(CLIENT_ID), getClientId());
         tokenInfo.put(getResourceString(GRANT_TYPE), getGrantType());
         return tokenInfo;
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_ACCESS;
     }
 
     /**

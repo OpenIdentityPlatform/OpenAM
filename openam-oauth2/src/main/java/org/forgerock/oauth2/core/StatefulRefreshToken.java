@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.openam.audit.AuditConstants;
 
 /**
  * Models a OAuth2 Refresh Token.
@@ -171,6 +172,11 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         tokenInfo.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         tokenInfo.put(getResourceString(SCOPE), getScope());
         return tokenInfo;
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_REFRESH;
     }
 
     @Override

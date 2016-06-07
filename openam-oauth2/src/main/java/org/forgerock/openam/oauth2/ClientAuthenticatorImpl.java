@@ -17,6 +17,7 @@
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.Constants.AM_CTX_ID;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 import javax.inject.Inject;
@@ -169,6 +170,8 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
 
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
+                request.<Request>getRequest().getAttributes().put(AM_CTX_ID,
+                        lc.getAuthContextLocal().getLoginState().getSession().getProperty(AM_CTX_ID));
                 return true;
             } else {
                 throw failureFactory.getException(request, "Client authentication failed");

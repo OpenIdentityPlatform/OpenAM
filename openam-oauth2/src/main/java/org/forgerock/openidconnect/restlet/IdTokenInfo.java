@@ -16,40 +16,40 @@
 
 package org.forgerock.openidconnect.restlet;
 
-import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.ClientAuthenticator;
-import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
-import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
@@ -57,7 +57,8 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
+
+import com.sun.identity.authentication.util.ISAuthConstants;
 
 /**
  * OpenID Connect id_token validation and claim decoding endpoint. This is a non-standard endpoint that allows a
@@ -143,6 +144,8 @@ public class IdTokenInfo extends ServerResource {
         } catch (InvalidJwtException e) {
             throw new BadRequestException("invalid id_token: " + e.getMessage());
         }
+
+        request.setToken(OpenIdConnectToken.class, new OpenAMOpenIdConnectToken(idToken.getSignedJwt().getClaimsSet()));
 
         final String clientId = CollectionUtils.getFirstItem(idToken.getSignedJwt().getClaimsSet().getAudience());
         final String realm = idToken.getSignedJwt().getClaimsSet().get(OAuth2Constants.JWTTokenParams.REALM)

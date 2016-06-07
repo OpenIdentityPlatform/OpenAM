@@ -16,12 +16,13 @@
 
 package org.forgerock.oauth2.core;
 
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Set;
+
 import org.forgerock.guava.common.collect.ClassToInstanceMap;
 import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.JsonValue;
-
-import java.util.Locale;
-import java.util.Set;
 
 /**
  * An abstraction of the actual request so as to allow the core of the OAuth2 provider to be agnostic of the library
@@ -98,13 +99,21 @@ public abstract class OAuth2Request {
     }
 
     /**
-     * Set a Token that is in play for this request.
+     * Get a Token that is in play for this request.
      * @param tokenClass The token type.
      * @param <T> The type of token.
      * @return The token instance.
      */
     public <T extends Token> T getToken(Class<T> tokenClass) {
         return tokens.getInstance(tokenClass);
+    }
+
+    /**
+     * Get all the tokens that have been used in this request.
+     * @return The token instances.
+     */
+    public Collection<Token> getTokens() {
+        return tokens.values();
     }
 
     /**

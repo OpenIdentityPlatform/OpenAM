@@ -16,22 +16,22 @@
 package org.forgerock.openam.oauth2.guice;
 
 import static com.google.inject.name.Names.named;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.FORM_BODY;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_FORM_BODY;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
 import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
-import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.JWT_BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.PASSWORD;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -39,16 +39,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.iplanet.services.naming.WebtopNamingQuery;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -108,7 +102,12 @@ import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
-import org.forgerock.openam.blacklist.*;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.Blacklistable;
+import org.forgerock.openam.blacklist.BloomFilterBlacklist;
+import org.forgerock.openam.blacklist.CTSBlacklist;
+import org.forgerock.openam.blacklist.CachingBlacklist;
+import org.forgerock.openam.blacklist.NoOpBlacklist;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
@@ -132,7 +131,6 @@ import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
 import org.forgerock.openam.oauth2.StatelessCheck;
-import org.forgerock.openam.oauth2.StatelessToken;
 import org.forgerock.openam.oauth2.StatelessTokenCtsAdapter;
 import org.forgerock.openam.oauth2.StatelessTokenMetadata;
 import org.forgerock.openam.oauth2.StatelessTokenStore;
@@ -144,10 +142,6 @@ import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
-import org.forgerock.openam.rest.audit.OAuth2AuditAccessTokenContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditRefreshTokenContextProvider;
-import org.forgerock.openam.rest.audit.OAuth2AuditSSOTokenContextProvider;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -172,6 +166,17 @@ import org.forgerock.openidconnect.UserInfoServiceImpl;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.restlet.Request;
 import org.restlet.Restlet;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.iplanet.services.naming.WebtopNamingQuery;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
@@ -457,21 +462,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
             //No need to validate the realm for the provided token.
         }
-    }
-
-    @Inject
-    @Provides
-    @Singleton
-    @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS)
-    Set<OAuth2AuditContextProvider> getOAuth2AuditContextProviders(TokenStore tokenStore,
-            OAuth2RequestFactory<?, Request> requestFactory) {
-        Set<OAuth2AuditContextProvider> set = new HashSet<>();
-
-        set.add(new OAuth2AuditAccessTokenContextProvider(tokenStore, requestFactory));
-        set.add(new OAuth2AuditRefreshTokenContextProvider(tokenStore, requestFactory));
-        set.add(new OAuth2AuditSSOTokenContextProvider());
-
-        return set;
     }
 
     @Provides

@@ -167,6 +167,8 @@ public final class AuditConstants {
         OAUTH2_ACCESS,
         /** Tracking ID for Session used during authentication. */
         AUTH,
+        /** Tracking ID for an OpenID Connect ID Token. */
+        OIDC_ID_TOKEN,
         /** Radius Access Request. */
         RADIUS_ACCESS_REQUEST
     }

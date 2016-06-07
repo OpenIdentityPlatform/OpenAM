@@ -16,7 +16,9 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.audit.AuditConstants;
 
 import java.util.Map;
 
@@ -57,4 +59,23 @@ public interface Token {
      * @return A {@code Map} of the token's information.
      */
     Map<String, Object> getTokenInfo();
+
+    /**
+     * Gets the {@link JsonValue} representation of the token.
+     *
+     * @return The {@link JsonValue} representation of the token.
+     */
+    JsonValue toJsonValue();
+
+    /**
+     * Get the audit tracking ID for this token.
+     * @return The tracking ID.
+     */
+    String getAuditTrackingId();
+
+    /**
+     * Get the audit tracking ID key for this token.
+     * @return The tracking ID key.
+     */
+    AuditConstants.TrackingIdKey getAuditTrackingIdKey();
 }

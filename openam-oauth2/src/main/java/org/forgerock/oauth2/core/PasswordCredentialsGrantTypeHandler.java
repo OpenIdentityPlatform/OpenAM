@@ -80,7 +80,7 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
             requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request, false);
+        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(request);
         if (resourceOwner == null) {
             logger.error("Unable to verify user");
             throw new InvalidGrantException();

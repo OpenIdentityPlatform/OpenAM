@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.oauth2.core.RefreshToken;
+import org.forgerock.openam.audit.AuditConstants;
 
 /**
  * Models a stateless OpenAM OAuth2 refresh token.
@@ -70,6 +71,11 @@ public class StatelessRefreshToken extends StatelessToken implements RefreshToke
         tokenMap.put(getResourceString(TOKEN_TYPE), BEARER);
         tokenMap.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         return tokenMap;
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_REFRESH;
     }
 
     protected Long getTimeLeft() {

@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.openam.audit.AuditConstants;
 
 /**
  * Models a stateless OpenAM OAuth2 access token.
@@ -82,6 +83,11 @@ public final class StatelessAccessToken extends StatelessToken implements Access
         tokenMap.put(getResourceString(EXPIRE_TIME), getTimeLeft());
         tokenMap.putAll(extraData);
         return tokenMap;
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_ACCESS;
     }
 
     /**

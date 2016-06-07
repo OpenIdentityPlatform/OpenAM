@@ -78,7 +78,9 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.TransactionId;
 import org.forgerock.util.encode.Base64url;
+import org.forgerock.util.generator.IdGenerator;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -94,6 +96,11 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
+    //removed 0, 1, U, u, 8, 9 and l due to similarities to O, I, V, v, B, g and I on some displays
+    protected final static String ALPHABET = "234567ABCDEFGHIJKLMNOPQRSTVWXYZabcdefghijkmnopqrstvwxyz";
+    private final static int CODE_LENGTH = 8;
+    private final static int NUM_RETRIES = 10;
+
     private final Debug logger;
     private final OAuth2AuditLogger auditLogger;
     private final OAuthTokenStore tokenStore;
@@ -105,12 +112,6 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     private final CookieExtractor cookieExtractor;
     private final SecureRandom secureRandom;
     private final ClientAuthenticationFailureFactory failureFactory;
-
-    //removed 0, 1, U, u, 8, 9 and l due to similarities to O, I, V, v, B, g and I on some displays
-    protected final static String ALPHABET = "234567ABCDEFGHIJKLMNOPQRSTVWXYZabcdefghijkmnopqrstvwxyz";
-
-    private final static int CODE_LENGTH = 8;
-    private final static int NUM_RETRIES = 10;
 
     /**
      * Constructs a new OpenAMTokenStore.
@@ -156,6 +157,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
+        final String auditId = IdGenerator.DEFAULT.generate();
 
         long expiryTime = 0;
         if (clientRegistration == null) {
@@ -173,10 +175,10 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new NotFoundException(e.getMessage());
         }
 
-        final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
+        final AuthorizationCode authorizationCode = new AuthorizationCode(code, resourceOwner.getId(), clientId,
                 redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realm,
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
-                ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString());
+                ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString(), auditId);
 
         // Store in CTS
         try {
@@ -301,8 +303,10 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(signingKeyId, encryptionKeyId,
                 clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
                 encryptionMethod, clientRegistration.isIDTokenEncryptionEnabled(), iss, subId, clientId,
-                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr, realm);
+                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr, realm,
+                IdGenerator.DEFAULT.generate());
         request.setSession(ops);
+        request.setToken(OpenIdConnectToken.class, oidcToken);
 
         //See spec section 5.4. - add claims to id_token based on 'response_type' parameter
         String responseType = request.getParameter(OAuth2Constants.Params.RESPONSE_TYPE);
@@ -504,7 +508,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
-        final String auditId = UUID.randomUUID().toString();
+        final String auditId = IdGenerator.DEFAULT.generate();
 
         String realm = null;
         try {
@@ -581,7 +585,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         final String id = UUID.randomUUID().toString();
-        final String auditId = UUID.randomUUID().toString();
+        final String auditId = IdGenerator.DEFAULT.generate();
 
         final long lifeTime;
         if (clientRegistration == null) {
@@ -660,7 +664,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new InvalidGrantException("The provided access grant is invalid, expired, or revoked.");
         }
 
-        OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(token);
+        AuthorizationCode authorizationCode = new AuthorizationCode(token);
         validateTokenRealm(authorizationCode.getRealm(), request);
 
         request.setToken(AuthorizationCode.class, authorizationCode);
@@ -857,6 +861,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String deviceCode = UUID.randomUUID().toString();
+        final String auditId = IdGenerator.DEFAULT.generate();
         final StringBuilder codeBuilder = new StringBuilder(CODE_LENGTH);
 
         String userCode = null;
@@ -894,7 +899,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         String resourceOwnerId = resourceOwner == null ? null : resourceOwner.getId();
         final DeviceCode code = new DeviceCode(deviceCode, userCode, resourceOwnerId, clientId, nonce,
                 responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
-                realm, codeChallenge, codeChallengeMethod);
+                realm, codeChallenge, codeChallengeMethod, auditId);
 
         // Store in CTS
         try {

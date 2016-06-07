@@ -21,6 +21,7 @@ import static org.forgerock.oauth2.core.Utils.*;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.jdi.IntegerValue;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -29,6 +30,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -56,7 +58,7 @@ public class DeviceCode extends JsonValue implements Token {
     public DeviceCode(String deviceCode, String userCode, String resourceOwnerId, String clientId, String nonce,
             String responseType, String state, String acrValues, String prompt, String uiLocales, String loginHint,
             Integer maxAge, String claims, long expiryTime, Set<String> scope, String realm, String codeChallenge,
-            String codeChallengeMethod) {
+            String codeChallengeMethod, String auditTrackingId) {
         super(object());
         setStringProperty(TOKEN_NAME, OAuth2Constants.DeviceCode.DEVICE_CODE);
         setStringProperty(OAuth2Constants.CoreTokenParams.ID, deviceCode);
@@ -75,6 +77,7 @@ public class DeviceCode extends JsonValue implements Token {
         setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
         setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
         setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+        setStringProperty(OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID, auditTrackingId);
         put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
         put(SCOPE, scope);
     }
@@ -237,6 +240,15 @@ public class DeviceCode extends JsonValue implements Token {
         return getStringProperty(OAuth2Constants.CoreTokenParams.ID);
     }
 
+    public String getAuditTrackingId() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID);
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_GRANT;
+    }
+
     @Override
     public String getTokenName() {
         return getStringProperty(TOKEN_NAME);
@@ -319,5 +331,12 @@ public class DeviceCode extends JsonValue implements Token {
 
     public boolean isAuthorized() {
         return Boolean.valueOf(getStringProperty("AUTHORIZED"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JsonValue toJsonValue() {
+        return this;
     }
 }

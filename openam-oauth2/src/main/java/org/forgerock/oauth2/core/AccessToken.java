@@ -82,11 +82,4 @@ public interface AccessToken extends IntrospectableToken {
      * @return The token's audit tracking id.
      */
     String getAuditTrackingId();
-
-    /**
-     * Gets the {@link JsonValue} representation of the token.
-     *
-     * @return The {@link JsonValue} representation of the token.
-     */
-    JsonValue toJsonValue();
 }

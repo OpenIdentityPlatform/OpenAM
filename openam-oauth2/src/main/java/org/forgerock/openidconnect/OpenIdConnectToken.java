@@ -17,6 +17,18 @@
 package org.forgerock.openidconnect;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AMR;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AT_HASH;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AUD;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AUTH_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AZP;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.C_HASH;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ISS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.NONCE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.OPS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.SUB;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -40,8 +52,10 @@ import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuthProblemException;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,11 +104,13 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param cHash The c_hash.
      * @param acr The acr.
      * @param amr The amr.
+     * @param auditTrackingId The audit tracking ID.
      */
     public OpenIdConnectToken(String signingKeyId, String encryptionKeyId, byte[] clientSecret, KeyPair signingKeyPair,
             PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm, String encryptionMethod,
             boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp, long exp, long iat,
-            long authTime, String nonce, String ops, String atHash, String cHash, String acr, List<String> amr) {
+            long authTime, String nonce, String ops, String atHash, String cHash, String acr, List<String> amr,
+            String auditTrackingId) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
         this.signingAlgorithm = signingAlgorithm;
@@ -120,9 +136,33 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setAmr(amr);
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
+        set(AUDIT_TRACKING_ID, auditTrackingId);
     }
 
+    public OpenIdConnectToken(JwtClaimsSet claims) {
+        super(new HashMap<String, Object>());
+        this.clientSecret = null;
+        this.signingAlgorithm = null;
+        this.isIDTokenEncryptionEnabled = false;
+        this.encryptionAlgorithm = null;
+        this.encryptionMethod = null;
+        this.signingKeyPair = null;
+        this.encryptionPublicKey = null;
+        this.signingKeyId = null;
+        this.encryptionKeyId = null;
+        setClaims(claims, ISS, SUB, AZP, NONCE, OPS, AT_HASH, C_HASH, ACR, AUDIT_TRACKING_ID, AUTH_TIME, AMR);
+        setAud(CollectionUtils.getFirstItem(claims.getAudience()));
+        setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
+        setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
+    }
 
+    protected void setClaims(JwtClaimsSet claims, String... keys) {
+        for (String key : keys) {
+            if (claims.isDefined(key)) {
+                this.put(key, claims.get(key).getObject());
+            }
+        }
+    }
 
     /**
      * Sets a value on the OpenId Connect token if the value is not null or an empty String.
@@ -169,7 +209,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param azp The authorized party.
      */
     private void setAzp(String azp) {
-        set(OAuth2Constants.JWTTokenParams.AZP, azp);
+        set(AZP, azp);
     }
 
     /**
@@ -309,6 +349,23 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      */
     public Map<String, Object> getTokenInfo() {
         return new HashMap<String, Object>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JsonValue toJsonValue() {
+        return this;
+    }
+
+    @Override
+    public String getAuditTrackingId() {
+        return get(AUDIT_TRACKING_ID).asString();
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OIDC_ID_TOKEN;
     }
 
     /**

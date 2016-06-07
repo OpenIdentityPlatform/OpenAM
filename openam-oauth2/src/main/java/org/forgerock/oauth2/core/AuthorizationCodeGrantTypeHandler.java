@@ -141,8 +141,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             final String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
             authorizationScope = authorizationCode.getScope();
             final String resourceOwnerId = authorizationCode.getResourceOwnerId();
-            final String validatedClaims = providerSettings.validateRequestedClaims(
-                    authorizationCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
+            final String validatedClaims = providerSettings.validateRequestedClaims(authorizationCode.getClaims());
 
             accessToken = accessTokenGenerator.generateAccessToken(providerSettings, grantType,
                     clientRegistration.getClientId(), resourceOwnerId, redirectUri, authorizationScope, validatedClaims,

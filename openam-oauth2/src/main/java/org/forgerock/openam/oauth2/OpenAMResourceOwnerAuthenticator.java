@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.Constants.AM_CTX_ID;
 import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 
@@ -77,52 +78,27 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request, boolean useSession) throws NotFoundException {
-        SSOToken token = null;
+    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
+        final String username = request.getParameter(USERNAME);
+        final char[] password = request.getParameter(PASSWORD) == null ? null :
+                request.<String>getParameter(PASSWORD).toCharArray();
         try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            token = mgr.createSSOToken(ServletUtils.getRequest(request.<Request>getRequest()));
-        } catch (Exception e){
-            logger.warning("No SSO Token in request", e);
+            final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
+            final String authChain = request.getParameter(AUTH_CHAIN);
+            return authenticate(request.<Request>getRequest(), username, password, realm, authChain);
+        } catch (org.forgerock.json.resource.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
-        if (token == null || !useSession) {
-            final String username = request.getParameter(USERNAME);
-            final char[] password = request.getParameter(PASSWORD) == null ? null :
-                    request.<String>getParameter(PASSWORD).toCharArray();
-            try {
-                final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
-                final String authChain = request.getParameter(AUTH_CHAIN);
-                return authenticate(username, password, realm, authChain);
-            } catch (org.forgerock.json.resource.NotFoundException e) {
-                throw new NotFoundException(e.getMessage());
-            }
-        } else {
-            try {
-                final AMIdentity id = IdUtils.getIdentity(
-                        AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                        token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-
-                long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
-
-                return new OpenAMResourceOwner(id.getName(), id, authTime);
-            } catch (SSOException e) {
-                logger.error("Unable to create ResourceOwner", e);
-            } catch (ParseException e) {
-                logger.error("Unable to create ResourceOwner", e);
-            } catch (IdRepoException e) {
-                logger.error("Unable to create ResourceOwner", e);
-            }
-        }
-        return null;
     }
 
-    private ResourceOwner authenticate(String username, char[] password, String realm, String service) {
+    private ResourceOwner authenticate(Request req, String username, char[] password, String realm,
+            String service) {
 
         ResourceOwner ret = null;
-        AuthContext lc = null;
+        AuthContext lc;
         try {
             lc = new AuthContext(realm);
-            HttpServletRequest request = ServletUtils.getRequest(Request.getCurrent());
+            HttpServletRequest request = ServletUtils.getRequest(req);
             request.setAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR, "true");
             if (service != null) {
                 lc.login(AuthContext.IndexType.SERVICE, service, null, request,
@@ -156,8 +132,12 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 try {
-                    // package up the token for transport..
-                    ret = createResourceOwner(lc);
+                    LoginState loginState = lc.getAuthContextLocal().getLoginState();
+                    String universalId = loginState.getUserUniversalId(loginState.getUserDN());
+                    SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                    final AMIdentity id = IdUtils.getIdentity(adminToken, universalId);
+                    req.getAttributes().put(AM_CTX_ID, loginState.getSession().getProperty(AM_CTX_ID));
+                    ret = new OpenAMResourceOwner(id.getName(), id);
                 } catch (Exception e) {
                     logger.error("Unable to get SSOToken", e);
                     // we're going to throw a generic error
@@ -172,11 +152,4 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
         return ret;
     }
 
-    private ResourceOwner createResourceOwner(AuthContext authContext) throws Exception {
-        LoginState loginState = authContext.getAuthContextLocal().getLoginState();
-        String universalId = loginState.getUserUniversalId(loginState.getUserDN());
-        final AMIdentity id = IdUtils.getIdentity(AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                universalId);
-        return new OpenAMResourceOwner(id.getName(), id);
-    }
 }

@@ -86,7 +86,7 @@ public class EndSession extends ServerResource {
         final String idToken = request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT);
         final String redirectUri = request.getParameter(OAuth2Constants.Params.POST_LOGOUT_REDIRECT_URI);
         try {
-            openIDConnectEndSession.endSession(idToken);
+            openIDConnectEndSession.endSession(request, idToken);
             if (StringUtils.isNotEmpty(redirectUri)) {
                 return handleRedirect(request, idToken, redirectUri);
             }

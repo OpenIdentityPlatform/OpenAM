@@ -16,17 +16,40 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
-import static org.forgerock.openam.utils.Time.*;
-
-import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ISSUED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CODE_CHALLENGE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CODE_CHALLENGE_METHOD;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_CODE_TYPE;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Models a OAuth2 Authorization Code.
@@ -34,6 +57,7 @@ import java.util.Set;
  * @since 12.0.0
  */
 public class AuthorizationCode extends JsonValue implements Token {
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
     /**
      * Constructs a new AuthorizationCode backed with the data in the specified JsonValue.
@@ -41,9 +65,9 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param token The JsonValue of the token.
      * @throws InvalidGrantException If the given token is not an Authorization Code token.
      */
-    protected AuthorizationCode(JsonValue token) throws InvalidGrantException {
+    public AuthorizationCode(JsonValue token) throws InvalidGrantException {
         super(token);
-        if (!OAuth2Constants.Token.OAUTH_CODE_TYPE.equals(getTokenName())) {
+        if (!OAUTH_CODE_TYPE.equals(getTokenName())) {
             throw new InvalidGrantException("Token is not an authorization code token: " + getTokenId());
         }
     }
@@ -59,122 +83,28 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param expiryTime The expiry time.
      * @param nonce The nonce.
      */
-    public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri,
-            Set<String> scope, long expiryTime, String nonce, String authModules, String acr, String codeChallenge,
-                             String codeChallengeMethod, String authGrantId) {
+    public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
+            String claims, long expiryTime, String nonce, String realm, String authModules, String acr,
+            String ssoTokenId, String codeChallenge, String codeChallengeMethod, String authGrantId, String auditId) {
         super(new HashMap<String, Object>());
-        setCode(code);
-        setResourceOwnerId(resourceOwnerId);
-        setClientId(clientId);
-        setRedirectUri(redirectUri);
-        setScope(scope);
-        setExpiryTime(expiryTime);
-        setTokenType("Bearer");
-        setTokenName(OAuth2Constants.Token.OAUTH_CODE_TYPE);
-        setNonce(nonce);
-        setAuthModules(authModules);
-        setAuthenticationContextClassReference(acr);
-        setCodeChallenge(codeChallenge);
-        setCodeChallengeMethod(codeChallengeMethod);
-        setAuthGrantId(authGrantId);
-    }
-
-    /**
-     * Sets the authorization code.
-     *
-     * @param code The authorization code.
-     */
-    protected void setCode(String code) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.ID, code);
-    }
-
-    /**
-     * Sets the resource owner's id.
-     *
-     * @param resourceOwnerId The resource owner's id.
-     */
-    protected void setResourceOwnerId(String resourceOwnerId) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
-    }
-
-    /**
-     * Sets the client's id.
-     *
-     * @param clientId The client's id.
-     */
-    protected void setClientId(String clientId) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
-    }
-
-    /**
-     * Sets the redirect uri.
-     *
-     * @param redirectUri The redirect uri.
-     */
-    protected void setRedirectUri(String redirectUri) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
-    }
-
-    /**
-     * Sets the token type.
-     *
-     * @param tokenType The token type.
-     */
-    protected void setTokenType(String tokenType) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
-    }
-
-    /**
-     * Sets the token name.
-     *
-     * @param tokenName The token name.
-     */
-    protected void setTokenName(String tokenName) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
-    }
-
-    /**
-     * Sets the auth modules
-     * @param authModules The auth modules string.
-     */
-    protected void setAuthModules(String authModules) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
-    }
-
-    /**
-     * Sets the nonce.
-     *
-     * @param nonce The nonce.
-     */
-    protected void setNonce(String nonce) {
-        setStringProperty(OAuth2Constants.Custom.NONCE, nonce);
-    }
-
-    /**
-     * Sets the authentication context class reference (acr).
-     *
-     * @param acr The acr.
-     */
-    protected void setAuthenticationContextClassReference(String acr) {
-        setStringProperty(OAuth2Constants.JWTTokenParams.ACR, acr);
-    }
-
-    /**
-     * Sets the scope.
-     *
-     * @param scope The scope.
-     */
-    protected void setScope(Set<String> scope) {
-        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
-    }
-
-    /**
-     * Sets the expiry time.
-     *
-     * @param expiryTime The expiry time.
-     */
-    protected void setExpiryTime(long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, expiryTime);
+        setStringProperty(ID, code);
+        setStringProperty(USERNAME, resourceOwnerId);
+        setStringProperty(CLIENT_ID, clientId);
+        setStringProperty(REDIRECT_URI, redirectUri);
+        setStringProperty(EXPIRE_TIME, String.valueOf(expiryTime));
+        put(SCOPE, scope);
+        setStringProperty(TOKEN_TYPE, "Bearer");
+        setStringProperty(TOKEN_NAME, OAUTH_CODE_TYPE);
+        setStringProperty(NONCE, nonce);
+        setStringProperty(AUTH_MODULES, authModules);
+        setStringProperty(ACR, acr);
+        setStringProperty(CODE_CHALLENGE, codeChallenge);
+        setStringProperty(CODE_CHALLENGE_METHOD, codeChallengeMethod);
+        setStringProperty(AUTH_GRANT_ID, authGrantId);
+        setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
+        setStringProperty(SSO_TOKEN_ID, ssoTokenId);
+        put(CLAIMS, CollectionUtils.asSet(claims));
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
     }
 
     /**
@@ -192,8 +122,9 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The Expiry time.
      */
     public long getExpiryTime() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.EXPIRE_TIME)) {
-            return get(OAuth2Constants.CoreTokenParams.EXPIRE_TIME).asLong();
+        final Set<String> value = getParameter(EXPIRE_TIME);
+        if (value != null && !value.isEmpty()) {
+            return Long.parseLong(value.iterator().next());
         }
         return 0;
     }
@@ -202,7 +133,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * {@inheritDoc}
      */
     public String getTokenId() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.ID);
+        return getStringProperty(ID);
     }
 
     /**
@@ -211,14 +142,14 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The token type.
      */
     public String getTokenType() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        return getStringProperty(TOKEN_TYPE);
     }
 
     /**
      * {@inheritDoc}
      */
     public String getTokenName() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+        return getStringProperty(TOKEN_NAME);
     }
 
     /**
@@ -227,7 +158,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The scope.
      */
     public Set<String> getScope() {
-        final Set<String> scope = (Set<String>) get(OAuth2Constants.CoreTokenParams.SCOPE).getObject();
+        final Set<String> scope = getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
         if (!Utils.isEmpty(scope)) {
             return scope;
         }
@@ -240,10 +171,8 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return {@code true} if the authorization code has been issued.
      */
     public boolean isIssued() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.ISSUED)) {
-            return get(OAuth2Constants.CoreTokenParams.ISSUED).asBoolean();
-        }
-        return false;
+        Set<String> issued = getParameter(ISSUED);
+        return issued != null && Boolean.parseBoolean(issued.iterator().next());
     }
 
     /**
@@ -252,7 +181,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The redirect uri.
      */
     public String getRedirectUri() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        return getStringProperty(REDIRECT_URI);
     }
 
     /**
@@ -261,7 +190,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The client's id.
      */
     public String getClientId() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        return getStringProperty(CLIENT_ID);
     }
 
     /**
@@ -270,7 +199,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The resource owner's id.
      */
     public String getResourceOwnerId() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
+        return getStringProperty(USERNAME);
     }
 
     /**
@@ -278,7 +207,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The pipe-separated list of auth modules.
      */
     public String getAuthModules() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
+        return getStringProperty(AUTH_MODULES);
     }
 
     /**
@@ -286,14 +215,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The acr string matched, if any.
      */
     public String getAuthenticationContextClassReference() {
-        return getStringProperty(OAuth2Constants.JWTTokenParams.ACR);
-    }
-
-    /**
-     * Sets the authorization code as issued.
-     */
-    public void setIssued() {
-        put(OAuth2Constants.CoreTokenParams.ISSUED, true);
+        return getStringProperty(ACR);
     }
 
     /**
@@ -302,7 +224,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The nonce.
      */
     public String getNonce() {
-        return getStringProperty(OAuth2Constants.Custom.NONCE);
+        return getStringProperty(NONCE);
     }
 
     /**
@@ -311,15 +233,41 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The session id.
      */
     public String getSessionId() {
-        return getStringProperty(OAuth2Constants.Custom.SSO_TOKEN_ID);
+        return getStringProperty(SSO_TOKEN_ID);
     }
 
-    protected String getStringProperty(String key) {
-        return isDefined(key) ? get(key).asString() : null;
+    /**
+     * Sets the authorization code as issued.
+     */
+    public void setIssued() {
+        setStringProperty(OAuth2Constants.CoreTokenParams.ISSUED, "true");
     }
 
-    protected void setStringProperty(String key, String value) {
-        put(key, value);
+    /**
+     * Gets the specified parameter from the JsonValue.
+     *
+     * @param paramName The parameter name.
+     * @return A {@code Set} of the parameter values.
+     */
+    private Set<String> getParameter(String paramName) {
+        final JsonValue param = get(paramName);
+        if (param != null) {
+            return (Set<String>) param.getObject();
+        }
+        return null;
+    }
+
+    private String getStringProperty(String key) {
+        final Set<String> value = getParameter(key);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+
+    }
+
+    private void setStringProperty(String key, String value) {
+        put(key, stringToSet(value));
     }
 
     /**
@@ -328,7 +276,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param s The String.
      * @return The display String.
      */
-    protected String getResourceString(final String s) {
+    private String getResourceString(final String s) {
         return s;
     }
 
@@ -337,7 +285,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      */
     public Map<String, Object> toMap() {
         final Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
+        tokenMap.put(getResourceString(TOKEN_TYPE), getTokenType());
         tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
                 (getExpiryTime() - currentTimeMillis()) / 1000);
         return tokenMap;
@@ -348,19 +296,12 @@ public class AuthorizationCode extends JsonValue implements Token {
      */
     public Map<String, Object> getTokenInfo() {
         final Map<String, Object> tokenInfo = new HashMap<String, Object>();
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
+        tokenInfo.put(getResourceString(TOKEN_TYPE), getTokenType());
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
                 (getExpiryTime() - currentTimeMillis()) / 1000);
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
+        tokenInfo.put(RESOURCE_BUNDLE.getString(REALM), getRealm());
         return tokenInfo;
-    }
-
-    /**
-     * Sets the code challenge
-     * @param codeChallenge
-     */
-    public void setCodeChallenge(String codeChallenge) {
-        setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
     }
 
     /**
@@ -368,15 +309,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return code challenge
      */
     public String getCodeChallenge() {
-        return getStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE);
-    }
-
-    /**
-     * Sets the code challenge method
-     * @param codeChallengeMethod
-     */
-    public void setCodeChallengeMethod(String codeChallengeMethod) {
-        setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+        return getStringProperty(CODE_CHALLENGE);
     }
 
     /**
@@ -384,17 +317,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return code challenge method
      */
     public String getCodeChallengeMethod() {
-        return getStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
-    }
-
-    /**
-     *
-     * Sets the authorization grant id
-     *
-     * @param authGrantId The authorization grant id
-     */
-    public void setAuthGrantId(String authGrantId) {
-        setStringProperty(AUTH_GRANT_ID, authGrantId);
+        return getStringProperty(CODE_CHALLENGE_METHOD);
     }
 
     /**
@@ -403,4 +326,40 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The authorization grant id
      */
     public String getAuthGrantId() { return getStringProperty(AUTH_GRANT_ID); }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JsonValue toJsonValue() {
+        return this;
+    }
+
+    @Override
+    public String getAuditTrackingId() {
+        return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    @Override
+    public AuditConstants.TrackingIdKey getAuditTrackingIdKey() {
+        return AuditConstants.TrackingIdKey.OAUTH2_GRANT;
+    }
+
+    /**
+     * Returns the requested claims.
+     *
+     * @return The requested claims.
+     */
+    public String getClaims() {
+        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
+    }
+
+    /**
+     * Gets the realm.
+     *
+     * @return The realm.
+     */
+    public String getRealm() {
+        return getStringProperty(REALM);
+    }
+
 }

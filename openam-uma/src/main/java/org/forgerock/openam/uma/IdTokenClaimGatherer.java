@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -40,6 +40,8 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
+import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +81,7 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
         try {
             SignedJwt idToken = jwtReconstruction.reconstructJwt(claimToken.asString(), SignedJwt.class);
+            oAuth2Request.setToken(OpenIdConnectToken.class, new OpenAMOpenIdConnectToken(idToken.getClaimsSet()));
 
             OAuth2ProviderSettings oAuth2ProviderSettings = oauth2ProviderSettingsFactory.get(oAuth2Request);
             OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
