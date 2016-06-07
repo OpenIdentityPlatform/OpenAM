@@ -17,16 +17,13 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.set;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.EXPIRES_IN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 
@@ -467,7 +464,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(request, jwt);
+                verifySignature(jwt);
                 verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
@@ -490,7 +487,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(request, jwt);
+                verifySignature(jwt);
                 verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
@@ -513,7 +510,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(request, jwt);
+                verifySignature(jwt);
                 verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwtString);
@@ -537,7 +534,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(request, jwt);
+                verifySignature(jwt);
                 verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 StatelessRefreshToken refreshToken = new StatelessRefreshToken(jwt, jwtString);
@@ -650,9 +647,10 @@ public class StatelessTokenStore implements TokenStore {
         }
     }
 
-    private void verifySignature(OAuth2Request request, SignedJwt jwt) throws InvalidGrantException, ServerException,
+    private void verifySignature(SignedJwt jwt) throws InvalidGrantException, ServerException,
             NotFoundException {
-        verifySignature(providerSettingsFactory.get(request), jwt);
+        String realm = jwt.getClaimsSet().getClaim("realm", String.class);
+        verifySignature(providerSettingsFactory.get(realm), jwt);
     }
 
     private void verifySignature(OAuth2ProviderSettings providerSettings, SignedJwt jwt) throws InvalidGrantException, ServerException,
