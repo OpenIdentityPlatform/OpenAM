@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 
@@ -51,7 +50,6 @@ import com.sun.identity.sm.ServiceSchema;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
-import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonPointer;
@@ -338,9 +336,10 @@ public class SmsJsonConverter {
                 for (Object val : attributeArray) {
                     value.add(convertJsonToString(attributeName, val));
                 }
-            } else {
+            } else if (attributeValue != null) {
                 value.add(convertJsonToString(attributeName, attributeValue));
             }
+
             result.put(attributeName, value);
         }
 
