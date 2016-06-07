@@ -603,6 +603,33 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>precompile-jsps</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-jspc-maven-plugin</artifactId>
+                        <version>${jetty.jspc.version}</version>
+                        <executions>
+                            <execution>
+                                <id>jspc</id>
+                                <goals>
+                                    <goal>jspc</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Exclude JSPs with known compilation issues: -->
+                                    <excludes>**/ButtonFrame.jsp,**/Masthead.jsp,**/Version.jsp,
+                                        **/userconsole.jsp</excludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 
     <dependencies>
