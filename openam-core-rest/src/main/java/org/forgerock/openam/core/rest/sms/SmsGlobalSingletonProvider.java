@@ -101,41 +101,18 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue getJsonValue(String realm, ServiceConfig config, Context context) throws
-            InternalServerErrorException {
-        final JsonValue value = converter.toJson(schema.getAttributeDefaults(), true);
-        try {
-            value.add("_type", getTypeValue(context).getObject());
-        } catch (SSOException | SMSException e) {
-            debug.error("Error reading type for " + config.getName(), e);
-            throw new InternalServerErrorException();
-        }
-        return value;
-    }
-
-
-    /**
-     * Additionally adds "default" entry for realm attribute defaults, if present.
-     *
-     * @param value {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    protected JsonValue withExtraAttributes(String realm, JsonValue value) {
+    protected void addOrganisationAttributes(String realm, ServiceConfig config, JsonValue result) {
         if (organizationSchema != null) {
-            value.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults(), true)
+            result.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults(), true)
                     .getObject());
         }
-        return super.withExtraAttributes(null, value);
     }
 
     @Override
-    protected JsonValue createSchema(Context context) {
-        JsonValue result = super.createSchema(context);
+    protected void addOrganisationSchema(Context context, JsonValue result) {
         if (organizationSchema != null) {
             addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
         }
-        return result;
     }
 
     /**

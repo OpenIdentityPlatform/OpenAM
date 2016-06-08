@@ -144,10 +144,40 @@ public class SmsJsonConverter {
      * corresponding JSON representation
      *
      * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
+     * @param parentJson The {@link JsonValue} to which the attributes should be added.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs, boolean validate, JsonValue parentJson) {
+        return toJson(null, attributeValuePairs, validate, parentJson);
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
      * @param realm The realm, or null if global.
+     * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
      * @return Json representation of attributeValuePairs
      */
     public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate) {
+        return toJson(realm, attributeValuePairs, validate, json(object()));
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
+     * @param realm The realm, or null if global.
+     * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
+     * @param parentJson The {@link JsonValue} to which the attributes should be added.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate,
+            JsonValue parentJson) {
+
         if (!initialised) {
             init();
         }
@@ -161,14 +191,11 @@ public class SmsJsonConverter {
                     validAttributes = schema.validateAttributes(attributeValuePairs, realm);
                 }
             } catch (SMSException e) {
-                debug.error(
-                        "schema validation threw an exception while validating the attributes: realm=" + realm + " attributes: " + attributeValuePairs,
-                        e);
+                debug.error("schema validation threw an exception while validating the attributes: realm=" + realm +
+                        " attributes: " + attributeValuePairs, e);
                 throw new JsonException("Unable to validate attributes", e);
             }
         }
-
-        JsonValue parentJson = json(object());
 
         if (validAttributes) {
             for (String attributeName : attributeValuePairs.keySet()) {

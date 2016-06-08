@@ -108,7 +108,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 throw new NotFoundException();
             }
             String realm = realmFor(serverContext);
-            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
+            JsonValue result = getJsonValue(realm, config, serverContext);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException | SSOException | IdRepoException | InternalServerErrorException e) {
             debug.warning("::SmsSingletonProvider:: {} on Read", e.getClass().getSimpleName(), e);
@@ -134,17 +134,11 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         return result;
     }
 
-    /**
-     * Augments the provided {@code JsonValue} to include any dynamic attributes, if present.
-     *
-     * @param value The {@code JsonValue} to augment.
-     * @return The same {@code JsonValue} after is has been augmented.
-     */
-    protected JsonValue withExtraAttributes(String realm, JsonValue value) {
+    @Override
+    protected void addDynamicAttributes(String realm, JsonValue result) {
         if (dynamicConverter != null) {
-            value.add("dynamic", dynamicConverter.toJson(realm, getDynamicAttributes(realm), true).getObject());
+            result.add("dynamic", dynamicConverter.toJson(realm, getDynamicAttributes(realm), true).getObject());
         }
-        return value;
     }
 
     private void updateDynamicAttributes(Context context, JsonValue value) throws SMSException, SSOException,
@@ -175,7 +169,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             String realm = realmFor(serverContext);
             saveConfigAttributes(config, convertFromJson(updateRequest.getContent(), realm));
 
-            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
+            JsonValue result = getJsonValue(realm, config, serverContext);
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException | SSOException | IdRepoException e) {
             debug.warning("::SmsSingletonProvider:: {} on Update", e.getClass().getSimpleName(), e);
@@ -268,7 +262,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
                 parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrsDefaultAndGlobal);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
-            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
+            JsonValue result = getJsonValue(realm, config, serverContext);
             return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException | SSOException | IdRepoException e) {
             debug.warning("::SmsSingletonProvider:: {} on Create", e.getClass().getSimpleName(), e);
@@ -290,12 +284,10 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     }
 
     @Override
-    protected JsonValue createSchema(Context context) {
-        JsonValue result = super.createSchema(context);
+    protected void addDynamicSchema(Context context, JsonValue result) {
         if (dynamicSchema != null) {
             addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
         }
-        return result;
     }
 
     /**
