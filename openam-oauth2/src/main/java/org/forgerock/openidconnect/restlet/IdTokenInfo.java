@@ -19,8 +19,11 @@ package org.forgerock.openidconnect.restlet;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
@@ -32,6 +35,7 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Uris;
 import org.forgerock.oauth2.core.OAuth2UrisFactory;
+import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -41,6 +45,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
@@ -48,6 +53,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
@@ -142,12 +148,15 @@ public class IdTokenInfo extends ServerResource {
         final String realm = idToken.getSignedJwt().getClaimsSet().get(OAuth2Constants.JWTTokenParams.REALM)
                                     .defaultTo("/")
                                     .asString();
+
+        setRealmOnRequest(request, realm);
+
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId,
                 new ValidateIdTokenRequest(request, realm));
-
         JwsAlgorithm algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm());
         boolean requiresClientAuthentication =
                 providerSettingsFactory.get(request).isIdTokenInfoClientAuthenticationEnabled();
+
         if (requiresClientAuthentication && algorithm.getAlgorithmType().equals(JwsAlgorithmType.HMAC)) {
             clientAuthenticator.authenticate(request, urisFactory.get(request).getTokenEndpoint());
         }
@@ -161,6 +170,20 @@ public class IdTokenInfo extends ServerResource {
         }
 
         return idToken;
+    }
+
+    /**
+     * This method satisfies parts of the code which can only read realm information from the request.
+     *
+     * @param request the request.
+     * @param realm the realm taken from the token.
+     */
+    private void setRealmOnRequest(OAuth2Request request, String realm) {
+        ConcurrentMap<String, Object> attributes = request.<Request>getRequest().getAttributes();
+        attributes.put(OAuth2Constants.Custom.REALM, realm);
+        attributes.put(RestletRealmRouter.REALM_INFO, new RealmInfo(realm));
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request.<Request>getRequest());
+        httpRequest.setAttribute(ISAuthConstants.REALM_PARAM, realm);
     }
 
     /**
