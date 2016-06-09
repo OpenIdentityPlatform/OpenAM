@@ -26,10 +26,8 @@ package org.forgerock.openam.upgrade;
 
 import static java.nio.file.Files.copy;
 
-import com.sun.identity.setup.AMSetupUtils;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
-
+import javax.annotation.Nonnull;
+import javax.servlet.ServletContext;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,9 +44,10 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.Nonnull;
-import javax.servlet.ServletContext;
 
+import com.sun.identity.setup.AMSetupUtils;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -90,7 +89,7 @@ import org.opends.server.util.TimeThread;
  * users will backup their OpenAM before performing an upgrade allowing them to
  * revert their changes by restoring from backup.
  */
-public final class OpenDJUpgrader {
+public class OpenDJUpgrader {
     private static final String ZIP_FILE = "/WEB-INF/template/opendj/opendj.zip";
     private static final OpenDJVersion DJ_245_VERSION = OpenDJVersion.valueOf("2.4.5.7743");
     private static final OpenDJVersion DJ_246_VERSION = OpenDJVersion.valueOf("2.4.6.8102");
@@ -101,7 +100,7 @@ public final class OpenDJUpgrader {
     public static final List<String> INSTALL_ROOT_PROPERTIES = Arrays.asList("INSTALL_ROOT",
             "org.opends.server.ServerRoot", "org.opends.quicksetup.Root");
 
-
+    private final EmbeddedOpenDJBackupManager backupManager;
     private final String installRoot;
     private final File upgradeMarker;
     private final OpenDJVersion currentVersion;
@@ -112,11 +111,13 @@ public final class OpenDJUpgrader {
     /**
      * Creates a new OpenDJ upgrader.
      *
-     * @param installRoot
-     *          The installation root of the embedded OpenDS instance, which is
-     *          usually {@code ~/openam/opends}.
+     * @param backupManager An instance of the {@link EmbeddedOpenDJBackupManager}.
+     * @param installRoot The installation root of the embedded OpenDS instance, which is
+     *                    usually {@code ~/openam/opends}.
+     * @param servletCtx The {@code ServletContext}.
      */
-    public OpenDJUpgrader(final String installRoot, final ServletContext servletCtx) {
+    public OpenDJUpgrader(EmbeddedOpenDJBackupManager backupManager, String installRoot, ServletContext servletCtx) {
+        this.backupManager = backupManager;
         this.installRoot = installRoot;
         this.servletCtx = servletCtx;
         this.upgradeMarker = new File(installRoot + "/.upgrade_marker");
@@ -173,6 +174,7 @@ public final class OpenDJUpgrader {
             return;
         }
 
+        backupManager.createOpenDJBackup();
         // Create a marker file which will be removed only on completion.
         try (BufferedWriter out = new BufferedWriter(new FileWriter(upgradeMarker))) {
             out.write(currentVersion.toString());
