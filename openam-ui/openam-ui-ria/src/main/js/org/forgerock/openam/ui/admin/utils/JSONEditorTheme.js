@@ -367,6 +367,11 @@ define([
                     return button;
                 },
 
+                getSwitcher () {
+                    var el = document.createElement("div");
+                    return el;
+                },
+
                 getModal () {
                     var el = document.createElement("div");
                     el.className = "form-group";
