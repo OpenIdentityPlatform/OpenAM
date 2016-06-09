@@ -62,7 +62,7 @@ public class ScriptsViewBean extends RealmPropertiesBase implements HasEntitiesT
      */
     public void beginDisplay(DisplayEvent event) {
         redirectToXui(getRequestContext().getRequest(), getRedirectRealm(this),
-                MessageFormat.format("realms/{0}/scripts/list", getCurrentRealmEncoded()));
+                MessageFormat.format("realms/{0}/scripts", getCurrentRealmEncoded()));
     }
 
     @Override
