@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.shared.security.whitelist;
 
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.whitelist.URLPatternMatcher;
@@ -25,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Validates the provided redirect URL against the list of valid goto URL domains.
@@ -46,8 +48,10 @@ public class RedirectUrlValidator<T> {
     private static final Debug DEBUG = Debug.getInstance("patternMatching");
     private final ValidDomainExtractor<T> domainExtractor;
 
-    // See http://stackoverflow.com/a/417184
-    private final static int MAX_URL_LENGTH = 2000;
+    private final static String MAX_URL_LENGTH_PROPERTY = "org.forgerock.openam.redirecturlvalidator.maxUrlLength";
+
+    // Default of 2000 comes from the discussion in http://stackoverflow.com/a/417184
+    private final static int MAX_URL_LENGTH = SystemPropertiesManager.getAsInt(MAX_URL_LENGTH_PROPERTY, 2000);
 
     /**
      * Constructs a new RedirectUrlValidator instance.
@@ -68,15 +72,17 @@ public class RedirectUrlValidator<T> {
      * @return <code>true</code> if the provided URL is valid, <code>false</code> otherwise.
      */
     public boolean isRedirectUrlValid(final String url, final T configInfo) {
-        if (url == null || url.isEmpty()) {
+        if (StringUtils.isEmpty(url)) {
             return false;
         }
         final Collection<String> patterns = domainExtractor.extractValidDomains(configInfo);
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Validating goto URL " + url + " against patterns:\n" + patterns);
-        }
+        DEBUG.message("RedirectUrlValidator.isRedirectUrlValid: Validating goto URL {} against patterns: {}",
+                url, patterns);
 
         if (url.length() > MAX_URL_LENGTH) {
+            DEBUG.message("RedirectUrlValidator.isRedirectUrlValid:"
+                    + " The url was length {} which is longer than the allowed maximum of {}",
+                    url.length(), MAX_URL_LENGTH);
             return false;
         }
 
@@ -91,16 +97,13 @@ public class RedirectUrlValidator<T> {
                 return false;
             }
         } catch (final URISyntaxException urise) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("The goto URL " + url + " is not a valid URI", urise);
-            }
+            DEBUG.message("RedirectUrlValidator.isRedirectUrlValid: The goto URL {} is not a valid URI", url, urise);
             return false;
         }
 
         if (patterns == null || patterns.isEmpty()) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("There are no patterns to validate the URL against, the goto URL is considered valid");
-            }
+            DEBUG.message("RedirectUrlValidator.isRedirectUrlValid:"
+                    + " There are no patterns to validate the URL against, the goto URL {} is considered valid", url);
             return true;
         }
 
@@ -108,7 +111,8 @@ public class RedirectUrlValidator<T> {
         try {
             return patternMatcher.match(url, patterns, true);
         } catch (MalformedURLException murle) {
-            DEBUG.error("An error occurred while validating goto URL: " + url, murle);
+            DEBUG.error("RedirectUrlValidator.isRedirectUrlValid: An error occurred while validating goto URL: {}",
+                    url, murle);
             return false;
         }
     }
@@ -164,9 +168,10 @@ public class RedirectUrlValidator<T> {
         String encoded = request.getParameter("encoded");
         if (Boolean.parseBoolean(encoded)) {
             String decodedParameterValue = Base64.decodeAsUTF8String(value);
-            if (decodedParameterValue == null && DEBUG.warningEnabled()) {
-                DEBUG.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64 encoded",
-                            paramName, value);
+            if (decodedParameterValue == null) {
+                DEBUG.warning("RedirectUrlValidator.getAndDecodeParameter: "
+                        + "As parameter 'encoded' is true, parameter ['{}']='{}' should be base64 encoded",
+                        paramName, value);
             }
             return decodedParameterValue;
 
@@ -190,5 +195,4 @@ public class RedirectUrlValidator<T> {
             return input.get(paramName).asString();
         }
     }
-
 }
