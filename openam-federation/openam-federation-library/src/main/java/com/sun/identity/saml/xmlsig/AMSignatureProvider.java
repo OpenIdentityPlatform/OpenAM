@@ -66,6 +66,7 @@ import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.ElementProxy;
 import org.apache.xml.security.transforms.Transforms;
 
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -1419,7 +1420,10 @@ public class AMSignatureProvider implements SignatureProvider {
                     return false;
                 }
             } else {
-                if (certAlias == null || certAlias.length() == 0) {
+                if (StringUtils.isEmpty(certAlias)) {
+                    if (SAMLUtilsCommon.debug.warningEnabled()) {
+                        SAMLUtilsCommon.debug.warning("Could not find a KeyInfo and certAlias was not defined");
+                    }
                     return false; 
                 }
                 if (SAMLUtilsCommon.debug.messageEnabled()) {

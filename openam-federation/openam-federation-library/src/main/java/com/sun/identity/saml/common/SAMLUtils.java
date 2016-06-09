@@ -1356,6 +1356,7 @@ public class SAMLUtils  extends SAMLUtilsCommon {
         }
       
         try {
+            SAMLUtils.debug.message("SAMLUtils.checkSignatureValid for certAlias {}", certAlias);
             XMLSignatureManager manager = XMLSignatureManager.getInstance();
             valid = manager.verifyXMLSignature(xmlString, 
                                    idAttribute, certAlias);
