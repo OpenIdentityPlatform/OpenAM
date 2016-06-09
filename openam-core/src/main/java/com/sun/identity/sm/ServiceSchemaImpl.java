@@ -238,7 +238,7 @@ class ServiceSchemaImpl {
     /**
      * Get a map of all the attribute and their default values in this schema
      */
-    Map getAttributeDefaults() {
+    Map<String, Set<String>> getAttributeDefaults() {
         return (SMSUtils.copyAttributes(attrDefaults));
     }
 

@@ -540,7 +540,7 @@ public class ServiceSchema {
      * @return Map of Attribute Names and Sets of their default values as
      *         defined in the Schema
      */
-    public Map getAttributeDefaults() {
+    public Map<String, Set<String>> getAttributeDefaults() {
         return (ss.getAttributeDefaults());
     }
 

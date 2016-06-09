@@ -233,12 +233,13 @@ public class SMSUtils {
     }
 
     // Performs a deep copy of the Map
-    public static Map<String, Object> copyAttributes(Map<String, Set<String>> attributes) {
+    public static Map<String, Set<String>> copyAttributes(Map<String, Set<String>> attributes) {
         if (attributes == null) {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
-        Map<String, Object> answer = attributes instanceof CaseInsensitiveHashMap ?
-                new CaseInsensitiveHashMap(attributes.size()) : new HashMap<String, Object>(attributes.size());
+        Map<String, Set<String>> answer = attributes instanceof CaseInsensitiveHashMap
+                ? new CaseInsensitiveHashMap<String, Set<String>>(attributes.size())
+                : new HashMap<String, Set<String>>(attributes.size());
 
         if (attributes.isEmpty()) {
             return answer;
@@ -246,21 +247,16 @@ public class SMSUtils {
 
         for (Map.Entry<String, Set<String>> entry : attributes.entrySet()) {
             String attrName = entry.getKey();
-            Object value = entry.getValue();
-            if (value instanceof Set) {
-                Set<String> set = (Set<String>) value;
-                if (set.isEmpty()) {
-                    if (set == Collections.EMPTY_SET) {
-                        answer.put(attrName, Collections.EMPTY_SET);
-                    } else {
-                        answer.put(attrName, new HashSet<String>(0));
-                    }
+            Set<String> value = entry.getValue();
+            if (value.isEmpty()) {
+                if (value == Collections.EMPTY_SET) {
+                    answer.put(attrName, value);
                 } else {
-                    // Copy the HashSet
-                    answer.put(attrName, new HashSet(set));
+                    answer.put(attrName, new HashSet<String>(0));
                 }
             } else {
-                answer.put(attrName, value);
+                // Copy the HashSet
+                answer.put(attrName, new HashSet<>(value));
             }
         }
         return answer;

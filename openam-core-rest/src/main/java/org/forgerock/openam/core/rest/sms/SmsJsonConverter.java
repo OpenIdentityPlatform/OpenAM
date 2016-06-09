@@ -340,7 +340,9 @@ public class SmsJsonConverter {
                 value.add(convertJsonToString(attributeName, attributeValue));
             }
 
-            result.put(attributeName, value);
+            if (!value.isEmpty() || !isPassword(schema.getAttributeSchema(attributeName).getSyntax())) {
+                result.put(attributeName, value);
+            }
         }
 
         try {
