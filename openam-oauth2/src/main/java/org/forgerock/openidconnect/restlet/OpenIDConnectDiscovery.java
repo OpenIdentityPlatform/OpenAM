@@ -39,7 +39,7 @@ import org.restlet.resource.ServerResource;
  */
 public class OpenIDConnectDiscovery extends ServerResource {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final OpenIDConnectProviderDiscovery providerDiscovery;
     private final ExceptionHandler exceptionHandler;
     private final BaseURLProviderFactory baseUrlProviderFactory;
@@ -52,7 +52,7 @@ public class OpenIDConnectDiscovery extends ServerResource {
      * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public OpenIDConnectDiscovery(OAuth2RequestFactory<?, Request> requestFactory,
+    public OpenIDConnectDiscovery(OAuth2RequestFactory requestFactory,
             OpenIDConnectProviderDiscovery providerDiscovery, ExceptionHandler exceptionHandler,
             BaseURLProviderFactory baseUrlProviderFactory) {
         this.requestFactory = requestFactory;

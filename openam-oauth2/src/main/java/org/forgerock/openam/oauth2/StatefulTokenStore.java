@@ -20,7 +20,6 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
-import static org.forgerock.util.query.QueryFilter.or;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -59,6 +58,8 @@ import org.forgerock.oauth2.core.OAuth2Uris;
 import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.StatefulAccessToken;
+import org.forgerock.oauth2.core.StatefulRefreshToken;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -67,9 +68,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
@@ -77,8 +76,6 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.TransactionId;
 import org.forgerock.util.encode.Base64url;
 import org.forgerock.util.generator.IdGenerator;
 import org.forgerock.util.query.QueryFilter;
@@ -300,11 +297,11 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             }
         }
 
-        final OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(signingKeyId, encryptionKeyId,
+        final OpenIdConnectToken oidcToken = new OpenIdConnectToken(signingKeyId, encryptionKeyId,
                 clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
                 encryptionMethod, clientRegistration.isIDTokenEncryptionEnabled(), iss, subId, clientId,
-                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr, realm,
-                IdGenerator.DEFAULT.generate());
+                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr,
+                IdGenerator.DEFAULT.generate(), realm);
         request.setSession(ops);
         request.setToken(OpenIdConnectToken.class, oidcToken);
 
@@ -324,7 +321,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
     //return all claims from scopes + claims requested in the id_token
     private void appendIdTokenClaims(OAuth2Request request, OAuth2ProviderSettings providerSettings,
-                                     OpenAMOpenIdConnectToken oidcToken)
+                                     OpenIdConnectToken oidcToken)
             throws ServerException, NotFoundException, InvalidClientException {
 
         try {
@@ -343,7 +340,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
     //See spec section 5.5. - add claims to id_token based on 'claims' parameter in the access token
     private void appendRequestedIdTokenClaims(OAuth2Request request, OAuth2ProviderSettings providerSettings,
-                                              OpenAMOpenIdConnectToken oidcToken)
+                                              OpenIdConnectToken oidcToken)
             throws ServerException, NotFoundException, InvalidClientException {
 
         AccessToken accessToken = request.getToken(AccessToken.class);
@@ -524,7 +521,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + currentTimeMillis();
         }
         
-        final AccessToken accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId,
+        final AccessToken accessToken = new StatefulAccessToken(id, authorizationCode, resourceOwnerId,
                 clientId, redirectUri, scope, expiryTime, refreshToken, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN,
                 grantType, nonce, realm, claims, auditId);
         try {
@@ -610,7 +607,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             acr = currentRefreshToken.getAuthenticationContextClassReference();
         }
 
-        OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
+        StatefulRefreshToken refreshToken = new StatefulRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType,
                 realm, authModules, acr, auditId, authGrantId);
 
@@ -797,7 +794,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new InvalidGrantException("Could not read token in CTS");
         }
 
-        OpenAMAccessToken accessToken = new OpenAMAccessToken(token);
+        StatefulAccessToken accessToken = new StatefulAccessToken(token);
         validateTokenRealm(accessToken.getRealm(), request);
 
         request.setToken(AccessToken.class, accessToken);
@@ -829,7 +826,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new InvalidGrantException("grant is invalid");
         }
 
-        OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(token);
+        StatefulRefreshToken refreshToken = new StatefulRefreshToken(token);
         validateTokenRealm(refreshToken.getRealm(), request);
 
         request.setToken(RefreshToken.class, refreshToken);

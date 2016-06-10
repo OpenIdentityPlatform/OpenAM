@@ -43,7 +43,7 @@ public class OAuth2FlowFinder extends Finder {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final Map<String, Finder> endpointClasses;
     private final ExceptionHandler exceptionHandler;
 
@@ -54,7 +54,7 @@ public class OAuth2FlowFinder extends Finder {
      * @param exceptionHandler An instance of the ExceptionHandler.
      * @param endpointClasses The endpoint handlers for the OAuth2 token endpoints.
      */
-    public OAuth2FlowFinder(OAuth2RequestFactory<?, Request> requestFactory,
+    public OAuth2FlowFinder(OAuth2RequestFactory requestFactory,
             ExceptionHandler exceptionHandler, Map<String, Finder> endpointClasses) {
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;

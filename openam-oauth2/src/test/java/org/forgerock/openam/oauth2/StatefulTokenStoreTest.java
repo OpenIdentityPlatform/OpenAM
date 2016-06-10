@@ -42,6 +42,7 @@ import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
@@ -49,8 +50,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.restlet.RestletOAuth2Request;
-import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
@@ -77,7 +76,7 @@ public class StatefulTokenStoreTest {
     private OAuth2AuditLogger auditLogger;
     private Debug debug;
     private ClientAuthenticationFailureFactory failureFactory;
-    private RestletOAuth2RequestFactory oAuth2RequestFactory;
+    private OAuth2RequestFactory oAuth2RequestFactory;
 
     @BeforeMethod
     public void setUp() {
@@ -94,7 +93,7 @@ public class StatefulTokenStoreTest {
         debug = mock(Debug.class);
         failureFactory = mock(ClientAuthenticationFailureFactory.class);
 
-        oAuth2RequestFactory = new RestletOAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()));
+        oAuth2RequestFactory = new OAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()));
 
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         InvalidClientException expectedResult = mock(InvalidClientException.class);
@@ -224,7 +223,7 @@ public class StatefulTokenStoreTest {
         given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
-        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
+        final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
         given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
@@ -274,7 +273,7 @@ public class StatefulTokenStoreTest {
                 field("user_code", asSet("456")),
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
-        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
+        final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 
@@ -297,7 +296,7 @@ public class StatefulTokenStoreTest {
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
-        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
+        final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 
@@ -318,7 +317,7 @@ public class StatefulTokenStoreTest {
                 field("realm", asSet("/")),
                 field("clientID", asSet("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
-        final RestletOAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
+        final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
 

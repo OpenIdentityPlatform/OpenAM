@@ -16,21 +16,24 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.isNull;
 import static org.mockito.Mockito.anySetOf;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.mockito.Matchers;
@@ -40,9 +43,9 @@ import org.testng.annotations.Test;
 /**
  * @since 12.0.0
  */
-public class AccessTokenServiceImplTest {
+public class AccessTokenServiceTest {
 
-    private AccessTokenServiceImpl accessTokenService;
+    private AccessTokenService accessTokenService;
 
     private GrantTypeHandler grantTypeHandler;
     private ClientAuthenticator clientAuthenticator;
@@ -61,7 +64,7 @@ public class AccessTokenServiceImplTest {
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
 
-        accessTokenService = new AccessTokenServiceImpl(grantTypeHandlers, clientAuthenticator, tokenStore,
+        accessTokenService = new AccessTokenService(grantTypeHandlers, clientAuthenticator, tokenStore,
                 providerSettingsFactory, urisFactory);
 
         providerSettings = mock(OAuth2ProviderSettings.class);

@@ -16,6 +16,18 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
+
+import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -27,7 +39,26 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 /**
  * A service for introspecting tokens.
  */
-public interface TokenIntrospectionService {
+public class TokenIntrospectionService {
+
+    private final ClientAuthenticator clientAuthenticator;
+    private final Set<TokenIntrospectionHandler> handlers;
+    private final OAuth2UrisFactory urisFactory;
+
+    @Inject
+    public TokenIntrospectionService(ClientAuthenticator clientAuthenticator,
+            Set<TokenIntrospectionHandler> handlers, OAuth2UrisFactory urisFactory) {
+        this.clientAuthenticator = clientAuthenticator;
+        this.urisFactory = urisFactory;
+        this.handlers = new TreeSet<>(new Comparator<TokenIntrospectionHandler>() {
+            @Override
+            public int compare(TokenIntrospectionHandler t1, TokenIntrospectionHandler t2) {
+                int priorityOrder = t2.priority().compareTo(t1.priority());
+                return priorityOrder != 0 ? priorityOrder : t1.getClass().getName().compareTo(t2.getClass().getName());
+            }
+        });
+        this.handlers.addAll(handlers);
+    }
 
     /**
      * Allows introspection of a (refresh or access) token according to the
@@ -39,6 +70,20 @@ public interface TokenIntrospectionService {
      * @param request The OAuth 2.0 request
      * @return Details of the specified token.
      */
-    JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException, NotFoundException, ServerException, BadRequestException, InvalidGrantException;
+    public JsonValue introspect(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+            NotFoundException, ServerException {
+        ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
+                urisFactory.get(request).getIntrospectionEndpoint());
+        String tokenType = request.getParameter(TOKEN_TYPE_HINT);
+        String tokenId = request.getParameter(TOKEN);
 
+        for (TokenIntrospectionHandler handler : handlers) {
+            JsonValue result = handler.introspect(request, clientRegistration.getClientId(), tokenType, tokenId);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return json(object(field(ACTIVE, false)));
+    }
 }

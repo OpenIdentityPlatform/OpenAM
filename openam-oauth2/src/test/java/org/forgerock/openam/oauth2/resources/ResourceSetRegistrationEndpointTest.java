@@ -105,7 +105,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         store = mock(ResourceSetStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);
-        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2RequestFactory requestFactory = mock(OAuth2RequestFactory.class);
         Set<ResourceSetRegistrationHook> hooks = new HashSet<>();
         hook = mock(ResourceSetRegistrationHook.class);
         hooks.add(hook);

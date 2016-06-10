@@ -65,6 +65,7 @@ import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.services.context.Context;
@@ -95,7 +96,6 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.IdentityManager;
-import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openidconnect.Client;
@@ -103,6 +103,7 @@ import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
+import org.restlet.Request;
 
 
 /**
@@ -131,7 +132,7 @@ public class TokenResource implements CollectionResourceProvider {
     private final ClientDAO clientDao;
 
     private final OAuthTokenStore tokenStore;
-    private final OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
+    private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final Debug debug;
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
@@ -149,7 +150,7 @@ public class TokenResource implements CollectionResourceProvider {
 
     @Inject
     public TokenResource(OAuthTokenStore tokenStore, ClientDAO clientDao, IdentityManager identityManager,
-            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, OpenAMSettings authServiceSettings,
+            OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, OpenAMSettings authServiceSettings,
             @Named("frRest") Debug debug) {
         this.tokenStore = tokenStore;
         this.clientDao = clientDao;
@@ -561,32 +562,7 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     private OAuth2Request getRequest(final String realm) {
-        return new OAuth2Request() {
-                public <T> T getRequest() {
-                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                }
-
-                public <T> T getParameter(String name) {
-                    if ("realm".equals(name)) {
-                        return (T) realm;
-                    }
-                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                }
-
-                @Override
-                public JsonValue getBody() {
-                    return null;
-                }
-
-            public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
-
-            public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
-
-            @Override
-            public java.util.Locale getLocale() {
-                throw new UnsupportedOperationException();
-            }
-        };
+        return OAuth2Request.forRealm(realm);
     }
 
     private String getExpiryDate(JsonValue token, Context context) throws CoreTokenException,

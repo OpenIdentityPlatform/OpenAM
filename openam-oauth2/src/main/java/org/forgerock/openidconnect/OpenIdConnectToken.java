@@ -18,17 +18,7 @@ package org.forgerock.openidconnect;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AMR;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AT_HASH;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AUD;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AUTH_TIME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.AZP;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.C_HASH;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ISS;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.NONCE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.OPS;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.SUB;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.*;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -105,12 +95,13 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param acr The acr.
      * @param amr The amr.
      * @param auditTrackingId The audit tracking ID.
+     * @param realm The realm.
      */
     public OpenIdConnectToken(String signingKeyId, String encryptionKeyId, byte[] clientSecret, KeyPair signingKeyPair,
             PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm, String encryptionMethod,
             boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp, long exp, long iat,
             long authTime, String nonce, String ops, String atHash, String cHash, String acr, List<String> amr,
-            String auditTrackingId) {
+            String auditTrackingId, String realm) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
         this.signingAlgorithm = signingAlgorithm;
@@ -137,6 +128,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
         set(AUDIT_TRACKING_ID, auditTrackingId);
+        setRealm(realm);
     }
 
     public OpenIdConnectToken(JwtClaimsSet claims) {
@@ -150,7 +142,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         this.encryptionPublicKey = null;
         this.signingKeyId = null;
         this.encryptionKeyId = null;
-        setClaims(claims, ISS, SUB, AZP, NONCE, OPS, AT_HASH, C_HASH, ACR, AUDIT_TRACKING_ID, AUTH_TIME, AMR);
+        setClaims(claims, ISS, SUB, AZP, NONCE, OPS, AT_HASH, C_HASH, ACR, AUDIT_TRACKING_ID, AUTH_TIME, AMR, REALM);
         setAud(CollectionUtils.getFirstItem(claims.getAudience()));
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
@@ -161,6 +153,17 @@ public class OpenIdConnectToken extends JsonValue implements Token {
             if (claims.isDefined(key)) {
                 this.put(key, claims.get(key).getObject());
             }
+        }
+    }
+
+    /**
+     * Sets the realm.
+     *
+     * @param realm The realm.
+     */
+    private void setRealm(final String realm) {
+        if (!isEmpty(realm)) {
+            put(OAuth2Constants.CoreTokenParams.REALM, realm);
         }
     }
 

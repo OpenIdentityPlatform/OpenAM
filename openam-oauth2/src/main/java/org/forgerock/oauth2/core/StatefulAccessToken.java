@@ -16,26 +16,26 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.PARENT;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REFRESH_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Models a OAuth2 access token.
@@ -43,6 +43,8 @@ import org.forgerock.openam.audit.AuditConstants;
  * @since 12.0.0
  */
 public class StatefulAccessToken extends StatefulToken implements AccessToken {
+
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
     protected Map<String, Object> extraData = new HashMap<>();
 
@@ -84,19 +86,14 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param tokenName The token name.
      * @param grantType The grant type.
      * @param nonce The nonce.
+     * @param realm The realm.
+     * @param claims The requested claims.
+     * @param auditTrackingId The tracking ID, used for tracking tokens throughout the audit logs.
      */
-    public StatefulAccessToken(
-            String id,
-            String authorizationCode,
-            String resourceOwnerId,
-            String clientId,
-            String redirectUri,
-            Set<String> scope,
-            long expiryTime,
-            RefreshToken refreshToken,
-            String tokenName,
-            String grantType,
-            String nonce) {
+    public StatefulAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
+            String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
+            String tokenName, String grantType, String nonce, String realm, String claims,
+            String auditTrackingId) {
         super(new HashMap<String, Object>());
         setId(id);
         setAuthorizationCode(authorizationCode);
@@ -113,6 +110,209 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         setTokenName(tokenName);
         setGrantType(grantType);
         setNonce(nonce);
+        setRealm(realm);
+        setAuditTrackingId(auditTrackingId);
+
+        if (!StringUtils.isBlank(claims)) {
+            setClaims(claims);
+        }
+    }
+
+    public void setClaims(String claims) {
+        put(OAuth2Constants.Custom.CLAIMS, CollectionUtils.asSet(claims));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setId(String id) {
+        put(ID, stringToSet(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setResourceOwnerId(String resourceOwnerId) {
+        put(USERNAME, CollectionUtils.asSet(resourceOwnerId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setClientId(String clientId) {
+        put(CLIENT_ID, CollectionUtils.asSet(clientId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setRedirectUri(String redirectUri) {
+        put(REDIRECT_URI, stringToSet(redirectUri));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setScope(Set<String> scope) {
+        put(SCOPE, scope);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setExpiryTime(long expiryTime) {
+        put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setTokenType(String tokenType) {
+        put(TOKEN_TYPE, stringToSet(tokenType));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setTokenName(String tokenName) {
+        put(TOKEN_NAME, stringToSet(tokenName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setGrantType(String grantType) {
+        put(OAuth2Constants.Params.GRANT_TYPE, stringToSet(grantType));
+    }
+
+
+    /**
+     * Sets the realm.
+     * <br/>
+     * If the specified realm is {@code null} or an empty String. '/' is used instead.
+     *
+     * @param realm The realm.
+     */
+    private void setRealm(final String realm) {
+        if (realm == null || realm.isEmpty()) {
+            this.put(REALM, stringToSet("/"));
+        } else {
+            this.put(REALM, stringToSet(realm));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getResourceString(String s) {
+        return RESOURCE_BUNDLE.getString(s);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> getScope() {
+        final Set<String> value = getParameter(SCOPE);
+        if (value != null && !value.isEmpty()) {
+            return value;
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getClientId() {
+        final Set<String> value = getParameter(CLIENT_ID);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getResourceOwnerId() {
+        final Set<String> value = getParameter(USERNAME);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenId() {
+        final Set<String> value = getParameter(ID);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * Gets the realm.
+     *
+     * @return The realm.
+     */
+    public String getRealm() {
+        final Set<String> value = getParameter(OAuth2Constants.Custom.REALM);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenName() {
+        final Set<String> value = getParameter(TOKEN_NAME);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getExpiryTime() {
+        final Set<String> value = getParameter(EXPIRE_TIME);
+        if (value != null && !value.isEmpty()) {
+            return Long.parseLong(value.iterator().next());
+        }
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTokenType() {
+        final Set<String> value = getParameter(TOKEN_TYPE);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
     }
 
     /**
@@ -121,7 +321,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param authorizationCode The authorization code.
      */
     protected void setAuthorizationCode(String authorizationCode) {
-        setStringProperty(PARENT, authorizationCode);
+        put(PARENT, stringToSet(authorizationCode));
     }
 
     /**
@@ -130,7 +330,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param refreshTokenId The refresh token id.
      */
     protected void setRefreshTokenId(String refreshTokenId) {
-        setStringProperty(REFRESH_TOKEN, refreshTokenId);
+        put(REFRESH_TOKEN, stringToSet(refreshTokenId));
     }
 
     /**
@@ -139,7 +339,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param nonce The nonce.
      */
     protected void setNonce(String nonce) {
-        setStringProperty(NONCE, nonce);
+        put(OAuth2Constants.Custom.NONCE, stringToSet(nonce));
     }
 
     /**
@@ -149,7 +349,11 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getNonce() {
-        return getStringProperty(NONCE);
+        final Set<String> value = getParameter(OAuth2Constants.Custom.NONCE);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
     }
 
     /**
@@ -173,7 +377,25 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getGrantType() {
-        return getStringProperty(GRANT_TYPE);
+        final Set<String> value = getParameter(OAuth2Constants.Params.GRANT_TYPE);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * Gets the specified parameter from the JsonValue.
+     *
+     * @param paramName The parameter name.
+     * @return A {@code Set} of the parameter values.
+     */
+    private Set<String> getParameter(String paramName) {
+        final JsonValue param = get(paramName);
+        if (param != null) {
+            return (Set<String>) param.getObject();
+        }
+        return null;
     }
 
     @Override
@@ -195,6 +417,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         tokenInfo.put(getResourceString(SCOPE), getScope());
         tokenInfo.put(getResourceString(CLIENT_ID), getClientId());
         tokenInfo.put(getResourceString(GRANT_TYPE), getGrantType());
+        tokenInfo.put(getResourceString(REALM), getRealm());
         return tokenInfo;
     }
 
@@ -224,6 +447,34 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         if (! OAUTH_ACCESS_TOKEN.equals(tokenName)) {
             throw new InvalidGrantException("Token is not an access token: " + tokenId);
         }
+    }
+
+    /**
+     * Sets the audit id.
+     *
+     * @param auditId The audit id.
+     */
+    protected void setAuditTrackingId(String auditId) {
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
+    }
+
+    /**
+     * Gets the audit id.
+     *
+     * @return The audit id.
+     */
+    @Override
+    public String getAuditTrackingId() {
+        return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    /**
+     * Set a string property in the store.
+     * @param key The property key.
+     * @param value The value.
+     */
+    protected void setStringProperty(String key, String value) {
+        put(key, stringToSet(value));
     }
 
     @Override

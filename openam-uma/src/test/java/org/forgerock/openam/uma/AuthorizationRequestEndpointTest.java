@@ -91,7 +91,7 @@ public class AuthorizationRequestEndpointTest {
     private AuthorizationRequestEndpoint endpoint;
     private UmaProviderSettings umaProviderSettings;
     private UmaProviderSettingsFactory umaProviderSettingsFactory;
-    private OAuth2RequestFactory<?, Request> requestFactory;
+    private OAuth2RequestFactory requestFactory;
     private TokenStore oauth2TokenStore;
     private Evaluator policyEvaluator;
     private UmaTokenStore umaTokenStore;
@@ -114,7 +114,7 @@ public class AuthorizationRequestEndpointTest {
     private class AuthorizationRequestEndpoint2 extends AuthorizationRequestEndpoint {
 
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
-                TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
+                TokenStore oauth2TokenStore, OAuth2RequestFactory requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
                 OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
                 UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,

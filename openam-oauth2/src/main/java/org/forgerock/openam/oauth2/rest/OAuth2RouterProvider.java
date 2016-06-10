@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.OAUTH2_AUDIT_CONTEXT_PROVIDERS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
@@ -28,9 +27,7 @@ import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import java.util.Set;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -59,7 +56,6 @@ import org.forgerock.openidconnect.restlet.IdTokenInfo;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
-import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
@@ -75,7 +71,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
     private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
@@ -90,7 +86,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
     @Inject
     public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            OAuth2RequestFactory<?, Request> requestFactory,
+            OAuth2RequestFactory requestFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;

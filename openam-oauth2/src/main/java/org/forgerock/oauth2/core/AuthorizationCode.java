@@ -17,24 +17,9 @@
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.oauth2.core.Utils.stringToSet;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ISSUED;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CODE_CHALLENGE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CODE_CHALLENGE_METHOD;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_CODE_TYPE;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -277,7 +262,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The display String.
      */
     private String getResourceString(final String s) {
-        return s;
+        return RESOURCE_BUNDLE.getString(s);
     }
 
     /**

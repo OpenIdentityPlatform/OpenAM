@@ -16,16 +16,55 @@
 
 package org.forgerock.openidconnect;
 
+import static org.forgerock.oauth2.core.AccessTokenVerifier.FORM_BODY;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AccessTokenVerifier;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for retrieving user's information from the access token the user granted the authorization.
  *
  * @since 12.0.0
  */
-public interface UserInfoService {
+public class UserInfoService {
+
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final TokenStore tokenStore;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final AccessTokenVerifier headerTokenVerifier;
+    private final AccessTokenVerifier formTokenVerifier;
+
+    /**
+     * Constructs a new UserInfoServiceImpl.
+     *
+     * @param tokenStore An instance of the TokenStore.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param headerTokenVerifier An instance of the AccessTokenVerifier to validate Authorization header.
+     * @param formTokenVerifier An instance of the AccessTokenVerifier to validate form body.
+     */
+    @Inject
+    public UserInfoService(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
+            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(FORM_BODY) AccessTokenVerifier formTokenVerifier) {
+        this.tokenStore = tokenStore;
+        this.providerSettingsFactory = providerSettingsFactory;
+        this.headerTokenVerifier = headerTokenVerifier;
+        this.formTokenVerifier = formTokenVerifier;
+    }
 
     /**
      * Gets the user's information for the specified access token.
@@ -34,5 +73,25 @@ public interface UserInfoService {
      * @return A JsonValue of the user's information.
      * @throws OAuth2Exception If there is any issue in getting the user information.
      */
-    JsonValue getUserInfo(OAuth2Request request) throws OAuth2Exception;
+    public JsonValue getUserInfo(OAuth2Request request) throws OAuth2Exception {
+
+        AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
+        AccessTokenVerifier.TokenState formToken = formTokenVerifier.verify(request);
+        if (!headerToken.isValid() && !formToken.isValid()) {
+            logger.debug("No access token provided for this request.");
+            throw new InvalidTokenException();
+        }
+        if (headerToken.isValid() && formToken.isValid()) {
+            logger.debug("Access token provided in both form and header.");
+            throw new ServerException("Access Token cannot be provided in both form and header");
+        }
+
+        final String tokenId = headerToken.isValid() ? headerToken.getTokenId() : formToken.getTokenId();
+
+        final AccessToken token = tokenStore.readAccessToken(request, tokenId);
+
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+
+        return new JsonValue(providerSettings.getUserInfo(token, request).getValues());
+    }
 }

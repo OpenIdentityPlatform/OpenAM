@@ -16,33 +16,91 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Models a OAuth2 resource owner.
  *
  * @since 12.0.0
  */
-public interface ResourceOwner {
+public class ResourceOwner {
+
+    private final String id;
+    private final AMIdentity amIdentity;
+    private final long authTime;
+
+    /**
+     * Constructs a new OpenAMResourceOwner with their authTime set to now.
+     *  @param id The resource owner's id.
+     * @param amIdentity The resource owner's identity.
+     */
+    ResourceOwner(String id, AMIdentity amIdentity) {
+        this(id, amIdentity, currentTimeMillis());
+    }
+
+    /**
+     * Constructs a new OpenAMResourceOwner.
+     *  @param id The resource owner's id.
+     * @param amIdentity The resource owner's identity.
+     * @param authTime Time the resource owner authenticated, in ms.
+     */
+    ResourceOwner(String id, AMIdentity amIdentity, long authTime) {
+        this.id = id;
+        this.amIdentity = amIdentity;
+        this.authTime = TimeUnit.MILLISECONDS.toSeconds(authTime);
+    }
 
     /**
      * Gets the identifier of the resource owner.
      *
      * @return The resource owner id.
      */
-    String getId();
+    public String getId() {
+        return id;
+    }
 
     /**
      * Gets the time at which the user last performed an active auth, in seconds.
      *
      * @return The authentication time in seconds.
      */
-    long getAuthTime();
+    public long getAuthTime() {
+        return authTime;
+    }
 
     /**
      * Gets the name of the user, if possible.
      * @param settings The settings for the current realm.
      * @return The name of the user, or null.
      */
-    String getName(OAuth2ProviderSettings settings) throws ServerException;
+    public String getName(OAuth2ProviderSettings settings) throws ServerException {
+        try {
+            final String userDisplayNameAttribute = settings.getUserDisplayNameAttribute();
+            if (StringUtils.isNotBlank(userDisplayNameAttribute)) {
+                final Set<String> attribute = amIdentity.getAttribute(userDisplayNameAttribute);
+                return attribute.isEmpty() ? null : attribute.iterator().next();
+            }
+            return null;
+        } catch (IdRepoException | SSOException e) {
+            throw new ServerException(e);
+        }
+    }
+
+    /**
+     * Gets the resource owner's identity.
+     *
+     * @return The identity.
+     */
+    public AMIdentity getIdentity() {
+        return amIdentity;
+    }
 }

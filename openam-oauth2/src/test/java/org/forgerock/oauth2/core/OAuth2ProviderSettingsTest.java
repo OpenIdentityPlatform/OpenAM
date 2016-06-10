@@ -14,26 +14,25 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2;
+package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-
-import com.sun.identity.shared.encode.Hash;
 
 import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
 import java.util.Map;
 
+import com.sun.identity.shared.encode.Hash;
 import org.forgerock.json.jose.jwk.KeyUse;
 import org.forgerock.json.jose.jws.SupportedEllipticCurve;
 import org.forgerock.util.encode.Base64url;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class OpenAMOAuth2ProviderSettingsTest {
+public class OAuth2ProviderSettingsTest {
 
     @Test(dataProvider = "ellipticCurves")
     public void shouldGenerateCorrectEllipticCurveJWKs(SupportedEllipticCurve curve) throws Exception {
@@ -47,7 +46,7 @@ public class OpenAMOAuth2ProviderSettingsTest {
         given(key.getParams()).willReturn(curve.getParameters());
 
         // When
-        final Map<String, Object> jwk = OpenAMOAuth2ProviderSettings.createECJWK(alias, key, KeyUse.SIG);
+        final Map<String, Object> jwk = OAuth2ProviderSettings.createECJWK(alias, key, KeyUse.SIG);
 
         // Then
         assertThat(jwk).containsEntry("kty", "EC")

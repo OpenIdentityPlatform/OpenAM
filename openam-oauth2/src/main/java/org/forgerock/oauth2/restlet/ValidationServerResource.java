@@ -41,7 +41,7 @@ import javax.inject.Inject;
 public class ValidationServerResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final TokenInfoService tokenInfoService;
     private final ExceptionHandler exceptionHandler;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
@@ -54,7 +54,7 @@ public class ValidationServerResource extends ServerResource {
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public ValidationServerResource(OAuth2RequestFactory<?, Request> requestFactory, TokenInfoService tokenInfoService,
+    public ValidationServerResource(OAuth2RequestFactory requestFactory, TokenInfoService tokenInfoService,
             ExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.tokenInfoService = tokenInfoService;

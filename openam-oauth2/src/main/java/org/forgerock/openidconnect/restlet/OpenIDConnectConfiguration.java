@@ -38,7 +38,7 @@ import javax.inject.Inject;
  */
 public class OpenIDConnectConfiguration extends ServerResource {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final OpenIDConnectProviderConfiguration providerConfiguration;
     private final ExceptionHandler exceptionHandler;
 
@@ -50,7 +50,7 @@ public class OpenIDConnectConfiguration extends ServerResource {
      * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public OpenIDConnectConfiguration(OAuth2RequestFactory<?, Request> requestFactory,
+    public OpenIDConnectConfiguration(OAuth2RequestFactory requestFactory,
             OpenIDConnectProviderConfiguration providerConfiguration, ExceptionHandler exceptionHandler) {
         this.requestFactory = requestFactory;
         this.providerConfiguration = providerConfiguration;

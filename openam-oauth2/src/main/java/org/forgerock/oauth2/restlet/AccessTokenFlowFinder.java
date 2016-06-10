@@ -16,24 +16,20 @@
 
 package org.forgerock.oauth2.restlet;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.oauth2.core.DeviceCodeGrantTypeHandler;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.restlet.Request;
-import org.restlet.resource.Finder;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
-import static org.forgerock.openam.rest.service.RestletUtils.*;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.restlet.resource.Finder;
 
 public class AccessTokenFlowFinder extends OAuth2FlowFinder {
 
     public AccessTokenFlowFinder() {
-        super(InjectorHolder.getInstance(Key.get(new TypeLiteral<OAuth2RequestFactory<?, Request>>() { })),
+        super(InjectorHolder.getInstance(OAuth2RequestFactory.class),
                 InjectorHolder.getInstance(ExceptionHandler.class),
                 getEndpointClasses());
     }

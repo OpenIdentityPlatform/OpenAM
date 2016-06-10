@@ -162,7 +162,7 @@ public class UmaGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     @Named(UmaConstants.PERMISSION_REQUEST_ENDPOINT)
-    public Restlet createPermissionRequestEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> requestFactory) {
+    public Restlet createPermissionRequestEndpoint(TokenStore store, OAuth2RequestFactory requestFactory) {
         return new AccessTokenProtectionFilter(UmaConstants.PAT_SCOPE, store, requestFactory,
                         wrap(PermissionRequestEndpoint.class));
     }
@@ -171,7 +171,7 @@ public class UmaGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     @Named(UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT)
-    public Restlet createAuthorizationRequestEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> requestFactory) {
+    public Restlet createAuthorizationRequestEndpoint(TokenStore store, OAuth2RequestFactory requestFactory) {
         return new AccessTokenProtectionFilter(UmaConstants.AAT_SCOPE, store, requestFactory,
                         wrap(AuthorizationRequestEndpoint.class));
     }

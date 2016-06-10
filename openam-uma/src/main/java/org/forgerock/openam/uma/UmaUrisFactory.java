@@ -29,7 +29,6 @@ import org.forgerock.oauth2.core.OAuth2Uris;
 import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
@@ -78,7 +77,7 @@ public class UmaUrisFactory {
      * @return A UmaProviderSettings instance.
      */
     UmaUris get(Request req) throws NotFoundException, ServerException {
-        return get(new RestletOAuth2Request(jacksonRepresentationFactory, req));
+        return get(new OAuth2Request(jacksonRepresentationFactory, req));
     }
 
     public UmaUris get(OAuth2Request request) throws NotFoundException, ServerException {

@@ -56,7 +56,7 @@ import org.restlet.resource.ServerResource;
 public class PermissionRequestEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final ExtensionFilterManager extensionFilterManager;
     private final UmaExceptionHandler exceptionHandler;
@@ -72,7 +72,7 @@ public class PermissionRequestEndpoint extends ServerResource {
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<?, Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
+            OAuth2RequestFactory requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
             ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.providerSettingsFactory = providerSettingsFactory;

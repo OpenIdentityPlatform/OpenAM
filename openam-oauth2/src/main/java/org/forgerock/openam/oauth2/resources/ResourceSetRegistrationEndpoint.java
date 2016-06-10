@@ -76,7 +76,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResourceSetDescriptionValidator validator;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final Set<ResourceSetRegistrationHook> hooks;
     private final ResourceSetLabelRegistration labelRegistration;
     private final ExtensionFilterManager extensionFilterManager;
@@ -98,7 +98,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      */
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ResourceSetDescriptionValidator validator, OAuth2RequestFactory<?, Request> requestFactory,
+            ResourceSetDescriptionValidator validator, OAuth2RequestFactory requestFactory,
             Set<ResourceSetRegistrationHook> hooks, ResourceSetLabelRegistration labelRegistration,
             ExtensionFilterManager extensionFilterManager, ExceptionHandler exceptionHandler,
             UmaLabelsStore umaLabelsStore, JacksonRepresentationFactory jacksonRepresentationFactory) {

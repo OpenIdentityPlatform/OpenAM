@@ -16,15 +16,57 @@
 
 package org.forgerock.openidconnect;
 
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.oauth2.IdentityManager;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provider for OpenId Connect for managing OpenId Connect sessions.
  *
  * @since 12.0.0
  */
-public interface OpenIDConnectProvider {
+@Singleton
+public class OpenIDConnectProvider {
+
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final SSOTokenManager tokenManager;
+    private final IdentityManager identityManager;
+    private final CTSPersistentStore cts;
+    private final TokenAdapter<JsonValue> tokenAdapter;
+
+    /**
+     * Constructs a new OpenAMOpenIDConnectProvider.
+     *
+     * @param tokenManager An instance of the SSOTokenManager.
+     * @param identityManager An instance of the IdentityManager.
+     * @param cts An instance of the CTSPersistentStore.
+     * @param tokenAdapter An instance of the TokenAdapter to convert CTS tokens into JsonValue.
+     */
+    @Inject
+    public OpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager,
+            CTSPersistentStore cts, @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)
+            TokenAdapter<JsonValue> tokenAdapter) {
+        this.tokenManager = tokenManager;
+        this.identityManager = identityManager;
+        this.cts = cts;
+        this.tokenAdapter = tokenAdapter;
+    }
 
     /**
      * Determines whether a user has a valid session.
@@ -33,7 +75,16 @@ public interface OpenIDConnectProvider {
      * @param request The OAuth2 request.
      * @return {@code true} if the user is valid.
      */
-    boolean isUserValid(String userId, OAuth2Request request);
+    public boolean isUserValid(String userId, OAuth2Request request) {
+        try {
+            identityManager.getResourceOwnerIdentity(userId,
+                    request.<String>getParameter(REALM));
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Destroys a users session.
@@ -41,5 +92,30 @@ public interface OpenIDConnectProvider {
      * @param kid The key id of the id token JWT
      * @throws ServerException If any internal server error occurs.
      */
-    void destroySession(String kid) throws ServerException;
+    public void destroySession(String opsId) throws ServerException {
+        try {
+            final Token opsToken = cts.read(opsId);
+
+            if (opsToken == null) {
+                throw new CoreTokenException("Unable to find id_token");
+            }
+
+            JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(opsToken);
+            cts.delete(opsId);
+            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.LEGACY_OPS)
+                    .asSet(String.class).iterator().next();
+
+            // for some grant type, there is no OpenAM session associated with a id_token
+            if (sessionId != null) {
+                final SSOToken token = tokenManager.createSSOToken(sessionId);
+                tokenManager.destroyToken(token);
+            }
+        } catch (CoreTokenException e) {
+            logger.error("Unable to get id_token meta data", e);
+            throw new ServerException("Unable to get id_token meta data");
+        } catch (Exception e) {
+            logger.error("Unable to get SsoTokenManager", e);
+            throw new ServerException("Unable to get SsoTokenManager");
+        }
+    }
 }

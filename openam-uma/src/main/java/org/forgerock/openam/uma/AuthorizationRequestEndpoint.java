@@ -81,7 +81,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final Debug debug = Debug.getInstance("UmaProvider");
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final TokenStore oauth2TokenStore;
 
     private static final String UNABLE_TO_RETRIEVE_TICKET_MESSAGE = "Unable to retrieve Permission Ticket";
@@ -100,7 +100,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
      */
     @Inject
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
-            TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
+            TokenStore oauth2TokenStore, OAuth2RequestFactory requestFactory,
             OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
             UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
             Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,

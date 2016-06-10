@@ -47,7 +47,7 @@ import java.util.Map;
  */
 public class RefreshTokenResource extends ServerResource {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
@@ -61,7 +61,7 @@ public class RefreshTokenResource extends ServerResource {
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public RefreshTokenResource(OAuth2RequestFactory<?, Request> requestFactory, AccessTokenService accessTokenService,
+    public RefreshTokenResource(OAuth2RequestFactory requestFactory, AccessTokenService accessTokenService,
             ExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;

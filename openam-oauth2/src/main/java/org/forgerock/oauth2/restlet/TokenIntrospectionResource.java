@@ -38,13 +38,13 @@ import org.restlet.resource.ServerResource;
 public class TokenIntrospectionResource extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final ExceptionHandler exceptionHandler;
     private final TokenIntrospectionService tokenIntrospectionService;
 
     @Inject
     public TokenIntrospectionResource(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<?, Request> requestFactory, ExceptionHandler exceptionHandler,
+            OAuth2RequestFactory requestFactory, ExceptionHandler exceptionHandler,
             TokenIntrospectionService tokenIntrospectionService) {
         this.requestFactory = requestFactory;
         this.providerSettingsFactory = providerSettingsFactory;

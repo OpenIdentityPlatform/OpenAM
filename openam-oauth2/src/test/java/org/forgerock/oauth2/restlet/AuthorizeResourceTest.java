@@ -49,7 +49,7 @@ public class AuthorizeResourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         OAuth2Representation representation = mock(OAuth2Representation.class);
-        OAuth2RequestFactory<?, Request> oauth2RequestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2RequestFactory oauth2RequestFactory = mock(OAuth2RequestFactory.class);
         o2request = mock(OAuth2Request.class);
         request = mock(Request.class);
         response = mock(Response.class);

@@ -50,7 +50,7 @@ public class ConnectClientRegistration extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final OpenIdConnectClientRegistrationService clientRegistrationService;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final ExceptionHandler exceptionHandler;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
@@ -64,7 +64,7 @@ public class ConnectClientRegistration extends ServerResource {
      */
     @Inject
     public ConnectClientRegistration(OpenIdConnectClientRegistrationService clientRegistrationService,
-            OAuth2RequestFactory<?, Request> requestFactory, ExceptionHandler exceptionHandler,
+            OAuth2RequestFactory requestFactory, ExceptionHandler exceptionHandler,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.clientRegistrationService = clientRegistrationService;
         this.requestFactory = requestFactory;

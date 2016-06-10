@@ -16,14 +16,12 @@
 
 package org.forgerock.openidconnect;
 
-import java.security.SignatureException;
+import javax.inject.Inject;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import org.forgerock.json.jose.jws.SignedJwt;
+
 import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
@@ -31,6 +29,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +108,6 @@ public class OpenIDTokenIssuer {
      * @return The ops value.
      */
     protected String getOps(AccessToken accessToken, OAuth2Request request) {
-        return null;
+        return accessToken.getSessionId();
     }
 }

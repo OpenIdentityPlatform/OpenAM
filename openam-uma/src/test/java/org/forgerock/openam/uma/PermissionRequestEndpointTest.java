@@ -69,7 +69,7 @@ public class PermissionRequestEndpointTest {
     @SuppressWarnings("unchecked")
     public void setup() throws ServerException, InvalidGrantException, NotFoundException {
         resourceSetStore = mock(ResourceSetStore.class);
-        OAuth2RequestFactory<?, Request> requestFactory = mock(OAuth2RequestFactory.class);
+        OAuth2RequestFactory requestFactory = mock(OAuth2RequestFactory.class);
         umaTokenStore = mock(UmaTokenStore.class);
 
         OAuth2ProviderSettingsFactory providerSettingFactory = mock(OAuth2ProviderSettingsFactory.class);

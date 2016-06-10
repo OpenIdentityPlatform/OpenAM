@@ -46,10 +46,10 @@ public class AccessTokenProtectionFilter extends Filter {
     private final Debug debug = Debug.getInstance("UmaProvider");
     private final String requiredScope;
     private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
 
     public AccessTokenProtectionFilter(String requiredScope, TokenStore tokenStore,
-            OAuth2RequestFactory<?, Request> requestFactory, Restlet next) {
+            OAuth2RequestFactory requestFactory, Restlet next) {
         this.requiredScope = requiredScope;
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;

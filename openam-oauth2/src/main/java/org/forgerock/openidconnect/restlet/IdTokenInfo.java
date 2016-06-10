@@ -16,13 +16,13 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
+import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
@@ -43,7 +43,6 @@ import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -57,8 +56,6 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-
-import com.sun.identity.authentication.util.ISAuthConstants;
 
 /**
  * OpenID Connect id_token validation and claim decoding endpoint. This is a non-standard endpoint that allows a
@@ -74,7 +71,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
  */
 public class IdTokenInfo extends ServerResource {
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final ExceptionHandler exceptionHandler;
     private final SigningManager signingManager = new SigningManager();
     private final OAuth2UrisFactory urisFactory;
@@ -91,7 +88,7 @@ public class IdTokenInfo extends ServerResource {
      */
     @Inject
     public IdTokenInfo(final OpenIdConnectClientRegistrationStore clientRegistrationStore,
-            final OAuth2RequestFactory<?, Request> requestFactory,
+            final OAuth2RequestFactory requestFactory,
             final ExceptionHandler exceptionHandler, final ClientAuthenticator clientAuthenticator,
             final OAuth2UrisFactory urisFactory, OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.clientRegistrationStore = clientRegistrationStore;
@@ -145,7 +142,7 @@ public class IdTokenInfo extends ServerResource {
             throw new BadRequestException("invalid id_token: " + e.getMessage());
         }
 
-        request.setToken(OpenIdConnectToken.class, new OpenAMOpenIdConnectToken(idToken.getSignedJwt().getClaimsSet()));
+        request.setToken(OpenIdConnectToken.class, new OpenIdConnectToken(idToken.getSignedJwt().getClaimsSet()));
 
         final String clientId = CollectionUtils.getFirstItem(idToken.getSignedJwt().getClaimsSet().getAudience());
         final String realm = idToken.getSignedJwt().getClaimsSet().get(OAuth2Constants.JWTTokenParams.REALM)
@@ -232,12 +229,13 @@ public class IdTokenInfo extends ServerResource {
         private final String realm;
 
         ValidateIdTokenRequest(final OAuth2Request delegate, final String realm) {
+            super(null, null);
             this.delegate = delegate;
             this.realm = realm;
         }
 
         @Override
-        public <T> T getRequest() {
+        public Request getRequest() {
             return delegate.getRequest();
         }
 

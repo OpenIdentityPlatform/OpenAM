@@ -52,7 +52,7 @@ import java.net.URI;
  */
 public class EndSession extends ServerResource {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final OpenIDConnectEndSession openIDConnectEndSession;
     private final ExceptionHandler exceptionHandler;
     private final ClientRegistrationStore clientRegistrationStore;
@@ -65,7 +65,7 @@ public class EndSession extends ServerResource {
      * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public EndSession(OAuth2RequestFactory<?, Request> requestFactory, OpenIDConnectEndSession openIDConnectEndSession,
+    public EndSession(OAuth2RequestFactory requestFactory, OpenIDConnectEndSession openIDConnectEndSession,
             ExceptionHandler exceptionHandler, ClientRegistrationStore clientRegistrationStore) {
         this.requestFactory = requestFactory;
         this.openIDConnectEndSession = openIDConnectEndSession;

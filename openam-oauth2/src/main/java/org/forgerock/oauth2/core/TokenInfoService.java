@@ -16,21 +16,61 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.restlet.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service to return the full information of a OAuth2 token.
  *
  * @since 12.0.0
  */
-public interface TokenInfoService {
+@Singleton
+public class TokenInfoService {
+
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final AccessTokenVerifier headerTokenVerifier;
+    private final AccessTokenVerifier queryTokenVerifier;
+    private final ClientRegistrationStore clientRegistrationStore;
+
+    /**
+     * Constructs a new TokenInfoServiceImpl.
+     *
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param headerTokenVerifier Basic HTTP access token verification.
+     * @param queryTokenVerifier Query string access token verification.
+     * @param clientRegistrationStore An instance of the ClientRegistrationStore.
+     */
+    @Inject
+    public TokenInfoService(OAuth2ProviderSettingsFactory providerSettingsFactory,
+            @Named(REALM_AGNOSTIC_HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(REALM_AGNOSTIC_QUERY_PARAM) AccessTokenVerifier queryTokenVerifier,
+            ClientRegistrationStore clientRegistrationStore) {
+        this.providerSettingsFactory = providerSettingsFactory;
+        this.headerTokenVerifier = headerTokenVerifier;
+        this.queryTokenVerifier = queryTokenVerifier;
+        this.clientRegistrationStore = clientRegistrationStore;
+    }
 
     /**
      * Returns a Json representation of the token's information that is on the OAuth2 request.
@@ -43,6 +83,61 @@ public interface TokenInfoService {
      * @throws InvalidGrantException If the given token is not an Access token.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
-            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException, NotFoundException;
+    public JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
+            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException, NotFoundException {
+
+        final AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
+        final AccessTokenVerifier.TokenState queryToken = queryTokenVerifier.verify(request);
+
+        ensureSingleTokenInRequest(headerToken, queryToken);
+        assertTokenIsValid(headerToken, queryToken);
+        final AccessToken accessToken = request.getToken(AccessToken.class);
+        //since the token info request is realm agnostic the realm is read from the token and is set on the
+        //request object to correctly check the client for token is created still exists and is active
+        request.<Request>getRequest().getAttributes().put(OAuth2Constants.Custom.REALM, accessToken.getRealm());
+        assertTokenClientExists(accessToken, request);
+
+        logger.trace("In Validator resource - got token = " + accessToken);
+
+        final Map<String, Object> response = new HashMap<String, Object>();
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final Map<String, Object> scopeEvaluation = providerSettings.evaluateScope(accessToken);
+        response.putAll(accessToken.getTokenInfo());
+        response.putAll(scopeEvaluation);
+
+        return new JsonValue(response);
+    }
+
+    /**
+     * Checks that the token for which the info is being requested is valid
+     */
+    private void assertTokenIsValid(AccessTokenVerifier.TokenState headerToken, AccessTokenVerifier.TokenState queryToken) throws InvalidTokenException {
+        if (!headerToken.isValid() && !queryToken.isValid()) {
+            logger.error("Access Token not valid");
+            throw new InvalidTokenException();
+        }
+    }
+
+    /**
+     * Ensure there is only one token in the token info request
+     */
+    private void ensureSingleTokenInRequest(AccessTokenVerifier.TokenState headerToken, AccessTokenVerifier.TokenState queryToken) throws InvalidRequestException {
+        if (headerToken.isValid() && queryToken.isValid()) {
+            logger.error("Access Token provided in both query and header in request");
+            throw new InvalidRequestException("Access Token cannot be provided in both query and header");
+        }
+    }
+
+    /**
+     * Checks if the client to which the access token is issued exists and is inactive
+     */
+    private void assertTokenClientExists(AccessToken accessToken, OAuth2Request request) throws InvalidTokenException {
+        String clientId = accessToken.getClientId();
+        try {
+            clientRegistrationStore.get(clientId, request);
+        } catch (InvalidClientException | NotFoundException e) {
+            logger.error("The client identified by the id: " + clientId + " does not exist");
+            throw new InvalidTokenException();
+        }
+    }
 }

@@ -56,7 +56,7 @@ public class DeviceCodeResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final BaseURLProviderFactory baseURLProviderFactory;
@@ -65,7 +65,7 @@ public class DeviceCodeResource extends ServerResource {
     private final OAuth2Utils oAuth2Utils;
 
     @Inject
-    public DeviceCodeResource(TokenStore tokenStore, OAuth2RequestFactory<?, Request> requestFactory,
+    public DeviceCodeResource(TokenStore tokenStore, OAuth2RequestFactory requestFactory,
             ClientRegistrationStore clientRegistrationStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             BaseURLProviderFactory baseURLProviderFactory, ExceptionHandler exceptionHandler,
             JacksonRepresentationFactory jacksonRepresentationFactory, OAuth2Utils oAuth2Utils) {

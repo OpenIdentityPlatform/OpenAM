@@ -16,6 +16,16 @@
 
 package org.forgerock.openam.oauth2;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -29,18 +39,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.json.JsonValue;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Allows a client and resource owner's identity to be retrieved.
@@ -88,31 +86,7 @@ public class IdentityManager {
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results.addAll(searchResults.getSearchResults());
             } else {
-                OAuth2ProviderSettings settings = providerSettingsFactory.get(new OAuth2Request() {
-                    public <T> T getRequest() {
-                        throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                    }
-
-                    public <T> T getParameter(String name) {
-                        if ("realm".equals(name)) {
-                            return (T) realm;
-                        }
-                        throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                    }
-
-                    public JsonValue getBody() {
-                        throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
-                    }
-
-                    public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
-
-                    public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
-
-                    @Override
-                    public Locale getLocale() {
-                        throw new UnsupportedOperationException();
-                    }
-                });
+                OAuth2ProviderSettings settings = providerSettingsFactory.get(OAuth2Request.forRealm(realm));
                 final Map<String, Set<String>> avPairs = toAvPairMap(
                         settings.getResourceOwnerAuthenticatedAttributes(), username);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);

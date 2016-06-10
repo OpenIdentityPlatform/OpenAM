@@ -50,7 +50,7 @@ public class ExceptionHandler {
 
     private final OAuth2Representation representation;
     private final BaseURLProviderFactory baseURLProviderFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
@@ -62,7 +62,7 @@ public class ExceptionHandler {
      */
     @Inject
     public ExceptionHandler(OAuth2Representation representation, BaseURLProviderFactory baseURLProviderFactory,
-            OAuth2RequestFactory<?, Request> requestFactory,
+            OAuth2RequestFactory requestFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.representation = representation;
         this.baseURLProviderFactory = baseURLProviderFactory;

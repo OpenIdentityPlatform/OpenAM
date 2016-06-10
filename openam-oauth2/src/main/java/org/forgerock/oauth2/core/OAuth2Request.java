@@ -16,13 +16,27 @@
 
 package org.forgerock.oauth2.core;
 
+import javax.inject.Inject;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.assistedinject.Assisted;
 import org.forgerock.guava.common.collect.ClassToInstanceMap;
 import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstraction of the actual request so as to allow the core of the OAuth2 provider to be agnostic of the library
@@ -31,18 +45,35 @@ import org.forgerock.json.JsonValue;
  * @since 12.0.0
  * @supported.all.api
  */
-public abstract class OAuth2Request {
+public class OAuth2Request {
 
     private final ClassToInstanceMap<Token> tokens = MutableClassToInstanceMap.create();
     private String sessionId;
 
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final Request request;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private JsonValue body;
+
+    /**
+     * Constructs a new RestletOAuth2Request.
+     *
+     * @param request The Restlet request.
+     */
+    @Inject
+    public OAuth2Request(JacksonRepresentationFactory jacksonRepresentationFactory, @Assisted Request request) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+        this.request = request;
+    }
+
     /**
      * Gets the actual underlying request.
      *
-     * @param <T> The type of the underlying request.
      * @return The underlying request.
      */
-    public abstract <T> T getRequest();
+    public Request getRequest() {
+        return request;
+    }
 
     /**
      * Gets the specified parameter from the request.
@@ -54,8 +85,31 @@ public abstract class OAuth2Request {
      * @param <T> The type of the parameter.
      * @return The parameter value.
      */
-    public abstract <T> T getParameter(String name);
+    public <T> T getParameter(String name) {
+        Object value = getAttribute(request, name);
+        if (value != null) {
+            return (T) value;
+        }
 
+        //query param priority over body
+        if (getQueryParameter(request, name) != null) {
+            return (T) getQueryParameter(request, name);
+        }
+
+        if (request.getMethod().equals(Method.POST)) {
+            if (request.getEntity() != null) {
+                if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
+                    Form form = new Form(request.getEntity());
+                    // restore the entity body
+                    request.setEntity(form.getWebRepresentation());
+                    return (T) form.getValuesMap().get(name);
+                } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
+                    return (T) getBody().get(name).getObject();
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets the count of the parameter present in the request with the given name
@@ -63,8 +117,9 @@ public abstract class OAuth2Request {
      * @param name The name of the parameter
      * @return  The count of the the parameter with the given name
      */
-    public abstract int getParameterCount(String name);
-
+    public int getParameterCount(String name) {
+        return request.getResourceRef().getQueryAsForm().subList(name).size();
+    }
 
     /**
      *
@@ -73,7 +128,47 @@ public abstract class OAuth2Request {
      *
      * @return The parameter names in the request
      */
-    public abstract Set<String> getParameterNames();
+    public Set<String> getParameterNames() {
+
+        if (request.getMethod().equals(Method.GET)) {
+            return request.getResourceRef().getQueryAsForm().getNames();
+        } else if (request.getMethod().equals(Method.POST)) {
+            if (request.getEntity() != null) {
+                if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
+                    Form form = new Form(request.getEntity());
+                    // restore the entity body
+                    request.setEntity(form.getWebRepresentation());
+                    return  form.getNames();
+                } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
+                    return getBody().keys();
+                }
+            }
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * Gets the value for an attribute from the request with the specified name.
+     *
+     * @param request The request.
+     * @param name The name.
+     * @return The attribute value, may be {@code null}
+     */
+    private Object getAttribute(Request request, String name) {
+        final Object value = request.getAttributes().get(name);
+        return value;
+    }
+
+    /**
+     * Gets the value for a query parameter from the request with the specified name.
+     *
+     * @param request The request.
+     * @param name The name.
+     * @return The query parameter value, may be {@code null}.
+     */
+    private String getQueryParameter(Request request, String name) {
+        return request.getResourceRef().getQueryAsForm().getValuesMap().get(name);
+    }
 
     /**
      * Gets the body of the request.
@@ -86,7 +181,19 @@ public abstract class OAuth2Request {
      *
      * @return The body of the request.
      */
-    public abstract JsonValue getBody();
+    public JsonValue getBody() {
+        if (body == null) {
+            final JacksonRepresentation<Map> representation =
+                    jacksonRepresentationFactory.create(request.getEntity(), Map.class);
+            try {
+                body = new JsonValue(representation.getObject());
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+                return JsonValue.json(JsonValue.object());
+            }
+        }
+        return body;
+    }
 
     /**
      * Set a Token that is in play for this request.
@@ -138,5 +245,56 @@ public abstract class OAuth2Request {
      * Get the request locale.
      * @return The Locale object.
      */
-    public abstract Locale getLocale();
+    public Locale getLocale() {
+        return ServletUtils.getRequest(request).getLocale();
+    }
+
+    /**
+     * Creates an {@code OAuth2Request} which holds the provided realm only.
+     *
+     * @param realm The request realm.
+     * @return An {@code OAuth2Request}.
+     */
+    public static OAuth2Request forRealm(String realm) {
+        return new RealmOnlyOAuth2Request(realm);
+    }
+
+    private static class RealmOnlyOAuth2Request extends OAuth2Request {
+
+        private final String realm;
+
+        private RealmOnlyOAuth2Request(String realm) {
+            super(null, null);
+            this.realm = realm;
+        }
+
+        @Override
+        public Request getRequest() {
+            throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
+        }
+
+        @Override
+        public <T> T getParameter(String name) {
+            if ("realm".equals(name)) {
+                return (T) realm;
+            }
+            throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
+        }
+
+        @Override
+        public JsonValue getBody() {
+            return null;
+        }
+
+        @Override
+        public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }
+
+        @Override
+        public Set<String> getParameterNames() { throw new UnsupportedOperationException(); }
+
+        @Override
+        public java.util.Locale getLocale() {
+            throw new UnsupportedOperationException();
+        }
+    }
 }

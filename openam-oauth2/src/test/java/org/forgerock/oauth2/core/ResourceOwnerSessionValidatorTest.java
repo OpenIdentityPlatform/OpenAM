@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2;
+package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -39,11 +39,15 @@ import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
+import org.forgerock.openam.oauth2.ClientCredentialsReader;
+import org.forgerock.openam.oauth2.OpenAMAuthenticationMethod;
+import org.forgerock.openidconnect.ClientDAO;
 import org.restlet.Request;
 import org.restlet.data.Reference;
 import org.testng.annotations.BeforeMethod;
@@ -52,12 +56,12 @@ import org.testng.annotations.Test;
 /**
  * @since 12.0.0
  */
-public class OpenAMResourceOwnerSessionValidatorTest {
+public class ResourceOwnerSessionValidatorTest {
 
     private static final SSOToken ACTIVE_SESSION_TOKEN = mock(SSOToken.class);
     private static final SSOToken NO_SESSION_TOKEN = null;
 
-    private OpenAMResourceOwnerSessionValidator resourceOwnerSessionValidator;
+    private ResourceOwnerSessionValidator resourceOwnerSessionValidator;
 
     private SSOTokenManager mockSSOTokenManager;
     private OAuth2ProviderSettingsFactory mockProviderSettingsFactory;
@@ -76,7 +80,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
         CoreGuiceModule.DNWrapper dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
-        OpenAMClientDAO mockClientDAO = mock(OpenAMClientDAO.class);
+        ClientDAO mockClientDAO = mock(ClientDAO.class);
         ClientCredentialsReader mockClientCredentialsReader = mock(ClientCredentialsReader.class);
 
         given(mockOAuth2Request.getRequest()).willReturn(restletRequest);
@@ -90,7 +94,7 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         given(mockProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
 
         resourceOwnerSessionValidator =
-                new OpenAMResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory,
+                new ResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory,
                         mockClientDAO, mockClientCredentialsReader) {
             @Override
             HttpServletRequest getHttpServletRequest(Request req) {

@@ -16,14 +16,33 @@
 
 package org.forgerock.oauth2.core;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
+
 /**
  * A factory for creating OAuth2Request instances.
  *
- * @param <T> The type of the underlying request.
- * @param <R> The request type to be returned.
  * @since 12.0.0
  */
-public interface OAuth2RequestFactory<R extends OAuth2Request, T> {
+@Singleton
+public class OAuth2RequestFactory {
+
+    private static final String OAUTH2_REQ_ATTR = "OAUTH2_REQ_ATTR";
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+
+    /**
+     * Guice injection constructor.
+     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
+     */
+    @Inject
+    public OAuth2RequestFactory(JacksonRepresentationFactory jacksonRepresentationFactory) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+    }
 
     /**
      * Creates a new OAuth2Request for the underlying HTTP request.
@@ -31,5 +50,15 @@ public interface OAuth2RequestFactory<R extends OAuth2Request, T> {
      * @param request The underlying request.
      * @return The OAuth2Request.
      */
-    R create(T request);
+    public OAuth2Request create(Request request) {
+        HttpServletRequest req = ServletUtils.getRequest(request);
+        OAuth2Request o2request = req == null ? null : (OAuth2Request) req.getAttribute(OAUTH2_REQ_ATTR);
+        if (o2request == null) {
+            o2request = new OAuth2Request(jacksonRepresentationFactory, request);
+            if (req != null) {
+                req.setAttribute(OAUTH2_REQ_ATTR, o2request);
+            }
+        }
+        return o2request;
+    }
 }

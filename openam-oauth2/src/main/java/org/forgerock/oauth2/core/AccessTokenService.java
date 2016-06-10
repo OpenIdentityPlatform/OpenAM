@@ -16,6 +16,20 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
+import static org.forgerock.oauth2.core.Utils.splitScope;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_GRANT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.forgerock.oauth2.core.exceptions.AuthorizationDeclinedException;
 import org.forgerock.oauth2.core.exceptions.AuthorizationPendingException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
@@ -29,6 +43,11 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.util.Reject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles access token requests from OAuth2 clients to the OAuth2 provider to grant access tokens for the requested
@@ -36,7 +55,33 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
  *
  * @since 12.0.0
  */
-public interface AccessTokenService {
+public class AccessTokenService {
+
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final Map<String, ? extends GrantTypeHandler> grantTypeHandlers;
+    private final ClientAuthenticator clientAuthenticator;
+    private final TokenStore tokenStore;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OAuth2UrisFactory urisFactory;
+
+    /**
+     * Constructs a new AccessTokenServiceImpl.
+     * @param grantTypeHandlers A {@code Map} of the grant type handlers.
+     * @param clientAuthenticator An instance of the ClientAuthenticator.
+     * @param tokenStore An instance of the TokenStore.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param urisFactory An instance of the OAuth2UrisFactory.
+     */
+    @Inject
+    public AccessTokenService(Map<String, GrantTypeHandler> grantTypeHandlers,
+            final ClientAuthenticator clientAuthenticator, final TokenStore tokenStore,
+            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory) {
+        this.grantTypeHandlers = grantTypeHandlers;
+        this.clientAuthenticator = clientAuthenticator;
+        this.tokenStore = tokenStore;
+        this.providerSettingsFactory = providerSettingsFactory;
+        this.urisFactory = urisFactory;
+    }
 
     /**
      * Handles a request for access token(s) by a OAuth2 client, validates that the request is valid and contains the
@@ -57,10 +102,17 @@ public interface AccessTokenService {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AccessToken requestAccessToken(OAuth2Request request) throws InvalidGrantException, RedirectUriMismatchException,
-            InvalidClientException, InvalidRequestException, InvalidCodeException, ServerException,
-            UnauthorizedClientException, InvalidScopeException, NotFoundException, AuthorizationPendingException,
-            ExpiredTokenException, AuthorizationDeclinedException, BadRequestException;
+    public AccessToken requestAccessToken(OAuth2Request request) throws RedirectUriMismatchException,
+            InvalidClientException, InvalidRequestException, InvalidCodeException,
+            InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException,
+            NotFoundException, AuthorizationPendingException, ExpiredTokenException, AuthorizationDeclinedException, BadRequestException {
+        final String grantType = request.getParameter(GRANT_TYPE);
+        final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(grantType);
+        if (grantTypeHandler == null) {
+            throw new InvalidGrantException("Unknown Grant Type, " + grantType);
+        }
+        return grantTypeHandler.handle(request);
+    }
 
     /**
      * Handles a request to refresh an already issued access token for a OAuth2 client, validates that the request is
@@ -79,7 +131,77 @@ public interface AccessTokenService {
      * @throws InvalidGrantException If the given token is not a refresh token.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AccessToken refreshToken(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+    public AccessToken refreshToken(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException,
-            InvalidScopeException, NotFoundException;
+            InvalidScopeException, NotFoundException {
+
+        Reject.ifTrue(isEmpty(request.<String>getParameter(REFRESH_TOKEN)), "Missing parameter, 'refresh_token'");
+
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2Uris uris = urisFactory.get(request);
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
+                uris.getTokenEndpoint());
+
+        final String tokenId = request.getParameter(REFRESH_TOKEN);
+        final RefreshToken refreshToken = tokenStore.readRefreshToken(request, tokenId);
+
+        if (refreshToken == null) {
+            logger.error("Refresh token does not exist for id: " + tokenId);
+            throw new InvalidRequestException("RefreshToken does not exist");
+        }
+
+        AuditRequestContext.putProperty(OAUTH2_GRANT.toString(), refreshToken.getAuditTrackingId());
+
+        if (!refreshToken.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
+            logger.error("Refresh Token was issued to a different client id: " + clientRegistration.getClientId());
+            throw new InvalidRequestException("Token was issued to a different client");
+        }
+
+        if (refreshToken.isExpired()) {
+            logger.warn("Refresh Token is expired for id: " + refreshToken.getTokenId());
+            throw new InvalidGrantException("grant is invalid");
+        }
+
+        final Set<String> scope = splitScope(request.<String>getParameter(SCOPE));
+        final String grantType = request.getParameter(GRANT_TYPE);
+
+        final Set<String> tokenScope;
+        if (refreshToken.getScope() != null) {
+            tokenScope = new TreeSet<String>(refreshToken.getScope());
+        } else {
+            tokenScope = new TreeSet<String>();
+        }
+
+        final Set<String> validatedScope = providerSettings.validateRefreshTokenScope(clientRegistration,
+                Collections.unmodifiableSet(scope), Collections.unmodifiableSet(tokenScope),
+                request);
+
+        final String validatedClaims = providerSettings.validateRequestedClaims(refreshToken.getClaims());
+
+        RefreshToken newRefreshToken = null;
+        if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
+            newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
+                    refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request,
+                    validatedClaims, refreshToken.getAuthGrantId());
+
+            tokenStore.deleteRefreshToken(request, refreshToken.toString());
+        }
+
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER, null,
+                refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), refreshToken.getRedirectUri(),
+                validatedScope, newRefreshToken == null ? refreshToken : newRefreshToken,
+                null, validatedClaims, request);
+
+        if (newRefreshToken != null) {
+            accessToken.addExtraData(REFRESH_TOKEN, newRefreshToken.toString());
+        }
+
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
+
+        if (validatedScope != null && !validatedScope.isEmpty()) {
+            accessToken.addExtraData(SCOPE, joinScope(validatedScope));
+        }
+
+        return accessToken;
+    }
 }

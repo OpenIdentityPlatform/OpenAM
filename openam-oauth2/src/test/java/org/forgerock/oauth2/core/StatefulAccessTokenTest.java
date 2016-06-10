@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2;
+package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,25 +22,24 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.forgerock.oauth2.core.RefreshToken;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link OpenAMAccessToken}.
+ * Unit test for {@link StatefulAccessToken}.
  *
  * @since 14.0.0
  */
-public final class OpenAMAccessTokenTest {
+public final class StatefulAccessTokenTest {
 
     private static final String CLIENT_1 = "client1";
     private static final String CLIENT_1_WITH_SPACE = "client 1";
 
-    private OpenAMAccessToken openAMAccessToken;
+    private StatefulAccessToken openAMAccessToken;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        openAMAccessToken = newOpenAMAccessToken();
+        openAMAccessToken = newStatefulAccessToken();
     }
 
     @Test
@@ -67,7 +66,7 @@ public final class OpenAMAccessTokenTest {
         assertThat(clientId).isEqualTo(CLIENT_1_WITH_SPACE);
     }
 
-    private OpenAMAccessToken newOpenAMAccessToken() {
+    private StatefulAccessToken newStatefulAccessToken() {
         String id = "2dec6816-cf19-4207-8d88-818c809ea6cc";
         String authorizationCode = null;
         String resourceOwnerId = "demo";
@@ -83,7 +82,7 @@ public final class OpenAMAccessTokenTest {
         String claims = null;
         String auditTrackingId = "4ed857de-5d18-4afa-bc85-56991b0f8d3d";
 
-        return new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, client, redirectUri,
+        return new StatefulAccessToken(id, authorizationCode, resourceOwnerId, client, redirectUri,
                 scope, expiryTime, refreshToken, tokenName, grantType, nonce, realm, claims, auditTrackingId);
     }
 

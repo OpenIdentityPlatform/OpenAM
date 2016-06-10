@@ -30,7 +30,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Request;
@@ -72,7 +71,7 @@ public class UmaProviderSettingsFactory {
      * @return A UmaProviderSettings instance.
      */
     UmaProviderSettings get(Request req) throws NotFoundException {
-        return get(new RestletOAuth2Request(jacksonRepresentationFactory, req));
+        return get(new OAuth2Request(jacksonRepresentationFactory, req));
     }
 
     public UmaProviderSettings get(OAuth2Request request) throws NotFoundException {

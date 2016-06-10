@@ -16,9 +16,13 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.openam.rest.audit.RestletBodyAuditor.jsonAuditor;
+import static org.forgerock.openam.rest.audit.RestletBodyAuditor.noBodyAuditor;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 import static org.forgerock.openam.uma.UmaConstants.*;
-import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -32,13 +36,9 @@ import org.forgerock.openam.rest.audit.UMAAccessAuditFilter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
-import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Guice Provider from getting the UMA HTTP router.
@@ -51,7 +51,7 @@ public class UmaRouterProvider implements Provider<Router> {
     private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -65,7 +65,7 @@ public class UmaRouterProvider implements Provider<Router> {
     @Inject
     public UmaRouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            OAuth2RequestFactory<?, Request> requestFactory) {
+            OAuth2RequestFactory requestFactory) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;

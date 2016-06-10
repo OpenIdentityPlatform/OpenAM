@@ -15,13 +15,12 @@
  */
 package org.forgerock.openam.rest.audit;
 
+import static org.forgerock.openam.audit.AuditConstants.Component;
+
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.restlet.Request;
 import org.restlet.Restlet;
-
-import static org.forgerock.openam.audit.AuditConstants.Component;
 
 /**
  * Responsible for logging access audit events for OAuth2 and OIDC requests.
@@ -39,7 +38,7 @@ public class OAuth2AccessAuditFilter extends OAuth2AbstractAccessAuditFilter {
      * @param requestFactory The factory that provides access to OAuth2Request.
      */
     public OAuth2AccessAuditFilter(Restlet restlet, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory, OAuth2RequestFactory<?, Request> requestFactory,
+            AuditEventFactory auditEventFactory, OAuth2RequestFactory requestFactory,
             RestletBodyAuditor<?> requestDetailCreator, RestletBodyAuditor<?> responseDetailCreator) {
         super(Component.OAUTH, restlet, auditEventPublisher, auditEventFactory, requestFactory, requestDetailCreator,
                 responseDetailCreator);

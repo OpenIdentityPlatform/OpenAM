@@ -40,7 +40,7 @@ import javax.inject.Inject;
  */
 public class UserInfo extends ServerResource {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final UserInfoService userInfoService;
     private final ExceptionHandler exceptionHandler;
 
@@ -52,7 +52,7 @@ public class UserInfo extends ServerResource {
      * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public UserInfo(OAuth2RequestFactory<?, Request> requestFactory, UserInfoService userInfoService,
+    public UserInfo(OAuth2RequestFactory requestFactory, UserInfoService userInfoService,
             ExceptionHandler exceptionHandler) {
         this.requestFactory = requestFactory;
         this.userInfoService = userInfoService;

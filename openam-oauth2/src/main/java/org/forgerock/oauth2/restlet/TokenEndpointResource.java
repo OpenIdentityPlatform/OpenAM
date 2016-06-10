@@ -46,7 +46,7 @@ import java.util.Set;
  */
 public class TokenEndpointResource extends ServerResource {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
     private final Set<TokenRequestHook> hooks;
@@ -61,7 +61,7 @@ public class TokenEndpointResource extends ServerResource {
      * @param jacksonRepresentationFactory The factory to use for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public TokenEndpointResource(OAuth2RequestFactory<?, Request> requestFactory, AccessTokenService accessTokenService,
+    public TokenEndpointResource(OAuth2RequestFactory requestFactory, AccessTokenService accessTokenService,
             ExceptionHandler exceptionHandler, Set<TokenRequestHook> hooks,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;

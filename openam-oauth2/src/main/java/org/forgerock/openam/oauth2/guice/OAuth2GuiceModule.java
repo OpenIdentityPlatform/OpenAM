@@ -16,20 +16,14 @@
 package org.forgerock.openam.oauth2.guice;
 
 import static com.google.inject.name.Names.named;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.FORM_BODY;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_FORM_BODY;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
 import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.JWT_BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.PASSWORD;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +33,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.iplanet.services.naming.WebtopNamingQuery;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -50,17 +50,12 @@ import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
 import org.forgerock.json.jose.jws.SignedJwt;
-import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.AccessTokenServiceImpl;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
 import org.forgerock.oauth2.core.AuthorizationCodeGrantTypeHandler;
 import org.forgerock.oauth2.core.AuthorizationCodeRequestValidator;
 import org.forgerock.oauth2.core.AuthorizationCodeRequestValidatorImpl;
-import org.forgerock.oauth2.core.AuthorizationService;
-import org.forgerock.oauth2.core.AuthorizationServiceImpl;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.oauth2.core.AuthorizeRequestValidatorImpl;
-import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidator;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidatorImpl;
@@ -79,14 +74,8 @@ import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
 import org.forgerock.oauth2.core.RedirectUriResolver;
-import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
 import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
-import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
-import org.forgerock.oauth2.core.TokenInfoService;
-import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
-import org.forgerock.oauth2.core.TokenIntrospectionService;
-import org.forgerock.oauth2.core.TokenIntrospectionServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -97,7 +86,6 @@ import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
 import org.forgerock.oauth2.restlet.OpenAMClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.restlet.RestletFormBodyAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
-import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
@@ -115,18 +103,13 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
 import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2GlobalSettings;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
-import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
-import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.oauth2.OpenAMOAuth2UrisFactory;
-import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
-import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
@@ -139,9 +122,6 @@ import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
-import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -151,32 +131,14 @@ import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.ClaimsParameterValidator;
-import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.CodeVerifierValidator;
-import org.forgerock.openidconnect.OpenIDConnectProvider;
-import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
-import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.SubjectTypeValidator;
-import org.forgerock.openidconnect.UserInfoService;
-import org.forgerock.openidconnect.UserInfoServiceImpl;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
-import org.restlet.Request;
 import org.restlet.Restlet;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.iplanet.services.naming.WebtopNamingQuery;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
@@ -192,35 +154,22 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(RedirectUriResolver.class);
-        bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-        bind(new TypeLiteral<OAuth2RequestFactory<?, Request>>() {}).to(RestletOAuth2RequestFactory.class);
         bind(ResourceOwnerConsentVerifier.class).to(OpenIdResourceOwnerConsentVerifier.class);
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
-        bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class);
-        bind(ResourceOwnerSessionValidator.class).to(OpenAMResourceOwnerSessionValidator.class);
-        bind(ClientAuthenticator.class).to(ClientAuthenticatorImpl.class);
         bind(TokenStore.class).to(OpenAMTokenStore.class);
         bind(OpenIdConnectTokenStore.class).to(OpenAMTokenStore.class);
-        bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
-        bind(ResourceOwnerAuthenticator.class).to(OpenAMResourceOwnerAuthenticator.class);
-        bind(UserInfoService.class).to(UserInfoServiceImpl.class);
-        bind(TokenInfoService.class).to(TokenInfoServiceImpl.class);
         bind(ClientAuthenticationFailureFactory.class).to(OpenAMClientAuthenticationFailureFactory.class);
         bind(AccessTokenVerifier.class).to(RestletHeaderAccessTokenVerifier.class);
         bind(AccessTokenVerifier.class).annotatedWith(named(HEADER)).to(RestletHeaderAccessTokenVerifier.class);
         bind(AccessTokenVerifier.class).annotatedWith(named(FORM_BODY)).to(RestletFormBodyAccessTokenVerifier.class);
         bind(AccessTokenVerifier.class).annotatedWith(named(QUERY_PARAM)).to(RestletQueryParameterAccessTokenVerifier.class);
-        bind(OpenIDConnectProvider.class).to(OpenAMOpenIDConnectProvider.class);
-        bind(ClientDAO.class).to(OpenAMClientDAO.class);
-        bind(OpenIdConnectClientRegistrationService.class).to(OpenAMOpenIdConnectClientRegistrationService.class);
         bind(OpenAMSettings.class).toProvider(new Provider<OpenAMSettings>() {
             public OpenAMSettings get() {
                 return new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME,
                         OAuth2Constants.OAuth2ProviderService.VERSION);
             }
         });
-        bind(OpenIDTokenIssuer.class).to(OpenAMOpenIdTokenIssuer.class);
 
         final Multibinder<AuthorizeRequestValidator> authorizeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizeRequestValidator.class);
@@ -268,7 +217,6 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), TokenIntrospectionHandler.class)
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);
-        bind(TokenIntrospectionService.class).to(TokenIntrospectionServiceImpl.class);
 
         Multibinder.newSetBinder(binder(), ResourceSetRegistrationHook.class);
 
@@ -423,7 +371,7 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Named(OAuth2Constants.Custom.RSR_ENDPOINT)
-    public Restlet createResourceSetRegistrationEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> reqFactory,
+    public Restlet createResourceSetRegistrationEndpoint(TokenStore store, OAuth2RequestFactory reqFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         return new ResourceSetRegistrationExceptionFilter(
                 new AccessTokenProtectionFilter(null, store, reqFactory, wrap(ResourceSetRegistrationEndpoint.class)),

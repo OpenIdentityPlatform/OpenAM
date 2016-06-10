@@ -79,7 +79,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
 
     private final OAuth2Representation representation;
     private final TokenStore tokenStore;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final AuthorizationService authorizationService;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ExceptionHandler exceptionHandler;
@@ -96,7 +96,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     @Inject
     public DeviceCodeVerificationResource(XUIState xuiState, @Named("OAuth2Router") Router router,
             BaseURLProviderFactory baseURLProviderFactory, OAuth2Representation representation,
-            TokenStore tokenStore, OAuth2RequestFactory<?, Request> requestFactory,
+            TokenStore tokenStore, OAuth2RequestFactory requestFactory,
             AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
             ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
             ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils) {

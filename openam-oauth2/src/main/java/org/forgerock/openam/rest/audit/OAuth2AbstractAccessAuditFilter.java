@@ -15,18 +15,22 @@
 */
 package org.forgerock.openam.rest.audit;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AuthorizationCode;
+import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
+import static org.forgerock.openam.audit.AuditConstants.USER_ID;
+
+import java.util.Set;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.Constants;
 import org.forgerock.oauth2.core.IntrospectableToken;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectToken;
@@ -37,18 +41,6 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.Constants;
-
-import java.util.Set;
-
-import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.SESSION;
-import static org.forgerock.openam.audit.AuditConstants.USER_ID;
-import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACCESS;
-
 /**
  * Responsible for logging access audit events for all OAuth2-based filters. Common functionality is here, a filter
  * may overwrite this functionality if there is a known difference in access or outcome details for that filter.
@@ -57,7 +49,7 @@ import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_ACC
  */
 public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAccessAuditFilter {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final Logger logger = LoggerFactory.getLogger("oauth2");
 
     /**
@@ -71,7 +63,7 @@ public abstract class OAuth2AbstractAccessAuditFilter extends AbstractRestletAcc
      */
     OAuth2AbstractAccessAuditFilter(AuditConstants.Component component, Restlet restlet,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
-            OAuth2RequestFactory<?, Request> requestFactory, RestletBodyAuditor requestDetailCreator,
+            OAuth2RequestFactory requestFactory, RestletBodyAuditor requestDetailCreator,
             RestletBodyAuditor responseDetailCreator) {
         super(component, restlet, auditEventPublisher, auditEventFactory, requestDetailCreator, responseDetailCreator);
         this.requestFactory = requestFactory;

@@ -49,11 +49,11 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
  */
 public class OAuth2Representation {
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
     @Inject
-    public OAuth2Representation(OAuth2RequestFactory<?, Request> requestFactory) {
+    public OAuth2Representation(OAuth2RequestFactory requestFactory) {
         this.requestFactory = requestFactory;
     }
 

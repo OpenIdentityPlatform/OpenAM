@@ -16,17 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.stringToSet;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 /**
  * Models a OAuth2 Refresh Token.
@@ -34,6 +38,8 @@ import org.forgerock.openam.audit.AuditConstants;
  * @since 12.0.0
  */
 public class StatefulRefreshToken extends StatefulToken implements RefreshToken {
+
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
 
     /**
      * Constructs a new RefreshToken backed with the data in the specified JsonValue.
@@ -60,20 +66,13 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      * @param tokenType The token type.
      * @param tokenName The token name.
      * @param grantType The grant type.
+     * @param authModules The pipe-separated list of auth modules.
+     * @param realm The realm.
+     * @param auditId The audit id, used for tracking tokens throughout the audit logs.
      */
-    public StatefulRefreshToken(
-            String id,
-            String resourceOwnerId,
-            String clientId,
-            String redirectUri,
-            Set<String> scope,
-            long expiryTime,
-            String tokenType,
-            String tokenName,
-            String grantType,
-            String authModules,
-            String acr,
-            String authGrantId) {
+    public StatefulRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
+            long expiryTime, String tokenType, String tokenName, String grantType, String realm,
+            String authModules, String acr, String auditId, String authGrantId) {
         super(new HashMap<String, Object>());
         setId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -87,6 +86,112 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         setGrantType(grantType);
         setAuthModules(authModules);
         setAuthenticationContextClassReference(acr);
+        setRealm(realm);
+        setAuditTrackingId(auditId);
+    }
+
+    /**
+     * Sets the requested claims.
+     *
+     * @param claims Requested claims
+     */
+    public void setClaims(String claims) {
+        setStringProperty(OAuth2Constants.Custom.CLAIMS, claims);
+    }
+
+    /**
+     * Gets the requested claims.
+     *
+     * @return The claims.
+     */
+    public String getClaims() {
+        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setScope(Set<String> scope) {
+        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setExpiryTime(long expiryTime) {
+        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+    }
+
+    /**
+     * Sets the realm.
+     *
+     * @param realm The realm.
+     */
+    private void setRealm(String realm) {
+        if (realm == null || realm.isEmpty()) {
+            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, "/");
+        } else {
+            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm);
+        }
+    }
+
+    /**
+     * Gets the realm.
+     */
+    public String getRealm() {
+        return this.getStringProperty(OAuth2Constants.CoreTokenParams.REALM);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getResourceString(String s) {
+        return RESOURCE_BUNDLE.getString(s);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> getScope() {
+        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
+        if (value != null && !value.isEmpty()) {
+            return value;
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getExpiryTime() {
+        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        if (value != null && !value.isEmpty()) {
+            return Long.parseLong(value.iterator().next());
+        }
+        return -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setStringProperty(String key, String value) {
+        put(key, stringToSet(value));
+    }
+
+    @Override
+    public String getStringProperty(String key) {
+        final Set<String> value = getParameter(key);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+
     }
 
     /**
@@ -190,5 +295,43 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         } else {
             return super.getTimeLeft();
         }
+    }
+
+    /**
+     * Gets the specified parameter from the JsonValue.
+     *
+     * @param paramName The parameter name.
+     * @return A {@code Set} of the parameter values.
+     */
+    private Set<String> getParameter(String paramName) {
+        final JsonValue param = get(paramName);
+        if (param != null) {
+            return (Set<String>) param.getObject();
+        }
+        return null;
+    }
+
+    /**
+     * Sets the audit id.
+     *
+     * @param auditId The audit id.
+     */
+    protected void setAuditTrackingId(String auditId) {
+        setStringProperty(AUDIT_TRACKING_ID, auditId);
+    }
+
+    /**
+     * Gets the audit id.
+     *
+     * @return The audit id.
+     */
+    @Override
+    public String getAuditTrackingId() {
+        return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    @Override
+    public String toString() {
+        return getTokenId();
     }
 }

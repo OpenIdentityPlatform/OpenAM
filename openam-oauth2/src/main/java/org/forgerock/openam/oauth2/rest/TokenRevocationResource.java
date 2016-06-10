@@ -70,7 +70,7 @@ public class TokenRevocationResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final ClientAuthenticator clientAuthenticator;
     private final TokenStore tokenStore;
     private final ExceptionHandler exceptionHandler;
@@ -86,7 +86,7 @@ public class TokenRevocationResource extends ServerResource {
      * @param realmResolver An instance of the OAuth2RealmResolver
      */
     @Inject
-    public TokenRevocationResource(OAuth2RequestFactory<?, Request> requestFactory,
+    public TokenRevocationResource(OAuth2RequestFactory requestFactory,
             ClientAuthenticator clientAuthenticator,
             TokenStore tokenStore, ExceptionHandler exceptionHandler, OAuth2RealmResolver realmResolver) {
         this.clientAuthenticator = clientAuthenticator;

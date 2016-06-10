@@ -40,7 +40,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +80,7 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
         try {
             SignedJwt idToken = jwtReconstruction.reconstructJwt(claimToken.asString(), SignedJwt.class);
-            oAuth2Request.setToken(OpenIdConnectToken.class, new OpenAMOpenIdConnectToken(idToken.getClaimsSet()));
+            oAuth2Request.setToken(OpenIdConnectToken.class, new OpenIdConnectToken(idToken.getClaimsSet()));
 
             OAuth2ProviderSettings oAuth2ProviderSettings = oauth2ProviderSettingsFactory.get(oAuth2Request);
             OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
