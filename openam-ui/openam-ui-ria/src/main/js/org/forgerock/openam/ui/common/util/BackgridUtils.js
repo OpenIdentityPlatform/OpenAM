@@ -139,7 +139,14 @@ define([
      */
     obj.ClickableRow = Backgrid.Row.extend({
         events: {
-            "click": "onClick"
+            "click": "onClick",
+            "keyup": "onKeyup"
+        },
+
+        onKeyup (e) {
+            if (e.keyCode === 13 && this.callback) {
+                this.callback(e);
+            }
         },
 
         onClick (e) {

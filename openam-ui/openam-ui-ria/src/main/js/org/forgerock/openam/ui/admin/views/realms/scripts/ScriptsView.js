@@ -119,6 +119,7 @@ define([
             }];
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
+                attributes: () => ({ tabindex: 0 }),
                 callback (e) {
                     var $target = $(e.target);
 
