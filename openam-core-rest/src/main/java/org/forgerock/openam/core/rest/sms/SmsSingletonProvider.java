@@ -21,6 +21,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -103,13 +104,13 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         String resourceId = resourceId();
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
-            String realm = realmFor(serverContext);
-            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
-            if (serviceNotAssignedToRealm(config, result)) {
+            if (serviceNotAssignedToRealm(config, serverContext)) {
                 throw new NotFoundException();
             }
+            String realm = realmFor(serverContext);
+            JsonValue result = withExtraAttributes(realm, getJsonValue(realm, config, serverContext));
             return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
-        } catch (SMSException | SSOException | InternalServerErrorException e) {
+        } catch (SMSException | SSOException | IdRepoException | InternalServerErrorException e) {
             debug.warning("::SmsSingletonProvider:: {} on Read", e.getClass().getSimpleName(), e);
             return new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()).asPromise();
         } catch (NotFoundException  e) {
@@ -117,15 +118,20 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         }
     }
 
-    private boolean serviceNotAssignedToRealm(ServiceConfig config, JsonValue response) {
+    private boolean serviceNotAssignedToRealm(ServiceConfig config, Context serviceContext)
+            throws IdRepoException, SSOException {
         return (type != SchemaType.GLOBAL)
                 && (config == null || !config.exists())
                 && dynamicSchema != null
-                && (response.get(new JsonPointer("/dynamic")).asMap().isEmpty());
+                && !isAssignedIdentityService(serviceName,
+                        getRealmIdentity(realmFor(serviceContext), getSsoToken(serviceContext)));
     }
 
     protected Map<String, Set<String>> getDynamicAttributes(String realm) {
-        return AuthD.getAuth().getOrgServiceAttributes(realm, serviceName);
+        Map<String, Set<String>> result = new HashMap<>();
+        result.putAll(dynamicSchema.getAttributeDefaults());
+        result.putAll(AuthD.getAuth().getOrgServiceAttributes(realm, serviceName));
+        return result;
     }
 
     /**
