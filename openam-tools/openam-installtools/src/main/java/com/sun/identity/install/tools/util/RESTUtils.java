@@ -24,9 +24,11 @@
  *
  * $Id: RESTUtils.java,v 1.5 2008/08/19 19:13:03 veiming Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
-
 package com.sun.identity.install.tools.util;
+
+import org.forgerock.openam.utils.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -36,7 +38,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -45,117 +46,161 @@ import java.util.ArrayList;
  * Utility class to call REST APIs on OpenSSO.
  */
 public class RESTUtils {
-    
+
+    public static final String AUTHENTICATION_URI = "/json/authenticate"
+            + "?authIndexType=module"
+            + "&authIndexValue=Application";
+    public static final String AUTHENTICATION_URI_API_VERSION = "1.0";
+
+    public static final String CREATE_PROFILE_URI = "/json/agents/?_action=create"
+            + "&authIndexType=module"
+            + "&authIndexValue=Application";
+    public static final String CREATE_PROFILE_URI_API_VERSION = "1.0";
+
+    public static final String SERVER_INFO_URI = "/json/serverinfo/*";
+    public static final String SERVER_INFO_URI_API_VERSION = "1.0";
+
     /**
-     * call the REST service URL and return its reponse.
-     * @param url the URL to be called
-     * @postData the data to be posted over the url
+     * GET from the specified REST service URL and return its response, taking into account request headers.
+     * @param url the URL to be called with GET
+     * @headers name value pairs to be added into the HTTP headers
      * @return the response from called URL
      */
-    public static RESTResponse callServiceURL(String url,
-            String postData) throws MalformedURLException, IOException {
-        
-        URL serviceURL = null;
+    public static RESTResponse getServiceURL(String url,
+                                             String... headers) throws IOException {
+        return callServiceURL(HTTPMethod.GET, url, null, headers);
+    }
+
+    /**
+     * POST to the specified REST service URL and return its response, taking into account request headers.
+     * @param url the URL to be POSTed to
+     * @postData the data to be POSTed
+     * @headers name value pairs to be added into the HTTP headers
+     * @return the response from called URL
+     */
+    public static RESTResponse postServiceURL(String url,
+                                              String postData,
+                                              String... headers) throws IOException {
+        return callServiceURL(HTTPMethod.POST, url, postData, headers);
+    }
+
+    /**
+     * call the REST service URL and return its response, taking into account request headers.
+     * @param url the URL to be called
+     * @postData the data to be posted over the url
+     * @headers name value pairs to be added into the HTTP headers
+     * @return the response from called URL
+     */
+    public static RESTResponse callServiceURL(HTTPMethod method,
+                                              String url,
+                                              String postData,
+                                              String... headers)
+            throws IOException {
+
         HttpURLConnection urlConnect = null;
         DataOutputStream output = null;
-        BufferedReader reader = null;
         RESTResponse response = new RESTResponse();
         ArrayList returnList = new ArrayList();
         try {
-            serviceURL = new URL(url);
+            URL serviceURL = new URL(url);
             urlConnect = (HttpURLConnection)serviceURL.openConnection();
-            urlConnect.setRequestMethod("POST");
+            if (method == HTTPMethod.GET) {
+                urlConnect.setRequestMethod("GET");
+            } else {
+                urlConnect.setRequestMethod("POST");
+                urlConnect.setDoOutput(true);
+            }
             urlConnect.setUseCaches(false);
-            urlConnect.setDoOutput(true);
-            //urlConnect.setConnectTimeout(10000);
-            urlConnect.setRequestProperty("Content-Type",
-                    "application/x-www-form-urlencoded");
-            
-            // post data
-            output = new DataOutputStream(urlConnect.getOutputStream());
-            output.writeBytes(postData);
-            output.flush();
-            
+            if (headers.length > 0) {
+                for (int i = 0; i + 1 < headers.length; i += 2) {
+                    String header = headers[i];
+                    String value = headers[i + 1];
+                    urlConnect.setRequestProperty(header, value);
+                }
+            }
+
+            if (method == HTTPMethod.POST) {
+                // post data
+                output = new DataOutputStream(urlConnect.getOutputStream());
+                output.writeBytes(postData);
+                output.flush();
+            }
+
             // read response
             response.setResponseCode(urlConnect.getResponseCode());
-            
-            reader = new BufferedReader(new InputStreamReader(
-                    urlConnect.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                returnList.add(line);
-            }
-            
-        } catch (FileNotFoundException ex) {
-            throw ex;
-            
-        } catch (UnknownHostException ex) {
-            throw ex;
 
-        } catch (ConnectException ex) {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new InputStreamReader(urlConnect.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    returnList.add(line);
+                }
+            } finally {
+                IOUtils.closeIfNotNull(reader);
+            }
+
+        } catch (FileNotFoundException|UnknownHostException|ConnectException ex) {
             throw ex;
 
         } catch (IOException ex) {
             BufferedReader br = null;
             try {
-                InputStream is = urlConnect.getErrorStream();
-                br = new BufferedReader(new InputStreamReader(is));
-                String line = null;
-                while ((line=br.readLine()) != null) {
-                    returnList.add(line);
+                if (urlConnect != null) {
+                    InputStream is = urlConnect.getErrorStream();
+                    br = new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        returnList.add(line);
+                    }
                 }
             } finally {
-                if (br != null) {
-                    try { br.close(); } catch(Exception e) {}
-                }
+                IOUtils.closeIfNotNull(br);
             }
-            
+
         } finally {
-            if (output != null) {
-                try { output.close(); } catch (Exception ex) {}
-            }
-            if (reader != null) {
-                try { reader.close(); } catch (Exception ex) {}
-            }
+            IOUtils.closeIfNotNull(output);
         }
         response.setContent(returnList);
-        
+
         return response;
     }
-    
+
     /**
-     * Inner public class to encapsulate the reponse from REST API.
+     * Inner public class to encapsulate the response from REST API.
      */
     public static class RESTResponse {
         private int responseCode = -1;
         private ArrayList content = null;
-        
+
         public ArrayList getContent() {
             return content;
         }
-        
+
         public void setContent(ArrayList content) {
             this.content = content;
         }
-        
+
         public int getResponseCode() {
             return responseCode;
         }
-        
+
         public void setResponseCode(int responseCode) {
             this.responseCode = responseCode;
         }
-        
+
         public String toString() {
-            StringBuffer buffer = null;
+            StringBuilder buffer = new StringBuilder();
             if (content != null) {
-                buffer = new StringBuffer();
-                for (int i=0; i<content.size(); i++) {
+                for (int i = 0; i < content.size(); i++) {
                     buffer.append(content.get(i) + "\n");
                 }
-            } // end of if (...
+            }
             return buffer.toString();
-        } // end of toString()
-        
+        }
+    }
+
+    private enum HTTPMethod {
+        GET, POST;
     }
 }

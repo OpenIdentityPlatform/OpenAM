@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2016 ForgeRock Inc
  */
 package com.sun.identity.install.tools.configurator;
 
@@ -49,18 +49,18 @@ import com.sun.identity.install.tools.util.LocalizedMessage;
 
 
 public class PasswordValidator extends ValidatorBase {
-    
+
     public PasswordValidator() throws InstallException {
         super();
     }
-    
+
     public ValidationResult isPasswordValid(String passfileName, Map props,
             IStateAccess state) {
-        
+
         ValidationResultStatus validRes = ValidationResultStatus.STATUS_FAILED;
         LocalizedMessage returnMessage = null;
         BufferedReader br = null;
-        
+
         try {
             br = new BufferedReader(new FileReader(passfileName));
             String line;
@@ -71,13 +71,13 @@ public class PasswordValidator extends ValidatorBase {
                     int passLen = line.length();
                     String minSize = (String) props.get(STR_VAL_MIN_DIGITS);
                     String maxSize = (String) props.get(STR_IN_MAX_DIGITS);
-                    
+
                     if ((minSize != null) && (minSize.length() > 0)
                     && (maxSize != null) && (maxSize.length() > 0)) {
-                        
+
                         int minLen = Integer.parseInt(minSize);
                         int maxLen = Integer.parseInt(maxSize);
-                        
+
                         Debug.log("PasswordValidator : Password : "
                                 + " Min length = " + minLen + ", "
                                 + "Max Length = " + maxLen);
@@ -85,7 +85,7 @@ public class PasswordValidator extends ValidatorBase {
                             if ((passLen >= minLen) && (passLen <= maxLen)) {
                                 validRes =
                                         ValidationResultStatus.STATUS_SUCCESS;
-                                
+
                             } else {
                                 Debug.log("PasswordValidator : Length of "
                                         + "password field is invalid");
@@ -117,16 +117,16 @@ public class PasswordValidator extends ValidatorBase {
                 }
             }
         }
-        
+
         if (validRes.getIntValue() == ValidationResultStatus.INT_STATUS_FAILED) {
             returnMessage = LocalizedMessage.get(LOC_VA_WRN_IN_VAL_PASS);
         }
-        
+
         Debug.log("PasswordValidator : Is password valid ? "
                 + validRes.isSuccessful());
         return new ValidationResult(validRes, null, returnMessage);
     }
-    
+
     /*
      * Checks if Agent profile/User's name&password is valid.
      *
@@ -134,241 +134,182 @@ public class PasswordValidator extends ValidatorBase {
      *
      * @return ValidationResult
      */
-    
+
     public ValidationResult isAgentLoginValid(String passfileName, Map props,
             IStateAccess state) throws InstallException {
-        
+
         ValidationResultStatus validRes = ValidationResultStatus.STATUS_FAILED;
         LocalizedMessage returnMessage = null;
         String agentUserName = null;
         String serverURL = null;
         String restAuthURL = null;
-        String str = null;
-        
         String serverURLValid = (String)state.get("isServerURLValid");
-        String createAgentProfileKey = (String)state.get(
-                InstallConstants.STR_CREATE_AGENT_PROFILE_KEY);
+        String createAgentProfileKey = (String)state.get(InstallConstants.STR_CREATE_AGENT_PROFILE_KEY);
+
         if (createAgentProfileKey == null) {
             setCreateAgentProfile(state, "false");
         }
 
         if (serverURLValid != null && serverURLValid.equals("true")) {
-            
+
             if (isAgentAdmin(props, state)) {
                 return isAgentAdminLoginValid(passfileName, props, state);
             }
-            
-            String agentUserNameKey = (String)props.get(
-                    STR_AGENT_PROFILE_LOOKUP_KEY);
+
+            String agentUserNameKey = (String)props.get(STR_AGENT_PROFILE_LOOKUP_KEY);
             if (agentUserNameKey != null) {
                 agentUserName = (String) state.get(agentUserNameKey);
             }
-            
+
             Map tokens = state.getData();
             if (tokens.containsKey("AM_SERVER_URL")) {
                 serverURL = (String) tokens.get("AM_SERVER_URL");
             }
-            
+
             String agentUserPasswd = readDataFromFile(passfileName);
+            int responseCode;
             try {
-                restAuthURL = serverURL +
-                        "/identity/authenticate";
-                String encodingType = "UTF-8";
-                String encodedPostData = "username="
-                        + URLEncoder.encode(agentUserName, encodingType)
-                        + "&password="
-                        + URLEncoder.encode(agentUserPasswd, encodingType)
-                        + "&uri=" + URLEncoder.encode("realm=/&module=Application", encodingType);
-                RESTUtils.RESTResponse response = RESTUtils.callServiceURL(
-                        restAuthURL, encodedPostData);
-                
+                restAuthURL = serverURL + RESTUtils.AUTHENTICATION_URI + "&noSession=true";
+                Debug.log("about to call " + restAuthURL + " to authenticate " + agentUserName);
+
+                RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
+                        restAuthURL, "",
+                        "Content-Type", "application/json",
+                        "X-OpenAM-Username", agentUserName,
+                        "X-OpenAM-Password", agentUserPasswd,
+                        "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.AUTHENTICATION_URI_API_VERSION);
+
                 // Read response code
-                int responseCode = response.getResponseCode();
+                responseCode = response.getResponseCode();
                 if (responseCode == HTTP_RESPONSE_OK) {
                     validRes = ValidationResultStatus.STATUS_SUCCESS;
                     setCreateAgentProfile(state, "false");
-                    
-                } else if (responseCode ==
-                        HTTP_RESPONSE_AUTHENTICATION_FAILED) {
-                    String responseStr = response.toString();
-                    if (responseStr.indexOf(
-                            STR_IDENTITY_INVALID_PASSWORD) > 0) {
-                        // wrong password
-                        returnMessage = LocalizedMessage.get(
-                                LOC_VA_WRN_IN_VAL_AGENT_PASSWORD,
-                                new Object[] {agentUserName});
-                        
-                    } else if (responseStr.indexOf(
-                                STR_IDENTITY_INVALID_CREDENTIALS) > 0) {
-                        // create agent profile only when agent profile 
-                        // does not exist.
-                        setCreateAgentProfile(state, "true");
-                        returnMessage = LocalizedMessage.get(
-                                LOC_VA_WRN_IN_VAL_AGENT_PROFILE_NOT_PRESENT,
-                                new Object[] {agentUserName});
-                        validRes = ValidationResultStatus.STATUS_WARNING;
-                        
-                    } else {
-                        Debug.log("PasswordValidator.isAgentLoginValid() - " +
-                            "Error from OpenSSO:" + response.toString());
-                        returnMessage = LocalizedMessage.get(
-                                LOC_VA_WRN_IN_VAL_OTHER_AGENT_AUTH_FAILURE,
-                                new Object[] {Integer.valueOf(responseCode)});
-                        validRes = ValidationResultStatus.STATUS_WARNING;
-                    }
-                    
+                    Debug.log("Auth success with " + agentUserName + ": switching create agent profile to false");
+
+                } else if (responseCode == HTTP_RESPONSE_AUTHENTICATION_FAILED) {
+                    // the new JSON endpoint doesn't leak as much information as the old /identify/authenticate one -
+                    // leaked information that was useful at this point.  All we can do is try to go ahead and create
+                    // the agent profile.  This may fail, but we'll have to report that when it happens.
+                    //
+                    Debug.log("Auth failed with " + agentUserName + ": switching create agent profile to true");
+                    validRes = ValidationResultStatus.STATUS_WARNING;
+                    setCreateAgentProfile(state, "true");
+
                 } else {
-                    Debug.log("PasswordValidator.isAgentLoginValid() - " +
-                            "Error from OpenSSO:" + response.toString());
-                    returnMessage = LocalizedMessage.get(
-                            LOC_VA_WRN_IN_VAL_AGENT_GENERIC_FAILURE,
+                    Debug.log("PasswordValidator.isAgentLoginValid() "
+                            + "- Unexpected response code from JSON authenticate endpoint: "
+                            + responseCode
+                            + ": message" + response.toString());
+                    returnMessage = LocalizedMessage.get(LOC_VA_WRN_IN_VAL_AGENT_GENERIC_FAILURE,
                             new Object[] {Integer.valueOf(responseCode)});
                     validRes = ValidationResultStatus.STATUS_WARNING;
                 }
-                
+
             } catch (UnknownHostException uhe) {
-                Debug.log("PasswordValidator.isAgentLoginValid() " +
-                        "threw exception :",
-                        uhe);
+                Debug.log("PasswordValidator.isAgentLoginValid() threw exception :", uhe);
                 returnMessage = LocalizedMessage.get(
                         LOC_VA_WRN_UN_REACHABLE_FAM_SERVER_URL,
                         new Object[] { restAuthURL });
                 validRes = ValidationResultStatus.STATUS_WARNING;
             } catch (ConnectException ce) {
-                Debug.log("PasswordValidator.isAgentLoginValid() " +
-                        "threw exception :",
-                        ce);
+                Debug.log("PasswordValidator.isAgentLoginValid() threw exception :", ce);
                 returnMessage = LocalizedMessage.get(
                         LOC_VA_WRN_UN_REACHABLE_FAM_SERVER_URL,
                         new Object[] { restAuthURL });
                 validRes = ValidationResultStatus.STATUS_WARNING;
             } catch (FileNotFoundException ex) {
-                Debug.log("PasswordValidator.isAgentLoginValid() " +
-                        "threw exception :",
-                        ex);
+                Debug.log("PasswordValidator.isAgentLoginValid() threw exception :", ex);
                 returnMessage = LocalizedMessage.get(
                         LOC_VA_WRN_NOT_FOUND_SERVER_URL,
                         new Object[] { restAuthURL });
                 validRes = ValidationResultStatus.STATUS_WARNING;
             } catch (IOException ex) {
-                Debug.log("PasswordValidator.isAgentLoginValid() " +
-                        "threw exception :", ex);
+                Debug.log("PasswordValidator.isAgentLoginValid() threw exception :", ex);
             }
             return new ValidationResult(validRes, null, returnMessage);
-            
+
         } else {
-           
-            returnMessage = LocalizedMessage.get(
-                    LOC_VA_WRN_SERVER_URL_NOT_RUNNING,
-                    new Object[] { serverURL });
+            returnMessage = LocalizedMessage.get(LOC_VA_WRN_SERVER_URL_NOT_RUNNING, new Object[] { serverURL });
             validRes = ValidationResultStatus.STATUS_WARNING;
             return new ValidationResult(validRes, null, returnMessage);
         }
     }
 
     /*
+     * Much of this code seems to have been duplicated from above, the only difference being the key used to index
+     * the properties, i.e. props.get(STR_AGENT_PROFILE_LOOKUP_KEY)
+     *
+     * TODO Refactor to remove duplication
+     *
      * validate Agent Administrator's name and password.
      */
-    private ValidationResult isAgentAdminLoginValid(String passfileName, 
+    private ValidationResult isAgentAdminLoginValid(String passfileName,
             Map props, IStateAccess state) throws InstallException {
 
         ValidationResultStatus validRes = ValidationResultStatus.STATUS_FAILED;
         LocalizedMessage returnMessage = null;
-        String agentUserName = null;
+        String agentAdminUserName = null;
         String serverURL = null;
         String restAuthURL = null;
-        
-        String agentUserNameKey = (String)
-        props.get(STR_AGENT_PROFILE_LOOKUP_KEY);
+
+        String agentUserNameKey = (String) props.get(STR_AGENT_PROFILE_LOOKUP_KEY);
         if (agentUserNameKey != null) {
-            agentUserName = (String) state.get(agentUserNameKey);
+            agentAdminUserName = (String) state.get(agentUserNameKey);
         }
-        
+
         Map tokens = state.getData();
         if (tokens.containsKey("AM_SERVER_URL")) {
             serverURL = (String) tokens.get("AM_SERVER_URL");
         }
-        
-        String agentUserPasswd = readDataFromFile(passfileName);
+
+        String agentAdminUserPasswd = readDataFromFile(passfileName);
         try {
-            restAuthURL = serverURL +
-                    "/identity/authenticate";
-            String encodingType = "UTF-8";
-            String encodedPostData = "username="
-                    + URLEncoder.encode(agentUserName, encodingType)
-                    + "&password="
-                    + URLEncoder.encode(agentUserPasswd, encodingType)
-                    + "&uri=" + URLEncoder.encode("realm=/&module=Application", encodingType);
-            RESTUtils.RESTResponse response = RESTUtils.callServiceURL(
-                    restAuthURL, encodedPostData);
-            
+            restAuthURL = serverURL + RESTUtils.AUTHENTICATION_URI + "&noSession=true";
+            Debug.log("about to call " + restAuthURL + " to validate username agent admin: " + agentAdminUserName);
+            RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
+                    restAuthURL, "",
+                    "Content-Type", "application/json",
+                    "X-OpenAM-Username", agentAdminUserName,
+                    "X-OpenAM-Password", agentAdminUserPasswd,
+                    "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.AUTHENTICATION_URI_API_VERSION);
+
             // Read response code
             int responseCode = response.getResponseCode();
             if (responseCode == HTTP_RESPONSE_OK) {
                 validRes = ValidationResultStatus.STATUS_SUCCESS;
-                setCreateAgentProfile(state, "true");
+                // All is good.  If we want to create the agent profile, we can go ahead.
+                // It may be, of course, that we don't because the profile already exists.
+                // We will have determined that in the function above.
+                Debug.log("Auth success for " + agentAdminUserName);
 
-            } else if (responseCode ==
-                    HTTP_RESPONSE_AUTHENTICATION_FAILED) {
-                
-                String responseStr = response.toString();
-                if (responseStr.indexOf(
-                        STR_IDENTITY_INVALID_PASSWORD) > 0) {
-                    // wrong password
-                    returnMessage = LocalizedMessage.get(
-                            LOC_VA_WRN_IN_VAL_AGENT_PASSWORD,
-                            new Object[] {agentUserName});
-                    
-                } else if (responseStr.indexOf(
-                        STR_IDENTITY_INVALID_CREDENTIALS) > 0) {
-                    // user does not exist.
-                    returnMessage = LocalizedMessage.get(
-                            LOC_VA_ERR_IN_VAL_AGENT_PROFILE_NOT_PRESENT,
-                            new Object[] {agentUserName});
-                    
-                } else {
-                    Debug.log("PasswordValidator.isAgentAdminLoginValid() - " +
-                            "Error from OpenSSO:" + response.toString());
-                    returnMessage = LocalizedMessage.get(
-                            LOC_VA_ERR_IN_VAL_OTHER_AGENT_AUTH_FAILURE,
-                            new Object[] {Integer.valueOf(responseCode)});
-                }
-                
+            } else if (responseCode == HTTP_RESPONSE_AUTHENTICATION_FAILED) {
+
+                Debug.log("Auth FAILED for " + agentAdminUserName + ": cannot create agent profile");
+                setCreateAgentProfile(state, "false");
+                validRes = ValidationResultStatus.STATUS_WARNING;
+
+                // user does not exist or password incorrect
+                returnMessage = LocalizedMessage.get(LOC_VA_WRN_IN_VAL_AGENT_CREDENTIALS,
+                        new Object[] {agentAdminUserName});
+
             } else {
-                Debug.log("PasswordValidator.isAgentAdminLoginValid() - " +
-                        "Error from OpenSSO:" + response.toString());
-                returnMessage = LocalizedMessage.get(
-                        LOC_VA_ERR_IN_VAL_AGENT_GENERIC_FAILURE,
+                Debug.log("PasswordValidator.isAgentAdminLoginValid() - Error from OpenSSO:" + response.toString());
+                returnMessage = LocalizedMessage.get(LOC_VA_ERR_IN_VAL_AGENT_GENERIC_FAILURE,
                         new Object[] {Integer.valueOf(responseCode)});
             }
-            
+
         } catch (UnknownHostException uhe) {
-            Debug.log("PasswordValidator.isAgentAdminLoginValid() " +
-                    "threw exception :",
-                    uhe);
-            returnMessage = LocalizedMessage.get(
-                    LOC_VA_WRN_UN_REACHABLE_FAM_SERVER_URL,
-                    new Object[] { restAuthURL });
-        } catch (ConnectException ce) {
-            Debug.log("PasswordValidator.isAgentAdminLoginValid() " +
-                    "threw exception :",
-                    ce);
-            returnMessage = LocalizedMessage.get(
-                    LOC_VA_WRN_UN_REACHABLE_FAM_SERVER_URL,
+            Debug.log("PasswordValidator.isAgentAdminLoginValid() threw exception :", uhe);
+            returnMessage = LocalizedMessage.get(LOC_VA_WRN_UN_REACHABLE_FAM_SERVER_URL,
                     new Object[] { restAuthURL });
         } catch (FileNotFoundException ex) {
-            Debug.log("PasswordValidator.isAgentAdminLoginValid() " +
-                    "threw exception :",
-                    ex);
-            returnMessage = LocalizedMessage.get(
-                    LOC_VA_WRN_NOT_FOUND_SERVER_URL,
-                    new Object[] { restAuthURL });
+            Debug.log("PasswordValidator.isAgentAdminLoginValid() threw exception :", ex);
+            returnMessage = LocalizedMessage.get(LOC_VA_WRN_NOT_FOUND_SERVER_URL, new Object[] { restAuthURL });
         } catch (IOException ex) {
-            Debug.log("PasswordValidator.isAgentAdminLoginValid() " +
-                    "threw exception :", ex);
+            Debug.log("PasswordValidator.isAgentAdminLoginValid() threw exception :", ex);
         }
         return new ValidationResult(validRes, null, returnMessage);
-        
+
     }
 
     /*
@@ -376,49 +317,43 @@ public class PasswordValidator extends ValidatorBase {
      */
     private boolean isAgentAdmin(Map props, IStateAccess state) {
         String agentUserName = null;
-        String agentUserNameKey = (String) props.get(
-                STR_AGENT_PROFILE_LOOKUP_KEY);
+        String agentUserNameKey = (String) props.get(STR_AGENT_PROFILE_LOOKUP_KEY);
+
         if (agentUserNameKey != null) {
             agentUserName = (String) state.get(agentUserNameKey);
         }
-        
-        String agentAdminName = (String)state.get(
-                STR_AGENT_ADMIN_LOOKUP_KEY);
-        if ((agentAdminName == null) ||
-                !agentUserName.equalsIgnoreCase(agentAdminName)) {
+
+        String agentAdminName = (String)state.get(STR_AGENT_ADMIN_LOOKUP_KEY);
+        if (agentAdminName == null || !agentUserName.equalsIgnoreCase(agentAdminName)) {
             return false;
-            
         } else {
             return true;
         }
     }
-    
+
     /*
      * set flag indicating if agent profile will be created or not.
      */
     private void setCreateAgentProfile(IStateAccess state, String status) {
-        
         state.put(InstallConstants.STR_CREATE_AGENT_PROFILE_KEY, status);
         state.put(InstallConstants.STR_CREATE_AGENT_PROFILE_NAME, status);
     }
-    
+
     /*
      * read user's password from password file.
      */
     private String readDataFromFile(String fileName) throws InstallException {
         String firstLine = null;
         BufferedReader br = null;
-        
+
         try {
             FileInputStream fis = new FileInputStream(fileName);
             InputStreamReader fir = new InputStreamReader(fis);
             br = new BufferedReader(fir);
             firstLine = br.readLine();
         } catch (Exception e) {
-            Debug.log("PasswordValidator.readDataFromFile() - Error " +
-                    "reading file - " + fileName, e);
-            throw new InstallException(LocalizedMessage.get(
-                    LOC_TK_ERR_PASSWD_FILE_READ), e);
+            Debug.log("PasswordValidator.readDataFromFile() - Error reading file - " + fileName, e);
+            throw new InstallException(LocalizedMessage.get(LOC_TK_ERR_PASSWD_FILE_READ), e);
         } finally {
             if (br != null) {
                 try {
@@ -430,41 +365,34 @@ public class PasswordValidator extends ValidatorBase {
         }
         return firstLine;
     }
-    
+
     public void initializeValidatorMap() throws InstallException {
-        
+
         Class[] paramObjs = { String.class, Map.class, IStateAccess.class };
-        
+
         try {
             getValidatorMap().put("VALID_PASSWORD",
                     this.getClass().getMethod("isPasswordValid", paramObjs));
-            
+
             getValidatorMap().put("VALIDATE_AGENT_PASSWORD",
                     this.getClass().getMethod("isAgentLoginValid", paramObjs));
-            
+
         } catch (NoSuchMethodException nsme) {
-            Debug.log("PasswordValidator: "
-                    + "NoSuchMethodException thrown while loading method :",
-                    nsme);
-            throw new InstallException(LocalizedMessage
-                    .get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), nsme);
+            Debug.log("PasswordValidator: NoSuchMethodException thrown while loading method :", nsme);
+            throw new InstallException(LocalizedMessage.get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), nsme);
         } catch (SecurityException se) {
-            Debug.log("PasswordValidator: "
-                    + "SecurityException thrown while loading method :", se);
-            throw new InstallException(LocalizedMessage
-                    .get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), se);
+            Debug.log("PasswordValidator: SecurityException thrown while loading method :", se);
+            throw new InstallException(LocalizedMessage.get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), se);
         } catch (Exception ex) {
-            Debug.log("PasswordValidator: "
-                    + "Exception thrown while loading method :", ex);
-            throw new InstallException(LocalizedMessage
-                    .get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), ex);
+            Debug.log("PasswordValidator: Exception thrown while loading method :", ex);
+            throw new InstallException(LocalizedMessage.get(LOC_VA_ERR_VAL_METHOD_NOT_FOUND), ex);
         }
-        
+
     }
-    
+
     /** Hashmap of Validator names and integers */
     Map validMap = new HashMap();
-    
+
     /*
      * Localized messages
      */
@@ -478,34 +406,25 @@ public class PasswordValidator extends ValidatorBase {
     public static String LOC_VA_WRN_NOT_FOUND_SERVER_URL =
             "VA_WRN_NOT_FOUND_SERVER_URL";
 
-    public static String LOC_VA_WRN_IN_VAL_AGENT_PASSWORD =
-            "VA_WRN_IN_VAL_AGENT_PASSWORD";
-    public static String LOC_VA_WRN_IN_VAL_AGENT_PROFILE_NOT_PRESENT =
-            "VA_WRN_IN_VAL_AGENT_PROFILE_NOT_PRESENT";
-    public static String LOC_VA_ERR_IN_VAL_AGENT_PROFILE_NOT_PRESENT =
-            "VA_ERR_IN_VAL_AGENT_PROFILE_NOT_PRESENT";
-    
-    public static String LOC_VA_WRN_IN_VAL_OTHER_AGENT_AUTH_FAILURE =
-            "VA_WRN_IN_VAL_OTHER_AGENT_AUTH_FAILURE";
-    public static String LOC_VA_ERR_IN_VAL_OTHER_AGENT_AUTH_FAILURE =
-            "VA_ERR_IN_VAL_OTHER_AGENT_AUTH_FAILURE";
     public static String LOC_VA_WRN_IN_VAL_AGENT_GENERIC_FAILURE =
             "VA_WRN_IN_VAL_AGENT_GENERIC_FAILURE";
     public static String LOC_VA_ERR_IN_VAL_AGENT_GENERIC_FAILURE =
             "VA_ERR_IN_VAL_AGENT_GENERIC_FAILURE";
+    public static String LOC_VA_WRN_IN_VAL_AGENT_CREDENTIALS =
+            "VA_WRN_IN_VAL_AGENT_CREDENTIALS";
 
     // lookup keys
     public static final String STR_AGENT_PROFILE_LOOKUP_KEY =
             "AGENT_PROFILE_LOOKUP_KEY";
     public static final String STR_AGENT_ADMIN_LOOKUP_KEY =
             "AGENT_ADMINISTRATOR_NAME";
-    
+
     /*
      * String constants
      */
     public static String STR_VAL_MIN_DIGITS = "minLen";
     public static String STR_IN_MAX_DIGITS = "maxLen";
-    
+
     public static final int HTTP_RESPONSE_OK = 200;
     public static final int HTTP_RESPONSE_GENERIC_FAILURE = 500;
     public static final int HTTP_RESPONSE_AUTHENTICATION_FAILED = 401;

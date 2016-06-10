@@ -24,107 +24,129 @@
  *
  * $Id: CreateProfileTask.java,v 1.5 2008/08/19 19:13:02 veiming Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
-
 package com.sun.identity.install.tools.configurator;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Map;
+import static com.sun.identity.install.tools.util.RESTUtils.CREATE_PROFILE_URI;
+import static org.forgerock.json.JsonValue.*;
 
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.RESTUtils;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.utils.IOUtils;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * This class provides the feature of creating Agent Profile during installation
  * when the profile does not exist in OpenSSO.
  */
 public class CreateProfileTask implements ITask, InstallConstants {
-    
+
+    public static final String LOC_TSK_MSG_CREATE_AGENT_PROFILE_EXECUTE =
+            "TSK_MSG_CREATE_AGENT_PROFILE_EXECUTE";
+
+    public static final String STR_AM_SERVER_URL = "AM_SERVER_URL";
+
+    public static final String STR_AGENT_URL = "AGENT_URL";
+
+    public static final String STR_AGENT_PROFILE_TYPE = "AGENT_PROFILE_TYPE";
+
+    public static final String STR_AGENT_ADMINISTRATOR_NAME =
+            "AGENT_ADMINISTRATOR_NAME";
+
+    public static final String STR_AGENT_ADMINISTRATOR_PASSWORD_FILE =
+            "AGENT_ADMINISTRATOR_PASSWORD_FILE";
+
+    public static final String STR_AGENT_PROFILE_NAME =
+            "AGENT_PROFILE_NAME";
+
+    public static final String STR_AGENT_PASSWORD_FILE =
+            "AGENT_PASSWORD_FILE";
+
+    public static final String LOC_TK_ERR_PASSWD_FILE_READ =
+            "TSK_ERR_PASSWD_FILE_READ";
+
+    public static final String ENCODING_TYPE = "UTF-8";
+
+    public static final int HTTP_RESPONSE_OK = 200;
+    public static final int HTTP_RESPONSE_CREATED = 201;
+
     public boolean execute(String name, IStateAccess stateAccess,
             Map properties) throws InstallException {
-        
+
         boolean result = false;
-        
+
         // check if skipping creating agent profile is needed.
         String createAgentProfile = (String)stateAccess.get(
                 InstallConstants.STR_CREATE_AGENT_PROFILE_NAME);
-        if (createAgentProfile == null ||
-                createAgentProfile.equalsIgnoreCase("false")) {
-            Debug.log("CreateProfileTask.execute() - " +
-                    "Agent profile will not be created");
+        if (createAgentProfile == null || createAgentProfile.equalsIgnoreCase("false")) {
+            Debug.log("CreateProfileTask.execute() - Agent profile will not be created");
             return true;
         }
-        Debug.log("CreateProfileTask.execute() - " +
-                "Agent profile will be created");
+        Debug.log("CreateProfileTask.execute() - Agent profile will be created");
         try {
-            
-            RESTUtils.RESTResponse response = createAgentProfile(stateAccess,
-                    properties);
-            if (response.getResponseCode() != HTTP_RESPONSE_OK) {
-                Debug.log("CreateProfileTask.execute() - " +
-                        "failed to create agent profile. response code = " +
+
+            RESTUtils.RESTResponse response = createAgentProfile(stateAccess, properties);
+            int code = response.getResponseCode();
+            if (code != HTTP_RESPONSE_OK && code != HTTP_RESPONSE_CREATED) {
+                Debug.log("CreateProfileTask.execute() - FAILED to create agent profile. response code = " +
                         response.getResponseCode());
-                Debug.log("CreateProfileTask.execute() - " +
-                        "failed to create agent profile. response message = " +
+                Debug.log("CreateProfileTask.execute() - FAILED to create agent profile. response message = " +
                         response.toString());
                 return false;
-                
+
             } else {
-                String agentUserName = (String)stateAccess.get(
-                        STR_AGENT_PROFILE_NAME);
-                Debug.log("CreateProfileTask.execute() -" +
-                        " Agent profile:" + agentUserName  +
+                String agentUserName = (String)stateAccess.get(STR_AGENT_PROFILE_NAME);
+                Debug.log("CreateProfileTask.execute() - Agent profile:"
+                        + agentUserName  +
                         " was created successfully!");
+                Debug.log("CreateProfileTask.execute() - In case you're interested, the response message = " +
+                        response.toString());
                 result = true;
             }
         } catch (Exception ex) {
             Debug.log("CreateProfileTask.execute(): failed!", ex);
         }
-        
+
         return result;
     }
-    
+
     /*
      * create agent profile.
      * @param stateAccess
      */
-    private RESTUtils.RESTResponse createAgentProfile(IStateAccess stateAccess,
-            Map properties) throws Exception {
-        
+    private RESTUtils.RESTResponse createAgentProfile(IStateAccess stateAccess, Map properties) throws Exception {
+
         String agentUserName = (String)stateAccess.get(STR_AGENT_PROFILE_NAME);
-        String agentUserPasswordFile = (String)stateAccess.get(
-                STR_AGENT_PASSWORD_FILE);
+        String agentUserPasswordFile = (String)stateAccess.get(STR_AGENT_PASSWORD_FILE);
         String agentUserPassword = null;
-        
+
         if (agentUserName == null || agentUserPasswordFile == null) {
-            Debug.log("CreateProfileTask.createAgentProfile() - " +
-                    "Agent profile's name or password file is null");
+            Debug.log("CreateProfileTask.createAgentProfile() - Agent profile's name or password file is null");
             return null;
         }
-        
-        String agentAdminName = (String)stateAccess.get(
-                STR_AGENT_ADMINISTRATOR_NAME);
-        String agentAdminPasswordFile = (String)stateAccess.get(
-                STR_AGENT_ADMINISTRATOR_PASSWORD_FILE);
+
+        String agentAdminName = (String)stateAccess.get(STR_AGENT_ADMINISTRATOR_NAME);
+        String agentAdminPasswordFile = (String)stateAccess.get(STR_AGENT_ADMINISTRATOR_PASSWORD_FILE);
         String agentAdminPassword = null;
-        String agentProfileType = (String)properties.get(
-                STR_AGENT_PROFILE_TYPE);
-        String ssoToken = null;
+        String agentProfileType = (String)properties.get(STR_AGENT_PROFILE_TYPE);
+        String ssoToken;
         String serverURL = (String) stateAccess.get(STR_AM_SERVER_URL);
         String agentURL = (String) stateAccess.get(STR_AGENT_URL);
-        
-        if (agentAdminName == null || agentAdminPasswordFile == null ||
-                agentProfileType == null) {
-            Debug.log("CreateProfileTask.createAgentProfile() - " +
-                    "Agent Administrator's " +
+
+        if (agentAdminName == null || agentAdminPasswordFile == null || agentProfileType == null) {
+            Debug.log("CreateProfileTask.createAgentProfile() - Agent Administrator's " +
                     "name, password file or Agent Profile's type is null");
             return null;
         }
-        
+
         agentUserPassword = readDataFromFile(agentUserPasswordFile);
         agentAdminPassword = readDataFromFile(agentAdminPasswordFile);
         if (agentUserPassword == null || agentAdminPassword == null) {
@@ -133,82 +155,104 @@ public class CreateProfileTask implements ITask, InstallConstants {
                     "password is null");
             return null;
         }
-        
+
+        String cookieName = getCookieName(serverURL);
+
         // get Agent Administrator's sso token
-        String authURL = serverURL + AUTHENTICATION_URI;
+        String authURL = serverURL + RESTUtils.AUTHENTICATION_URI;
         ssoToken = getSSOToken(authURL, agentAdminName, agentAdminPassword);
         if (ssoToken == null) {
-            Debug.log("CreateProfileTask.createAgentProfile() - " +
-                    "can not create Agent Administrator's sso token.");
+            Debug.log("CreateProfileTask.createAgentProfile() - cannot create Agent Administrator's sso token.");
             return null;
         }
-        
-        // create the post data for creating agent profile.
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("identity_name=" +
-                URLEncoder.encode(agentUserName, ENCODING_TYPE));
-        buffer.append("&identity_attribute_names=userpassword");
-        buffer.append("&identity_attribute_values_userpassword=" +
-                URLEncoder.encode(agentUserPassword, ENCODING_TYPE));
-        buffer.append("&identity_type=AgentOnly");
-        buffer.append("&identity_attribute_names=AgentType");
-        buffer.append("&identity_attribute_values_AgentType=" +
-                agentProfileType);
-        buffer.append("&identity_attribute_names=AGENTURL");
-        buffer.append("&identity_attribute_values_AGENTURL=" +
-                URLEncoder.encode(agentURL, ENCODING_TYPE));
-        buffer.append("&identity_attribute_names=SERVERURL");
-        buffer.append("&identity_attribute_values_SERVERURL=" +
-                URLEncoder.encode(serverURL, ENCODING_TYPE));
-        buffer.append("&admin=" + URLEncoder.encode(ssoToken, ENCODING_TYPE));
-        
-        // call profile serivce to create agent profile.
-        String profileURL = serverURL + CREATE_PROFILE_URI;
-        Debug.log("CreateProfileTask.createAgentProfile() - REST URL: " +
-                profileURL + " postData: " + buffer.toString());
-        
-        RESTUtils.RESTResponse response = RESTUtils.callServiceURL(
+
+        JsonValue jsonPayload = json(object(
+                field("username", agentUserName),
+                field("userpassword", array(agentUserPassword)),
+                field("agenttype", array(agentProfileType)),
+                field("serverurl", array(serverURL)),
+                field("agenturl", array(agentURL))
+        ));
+
+        String profileURL = serverURL + RESTUtils.CREATE_PROFILE_URI;
+        Debug.log("CreateProfileTask.createAgentProfile() via endpoint " + profileURL);
+
+        RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
                 profileURL,
-                buffer.toString());
-        
+                jsonPayload.toString(),
+                "Content-type", "application/json",
+                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.CREATE_PROFILE_URI_API_VERSION,
+                cookieName, ssoToken);
+
         return response;
-        
     }
-    
+
     /*
-     * create one user's sso token.
+     * Create a user SSO token by using the authenticate endpoint.
      * @param serviceURL the URL to be called for authentication
-     * @param usreName the name of the user whose sso token to be created
-     * @param password the password of the user whose sso token to be created
+     * @param userName the name of the user
+     * @param password the password of the user
      *
-     * @return the String of sso token
+     * @return the SSO token as a string
      */
-    private String getSSOToken(String serviceURL,
-            String userName, String password) throws Exception {
-        
-        String encodedPostData = "username="  +
-                URLEncoder.encode(userName, ENCODING_TYPE) +
-                "&password=" +
-                URLEncoder.encode(password, ENCODING_TYPE);
-        RESTUtils.RESTResponse response = RESTUtils.callServiceURL(serviceURL,
-                encodedPostData);
-        Debug.log("CreateProfileTask.getSSOToken() - " +
-                "Response code=" + response.getResponseCode());
-        
+    private String getSSOToken(String serviceURL, String userName, String password) throws Exception {
+
+        Debug.log("about to call " + serviceURL + " to login user " + userName);
+
+        RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
+                serviceURL, "",
+                "Content-Type", "application/json",
+                "X-OpenAM-Username", userName,
+                "X-OpenAM-Password", password,
+                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.AUTHENTICATION_URI_API_VERSION);
+
         String ssoToken = null;
         if (response.getResponseCode() == HTTP_RESPONSE_OK) {
-            ssoToken = (String)response.getContent().get(0);
-            int index = ssoToken.indexOf("=");
-            if (index >=0) {
-                ssoToken = ssoToken.substring(index+1);
-            }
+            Debug.log("Call to " + serviceURL + " succeeded with response " + response.toString());
+            JSONObject jsonObject = new JSONObject(response.toString());
+            ssoToken = jsonObject.getString("tokenId");
+        } else {
+            Debug.log("Call to " + serviceURL + " FAILED with response code " + response.getResponseCode());
         }
-        Debug.log("CreateProfileTask.getSSOToken() - " +
-                "SSO Token =" + ssoToken);
-        
+        Debug.log("CreateProfileTask.getSSOToken() - SSO Token =" + ssoToken);
+
         return ssoToken;
     }
-    
+
+    /**
+     * Get the iPlanetDirectoryPro cookie name from the serverinfo endpoint, using the agent admin user name and
+     * password
+     *
+     * @param serviceURL The base OpenAM URL
+     * @return The correct name of the iPlanetDirectoryPro cookie, which may not be iPlanetDirectoryPro
+     * @throws Exception variously throws IOException from the rest service call and JSONException from JSON decoding
+     */
+    private String getCookieName(String serviceURL)
+            throws Exception {
+
+        String result = "iPlanetDirectoryPro";
+        String serverInfoURL = serviceURL + RESTUtils.SERVER_INFO_URI;
+        Debug.log("about to call " + serverInfoURL + " to determine iPlanetDirectoryPro cookie name");
+
+        RESTUtils.RESTResponse response = RESTUtils.getServiceURL(
+                serverInfoURL,
+                "Content-Type", "application/json",
+                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.SERVER_INFO_URI_API_VERSION);
+
+        if (response.getResponseCode() == HTTP_RESPONSE_OK) {
+            Debug.log("Call to " + serverInfoURL + " succeeded with response " + response.toString());
+            JSONObject jsonObject = new JSONObject(response.toString());
+            result = jsonObject.getString("cookieName");
+        } else {
+            Debug.log("Call to " + serverInfoURL + " FAILED with response code " + response.getResponseCode());
+            Debug.log("Here is the response\n" + response.toString());
+        }
+        Debug.log("CreateProfileTask.getCookieName() - cookie name = " + result);
+
+        return result;
+
+    }
+
     /*
      * read password from the file.
      * @fileName the file name to be read from
@@ -219,24 +263,17 @@ public class CreateProfileTask implements ITask, InstallConstants {
         try {
             br = new BufferedReader(new FileReader(fileName));
             firstLine = br.readLine();
-            
+
         } catch (Exception ex) {
-            Debug.log("CreateProfileTask.readDataFromFile() - Error " +
-                    "reading file - " + fileName, ex);
+            Debug.log("CreateProfileTask.readDataFromFile() - Error  reading file - " + fileName, ex);
             throw new InstallException(LocalizedMessage.get(
                     LOC_TK_ERR_PASSWD_FILE_READ), ex);
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException i) {
-                    // Ignore
-                }
-            }
+            IOUtils.closeIfNotNull(br);
         }
         return firstLine;
     }
-    
+
     public LocalizedMessage getExecutionMessage(IStateAccess stateAccess,
             Map properties) {
         String agentUserName = (String)stateAccess.get(STR_AGENT_PROFILE_NAME);
@@ -245,49 +282,17 @@ public class CreateProfileTask implements ITask, InstallConstants {
                 LOC_TSK_MSG_CREATE_AGENT_PROFILE_EXECUTE, args);
         return message;
     }
-    
+
     public LocalizedMessage getRollBackMessage(IStateAccess stateAccess,
             Map properties) {
         // There is no roll back for uninstall tasks
         return null;
     }
-    
+
     public boolean rollBack(String name, IStateAccess state, Map properties)
     throws InstallException {
-        
+
         // Nothing to roll back during uninstall
         return true;
     }
-    
-    public static final String LOC_TSK_MSG_CREATE_AGENT_PROFILE_EXECUTE =
-            "TSK_MSG_CREATE_AGENT_PROFILE_EXECUTE";
-    
-    public static final String STR_AM_SERVER_URL = "AM_SERVER_URL";
-    
-    public static final String STR_AGENT_URL = "AGENT_URL";
-    
-    public static final String STR_AGENT_PROFILE_TYPE = "AGENT_PROFILE_TYPE";
-    
-    public static final String STR_AGENT_ADMINISTRATOR_NAME =
-            "AGENT_ADMINISTRATOR_NAME";
-    
-    public static final String STR_AGENT_ADMINISTRATOR_PASSWORD_FILE =
-            "AGENT_ADMINISTRATOR_PASSWORD_FILE";
-    
-    public static final String STR_AGENT_PROFILE_NAME =
-            "AGENT_PROFILE_NAME";
-    
-    public static final String STR_AGENT_PASSWORD_FILE =
-            "AGENT_PASSWORD_FILE";
-    
-    public static final String LOC_TK_ERR_PASSWD_FILE_READ =
-            "TSK_ERR_PASSWD_FILE_READ";
-    
-    public static final String AUTHENTICATION_URI = "/identity/authenticate";
-    
-    public static final String CREATE_PROFILE_URI = "/identity/create";
-    
-    public static final String ENCODING_TYPE = "UTF-8";
-    
-    public static final int HTTP_RESPONSE_OK = 200;
 }
