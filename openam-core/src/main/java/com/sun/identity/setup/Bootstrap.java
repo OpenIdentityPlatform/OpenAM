@@ -24,7 +24,7 @@
  *
  * $Id: Bootstrap.java,v 1.18 2009/05/13 21:26:36 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.setup;
 
@@ -229,7 +229,7 @@ public class Bootstrap {
                     ServerConfiguration.getServerConfigXML(
                     ssoToken, instanceName);
                 Crypt.reinitialize();
-                BootstrapData.loadServerConfigXML(serverConfigXML);
+                BootstrapData.loadServerConfigXML(serverConfigXML, true);
                 SMSEntry.initializeClass();
 
                 if (debugSetAtDefault) {

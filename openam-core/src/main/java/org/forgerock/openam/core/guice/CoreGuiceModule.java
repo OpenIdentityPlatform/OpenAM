@@ -163,12 +163,12 @@ public class CoreGuiceModule extends AbstractModule {
         bind(DSConfigMgr.class).toProvider(new Provider<DSConfigMgr>() {
             public DSConfigMgr get() {
                 try {
-                    return DSConfigMgr.getDSConfigMgr();
+                    return DSConfigMgr.getStableDSConfigMgr();
                 } catch (LDAPServiceException e) {
                     throw new IllegalStateException(e);
                 }
             }
-        }).in(Singleton.class);
+        });
 
         bind(SSOTokenManager.class).toProvider(new Provider<SSOTokenManager>() {
             public SSOTokenManager get() {

@@ -24,7 +24,7 @@
  *
  * $Id: BootstrapData.java,v 1.16 2009/05/05 21:24:47 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -179,7 +179,7 @@ public class BootstrapData {
         Properties prop = getBootstrapProperties();
         SystemProperties.initializeProperties(prop, true);
         Crypt.reinitialize();
-        loadServerConfigXML(serverConfigXML);
+        loadServerConfigXML(serverConfigXML, false);
         
         if (startDS) {
             startEmbeddedDS(basedir + AMSetupServlet.OPENDS_DIR);
@@ -235,12 +235,12 @@ public class BootstrapData {
         }
     }
     
-    static void loadServerConfigXML(String xml)
+    static void loadServerConfigXML(String xml, boolean isBootstrapComplete)
         throws LDAPServiceException {
         ByteArrayInputStream bis = null;
         try {
             bis = new ByteArrayInputStream(xml.getBytes());
-            DSConfigMgr.initInstance(bis);
+            DSConfigMgr.initInstance(bis, isBootstrapComplete);
         } finally {
             if (bis != null) {
                 try {

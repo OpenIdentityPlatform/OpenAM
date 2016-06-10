@@ -1758,7 +1758,7 @@ public class AMSetupServlet extends HttpServlet {
         ByteArrayInputStream bis = null;
         try {
             bis = new ByteArrayInputStream(str.getBytes());
-            DSConfigMgr.initInstance(bis);
+            DSConfigMgr.initInstance(bis, true);
         } finally {
             if (bis != null) {
                 try {
