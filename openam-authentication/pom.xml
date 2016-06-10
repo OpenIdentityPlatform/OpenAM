@@ -62,7 +62,6 @@
         <module>openam-auth-push</module>
         <module>openam-auth-windowsdesktopsso</module>
         <module>openam-auth-persistentcookie</module>
-        <module>deviceprint</module>
         <module>openam-auth-oidc</module>
         <module>openam-auth-scripted</module>
         <module>openam-auth-device-id</module>
