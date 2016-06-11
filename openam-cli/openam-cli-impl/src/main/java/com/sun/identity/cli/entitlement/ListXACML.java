@@ -71,6 +71,7 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Gets policies in a realm.
@@ -111,7 +112,7 @@ public class ListXACML extends AuthenticatedCommand {
         adminSubject = SubjectUtils.createSubject(adminSSOToken);
         realm = getStringOptionValue(IArgument.REALM_NAME);
         getPolicyNamesOnly = isOptionSet("namesonly");
-        filters = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
+        filters = convertToSearchFilters((List)rc.getOption(ARGUMENT_POLICY_NAMES));
         outfile = getStringOptionValue(IArgument.OUTPUT_FILE);
         outputWriter = getOutputWriter();
 
@@ -121,6 +122,22 @@ public class ListXACML extends AuthenticatedCommand {
             getPolicies();
         }
 
+    }
+
+    /**
+     * Prefix the filters with name= for use with the {@link SearchFilterFactory}.
+     * ssoadm sends the policyname value only, in the argument --policynames.
+     * @param filters can be null or empty.
+     * @return PrefixedFilters.
+     */
+    private List<String> convertToSearchFilters(List<String> filters) {
+        if (CollectionUtils.isEmpty(filters)) {
+            return Collections.EMPTY_LIST;
+        }
+        for (int idx = 0; idx < filters.size(); idx++) {
+            filters.set(idx, "name=" + filters.get(idx).trim());
+        }
+        return filters;
     }
 
     /**
