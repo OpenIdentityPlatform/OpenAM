@@ -30,6 +30,12 @@
 
             <Organization>
 
+                <AttributeSchema name="KeyAliasValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.selfservice.config.KeyAliasValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- General configuration -->
 
                 <AttributeSchema name="selfServiceEncryptionKeyPairAlias"
@@ -37,10 +43,11 @@
                                  syntax="string"
                                  resourceName="encryptionKeyPairAlias"
                                  i18nKey="encryption.key.pair.alias"
+                                 validator="KeyAliasValidator"
                                  order="0">
-                    <DefaultValues>
+                    <ExampleValue>
                         <Value>selfserviceenctest</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="selfServiceSigningSecretKeyAlias"
@@ -48,10 +55,11 @@
                                  syntax="string"
                                  resourceName="signingSecretKeyAlias"
                                  i18nKey="signing.secret.key.alias"
+                                 validator="KeyAliasValidator"
                                  order="10">
-                    <DefaultValues>
+                    <ExampleValue>
                         <Value>selfservicesigntest</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema name="selfServiceCaptchaSiteKey"

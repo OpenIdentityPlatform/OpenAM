@@ -494,4 +494,15 @@ public class AMKeyProvider implements KeyProvider {
         String key = Base64.encode(publicKey.getEncoded());
         return (Certificate) keyTable.get(key);
     }
+
+    @Override
+    public boolean containsKey(String alias) {
+        try {
+            return ks.containsAlias(alias);
+        } catch (KeyStoreException ksE) {
+            logger.error("Unable to determine key alias presence", ksE);
+            return false;
+        }
+    }
+
 }

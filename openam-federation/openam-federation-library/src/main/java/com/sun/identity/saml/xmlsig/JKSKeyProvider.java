@@ -221,4 +221,10 @@ public class JKSKeyProvider implements KeyProvider {
     public Certificate getCertificate (java.security.PublicKey publicKey) {
         return keyProvider.getCertificate(publicKey);
     }
+
+    @Override
+    public boolean containsKey(String alias) {
+        return keyProvider.containsKey(alias);
+    }
+
 }

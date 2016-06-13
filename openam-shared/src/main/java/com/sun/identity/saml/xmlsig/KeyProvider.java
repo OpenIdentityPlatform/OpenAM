@@ -32,10 +32,11 @@
 
 package com.sun.identity.saml.xmlsig;
 
-import javax.crypto.SecretKey;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+
+import javax.crypto.SecretKey;
 
 /**
  * The class <code>KeyProvider</code> is an interface
@@ -144,4 +145,15 @@ public interface KeyProvider {
      * @return the keystore instance.
      */
     public KeyStore getKeyStore();
+
+    /**
+     * Whether the key alias exists in the keystore.
+     *
+     * @param alias
+     *         the key alias
+     *
+     * @return whether the key alias exists
+     */
+    boolean containsKey(String alias);
+
 }
