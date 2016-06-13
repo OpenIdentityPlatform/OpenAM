@@ -42,6 +42,7 @@ import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
@@ -397,18 +398,12 @@ public class PolicyRequestHandler implements RequestHandler {
             ResourceResults resourceRst = null;
 
             // check if the request contains user response attributes
-            Set respAttrs = resourceResultReq.getResponseAttributes(); 
-            if (debug.messageEnabled()) {
-                debug.message(
-                   "PolicyRequestHandler.processPolicyRequest(): "
-                   + "respAttrs=\n" 
-                   + respAttrs);
-            }
+            Set responseAttributes = resourceResultReq.getResponseAttributes();
+            debug.message("PolicyRequestHandler.processPolicyRequest(): respAttrs={}", responseAttributes);
 
-            Map respDecisions = null;
-            if ((respAttrs != null) && (userToken != null)) {
-                // get the response decisions wrt the attributes  
-                respDecisions = getResponseDecisions(userToken, respAttrs);
+            Map<String, Set<String>> responseAttributeValues = null;
+            if ((responseAttributes != null) && (userToken != null)) {
+                responseAttributeValues = getResponseAttributeValues(userToken, responseAttributes);
             }
            
             // Get the service name and resource name of the request
@@ -462,7 +457,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 }
             }
 
-            resourceRst.setResponseDecisions(respDecisions);
+            resourceRst.setResponseDecisions(responseAttributeValues);
             resourceResults.addAll(resourceRst.getResourceResults());
             policyRes.setResourceResults(resourceResults);
             policyRes.setMethodID(
@@ -476,33 +471,33 @@ public class PolicyRequestHandler implements RequestHandler {
     }
 
     /**
-     * Returns the response decisions based on the response attributes.
+     * Returns the response attributes.
      *
      * @param token the user's SSO token
-     * @param attrs a set of response attributes
-     * @return a map which contains the response decisions.
+     * @param attrs the set of response attributes to get for the user.
+     * @return a map which contains the user attribute values.
      */
-    private Map getResponseDecisions(SSOToken token, Set attrs)
-        throws PolicyEvaluationException
-    {
-        if ((attrs == null) || (attrs.isEmpty())) {
-            return null;
+    private Map<String, Set<String>> getResponseAttributeValues(SSOToken token, Set attrs) throws PolicyEvaluationException {
+
+        Map<String, Set<String>>  attributeValues = null;
+        if (CollectionUtils.isNotEmpty(attrs)) {
+            try {
+                // No point in trying to get the user attributes if profile mode set to ignore
+                if (!ISAuthConstants.IGNORE.equals(token.getProperty(ISAuthConstants.USER_PROFILE))) {
+                    AMIdentity id = IdUtils.getIdentity(token);
+                    attributeValues = id.getAttributes(attrs);
+                }
+            } catch (IdRepoException ie) {
+                debug.error("PolicyRequestHandler.getResponseAttributeValues: failed to get user attributes: {}", attrs, ie);
+                throw new PolicyEvaluationException(ie);
+            } catch (SSOException se) {
+                debug.error("PolicyRequestHandler.getResponseAttributeValues: bad sso token", se);
+                throw new PolicyEvaluationException(se);
+            }
         }
 
-        Map userAttrMap = null;
-        try {
-            AMIdentity id = IdUtils.getIdentity(token);
-            userAttrMap = id.getAttributes(attrs);            
-        } catch (IdRepoException ie) {
-            debug.error("PolicyRequestHandler: " +
-                        "failed to get user attributes.", ie);
-            throw new PolicyEvaluationException(ie);
-        } catch (SSOException se) {
-            debug.error("PolicyRequestHandler: bad sso token", se);
-            throw new PolicyEvaluationException(se);
-        }
-        return userAttrMap;
-    } 
+        return attributeValues;
+    }
 
     /*
      *  Register a policy change listener to the policy framework.
