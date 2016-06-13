@@ -25,8 +25,10 @@
 
 package com.sun.identity.sm;
 
+import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.xml.XMLUtils;
 
+import java.security.AccessController;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,6 +73,25 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
         attribute.update(attributeNode);
         
         return attribute;
+    }
+
+    /**
+     * Encrypts all values in the provided set.
+     *
+     * <p>To be used when copying default values which need to be stored encrypted.</p>
+     *
+     * @param values The values to encrypt.
+     * @return A Set containing the encrypted values.
+     */
+    protected Set<String> encryptValues(Set<String> values) {
+        if (values.isEmpty()) {
+            return values;
+        }
+        Set<String> encryptedValues = new HashSet<>();
+        for (String value : values) {
+            encryptedValues.add(AccessController.doPrivileged(new EncodeAction(value)));
+        }
+        return encryptedValues;
     }
 
     protected AttributeSchemaImpl updateChoiceValues(AttributeSchemaImpl attribute, Collection<String> choiceValues)

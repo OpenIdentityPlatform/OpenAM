@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,11 +25,16 @@
 package org.forgerock.openam.upgrade.helpers;
 
 import static org.forgerock.openam.utils.CollectionUtils.*;
+
+import com.sun.identity.entitlement.xacml3.core.Version;
+import com.sun.identity.security.EncodeAction;
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
+import java.security.AccessController;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -66,10 +71,12 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String XUI_REVERSE_PROXY_SUPPORT = "openam-xui-reverseproxy-support";
     private final static String XUI_ADMIN_CONSOLE_ENABLED = "xuiAdminConsoleEnabled";
     private static final String GOTO_DOMAINS = "iplanet-am-auth-valid-goto-domains";
+    private final static String HMAC_SHARED_SECRET = "iplanet-am-auth-hmac-signing-shared-secret";
 
     public AuthServiceHelper() {
         attributes.add(ATTR);
         attributes.add(GOTO_DOMAINS);
+        attributes.add(HMAC_SHARED_SECRET);
     }
 
     @Override
@@ -78,7 +85,17 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         if (GOTO_DOMAINS.equals(newAttr.getName())) {
             return existingAttr.getI18NKey() != null && !existingAttr.getI18NKey().isEmpty() ? newAttr : null;
         }
-        if (!(newAttr.getName().equals(ATTR))) {
+        if (HMAC_SHARED_SECRET.equals(newAttr.getName())) {
+            if (VersionUtils.isCurrentVersionEqualTo(1300)) {
+                if (CollectionUtils.isEmpty(existingAttr.getDefaultValues())) {
+                    return newAttr;
+                } else {
+                    return updateDefaultValues(newAttr, encryptValues(existingAttr.getDefaultValues()));
+                }
+            } else {
+                return null;
+            }
+        } else if (!(newAttr.getName().equals(ATTR))) {
             return newAttr;
         }
 
