@@ -30,6 +30,7 @@ import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import org.forgerock.openam.core.rest.authn.core.AuthIndexType;
 import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * A wrapper class around AuthContextLocal.
@@ -165,7 +166,7 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
     @Override
     public String getErrorMessage() {
         String lockoutWarning = authContextLocal.getLockoutMsg();
-        if (lockoutWarning != null) {
+        if (StringUtils.isNotEmpty(lockoutWarning)) {
             return authContextLocal.getErrorMessage() + " " + lockoutWarning;
         }
 
