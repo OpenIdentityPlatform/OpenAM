@@ -31,17 +31,22 @@ define([
     let knownAuth = {};
     function getURLParameters () {
         const query = URIUtils.getCurrentCompositeQueryString();
-        const urlParams = _.object(_.map(query.split("&"), (pair) => {
-            return pair.split("=", 2);
-        }));
+        const urlParams = _.object(_.map(query.split("&"), (pair) => pair.split("=", 2)));
+
+        if (Configuration.globalData.auth.urlParams) {
+            _.extend(urlParams, Configuration.globalData.auth.urlParams);
+        }
+
         if (RealmHelper.getOverrideRealm()) {
             urlParams.realm = RealmHelper.getOverrideRealm();
         }
+
         // In case user has logged in already update session
         const tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
         if (tokenCookie) {
             urlParams.sessionUpgradeSSOTokenId = tokenCookie;
         }
+
         return urlParams;
     }
     function urlParamsFromObject (params) {
