@@ -125,6 +125,13 @@ define([
             });
         },
         onSave () {
+            if (!this.getJSONSchemaView().isValid()) {
+                Messages.addMessage({
+                    message: $.t("common.form.validation.errorsNotSaved"),
+                    type: Messages.TYPE_DANGER
+                });
+                return;
+            }
             this.updateData();
             ServersService.servers.update(this.sectionId, this.values.raw, this.serverId)
             .then(() => {

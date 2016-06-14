@@ -330,6 +330,7 @@
             "addName": "Add a name",
             "addValue": "Add a value",
             "validation" : {
+                "errorsNotSaved" : "Validation errors exist in form. Changes not saved.",
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
                 "VALID_NAME_FORMAT": "Contains invalid characters",
                 "VALID_EMAIL_ADDRESS_FORMAT": "Not a valid email address",

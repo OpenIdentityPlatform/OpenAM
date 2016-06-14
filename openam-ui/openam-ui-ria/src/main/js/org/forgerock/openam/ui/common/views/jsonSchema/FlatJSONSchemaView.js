@@ -89,6 +89,9 @@ define([
 
             return this;
         },
+        isValid () {
+            return !this.subview || this.subview.isValid();
+        },
         getData () {
             if (this.subview) {
                 return this.subview.getData();

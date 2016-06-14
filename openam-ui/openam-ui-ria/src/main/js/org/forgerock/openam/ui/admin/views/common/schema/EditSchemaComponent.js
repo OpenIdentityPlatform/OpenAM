@@ -199,6 +199,13 @@ define([
         },
 
         onSave () {
+            if (!this.getJSONSchemaView().isValid()) {
+                Messages.addMessage({
+                    message: $.t("common.form.validation.errorsNotSaved"),
+                    type: Messages.TYPE_DANGER
+                });
+                return;
+            }
             this.updateInstance(this.getCurrentValues()).then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

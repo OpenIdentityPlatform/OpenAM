@@ -130,6 +130,10 @@ define([
             return _.map(this.rows, (row) => row.getData());
         },
 
+        isValid () {
+            return true;
+        },
+
         setData (data) {
             this.values = data;
             this.rows = [];
