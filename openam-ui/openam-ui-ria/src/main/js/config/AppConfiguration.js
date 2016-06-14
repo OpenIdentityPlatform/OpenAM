@@ -182,7 +182,7 @@ define([
                                     "name": "config.AppConfiguration.Navigation.links.configure.server-defaults",
                                     "icon": "fa fa-server"
                                 }],
-                                "visibleToRoles": ["ui-realm-admin"]
+                                "visibleToRoles": ["ui-global-admin"]
                             },
                             "deployment": {
                                 "url": "#deployment",
@@ -198,7 +198,7 @@ define([
                                     "name": "config.AppConfiguration.Navigation.links.deployment.sites",
                                     "icon": "fa fa-bookmark-o"
                                 }],
-                                "visibleToRoles": ["ui-realm-admin"]
+                                "visibleToRoles": ["ui-global-admin"]
                             },
                             "federation": {
                                 "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,

@@ -67,7 +67,7 @@ define([
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
             url: /deployment\/sites$/,
             pattern: "deployment/sites",
-            role: "ui-realm-admin",
+            role: "ui-global-admin",
             navGroup: "admin"
         },
         editSite: {
@@ -88,21 +88,21 @@ define([
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
             url: /deployment\/servers$/,
             pattern: "deployment/servers",
-            role: "ui-realm-admin",
+            role: "ui-global-admin",
             navGroup: "admin"
         },
         newServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
             url: /deployment\/servers\/new$/,
             pattern: "deployment/servers/new",
-            role: "ui-realm-admin",
+            role: "ui-global-admin",
             navGroup: "admin"
         },
         cloneServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
             url: /deployment\/servers\/clone\/([^\/]+)/,
             pattern: "deployment/servers/clone/?",
-            role: "ui-realm-admin",
+            role: "ui-global-admin",
             navGroup: "admin"
         }
     };
