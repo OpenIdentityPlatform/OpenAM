@@ -21,10 +21,21 @@
                         {{this}}{{#unless @last}}, {{/unless}}
                     {{/each}}
                 </td>
-                <td class="fr-col-btn-2">
+                <td class="fr-col-btn-3">
                     <div class="btn-group" data-realm-path="{{path}}">
                         <a href="{{routeTo 'realmEdit' path}}" class="btn btn-link" data-realm-name="{{name}}" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
-                        <button type="button" data-delete-realm {{#unless canDelete}}disabled{{/unless}} class="btn btn-link" title="{{t 'common.form.delete'}}"><i class="fa fa-close"></i></button>
+                        {{#if active}}
+                            <button type="button" data-toggle-realm class="btn btn-link" title="{{t 'common.form.deactivate'}}">
+                                <i class="fa fa-ban"/>
+                            </button>
+                        {{else}}
+                            <button type="button" data-toggle-realm class="btn btn-link" title="{{t 'common.form.activate'}}">
+                                <i class="fa fa-check"/>
+                            </button>
+                        {{/if}}
+                        <button type="button" data-delete-realm {{#unless canDelete}}disabled{{/unless}} class="btn btn-link" title="{{t 'common.form.delete'}}">
+                            <i class="fa fa-close"/>
+                        </button>
                     </div>
                 </td>
             </tr>
