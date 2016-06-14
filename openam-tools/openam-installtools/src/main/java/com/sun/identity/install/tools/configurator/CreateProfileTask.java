@@ -32,8 +32,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
 
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
-import com.sun.identity.install.tools.util.RESTUtils;
-
+import com.sun.identity.install.tools.util.RESTEndpoint;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.utils.IOUtils;
 import org.json.JSONObject;
@@ -89,7 +88,7 @@ public class CreateProfileTask implements ITask, InstallConstants {
         }
         Debug.log("CreateProfileTask.execute() - Agent profile will be created");
         try {
-            RESTUtils.RESTResponse response = createAgentProfile(stateAccess, properties);
+            RESTEndpoint.RESTResponse response = createAgentProfile(stateAccess, properties);
             int code = response.getResponseCode();
             if (code != HTTP_RESPONSE_OK && code != HTTP_RESPONSE_CREATED) {
                 Debug.log("CreateProfileTask.execute() - FAILED to create agent profile. response code = " +
@@ -110,7 +109,6 @@ public class CreateProfileTask implements ITask, InstallConstants {
         } catch (Exception ex) {
             Debug.log("CreateProfileTask.execute(): failed!", ex);
         }
-
         return result;
     }
 
@@ -118,7 +116,7 @@ public class CreateProfileTask implements ITask, InstallConstants {
      * create agent profile.
      * @param stateAccess
      */
-    private RESTUtils.RESTResponse createAgentProfile(IStateAccess stateAccess, Map properties) throws Exception {
+    private RESTEndpoint.RESTResponse createAgentProfile(IStateAccess stateAccess, Map properties) throws Exception {
 
         String agentUserName = (String)stateAccess.get(STR_AGENT_PROFILE_NAME);
         String agentUserPasswordFile = (String)stateAccess.get(STR_AGENT_PASSWORD_FILE);
@@ -155,8 +153,7 @@ public class CreateProfileTask implements ITask, InstallConstants {
         String cookieName = getCookieName(serverURL);
 
         // get Agent Administrator's sso token
-        String authURL = serverURL + RESTUtils.AUTHENTICATION_URI;
-        ssoToken = getSSOToken(authURL, agentAdminName, agentAdminPassword);
+        ssoToken = getSSOToken(serverURL, RESTEndpoint.AUTHENTICATION_URI, agentAdminName, agentAdminPassword);
         if (ssoToken == null) {
             Debug.log("CreateProfileTask.createAgentProfile() - cannot create Agent Administrator's sso token.");
             return null;
@@ -170,17 +167,21 @@ public class CreateProfileTask implements ITask, InstallConstants {
                 field("agenturl", array(agentURL))
         ));
 
-        String profileURL = serverURL + RESTUtils.CREATE_PROFILE_URI;
-        Debug.log("CreateProfileTask.createAgentProfile() via endpoint " + profileURL);
+        RESTEndpoint restEndpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(serverURL)
+                .path(RESTEndpoint.CREATE_PROFILE_URI)
+                .post()
+                .parameter("_action", RESTEndpoint.CREATE_PROFILE_URI_ACTION_VALUE)
+                .addModuleParameters()
+                .postData(jsonPayload.toString())
+                .headers("Content-Type", "application/json")
+                .headers(cookieName, ssoToken)
+                .apiVersion(RESTEndpoint.CREATE_PROFILE_URI_API_VERSION)
+                .build();
 
-        RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
-                profileURL,
-                jsonPayload.toString(),
-                "Content-type", "application/json",
-                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.CREATE_PROFILE_URI_API_VERSION,
-                cookieName, ssoToken);
+        Debug.log("CreateProfileTask.createAgentProfile() via endpoint " + restEndpoint.toString());
 
-        return response;
+        return restEndpoint.call();
     }
 
     /*
@@ -191,16 +192,22 @@ public class CreateProfileTask implements ITask, InstallConstants {
      *
      * @return the SSO token as a string
      */
-    private String getSSOToken(String serviceURL, String userName, String password) throws Exception {
+    private String getSSOToken(String serviceURL, String authURL, String userName, String password) throws Exception {
 
-        Debug.log("about to call " + serviceURL + " to login user " + userName);
+        RESTEndpoint restEndpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(serviceURL)
+                .path(authURL)
+                .post()
+                .addModuleParameters()
+                .headers("Content-Type", "application/json")
+                .headers("X-OpenAM-Username", userName)
+                .headers("X-OpenAM-Password", password)
+                .apiVersion(RESTEndpoint.AUTHENTICATION_URI_API_VERSION)
+                .build();
 
-        RESTUtils.RESTResponse response = RESTUtils.postServiceURL(
-                serviceURL, "",
-                "Content-Type", "application/json",
-                "X-OpenAM-Username", userName,
-                "X-OpenAM-Password", password,
-                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.AUTHENTICATION_URI_API_VERSION);
+        Debug.log("about to login user " + userName + " with REST call " + restEndpoint.toString());
+
+        RESTEndpoint.RESTResponse response = restEndpoint.call();
 
         String ssoToken = null;
         if (response.getResponseCode() == HTTP_RESPONSE_OK) {
@@ -226,21 +233,26 @@ public class CreateProfileTask implements ITask, InstallConstants {
     private String getCookieName(String serviceURL)
             throws Exception {
 
-        String result = "iPlanetDirectoryPro";
-        String serverInfoURL = serviceURL + RESTUtils.SERVER_INFO_URI;
-        Debug.log("about to call " + serverInfoURL + " to determine iPlanetDirectoryPro cookie name");
+        String result = "iPlanetDirectoryPro"; // jump the gun with a suitable default
 
-        RESTUtils.RESTResponse response = RESTUtils.getServiceURL(
-                serverInfoURL,
-                "Content-Type", "application/json",
-                "Accept-API-Version", "protocol=1.0,resource=" + RESTUtils.SERVER_INFO_URI_API_VERSION);
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(serviceURL)
+                .path(RESTEndpoint.SERVER_INFO_URI)
+                .get()
+                .headers("Content-Type", "application/json")
+                .apiVersion(RESTEndpoint.SERVER_INFO_URI_API_VERSION)
+                .build();
+
+        Debug.log("About to determine cookie name, details of REST call: " + endpoint.toString());
+
+        RESTEndpoint.RESTResponse response = endpoint.call();
 
         if (response.getResponseCode() == HTTP_RESPONSE_OK) {
-            Debug.log("Call to " + serverInfoURL + " succeeded with response " + response.toString());
+            Debug.log("Call succeeded with response " + response.toString());
             JSONObject jsonObject = new JSONObject(response.toString());
             result = jsonObject.getString("cookieName");
         } else {
-            Debug.log("Call to " + serverInfoURL + " FAILED with response code " + response.getResponseCode());
+            Debug.log("Call FAILED with response code " + response.getResponseCode());
             Debug.log("Here is the response\n" + response.toString());
         }
         Debug.log("CreateProfileTask.getCookieName() - cookie name = " + result);
