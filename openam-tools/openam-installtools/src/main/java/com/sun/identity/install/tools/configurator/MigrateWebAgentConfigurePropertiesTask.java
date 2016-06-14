@@ -47,11 +47,11 @@ import com.sun.identity.install.tools.util.LocalizedMessage;
 
 /**
  * This class extends class ConfigurePropertiesTask and performs
- * data migration. 
+ * data migration.
  */
-public class MigrateWebAgentConfigurePropertiesTask extends 
+public class MigrateWebAgentConfigurePropertiesTask extends
 	ConfigurePropertiesTask {
-    
+
     private static HashSet agentListParameters = new HashSet();
     private static HashSet agentMapParameters = new HashSet();
     private static HashSet agentResetCookieParameters = new HashSet();
@@ -88,49 +88,49 @@ public class MigrateWebAgentConfigurePropertiesTask extends
         agentResetCookieParameters.add(
                     "com.sun.identity.agents.config.logout.cookie.reset");
     }
-    
-    // parameters not to be migrated from previous product
+
+    // parameter not to be migrated from previous product
     static {
         nonMigratedParameters.add("com.sun.identity.agents.config.local.logfile");
     }
-    
+
     // New property introduced in 3.0
     public static String AGENT_ENCRYPT_KEY_PROPERTY =
                                    "com.sun.identity.agents.config.key";
     // 2.2 agent encrypt key value, used during migration
     public static String AGENT_22_ENCRYPT_KEY_VALUE = "3137517";
-	
-    public boolean execute(String name, IStateAccess stateAccess, 
+
+    public boolean execute(String name, IStateAccess stateAccess,
             Map properties)
     throws InstallException {
-        
+
         boolean status = false;
         FileInputStream fStream = null;
         Properties mappedProperties;
         status = super.execute(name, stateAccess, properties);
-        
+
         if (status) {
             status = false;
             String instanceConfigFileMigrate = (String) stateAccess
                     .get(STR_CONFIG_DIR_PREFIX_MIGRATE_TAG);
-            
+
             Debug.log("MigrateWebAgentConfigurePropertiesTask.execute() - " +
-                    "instance config file name to migrate from: " + 
+                    "instance config file name to migrate from: " +
                     instanceConfigFileMigrate);
-            
+
             String instanceConfigFile = (String) stateAccess
                     .get(STR_CONFIG_AGENT_CONFIG_FILE_PATH_TAG);
-            
+
             Debug.log("MigrateWebAgentConfigurePropertiesTask.execute() - " +
                     "instance config file name: " + instanceConfigFile);
-            
+
             String configFile = (String) stateAccess
             .get(STR_CONFIG_FILE_PATH_TAG);
-    
+
             Debug.log("MigrateWebAgentConfigurePropertiesTask.execute() - " +
             "config file name: " + instanceConfigFile);
 
-            String migratePropertiesFile = 
+            String migratePropertiesFile =
                     getAgentMigratePropertiesFile(stateAccess, properties);
 
             try {
@@ -143,14 +143,14 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                         "Error loading Migrate Properties file", e);
                     throw new InstallException(LocalizedMessage
                             .get(LOC_IS_ERR_LOAD_INSTALL_STATE), e);
-             } 
+             }
             try {
-                mergeConfigFiles(instanceConfigFileMigrate, instanceConfigFile, 
+                mergeConfigFiles(instanceConfigFileMigrate, instanceConfigFile,
                                  mappedProperties);
-                mergeConfigFiles(instanceConfigFileMigrate, configFile, 
+                mergeConfigFiles(instanceConfigFileMigrate, configFile,
                                  mappedProperties);
                 status = true;
-                
+
             } catch (Exception e) {
                 Debug.log(
                   "MigrateWebAgentConfigurePropertiesTask.execute() - Exception "
@@ -159,7 +159,7 @@ public class MigrateWebAgentConfigurePropertiesTask extends
         }
         return status;
     }
-    
+
     /**
      * merge previous product's config file with the one newly generated.
      *
@@ -170,43 +170,43 @@ public class MigrateWebAgentConfigurePropertiesTask extends
     private void mergeConfigFiles(String instanceConfigFileMigrate,
             String instanceConfigFile,
             Properties mappedProperties ) throws Exception {
-        
+
         BufferedReader br = null;
         PrintWriter pw = null;
 	FileInputStream fStream = null;
 	String oldPropertyName = null;
-        
+
         Debug.log(
                 "MigrateWebAgentConfigurePropertiesTask.mergeConfigFiles() - " +
                 "config file to migrate from: " + instanceConfigFileMigrate +
                 " config file to migrate to: " + instanceConfigFile);
-        
+
         try {
             FileReader fr = new FileReader(instanceConfigFile);
             br = new BufferedReader(fr);
-            
+
             String tmpFileName = instanceConfigFile + ".tmp";
             pw = new PrintWriter(new FileWriter(tmpFileName));
-            
+
             String lineData = null;
             KeyValue keyValue = null;
             ArrayList migrateLines = null;
-            
+
             while ((lineData = br.readLine()) != null) {
                 lineData = lineData.trim();
-                
+
                 if (lineData.startsWith(FileUtils.HASH) ||
                         lineData.length() == 0) {
                     // write back comment statement and empty line.
                     pw.println(lineData);
-                } else {                    
+                } else {
                     keyValue = new KeyValue(lineData);
-                    
+
                     if (nonMigratedParameters.contains(keyValue.getKey())) {
                     	pw.println(lineData);
                     	continue;
                     }
-                    
+
 		    // For the new web agent property, get its corresponding
 		    // old property name
 		    oldPropertyName = mappedProperties.getProperty(
@@ -217,8 +217,8 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                     Debug.log(
                     "MigrateWebAgentConfigurePropertiesTask.mergeConfigFiles()- " +
                     "parameter: " + keyValue.getParameter() +
-                    " matched migration parameters: " + migrateLines);
-                    
+                    " matched migration parameter: " + migrateLines);
+
                     if (migrateLines.size() > 0) {
                         for (int i=0; i<migrateLines.size(); i++) {
                             pw.println(migrateLines.get(i));
@@ -228,7 +228,7 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                             // encrypt key property
                             StringBuffer newLineData = new StringBuffer();
                             int count = 0;
-                            StringTokenizer st = 
+                            StringTokenizer st =
                                     new StringTokenizer(lineData, "=");
                             while (st.hasMoreElements()) {
                                 String tok = st.nextToken();
@@ -237,27 +237,27 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                                     newLineData.append("= ");
                                 } else {
                                     newLineData.append(
-                                                AGENT_22_ENCRYPT_KEY_VALUE);                                            
+                                                AGENT_22_ENCRYPT_KEY_VALUE);
                                 }
                                 count++;
                             }
                             pw.println(newLineData);
-                        } else {                            
+                        } else {
                             // new parameter, write back.
                             pw.println(lineData);
                         }
                     }
                 } // end of if (lineData..
             } // end of while
-            
+
             br.close();
             pw.flush();
             pw.close();
-            
+
             FileUtils.copyFile(tmpFileName, instanceConfigFile);
             File tmpFile = new File(tmpFileName);
             tmpFile.delete();
-            
+
         } catch (Exception ex) {
             if (br != null) {
                 try {
@@ -271,9 +271,9 @@ public class MigrateWebAgentConfigurePropertiesTask extends
             }
         }
     }
-    
+
     /**
-     * read the lines of parameters within previous product's config file
+     * read the lines of parameter within previous product's config file
      * for each parameter.
      *
      * @param parameter
@@ -283,9 +283,9 @@ public class MigrateWebAgentConfigurePropertiesTask extends
      */
     private ArrayList getMigrateLines(String parameter, String oldPropertyName,
             String instanceConfigFileMigrate) throws IOException {
-        
+
         ArrayList migrateLines = new ArrayList();
-        
+
         FileReader fr = null;
         BufferedReader br = null;
 
@@ -295,31 +295,31 @@ public class MigrateWebAgentConfigurePropertiesTask extends
         try {
             fr = new FileReader(instanceConfigFileMigrate);
             br = new BufferedReader(fr);
-            
+
             String lineData = null;
             int index = 0;
-            
+
             while ((lineData = br.readLine()) != null) {
                 if (!lineData.startsWith(FileUtils.HASH) &&
                         lineData.indexOf(oldPropertyName) >= 0) {
                     KeyValue keyValue = new KeyValue(lineData);
                     if (keyValue.getParameter().equals(oldPropertyName)) {
                         if (agentListParameters.contains(parameter)) {
-                            // Property is a list 
-                            StringTokenizer strTok = 
+                            // Property is a list
+                            StringTokenizer strTok =
                                     new StringTokenizer(keyValue.getValue());
                             while (strTok.hasMoreElements()) {
                                migrateLines.add(
-				   parameter + "[" + index + "] = " + 
+				   parameter + "[" + index + "] = " +
                                              strTok.nextToken());
                                index++;
                             }
                         } else if (agentMapParameters.contains(parameter)) {
                             // Property is a map
-                            StringTokenizer strTok_first = 
+                            StringTokenizer strTok_first =
                                  new StringTokenizer(keyValue.getValue(), ",");
                             while (strTok_first.hasMoreElements()) {
-                                StringTokenizer strTok_sec = 
+                                StringTokenizer strTok_sec =
                                     new StringTokenizer(
 					strTok_first.nextToken(),"|");
                                 while (strTok_sec.hasMoreElements()) {
@@ -328,24 +328,24 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                                              + strTok_sec.nextToken().trim()
 					     + "] = " + strTok_sec.nextToken());
                                 }
-                            }                            
-                        } else 
+                            }
+                        } else
 			    if (agentResetCookieParameters.contains(parameter)){
                                 // Property is reset cookie
-                                StringTokenizer strTok = 
+                                StringTokenizer strTok =
                                  new StringTokenizer(keyValue.getValue(), ",");
                                 while (strTok.hasMoreElements()) {
                                     migrateLines.add(
-                                        parameter + "[" + index + "] = " + 
+                                        parameter + "[" + index + "] = " +
                                         strTok.nextToken().trim());
                                     index++;
                                 }
                         } else {
-                            migrateLines.add(parameter + " = " + 
+                            migrateLines.add(parameter + " = " +
                                              keyValue.getValue());
                         }
                     }
-                }    
+                }
             }
         } finally {
             if (br != null) {
@@ -355,17 +355,17 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                 }
             }
         }
-        return migrateLines;        
+        return migrateLines;
     }
-    
+
         /*
-         * inner class to parse&wrap config parameters.
+         * inner class to parse&wrap config parameter.
          */
     class KeyValue {
         String key = null;
         String parameter = null;
         String value = null;
-        
+
         public KeyValue(String lineData) {
             int index = 0;
             if (lineData != null && lineData.length() != 0) {
@@ -377,34 +377,34 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                 }
             }
         }
-        
+
         public String getKey() {
             return key;
         }
-        
+
         public void setKey(String key) {
             this.key = key;
         }
-        
+
         public String getParameter() {
             return parameter;
         }
-        
+
         public void setParameter(String parameter) {
             this.parameter = parameter;
         }
-        
+
         public String getValue() {
             return value;
         }
-        
+
         public void setValue(String value) {
             this.value = value;
         }
-        
+
         private void getParameterName() {
             parameter = key;
-            
+
             if (key != null && key.length() > 0) {
                 if (key.endsWith(FileUtils.SQRBRACKET_CLOSE)) {
                     int index = key.lastIndexOf(FileUtils.SQRBRACKET_OPEN);
@@ -413,6 +413,6 @@ public class MigrateWebAgentConfigurePropertiesTask extends
                     }
                 }
             }
-        } // end of getParameterName        
+        } // end of getParameterName
     }
 }
