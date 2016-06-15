@@ -53,6 +53,7 @@ import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
 import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -90,6 +91,7 @@ public class AuthenticatorPush extends AbstractPushModule {
     private PushDeviceSettings device;
 
     private PollingWaitAssistant pollingWaitAssistant;
+    private long expireTime;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -108,10 +110,10 @@ public class AuthenticatorPush extends AbstractPushModule {
         try {
             lbCookieValue = sessionCookies.getLBCookie(getSessionId());
         } catch (SessionException e) {
-            DEBUG.warning("AuthenticatorPush :: init() : Unable to determine loadbalancer bookie value", e);
+            DEBUG.warning("AuthenticatorPush :: init() : Unable to determine loadbalancer cookie value", e);
         }
 
-        if (Boolean.parseBoolean(SystemPropertiesManager.get("com.forgerock.openam.authentication.push.nearinstant"))) {
+        if (Boolean.parseBoolean(SystemPropertiesManager.get(nearInstantProperty))) {
             pollingWaitAssistant = new PollingWaitAssistant(timeout, 1000, 1000, 1000);
         } else {
             pollingWaitAssistant = new PollingWaitAssistant(timeout);
@@ -157,6 +159,9 @@ public class AuthenticatorPush extends AbstractPushModule {
 
     private int stateWait(Callback[] callbacks) throws AuthLoginException {
         checkDeviceExists();
+        if (expireTime < Time.currentTimeMillis()) {
+            throw failedAsLoginException();
+        }
         if (emergencyPressed(callbacks)) {
             return STATE_EMERGENCY;
         } else {
@@ -276,6 +281,7 @@ public class AuthenticatorPush extends AbstractPushModule {
         } else {
             device = getDevice(username, realm);
             if (sendMessage(device)) {
+                this.expireTime = Time.currentTimeMillis() + timeout;
                 setEmergencyButton();
                 return STATE_WAIT;
             } else {

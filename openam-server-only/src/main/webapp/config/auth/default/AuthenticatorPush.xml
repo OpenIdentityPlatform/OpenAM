@@ -58,8 +58,7 @@
     <!-- For recovery code use -->
     <Callbacks length="2" order="5" timeout="120" header="ForgeRock Authenticator (Push) Emergency Code Used">
         <TextOutputCallback>
-            You have used one of your Emergency ForgeRock Authenticator (Push) Codes. Please make sure you have a note of
-            any remaining ForgeRock Authenticator (Push) Codes.
+            You have used one of your Recovery Codes. Please make sure you have a note of any remaining Recovery Codes.
         </TextOutputCallback>
         <ConfirmationCallback>
             <OptionValues>
