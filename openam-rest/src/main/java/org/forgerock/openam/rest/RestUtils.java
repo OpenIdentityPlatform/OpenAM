@@ -126,6 +126,9 @@ final public class RestUtils {
                 delegationPermission.setServiceName("sunAMRealmService");
                 delegationPermission.setActions(CollectionUtils.asSet("DELEGATE"));
                 isAdmin = delegationEvaluator.isAllowed(userSSOToken, delegationPermission, envParams);
+                if (!isAdmin) {
+                    return false;
+                }
             } else {
                 delegationPermission.setConfigType(null);
                 delegationPermission.setVersion("*");
