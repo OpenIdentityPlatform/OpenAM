@@ -65,6 +65,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -583,7 +584,26 @@ public final class IdUtils {
                     unknownOrgLookupCache.add(orgIdentifier);
                     throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                             IdRepoErrorCode.NO_MAPPING_FOUND, args);
-                } else if (CollectionUtils.isNotEmpty(orgAliases) && (foundOrg || orgAliases.size() > 1)) {
+                } else if (CollectionUtils.isNotEmpty(orgAliases) && foundOrg) {
+                    // Check to see if there is one alias, which points to the same realm as the one previously found
+                    boolean sameRealm = false;
+                    if (orgAliases.size() == 1) {
+                        String aliasId = DNMapper.orgNameToDN((String)orgAliases.iterator().next());
+                        if (StringUtils.isEqualTo(aliasId, id)) {
+                            // The realm has an alias that is equivalent to the realm name
+                            sameRealm = true;
+                        }
+                    }
+                    if (!sameRealm) {
+                        // Multiple realms should not have the same alias
+                        if (debug.warningEnabled()) {
+                            debug.warning("IdUtils.getOrganization Multiple " +
+                                    " matching Orgs found for: " + orgIdentifier);
+                        }
+                        throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                                IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
+                    }
+                } else if (CollectionUtils.isNotEmpty(orgAliases) && (orgAliases.size() > 1)) {
                     // Multiple realms should not have the same alias
                     if (debug.warningEnabled()) {
                         debug.warning("IdUtils.getOrganization Multiple " +
