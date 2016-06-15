@@ -208,20 +208,19 @@ public class SchemaXmlAttributeUpgradeStep extends AbstractUpgradeStep {
         @Override
         public Boolean apply(Element parent) throws XPathExpressionException {
             Element element = getElement(parent);
+            boolean result = false;
 
             for (ElementModifier modifier : modifiers.values()) {
-                if (modifier.apply(element)) {
-                    return true;
-                }
+                Boolean modificationResult = modifier.apply(element);
+                result = result || modificationResult;
             }
 
             for (AttributeModifier modifier : attributeModifiers) {
-                if (modifier.apply(element)) {
-                    return true;
-                }
+                Boolean modificationResult = modifier.apply(element);
+                result = result || modificationResult;
             }
 
-            return false;
+            return result;
         }
 
         protected abstract Element getElement(Element parent) throws XPathExpressionException;
