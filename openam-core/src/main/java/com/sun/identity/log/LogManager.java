@@ -24,7 +24,7 @@
  *
  * $Id: LogManager.java,v 1.14 2009/12/09 00:34:22 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Cybernetica AS
  */
 package com.sun.identity.log;
@@ -34,6 +34,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -110,6 +111,9 @@ public class LogManager extends java.util.logging.LogManager {
     private static int loggerCount = 0;
     private String inactive = "INACTIVE";
 
+    private ReentrantReadWriteLock readWriteLockAllFields = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock readWriteLockSelectedFieldSet = new ReentrantReadWriteLock();
+
     /**
      * Adds a logger to the Log Manager.
      *
@@ -183,8 +187,13 @@ public class LogManager extends java.util.logging.LogManager {
      *
      * @return <code>allFields</code>
      */
-    public synchronized final String[] getAllFields() {
-        return allFields;
+    public final String[] getAllFields() {
+        readWriteLockAllFields.readLock().lock();
+        try {
+            return allFields;
+        } finally {
+            readWriteLockAllFields.readLock().unlock();
+        }
     }
 
     /**
@@ -193,36 +202,53 @@ public class LogManager extends java.util.logging.LogManager {
      * @return <code>selectedFieldSet</code>
      */
     public synchronized final Set getSelectedFieldSet() {
-        return selectedFieldSet;
-    }
 
-    private synchronized final void readAllFields() {
-        String strAllFields = getProperty(LogConstants.ALL_FIELDS);
-        StringTokenizer strToken = new StringTokenizer(strAllFields, ", ");
-        int count = strToken.countTokens();
-        String localAllFields[] = new String[count];
-        count = 0;
-        while (strToken.hasMoreElements()) {
-            localAllFields[count++] = strToken.nextToken().trim();
+        readWriteLockSelectedFieldSet.readLock().lock();
+        try {
+            return selectedFieldSet;
+        } finally {
+            readWriteLockSelectedFieldSet.readLock().unlock();
         }
-        allFields = localAllFields;
     }
 
-    private synchronized final void readSelectedFieldSet() {
-        HashSet fieldSet = new HashSet();
+    private final void readAllFields() {
 
-        String strSelectedFields = getProperty(LogConstants.LOG_FIELDS);
-
-        if ((strSelectedFields != null) && (strSelectedFields.length() != 0)) {
-            StringTokenizer stoken =
-                new StringTokenizer(strSelectedFields, ", ");
-
-            while (stoken.hasMoreElements()) {
-                fieldSet.add(stoken.nextToken());
+        readWriteLockAllFields.writeLock().lock();
+        try {
+            String strAllFields = getProperty(LogConstants.ALL_FIELDS);
+            StringTokenizer strToken = new StringTokenizer(strAllFields, ", ");
+            int count = strToken.countTokens();
+            String localAllFields[] = new String[count];
+            count = 0;
+            while (strToken.hasMoreElements()) {
+                localAllFields[count++] = strToken.nextToken().trim();
             }
+            allFields = localAllFields;
+        } finally {
+            readWriteLockAllFields.writeLock().unlock();
         }
-        selectedFieldSet = fieldSet;
-        return;
+    }
+
+    private final void readSelectedFieldSet() {
+
+        readWriteLockSelectedFieldSet.writeLock().lock();
+        try {
+            HashSet fieldSet = new HashSet();
+
+            String strSelectedFields = getProperty(LogConstants.LOG_FIELDS);
+
+            if ((strSelectedFields != null) && (strSelectedFields.length() != 0)) {
+                StringTokenizer stoken =
+                        new StringTokenizer(strSelectedFields, ", ");
+
+                while (stoken.hasMoreElements()) {
+                    fieldSet.add(stoken.nextToken());
+                }
+            }
+            selectedFieldSet = fieldSet;
+        } finally {
+            readWriteLockSelectedFieldSet.writeLock().unlock();
+        }
     }
 
     /**
