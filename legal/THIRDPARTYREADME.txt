@@ -356,7 +356,7 @@ Version: xml-resolver-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
 
 Version: xml-resolver-1.2.jar
-Copyright:
+Copyright: Copyright 2006 The Apache Software Foundation.
 
 Version: xml-serializer-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
@@ -805,7 +805,7 @@ Version: bootstrap-datetimepicker-4.14.30-min.js
 Copyright: Copyright (c) 2015 Jonathan Peterson
 
 Version: bootstrap-dialog-1.34.4-min.js
-Copyright:
+Copyright: Copyright 2015 Twitter.
 
 Version: codemirror/addon/display/fullscreen.js
 Copyright: Copyright (C) 2014 by Marijn Haverbeke
@@ -878,7 +878,7 @@ Version: requirejs-2.1.14-min.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
 Version: spin-2.0.1-min.js
-Copyright:
+Copyright: Copyright (c) 2011-2014 Felix Gnass
 
 Version: squire-0.2.0.js
 Copyright: Copyright (c) 2013 Merrick Christensen
@@ -911,7 +911,7 @@ Version: sha256.js
 Copyright: Copyright (c) 2009-2013 by Jeff Mott. All rights reserved.
 
 Version: swfobject-2.2-min.js
-Copyright:
+Copyright: Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 
 Version: calendar_date_select.js (1.16.1)
 Copyright: Copyright 2009 Tim Harper
@@ -1201,40 +1201,40 @@ Version: jato-2005-05-04.jar
 Copyright: Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved
 
 Version: cc-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_de-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_es-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_fr-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_it-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_ja-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_ko-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_sv-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_CN-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_HK-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_TW-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: grizzly-framework-2.3.23.jar
 Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
@@ -1252,10 +1252,10 @@ Version: javax.jms:javax.jms-api:2.0.1.jar
 Copyright: Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights reserved.
 
 Version: jaxb-impl-1.0.6.jar
-Copyright:
+Copyright: Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
 
 Version: jaxb-xjc-1.0.6.jar
-Copyright:
+Copyright: Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
 
 Version: jsp-api-2.1.jar
 Copyright: Copyright 2005 Sun Microsystems, Inc. All rights reserved.
