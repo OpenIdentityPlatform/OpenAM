@@ -1111,7 +1111,6 @@ public class SPACSUtils {
         }
 
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
         boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
         String existUserName = null;
         SessionProvider sessionProvider = null;
@@ -1140,8 +1139,8 @@ public class SPACSUtils {
         String remoteHostId = authnAssertion.getIssuer().getValue();
         String userName = null;
         boolean isNewAccountLink = false;
-        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && acctMapper.shouldPersistNameIDFormat(realm, hostEntityId, remoteHostId, nameIDFormat));
+        boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, hostEntityId, remoteHostId, nameIDFormat);
         try {
             if (shouldPersistNameID) {
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -2143,11 +2142,10 @@ public class SPACSUtils {
         }
 
         final boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        final boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
         final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
 
-        final boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat));
+        final boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat);
 
         String userName = null;
         boolean isNewAccountLink = false;
@@ -2172,7 +2170,7 @@ public class SPACSUtils {
         }
 
         //if we're new and we're persistent, store the federation data in the user pref
-        if (isNewAccountLink && isPersistent) {
+        if (isNewAccountLink && shouldPersistNameID) {
             try {
                 writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName, storageKey);
             } catch (SAML2Exception se) {

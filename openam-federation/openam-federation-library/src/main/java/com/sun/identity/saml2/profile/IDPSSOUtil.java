@@ -1546,19 +1546,17 @@ public class IDPSSOUtil {
 
         nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
 
         NameIDInfo nameIDInfo;
         NameID nameID = null;
         IDPAccountMapper idpAccountMapper = SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
 
         //Use-cases for NameID persistence:
-        //* persistent NameID -> The NameID MUST be stored
         //* transient NameID -> The NameID MUST NOT be stored
         //* ignored user profile mode -> The NameID CANNOT be stored
         //* for any other cases -> The NameID MAY be stored based on customizable logic
-        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && idpAccountMapper.shouldPersistNameIDFormat(realm, idpEntityID, remoteEntityID, nameIDFormat));
+        boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && idpAccountMapper.shouldPersistNameIDFormat(realm, idpEntityID, remoteEntityID, nameIDFormat);
 
         if (!isTransient) {
             String userID;
@@ -1569,7 +1567,7 @@ public class IDPSSOUtil {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("invalidSSOToken"));
             }
 
-            if (isPersistent || shouldPersistNameID) {
+            if (shouldPersistNameID) {
                 nameIDInfo = AccountUtils.getAccountFederation(userID, idpEntityID, remoteEntityID);
 
                 if (nameIDInfo != null) {
@@ -1585,7 +1583,7 @@ public class IDPSSOUtil {
         }
 
         if (nameID == null) {
-            if (!allowCreate && isPersistent) {
+            if (!allowCreate && shouldPersistNameID) {
                 throw new SAML2InvalidNameIDPolicyException(SAML2Utils.bundle.getString("cannotCreateNameID"));
             }
 

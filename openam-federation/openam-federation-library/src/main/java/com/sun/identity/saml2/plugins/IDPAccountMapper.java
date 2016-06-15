@@ -24,7 +24,7 @@
  *
  * $Id: IDPAccountMapper.java,v 1.5 2008/06/25 05:47:51 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.plugins;
 
@@ -97,7 +97,7 @@ public interface IDPAccountMapper {
      * @param realm The hosted IdP's realm.
      * @param hostEntityID The hosted IdP's entityID.
      * @param remoteEntityID The remote SP's entityID.
-     * @param nameIDFormat The non-transient, non-persistent NameID-Format in question.
+     * @param nameIDFormat The non-transient NameID-Format in question.
      * @return <code>true</code> if the provided NameID-Format should be persisted in the user data store,
      * <code>false</code> otherwise.
      */

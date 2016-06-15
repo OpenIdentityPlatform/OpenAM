@@ -708,11 +708,10 @@ public class SAML2 extends AMLoginModule {
 
         nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
         isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
         boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
 
-        return isPersistent || (!isTransient && !ignoreProfile
-                && spAccountMapper.shouldPersistNameIDFormat(realm, spEntityId, entityName, nameIDFormat));
+        return !isTransient && !ignoreProfile
+                && spAccountMapper.shouldPersistNameIDFormat(realm, spEntityId, entityName, nameIDFormat);
     }
 
     /**

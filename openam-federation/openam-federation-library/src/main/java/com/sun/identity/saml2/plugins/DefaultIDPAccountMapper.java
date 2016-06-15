@@ -42,6 +42,7 @@ import com.sun.identity.plugin.session.SessionException;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2InvalidNameIDPolicyException;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -102,7 +103,13 @@ public class DefaultIDPAccountMapper extends DefaultAccountMapper implements IDP
             nameIDValue = getNameIDValueFromUserProfile(realm, hostEntityID, userID, nameIDFormat);
             if (nameIDValue == null) {
                 if (nameIDFormat.equals(SAML2Constants.PERSISTENT)) {
-                    nameIDValue = SAML2Utils.createNameIdentifier();
+                    // Double check that NameID persistence is enabled, there is no point in generating a value if not.
+                    if (shouldPersistNameIDFormat(realm, hostEntityID, remoteEntityID, nameIDFormat)) {
+                        nameIDValue = SAML2Utils.createNameIdentifier();
+                    } else {
+                        throw new SAML2InvalidNameIDPolicyException(
+                                bundle.getString("unableToGenerateNameIDValuePersistenceDisabled"));
+                    }
                 } else {
                     throw new SAML2Exception(bundle.getString("unableToGenerateNameIDValue"));
                 }
