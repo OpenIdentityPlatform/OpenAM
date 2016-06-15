@@ -1381,12 +1381,6 @@ Version: openam-auth-datastore-12.0.0.jar
 Copyright: Copyright (c) 2005-2009 Sun Microsystems Inc. All Rights Reserved,
            Portions Copyrighted 2011-2014 ForgeRock AS
 
-Version: openam-auth-deviceprint-module-12.0.0.jar
-Copyright: Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved,
-           Portions Copyrighted 2013 Syntegrity.
-           Portions Copyrighted 2013 ForgeRock Inc.,
-           Portions Copyrighted 2014 Nomura Research Institute, Ltd
-
 Version: openam-auth-hotp-12.0.0.jar
 Copyright: Copyright (c) 2005-2009 Sun Microsystems Inc. All Rights Reserved,
            Portions Copyrighted 2011-2014 ForgeRock AS,

@@ -651,18 +651,6 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-auth-deviceprint-module</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-auth-deviceprint-scripts</artifactId>
-                <version>${project.version}</version>
-                <type>js</type>
-                <classifier>min</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-hotp</artifactId>
                 <version>${project.version}</version>
             </dependency>
