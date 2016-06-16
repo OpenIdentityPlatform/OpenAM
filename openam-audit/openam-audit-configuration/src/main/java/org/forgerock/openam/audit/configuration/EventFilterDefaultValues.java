@@ -54,7 +54,7 @@ public final class EventFilterDefaultValues extends DefaultValues {
     };
 
     @Override
-    public Set getDefaultValues() {
+    public Set<String> getDefaultValues() {
         return CollectionUtils.asSet(DEFAULT_VALUES);
     }
 }

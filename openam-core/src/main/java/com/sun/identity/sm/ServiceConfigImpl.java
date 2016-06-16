@@ -80,9 +80,9 @@ class ServiceConfigImpl implements ServiceListener {
 
     private int priority;
 
-    private Map attributes;
+    private Map<String, Set<String>> attributes;
 
-    private Map attributesWithoutDefaults;
+    private Map<String, Set<String>> attributesWithoutDefaults;
 
     private CachedSMSEntry smsEntry;
 
@@ -239,7 +239,7 @@ class ServiceConfigImpl implements ServiceListener {
      * values in the <code>Map</code> is a <code>Set</code> that contains
      * the values for the attribute.
      */
-    Map getAttributes() {
+    Map<String, Set<String>> getAttributes() {
         if (!SMSEntry.cacheSMSEntries) {
             // Read the entry, since it should not be cached
             smsEntry.refresh();
@@ -253,7 +253,7 @@ class ServiceConfigImpl implements ServiceListener {
      * their corresponding values in the <code>Map</code> is a
      * <code>Set</code> that contains the values for the attribute.
      */
-    Map getAttributesForRead() {
+    Map<String, Set<String>> getAttributesForRead() {
         if (!SMSEntry.cacheSMSEntries) {
             // Read the entry, since it should not be cached
             smsEntry.refresh();
@@ -285,7 +285,7 @@ class ServiceConfigImpl implements ServiceListener {
      * attributes returned by this method are the ones which do not
      * include default values from the service schema
      */
-    Map getAttributesWithoutDefaultsForRead() {
+    Map<String, Set<String>> getAttributesWithoutDefaultsForRead() {
         if (!SMSEntry.cacheSMSEntries) {
             // Read the entry, since it should not be cached
             smsEntry.refresh();
@@ -406,16 +406,16 @@ class ServiceConfigImpl implements ServiceListener {
         SMSEntry entry = smsEntry.getSMSEntry();
 
         // Read the attributes
-        Map origAttributes = SMSUtils.getAttrsFromEntry(entry);
-        Map origAttributesWithoutDefaults = SMSUtils.getAttrsFromEntry(entry);
+        Map<String, Set<String>> origAttributes = SMSUtils.getAttrsFromEntry(entry);
+        Map<String, Set<String>> origAttributesWithoutDefaults = SMSUtils.getAttrsFromEntry(entry);
         // Add default values, if attribute not present
         // and decrypt password attributes
         String validate = ss.getValidate();
         if ((validate == null) || validate.equalsIgnoreCase("yes")) {
-            Set asNames = ss.getAttributeSchemaNames();
+            Set<String> asNames = ss.getAttributeSchemaNames();
             // Remove attributes that do not exist in the schema.
-            Set oldSet = origAttributes.keySet();
-            Set removeAttrs = new HashSet();
+            Set<String> oldSet = origAttributes.keySet();
+            Set<String> removeAttrs = new HashSet<>();
             Iterator it = oldSet.iterator();
             while (it.hasNext()) {
                 String tName = (String) it.next();
@@ -431,13 +431,10 @@ class ServiceConfigImpl implements ServiceListener {
                 origAttributes.remove(t);
                 origAttributesWithoutDefaults.remove(t);
             }
-            Iterator ass = asNames.iterator();
-            while (ass.hasNext()) {
-                AttributeValidator av = ss.getAttributeValidator((String) ass
-                        .next());
+            for (String asName : asNames) {
+                AttributeValidator av = ss.getAttributeValidator(asName);
                 origAttributes = av.inheritDefaults(origAttributes);
-                origAttributesWithoutDefaults = av
-                        .decodeEncodedAttrs(origAttributesWithoutDefaults);
+                origAttributesWithoutDefaults = av.decodeEncodedAttrs(origAttributesWithoutDefaults);
             }
         } // if (validate....)
 

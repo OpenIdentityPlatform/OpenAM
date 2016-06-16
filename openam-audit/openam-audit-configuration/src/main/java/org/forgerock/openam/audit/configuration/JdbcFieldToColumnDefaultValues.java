@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.audit.configuration;
@@ -110,9 +110,8 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[realm]=realm"))));
 
     @Override
-    public Set getDefaultValues() {
+    public Set<String> getDefaultValues() {
         String topic = null;
-        @SuppressWarnings("unchecked")
         Map<String, Set<String>> keyValues = getConfiguredKeyValues();
         if (isNotEmpty(keyValues)) {
             Set<String> values = keyValues.get("topic");

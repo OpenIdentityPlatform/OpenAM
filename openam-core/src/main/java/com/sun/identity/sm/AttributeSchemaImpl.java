@@ -73,7 +73,7 @@ public class AttributeSchemaImpl {
 
     private AttributeSchema.Syntax syntax;
 
-    private Set defaultValues = null;
+    private Set<String> defaultValues = null;
 
     private Set<String> exampleValues = null;
 
@@ -200,7 +200,7 @@ public class AttributeSchemaImpl {
     /**
      * Returns the default values of the attribute.
      */
-    public Set getDefaultValues() {
+    public Set<String> getDefaultValues() {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues();
         }
@@ -228,7 +228,7 @@ public class AttributeSchemaImpl {
         return getValuesCopy(exampleValues);
     }
 
-    private Set<?> getValuesCopy(Set<?> defaultValues) {
+    private <T> Set<T> getValuesCopy(Set<T> defaultValues) {
         if (isEmpty(defaultValues)) {
             return emptySet();
         }

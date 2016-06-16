@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: DefaultValues.java,v 1.3 2008/06/25 05:44:03 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -53,7 +54,7 @@ public abstract class DefaultValues {
      * 
      * @return defaults values for the attribute as a <code>java.util.Set</code>
      */
-    public abstract Set getDefaultValues();
+    public abstract Set<String> getDefaultValues();
 
     /**
      * Returns a Set of default values for the attribute, given the environment
@@ -64,7 +65,7 @@ public abstract class DefaultValues {
      * 
      * @return defaults values for the attribute as a <code>java.util.Set</code>
      */
-    public Set getDefaultValues(Map envParams) {
+    public Set<String> getDefaultValues(Map envParams) {
         return (getDefaultValues());
     }
 
@@ -85,7 +86,7 @@ public abstract class DefaultValues {
      * @return key-value pairs configured for this class in the service schema
      *         XML file
      */
-    public final Map getConfiguredKeyValues() {
+    public final Map<String, Set<String>> getConfiguredKeyValues() {
         return (keyValues);
     }
 
@@ -124,7 +125,7 @@ public abstract class DefaultValues {
     // Pointer to AttributeSchema, key-value pairs and parent node
     AttributeSchemaImpl attributeSchema;
 
-    Map keyValues;
+    Map<String, Set<String>> keyValues;
 
     Node parentNode;
 }

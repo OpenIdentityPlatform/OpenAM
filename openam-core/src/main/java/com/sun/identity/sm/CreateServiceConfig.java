@@ -24,12 +24,11 @@
  *
  * $Id: CreateServiceConfig.java,v 1.14 2009/01/28 05:35:03 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import javax.naming.ldap.Rdn;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,16 +39,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
+import org.w3c.dom.Node;
+
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.RDN;
-import org.w3c.dom.Node;
 
 public class CreateServiceConfig {
 
@@ -488,11 +488,11 @@ public class CreateServiceConfig {
 
     // Returns a map that contains attribute value pairs
     // %%% This must be moved to XMLUtils
-    public static Map getAttributeValuePairs(Node n) {
+    public static Map<String, Set<String>> getAttributeValuePairs(Node n) {
         if (n == null) {
             return (null);
         }
-        Map answer = null;
+        Map<String, Set<String>> answer = null;
         Iterator attrNodes = XMLUtils.getChildNodes(n,
                 SMSUtils.ATTRIBUTE_VALUE_PAIR).iterator();
         while (attrNodes.hasNext()) {
@@ -504,9 +504,9 @@ public class CreateServiceConfig {
             }
             String attrName = XMLUtils.getNodeAttributeValue(attrNode,
                     SMSUtils.NAME);
-            Set values = XMLUtils.getAttributeValuePair(attrValuePair);
+            Set<String> values = XMLUtils.getAttributeValuePair(attrValuePair);
             if (answer == null) {
-                answer = new HashMap();
+                answer = new HashMap<>();
             }
             answer.put(attrName, values);
         }

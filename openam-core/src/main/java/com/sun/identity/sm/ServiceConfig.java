@@ -492,7 +492,7 @@ public class ServiceConfig {
      * @return the <code>Map</code> where key is the attribute name
      *	 and value is the <code>Set</code> of attribute values
      */
-    public Map getAttributesForRead() {
+    public Map<String, Set<String>> getAttributesForRead() {
         validate();
 	return (sc.getAttributesForRead());
     }
@@ -504,7 +504,7 @@ public class ServiceConfig {
      * corresponding values in the <code>Map</code> is a
      * <code>Set</code> that contains the values for the attribute.
      */
-    public Map getAttributesWithoutDefaultsForRead() {
+    public Map<String, Set<String>> getAttributesWithoutDefaultsForRead() {
         validate();
         return (sc.getAttributesWithoutDefaultsForRead());
     }
