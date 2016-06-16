@@ -33,7 +33,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import java.security.AccessController;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,28 +90,14 @@ public class SessionPropertyWhitelist {
 
     /**
      * Get the properties listed for the provided realm, using the caller token to check
-     * they have permission to see this result.
+     * they have permission to see this result. This will return all properties that have been whitelisted,
+     * even those which may not be settable due to being protected properties.
      *
-     * @param caller The token responsible for calling this method.
      * @param realm The realm in which this operation is taking place.
      * @return The set of allowed listed properties.
      */
-    public Set<String> getAllListedProperties(SSOToken caller, String realm) {
-
-        final Set<String> allowed = getWhitelist(realm);
-
-        Iterator<String> it = allowed.iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            try {
-                SessionUtils.checkPermissionToSetProperty(caller, key, null);
-            } catch (SessionException e) {
-                LOGGER.message("Removed {} from list as protected property ", key);
-                it.remove();
-            }
-        }
-
-        return allowed;
+    public Set<String> getAllListedProperties(String realm) {
+        return getWhitelist(realm);
     }
 
     /**
@@ -142,14 +127,6 @@ public class SessionPropertyWhitelist {
      */
     public boolean isPropertyListed(SSOToken caller, String realm, Set<String> propertyNames)
             throws DelegationException, SSOException {
-        for (String prop : propertyNames) {
-            try {
-                SessionUtils.checkPermissionToSetProperty(caller, prop, null);
-            } catch (SessionException e) {
-                return false;
-            }
-        }
-
         return userHasReadAdminPrivs(caller, realm) || getWhitelist(realm).containsAll(propertyNames);
     }
 
@@ -173,7 +150,48 @@ public class SessionPropertyWhitelist {
             }
         }
 
-        return WHITELIST_REALM_MAP.get(lowerRealm);
+        return Collections.unmodifiableSet(WHITELIST_REALM_MAP.get(lowerRealm));
+    }
+
+    /**
+     * Queries whether all the properties in the properties set are settable. Recording the key of the attempted
+     * setting. Returns true if all  properties are settable, returns false if any one of them is not.
+     *
+     * @param caller The user checking their permission.
+     * @param properties The property names they wish to set.
+     * @return true if all requested properties are settable.
+     */
+    public boolean isPropertySetSettable(SSOToken caller, Set<String> properties) {
+        for (String property : properties) {
+            try {
+                SessionUtils.checkPermissionToSetProperty(caller, property, null);
+            } catch (SessionException e) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Queries whether all the properties in the properties map are settable, recording the
+     * key and value of the attempted setting. Returns true if all properties are settable, returns false if any one
+     * of them is not.
+     *
+     * @param caller The user checking their permission.
+     * @param properties Map of property to value it wishes to be set to.
+     * @return true if all requested properties are settable.
+     */
+    public boolean isPropertyMapSettable(SSOToken caller, Map<String, String> properties) {
+        for (Map.Entry<String, String> property : properties.entrySet()) {
+            try {
+                SessionUtils.checkPermissionToSetProperty(caller, property.getKey(), property.getValue());
+            } catch (SessionException e) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

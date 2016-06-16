@@ -35,12 +35,10 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,9 +48,19 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import org.forgerock.http.session.Session;
+import org.forgerock.http.session.SessionContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.AdviceContext;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
@@ -62,10 +70,8 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
-import org.forgerock.services.context.SecurityContext;
 import org.forgerock.services.context.RootContext;
-import org.forgerock.http.session.Session;
-import org.forgerock.http.session.SessionContext;
+import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -139,8 +145,7 @@ public class SessionResourceTest {
         whitelist.add("two");
         whitelist.add("three");
 
-        given(propertyWhitelist.getAllListedProperties(any(SSOToken.class), any(String.class))).willReturn(whitelist);
-
+        given(propertyWhitelist.getAllListedProperties(any(String.class))).willReturn(whitelist);
     }
 
     @Test
@@ -552,6 +557,7 @@ public class SessionResourceTest {
         given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(jsonContent);
         given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+        given(propertyWhitelist.isPropertyMapSettable(any(SSOToken.class), anyMapOf(String.class, String.class))).willReturn(true);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -619,6 +625,7 @@ public class SessionResourceTest {
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
         given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+        given(propertyWhitelist.isPropertySetSettable(any(SSOToken.class), anySetOf(String.class))).willReturn(true);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);

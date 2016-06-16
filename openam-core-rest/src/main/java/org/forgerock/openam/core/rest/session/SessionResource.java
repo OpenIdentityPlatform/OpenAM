@@ -862,7 +862,7 @@ public class SessionResource implements CollectionResourceProvider {
                 final SSOToken target = getToken(tokenId);
 
                 if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
-                    for (String property : sessionPropertyWhitelist.getAllListedProperties(caller, realm)) {
+                    for (String property : sessionPropertyWhitelist.getAllListedProperties(realm)) {
                         final String value = target.getProperty(property);
                         result.add(property, value == null ? "" : value);
                     }
@@ -914,7 +914,8 @@ public class SessionResource implements CollectionResourceProvider {
 
                 final Map<String, String> entrySet = request.getContent().asMap(String.class);
 
-                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, entrySet.keySet())) {
+                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, entrySet.keySet()) &&
+                        sessionPropertyWhitelist.isPropertyMapSettable(caller, entrySet)) {
                     for (Map.Entry<String, String> entry : request.getContent().asMap(String.class).entrySet()) {
                         target.setProperty(entry.getKey(), entry.getValue());
                     }
@@ -958,7 +959,8 @@ public class SessionResource implements CollectionResourceProvider {
 
                 final Set<String> propSet = request.getContent().get(KEYWORD_PROPERTIES).asSet(String.class);
 
-                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, propSet)) {
+                if (sessionPropertyWhitelist.isPropertyListed(caller, realm, propSet) &&
+                        sessionPropertyWhitelist.isPropertySetSettable(caller, propSet)) {
                     for (String entry : propSet) {
                         //there is no "delete" function - we can't store null in the property map so blank it
                         target.setProperty(entry, "");
@@ -995,7 +997,7 @@ public class SessionResource implements CollectionResourceProvider {
                 final SSOToken caller = getCallerToken(context);
                 final String realm = getCallerRealm(context);
                 return newResultPromise(newActionResponse(json(object(field(KEYWORD_PROPERTIES,
-                        sessionPropertyWhitelist.getAllListedProperties(caller, realm))))));
+                        sessionPropertyWhitelist.getAllListedProperties(realm))))));
             } catch (SSOException e) {
                 LOGGER.message("Unable to read all whitelisted session properties.", e);
             }
