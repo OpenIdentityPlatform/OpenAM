@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting.service;
 
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -25,15 +26,23 @@ import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
 
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.scripting.ScriptException;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 public class ScriptConfigurationServiceTest {
 
@@ -44,18 +53,55 @@ public class ScriptConfigurationServiceTest {
             return TEST_USER;
         }
     };
+    private Subject subject;
     private ScriptConfigurationService service;
-    private ScriptingDataStore dataStore;
+    @Mock
+    private ServiceConfigManager serviceConfigManager;
+    @Mock
+    private ServiceConfig orgConfig;
+    @Mock
+    private ServiceConfig orgSubConfig;
+    @Mock
+    private ServiceConfig globalConfig;
+    @Mock
+    private ServiceConfig globalSubConfig;
 
     @BeforeMethod
-    public void setUp() throws ResourceException {
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         Logger logger = mock(Logger.class);
-        Subject subject = new Subject();
+        subject = new Subject();
         subject.getPrincipals().add(testUserPrinciple);
-        dataStore = mock(ScriptingDataStore.class);
-        ScriptingDataStoreFactory dataStoreFactory = mock(ScriptingDataStoreFactory.class);
-        when(dataStoreFactory.create(any(Subject.class), anyString())).thenReturn(dataStore);
-        service = new ScriptConfigurationService(logger, subject, "/", dataStoreFactory);
+        CoreWrapper coreWrapper = mock(CoreWrapper.class);
+        when(coreWrapper.getServiceConfigManager(anyString(), any(SSOToken.class))).thenReturn(serviceConfigManager);
+
+        when(serviceConfigManager.getOrganizationConfig("/", null)).thenReturn(orgConfig);
+        when(orgConfig.getSubConfig(anyString())).thenReturn(orgSubConfig);
+        when(orgSubConfig.getSubConfigNames()).thenReturn(asSet("ExistingOrgScript"));
+        ServiceConfig orgScript = mock(ServiceConfig.class);
+        when(orgSubConfig.getSubConfig("ExistingOrgScript")).thenReturn(orgScript);
+        when(orgScript.getAttributesForRead()).thenReturn(scriptAttributes("Existing Org Script"));
+
+        when(serviceConfigManager.getGlobalConfig(null)).thenReturn(globalConfig);
+        when(globalConfig.getSubConfig(anyString())).thenReturn(globalSubConfig);
+        when(globalSubConfig.getSubConfigNames()).thenReturn(asSet("ExistingGlobalScript"));
+        ServiceConfig globalScript = mock(ServiceConfig.class);
+        when(globalSubConfig.getSubConfig("ExistingGlobalScript")).thenReturn(globalScript);
+        when(globalScript.getAttributesForRead()).thenReturn(scriptAttributes("Existing Global Script"));
+
+        service = new ScriptConfigurationService(logger, "/", coreWrapper, serviceConfigManager);
+    }
+
+    private Map<String, Set<String>> scriptAttributes(String name) {
+        Map<String, Set<String>> result = new HashMap<>();
+        result.put("name", asSet(name));
+        result.put("description", asSet("This is a test script configuration"));
+        result.put("script", asSet("var a = 123;var b = 456;"));
+        result.put("language", asSet((JAVASCRIPT.name())));
+        result.put("context", asSet(POLICY_CONDITION.name()));
+        result.put("createdBy", asSet("TestUser"));
+        result.put("creationDate", asSet("1422886484092"));
+        return result;
     }
 
     @Test
@@ -68,11 +114,9 @@ public class ScriptConfigurationServiceTest {
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
-        when(dataStore.containsUuid(anyString())).thenReturn(false);
-        when(dataStore.containsName(anyString())).thenReturn(false);
 
         // when
-        sc = service.create(sc);
+        sc = service.create(sc, subject);
 
         // then
         assertNotNull(sc.getCreatedBy());
@@ -90,17 +134,15 @@ public class ScriptConfigurationServiceTest {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
                 .generateId()
-                .setName("MyJavaScript")
+                .setName("Existing Org Script")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
-        when(dataStore.containsUuid(anyString())).thenReturn(false);
-        when(dataStore.containsName(anyString())).thenReturn(true);
 
         // when
         try {
-            service.create(sc);
+            service.create(sc, subject);
             fail("shouldFailIfNameExistsOnCreate");
         } catch (ScriptException e) {
             // then
@@ -113,18 +155,16 @@ public class ScriptConfigurationServiceTest {
     public void shouldFailIfUuidExistsOnCreate() throws ScriptException {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
-                .generateId()
+                .setId("ExistingOrgScript")
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
-        when(dataStore.containsUuid(anyString())).thenReturn(true);
-        when(dataStore.containsName(anyString())).thenReturn(false);
 
         // when
         try {
-            service.create(sc);
+            service.create(sc, subject);
             fail("shouldFailIfUuidExistsOnCreate");
         } catch (ScriptException e) {
             // then
@@ -135,13 +175,9 @@ public class ScriptConfigurationServiceTest {
 
     @Test
     public void shouldFailIfUuidDoesNotExistOnDelete() throws ScriptException {
-        // given
-        String uuid = "1234567890";
-        when(dataStore.containsUuid(anyString())).thenReturn(false);
-
         // when
         try {
-            service.delete(uuid);
+            service.delete("1234567890");
             fail("shouldFailIfUuidDoesNotExistOnDelete");
         } catch (ScriptException e) {
             // then
@@ -152,13 +188,9 @@ public class ScriptConfigurationServiceTest {
 
     @Test
     public void shouldFailIfUuidDoesNotExistOnGet() throws ScriptException {
-        // given
-        String uuid = "1234567890";
-        when(dataStore.containsUuid(anyString())).thenReturn(false);
-
         // when
         try {
-            service.delete(uuid);
+            service.get("1234567890");
             fail("shouldFailIfUuidDoesNotExistOnGet");
         } catch (ScriptException e) {
             // then
@@ -170,28 +202,16 @@ public class ScriptConfigurationServiceTest {
     @Test
     public void shouldModifyMetaDataOnUpdate() throws ScriptException {
         // given
-        ScriptConfiguration scOld = ScriptConfiguration.builder()
-                .generateId()
-                .setName("MyJavaScript")
-                .setDescription("This is a test script configuration")
-                .setScript("var a = 123;var b = 456;")
-                .setLanguage(JAVASCRIPT)
-                .setContext(POLICY_CONDITION)
-                .setCreatedBy("TestUser")
-                .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
-                .generateId()
+                .setId("ExistingOrgScript")
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
 
-        when(dataStore.get(anyString())).thenReturn(scOld);
-        when(dataStore.containsUuid(anyString())).thenReturn(true);
-
         // when
-        scNew = service.update(scNew);
+        scNew = service.update(scNew, subject);
 
         // then
         assertNotNull(scNew.getCreatedBy());
@@ -215,11 +235,9 @@ public class ScriptConfigurationServiceTest {
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
 
-        when(dataStore.containsUuid(anyString())).thenReturn(false);
-
         // when
         try {
-            service.update(scNew);
+            service.update(scNew, subject);
             fail("shouldFailIfUuidDoesNotExistOnUpdate");
         } catch (ScriptException e) {
             // then
@@ -230,30 +248,17 @@ public class ScriptConfigurationServiceTest {
     @Test
     public void shouldFailIfNameExistOnUpdate() throws ScriptException {
         // given
-        ScriptConfiguration scOld = ScriptConfiguration.builder()
-                .generateId()
-                .setName("MyJavaScript")
-                .setDescription("This is a test script configuration")
-                .setScript("var a = 123;var b = 456;")
-                .setLanguage(JAVASCRIPT)
-                .setContext(POLICY_CONDITION)
-                .setCreatedBy("TestUser")
-                .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
-                .generateId()
-                .setName("NewNameForMyJavaScript")
+                .setId("ExistingOrgScript")
+                .setName("Existing Global Script")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(POLICY_CONDITION).build();
 
-        when(dataStore.get(anyString())).thenReturn(scOld);
-        when(dataStore.containsUuid(anyString())).thenReturn(true);
-        when(dataStore.containsName(anyString())).thenReturn(true);
-
         // when
         try {
-            service.update(scNew);
+            service.update(scNew, subject);
             fail("shouldFailIfNameExistOnUpdate");
         } catch (ScriptException e) {
             // then

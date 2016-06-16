@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps.scripting;
 
@@ -161,21 +161,21 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
     private void upgradeScriptedAuthModules(String realm, Set<ScriptData> scriptDataSet)
             throws AMConfigurationException, ScriptException, SSOException, SMSException {
 
-        ScriptingService service = serviceFactory.create(getAdminSubject(), realm);
+        ScriptingService service = serviceFactory.create(realm);
         AMAuthenticationManager authManager = new AMAuthenticationManager(getAdminToken(), realm);
         for (ScriptData scriptData : scriptDataSet) {
             Map<String, Set<String>> attributes = new HashMap<>();
 
             UpgradeProgress.reportStart("upgrade.scripted.auth.server.script.start",
                     scriptData.serverSideScript.getName(), realm);
-            service.create(scriptData.serverSideScript);
+            service.create(scriptData.serverSideScript, getAdminSubject());
             attributes.put(SERVER_SCRIPT, Collections.singleton(scriptData.serverSideScript.getId()));
             UpgradeProgress.reportEnd("upgrade.success");
 
             if (scriptData.clientSideScript != null) {
                 UpgradeProgress.reportStart("upgrade.scripted.auth.client.script.start",
                         scriptData.clientSideScript.getName(), realm);
-                service.create(scriptData.clientSideScript);
+                service.create(scriptData.clientSideScript, getAdminSubject());
                 attributes.put(CLIENT_SCRIPT, Collections.singleton(scriptData.clientSideScript.getId()));
                 UpgradeProgress.reportEnd("upgrade.success");
             } else {

@@ -17,32 +17,35 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.oauth2.core.Utils.splitScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.OPENID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
-import static org.forgerock.oauth2.core.Utils.splitScope;
 import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
 import static org.forgerock.openam.scripting.ScriptConstants.OIDC_CLAIMS_NAME;
 
-import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -72,26 +75,22 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.security.auth.Subject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 
 /**
  * Provided as extension points to allow the OpenAM OAuth2 provider to customise the requested scope of authorize,
@@ -114,8 +113,6 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final ScriptEvaluator scriptEvaluator;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final ScriptingServiceFactory scriptingServiceFactory;
-
-    private Subject adminSubject;
 
     /**
      * Constructs a new OpenAMScopeValidator.
@@ -381,10 +378,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private ScriptConfiguration getScriptConfiguration(String realm, String scriptId)
             throws org.forgerock.openam.scripting.ScriptException {
 
-        if (adminSubject == null) {
-            adminSubject = SubjectUtils.createSuperAdminSubject();
-        }
-        return scriptingServiceFactory.create(adminSubject, realm).get(scriptId);
+        return scriptingServiceFactory.create(realm).get(scriptId);
     }
 
     /**

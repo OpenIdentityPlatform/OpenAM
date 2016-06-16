@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.conditions.environment;
 
@@ -181,7 +181,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
      * @throws ScriptException if the operation was not successful
      */
     protected ScriptConfiguration getScriptConfiguration(String realm) throws ScriptException {
-        return scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), realm).get(scriptId);
+        return scriptingServiceFactory.create(realm).get(scriptId);
     }
 
     /**

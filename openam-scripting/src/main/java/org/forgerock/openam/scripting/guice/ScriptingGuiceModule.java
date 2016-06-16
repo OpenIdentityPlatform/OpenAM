@@ -16,21 +16,21 @@
 
 package org.forgerock.openam.scripting.guice;
 
-import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
+import static org.forgerock.openam.scripting.ScriptConstants.AUTHENTICATION_SERVER_SIDE_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.OIDC_CLAIMS_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.POLICY_CONDITION_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPTING_HTTP_CLIENT_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OIDC_CLAIMS;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
 import org.forgerock.http.client.RestletHttpClient;
@@ -45,17 +45,16 @@ import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
 import org.forgerock.openam.scripting.api.http.GroovyHttpClient;
 import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
-import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
-import org.forgerock.openam.scripting.service.ScriptConfigurationService;
-import org.forgerock.openam.scripting.service.ScriptingService;
-import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 
 
 /**
@@ -72,16 +71,6 @@ public class ScriptingGuiceModule extends AbstractModule {
 
         bind(Logger.class).annotatedWith(Names.named("ScriptLogger"))
                 .toInstance(logger);
-
-        install(new FactoryModuleBuilder()
-                .implement(new TypeLiteral<ScriptingService>() {},
-                        ScriptConfigurationService.class)
-                .build(new TypeLiteral<ScriptingServiceFactory>() {}));
-
-        install(new FactoryModuleBuilder()
-                .implement(new TypeLiteral<ScriptingDataStore>() {},
-                        ScriptConfigurationDataStore.class)
-                .build(new TypeLiteral<ScriptingDataStoreFactory>() {}));
 
         bind(StandardScriptEngineManager.class)
                 .annotatedWith(Names.named(AUTHENTICATION_SERVER_SIDE.name()))

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting.rest;
 
@@ -140,8 +140,8 @@ public class ScriptResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         try {
              final ScriptConfiguration sc = serviceFactory
-                    .create(getContextSubject(context), getRealm(context))
-                    .create(fromJson(request.getContent()));
+                    .create(getRealm(context))
+                    .create(fromJson(request.getContent()), getContextSubject(context));
             return newResultPromise(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
         } catch (ScriptException se) {
             return exceptionMappingHandler.handleError(context, request, se).asPromise();
@@ -153,7 +153,7 @@ public class ScriptResource extends RealmAwareResource {
             DeleteRequest request) {
 
         try {
-            serviceFactory.create(getContextSubject(context), getRealm(context)).delete(resourceId);
+            serviceFactory.create(getRealm(context)).delete(resourceId);
             return newResultPromise(newResourceResponse(resourceId, null, json(object())));
         } catch (ScriptException se) {
             return exceptionMappingHandler.handleError(context, request, se).asPromise();
@@ -167,11 +167,11 @@ public class ScriptResource extends RealmAwareResource {
         try {
             final Set<ScriptConfiguration> configs;
             if (filter == null) {
-                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).getAll();
+                configs = serviceFactory.create(getRealm(context)).getAll();
             } else {
                 QueryFilter<String> stringQueryFilter = filter.accept(
                         new QueryByStringFilterConverter(), null);
-                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
+                configs = serviceFactory.create(getRealm(context)).get(stringQueryFilter);
             }
 
             List<ResourceResponse> results = new ArrayList<>();
@@ -192,7 +192,7 @@ public class ScriptResource extends RealmAwareResource {
             ReadRequest request) {
         try {
             return newResultPromise(newResourceResponse(resourceId, null, asJson(
-                    serviceFactory.create(getContextSubject(context), getRealm(context)).get(resourceId))));
+                    serviceFactory.create(getRealm(context)).get(resourceId))));
         } catch (ScriptException se) {
             return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }
@@ -203,8 +203,8 @@ public class ScriptResource extends RealmAwareResource {
             UpdateRequest request) {
         try {
             return newResultPromise(newResourceResponse(resourceId, null, asJson(serviceFactory
-                    .create(getContextSubject(context), getRealm(context))
-                    .update(fromJson(request.getContent(), resourceId)))));
+                    .create(getRealm(context))
+                    .update(fromJson(request.getContent(), resourceId), getContextSubject(context)))));
         } catch (ScriptException se) {
             return exceptionMappingHandler.handleError(context, request, se).asPromise();
         }

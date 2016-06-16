@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting.rest;
 
@@ -19,6 +19,8 @@ import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
 import static org.forgerock.json.resource.ResourceException.CONFLICT;
 import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.forgerock.json.resource.ResourceException.FORBIDDEN;
+import static org.forgerock.json.resource.ResourceException.NOT_FOUND;
+import static org.forgerock.json.resource.ResourceException.NOT_SUPPORTED;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
@@ -109,7 +111,7 @@ public class ScriptExceptionMappingHandler implements ExceptionMappingHandler<Sc
             ERROR_CODE_MAP.put(MISSING_SCRIPT_CONTEXT, BAD_REQUEST);
             ERROR_CODE_MAP.put(SCRIPT_NAME_EXISTS, CONFLICT);
             ERROR_CODE_MAP.put(SCRIPT_UUID_EXISTS, INTERNAL_ERROR);
-            ERROR_CODE_MAP.put(SCRIPT_UUID_NOT_FOUND, BAD_REQUEST);
+            ERROR_CODE_MAP.put(SCRIPT_UUID_NOT_FOUND, NOT_FOUND);
             ERROR_CODE_MAP.put(FILTER_BOOLEAN_LITERAL_FALSE, BAD_REQUEST);
             ERROR_CODE_MAP.put(FILTER_EXTENDED_MATCH, BAD_REQUEST);
             ERROR_CODE_MAP.put(FILTER_GREATER_THAN, BAD_REQUEST);

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.scripting.rest;
 
@@ -49,8 +49,6 @@ import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.openam.scripting.StandardScriptValidator;
-import org.forgerock.openam.scripting.rest.ScriptExceptionMappingHandler;
-import org.forgerock.openam.scripting.rest.ScriptResource;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
@@ -82,7 +80,7 @@ public class ScriptResourceTest {
     private class MockScriptingService implements ScriptingService {
 
         @Override
-        public ScriptConfiguration create(ScriptConfiguration config) throws ScriptException {
+        public ScriptConfiguration create(ScriptConfiguration config, Subject subject) throws ScriptException {
             return config;
         }
 
@@ -107,7 +105,7 @@ public class ScriptResourceTest {
         }
 
         @Override
-        public ScriptConfiguration update(ScriptConfiguration config) throws ScriptException {
+        public ScriptConfiguration update(ScriptConfiguration config, Subject subject) throws ScriptException {
             return config;
         }
     }
@@ -118,7 +116,7 @@ public class ScriptResourceTest {
         Logger logger = mock(Logger.class);
         ScriptingService scriptingService = new MockScriptingService();
         ScriptingServiceFactory serviceFactory = mock(ScriptingServiceFactory.class);
-        when(serviceFactory.create(any(Subject.class), anyString())).thenReturn(scriptingService);
+        when(serviceFactory.create(anyString())).thenReturn(scriptingService);
         ExceptionMappingHandler<ScriptException, ResourceException> errorHandler = new ScriptExceptionMappingHandler();
         scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,
                 new StandardScriptValidator(new StandardScriptEngineManager()));

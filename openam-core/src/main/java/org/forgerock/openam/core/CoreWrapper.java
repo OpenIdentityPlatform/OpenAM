@@ -35,6 +35,8 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * A wrapper around core utility class like, {@link AMAuthUtils} and {@link IdUtils} to facilitate testing.
@@ -265,5 +267,16 @@ public class CoreWrapper {
      */
     public AMIdentity getIdentity(String username, String realm) {
         return IdUtils.getIdentity(username, realm);
+    }
+
+    /**
+     * Gets a {@link com.sun.identity.sm.ServiceConfigManager} for the given service.
+     * @param serviceName The name of the service.
+     * @param token The token to use.
+     * @return The service config manager.
+     */
+    public ServiceConfigManager getServiceConfigManager(String serviceName, SSOToken token)
+            throws SSOException, SMSException {
+        return new ServiceConfigManager(serviceName, token);
     }
 }
