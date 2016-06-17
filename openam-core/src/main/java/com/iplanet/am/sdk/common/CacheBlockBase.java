@@ -219,8 +219,7 @@ public abstract class CacheBlockBase {
      * @return true if cache expiry is enabled and the cache has expired
      */
     public boolean hasExpiredAndUpdated() {
-
-        writeLock.lock();
+        readLock.lock();
         try {
             // We need to have the isExpired variable to make sure
             // the notifications are sent only once.
@@ -236,21 +235,31 @@ public abstract class CacheBlockBase {
                 }
                 long elapsedTime = currentTimeMillis() - lastModifiedTime;
                 if (elapsedTime >= expirationTime) { // Expired
-                    // Send notifications first to the SDK listeners
-                    isExpired = true;
-                    clear();
-                    if (getDebug().messageEnabled()) {
-                        getDebug().message(
-                                "CacheBlock.hasExpiredAndUpdated(): "
-                                        + "Entry with DN " + entryDN + " expired.");
+                    readLock.unlock();
+                    writeLock.lock();
+                    try {
+                        elapsedTime = currentTimeMillis() - lastModifiedTime;
+                        if (!isExpired && elapsedTime >= expirationTime) { // Expired
+                            // Send notifications first to the SDK listeners
+                            isExpired = true;
+                            clear();
+                            if (getDebug().messageEnabled()) {
+                                getDebug().message(
+                                        "CacheBlock.hasExpiredAndUpdated(): "
+                                                + "Entry with DN " + entryDN + " expired.");
+                            }
+                            // FIXME: AMObjectImpl.sendExpiryEvent(entryDN, sourceType);
+                            // TODO: Add object notification mechanism
+                        }
+                        readLock.lock();
+                    } finally {
+                        writeLock.unlock();
                     }
-                    // FIXME: AMObjectImpl.sendExpiryEvent(entryDN, sourceType);
-                    // TODO: Add object notification mechanism
                 }
             }
             return isExpired;
         } finally {
-            writeLock.unlock();
+            readLock.unlock();
         }
     }
 
