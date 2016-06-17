@@ -29,8 +29,8 @@ define([
 
     // jquery dependencies
     "sortable"
-], function ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView,
-             OperatorRulesView, LegacyListItemView) {
+], ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView, OperatorRulesView,
+    LegacyListItemView) => {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ManageRulesTemplate.html",
@@ -65,7 +65,7 @@ define([
                     "ConditionAttrEnum", "ConditionAttrString", "ConditionAttrBoolean", "ConditionAttrArray",
                     "ConditionAttrObject", "ConditionAttrTime", "ConditionAttrDay", "ConditionAttrDate",
                     "OperatorRulesTemplate", "EditSubjectTemplate", "EditEnvironmentTemplate"
-                ], function (filename) {
+                ], (filename) => {
                     return `templates/admin/views/realms/authorization/policies/conditions/${filename}.html`;
                 })
             );
@@ -151,6 +151,13 @@ define([
                 exclude: ".item-button-panel, li.editing",
                 delay: 100,
 
+                onMousedown ($item, _super, event) {
+                    event.stopPropagation();
+                    if (!event.target.nodeName.match(/^(input|select|textarea)$/i)) {
+                        event.preventDefault();
+                        return true;
+                    }
+                },
                 // set item relative to cursor position
                 onDragStart (item, container) {
                     var offset = item.offset(),
