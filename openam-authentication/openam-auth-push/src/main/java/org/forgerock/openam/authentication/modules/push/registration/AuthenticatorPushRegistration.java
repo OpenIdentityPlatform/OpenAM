@@ -284,6 +284,11 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         } catch (CoreTokenException e) {
             DEBUG.warning("Removing token from CTS failed.", e);
         }
+        return finaliseSuccess();
+    }
+
+    private int finaliseSuccess() throws AuthLoginException {
+        storeUsername(amIdentityPrincipal.getName());
         saveDeviceDetailsUnderUserAccount();
         return STATE_CONFIRMATION;
     }
@@ -296,8 +301,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
                 coreTokenService.deleteAsync(messageId);
 
                 if (ctsValue) {
-                    storeUsername(amIdentityPrincipal.getName());
-                    return ISAuthConstants.LOGIN_SUCCEED;
+                    return finaliseSuccess();
                 } else { //denied
                     throw failedAsLoginException();
                 }
@@ -392,7 +396,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         } catch (MalformedURLException e) {
             throw new ServerEntryNotFoundException(e);
         }
-        String localServerURL = url.toString() + "/json/";
+        String localServerURL = url.toString() + "/json";
         return Base64url.encode((localServerURL + component).getBytes());
     }
 

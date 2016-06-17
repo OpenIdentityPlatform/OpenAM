@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
+import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.sns.SnsMessageResource;
 
 /**
@@ -30,6 +30,7 @@ public class SnsMessageResourceFactory {
 
     private final CTSPersistentStore coreTokenService;
     private final JSONSerialisation jsonSerialisation;
+    private final PushNotificationService pushNotificationService;
     private final Debug debug;
 
     /**
@@ -38,22 +39,23 @@ public class SnsMessageResourceFactory {
      * @param coreTokenService The CTS instance to utilise.
      * @param jsonSerialisation For serializing down to the CTS.
      * @param debug For logging purposes.
+     * @param pushNotificationService for retrieving the appropriate message dispatcher for this realm.
      */
     @Inject
     public SnsMessageResourceFactory(CTSPersistentStore coreTokenService, JSONSerialisation jsonSerialisation,
-                                     @Named("frRest") Debug debug) {
+                                     @Named("frRest") Debug debug, PushNotificationService pushNotificationService) {
         this.coreTokenService = coreTokenService;
         this.jsonSerialisation = jsonSerialisation;
+        this.pushNotificationService = pushNotificationService;
         this.debug = debug;
     }
 
     /**
      * Generates a new SnsMessageResource.
      *
-     * @param messageDispatcher The MessageDispatcher which backs this message resource.
      * @return a new SnsMessageResource.
      */
-    public SnsMessageResource produce(MessageDispatcher messageDispatcher) {
-        return new SnsMessageResource(coreTokenService, messageDispatcher, jsonSerialisation, debug);
+    public SnsMessageResource produce() {
+        return new SnsMessageResource(coreTokenService, pushNotificationService, jsonSerialisation, debug);
     }
 }

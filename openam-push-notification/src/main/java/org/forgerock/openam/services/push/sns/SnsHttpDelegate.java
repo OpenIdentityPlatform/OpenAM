@@ -93,7 +93,7 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public String getAuthServiceLocation() {
-        return ROUTE + "?_action=authenticate";
+        return (realm.endsWith("/") ? realm : realm + "/") + ROUTE + "?_action=authenticate";
     }
 
     @Override
@@ -109,7 +109,7 @@ public class SnsHttpDelegate implements PushNotificationDelegate {
 
     @Override
     public String getRegServiceLocation() {
-        return ROUTE + "?_action=register";
+        return (realm.endsWith("/") ? realm : realm + "/") + ROUTE + "?_action=register";
     }
 
     @Override

@@ -25,7 +25,6 @@ import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationServiceConfig;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.sns.utils.SnsClientFactory;
-import org.forgerock.openam.services.push.sns.utils.SnsMessageResourceFactory;
 
 /**
  * Produces SnsHttpDelegates matching the PushNotificationServiceFactory interface.
@@ -34,16 +33,16 @@ public class SnsHttpDelegateFactory implements PushNotificationDelegateFactory {
 
     private final static Key<Router> KEY = Key.get(Router.class, Names.named("CrestRealmRouter"));
 
-    private final SnsMessageResourceFactory messageResourceFactory;
     private final SnsPushMessageConverter pushMessageConverter;
+    private final SnsMessageResource snsMessageResource;
     private final Router router;
 
     /**
      * Default constructor sets the debug for passing into produced delegates.
      */
     public SnsHttpDelegateFactory() {
-        messageResourceFactory = InjectorHolder.getInstance(SnsMessageResourceFactory.class);
         pushMessageConverter  = InjectorHolder.getInstance(SnsPushMessageConverter.class);
+        snsMessageResource = InjectorHolder.getInstance(SnsMessageResource.class);
         router = InjectorHolder.getInstance(KEY);
     }
 
@@ -52,8 +51,7 @@ public class SnsHttpDelegateFactory implements PushNotificationDelegateFactory {
                                               MessageDispatcher messageDispatcher)
             throws PushNotificationException {
         AmazonSNSClient service = new SnsClientFactory().produce(config);
-        SnsMessageResource messageResource = messageResourceFactory.produce(messageDispatcher);
-        return new SnsHttpDelegate(service, config, router, messageResource, pushMessageConverter, realm,
+        return new SnsHttpDelegate(service, config, router, snsMessageResource, pushMessageConverter, realm,
                 messageDispatcher);
     }
 

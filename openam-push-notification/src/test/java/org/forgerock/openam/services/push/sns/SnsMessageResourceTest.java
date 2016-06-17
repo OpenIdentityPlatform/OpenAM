@@ -38,6 +38,8 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.services.push.PushNotificationException;
+import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
 import org.forgerock.util.promise.Promise;
@@ -46,19 +48,27 @@ import org.testng.annotations.Test;
 
 public class SnsMessageResourceTest {
 
-
     SnsMessageResource messageResource;
+    PushNotificationService mockService;
     MessageDispatcher mockDispatcher;
     CTSPersistentStore mockCTS;
 
     @BeforeMethod
     public void theSetUp() { //you need this
 
-        mockDispatcher = mock(MessageDispatcher.class);
+        mockService = mock(PushNotificationService.class);
         Debug mockDebug = mock(Debug.class);
         mockCTS = mock(CTSPersistentStore.class);
+        mockDispatcher = mock(MessageDispatcher.class);
+
+        try {
+            given(mockService.getMessageDispatcher(anyString())).willReturn(mockDispatcher);
+        } catch (PushNotificationException e) {
+            //does not happen
+        }
+
         JSONSerialisation mockSerialisation = mock(JSONSerialisation.class);
-        messageResource = new SnsMessageResource(mockCTS, mockDispatcher, mockSerialisation, mockDebug);
+        messageResource = new SnsMessageResource(mockCTS, mockService, mockSerialisation, mockDebug);
     }
 
     @Test

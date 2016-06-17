@@ -22,6 +22,7 @@ import static org.forgerock.util.promise.Promises.*;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -39,6 +40,8 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.services.push.PushNotificationException;
+import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
@@ -69,7 +72,7 @@ import org.forgerock.util.promise.Promise;
 @RequestHandler
 public class SnsMessageResource {
 
-    private final MessageDispatcher messageDispatcher;
+    private final PushNotificationService pushNotificationService;
     private final Debug debug;
     private final CTSPersistentStore coreTokenService;
     private final JSONSerialisation jsonSerialisation;
@@ -78,14 +81,15 @@ public class SnsMessageResource {
      * Generate a new SnsMessageResource using the provided MessageDispatcher.
      * @param coreTokenService A copy of the core token services - messages are dropped on to this for use in clustered
      *                         environments.
-     * @param messageDispatcher Used to deliver messages received at this endpoint to their appropriate locations
-     *                          within OpenAM.
+     * @param pushNotificationService Used to get the message dispatcher, usde to deliver messages received at this
+     *                         endpoint to their appropriate locations within OpenAM.
      * @param jsonSerialisation Used to perform the serialisation necessary for inserting tokens into the CTS.
      * @param debug For writing out debug messages.
      */
-    public SnsMessageResource(CTSPersistentStore coreTokenService, MessageDispatcher messageDispatcher,
+    @Inject
+    public SnsMessageResource(CTSPersistentStore coreTokenService, PushNotificationService pushNotificationService,
                               JSONSerialisation jsonSerialisation, @Named("frPush") Debug debug) {
-        this.messageDispatcher = messageDispatcher;
+        this.pushNotificationService = pushNotificationService;
         this.jsonSerialisation = jsonSerialisation;
         this.debug = debug;
         this.coreTokenService = coreTokenService;
@@ -137,8 +141,8 @@ public class SnsMessageResource {
         }
 
         try {
-            messageDispatcher.handle(messageId, actionContent);
-        } catch (NotFoundException e) {
+            pushNotificationService.getMessageDispatcher(realm).handle(messageId, actionContent);
+        } catch (NotFoundException | PushNotificationException e) {
             debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
             try {
                 attemptFromCTS(messageId, actionContent);
