@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting.guice;
@@ -27,14 +27,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.client.RestletHttpClient;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -53,6 +52,7 @@ import org.forgerock.openam.scripting.service.ScriptConfigurationService;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
+import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,13 +103,9 @@ public class ScriptingGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(SupportedScriptingLanguage.GROOVY.name()))
                 .to(GroovyHttpClient.class);
 
-        try {
-            bind(Client.class)
-                    .annotatedWith(Names.named("ScriptingHttpClient"))
-                    .toInstance(new Client(new HttpClientHandler()));
-        } catch (HttpApplicationException e) {
-            logger.error("Failed to create HttpClientHandler", e);
-        }
+        bind(Client.class)
+                .annotatedWith(Names.named(SCRIPTING_HTTP_CLIENT_NAME))
+                .toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
     }
 
     /**

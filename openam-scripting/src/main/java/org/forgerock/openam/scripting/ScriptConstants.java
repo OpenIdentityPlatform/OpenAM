@@ -69,6 +69,7 @@ public final class ScriptConstants {
     public static final String AUTHENTICATION_SERVER_SIDE_NAME = "AUTHENTICATION_SERVER_SIDE";
     public static final String POLICY_CONDITION_NAME = "POLICY_CONDITION";
     public static final String OIDC_CLAIMS_NAME = "OIDC_CLAIMS";
+    public static final String SCRIPTING_HTTP_CLIENT_NAME = "ScriptingHttpClient";
 
     /**
      * The context in which a script will be used.

@@ -18,6 +18,7 @@ package org.forgerock.openam.audit.events.handlers;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,11 +29,14 @@ import org.forgerock.audit.handlers.elasticsearch.ElasticsearchAuditEventHandler
 import org.forgerock.audit.handlers.elasticsearch.ElasticsearchAuditEventHandlerConfiguration.ConnectionConfiguration;
 import org.forgerock.audit.handlers.elasticsearch.ElasticsearchAuditEventHandlerConfiguration.EventBufferingConfiguration;
 import org.forgerock.audit.handlers.elasticsearch.ElasticsearchAuditEventHandlerConfiguration.IndexMappingConfiguration;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -67,7 +71,23 @@ public final class ElasticsearchAuditEventHandlerFactory implements AuditEventHa
 
     private Client createClient() throws AuditException {
         try {
-            return new Client(new HttpClientHandler());
+            final HttpClientHandler httpClientHandler = new HttpClientHandler();
+
+            // Register listener to tidy up resulting threads on shutdown
+            ShutdownManager shutdownManager = InjectorHolder.getInstance(ShutdownManager.class);
+            shutdownManager.addShutdownListener(new ShutdownListener() {
+                @Override
+                public void shutdown() {
+                    try {
+                        httpClientHandler.close();
+                    } catch (IOException e) {
+                        // Abandon attempt to close the handler. Handler may have already been closed.
+                        DEBUG.message("Unable to close the HttpClientHandler", e);
+                    }
+                }
+            });
+
+            return new Client(httpClientHandler);
         } catch (HttpApplicationException e) {
             throw new AuditException("Failed to create HttpClientHandler", e);
         }

@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2010-2015 ForgeRock AS.
+ * Copyright 2010-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting.api.http;
+
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPTING_HTTP_CLIENT_NAME;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,7 +48,7 @@ public class JavaScriptHttpClient extends RestletHttpClient {
     private final Client client;
 
     @Inject
-    public JavaScriptHttpClient(@Named("ScriptingHttpClient") Client client) {
+    public JavaScriptHttpClient(@Named(SCRIPTING_HTTP_CLIENT_NAME) Client client) {
         this.client = client;
     }
 

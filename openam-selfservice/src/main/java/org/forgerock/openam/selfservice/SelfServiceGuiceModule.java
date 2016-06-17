@@ -23,13 +23,12 @@ import static org.forgerock.openam.selfservice.config.beans.UserRegistrationCons
 import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourcePath;
@@ -40,6 +39,7 @@ import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
+import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
@@ -68,13 +68,9 @@ public final class SelfServiceGuiceModule extends PrivateModule {
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
         bind(KbaResource.class);
 
-        try {
-            bind(Client.class)
-                    .annotatedWith(SelfService.class)
-                    .toInstance(new Client(new HttpClientHandler()));
-        } catch (HttpApplicationException haE) {
-            throw new HttpClientCreationException("Unable to create http client", haE);
-        }
+        bind(Client.class)
+                .annotatedWith(SelfService.class)
+                .toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
 
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { });
