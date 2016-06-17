@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ *
+ * Portions Copyright 2008 Sun Microsystems Inc.
  */
 package com.sun.identity.install.tools.util;
 
