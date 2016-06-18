@@ -24,7 +24,7 @@
  *
  * $Id: SAML2MetaManager.java,v 1.18 2009/10/28 23:58:58 exu Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.meta;
@@ -38,6 +38,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
+
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.COTConstants;
@@ -1098,28 +1101,24 @@ public class SAML2MetaManager {
     {
         try {
             if (eConfig != null) {
-                List elist = eConfig.
-                    getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
-                // use first one to add the entity to COT
-                BaseConfigType config = (BaseConfigType)elist.iterator().next();
+                List elist = eConfig.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                // Use first one to add the entity to COT, if this is present in the config
+                // Typically found in the proprietary extended metadata, not standard SAML2 entity metadata
+                BaseConfigType config = (BaseConfigType) elist.iterator().next();
                 Map attr = SAML2MetaUtils.getAttributes(config);
-                List cotAttr = (List) attr.get(SAML2Constants.COT_LIST);
-                List cotList = new ArrayList(cotAttr); 
-                if ((cotList != null) && !cotList.isEmpty()) {
-                    for (Iterator iter = cotList.iterator(); 
-                        iter.hasNext();) {
+                List cotList = (List) attr.get(SAML2Constants.COT_LIST);
+                if (CollectionUtils.isNotEmpty(cotList)) {
+                    for (Iterator iter = cotList.iterator(); iter.hasNext();) {
                         String cotName = ((String) iter.next()).trim();
-                        if ((cotName != null) && (!cotName.equals(""))) { 
-                            cotm.addCircleOfTrustMember(realm,
-                            cotName, COTConstants.SAML2, entityId, false);
+                        if (StringUtils.isNotEmpty(cotName)) {
+                            cotm.addCircleOfTrustMember(realm, cotName, COTConstants.SAML2, entityId, false);
                         }
-                     }               
-                 }
-             }
-         } catch (Exception e) {
-             debug.error("SAML2MetaManager.addToCircleOfTrust:" +
-                   "Error while adding entity" + entityId + "to COT.",e);
-         }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            debug.error("SAML2MetaManager.addToCircleOfTrust: Error while adding entity " + entityId + " to COT.", e);
+        }
     }
 
     /**
