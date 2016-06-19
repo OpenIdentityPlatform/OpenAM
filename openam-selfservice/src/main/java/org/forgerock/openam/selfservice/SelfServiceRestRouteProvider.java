@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.selfservice;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.USERS;
+import static org.forgerock.openam.audit.AuditConstants.Component.SELF_SERVICE;
 import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import com.google.inject.Key;
@@ -40,6 +41,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter
                 .route("/selfservice/userRegistration")
+                .auditAs(SELF_SERVICE)
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
@@ -49,6 +51,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
 
         realmRouter
                 .route("/selfservice/forgottenPassword")
+                .auditAs(SELF_SERVICE)
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
@@ -58,6 +61,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
 
         realmRouter
                 .route("/selfservice/forgottenUsername")
+                .auditAs(SELF_SERVICE)
                 .authenticateWith(
                         ssoToken()
                                 .exceptRead()
@@ -73,6 +77,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
 
         realmRouter
                 .route("selfservice/kba")
+                .auditAs(SELF_SERVICE)
                 .authenticateWith(ssoToken())
                 .toSingleton(KbaResource.class);
     }

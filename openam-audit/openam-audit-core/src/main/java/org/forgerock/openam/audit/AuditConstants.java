@@ -116,7 +116,9 @@ public final class AuditConstants {
         /** Jato audit event component. */
         JATO("jato"),
         /** SAML2 audit event component. */
-        SAML2("SAML2");
+        SAML2("SAML2"),
+        /** Self Service audit event component. */
+        SELF_SERVICE("Self Service");
 
         private final String name;
 
