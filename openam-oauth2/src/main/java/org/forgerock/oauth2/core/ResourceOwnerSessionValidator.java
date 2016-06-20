@@ -99,6 +99,7 @@ import org.restlet.ext.servlet.ServletUtils;
 public class ResourceOwnerSessionValidator {
 
     private static final Debug logger = Debug.getInstance("OAuth2Provider");
+    private static final String UNMATCHED_ACR_VALUE = "0";
     private final SSOTokenManager ssoTokenManager;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ClientDAO clientDAO;
@@ -305,18 +306,19 @@ public class ResourceOwnerSessionValidator {
         Set<String> acrValues = new HashSet<>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
+        final Request req = request.getRequest();
         boolean matched = false;
         for (String acr : acrValues) {
             if (acrMap.containsKey(acr)) {
                 if (serviceUsed.equals(acrMap.get(acr).getName())) {
-                    final Request req = request.getRequest();
                     req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, acr);
                     matched = true;
+                    break;
                 }
             }
         }
         if (!matched) {
-            throw authenticationRequired(request);
+            req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, UNMATCHED_ACR_VALUE);
         }
     }
 
