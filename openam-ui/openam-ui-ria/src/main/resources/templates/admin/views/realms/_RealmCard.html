@@ -7,12 +7,12 @@
             <ul class="dropdown-menu pull-left" role="menu">
                 <li><a href="{{routeTo 'realmEdit' path}}"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
                 {{#if active}}
-                    <li><a href="#" data-toggle-realm><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
+                    <li {{#if isTopLevelRealm}} class="disabled" {{/if}}><a href="#" data-toggle-realm><i class="fa fa-ban"></i> {{t "common.form.deactivate"}}</a></li>
                 {{else}}
-                    <li><a href="#" data-toggle-realm><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
+                    <li {{#if isTopLevelRealm}} class="disabled" {{/if}}><a href="#" data-toggle-realm><i class="fa fa-check"></i> {{t "common.form.activate"}}</a></li>
                 {{/if}}
                 <li class="divider"></li>
-                <li {{#unless canDelete}} class="disabled" {{/unless}}><a href="#" data-delete-realm ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+                <li {{#if isTopLevelRealm}} class="disabled" {{/if}}><a href="#" data-delete-realm ><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
             </ul>
         </div>
         <a href="{{routeTo 'realmDefault' path}}">
@@ -20,7 +20,7 @@
                 <div class="card-icon-circle bg-primary">
                     <i class="fa fa-cloud"></i>
                 </div>
-                <h3 class="card-name text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{{name}}">{{name}}</h3>    
+                <h3 class="card-name text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{{name}}">{{name}}</h3>
                 <div class="card-subtext">
                     <div class="realm-card-path">{{path}}</div>
                     <div class="realm-card-aliases am-text-lines-two small">

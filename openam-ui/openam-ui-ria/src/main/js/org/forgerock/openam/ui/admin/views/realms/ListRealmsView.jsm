@@ -58,7 +58,7 @@ class ListRealmsView extends AbstractView {
                 }
             }];
 
-        if (!realm.canDelete) {
+        if (realm.isTopLevelRealm) {
             return false;
         }
 
@@ -114,8 +114,8 @@ class ListRealmsView extends AbstractView {
             }
         });
     }
-    canRealmBeDeleted (realm) {
-        return realm.path === "/" ? false : true;
+    isTopLevelRealm (name) {
+        return name === "/";
     }
     render (args, callback) {
         var self = this;
@@ -131,7 +131,7 @@ class ListRealmsView extends AbstractView {
             NavigationHelper.populateRealmsDropdown(data);
 
             _.each(self.data.realms, (realm) => {
-                realm.canDelete = self.canRealmBeDeleted(realm);
+                realm.isTopLevelRealm = self.isTopLevelRealm(realm.path);
                 self.data.allRealmPaths.push(realm.path);
             });
 
@@ -188,6 +188,9 @@ class ListRealmsView extends AbstractView {
         var self = this,
             realm = this.getRealmFromEvent(event);
 
+        if (realm.isTopLevelRealm) {
+            return false;
+        }
         realm.active = !realm.active;
         RealmsService.realms.update(realm).then(null, (response) => {
             Messages.addMessage({

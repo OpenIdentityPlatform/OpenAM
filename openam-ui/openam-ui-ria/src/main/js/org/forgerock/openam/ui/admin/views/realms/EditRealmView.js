@@ -55,6 +55,10 @@ define([
         return false;
     }
 
+    function isTopLevelRealm (name) {
+        return name === "/";
+    }
+
     function validateRealmName () {
         let valid = false;
         const realmName = $("input[name=\"root[name]\"]").val();
@@ -130,6 +134,9 @@ define([
                         // Once created, it should not be possible to edit a realm's name or who it's parent is.
                         data.schema.properties.name.readonly = true;
                         data.schema.properties.parentPath.readonly = true;
+                        if (isTopLevelRealm(data.values.name)) {
+                            data.schema.properties.active.readonly = true;
+                        }
 
                         this.toggleSubmitButton(true);
                     }
