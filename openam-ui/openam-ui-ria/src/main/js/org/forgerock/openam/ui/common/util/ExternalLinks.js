@@ -14,13 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-/*global define*/
-
 define([
     "lodash"
 ], (_) => {
-
-    const backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13/";
+    const backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13.5/";
 
     return {
         backstage: {
