@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
@@ -79,7 +80,11 @@ public class UserDevicesDao {
             Set<String> set = (Set<String>) identity.getAttribute(attrName);
 
             for (String profile : set) {
-                devices.add(deviceSerialisation.stringToDeviceProfile(profile));
+                try {
+                    devices.add(deviceSerialisation.stringToDeviceProfile(profile));
+                } catch (JsonException jve) {
+                    //RTE, generally indicative that the profile attribute name has changed (still return devices set)
+                }
             }
 
             return devices;

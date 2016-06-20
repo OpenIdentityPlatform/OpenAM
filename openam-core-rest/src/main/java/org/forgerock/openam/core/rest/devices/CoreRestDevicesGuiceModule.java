@@ -27,6 +27,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import java.security.AccessController;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesDao;
 import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
@@ -96,6 +97,7 @@ public class CoreRestDevicesGuiceModule extends AbstractModule {
     @Provides
     @Named(AuthenticatorOathServiceFactory.FACTORY_NAME)
     @Inject
+    @Singleton
     AuthenticatorDeviceServiceFactory<AuthenticatorOathService> getAuthenticatorOathServiceFactory(
             @Named("frRest") Debug debug,
             @Named(AuthenticatorOathService.SERVICE_NAME) ServiceConfigManager serviceConfigManager) {
@@ -106,6 +108,7 @@ public class CoreRestDevicesGuiceModule extends AbstractModule {
     @Provides
     @Named(AuthenticatorPushServiceFactory.FACTORY_NAME)
     @Inject
+    @Singleton
     AuthenticatorDeviceServiceFactory<AuthenticatorPushService> getAuthenticatorPushServiceFactory(
             @Named("frRest") Debug debug,
             @Named(AuthenticatorPushService.SERVICE_NAME) ServiceConfigManager serviceConfigManager) {

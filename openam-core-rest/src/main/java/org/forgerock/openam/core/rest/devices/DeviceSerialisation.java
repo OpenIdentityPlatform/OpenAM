@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.devices;
 
+import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 
 /**
@@ -37,6 +38,7 @@ public interface DeviceSerialisation {
      * @param value the value to parse back into a JSON device profile.
      * @return the JSON device profile.
      * @throws IllegalArgumentException if the value cannot be parsed as a string.
+     * @throws JsonException if the value cannot be parsed as Json.
      */
     JsonValue stringToDeviceProfile(String value);
 }

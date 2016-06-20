@@ -45,6 +45,7 @@ public class AuthenticatorDeviceServiceFactory<T extends DeviceService> {
      *
      * @param debug For writing debug messages.
      * @param serviceConfigManager To communicate with the data store.
+     * @param factory For producing DeviceServices.
      */
     public AuthenticatorDeviceServiceFactory(Debug debug, ServiceConfigManager serviceConfigManager,
                                              DeviceServiceFactory<T> factory) {
