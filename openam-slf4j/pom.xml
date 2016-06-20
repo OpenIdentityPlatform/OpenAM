@@ -40,5 +40,9 @@
             <groupId>org.forgerock.commons.guava</groupId>
             <artifactId>forgerock-guava-cache</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-server-legacy</artifactId>
+        </dependency>
     </dependencies>
 </project>

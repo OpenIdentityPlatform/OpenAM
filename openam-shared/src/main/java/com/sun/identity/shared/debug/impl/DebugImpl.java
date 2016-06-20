@@ -28,7 +28,6 @@
  */
 package com.sun.identity.shared.debug.impl;
 
-import static java.util.Collections.newSetFromMap;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 import static org.forgerock.openam.utils.Time.*;
 
@@ -47,11 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -60,10 +56,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class DebugImpl implements IDebug {
 
     static final Map<String, String> INSTANCE_NAMES = new ConcurrentSkipListMap<>(new WildcardComparator());
-    static final Set<String> SINGLE_INSTANCE_CATEGORY = newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     static {
-        SINGLE_INSTANCE_CATEGORY.add("EmbeddedDJ");
         initProperties();
     }
 

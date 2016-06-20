@@ -29,8 +29,6 @@
 
 package com.sun.identity.shared.debug.impl;
 
-import static com.sun.identity.shared.debug.impl.DebugImpl.*;
-
 import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.IDebugProvider;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
@@ -72,11 +70,6 @@ public class DebugProviderImpl implements IDebugProvider {
      * @return a debug instance
      */
     public synchronized IDebug getInstance(String debugName) {
-
-        String instanceName = INSTANCE_NAMES.get(debugName);
-        if (instanceName != null && SINGLE_INSTANCE_CATEGORY.contains(instanceName)) {
-            debugName = instanceName;
-        }
 
         IDebug debug = debugMap.get(debugName);
         if (debug == null) {
