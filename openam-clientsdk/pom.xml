@@ -164,7 +164,9 @@
                                 <include>com/iplanet/ums/validation/URLValidator*</include>
                                 <include>com/sun/identity/authentication/*</include>
                                 <include>com/sun/identity/authentication/client/**</include>
-                                <include>com/sun/identity/authentication/config/**</include>
+                                <include>com/sun/identity/authentication/config/AMAuthenticationInstance*</include>
+                                <include>com/sun/identity/authentication/config/AMAuthenticationManager*</include>
+                                <include>com/sun/identity/authentication/config/AMConfigurationException*</include>
                                 <include>com/sun/identity/authentication/internal/AuthSSOProvider*</include>
                                 <include>com/sun/identity/authentication/internal/AuthSSOToken*</include>
                                 <include>com/sun/identity/authentication/internal/InvalidAuthContextException*</include>
@@ -217,6 +219,7 @@
                                 <include>com/sun/identity/configuration/SystemProperties*</include>
                                 <include>com/sun/identity/delegation/DelegationManager*</include>
                                 <include>com/sun/identity/delegation/DelegationException*</include>
+                                <include>com/sun/identity/delegation/ResBundleUtils*</include>
                                 <include>com/sun/identity/entitlement/**</include>
                                 <include>com/sun/identity/entity/*</include>
                                 <include>com/sun/identity/idm/*</include>
@@ -243,12 +246,36 @@
                                 <include>com/sun/identity/monitoring/SsoServerIdRepoSvcImpl*</include>
                                 <include>com/sun/identity/monitoring/SsoServerPolicySvc*</include>
                                 <include>com/sun/identity/monitoring/SsoServerPolicySvcImpl*</include>
-                                <include>com/sun/identity/policy/Agen**</include>
-                                <include>com/sun/identity/policy/**</include>
-                                <include>com/sun/identity/policy/client/**</include>
-                                <include>com/sun/identity/policy/interfaces/**</include>
-                                <include>com/sun/identity/policy/remote/**</include>
-                                <include>com/sun/identity/policy/util/**</include>
+
+                                <include>com/sun/identity/policy/ChainedException*</include>
+                                <include>com/sun/identity/policy/Conditions*</include>
+                                <include>com/sun/identity/policy/InvalidFormatException*</include>
+                                <include>com/sun/identity/policy/InvalidNameException*</include>
+                                <include>com/sun/identity/policy/NameAlreadyExistsException*</include>
+                                <include>com/sun/identity/policy/NameNotFoundException*</include>
+                                <include>com/sun/identity/policy/NoPermissionException*</include>
+                                <include>com/sun/identity/policy/Referrals*</include>
+                                <include>com/sun/identity/policy/ResBundleUtils*</include>
+                                <include>com/sun/identity/policy/ResourceIndexManager*</include>
+                                <include>com/sun/identity/policy/ResourceManager*</include>
+                                <include>com/sun/identity/policy/ResponseProviders*</include>
+                                <include>com/sun/identity/policy/ServiceType*</include>
+                                <include>com/sun/identity/policy/ServiceTypeManager*</include>
+                                <include>com/sun/identity/policy/Subjects*</include>
+                                <include>com/sun/identity/policy/ActionSchema*</include>
+                                <include>com/sun/identity/policy/ObjectInUseException*</include>
+                                <include>com/sun/identity/policy/plugins/OrgReferral*</include>
+                                <include>com/sun/identity/policy/plugins/LDAPRoles*</include>
+                                <include>com/sun/identity/policy/plugins/LDAPConnectionPools*</include>
+                                <include>com/sun/identity/policy/plugins/PrefixResourceName*</include>
+                                <include>com/sun/identity/policy/plugins/URLResourceName*</include>
+                                <include>com/sun/identity/policy/remote/PolicyEvaluationException*</include>
+                                <include>com/sun/identity/policy/remote/PolicyRequestHandler*</include>
+                                <include>com/sun/identity/policy/SharedSubject*</include>
+                                <include>com/sun/identity/policy/SubjectEvaluationCache*</include>
+                                <include>com/sun/identity/policy/ValidationErrorHandler*</include>
+                                <include>com/sun/identity/policy/util/PolicyDecisionUtils*</include>
+
                                 <include>com/sun/identity/protocol/**</include>
                                 <include>com/sun/identity/security/AMSecurityPropertiesException*</include>
                                 <include>com/sun/identity/security/AdminTokenAction*</include>
@@ -261,23 +288,23 @@
                                 <include>com/sun/identity/sm/*</include>
                                 <include>com/sun/identity/sm/jaxrpc/**</include>
                                 <include>com/sun/identity/util/**</include>
+
                                 <include>org/forgerock/openam/idm/**</include>
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
                                 <include>org/forgerock/openam/console/base/ConsoleViewBeanBase*</include>
-                                <include>org/forgerock/openam/entitlement/service/ApplicationService*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSaveIndex*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSearchIndex*</include>
                                 <include>org/forgerock/openam/entitlement/utils/EntitlementUtils*</include>
                                 <include>org/forgerock/openam/entitlement/conditions/**</include>
                                 <include>org/forgerock/openam/entitlement/PolicyConstants*</include>
+                                <include>org/forgerock/openam/entitlement/service/ApplicationService*</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
                                 <include>org/forgerock/openam/session/*</include>
                                 <include>org/forgerock/openam/security/whitelist/**</include>
                                 <include>org/forgerock/openam/sso/providers/stateless/*</include>
                                 <include>org/forgerock/openam/upgrade/UpgradeException*</include>
                                 <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
-                                <include>org/forgerock/openam/network/ipv4/**</include>
-                                <include>org/forgerock/openam/network/ipv6/**</include>
+
                                 <include>META-INF/services/org.forgerock.openam.entitlement.ConditionTypeRegistry</include>
                             </includes>
                             <excludes>
