@@ -92,7 +92,7 @@ public class DNUtils {
         if (StringUtils.isNotEmpty(dn) && LDAPUtils.isDN(dn, 1)) {
             try {
                 DN name = DN.valueOf(dn);
-                id = noTypes ? rdnValueFromDn(name) : name.rdn().toString();
+                id = LDAPUtils.unescapeValue(noTypes ? rdnValueFromDn(name) : name.rdn().toString());
             } catch (LocalizedIllegalArgumentException e) {
                 DEBUG.error("DNUtils.isDN: Invalid DN {}", dn, e);
             }

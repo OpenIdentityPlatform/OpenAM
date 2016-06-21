@@ -868,19 +868,21 @@ public class AuthD implements ConfigurationListener {
      */
     public boolean isSuperAdmin(String dn) {
         boolean isAdmin = false;
-        String nDN = DNUtils.normalizeDN(dn);
-        if ((nDN != null) && (superAdmin != null || specialUser != null)) {
-            if (debug.messageEnabled()) {
-                debug.message("passed dn is :" + dn);
-            }
-            if (superAdmin != null) {
+        if (LDAPUtils.isDN(dn)) {
+            String nDN = DNUtils.normalizeDN(dn);
+            if ((nDN != null) && (superAdmin != null || specialUser != null)) {
                 if (debug.messageEnabled()) {
-                    debug.message("normalized super dn is :" + superAdmin);
+                    debug.message("passed dn is :" + dn);
                 }
-                isAdmin = nDN.equals(superAdmin);
-            }
-            if (!isAdmin) {
-                isAdmin = isSpecialUser(nDN);
+                if (superAdmin != null) {
+                    if (debug.messageEnabled()) {
+                        debug.message("normalized super dn is :" + superAdmin);
+                    }
+                    isAdmin = nDN.equals(superAdmin);
+                }
+                if (!isAdmin) {
+                    isAdmin = isSpecialUser(nDN);
+                }
             }
         }
         if (debug.messageEnabled()) {

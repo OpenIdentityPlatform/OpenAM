@@ -205,8 +205,12 @@ public class AMIdentity {
     }
 
     public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type, String orgName) {
-        // escaped name will come in from xxx
-        // but escaped name fails if used in search.
+        // check if name is DN with more than one RDN
+        if (LDAPUtils.isDN(name, 1)) {
+            // escaped name will come in from xxx, but escaped name fails if used in search.
+            name = LDAPUtils.rdnValueFromDn(name);
+        }
+
         name = LDAPUtils.unescapeValue(name);
 
         this.name = name;
@@ -215,11 +219,6 @@ public class AMIdentity {
         this.token = token;
         if (amsdkdn != null && amsdkdn.size() > 0) {
             this.univDN = amsdkdn.toString();
-        }
-
-        // check if name is DN with more than one RDN
-        if (LDAPUtils.isDN(name, 1)) {
-            name = LDAPUtils.rdnValueFromDn(name);
         }
 
         try {
