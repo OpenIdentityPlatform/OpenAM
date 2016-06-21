@@ -133,8 +133,6 @@ define([
         constructor (schema) {
             throwOnNoSchemaRootType(schema);
 
-            schema = cleanJSONSchema(schema);
-
             const hasDefaults = _.has(schema, "properties.defaults");
             const hasDynamic = _.has(schema, "properties.dynamic");
 
@@ -144,6 +142,8 @@ define([
                 if (hasDefaults) { schema = ungroupProperty(schema, "defaults"); }
                 if (hasDynamic) { schema = ungroupProperty(schema, "dynamic"); }
             }
+
+            schema = cleanJSONSchema(schema);
 
             this.raw = Object.freeze(schema);
         }
