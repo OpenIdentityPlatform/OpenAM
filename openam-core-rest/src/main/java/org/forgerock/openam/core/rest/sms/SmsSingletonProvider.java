@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -210,6 +209,8 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         } catch (SMSException | SSOException | IdRepoException e) {
             debug.warning("::SmsSingletonProvider:: {} on Delete", e.getClass().getSimpleName(), e);
             return new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()).asPromise();
+        } catch (NotFoundException e) {
+            return e.asPromise();
         }
     }
 

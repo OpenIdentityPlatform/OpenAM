@@ -17,17 +17,14 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import org.assertj.core.api.Assertions;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.forgerock.openam.rest.RealmContext;
@@ -35,17 +32,19 @@ import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.test.assertj.Conditions;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.*;
 
 
 public class SmsResourceProviderTest {
+
+    private static final String RESOLVED_REALM = "resolvedRealm";
 
     /* This class currently only tests a small number of methods in the SmsResourceProvider Class
      * Do not presume that the current set of mock objects are suitably configured to test additional methods
@@ -62,15 +61,22 @@ public class SmsResourceProviderTest {
     @Mock
     private Debug debug;
     @Mock
-    private Context theContext;
+    private Context mockContext;
     @Mock
-    private RealmContext realmContext;
+    private RealmContext mockRealmContext;
     @Mock
     private LocaleContext localeContext;
 
+    @Mock
+    private ServiceConfigManager mockServiceConfigManager;
+
+    @Mock
+    private ServiceConfig mockServiceConfig;
+    @Mock
+    private ServiceConfig mockServiceSubConfig;
+
     private Locale local = new Locale("Test");
 
-    MySmsResourceProvider resourceProvider;
     private LocaleContext context = new LocaleContext(new HttpContext(
             json(object(field("headers", object()), field("parameters", object()))),
             this.getClass().getClassLoader())) {
@@ -81,17 +87,23 @@ public class SmsResourceProviderTest {
     };
 
 
-    @BeforeTest
-    public void initMocks() {
+    @BeforeMethod
+    public void initMocks() throws Exception {
         MockitoAnnotations.initMocks(this);
-        resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath, uriPath, true,
-                jsonConverter, debug);
         when(localeContext.getLocale()).thenReturn(local);
-        when(theContext.asContext(LocaleContext.class)).thenReturn(localeContext);
+        when(mockContext.asContext(LocaleContext.class)).thenReturn(localeContext);
+
+        when(mockContext.containsContext(RealmContext.class)).thenReturn(true);
+        when(mockContext.asContext(RealmContext.class)).thenReturn(mockRealmContext);
+        when(mockRealmContext.getResolvedRealm()).thenReturn(RESOLVED_REALM);
+        when(mockServiceConfigManager.getOrganizationConfig(RESOLVED_REALM, null)).thenReturn(mockServiceConfig);
     }
 
     @Test
     public void verifyResourceProviderIsNotNull() {
+        SmsResourceProvider resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath,
+                uriPath, true, jsonConverter, debug);
+
         Assertions.assertThat(resourceProvider).isNotNull();
     }
 
@@ -99,17 +111,14 @@ public class SmsResourceProviderTest {
     public void verifyRelmForReturnsRealmWhenItIsContinaedWithinTheContext() {
 
         // Given
-        String mockReturn = "ToReturn";
-
-        when(theContext.containsContext(RealmContext.class)).thenReturn(true);
-        when(realmContext.getResolvedRealm()).thenReturn(mockReturn);
-        when(theContext.asContext(RealmContext.class)).thenReturn(realmContext);
+        SmsResourceProvider resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath,
+                uriPath, true, jsonConverter, debug);
 
         // When
-        String returnedRealm = resourceProvider.realmFor(theContext);
+        String returnedRealm = resourceProvider.realmFor(mockContext);
 
         // Then
-        Assertions.assertThat(returnedRealm).isEqualTo(mockReturn);
+        Assertions.assertThat(returnedRealm).isEqualTo(RESOLVED_REALM);
     }
 
     @Test
@@ -121,6 +130,9 @@ public class SmsResourceProviderTest {
         when(serviceSchema.getI18NKey()).thenReturn("subOne");
         when(serviceSchema.supportsMultipleConfigurations()).thenReturn(false);
 
+        SmsResourceProvider resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath,
+                uriPath, true, jsonConverter, debug);
+
         // When
         JsonValue returnedJV = resourceProvider.getType(mock(Context.class)).getOrThrow().getJsonContent();
 
@@ -130,6 +142,242 @@ public class SmsResourceProviderTest {
                 .stringIs("_id", Conditions.equalTo("one"))
                 .stringIs("name", Conditions.equalTo("Sub Schema One"))
                 .booleanAt("collection").isFalse();
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichExistsInRealmReturnsSubConfig() throws Exception {
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager)).isEqualTo(mockServiceConfig);
+    }
+
+    @Test(expectedExceptions = NotFoundException.class)
+    public void fetchingParentSubConfigWhichDoesntExistInRealmThrowsException() throws Exception {
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(false);
+
+        rp.parentSubConfigFor(mockContext, mockServiceConfigManager);
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichExistsFromSubSchemaWithResourceNameReturnsConfig() throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn("resourceName");
+        when(mockServiceConfig.getSubConfig("resourceName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(true);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+                .isEqualTo(mockServiceSubConfig);
+    }
+
+    @Test(expectedExceptions = NotFoundException.class)
+    public void fetchingParentSubConfigWhichDoesntExistFromSubSchemaWithResourceNameThrowsException() throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn("resourceName");
+        when(mockServiceConfig.getSubConfig("resourceName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(false);
+
+        rp.parentSubConfigFor(mockContext, mockServiceConfigManager);
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichExistsFromSubSchemaWithoutResourceNameReturnsConfig() throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
+        when(branch.getName()).thenReturn("schemaName");
+        when(mockServiceConfig.getSubConfig("schemaName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(true);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+                .isEqualTo(mockServiceSubConfig);
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichDoesntExistFromSubSchemaWithoutResourceReturnsSubConfig()
+            throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                uriPath, false, jsonConverter, debug);
+
+        UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
+        when(branch.getName()).thenReturn("schemaName");
+        when(mockServiceConfig.getSubConfig("schemaName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(false);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+                .isEqualTo(mockServiceSubConfig);
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichExistsFromSubSchemaWithPlaceholderResourceNameReturnsSubConfig()
+            throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                "/{placeholder}", false, jsonConverter, debug);
+
+        Map<String, String> uriTemplaceVariables = new HashMap<String, String>();
+        uriTemplaceVariables.put("placeholder", "subConfigName");
+        UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn("placeholder");
+        when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(true);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+                .isEqualTo(mockServiceSubConfig);
+    }
+
+    @Test(expectedExceptions = NotFoundException.class)
+    public void fetchingParentSubConfigWhichDoenstExistFromSubSchemaWithPlaceholderResourceNameThrowsException()
+            throws Exception {
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                "/{placeholder}", false, jsonConverter, debug);
+
+        Map<String, String> uriTemplaceVariables = new HashMap<String, String>();
+        uriTemplaceVariables.put("placeholder", "subConfigName");
+        UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn("placeholder");
+        when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(false);
+
+        rp.parentSubConfigFor(mockContext, mockServiceConfigManager);
+    }
+
+    @Test
+    public void fetchingParentSubConfigWhichExistsFromSubSchemaWithPlaceholderSchemaNameReturnsSubConfig()
+            throws Exception {
+        String resolvedRealm = "resolvedRealm";
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                "/{placeholder}", false, jsonConverter, debug);
+
+        Map<String, String> uriTemplaceVariables = new HashMap<String, String>();
+        uriTemplaceVariables.put("placeholder", "subConfigName");
+        UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
+        when(branch.getName()).thenReturn("placeholder");
+        when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(true);
+
+        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+                .isEqualTo(mockServiceSubConfig);
+    }
+
+    @Test(expectedExceptions = NotFoundException.class)
+    public void fetchingParentSubConfigWhichDoenstExistFromSubSchemaWithPlaceholderSchemaNameThrowsException()
+            throws Exception {
+        String resolvedRealm = "resolvedRealm";
+
+        ServiceSchema branch = Mockito.mock(ServiceSchema.class);
+        ServiceSchema leaf = Mockito.mock(ServiceSchema.class);
+
+        List<ServiceSchema> subSchemaPath = Arrays.asList(branch, leaf);
+
+        SmsResourceProvider rp = new MySmsResourceProvider(serviceSchema, SchemaType.ORGANIZATION, subSchemaPath,
+                "/{placeholder}", false, jsonConverter, debug);
+
+        Map<String, String> uriTemplaceVariables = new HashMap<String, String>();
+        uriTemplaceVariables.put("placeholder", "subConfigName");
+        UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
+
+        when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockServiceConfig.exists()).thenReturn(true);
+
+        when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
+        when(branch.getName()).thenReturn("placeholder");
+        when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
+        when(mockServiceSubConfig.exists()).thenReturn(false);
+
+        rp.parentSubConfigFor(mockContext, mockServiceConfigManager);
     }
 
     /**

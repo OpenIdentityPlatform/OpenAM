@@ -295,6 +295,8 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         } catch (SSOException | InternalServerErrorException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on query", e);
             return new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()).asPromise();
+        } catch (NotFoundException e) {
+            return e.asPromise();
         }
     }
 

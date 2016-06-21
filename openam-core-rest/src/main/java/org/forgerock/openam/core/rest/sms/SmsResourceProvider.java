@@ -154,26 +154,43 @@ public abstract class SmsResourceProvider {
      * @return The ServiceConfig that was found.
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
+     * @throws NotFoundException When some configuration in the parent path does not exist.
      */
     protected ServiceConfig parentSubConfigFor(Context context, ServiceConfigManager scm)
-            throws SMSException, SSOException {
-        String name = null;
+            throws SMSException, SSOException, NotFoundException {
+
         Map<String, String> uriTemplateVariables = context.asContext(UriRouterContext.class).getUriTemplateVariables();
-        if (hasInstanceName) {
-            name = uriTemplateVariables.get("name");
+
+        ServiceConfig config;
+        if (type == SchemaType.GLOBAL) {
+            config = scm.getGlobalConfig(hasInstanceName ? uriTemplateVariables.get("name") : null);
+        } else {
+            config = scm.getOrganizationConfig(realmFor(context), null);
+            if (!SmsRequestHandler.USE_PARENT_PATH.equals(schema.getResourceName()) && !config.exists()) {
+                throw new NotFoundException("Parent service does not exist.");
+            }
         }
-        ServiceConfig config = type == SchemaType.GLOBAL ?
-                scm.getGlobalConfig(name) : scm.getOrganizationConfig(realmFor(context), null);
+
         for (int i = 0; i < subSchemaPath.size() - 1; i++) {
             ServiceSchema schema = subSchemaPath.get(i);
-            String pathFragment = schema.getResourceName();
-            if (pathFragment == null || SmsRequestHandler.USE_PARENT_PATH.equals(pathFragment)) {
-                pathFragment = schema.getName();
+            String subConfigName = schema.getResourceName();
+
+            boolean configNeedsToExist = true;
+            if (subConfigName == null || SmsRequestHandler.USE_PARENT_PATH.equals(subConfigName)) {
+                subConfigName = schema.getName();
+                configNeedsToExist = false;
             }
-            if (uriPath.contains("{" + pathFragment + "}")) {
-                pathFragment = uriTemplateVariables.get(pathFragment);
+
+            if (uriPath.contains("{" + subConfigName + "}")) {
+                subConfigName = uriTemplateVariables.get(subConfigName);
+                configNeedsToExist = true;
             }
-            config = config.getSubConfig(pathFragment);
+
+            config = config.getSubConfig(subConfigName);
+
+            if (configNeedsToExist && !config.exists()) {
+                throw new NotFoundException("Parent subconfig of type " + subConfigName + " does not exist.");
+            }
         }
         return config;
     }
