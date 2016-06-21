@@ -61,12 +61,10 @@ define([
                 this.values = values;
                 this.defaultValues = defaultValues;
 
-                const clonedValues = _.cloneDeep(values.raw);
-
                 this.parentRender(() => {
                     if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
-                            createBody: () => new InlineEditTable({ values: clonedValues }),
+                            createBody: () => new InlineEditTable({ values: this.values.raw }),
                             createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                         });
                     } else {
@@ -76,13 +74,13 @@ define([
                             createBody: (id) => {
                                 if (schema.raw.properties[id].type === "array") {
                                     return new InlineEditTable({
-                                        values: clonedValues[id],
+                                        values: this.values.raw[id],
                                         rowSchema: schema.raw.properties[id].items
                                     });
                                 } else {
                                     return new FlatJSONSchemaView({
                                         schema: new JSONSchema(schema.raw.properties[id]),
-                                        values: new JSONValues(clonedValues[id])
+                                        values: new JSONValues(this.values.raw[id])
                                     });
                                 }
                             },
@@ -118,10 +116,8 @@ define([
                 : this.subview.getTabId();
         },
         updateData () {
-            const section = this.getSection();
-
             this.values = this.values.extend({
-                [section]: this.getJSONSchemaView().getData()
+                [this.getSection()]: this.getJSONSchemaView().getData()
             });
         },
         onSave () {
@@ -135,7 +131,6 @@ define([
             this.updateData();
             ServersService.servers.update(this.sectionId, this.values.raw, this.serverId)
             .then(() => {
-                this.getJSONSchemaView().setData(_.cloneDeep(this.values.raw[this.getSection()]));
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({

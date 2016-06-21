@@ -188,11 +188,17 @@ define([
             return this;
         },
 
+        updateValues () {
+            if (this.data.schema.isCollection()) {
+                this.data.values = this.data.values.extend({
+                    [this.subview.getTabId()]: this.getJSONSchemaView().getData()
+                });
+            }
+        },
+
         getCurrentValues () {
             if (this.data.schema.isCollection()) {
-                return this.data.values.extend({
-                    [this.subview.getTabId()]: this.getJSONSchemaView().getData()
-                }).raw;
+                return this.data.values.raw;
             } else {
                 return this.getJSONSchemaView().getData();
             }
@@ -206,6 +212,7 @@ define([
                 });
                 return;
             }
+            this.updateValues();
             this.updateInstance(this.getCurrentValues()).then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {

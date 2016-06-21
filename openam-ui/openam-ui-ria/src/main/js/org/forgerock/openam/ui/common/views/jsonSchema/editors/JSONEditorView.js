@@ -144,6 +144,7 @@ define([
                 valuesWithoutEmptyPasswords = valuesWithoutEmptyPasswords.addInheritance(this.options.values.raw);
             }
 
+            this.options.values = valuesWithoutEmptyPasswords;
             return valuesWithoutEmptyPasswords.raw;
         },
         setData (data) {
