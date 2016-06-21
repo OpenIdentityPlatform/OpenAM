@@ -24,7 +24,7 @@
  *
  * $Id: SessionID.java,v 1.10 2009/10/02 23:45:42 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -40,7 +40,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.utils.PerThreadCache;
-import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
@@ -710,11 +709,7 @@ public class SessionID implements Serializable {
                 serverConfig.getLocalServerID() != null &&
                 !serverConfig.getLocalServerID().isEmpty()) {
 
-            if (StringUtils.isNotBlank(jwt)) {
-                primaryID = serverConfig.getPrimaryServerID();
-            } else {
-                primaryID = serverConfig.getLocalServerID();
-            }
+            primaryID = serverConfig.getLocalServerID();
         }
         // AME-129, always set a Storage Key regardless of persisting or not.
         String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());

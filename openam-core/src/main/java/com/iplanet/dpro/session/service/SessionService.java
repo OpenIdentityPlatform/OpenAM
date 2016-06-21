@@ -528,7 +528,10 @@ public class SessionService {
      * @return a boolean
      */
     public boolean checkSessionLocal(SessionID sid) throws SessionException {
-        if (isSessionPresent(sid)) {
+        if (statelessSessionFactory.containsJwt(sid)) {
+            // Stateless sessions are not stored in memory and so are not local to any server.
+            return false;
+        } else if (isSessionPresent(sid)) {
             return true;
         } else {
             if (serviceConfig.isSessionFailoverEnabled()) {
