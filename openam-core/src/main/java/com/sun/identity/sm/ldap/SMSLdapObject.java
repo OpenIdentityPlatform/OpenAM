@@ -588,10 +588,11 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             int numOfEntries, int timeLimit, boolean sortResults,
             boolean ascendingOrder, Set<String> excludes)
             throws SSOException, SMSException {
-        Connection conn = getConnection(adminPrincipal);
-        ConnectionEntryReader results = searchObjectsEx(token, startDN, filter,
+        try (Connection conn = getConnection(adminPrincipal)){
+            ConnectionEntryReader results = searchObjectsEx(token, startDN, filter,
                 numOfEntries, timeLimit, sortResults, ascendingOrder, conn);
-        return new SearchResultIterator(results, excludes, conn);
+            return new SearchResultIterator(results, excludes, conn);
+        }
     }
 
     private ConnectionEntryReader searchObjectsEx(SSOToken token,
@@ -698,6 +699,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             }
 
             try {
+                //the connection used here will be closed in caller method
                 results = conn.search(request);
                 results.hasNext();
                 return results;
