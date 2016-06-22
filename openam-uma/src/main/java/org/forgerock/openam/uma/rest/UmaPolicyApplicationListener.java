@@ -17,6 +17,7 @@
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -73,6 +75,7 @@ import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtClaimSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdEventListener;
@@ -257,6 +260,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
+                application.setSubjects(asSet(EntitlementRegistry.getSubjectTypeName(JwtClaimSubject.class)));
                 appService.saveApplication(application);
             }
         } catch (EntitlementException e) {

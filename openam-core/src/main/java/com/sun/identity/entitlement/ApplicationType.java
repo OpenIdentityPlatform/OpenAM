@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationType.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  *
- * Portions Copyright 2013-2014 ForgeRock, Inc.
+ * Portions Copyright 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -34,6 +34,7 @@ import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.ResourceNameIndexGenerator;
 import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Application Type defines the default supported action names; search and save
@@ -219,4 +220,26 @@ public final class ApplicationType {
         return searchIndexInstance;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ApplicationType that = (ApplicationType) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(actions, that.actions) &&
+                Objects.equals(resourceCompInstance.getClass(), that.resourceCompInstance.getClass()) &&
+                Objects.equals(saveIndexInstance.getClass(), that.saveIndexInstance.getClass()) &&
+                Objects.equals(searchIndexInstance.getClass(), that.searchIndexInstance.getClass()) &&
+                Objects.equals(applicationClassName, that.applicationClassName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, actions, resourceCompInstance, saveIndexInstance, searchIndexInstance,
+                applicationClassName);
+    }
 }
