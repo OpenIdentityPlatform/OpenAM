@@ -55,8 +55,6 @@ define([
                 self.setElement(`#subject_${itemID}`);
 
                 if (itemData) {
-                    // Temporary fix: The name attribute is being added by the server after the policy is created.
-                    delete itemData.name;
 
                     if (itemData.type === self.IDENTITY_RESOURCE) { // client side fix for 'Identity'
                         self.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.subjectValues));
