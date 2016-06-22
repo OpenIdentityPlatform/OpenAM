@@ -87,6 +87,7 @@
                     <DefaultValues>
                         <Value>changeit</Value>
                     </DefaultValues>
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-push-device-settings-encryption-keypair-alias"
@@ -94,6 +95,7 @@
                                  syntax="string"
                                  i18nKey="a105"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystoreKeyPairAlias">
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-push-device-settings-encryption-privatekey-password"
@@ -101,6 +103,7 @@
                                  syntax="password"
                                  i18nKey="a106"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystorePrivateKeyPassword">
+                    <IsOptional/>
                 </AttributeSchema>
 
             </Organization>

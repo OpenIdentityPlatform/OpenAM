@@ -31,7 +31,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/ForgeRockRestSecurityService"
                 i18nFileName="RestSecurity"
-                revisionNumber="1"
+                revisionNumber="2"
                 resourceName="security"
                 i18nKey="forgerock-restSecurity-service-description">
 
@@ -135,6 +135,7 @@
                                  syntax="string"
                                  resourceName="protectedUserAttributes"
                                  i18nKey="a108">
+                    <IsOptional/>
                 </AttributeSchema> 
             </Organization>
         </Schema>

@@ -20,15 +20,24 @@
 <ServicesConfiguration>
     <Service name="validationService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/validationService"
-                i18nFileName="validationService" revisionNumber="1"
+                i18nFileName="validationService" revisionNumber="2"
                 i18nKey="openam-validation-service-description"
                 resourceName="validation">
             <Organization>
+                <!-- validators -->
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- configuration settings -->
                 <AttributeSchema name="openam-auth-valid-goto-resources"
                                  type="list"
                                  syntax="string"
                                  resourceName="validGotoDestinations"
-                                 i18nKey="a100">
+                                 i18nKey="a100"
+                                 validator="RequiredValueValidator">
                 </AttributeSchema>
             </Organization>
         </Schema>

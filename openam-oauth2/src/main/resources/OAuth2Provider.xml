@@ -25,7 +25,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/ForgerockOAuth2ProviderService"
                 i18nFileName="OAuth2Provider"
-                revisionNumber="1"
+                revisionNumber="2"
                 i18nKey="forgerock-oauth2-provider-description"
                 resourceName="oauth-oidc">
             <Global>
@@ -71,6 +71,15 @@
                 </AttributeSchema>
             </Global>
             <Organization>
+
+                <!-- validators -->
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- configuration settings -->
                 <AttributeSchema name="statelessTokensEnabled"
                                  type="single"
                                  syntax="boolean"
@@ -237,7 +246,11 @@
                         syntax="string"
                         resourceName="supportedScopes"
                         i18nKey="a108"
-                        order="130">
+                        order="130"
+                        validator="RequiredValueValidator">
+                    <ExampleValue>
+                        <Value>profile</Value>
+                    </ExampleValue>
                 </AttributeSchema>
 
                 <AttributeSchema

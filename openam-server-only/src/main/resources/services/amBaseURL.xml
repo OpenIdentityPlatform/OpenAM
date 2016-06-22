@@ -28,6 +28,8 @@
                 resourceName="baseurl">
 
             <Organization>
+
+                <!-- configuration settings -->
                 <AttributeSchema name="base-url-source"
                         type="single_choice"
                         syntax="string"
@@ -49,12 +51,14 @@
                                  syntax="string"
                                  resourceName="fixedValue"
                                  i18nKey="a102">
+                    <IsOptional/>
                 </AttributeSchema>
                 <AttributeSchema name="base-url-extension-class"
                                  type="single"
                                  syntax="string"
                                  resourceName="extensionClassName"
                                  i18nKey="a103">
+                    <IsOptional/>
                 </AttributeSchema>
                 <AttributeSchema name="base-url-context-path"
                                  type="single"
