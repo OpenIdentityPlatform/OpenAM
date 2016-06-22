@@ -17,23 +17,29 @@ package org.forgerock.openam.services.push.sns;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.anyObject;
-import static org.mockito.BDDMockito.anyString;
-import static org.mockito.BDDMockito.doThrow;
+import static org.forgerock.openam.services.push.PushNotificationConstants.*;
+import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.times;
-import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.jwt.Jwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
@@ -42,6 +48,7 @@ import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -52,6 +59,8 @@ public class SnsMessageResourceTest {
     PushNotificationService mockService;
     MessageDispatcher mockDispatcher;
     CTSPersistentStore mockCTS;
+    JSONSerialisation mockSerialisation;
+    JwtReconstruction mockReconstructor;
 
     @BeforeMethod
     public void theSetUp() { //you need this
@@ -60,6 +69,8 @@ public class SnsMessageResourceTest {
         Debug mockDebug = mock(Debug.class);
         mockCTS = mock(CTSPersistentStore.class);
         mockDispatcher = mock(MessageDispatcher.class);
+        mockSerialisation = mock(JSONSerialisation.class);
+        mockReconstructor = mock(JwtReconstruction.class);
 
         try {
             given(mockService.getMessageDispatcher(anyString())).willReturn(mockDispatcher);
@@ -67,8 +78,7 @@ public class SnsMessageResourceTest {
             //does not happen
         }
 
-        JSONSerialisation mockSerialisation = mock(JSONSerialisation.class);
-        messageResource = new SnsMessageResource(mockCTS, mockService, mockSerialisation, mockDebug);
+        messageResource = new SnsMessageResource(mockCTS, mockService, mockSerialisation, mockDebug, mockReconstructor);
     }
 
     @Test
@@ -84,6 +94,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         //when
         Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
@@ -91,6 +102,68 @@ public class SnsMessageResourceTest {
         //then
         verify(mockDispatcher, times(1)).handle("asdf", request.getContent());
         assertThat(result.get()).isNotNull();
+    }
+
+    @Test
+    public void regShouldHandleByCTS() throws NotFoundException, PredicateNotMetException,
+            ExecutionException, InterruptedException, CoreTokenException {
+        //given
+        Token mockToken = mock(Token.class);
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
+        realmContext.setSubRealm("realm", "realm");
+
+        JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
+
+        ActionRequest request = mock(ActionRequest.class);
+        given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("register");
+        doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
+        given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getBlob()).willReturn("{ }".getBytes());
+        given(mockSerialisation.serialise(any())).willReturn("");
+
+        //when
+        Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
+
+        //then
+        assertThat(result.get()).isNotNull();
+        verify(mockToken, times(1)).setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
+        verify(mockToken, times(1)).setBlob((byte[]) any());
+        verify(mockCTS, times(1)).update(mockToken);
+    }
+
+    @Test
+    public void authShouldHandleByCTS() throws NotFoundException, PredicateNotMetException,
+            ExecutionException, InterruptedException, CoreTokenException {
+        //given
+        Jwt mockJwt = mock(Jwt.class);
+        JwtClaimsSet mockClaimSet = mock(JwtClaimsSet.class);
+        Token mockToken = mock(Token.class);
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
+        realmContext.setSubRealm("realm", "realm");
+
+        JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
+
+        ActionRequest request = mock(ActionRequest.class);
+        given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
+        doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
+        given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getBlob()).willReturn("{ }".getBytes());
+        given(mockSerialisation.serialise(any())).willReturn("");
+        given(mockReconstructor.reconstructJwt(anyString(), (Class<Jwt>) any())).willReturn(mockJwt);
+        given(mockJwt.getClaimsSet()).willReturn(mockClaimSet);
+        given(mockClaimSet.getClaim(anyString())).willReturn(null);
+
+        //when
+        Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
+
+        //then
+        assertThat(result.get()).isNotNull();
+        verify(mockToken, times(1)).setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
+        verify(mockCTS, times(1)).update(mockToken);
     }
 
     @Test (expectedExceptions = BadRequestException.class)
@@ -105,6 +178,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         //when
         Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
@@ -125,6 +199,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         doThrow(new PredicateNotMetException("")).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
 
@@ -148,6 +223,7 @@ public class SnsMessageResourceTest {
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
         given(mockCTS.read("asdf")).willReturn(null);
+        given(request.getAction()).willReturn("authenticate");
 
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
 

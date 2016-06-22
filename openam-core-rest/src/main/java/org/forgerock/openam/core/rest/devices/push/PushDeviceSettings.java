@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.devices.push;
 import java.util.Arrays;
 import java.util.Objects;
 import org.forgerock.openam.core.rest.devices.DeviceSettings;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 /**
@@ -62,7 +63,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param communicationId The communication id. Can not be null.
      */
     public void setCommunicationId(String communicationId) {
-        Reject.ifNull(communicationId, "communicationId can not be null.");
+        Reject.ifTrue(StringUtils.isBlank(communicationId), "communicationId can not be null.");
         this.communicationId = communicationId;
     }
 
@@ -73,7 +74,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param deviceId The device id. Can not be null.
      */
     public void setDeviceId(String deviceId) {
-        Reject.ifNull(deviceId, "deviceId can not be null.");
+        Reject.ifTrue(StringUtils.isBlank(deviceId), "deviceId can not be null.");
         this.deviceId = deviceId;
     }
 
@@ -83,7 +84,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param sharedSecret The shared secret. Can not be null.
      */
     public void setSharedSecret(String sharedSecret) {
-        Reject.ifNull(sharedSecret, "sharedSecret can not be null.");
+        Reject.ifTrue(StringUtils.isBlank(sharedSecret), "sharedSecret can not be null.");
         this.sharedSecret = sharedSecret;
     }
 
@@ -93,7 +94,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param deviceName The identifier. Can not be null.
      */
     public void setDeviceName(String deviceName) {
-        Reject.ifNull(deviceName, "deviceName can not be null.");
+        Reject.ifTrue(StringUtils.isBlank(deviceName), "deviceName can not be null.");
         this.deviceName = deviceName;
     }
 
@@ -102,7 +103,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param deviceMechanismUID The identifier (unique on the phone) to the specific mechanism.
      */
     public void setDeviceMechanismUID(String deviceMechanismUID) {
-        Reject.ifNull(deviceMechanismUID);
+        Reject.ifTrue(StringUtils.isBlank(deviceMechanismUID), "deviceMechanismUID can not be null.");
         this.deviceMechanismUID = deviceMechanismUID;
     }
 
@@ -111,7 +112,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param communicationType The communication medium.
      */
     public void setCommunicationType(String communicationType) {
-        Reject.ifNull(communicationType, "communicationType can not be null");
+        Reject.ifTrue(StringUtils.isBlank(communicationType), "communicationType can not be null");
         this.communicationType = communicationType;
     }
 
@@ -120,7 +121,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param deviceType The device type (likely ios or android).
      */
     public void setDeviceType(String deviceType) {
-        Reject.ifNull(deviceType, "deviceType can not be null");
+        Reject.ifTrue(StringUtils.isBlank(deviceType), "deviceType can not be null");
         this.deviceType = deviceType;
     }
 
@@ -129,7 +130,7 @@ public final class PushDeviceSettings extends DeviceSettings {
      * @param issuer The name of the issuer.
      */
     public void setIssuer(String issuer) {
-        Reject.ifNull(deviceType, "issuer can not be null");
+        Reject.ifTrue(StringUtils.isBlank(issuer), "issuer can not be null");
         this.issuer = issuer;
     }
 

@@ -245,7 +245,7 @@ public class AuthenticatorPush extends AbstractPushModule {
 
     private int waitingChecks() throws AuthLoginException {
         try {
-            Boolean ctsValue = checkCTS(messageId);
+            Boolean ctsValue = checkCTSAuth(messageId);
             if (ctsValue != null) {
                 pushService.getMessageDispatcher(realm).forget(messageId);
                 coreTokenService.deleteAsync(messageId);

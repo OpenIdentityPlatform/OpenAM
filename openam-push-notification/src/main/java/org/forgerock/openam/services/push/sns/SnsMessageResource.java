@@ -72,10 +72,14 @@ import org.forgerock.util.promise.Promise;
 @RequestHandler
 public class SnsMessageResource {
 
+    private static final String AUTHENTICATE = "authenticate";
+    private static final String REGISTER = "register";
+
     private final PushNotificationService pushNotificationService;
     private final Debug debug;
     private final CTSPersistentStore coreTokenService;
     private final JSONSerialisation jsonSerialisation;
+    private final JwtReconstruction jwtReconstruction;
 
     /**
      * Generate a new SnsMessageResource using the provided MessageDispatcher.
@@ -85,14 +89,17 @@ public class SnsMessageResource {
      *                         endpoint to their appropriate locations within OpenAM.
      * @param jsonSerialisation Used to perform the serialisation necessary for inserting tokens into the CTS.
      * @param debug For writing out debug messages.
+     * @param jwtReconstruction For recreating JWTs.
      */
     @Inject
     public SnsMessageResource(CTSPersistentStore coreTokenService, PushNotificationService pushNotificationService,
-                              JSONSerialisation jsonSerialisation, @Named("frPush") Debug debug) {
+                              JSONSerialisation jsonSerialisation, @Named("frPush") Debug debug,
+                              JwtReconstruction jwtReconstruction) {
         this.pushNotificationService = pushNotificationService;
         this.jsonSerialisation = jsonSerialisation;
         this.debug = debug;
         this.coreTokenService = coreTokenService;
+        this.jwtReconstruction = jwtReconstruction;
     }
 
     /**
@@ -127,9 +134,15 @@ public class SnsMessageResource {
     private Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest actionRequest) {
         Reject.ifFalse(context.containsContext(RealmContext.class));
 
+        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+
+        if (!actionRequest.getAction().equals(AUTHENTICATE) && !actionRequest.getAction().equals(REGISTER)) {
+            debug.warning("Received message in realm {} with invalid messageId.", realm);
+            return RestUtils.generateBadRequestException();
+        }
+
         final JsonValue actionContent = actionRequest.getContent();
 
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
         JsonValue messageIdLoc = actionContent.get(MESSAGE_ID_JSON_POINTER);
         String messageId;
 
@@ -145,7 +158,7 @@ public class SnsMessageResource {
         } catch (NotFoundException | PushNotificationException e) {
             debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
             try {
-                attemptFromCTS(messageId, actionContent);
+                attemptFromCTS(messageId, actionContent, actionRequest.getAction().equals(REGISTER));
             } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
                     | CoreTokenException | NotFoundException ex) {
                 debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
@@ -163,7 +176,7 @@ public class SnsMessageResource {
     /**
      * For the in-memory equivalent, {@link MessageDispatcher#handle(String, JsonValue)}.
      */
-    private boolean attemptFromCTS(String messageId, JsonValue actionContent)
+    private boolean attemptFromCTS(String messageId, JsonValue actionContent, boolean register)
             throws CoreTokenException, ClassNotFoundException, IllegalAccessException, InstantiationException,
             NotFoundException {
         Token coreToken = coreTokenService.read(messageId);
@@ -187,16 +200,25 @@ public class SnsMessageResource {
             }
         }
 
-        addDeny(coreToken, actionContent);
+        if (register) {
+            addRegistrationInfo(coreToken, actionContent);
+        } else {
+            addDeny(coreToken, actionContent);
+        }
 
         coreTokenService.update(coreToken);
 
         return true;
     }
 
+    private void addRegistrationInfo(Token coreToken, JsonValue actionContent) {
+        coreToken.setBlob(jsonSerialisation.serialise(actionContent.getObject()).getBytes());
+        coreToken.setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
+    }
+
     private void addDeny(Token coreToken, JsonValue actionContent) {
 
-        Jwt possibleDeny = new JwtReconstruction().reconstructJwt(actionContent.get(JWT).asString(), SignedJwt.class);
+        Jwt possibleDeny = jwtReconstruction.reconstructJwt(actionContent.get(JWT).asString(), SignedJwt.class);
 
         if (possibleDeny.getClaimsSet().getClaim(DENY_LOCATION) != null) {
             coreToken.setAttribute(CoreTokenField.INTEGER_ONE, DENY_VALUE);

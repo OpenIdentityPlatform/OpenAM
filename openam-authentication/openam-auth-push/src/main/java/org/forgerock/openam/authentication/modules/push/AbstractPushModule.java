@@ -37,6 +37,7 @@ import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.Time;
 
 /**
@@ -127,7 +128,7 @@ public abstract class AbstractPushModule extends AMLoginModule {
      * denied, null if the CTS has no message.
      * @throws CoreTokenException if there were issues reading from the CTS.
      */
-    protected Boolean checkCTS(String tokenId) throws CoreTokenException {
+    protected Boolean checkCTSAuth(String tokenId) throws CoreTokenException {
         Token coreToken = coreTokenService.read(tokenId);
 
         if (coreToken == null) {
@@ -145,6 +146,35 @@ public abstract class AbstractPushModule extends AMLoginModule {
         }
 
         return Boolean.TRUE;
+    }
+
+    /**
+     * Checks the CTS for the existence of a token with the expected name, and ensures that the necessary fields
+     * are correctly populated.
+     *
+     * @param tokenId The token's Id.
+     * @return jsonValue containing the necessary data for registration as defined at the top of
+     * AuthenticatorPushRegistration.
+     * @throws CoreTokenException if there were issues reading from the CTS.
+     */
+    protected JsonValue checkCTSRegistration(String tokenId) throws CoreTokenException {
+        Token coreToken = coreTokenService.read(tokenId);
+
+        if (coreToken == null) {
+            return null;
+        }
+
+        Integer accept = coreToken.getValue(CoreTokenField.INTEGER_ONE);
+
+        if (accept == null) {
+            return null;
+        }
+
+        if (accept == PushNotificationConstants.ACCEPT_VALUE) {
+            return JsonValueBuilder.toJsonValue(new String(coreToken.getBlob()));
+        }
+
+        return null;
     }
 
 }

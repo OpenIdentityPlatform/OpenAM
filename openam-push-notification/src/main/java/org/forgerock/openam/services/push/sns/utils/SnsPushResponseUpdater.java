@@ -111,5 +111,4 @@ public class SnsPushResponseUpdater {
         return client.createPlatformEndpoint(request);
     }
 
-
 }

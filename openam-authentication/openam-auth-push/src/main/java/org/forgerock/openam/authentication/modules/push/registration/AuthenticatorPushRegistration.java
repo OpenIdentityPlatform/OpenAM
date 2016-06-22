@@ -68,7 +68,8 @@ import org.forgerock.util.time.TimeService;
  * The Authenticator Push Registration Module is a registration module that does not authenticate a user but
  * allows a user already authenticated earlier in the chain to register their mobile device.
  *
- * A registering device will need to supply the following information to this module during its await state:
+ * A registering device will need to supply the following information to this module during its await state
+ * via either the MessageDispatcher (local) or the CTS (cross-cluster).
  *
  * Format: JSON
  *
@@ -284,27 +285,27 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         } catch (CoreTokenException e) {
             DEBUG.warning("Removing token from CTS failed.", e);
         }
-        return finaliseSuccess();
+        try {
+            return finaliseSuccess(deviceResponsePromise.get());
+        } catch (ExecutionException | InterruptedException e) {
+            DEBUG.error("{} :: Failed to save device settings.", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, e);
+            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, "authFailed", null);
+        }
     }
 
-    private int finaliseSuccess() throws AuthLoginException {
+    private int finaliseSuccess(JsonValue deviceResponse) throws AuthLoginException {
         storeUsername(amIdentityPrincipal.getName());
-        saveDeviceDetailsUnderUserAccount();
+        saveDeviceDetailsUnderUserAccount(deviceResponse);
         return STATE_CONFIRMATION;
     }
 
     private int waitingChecks() throws AuthLoginException {
         try {
-            Boolean ctsValue = checkCTS(messageId);
+            JsonValue ctsValue = checkCTSRegistration(messageId);
             if (ctsValue != null) {
                 pushService.getMessageDispatcher(realm).forget(messageId);
                 coreTokenService.deleteAsync(messageId);
-
-                if (ctsValue) {
-                    return finaliseSuccess();
-                } else { //denied
-                    throw failedAsLoginException();
-                }
+                return finaliseSuccess(ctsValue);
             }
         } catch (CoreTokenException e) {
             DEBUG.warning("CTS threw exception, falling back to local MessageDispatcher.", e);
@@ -318,28 +319,24 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         return STATE_WAIT_FOR_RESPONSE_FROM_QR_SCAN;
     }
 
-    private void saveDeviceDetailsUnderUserAccount() throws AuthLoginException {
-
+    private void saveDeviceDetailsUnderUserAccount(JsonValue deviceResponse) throws AuthLoginException {
+        newDeviceRegistrationProfile.setDeviceName("Push Device");
         try {
-            JsonValue deviceResponse = deviceResponsePromise.get();
-
-            newDeviceRegistrationProfile.setDeviceName("Push Device");
             newDeviceRegistrationProfile.setCommunicationId(deviceResponse.get(COMMUNICATION_ID).asString());
             newDeviceRegistrationProfile.setDeviceMechanismUID(deviceResponse.get(MECHANISM_UID).asString());
             newDeviceRegistrationProfile.setCommunicationType(deviceResponse.get(COMMUNICATION_TYPE).asString());
             newDeviceRegistrationProfile.setDeviceType(deviceResponse.get(DEVICE_TYPE).asString());
             newDeviceRegistrationProfile.setDeviceId(deviceResponse.get(DEVICE_ID).asString());
-            newDeviceRegistrationProfile.setRecoveryCodes(DeviceSettings.generateRecoveryCodes(NUM_RECOVERY_CODES));
-            newDeviceRegistrationProfile.setIssuer(issuer);
-
-            userPushDeviceProfileManager.saveDeviceProfile(
-                    amIdentityPrincipal.getName(), realm, newDeviceRegistrationProfile);
-
-        } catch (InterruptedException | ExecutionException e) {
-            DEBUG.error("{} :: Failed to save device settings.", AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, e);
-            throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, "authFailed", null);
+        } catch (NullPointerException npe) {
+            DEBUG.error("Blank value for necessary data from device response, {}", deviceResponse);
+            throw failedAsLoginException();
         }
 
+        newDeviceRegistrationProfile.setRecoveryCodes(DeviceSettings.generateRecoveryCodes(NUM_RECOVERY_CODES));
+        newDeviceRegistrationProfile.setIssuer(issuer);
+
+        userPushDeviceProfileManager.saveDeviceProfile(
+                amIdentityPrincipal.getName(), realm, newDeviceRegistrationProfile);
     }
 
     private void paintRegisterDeviceCallback(AMIdentity id, String messageId, String challenge)
