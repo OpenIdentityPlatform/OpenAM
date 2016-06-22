@@ -24,7 +24,7 @@
 
    $Id: index.jsp,v 1.14 2009/06/09 20:28:30 exu Exp $
 
-    Portions Copyrighted 2013-2016 ForgeRock AS
+    Portions Copyrighted 2013-2016 ForgeRock AS.
  --%>
 
 
@@ -162,23 +162,22 @@
             }
 
             File dir = new File(fedletHomeDir);
-            File file = new File(fedletHomeDir + File.separator + 
-                "FederationConfig.properties");
+            File file = new File(fedletHomeDir + File.separator + "FederationConfig.properties");
             if (!dir.exists() || !dir.isDirectory()) {
-                out.println("<p><br><b>Fedlet configuration home directory does not exist.</b>");
+                out.println("<p><br><b>Fedlet configuration home directory \"" + fedletHomeDir + "\" does not exist.</b>");
                 if (confExist) {
                     out.println("<br><br>Click <a href=\"index.jsp?CreateConfig=true\">here</a> to create Fedlet configuration automatically.");
-                    out.println("<br>Or manually extract your fedlet.war and copy all files under \"conf\" directory to \"" + fedletHomeDir + "\" directory, then restart your web container.");
+                    out.println("<br>Or manually extract your fedlet.war and copy all files under \"conf\" directory to \"" + fedletHomeDir + "\" directory.");
                 } else {
-                    out.println("<br>Please follow the README bundled inside your Fedlet-unconfigured.zip file to setup Fedlet configuration, then restart your web container.");
+                    out.println("<br>Please follow the README bundled inside your Fedlet.zip or Fedlet-unconfigured.zip file to setup Fedlet configuration.");
                 }
             } else if (!file.exists()) {
-                out.println("<p><br><b>FederationConfig.properties could not be found.</b>");
+                out.println("<p><br><b>FederationConfig.properties could not be found in \"" + fedletHomeDir + "\".</b>");
                 if (confExist) {
                     out.println("<br><br>Click <a href=\"index.jsp?CreateConfig=true\">here</a> to create Fedlet configuration automatically.");
-                    out.println("<br>Or manually extract your fedlet.war and copy all files under \"conf\" directory to \"" + fedletHomeDir + "\" directory, then restart your web container.");
+                    out.println("<br>Or manually extract your fedlet.war and copy all files under \"conf\" directory to \"" + fedletHomeDir + "\" directory.");
                 } else {
-                    out.println("<br>Please follow the README bundled inside your Fedlet-unconfigured.zip file to setup Fedlet configuration, then restart your web container.");
+                    out.println("<br>Please follow the README bundled inside your Fedlet.zip or Fedlet-unconfigured.zip file to setup Fedlet configuration.");
                 }
             } else {
                 SAML2MetaManager manager = new SAML2MetaManager();
