@@ -89,9 +89,9 @@ public abstract class AbstractPushModule extends AMLoginModule {
 
         Calendar calendar = Time.getCalendarInstance();
         calendar.add(Calendar.SECOND, (int) (timeout / 1000));
-
         ctsToken.setExpiryTimestamp(calendar);
-        coreTokenService.createAsync(ctsToken);
+
+        coreTokenService.create(ctsToken);
     }
 
     /**
