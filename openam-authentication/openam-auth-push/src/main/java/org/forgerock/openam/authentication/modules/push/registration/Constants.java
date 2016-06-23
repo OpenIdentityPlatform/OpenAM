@@ -46,10 +46,14 @@ final class Constants {
     static final String AUTHLEVEL = "forgerock-am-auth-push-reg-auth-level";
     /** The name of the Issuer key for the Authenticator Push registration. */
     static final String ISSUER_OPTION_KEY = "forgerock-am-auth-push-reg-issuer";
-    /** The name of the background colour key for the Authenticator Push registration . */
+    /** The name of the background colour key for the Authenticator Push registration. */
     static final String BGCOLOUR = "forgerock-am-auth-hex-bgcolour";
     /** The name of the img url key for the Authenticator Push registration. */
     static final String IMG_URL = "forgerock-am-auth-img-url";
+    /** The name of the apple link key for the Authenticator Push registration. */
+    static final String APPLE_LINK = "forgerock-am-auth-apple-link";
+    /** The name of the google link key for the Authenticator Push registration. */
+    static final String GOOGLE_LINK = "forgerock-am-auth-google-link";
 
     /**
      * STATES.
@@ -77,6 +81,11 @@ final class Constants {
     public static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
     /** Index to use to access the wait period callback placeholder. */
     public static final int POLLING_TIME_OUTPUT_CALLBACK_INDEX = 2;
+
+    /** Index to use to access the apple link callback placeholder. */
+    public static final int APPLE_LINK_CALLBACK_INDEX = 0;
+    /** Index to use to access the google link callback placeholder. */
+    public static final int GOOGLE_LINK_CALLBACK_INDEX = 1;
 
     /**
      * QR CODE KEYS.

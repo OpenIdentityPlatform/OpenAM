@@ -149,7 +149,14 @@
                 "socialAuthentication" : "Or login with:",
                 "resetPassword" : "Forgot Password?",
                 "forgotUsername" : "Forgot Username?",
-                "troubleScanning": "Trouble Scanning?"
+                "onMobileDevice": "On a mobile device?",
+                "waitingForResponse": "Waiting for response...",
+                "havingTrouble": "Having trouble?",
+                "getTheAppFromThe": "Get the app from the",
+                "orOn": "or on",
+                "appStore": "App Store",
+                "googlePlay": "Google Play",
+                "useRecoveryCode": "Use recovery code"
             },
             "404" : {
                 "pageNotFound" : "Page not found",

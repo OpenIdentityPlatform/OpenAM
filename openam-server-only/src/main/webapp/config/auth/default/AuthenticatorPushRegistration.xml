@@ -37,15 +37,14 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- GET_THE_APP_INFO_PAGE -->
-    <Callbacks length="2" order="3" timeout="120" header="ForgeRock Authenticator (Push) Registration">
-        <TextOutputCallback>
-            Go to your mobile device application store and get the ForgeRock Authenticator application
-            then press OK to continue.
-        </TextOutputCallback>
+    <!-- For links to app store -->
+    <Callbacks length="3" order="3" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+        <TextOutputCallback>#REPLACE#</TextOutputCallback>
+        <TextOutputCallback>#REPLACE#</TextOutputCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>OK</Value>
+                    <Value>Continue</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -53,10 +52,9 @@
     <!-- WAIT_FOR_RESPONSE_FROM_QR_SCAN -->
     <Callbacks length="3" order="4" timeout="120" header="Register your device with OpenAM">
         <TextOutputCallback>
-            Scan the barcode image below with the ForgeRock Authenticator App to register your device with your login.
-            After scanning, please wait a few seconds for your device to register and authentication to continue.
+            Scan the barcode image below with the ForgeRock Authenticator app to register your device with your login.
         </TextOutputCallback>
-        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <TextOutputCallback messageType="script">#PLACEHOLDER#</TextOutputCallback>
         <PollingWaitCallback waitTime="10000"/>
     </Callbacks>
     <!-- CONFIRMATION -->

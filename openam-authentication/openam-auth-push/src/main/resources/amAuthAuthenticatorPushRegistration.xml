@@ -97,6 +97,26 @@
                         <Value>http://example.com/image.png</Value>
                     </ExampleValue>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-apple-link"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator UrlValidator"
+                                 i18nKey="a655"
+                                 resourceName="appleLink">
+                    <DefaultValues>
+                        <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-google-link"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator UrlValidator"
+                                 i18nKey="a656"
+                                 resourceName="googleLink">
+                    <DefaultValues>
+                        <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="UrlValidator" type="validator" syntax="string">
@@ -160,6 +180,26 @@
                         <ExampleValue>
                             <Value>http://example.com/image.png</Value>
                         </ExampleValue>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-apple-link"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator UrlValidator"
+                                     i18nKey="a655"
+                                     resourceName="appleLink">
+                        <DefaultValues>
+                            <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-google-link"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator UrlValidator"
+                                     i18nKey="a656"
+                                     resourceName="googleLink">
+                        <DefaultValues>
+                            <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

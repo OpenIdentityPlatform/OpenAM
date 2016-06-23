@@ -1,0 +1,22 @@
+<div class="container">
+    {{#if reqs.header}}
+        <div class="page-header">
+            <h1 class="text-center">{{reqs.header}}</h1>
+        </div>
+    {{/if}}
+
+    <form action="" method="post" class="form login col-sm-6 col-sm-offset-3 text-center" data-stage="{{reqs.stage}}">
+        <fieldset class="row">
+            <div class="form-group">
+                <span>{{t "templates.user.LoginTemplate.getTheAppFromThe"}} <a target="_blank" href="{{reqs.callbacks.0.output.0.value}}">{{t "templates.user.LoginTemplate.appStore"}}</a> {{t "templates.user.LoginTemplate.orOn"}} <a target="_blank" href="{{reqs.callbacks.1.output.0.value}}">{{t "templates.user.LoginTemplate.googlePlay"}}</a></span>
+            </div>
+            <div class="form-group">
+                {{#each reqs.callbacks}}
+                    {{#equals type "ConfirmationCallback"}}
+                        {{callbackRender}}
+                    {{/equals}}
+                {{/each}}
+            </div>
+        </fieldset>
+    </form>
+</div>

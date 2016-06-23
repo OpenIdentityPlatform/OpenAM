@@ -30,22 +30,20 @@
         </NameCallback>
     </Callbacks>
     <!-- AWAIT_STATE -->
-    <Callbacks length="3" order="3" timeout="9999" header="Authenticator Push">
-        <TextOutputCallback>Please use your mobile device to authorise this log in.  There may be short wait as the server and your device communicate.</TextOutputCallback>
+    <Callbacks length="2" order="3" timeout="9999" header="Authenticator Push">
         <PollingWaitCallback waitTime="10000"/>
-        <ChoiceCallback>
-            <Prompt>Lost Device</Prompt>
-            <ChoiceValues>
-                <ChoiceValue isDefault="false">
-                    <Value>Use Emergency Code</Value>
-                </ChoiceValue>
-            </ChoiceValues>
-        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Use Recovery Code</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="4" timeout="120" header="Use ForgeRock Authenticator (Push) Emergency Code">
+    <Callbacks length="2" order="4" timeout="120" header="Use ForgeRock Authenticator (Push) Recovery Code">
         <NameCallback>
-            <Prompt>Emergency Code</Prompt>
+            <Prompt>Recovery Code</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
@@ -56,7 +54,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="5" timeout="120" header="ForgeRock Authenticator (Push) Emergency Code Used">
+    <Callbacks length="2" order="5" timeout="120" header="ForgeRock Authenticator (Push) Recovery Code Used">
         <TextOutputCallback>
             You have used one of your Recovery Codes. Please make sure you have a note of any remaining Recovery Codes.
         </TextOutputCallback>

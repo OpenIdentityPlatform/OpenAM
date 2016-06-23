@@ -50,7 +50,7 @@ define([
         container.append(
             `<div class="form-group">
                 <a href="${options.text}" class="btn btn-lg btn-block btn-uppercase btn-default"
-                >${$.t("templates.user.LoginTemplate.troubleScanning")}</a>
+                >${$.t("templates.user.LoginTemplate.onMobileDevice")}</a>
             </div>`);
     };
 

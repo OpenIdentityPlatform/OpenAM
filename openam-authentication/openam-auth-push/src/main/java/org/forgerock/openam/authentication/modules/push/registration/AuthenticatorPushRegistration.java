@@ -44,6 +44,7 @@ import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.JsonValue;
@@ -108,6 +109,9 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
     private String bgColour;
     private String imgUrl;
 
+    private String appleLink;
+    private String googleLink;
+
     private String lbCookieValue;
     private String realm;
 
@@ -129,6 +133,8 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         this.issuer = CollectionHelper.getMapAttr(options, ISSUER_OPTION_KEY);
         this.imgUrl = CollectionHelper.getMapAttr(options, IMG_URL);
         this.bgColour = CollectionHelper.getMapAttr(options, BGCOLOUR);
+        this.appleLink = CollectionHelper.getMapAttr(options, APPLE_LINK);
+        this.googleLink = CollectionHelper.getMapAttr(options, GOOGLE_LINK);
 
         if (bgColour != null && bgColour.startsWith("#")) {
             bgColour = bgColour.substring(1);
@@ -214,6 +220,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         case START_REGISTRATION_OPTION:
             return startRegistration();
         case GET_THE_APP_OPTION:
+            setAppLinkCallbacks();
             return STATE_GET_THE_APP;
         default:
             throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH_REGISTRATION, "authFailed", null);
@@ -341,7 +348,6 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
 
     private void paintRegisterDeviceCallback(AMIdentity id, String messageId, String challenge)
             throws AuthLoginException {
-
         replaceCallback(
                 STATE_WAIT_FOR_RESPONSE_FROM_QR_SCAN,
                 SCRIPT_OUTPUT_CALLBACK_INDEX,
@@ -416,5 +422,13 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
                 .build();
         replaceCallback(STATE_WAIT_FOR_RESPONSE_FROM_QR_SCAN,
                 POLLING_TIME_OUTPUT_CALLBACK_INDEX, newPollingWaitCallback);
+    }
+
+    private void setAppLinkCallbacks() throws AuthLoginException {
+        TextOutputCallback appleOutput = new TextOutputCallback(TextOutputCallback.INFORMATION, appleLink);
+        TextOutputCallback googleOutput = new TextOutputCallback(TextOutputCallback.INFORMATION, googleLink);
+
+        replaceCallback(STATE_GET_THE_APP, APPLE_LINK_CALLBACK_INDEX, appleOutput);
+        replaceCallback(STATE_GET_THE_APP, GOOGLE_LINK_CALLBACK_INDEX, googleOutput);
     }
 }

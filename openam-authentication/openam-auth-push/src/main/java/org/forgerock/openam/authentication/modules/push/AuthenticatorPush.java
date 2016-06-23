@@ -93,6 +93,8 @@ public class AuthenticatorPush extends AbstractPushModule {
     private PollingWaitAssistant pollingWaitAssistant;
     private long expireTime;
 
+    private String pushMessage;
+
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
 
@@ -118,6 +120,8 @@ public class AuthenticatorPush extends AbstractPushModule {
         } else {
             pollingWaitAssistant = new PollingWaitAssistant(timeout);
         }
+
+        pushMessage = CollectionHelper.getMapAttr(options, DEVICE_PUSH_MESSAGE);
 
         String authLevel = CollectionHelper.getMapAttr(options, AUTH_LEVEL);
         if (authLevel != null) {
@@ -169,9 +173,8 @@ public class AuthenticatorPush extends AbstractPushModule {
         }
     }
 
-
     private boolean emergencyPressed(Callback[] callbacks) {
-        ConfirmationCallback callback = (ConfirmationCallback) callbacks[2];
+        ConfirmationCallback callback = (ConfirmationCallback) callbacks[EMERGENCY_CALLBACK_POSITION];
         return callback.getSelectedIndex() == EMERGENCY_PRESSED;
     }
 
@@ -183,8 +186,8 @@ public class AuthenticatorPush extends AbstractPushModule {
 
     private int emergencyState(Callback[] callbacks, String username, String realm) throws AuthLoginException {
 
-        NameCallback emergencyCode = (NameCallback) callbacks[0];
-        String codeAttempt = emergencyCode.getName();
+        NameCallback recoveryCode = (NameCallback) callbacks[RECOVERY_CODE_CALLBACK_POSITION];
+        String codeAttempt = recoveryCode.getName();
 
         List<String> recoveryCodes = new ArrayList<>(Arrays.asList(device.getRecoveryCodes()));
         if (recoveryCodes.contains(codeAttempt)) {
@@ -293,7 +296,7 @@ public class AuthenticatorPush extends AbstractPushModule {
 
     private int usernameState(Callback[] callbacks) throws AuthLoginException {
         Reject.ifNull(callbacks);
-        NameCallback nameCallback = (NameCallback) callbacks[0];
+        NameCallback nameCallback = (NameCallback) callbacks[USERNAME_CALLBACK_LOCATION_POSITION];
         username = nameCallback.getName();
 
         if (StringUtils.isBlank(username)) {
@@ -333,8 +336,11 @@ public class AuthenticatorPush extends AbstractPushModule {
                 .claims(jwtClaimsSetBuilder.build())
                 .headers().alg(JwsAlgorithm.HS256).done().build();
 
-        PushMessage message = new PushMessage(communicationId, jwt,
-                "Login attempt from " + username + " at " + device.getIssuer());
+        pushMessage = pushMessage.replaceAll("\\{\\{user\\}\\}", username);
+        pushMessage = pushMessage.replaceAll("\\{\\{issuer\\}\\}", device.getIssuer());
+
+        PushMessage message = new PushMessage(communicationId, jwt, pushMessage);
+        messageId = message.getMessageId();
 
         Set<Predicate> servicePredicates = new HashSet<>();
         servicePredicates.add(
@@ -343,14 +349,13 @@ public class AuthenticatorPush extends AbstractPushModule {
                 new PushMessageChallengeResponsePredicate(Base64.decode(device.getSharedSecret()), challenge, JWT));
 
         try {
-            messagePromise = pushService.getMessageDispatcher(realm).expect(message.getMessageId(), servicePredicates);
+            messagePromise = pushService.getMessageDispatcher(realm).expect(messageId, servicePredicates);
             pushService.send(message, realm);
             pollingWaitAssistant.start(messagePromise.getPromise());
 
             servicePredicates.addAll(pushService.getAuthenticationMessagePredicatesFor(realm));
 
-            storeInCTS(message.getMessageId(), servicePredicates, timeout);
-            messageId = message.getMessageId();
+            storeInCTS(messageId, servicePredicates, timeout);
 
         } catch (PushNotificationException e) {
             DEBUG.error("AuthenticatorPush :: sendMessage() : Failed to transmit message through PushService.");
@@ -373,7 +378,6 @@ public class AuthenticatorPush extends AbstractPushModule {
     }
 
     private void setPollbackTimePeriod(long periodInMilliseconds) throws AuthLoginException {
-
         PollingWaitCallback newPollingWaitCallback = PollingWaitCallback.makeCallback()
                 .asCopyOf((PollingWaitCallback) getCallback(STATE_WAIT)[POLLING_CALLBACK_POSITION])
                 .withWaitTime(String.valueOf(periodInMilliseconds))
@@ -383,7 +387,7 @@ public class AuthenticatorPush extends AbstractPushModule {
 
     private void setEmergencyButton() throws AuthLoginException {
         ConfirmationCallback confirmationCallback =
-                new ConfirmationCallback(ConfirmationCallback.INFORMATION, USE_EMERGENCY_CODE, 0);
+                new ConfirmationCallback(ConfirmationCallback.INFORMATION, USE_EMERGENCY_CODE, EMERGENCY_PRESSED);
         confirmationCallback.setSelectedIndex(EMERGENCY_NOT_PRESSED);
         replaceCallback(STATE_WAIT, EMERGENCY_CALLBACK_POSITION, confirmationCallback);
     }

@@ -60,7 +60,16 @@
                         <Value>120000</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
+                <AttributeSchema name="forgerock-am-auth-push-message"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a602"
+                                 resourceName="pushMessage">
+                    <DefaultValues>
+                        <Value>Login attempt from {{user}} at {{issuer}}</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="forgerock-am-auth-push-auth-level"
                                      type="single"
@@ -82,7 +91,16 @@
                             <Value>120000</Value>
                         </DefaultValues>
                     </AttributeSchema>
-
+                    <AttributeSchema name="forgerock-am-auth-push-message"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a602"
+                                     resourceName="pushMessage">
+                        <DefaultValues>
+                            <Value>Login attempt from {{user}} at {{issuer}}</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

@@ -37,7 +37,8 @@ public final class Constants {
     static final String DEVICE_PUSH_WAIT_TIMEOUT = "forgerock-am-auth-push-message-response-timeout";
     /** Module configuration key for authentication level of module. */
     static final String AUTH_LEVEL = "forgerock-am-auth-push-auth-level";
-
+    /** Module configuration key for push message. */
+    static final String DEVICE_PUSH_MESSAGE = "forgerock-am-auth-push-message";
 
     /**
      * MESSAGE CODE KEYS.
@@ -70,7 +71,7 @@ public final class Constants {
      */
 
     /** The Position of the Polling callback in the callbacks step in the xml for this module. */
-    static final int POLLING_CALLBACK_POSITION = 1;
+    static final int POLLING_CALLBACK_POSITION = 0;
 
 
     /** The return value submitted when the emergency button is pressed. */
@@ -81,7 +82,11 @@ public final class Constants {
     /** Text for the emergency code button. */
     static final String[] USE_EMERGENCY_CODE = new String[] { "Use Emergency Code" };
     /** Location of the emergency button callback in XML. */
-    static final int EMERGENCY_CALLBACK_POSITION = 2;
+    static final int EMERGENCY_CALLBACK_POSITION = 1;
+    /** Location of the input field for recovery code. */
+    static final int RECOVERY_CODE_CALLBACK_POSITION = 0;
+    /** Location of the username field for name input. */
+    static final int USERNAME_CALLBACK_LOCATION_POSITION = 0;
 
     /**
      * CONFIG.
