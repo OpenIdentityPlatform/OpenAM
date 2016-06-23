@@ -20,6 +20,7 @@ import static org.forgerock.openam.scripting.ScriptConstants.SERVICE_NAME;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,7 +42,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 public class ScriptingServiceFactory {
 
     private final Logger logger;
-    private final Map<String, ScriptingService> services = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final Map<String, ScriptingService> services = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
     private final CoreWrapper coreWrapper;
     private final RealmNormaliser realmNormaliser;
     private final ServiceConfigManager scm;
