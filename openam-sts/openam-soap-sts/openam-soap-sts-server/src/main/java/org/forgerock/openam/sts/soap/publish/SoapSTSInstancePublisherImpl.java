@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2016 Agile Digital Engineering
  */
 
 package org.forgerock.openam.sts.soap.publish;
@@ -30,7 +31,7 @@ import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
 import org.forgerock.openam.sts.soap.config.SoapSTSInstanceModule;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
-
+import org.forgerock.openam.sts.soap.healthcheck.HealthCheck;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.slf4j.Logger;
 
@@ -83,15 +84,18 @@ public class SoapSTSInstancePublisherImpl implements SoapSTSInstancePublisher {
     private final SoapSTSInstanceLifecycleManager soapSTSInstanceLifecycleManager;
     private final PublishServiceConsumer publishServiceConsumer;
     private final Logger logger;
+    private final HealthCheck healthCheck;
 
     @Inject
     public SoapSTSInstancePublisherImpl(SoapSTSInstanceLifecycleManager soapSTSInstanceLifecycleManager,
                                         PublishServiceConsumer publishServiceConsumer,
-                                        Logger logger) {
+                                        Logger logger,
+                                        HealthCheck healthCheck) {
         publishedAndExposedInstances = new HashMap<String, ConfigAndServerHolder>();
         this.soapSTSInstanceLifecycleManager = soapSTSInstanceLifecycleManager;
         this.publishServiceConsumer = publishServiceConsumer;
         this.logger = logger;
+        this.healthCheck = healthCheck;
     }
 
     @Override
@@ -138,6 +142,9 @@ public class SoapSTSInstancePublisherImpl implements SoapSTSInstancePublisher {
             exposeNewInstances(diff.entriesOnlyOnRight().values());
             removeDeletedInstances(diff.entriesOnlyOnLeft().values());
             updateInstances(diff.entriesDiffering().values());
+            
+            // Update the health check with the number of exposed STS instances.
+            healthCheck.setNumPublishedInstances(publishedAndExposedInstances.size());
         } catch (Exception e) {
             logger.error("Unexpected exception caught in SoapSTSInstancePublisherImpl#run: " + e, e);
         }

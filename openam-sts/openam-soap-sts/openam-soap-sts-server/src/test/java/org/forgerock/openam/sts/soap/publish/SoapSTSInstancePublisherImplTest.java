@@ -12,14 +12,19 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2016 Agile Digital Engineering
  */
 
 package org.forgerock.openam.sts.soap.publish;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Scopes;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
+import org.assertj.core.api.Assertions;
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -29,6 +34,9 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
+import org.forgerock.openam.sts.soap.healthcheck.HealthCheck;
+import org.forgerock.openam.sts.soap.healthcheck.HealthCheckImpl;
+import org.mockito.Matchers;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -58,6 +66,7 @@ public class SoapSTSInstancePublisherImplTest {
     private PublishServiceConsumer mockPublishServiceConsumer;
     private SoapSTSInstancePublisher instancePublisher;
     private Server mockServer;
+    private HealthCheck healthCheck;
 
     class MyModule extends AbstractModule {
         @Override
@@ -70,17 +79,21 @@ public class SoapSTSInstancePublisherImplTest {
             bind(PublishServiceConsumer.class).toInstance(mockPublishServiceConsumer);
             bind(Logger.class).toInstance(mockLogger);
             bind(SoapSTSInstancePublisher.class).to(SoapSTSInstancePublisherImpl.class);
+            bind(HealthCheck.class).to(HealthCheckImpl.class).in(Scopes.SINGLETON);
         }
     }
 
     //need to re-create the bindings before each test method because invocations against a mock being calculated.
     @BeforeMethod
     public void setUp() {
-        instancePublisher = Guice.createInjector(new MyModule()).getInstance(SoapSTSInstancePublisher.class);
+        Injector injector = Guice.createInjector(new MyModule());
+        instancePublisher = injector.getInstance(SoapSTSInstancePublisher.class);
+        healthCheck = injector.getInstance(HealthCheck.class);
     }
     @SuppressWarnings("unchecked")
     @Test
     public void testPublishAndRemove() throws ResourceException, UnsupportedEncodingException {
+        Assertions.assertThat(healthCheck.getNumPublishedInstances()).isEqualTo(0);
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(createInstanceConfig("instanceOne",
                 "http://host.com:8080/am"));
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(initialSet);
@@ -90,6 +103,7 @@ public class SoapSTSInstancePublisherImplTest {
         verify(mockPublishServiceConsumer, times(1)).getPublishedInstances();
         verify(mockLifecycleManager, times(1)).exposeSTSInstanceAsWebService(any(Map.class),
                 any(SecurityTokenServiceProvider.class), any(SoapSTSInstanceConfig.class));
+        Assertions.assertThat(healthCheck.getNumPublishedInstances()).isEqualTo(1);
 
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(Sets.<SoapSTSInstanceConfig>newHashSet());
         instancePublisher.run();
@@ -97,6 +111,7 @@ public class SoapSTSInstancePublisherImplTest {
         verify(mockLifecycleManager, times(1)).exposeSTSInstanceAsWebService(any(Map.class),
                 any(SecurityTokenServiceProvider.class), any(SoapSTSInstanceConfig.class));
         verify(mockLifecycleManager, times(1)).destroySTSInstance(any(Server.class));
+        Assertions.assertThat(healthCheck.getNumPublishedInstances()).isEqualTo(0);
     }
 
     @SuppressWarnings("unchecked")

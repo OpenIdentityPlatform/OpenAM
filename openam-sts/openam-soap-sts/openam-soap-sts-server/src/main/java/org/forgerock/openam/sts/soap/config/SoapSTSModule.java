@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2016 Agile Digital Engineering
  */
 
 package org.forgerock.openam.sts.soap.config;
@@ -48,6 +49,8 @@ import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccess;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccessImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycle;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycleImpl;
+import org.forgerock.openam.sts.soap.healthcheck.HealthCheck;
+import org.forgerock.openam.sts.soap.healthcheck.HealthCheckImpl;
 import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerInterceptorProvider;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumer;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumerImpl;
@@ -158,6 +161,9 @@ public class SoapSTSModule extends PrivateModule {
 
         bind(TimeService.class).toInstance(TimeService.SYSTEM);
         expose(TimeService.class);
+        
+        bind(HealthCheck.class).to(HealthCheckImpl.class).in(Scopes.SINGLETON);
+        expose(HealthCheck.class);
     }
 
     @Provides
