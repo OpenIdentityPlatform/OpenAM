@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcherFactory;
 import org.forgerock.openam.services.push.dispatch.Predicate;
@@ -164,14 +165,14 @@ public class PushNotificationService {
      *
      * @param realm The realm whose delegate's MessageDispatcher to return.
      * @return The MessageDispatcher belonging to the delegate associated with the realm requested.
-     * @throws PushNotificationException If there was no delegate configured for the given realm.
+     * @throws NotFoundException If there was no delegate configured for the given realm.
      */
-    public MessageDispatcher getMessageDispatcher(String realm) throws PushNotificationException {
+    public MessageDispatcher getMessageDispatcher(String realm) throws NotFoundException {
         if (pushRealmMap.containsKey(realm)) {
             return pushRealmMap.get(realm).getMessageDispatcher();
         }
 
-        throw new PushNotificationException("No Push Notification Service available for realm " + realm);
+        throw new NotFoundException("No Push Notification Service available for realm " + realm);
     }
 
     /**

@@ -41,6 +41,7 @@ import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jwt.Jwt;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
@@ -262,7 +263,7 @@ public class AuthenticatorPush extends AbstractPushModule {
             }
         } catch (CoreTokenException e) {
             DEBUG.warning("CTS threw exception, falling back to local MessageDispatcher.", e);
-        } catch (PushNotificationException e) {
+        } catch (NotFoundException e) {
             DEBUG.error("Could not find local MessageDispatcher for realm.", e);
             throw failedAsLoginException();
         }
@@ -357,7 +358,7 @@ public class AuthenticatorPush extends AbstractPushModule {
 
             storeInCTS(messageId, servicePredicates, timeout);
 
-        } catch (PushNotificationException e) {
+        } catch (NotFoundException | PushNotificationException e) {
             DEBUG.error("AuthenticatorPush :: sendMessage() : Failed to transmit message through PushService.");
             return false;
         } catch (JsonProcessingException | CoreTokenException e) {

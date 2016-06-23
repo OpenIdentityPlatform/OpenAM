@@ -44,7 +44,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
@@ -74,7 +73,7 @@ public class SnsMessageResourceTest {
 
         try {
             given(mockService.getMessageDispatcher(anyString())).willReturn(mockDispatcher);
-        } catch (PushNotificationException e) {
+        } catch (NotFoundException e) {
             //does not happen
         }
 

@@ -199,6 +199,15 @@ public class Routers {
         return InjectorHolder.getInstance(AuthenticationEnforcer.class);
     }
 
+    /**
+     * Creates a new filter which does not require authentication.
+     *
+     * @return A new {@link PassThroughFilter}.
+     */
+    public static PassThroughFilter none() {
+        return InjectorHolder.getInstance(PassThroughFilter.class);
+    }
+
     static class RootResourceRoute extends ResourceRoute {
 
         private final org.forgerock.http.routing.Router chfRouter;

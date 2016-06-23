@@ -48,6 +48,7 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.authentication.callbacks.helpers.PollingWaitAssistant;
 import org.forgerock.openam.authentication.callbacks.helpers.QRCallbackBuilder;
@@ -247,7 +248,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
                     realm));
             this.deviceResponsePromise = pushService.getMessageDispatcher(realm)
                     .expect(messageId, servicePredicates).getPromise();
-        } catch (PushNotificationException e) {
+        } catch (NotFoundException | PushNotificationException e) {
             DEBUG.error("Unable to read service addresses for Push Notification Service.");
             throw failedAsLoginException();
         }
@@ -316,7 +317,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
             }
         } catch (CoreTokenException e) {
             DEBUG.warning("CTS threw exception, falling back to local MessageDispatcher.", e);
-        } catch (PushNotificationException e) {
+        } catch (NotFoundException e) {
             DEBUG.error("Could not find local MessageDispatcher for realm.", e);
             throw failedAsLoginException();
         }

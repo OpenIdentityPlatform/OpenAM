@@ -40,7 +40,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
@@ -154,20 +153,25 @@ public class SnsMessageResource {
         }
 
         try {
-            pushNotificationService.getMessageDispatcher(realm).handle(messageId, actionContent);
-        } catch (NotFoundException | PushNotificationException e) {
-            debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
+            MessageDispatcher messageDispatcher = pushNotificationService.getMessageDispatcher(realm);
             try {
-                attemptFromCTS(messageId, actionContent, actionRequest.getAction().equals(REGISTER));
-            } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
-                    | CoreTokenException | NotFoundException ex) {
-                debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
+                messageDispatcher.handle(messageId, actionContent);
+            } catch (NotFoundException e) {
+                debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
+                try {
+                    attemptFromCTS(messageId, actionContent, actionRequest.getAction().equals(REGISTER));
+                } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
+                        | CoreTokenException | NotFoundException ex) {
+                    debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
+                    return RestUtils.generateBadRequestException();
+                }
+            } catch (PredicateNotMetException e) {
+                debug.warning("Unable to deliver message with messageId {} in realm {} as predicate not met.",
+                        messageId, realm, e);
                 return RestUtils.generateBadRequestException();
             }
-        } catch (PredicateNotMetException e) {
-            debug.warning("Unable to deliver message with messageId {} in realm {} as predicate not met.",
-                    messageId, realm, e);
-            return RestUtils.generateBadRequestException();
+        } catch (NotFoundException e) {
+            return e.asPromise();
         }
 
         return newResultPromise(newActionResponse(json(object())));
