@@ -561,7 +561,8 @@
             },
             "deviceDetailsDialog": {
                 "recoveryCodes": "Recovery codes",
-                "deviceName": "Device name"
+                "deviceName": "Device name",
+                "copyRecoveryCodes": "Keep a copy of these codes in a safe place. You will need to use one of your recovery codes to authenticate to OpenAM if you lose your device."
             }
         }
     },

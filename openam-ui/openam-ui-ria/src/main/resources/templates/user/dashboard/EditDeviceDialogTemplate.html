@@ -9,9 +9,7 @@
         <label class="control-label col-sm-4">{{t "openam.authDevices.deviceDetailsDialog.recoveryCodes"}}</label>
         <div class="col-sm-7">
             <pre class="text-center">{{#each recoveryCodes}}{{this}}<br>{{/each}}</pre>
-            <a class="btn btn-default" href="{{recoveryCodesHref}}">
-                <span class="bootstrap-dialog-button-icon fa fa-download"></span>{{t "common.form.download"}}
-            </a>
+            <span>{{t "openam.authDevices.deviceDetailsDialog.copyRecoveryCodes"}}</span>
         </div>
     </div>
 </form>

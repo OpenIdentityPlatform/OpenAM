@@ -23,8 +23,7 @@ define([
     return function (uuid, device) {
         const data = {
             deviceName: device.deviceName,
-            recoveryCodes: device.recoveryCodes,
-            recoveryCodesHref: `data:text/plain,${encodeURIComponent(device.recoveryCodes.join("\r\n"))}`
+            recoveryCodes: device.recoveryCodes
         };
 
         UIUtils.compileTemplate("templates/user/dashboard/EditDeviceDialogTemplate.html", data).then((tpl) => {
