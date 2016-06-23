@@ -148,7 +148,8 @@
                 "problemLoggingQuestion" : "Having trouble logging in?",
                 "socialAuthentication" : "Or login with:",
                 "resetPassword" : "Forgot Password?",
-                "forgotUsername" : "Forgot Username?"
+                "forgotUsername" : "Forgot Username?",
+                "troubleScanning": "Trouble Scanning?"
             },
             "404" : {
                 "pageNotFound" : "Page not found",

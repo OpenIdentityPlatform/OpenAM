@@ -42,12 +42,16 @@ define([
      * @param  {String} id - used to select target.
      */
     obj.createCode = function (options) {
-        var code = getCode(options),
-            element = $("<div class='text-center'/>");
+        const code = getCode(options);
+        const element = $("<div class='text-center'/>");
         element.append(code);
-
-        $(`#${options.id}`).append(element);
-
+        const container = $(`#${options.id}`);
+        container.append(element);
+        container.append(
+            `<div class="form-group">
+                <a href="${options.text}" class="btn btn-lg btn-block btn-uppercase btn-default"
+                >${$.t("templates.user.LoginTemplate.troubleScanning")}</a>
+            </div>`);
     };
 
     return obj;

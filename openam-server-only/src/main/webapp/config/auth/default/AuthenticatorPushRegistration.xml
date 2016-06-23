@@ -39,7 +39,7 @@
     <!-- GET_THE_APP_INFO_PAGE -->
     <Callbacks length="2" order="3" timeout="120" header="ForgeRock Authenticator (Push) Registration">
         <TextOutputCallback>
-            Go to your mobile device application store and get the Forgerock Authenticator application
+            Go to your mobile device application store and get the ForgeRock Authenticator application
             then press OK to continue.
         </TextOutputCallback>
         <ConfirmationCallback>
