@@ -26,11 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOToken;
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.CsrfProtection;
 import org.forgerock.oauth2.core.DeviceCode;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -52,6 +53,7 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.StringUtils;
@@ -66,6 +68,8 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A restlet resource for user codes
@@ -74,6 +78,8 @@ import org.restlet.routing.Router;
  * @since 13.0.0
  */
 public class DeviceCodeVerificationResource extends ConsentRequiredResource {
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+
     private static final String FORM = "templates/CodeVerificationForm.ftl";
     private static final String THANKS_PAGE = "templates/CodeThanks.ftl";
 
@@ -86,12 +92,14 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     private final ResourceOwnerSessionValidator resourceOwnerSessionValidator;
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2Utils oAuth2Utils;
+    private final CsrfProtection csrfProtection;
 
     /**
      * Constructs user code verification resource for OAuth2 Device Flow
      * @param router The base router
      * @param exceptionHandler
      * @param oAuth2Utils An OAuth2Utils instance.
+     * @param csrfProtection An instance of the CsrfProtection.
      */
     @Inject
     public DeviceCodeVerificationResource(XUIState xuiState, @Named("OAuth2Router") Router router,
@@ -99,7 +107,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             TokenStore tokenStore, OAuth2RequestFactory requestFactory,
             AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
             ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
-            ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils) {
+            ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils, CsrfProtection csrfProtection) {
         super(router, baseURLProviderFactory, xuiState);
         this.representation = representation;
         this.tokenStore = tokenStore;
@@ -110,6 +118,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
         this.clientRegistrationStore = clientRegistrationStore;
         this.oAuth2Utils = oAuth2Utils;
+        this.csrfProtection = csrfProtection;
     }
 
     /**
@@ -138,6 +147,12 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         try {
             final String decision = request.getParameter("decision");
             if (StringUtils.isNotEmpty(decision)) {
+
+                if (csrfProtection.isCsrfAttack(request)) {
+                    logger.debug("Session id from consent request does not match users session");
+                    throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
+                }
+
                 final boolean consentGiven = "allow".equalsIgnoreCase(decision);
                 final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
                 if (saveConsent) {

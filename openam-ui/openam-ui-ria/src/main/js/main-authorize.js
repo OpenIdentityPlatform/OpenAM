@@ -56,12 +56,13 @@ require([
     "jquery",
     "lodash",
     "handlebars",
+    "org/forgerock/openam/ui/user/oauth2/OAuth2ConsentPageHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager",
     "Router"
-], function ($, _, HandleBars, Configuration, Constants, i18nManager, ThemeManager, Router) {
+], function ($, _, HandleBars, OAuth2ConsentPageHelper, Configuration, Constants, i18nManager, ThemeManager, Router) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -79,7 +80,8 @@ require([
         ],
         data = window.pageData || {},
         KEY_CODE_ENTER = 13,
-        KEY_CODE_SPACE = 32;
+        KEY_CODE_SPACE = 32,
+        dataReady = $.Deferred();
 
     i18nManager.init({
         paramLang: {
@@ -108,41 +110,49 @@ require([
             data.noScopes = true;
         }
 
+        OAuth2ConsentPageHelper.getUserSessionId().then(function (userSessionId) {
+            data.oauth2Data.csrf = userSessionId;
+            dataReady.resolve();
+        });
     } else {
         data.noScopes = true;
+        dataReady.resolve();
     }
 
-    Configuration.globalData = { realm : data.realm };
+    dataReady.then(function () {
+        Configuration.globalData = { realm : data.realm };
 
-    Router.currentRoute = {
-        navGroup: "user"
-    };
+        Router.currentRoute = {
+            navGroup: "user"
+        };
 
-    ThemeManager.getTheme().always(function (theme) {
+        ThemeManager.getTheme().always(function (theme) {
 
-        // add prefix to templates for custom theme when path is defined
-        var themePath = Configuration.globalData.theme.path;
-        templatePaths = _.map(templatePaths, function (templatePath) {
-            return `text!${themePath}${templatePath}`;
-        });
+            // add prefix to templates for custom theme when path is defined
+            var themePath = Configuration.globalData.theme.path;
+            templatePaths = _.map(templatePaths, function (templatePath) {
+                return `text!${themePath}${templatePath}`;
+            });
 
-        require(templatePaths, function (AuthorizeTemplate, LoginBaseTemplate, FooterTemplate, LoginHeaderTemplate) {
-            data.theme = theme;
-            baseTemplate = HandleBars.compile(LoginBaseTemplate);
-            formTemplate = HandleBars.compile(AuthorizeTemplate);
-            footerTemplate = HandleBars.compile(FooterTemplate);
-            loginHeaderTemplate = HandleBars.compile(LoginHeaderTemplate);
+            require(templatePaths, function (AuthorizeTemplate, LoginBaseTemplate, FooterTemplate,
+                                             LoginHeaderTemplate) {
+                data.theme = theme;
+                baseTemplate = HandleBars.compile(LoginBaseTemplate);
+                formTemplate = HandleBars.compile(AuthorizeTemplate);
+                footerTemplate = HandleBars.compile(FooterTemplate);
+                loginHeaderTemplate = HandleBars.compile(LoginHeaderTemplate);
 
-            $("#wrapper").html(baseTemplate(data));
-            $("#footer").html(footerTemplate(data));
-            $("#loginBaseLogo").html(loginHeaderTemplate(data));
-            $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
-                // keyup is required so that the collapsed panel can be opened with the keyboard alone,
-                // and without relying on a mouse click event.
-                if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
-                    return;
-                }
-                $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
+                $("#wrapper").html(baseTemplate(data));
+                $("#footer").html(footerTemplate(data));
+                $("#loginBaseLogo").html(loginHeaderTemplate(data));
+                $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
+                    // keyup is required so that the collapsed panel can be opened with the keyboard alone,
+                    // and without relying on a mouse click event.
+                    if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {
+                        return;
+                    }
+                    $(this).toggleClass("expanded").next(".panel-collapse").slideToggle();
+                });
             });
         });
     });
