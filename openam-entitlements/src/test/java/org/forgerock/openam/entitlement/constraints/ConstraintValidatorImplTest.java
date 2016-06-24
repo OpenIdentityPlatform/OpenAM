@@ -200,5 +200,73 @@ public class ConstraintValidatorImplTest {
                 .against(resourceType)
                 .throwExceptionIfFailure();
     }
+    
+    @Test
+    public void validResourceWithoutPortNumberPass() {
+        // Given
+        ResourceType resourceType = ResourceType
+                .builder()
+                .setName("test")
+                .setUUID("abc")
+                .addPattern("http://www.example.com/*")
+                .build();
 
+        // When
+        Set<String> resources = CollectionUtils
+                .asSet("http://www.example.com/something");
+        boolean successful = validator
+                .verifyResources(resources)
+                .using(new URLResourceName())
+                .against(resourceType)
+                .isSuccessful();
+
+        // Then
+        assertThat(successful).isTrue();
+    }
+
+    @Test
+    public void validResourceWithPortNumberPass() {
+        // Given
+        ResourceType resourceType = ResourceType
+                .builder()
+                .setName("test")
+                .setUUID("abc")
+                .addPattern("http://www.example.com/*")
+                .build();
+
+        // When
+        Set<String> resources = CollectionUtils
+                .asSet("http://www.example.com:80/something");
+        boolean successful = validator
+                .verifyResources(resources)
+                .using(new URLResourceName())
+                .against(resourceType)
+                .isSuccessful();
+
+        // Then
+        assertThat(successful).isTrue();
+    }
+
+    @Test
+    public void validResourceWithPortNumberAndURLWithoutPortNumberPass() {
+        // Given
+        ResourceType resourceType = ResourceType
+                .builder()
+                .setName("test")
+                .setUUID("abc")
+                .addPattern("http://www.example.com:*/*")
+                .build();
+
+        // When
+        Set<String> resources = CollectionUtils
+                .asSet("http://www.example.com/something");
+        boolean successful = validator
+                .verifyResources(resources)
+                .using(new URLResourceName())
+                .against(resourceType)
+                .isSuccessful();
+
+        // Then
+        assertThat(successful).isTrue();
+    }
 }
