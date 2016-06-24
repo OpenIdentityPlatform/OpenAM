@@ -275,6 +275,9 @@ public class AMSetupServlet extends HttpServlet {
      * Checks if the embedded directory (if present) needs to be upgraded
      */
     private static void checkOpenDJUpgrade() throws ServletException {
+        if (!isEmbeddedDS()) {
+            return;
+        }
         String baseDirectory = getBaseDir();
         Debug logger = Debug.getInstance(SetupConstants.DEBUG_NAME);
         ZipUtils zipUtils = new ZipUtils(logger);
