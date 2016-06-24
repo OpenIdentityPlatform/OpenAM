@@ -328,6 +328,8 @@ public class ConfigureOAuth2 extends Task {
         }
         application.addAllResourceTypeUuids(asSet(resourceType.getUUID()));
         application.setEntitlementCombiner(DenyOverride.class);
+        application.setSubjects(EntitlementUtils.getSubjectsShortNames());
+        application.setConditions(EntitlementUtils.getConditionsShortNames());
         applicationService.saveApplication(application);
         return resourceType.getUUID();
     }
