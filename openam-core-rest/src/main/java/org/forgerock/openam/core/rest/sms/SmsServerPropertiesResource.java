@@ -37,8 +37,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +59,7 @@ import org.apache.commons.io.IOUtils;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -113,13 +116,8 @@ public class SmsServerPropertiesResource {
     private static final String UNKNOWN_PROPS = "serverconfig.updated.with.invalid.properties";
     private static final String EMPTY_SELECTION = "[Empty]";
 
-    private static JsonValue defaultSchema;
-    private static JsonValue nonDefaultSchema;
-    private static JsonValue directoryConfigSchema;
-
     private final Debug logger;
     private final Properties syntaxProperties;
-    private final Properties titleProperties;
 
     static {
         syntaxRawToReal.put("true,false", "boolean");
@@ -131,21 +129,17 @@ public class SmsServerPropertiesResource {
     }
 
     @Inject
-    public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties, @Named
-            ("ServerAttributeTitles") Properties titleProperties, @Named("frRest") Debug logger) {
+    public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties,
+            @Named("frRest") Debug logger) {
         this.logger = logger;
         this.syntaxProperties = syntaxProperties;
-        this.titleProperties = titleProperties;
-        defaultSchema = getSchema(titleProperties, true);
-        nonDefaultSchema = getSchema(titleProperties, false);
-        directoryConfigSchema = getDirectorySchema(titleProperties, logger);
     }
 
-    private JsonValue getDirectorySchema(Properties titleProperties, Debug logger) {
+    private JsonValue getDirectorySchema(ResourceBundle titleBundle, Debug logger) {
         try {
             String schema = readStream(getClass().getResourceAsStream(DIRECTORY_CONFIG_SCHEMA));
             JsonValue directoryConfigSchema = JsonValueBuilder.toJsonValue(schema);
-            replacePropertyRecursive(directoryConfigSchema, titleProperties, "title");
+            replacePropertyRecursive(directoryConfigSchema, titleBundle, "title");
             return directoryConfigSchema;
         } catch (IOException e) {
             logger.error("Error creating document builder", e);
@@ -153,60 +147,60 @@ public class SmsServerPropertiesResource {
         return null;
     }
 
-    private void replacePropertyRecursive(JsonValue jsonValue, Properties properties, String property) {
+    private void replacePropertyRecursive(JsonValue jsonValue, ResourceBundle bundle, String property) {
         if (jsonValue.isDefined(property) && jsonValue.get(property).isString()) {
             String propValue = jsonValue.get(property).asString();
-            jsonValue.put(property, properties.getProperty(propValue, propValue));
+            jsonValue.put(property, bundle.getString(propValue));
         }
 
         for (JsonValue child : jsonValue) {
             if (child.isMap()) {
-                replacePropertyRecursive(child, properties, property);
+                replacePropertyRecursive(child, bundle, property);
             }
         }
     }
 
-    private JsonValue getSchema(Properties titleProperties, boolean isDefault) {
-        JsonValue template = json(object());
-        for (String tabName : getTabNames()) {
-            try {
-                Document propertySheet = getPropertySheet(tabName);
-                Map<String, List<String>> options = getOptions(propertySheet, tabName);
-                Map<String, List<String>> optionLabels = getOptionLabels(propertySheet, tabName, titleProperties);
-                List<String> sectionNames = getSectionNames(propertySheet);
-                Set<String> optionalAttributes = getOptionalAttributes(propertySheet, tabName);
-                Set<String> passwordFields = getPasswordFields(propertySheet);
+    private JsonValue getSchema(ResourceBundle titleBundle, boolean isDefault, String tabName) {
+        JsonValue schema = json(object(field("type", "object")));
+        if (!getTabNames().contains(tabName)) {
+            return null;
+        }
+        try {
+            Document propertySheet = getPropertySheet(tabName);
+            Map<String, List<String>> options = getOptions(propertySheet, tabName);
+            Map<String, List<String>> optionLabels = getOptionLabels(propertySheet, tabName, titleBundle);
+            List<String> sectionNames = getSectionNames(propertySheet);
+            Set<String> optionalAttributes = getOptionalAttributes(propertySheet, tabName);
+            Set<String> passwordFields = getPasswordFields(propertySheet);
 
-                template.putPermissive(new JsonPointer("/properties/" + tabName + "/type"), "object");
-                int sectionOrder = 0;
-                for (String sectionName : sectionNames) {
-                    if (isDefault && SERVER_PARENT_SITE.equals(sectionName)) {
-                        continue;
-                    }
-                    final String sectionPath = "/properties/" + tabName + "/properties/" + sectionName;
-                    template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
-                    template.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
-                    template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
-
-                    int attributeOrder = 0;
-
-                    for (SMSLabel label : getLabels(sectionName, propertySheet, titleProperties, options, optionLabels,
-                            passwordFields)) {
-                        String attributeName = getAttributeNameFromCcName(label.getLabelFor());
-                        if (isDefault || isParentSiteAttribute(tabName, attributeName)) {
-                            addDefaultSchema(template, sectionPath, label, attributeOrder, optionalAttributes, tabName);
-                        } else {
-                            addServerSchema(template, sectionPath, label, attributeOrder);
-                        }
-                        attributeOrder++;
-                    }
+            int sectionOrder = 0;
+            for (String sectionName : sectionNames) {
+                if (isDefault && SERVER_PARENT_SITE.equals(sectionName)) {
+                    continue;
                 }
-            } catch (InternalServerErrorException | NotFoundException | XPathExpressionException e) {
-                logger.error("Error reading property sheet for tab " + tabName, e);
+                final String sectionPath = "/properties/" + sectionName;
+                schema.putPermissive(new JsonPointer(sectionPath + "/title"), titleBundle.getString(sectionName));
+                schema.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
+                schema.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
+
+                int attributeOrder = 0;
+
+                for (SMSLabel label : getLabels(sectionName, propertySheet, titleBundle, options, optionLabels,
+                        passwordFields)) {
+                    String attributeName = getAttributeNameFromCcName(label.getLabelFor());
+                    if (isDefault || isParentSiteAttribute(tabName, attributeName)) {
+                        addDefaultSchema(schema, sectionPath, label, attributeOrder, optionalAttributes, tabName);
+                    } else {
+                        addServerSchema(schema, sectionPath, label, attributeOrder);
+                    }
+                    attributeOrder++;
+                }
             }
+        } catch (InternalServerErrorException | NotFoundException | XPathExpressionException e) {
+            logger.error("Error reading property sheet for tab " + tabName, e);
         }
 
-        return template;
+        return schema;
     }
 
     private void addDefaultSchema(JsonValue template, String sectionPath, SMSLabel label, int attributeOrder,
@@ -355,7 +349,7 @@ public class SmsServerPropertiesResource {
     }
 
     @Action
-    public Promise<ActionResponse, ResourceException> schema(Context serverContext) {
+    public Promise<ActionResponse, ResourceException> schema(ActionRequest request, Context serverContext) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String serverId = uriVariables.get("serverName");
@@ -384,17 +378,19 @@ public class SmsServerPropertiesResource {
 
         JsonValue schema;
         boolean isServerDefault = serverUrl.equalsIgnoreCase(SERVER_DEFAULT_NAME);
-        final JsonPointer tabPointer = new JsonPointer("properties/" + tabName);
+
+        ResourceBundle titleBundle = request.getPreferredLocales()
+                .getBundleInPreferredLocale("amConsole", getClass().getClassLoader());
 
         if (ADVANCED_TAB_NAME.equals(tabName)) {
             schema = getAdvancedSchema(serverContext, serverUrl);
         } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
-            schema = directoryConfigSchema;
+            schema = getDirectorySchema(titleBundle, logger);
         } else if (isServerDefault) {
-            schema = defaultSchema.get(tabPointer);
+            schema = getSchema(titleBundle, true, tabName);
         } else {
-            schema = nonDefaultSchema.get(tabPointer);
-            addSiteOptions(tabName, serverContext, schema);
+            schema = getSchema(titleBundle, false, tabName);
+            addSiteOptions(tabName, serverContext, schema, titleBundle);
         }
 
         if (schema == null) {
@@ -404,13 +400,13 @@ public class SmsServerPropertiesResource {
         return newResultPromise(newActionResponse(schema));
     }
 
-    private void addSiteOptions(String tabName, Context serverContext, JsonValue schema) {
+    private void addSiteOptions(String tabName, Context serverContext, JsonValue schema, ResourceBundle titleBundle) {
         if (GENERAL_TAB_NAME.equals(tabName)) {
             try {
                 List<String> sites = new ArrayList<>(getSites(getSsoToken(serverContext)));
                 List<String> siteTitles = new ArrayList<>(sites);
                 sites.add(0, EMPTY_SELECTION);
-                siteTitles.add(0, titleProperties.getProperty(EMPTY_SELECTION));
+                siteTitles.add(0, titleBundle.getString(EMPTY_SELECTION));
                 JsonValue parentSite = schema.get("properties").get(SERVER_PARENT_SITE).get("properties")
                         .get(PARENT_SITE_PROPERTY);
                 parentSite.put("enum", sites);
@@ -439,7 +435,7 @@ public class SmsServerPropertiesResource {
         return properties;
     }
 
-    private List<SMSLabel> getLabels(String sectionName, Document propertySheet, Properties titleProperties,
+    private List<SMSLabel> getLabels(String sectionName, Document propertySheet, ResourceBundle titleBundle,
             Map<String, List<String>> options, Map<String, List<String>> optionLabels, Set<String> passwordFields)
             throws XPathExpressionException {
 
@@ -450,9 +446,9 @@ public class SmsServerPropertiesResource {
         for (int i = 0; i < labels.getLength() - 1; i = i + 2) {
             String defaultValue = labels.item(i).getNodeValue();
             String labelFor = labels.item(i + 1).getNodeValue();
-            String displayValue = titleProperties.getProperty(defaultValue);
+            String displayValue = titleBundle.getString(defaultValue);
             String defaultHelpValue = defaultValue.replaceFirst("amconfig.", "amconfig.help.");
-            String description = titleProperties.getProperty(defaultHelpValue);
+            String description = titleBundle.getString(defaultHelpValue);
 
             final String attributeName = getAttributeNameFromCcName(labelFor);
             final String type = getType(attributeName);
@@ -556,14 +552,14 @@ public class SmsServerPropertiesResource {
         return sectionNames;
     }
 
-    private Map<String, List<String>> getOptionLabels(Document propertySheet, String tabName, Properties optionProperties) {
+    private Map<String, List<String>> getOptionLabels(Document propertySheet, String tabName, ResourceBundle bundle) {
         Map<String, List<String>> options = getOptions(propertySheet, tabName, "@label");
 
         Map<String, List<String>> allOptionLabels = new HashMap<>();
         for (String attributeName : options.keySet()) {
             List<String> optionLabels = new ArrayList<>();
             for (String option : options.get(attributeName)) {
-                optionLabels.add(optionProperties.getProperty(option));
+                optionLabels.add(bundle.getString(option));
             }
             allOptionLabels.put(attributeName, optionLabels);
         }
@@ -880,7 +876,7 @@ public class SmsServerPropertiesResource {
     }
 
     @Update
-    public Promise<ResourceResponse, ResourceException> update(Context serverContext, UpdateRequest updateRequest) {
+    public Promise<ResourceResponse, ResourceException> update(Context serverContext, UpdateRequest request) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String tabName = getTabName(uriVariables);
@@ -900,11 +896,11 @@ public class SmsServerPropertiesResource {
             boolean isAdvancedTab = ADVANCED_TAB_NAME.equalsIgnoreCase(tabName);
 
             if (isServerDefault) {
-                updateServerDefaults(updateRequest.toJsonValue().get("content"), token, isAdvancedTab);
+                updateServerDefaults(request.toJsonValue().get("content"), token, isAdvancedTab);
             } else if (DIRECTORY_CONFIGURATION_TAB_NAME.equals(tabName)) {
-                updateDirectoryConfiguration(updateRequest.toJsonValue().get("content"), token, serverUrl);
+                updateDirectoryConfiguration(request.toJsonValue().get("content"), token, serverUrl);
             } else {
-                updateServerInstance(updateRequest.toJsonValue().get("content"), token, serverUrl, tabName);
+                updateServerInstance(request.toJsonValue().get("content"), token, serverUrl, tabName);
             }
 
             return read(serverContext);
@@ -920,8 +916,10 @@ public class SmsServerPropertiesResource {
             logger.error("Invalid property", e);
         } catch (UnknownPropertyNameException e) {
             logger.warning("Unknown property found.", e);
+            ResourceBundle bundle = request.getPreferredLocales().getBundleInPreferredLocale("amConsole",
+                    getClass().getClassLoader());
             return new BadRequestException(
-                    format(titleProperties.getProperty(UNKNOWN_PROPS), e.getMessage())).asPromise();
+                    format(bundle.getString(UNKNOWN_PROPS), e.getMessage())).asPromise();
         }
 
         return new BadRequestException("Error updating values for " + tabName).asPromise();

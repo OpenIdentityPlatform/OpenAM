@@ -92,15 +92,6 @@ public class CoreRestSmsGuiceModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton
-    @Named("ServerAttributeTitles")
-    public Properties getServerAttributeTitles() throws IOException {
-        Properties titleProperties = new Properties();
-        titleProperties.load(getClass().getClassLoader().getResourceAsStream("amConsole.properties"));
-        return titleProperties;
-    }
-
-    @Provides
     @Named("serviceSupportedSchemaTypes")
     public Set<SchemaType> getServiceSupportedSchemaTypes() {
         Set<SchemaType> supportedSchemaTypes = new HashSet<>();
