@@ -16,9 +16,12 @@
 
 package org.forgerock.openam.oauth2;
 
+import static java.util.Locale.ROOT;
 import static org.forgerock.openam.tokens.TokenType.OAUTH_STATELESS;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +30,6 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.TimeUtils;
-import org.joda.time.Duration;
 
 /**
  * Implementation of the TokenAdapter for the StatelessTokenMetadata objects.
@@ -46,7 +48,9 @@ public class StatelessTokenCtsAdapter implements TokenAdapter<StatelessTokenMeta
     public Token toToken(StatelessTokenMetadata metadata) {
         Token token = new Token(metadata.getId(), OAUTH_STATELESS);
         token.setUserId(metadata.getResourceOwnerId());
-        token.setExpiryTimestamp(TimeUtils.fromUnixTime(metadata.getExpiryTime() / 1000L));
+        Calendar calendar = getCalendarInstance(TimeUtils.UTC, ROOT);
+        calendar.setTimeInMillis(metadata.getExpiryTime());
+        token.setExpiryTimestamp(calendar);
         token.setAttribute(GRANT_ID_FIELD, metadata.getGrantId());
         token.setAttribute(CLIENT_ID_FIELD, metadata.getClientId());
         token.setAttribute(SCOPE_FIELD, StringUtils.join(metadata.getScope(), ','));

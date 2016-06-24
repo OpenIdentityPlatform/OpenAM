@@ -16,6 +16,7 @@
  */
 package org.forgerock.openam.oauth2;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -250,9 +251,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         String encryptionAlgorithm = clientRegistration.getIDTokenEncryptionResponseAlgorithm();
         String encryptionMethod = clientRegistration.getIDTokenEncryptionResponseMethod();
 
-        final long currentTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
-        final long exp = TimeUnit.MILLISECONDS.toSeconds(clientRegistration.getJwtTokenLifeTime(providerSettings)) +
-                currentTimeInSeconds;
+        long currentTimeMillis = currentTimeMillis();
+        final long exp = clientRegistration.getJwtTokenLifeTime(providerSettings) + currentTimeMillis;
 
         final String realm;
         try {
@@ -289,8 +289,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
                 tokenStore.create(json(object(
                         field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
                         field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
-                        field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(TimeUnit.SECONDS.toMillis(exp)
-                        ))))));
+                        field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
             } catch (CoreTokenException e) {
                 logger.error("Unable to create id_token user session token", e);
                 throw new ServerException("Could not create token in CTS");
@@ -300,8 +299,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OpenIdConnectToken oidcToken = new OpenIdConnectToken(signingKeyId, encryptionKeyId,
                 clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
                 encryptionMethod, clientRegistration.isIDTokenEncryptionEnabled(), iss, subId, clientId,
-                authorizationParty, exp, currentTimeInSeconds, authTime, nonce, opsId, atHash, cHash, acr, amr,
-                IdGenerator.DEFAULT.generate(), realm);
+                authorizationParty, MILLISECONDS.toSeconds(exp), MILLISECONDS.toSeconds(currentTimeMillis), authTime,
+                nonce, opsId, atHash, cHash, acr, amr, IdGenerator.DEFAULT.generate(), realm);
         request.setSession(ops);
         request.setToken(OpenIdConnectToken.class, oidcToken);
 

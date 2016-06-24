@@ -186,15 +186,14 @@ public class StatelessTokenStore implements TokenStore {
                 .asJwt();
         StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwt.build());
         request.setToken(AccessToken.class, accessToken);
-        createStatelessTokenMetadata(jwtId, accessToken);
+        createStatelessTokenMetadata(jwtId, expiryTime.getMillis(), accessToken);
         return accessToken;
     }
 
-    private void createStatelessTokenMetadata(String id, StatelessToken token) throws ServerException {
+    private void createStatelessTokenMetadata(String id, long expiryTime, StatelessToken token) throws ServerException {
 
         try {
             String resourceOwnerId = token.getResourceOwnerId();
-            long expiryTime = token.getExpiryTime();
             String grantId = token.getAuthGrantId();
             String clientId = token.getClientId();
             Set<String> scope = token.getScope();
@@ -409,7 +408,7 @@ public class StatelessTokenStore implements TokenStore {
 
         StatelessRefreshToken refreshToken = new StatelessRefreshToken(jwt, jwt.build());
         request.setToken(RefreshToken.class, refreshToken);
-        createStatelessTokenMetadata(jwtId, refreshToken);
+        createStatelessTokenMetadata(jwtId, expiryTime, refreshToken);
         return refreshToken;
     }
 

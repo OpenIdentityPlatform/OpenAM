@@ -32,6 +32,11 @@ import java.util.concurrent.TimeUnit;
  */
 public final class TimeUtils {
 
+    /**
+     * {@code TimeZone} for Universal Coordinated Time.
+     */
+    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     private TimeUtils() {
     }
 

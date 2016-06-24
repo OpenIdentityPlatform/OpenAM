@@ -18,6 +18,7 @@ package org.forgerock.openam.cts.adapters;
 import static org.forgerock.openam.utils.Time.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +66,7 @@ public class OAuthValues {
         String dateString = values.iterator().next();
         long timestamp = Long.parseLong(dateString);
 
-        Calendar calendar = getCalendarInstance();
+        Calendar calendar = getCalendarInstance(TimeUtils.UTC);
         calendar.setTimeInMillis(timestamp);
 
         return calendar;

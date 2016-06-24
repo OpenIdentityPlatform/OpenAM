@@ -162,7 +162,7 @@ public final class CTSBlacklist<T extends Blacklistable> implements Blacklist<T>
     }
 
     private Calendar now() {
-        return getCalendarInstance(getTimeZone("UTC"), ROOT);
+        return getCalendarInstance(TimeUtils.UTC, ROOT);
     }
 
     private Calendar timeOf(long utcMillis) {
