@@ -24,13 +24,12 @@
  *
  * $Id: IdCachedServicesImpl.java,v 1.21 2009/08/25 06:50:53 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
 
 import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -57,7 +56,10 @@ import com.sun.identity.sm.ServiceManager;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
+import org.forgerock.guava.common.cache.Cache;
+import org.forgerock.guava.common.cache.CacheBuilder;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -78,7 +80,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     private static IdCachedServicesImpl instance;
 
     // Class Private
-    private Cache idRepoCache;
+    private Cache<String, IdCacheBlock> idRepoCache;
 
     private IdCacheStats cacheStats;
 
@@ -116,7 +118,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     }
 
     private void initializeCache() {
-        idRepoCache = new Cache(maxSize);
+        idRepoCache = CacheBuilder.newBuilder().maximumSize(maxSize).build();
     }
 
     private void resetCache(int maxCacheSize) {
@@ -130,7 +132,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
      * @return the size of the SDK LRU cache
      */
     public int getSize() {
-        return idRepoCache.size();
+        return (int) idRepoCache.size();
     }
 
     protected static synchronized IdServices getInstance() {
@@ -171,11 +173,10 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n<<<<<<< BEGIN SDK CACHE CONTENTS >>>>>>>>");
-        if (!idRepoCache.isEmpty()) { // Should never be null
-            Enumeration cacheKeys = idRepoCache.keys();
-            while (cacheKeys.hasMoreElements()) {
-                String key = (String) cacheKeys.nextElement();
-                IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(key);
+        ConcurrentMap<String, IdCacheBlock> map = idRepoCache.asMap();
+        if (!map.isEmpty()) { // Should never be null
+            for (String key : map.keySet()) {
+                IdCacheBlock cb = map.get(key);
                 sb.append("\nSDK Cache Block: ").append(key);
                 sb.append(cb.toString());
             }
@@ -186,19 +187,17 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         return sb.toString();
     }
 
-    /*************************************************************************/
+    // *************************************************************************
     // Update/Dirty methods of this class.
     // *************************************************************************
     private void removeCachedAttributes(String affectDNs, Set attrNames) {
-        Enumeration cacheKeys = idRepoCache.keys();
-        while (cacheKeys.hasMoreElements()) {
-            String key = DNUtils.normalizeDN(
-                cacheKeys.nextElement().toString());
+        for (String key : idRepoCache.asMap().keySet()) {
+            key = DNUtils.normalizeDN(key);
             int l1 = key.length();
             int l2 = affectDNs.length();
             if (key.regionMatches(true, (l1 - l2), affectDNs, 0, l2)) {
                 // key ends with 'affectDN' string
-                IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(key);
+                IdCacheBlock cb = idRepoCache.getIfPresent(key);
                 if (cb != null) {
                     // key ends with 'affectDN' string
                     if ((attrNames != null) &&
@@ -222,7 +221,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
      * marked dirty).
      */
     public synchronized void clearCache() {
-        idRepoCache.clear();
+        idRepoCache.invalidateAll();
         initializeCache();
     }
 
@@ -265,7 +264,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
             }
             break;
         case AMEvent.OBJECT_REMOVED:
-            cb = (IdCacheBlock) idRepoCache.remove(cachedID);
+            cb = idRepoCache.getIfPresent(cachedID);
+            idRepoCache.invalidate(cachedID);
             if (cb != null) {
                 cb.clear(); // Clear anyway & help the GC process
             }
@@ -276,7 +276,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         case AMEvent.OBJECT_RENAMED:
             // Better to remove the renamed entry, or else it will be just
             // hanging in the cache, until LRU kicks in.
-            cb = (IdCacheBlock) idRepoCache.remove(cachedID);
+            cb = idRepoCache.getIfPresent(cachedID);
+            idRepoCache.invalidate(cachedID);
             if (cb != null) {
                 cb.clear(); // Clear anyway & help the GC process
             }
@@ -312,8 +313,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
      */
     private void updateCache(SSOToken token, String dn, Map stringAttributes,
         Map byteAttributes) throws IdRepoException, SSOException {
-        String key = dn; // This is already normalized
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(key);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         if (cb != null && !cb.hasExpiredAndUpdated() && cb.isExists()) {
             AMIdentity tokenId = IdUtils.getIdentity(token);
             String pDN = tokenId.getUniversalId();
@@ -369,7 +369,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         AMHashMap attributes;
 
         // Check in the cache
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         if (cb == null) { // Entry not present in cache
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("IdCachedServicesImpl.getAttributes(): "
@@ -452,7 +452,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String principalDN = IdUtils.getUniversalId(tokenId);
 
         // Get the cache entry
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         AMHashMap attributes;
         if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
@@ -533,7 +533,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         // Clear the cache, get identity DN
         AMIdentity id = new AMIdentity(token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
-        idRepoCache.remove(dn);
+        idRepoCache.invalidate(dn);
     }
 
     public void removeAttributes(SSOToken token, IdType type, String name,
@@ -545,7 +545,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         // Update the cache
         AMIdentity id = new AMIdentity(token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         if ((cb != null) && !cb.hasExpiredAndUpdated() && cb.isExists()) {
             // Remove the attributes
             cb.removeAttributes(attrNames);
@@ -584,7 +584,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                 // If not search in server.
                 AMIdentity uvid = new AMIdentity(token, pattern, type, orgName, null);
                 String universalID = uvid.getUniversalId().toLowerCase();
-                IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(universalID);
+                IdCacheBlock cb = idRepoCache.getIfPresent(universalID);
                 if ((cb != null) && !cb.hasExpiredAndUpdated() && cb.isExists() &&
                                                                             (ctrl.getSearchModifierMap() == null)) {
                     // Check if search is for a specific identity
@@ -634,7 +634,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
         // Get the cache entry
         Set answer = null;
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         if (cb != null) {
             // Get the fully qualified names
             answer = cb.getFullyQualifiedNames();
@@ -652,7 +652,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     // Return cache block for the universal identifier
     private IdCacheBlock getFromCache(String dn) {
-        IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
+        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         if (cb == null) {
             int ind = dn.toLowerCase().indexOf(",amsdkdn=");
             if (ind > -1) {
@@ -660,7 +660,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                 // TODO: Should return entries which might have amsdkDN but
                 // notifications have not told us about it (like
                 // notifications from plugins other than AMSDKRepo
-                cb = (IdCacheBlock) idRepoCache.get(tmp);
+                cb = idRepoCache.getIfPresent(tmp);
             }
         }
         return cb;
