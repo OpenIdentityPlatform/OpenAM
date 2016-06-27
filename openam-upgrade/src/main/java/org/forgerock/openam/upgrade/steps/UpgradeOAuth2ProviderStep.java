@@ -19,6 +19,7 @@ package org.forgerock.openam.upgrade.steps;
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import javax.inject.Inject;
 import java.security.PrivilegedAction;
@@ -35,12 +36,14 @@ import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.utils.MappingUtils;
 
 /**
  * This upgrade step will find all the OAuth2 Providers that was created with a subset of the available attributes.
@@ -56,6 +59,8 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
     public static final Map<String, String> ALGORITHM_NAMES = new HashMap<String, String>();
     public static final Set<String> DEFAULT_CLAIMS = new HashSet<String>();
     private static final Map<String, String> RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS = new HashMap<>();
+    private static final String OLD_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.provider.impl.ScopeImpl";
+    private static final String NEW_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.OpenAMScopeValidator";
 
     static {
         ALGORITHM_NAMES.put(JwsAlgorithm.HS256.getAlgorithm(), JwsAlgorithm.HS256.name());
@@ -135,6 +140,8 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                     attributesToUpdate.put(realm, null);
                 } else if (shouldUpgradeResponseTypePlugins(withoutDefaults)) {
                     attributesToUpdate.put(realm, null);
+                } else if (shouldUpgradeScopePlugin(withoutDefaults)) {
+                    attributesToUpdate.put(realm, null);
                 }
             }
         } catch (Exception e) {
@@ -179,6 +186,10 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
         return false;
     }
 
+    private boolean shouldUpgradeScopePlugin(Map<String, Set<String>> attributes) {
+        return attributes.get(SCOPE_PLUGIN_CLASS).contains(OLD_SCOPE_PLUGIN);
+    }
+
     @Override
     public void perform() throws UpgradeException {
         persistDefaultsForProviders();
@@ -197,6 +208,7 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 migrateResponseTypePlugins(attributes);
                 renameAlgorithms(attributes);
                 sortScopes(attributes);
+                migrateScopeValidatorPlugin(attributes);
                 serviceConfig.setAttributes(attributes);
                 UpgradeProgress.reportEnd("upgrade.success");
             }
@@ -232,6 +244,12 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 }
             }
             attributes.put(ID_TOKEN_SIGNING_ALGORITHMS, newAlgorithms);
+        }
+    }
+
+    private void migrateScopeValidatorPlugin(Map<String, Set<String>> attributes) {
+        if (attributes.get(SCOPE_PLUGIN_CLASS).contains(OLD_SCOPE_PLUGIN)) {
+            attributes.put(SCOPE_PLUGIN_CLASS, asSet(NEW_SCOPE_PLUGIN));
         }
     }
 
