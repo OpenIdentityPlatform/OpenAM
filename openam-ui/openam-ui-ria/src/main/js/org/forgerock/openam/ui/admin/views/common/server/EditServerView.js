@@ -64,7 +64,7 @@ define([
                 this.parentRender(() => {
                     if (this.sectionId === ServersService.servers.ADVANCED_SECTION) {
                         this.subview = new PanelComponent({
-                            createBody: () => new InlineEditTable({ values: this.values.raw }),
+                            createBody: () => new InlineEditTable({ values: _.cloneDeep(this.values.raw) }),
                             createFooter: () => new PartialBasedView({ partial: "form/_JSONSchemaFooter" })
                         });
                     } else {
@@ -74,13 +74,13 @@ define([
                             createBody: (id) => {
                                 if (schema.raw.properties[id].type === "array") {
                                     return new InlineEditTable({
-                                        values: this.values.raw[id],
+                                        values: _.cloneDeep(this.values.raw)[id],
                                         rowSchema: schema.raw.properties[id].items
                                     });
                                 } else {
                                     return new FlatJSONSchemaView({
                                         schema: new JSONSchema(schema.raw.properties[id]),
-                                        values: new JSONValues(this.values.raw[id])
+                                        values: new JSONValues(_.cloneDeep(this.values.raw)[id])
                                     });
                                 }
                             },

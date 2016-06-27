@@ -193,14 +193,8 @@ define([
                 this.data.values = this.data.values.extend({
                     [this.subview.getTabId()]: this.getJSONSchemaView().getData()
                 });
-            }
-        },
-
-        getCurrentValues () {
-            if (this.data.schema.isCollection()) {
-                return this.data.values.raw;
             } else {
-                return this.getJSONSchemaView().getData();
+                this.data.values = this.data.values.extend(this.getJSONSchemaView().getData());
             }
         },
 
@@ -213,7 +207,7 @@ define([
                 return;
             }
             this.updateValues();
-            this.updateInstance(this.getCurrentValues()).then(() => {
+            this.updateInstance(this.data.values.raw).then(() => {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({ response, type: Messages.TYPE_DANGER });
