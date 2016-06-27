@@ -423,6 +423,9 @@ public class IdServicesImpl implements IdServices {
        checkPermission(token, amOrgName, name, attrMap.keySet(),
                IdOperation.CREATE, type);
        if (type.equals(IdType.USER)) {
+           if (!attrMap.containsKey("username")) {
+               attrMap.put("username", CollectionUtils.asSet(name));
+           }
 
            IdRepoAttributeValidator attrValidator =
                IdRepoAttributeValidatorManager.getInstance().

@@ -171,6 +171,7 @@
                     <DefaultValues>
                        <Value>class=com.sun.identity.idm.server.IdRepoAttributeValidatorImpl</Value>
                        <Value>minimumPasswordLength=8</Value>
+                       <Value>usernameInvalidChars=*|(|)|&amp;|!</Value>
                    </DefaultValues>
                 </AttributeSchema>
 

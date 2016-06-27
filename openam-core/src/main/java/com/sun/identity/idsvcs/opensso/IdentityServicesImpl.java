@@ -221,6 +221,9 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             debug.error("IdentityServicesImpl:create", e);
             if (IdRepoErrorCode.ACCESS_DENIED.equals(e.getErrorCode())) {
                 throw new ForbiddenException(e.getMessage());
+            } else if (IdRepoErrorCode.IDENTITY_ATTRIBUTE_INVALID.equals(e.getErrorCode())) {
+                debug.error(e.getMessage(), e);
+                throw new BadRequestException(e.getMessage());
             } else if (e.getLdapErrorIntCode() == LDAPConstants.LDAP_CONSTRAINT_VIOLATION) {
                 debug.error(e.getMessage(), e);
                 throw new BadRequestException();

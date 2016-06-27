@@ -64,6 +64,7 @@ public class IdRepoErrorCode {
     public static final String NO_SPACE_IDENTITY_NAMES = "233";
     public static final String OLD_PASSWORD_INCORRECT = "234";
     public static final String PASSWORD_POLICY_FAILED = "235";
+    public static final String IDENTITY_ATTRIBUTE_INVALID = "236";
 
     // Plugin related error messages
     public static final String NO_PLUGINS_CONFIGURED = "301";
