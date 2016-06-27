@@ -168,6 +168,13 @@ public final class FMEncProvider implements EncProvider {
 
         String classMethod = "FMEncProvider.encrypt: ";
 
+        if (SAML2SDKUtils.debug.messageEnabled()) {
+            SAML2SDKUtils.debug.message("{} : Data encryption algorithm = '{}'", classMethod, dataEncAlgorithm);
+            SAML2SDKUtils.debug.message("{} : Data encryption strength = '{}'", classMethod, dataEncStrength);
+            SAML2SDKUtils.debug.message("{} : Unique identifier of the recipient = '{}'", classMethod,
+                    recipientEntityID);
+        }
+
 	    // checking the input parameters
         if (xmlString==null ||
             xmlString.length()==0 ||
@@ -187,6 +194,9 @@ public final class FMEncProvider implements EncProvider {
                 !dataEncAlgorithm.equals(XMLCipher.AES_256) &&
                 !dataEncAlgorithm.equals(XMLCipher.TRIPLEDES)) {
 
+                SAML2SDKUtils.debug.error("{} : The encryption algorithm '{}' is not supported", classMethod,
+                        dataEncAlgorithm);
+
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                     "unsupportedKeyAlg"));
         }
@@ -197,17 +207,16 @@ public final class FMEncProvider implements EncProvider {
                 (dataEncAlgorithm.equals(XMLCipher.AES_256) &&
                         dataEncStrength != 256)) {
 
-            SAML2SDKUtils.debug.error(
-                    classMethod +
-                            "Data encryption algorithm " + dataEncAlgorithm +
-                            "and strength " + dataEncStrength +
-                            " mismatch.");
+            SAML2SDKUtils.debug.error("{} : Data encryption algorithm '{}' and strength '{}' mismatch.",
+                    classMethod, dataEncAlgorithm, dataEncStrength);
+
             throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                     "algSizeMismatch"));
         }
         Document doc =
                 XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
         if (doc == null) {
+            SAML2SDKUtils.debug.error("{} : the XML '{}' String can't be parsed.", classMethod, xmlString);
             throw new SAML2Exception(
                     SAML2SDKUtils.bundle.getString("errorObtainingElement"));
         }
@@ -216,7 +225,7 @@ public final class FMEncProvider implements EncProvider {
         }
         Element rootElement = doc.getDocumentElement();
         if (rootElement == null) {
-            SAML2SDKUtils.debug.error(classMethod + "Empty document.");
+            SAML2SDKUtils.debug.error("{} : the XML '{}' String is empty.", classMethod, xmlString);
             throw new SAML2Exception(
                     SAML2SDKUtils.bundle.getString("emptyDoc"));
         }
@@ -249,6 +258,8 @@ public final class FMEncProvider implements EncProvider {
 	 * have three possible values here: "RSA", "AES", "DESede"
 	 */
         try {
+            SAML2SDKUtils.debug.message("{} : public key encryption algorithm '{}'", classMethod, publicKeyEncAlg);
+
             if (publicKeyEncAlg.equals(EncryptionConstants.RSA)) {
                 cipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
 
@@ -259,13 +270,14 @@ public final class FMEncProvider implements EncProvider {
 
                 cipher = XMLCipher.getInstance(XMLCipher.AES_128_KeyWrap);
             } else {
+                SAML2SDKUtils.debug.error("{} : public key encryption algorithm '{}' unsupported", classMethod,
+                        publicKeyEncAlg);
                 throw new SAML2Exception(
                         SAML2SDKUtils.bundle.getString("unsupportedKeyAlg"));
             }
         } catch (XMLEncryptionException xe1) {
             SAML2SDKUtils.debug.error(
-                    classMethod +
-                            "Unable to obtain cipher with public key algorithm.", xe1);
+                     "{} : Unable to obtain cipher with public key algorithm '{}'.", classMethod, publicKeyEncAlg, xe1);
             throw new SAML2Exception(
                     SAML2SDKUtils.bundle.getString("noCipherForPublicKeyAlg"));
         }
@@ -600,9 +612,7 @@ public final class FMEncProvider implements EncProvider {
                 cipher = XMLCipher.getInstance();
             } catch (XMLEncryptionException xe8) {
                 SAML2SDKUtils.debug.error(
-                        classMethod +
-                                "Failed to get cipher instance for " +
-                                "final data decryption.",
+                        classMethod + "Failed to get cipher instance for final data decryption.",
                         xe8);
                 throw new SAML2Exception(
                         SAML2SDKUtils.bundle.getString("noCipher"));
@@ -615,8 +625,7 @@ public final class FMEncProvider implements EncProvider {
                                 "Failed to initialize cipher with secret key.",
                         xe9);
                 throw new SAML2Exception(
-                        SAML2SDKUtils.bundle.getString(
-                                "failedInitCipherForDecrypt"));
+                        SAML2SDKUtils.bundle.getString("failedInitCipherForDecrypt"));
             }
             try {
                 decryptedDoc = cipher.doFinal(doc, firstChild);
@@ -670,6 +679,7 @@ public final class FMEncProvider implements EncProvider {
             } else if (algorithm.equals(XMLCipher.TRIPLEDES)) {
                 keygen = KeyGenerator.getInstance("TripleDES");
             } else {
+                SAML2SDKUtils.debug.error("generateSecretKey : unsupported algorithm '{}'", algorithm);
                 throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
                         "unsupportedKeyAlg"));
             }
@@ -678,6 +688,7 @@ public final class FMEncProvider implements EncProvider {
                 keygen.init(keyStrength);
             }
         } catch (NoSuchAlgorithmException ne) {
+            SAML2SDKUtils.debug.error("generateSecretKey : can't find algorithm '{}'", algorithm);
             throw new SAML2Exception(ne);
         }
 
@@ -687,6 +698,8 @@ public final class FMEncProvider implements EncProvider {
     private Key getEncryptionKey(XMLCipher cipher, Set<PrivateKey> privateKeys, EncryptedKey encryptedKey,
             String algorithm) throws SAML2Exception {
         final String classMethod = "FMEncProvider.getEncryptionKey";
+        SAML2SDKUtils.debug.error("{} : algorithm '{}'", classMethod, algorithm);
+
         String firstErrorCode = null;
         for (Key privateKey : privateKeys) {
             try {
