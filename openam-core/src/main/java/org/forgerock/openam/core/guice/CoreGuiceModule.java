@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -280,9 +281,15 @@ public class CoreGuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class);
 
-        bind(Stats.class)
-                .annotatedWith(Names.named(SessionConstants.STATS_MASTER_TABLE))
-                .toInstance(Stats.getInstance(SessionConstants.STATS_MASTER_TABLE));
+        /*
+         * Must use a provider to ensure initialisation happens after SystemProperties have been set.
+         */
+        bind(Key.get(Stats.class, Names.named(SessionConstants.STATS_MASTER_TABLE))).toProvider(new Provider<Stats>() {
+            @Override
+            public Stats get() {
+                return Stats.getInstance(SessionConstants.STATS_MASTER_TABLE);
+            }
+        });
 
         bind(SessionCache.class).toInstance(SessionCache.getInstance());
         bind(SessionPollerPool.class).toInstance(SessionPollerPool.getInstance());
