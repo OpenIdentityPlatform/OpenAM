@@ -85,8 +85,7 @@ public final class MakeExplicitDefaultKeyStoreTypeStep extends AbstractUpgradeSt
         }
 
         try {
-            Properties existingDefaults = ServerConfiguration
-                    .getServerInstance(getAdminToken(), ServerConfiguration.DEFAULT_SERVER_CONFIG);
+            Properties existingDefaults = getServerInstance(getAdminToken(), ServerConfiguration.DEFAULT_SERVER_CONFIG);
             applicability = isEmpty(existingDefaults.getProperty(KEYSTORE_TYPE));
         } catch (SSOException | IOException | SMSException e) {
             throw new UpgradeException("Failed to read server defaults", e);
@@ -102,8 +101,8 @@ public final class MakeExplicitDefaultKeyStoreTypeStep extends AbstractUpgradeSt
     public void perform() throws UpgradeException {
         try {
             UpgradeProgress.reportStart(AUDIT_START);
-            Map<String, String> serverDefaults = fromProperties(ServerConfiguration
-                    .getServerInstance(getAdminToken(), ServerConfiguration.DEFAULT_SERVER_CONFIG));
+            Map<String, String> serverDefaults = new HashMap<>(fromProperties(
+                    getServerInstance(getAdminToken(), ServerConfiguration.DEFAULT_SERVER_CONFIG)));
             serverDefaults.put(KEYSTORE_TYPE, "JKS");
 
             ServerConfiguration.upgradeServerInstance(getAdminToken(),
