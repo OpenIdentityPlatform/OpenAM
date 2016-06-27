@@ -17,17 +17,29 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.common.configuration.ServerConfigXML.ServerObject;
-import static com.sun.identity.common.configuration.ServerConfiguration.*;
+import static com.sun.identity.common.configuration.ServerConfiguration.getServerConfigXML;
+import static com.sun.identity.common.configuration.ServerConfiguration.getServerID;
+import static com.sun.identity.common.configuration.ServerConfiguration.getServerSite;
+import static com.sun.identity.common.configuration.ServerConfiguration.getServers;
+import static com.sun.identity.common.configuration.ServerConfiguration.removeServerConfiguration;
+import static com.sun.identity.common.configuration.ServerConfiguration.setServerConfigXML;
+import static com.sun.identity.common.configuration.ServerConfiguration.setServerInstance;
+import static com.sun.identity.common.configuration.ServerConfiguration.setServerSite;
 import static com.sun.identity.common.configuration.SiteConfiguration.getSites;
 import static com.sun.identity.setup.SetupConstants.CONFIG_VAR_DEFAULT_SHARED_KEY;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
 import static java.text.MessageFormat.format;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.utils.IOUtils.readStream;
-import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
+import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
@@ -37,8 +49,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -72,6 +84,7 @@ import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.BundleUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
@@ -150,7 +163,11 @@ public class SmsServerPropertiesResource {
     private void replacePropertyRecursive(JsonValue jsonValue, ResourceBundle bundle, String property) {
         if (jsonValue.isDefined(property) && jsonValue.get(property).isString()) {
             String propValue = jsonValue.get(property).asString();
-            jsonValue.put(property, bundle.getString(propValue));
+            try {
+                jsonValue.put(property, bundle.getString(propValue));
+            } catch (MissingResourceException e) {
+                // Ignore - retain original value
+            }
         }
 
         for (JsonValue child : jsonValue) {
@@ -179,7 +196,9 @@ public class SmsServerPropertiesResource {
                     continue;
                 }
                 final String sectionPath = "/properties/" + sectionName;
-                schema.putPermissive(new JsonPointer(sectionPath + "/title"), titleBundle.getString(sectionName));
+
+                String title = BundleUtils.getStringWithDefault(titleBundle, sectionName, sectionName);
+                schema.putPermissive(new JsonPointer(sectionPath + "/title"), title);
                 schema.putPermissive(new JsonPointer(sectionPath + "/type"), "object");
                 schema.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
 
@@ -446,9 +465,9 @@ public class SmsServerPropertiesResource {
         for (int i = 0; i < labels.getLength() - 1; i = i + 2) {
             String defaultValue = labels.item(i).getNodeValue();
             String labelFor = labels.item(i + 1).getNodeValue();
-            String displayValue = titleBundle.getString(defaultValue);
-            String defaultHelpValue = defaultValue.replaceFirst("amconfig.", "amconfig.help.");
-            String description = titleBundle.getString(defaultHelpValue);
+            String displayValue = BundleUtils.getStringWithDefault(titleBundle, defaultValue, defaultValue);
+            String defaultHelpValue = defaultValue.replaceFirst("amconfig\\.", "amconfig.help.");
+            String description = BundleUtils.getStringWithDefault(titleBundle, defaultHelpValue, "");
 
             final String attributeName = getAttributeNameFromCcName(labelFor);
             final String type = getType(attributeName);
@@ -458,7 +477,6 @@ public class SmsServerPropertiesResource {
 
             allLabels.add(new SMSLabel(defaultValue, labelFor, displayValue,
                     description, type, attributeOptions, attributeOptionLabels, isPasswordField));
-
         }
 
         return allLabels;
