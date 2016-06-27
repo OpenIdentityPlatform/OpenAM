@@ -20,6 +20,10 @@ import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
+import com.amazonaws.services.sns.model.InvalidParameterException;
+import com.amazonaws.services.sns.model.SetEndpointAttributesRequest;
+import java.util.HashMap;
+import java.util.Map;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jwt.Jwt;
@@ -31,6 +35,9 @@ import org.forgerock.openam.utils.StringUtils;
  * A utility class for {@see SnsRegistrationPredicate} to aid testing.
  */
 public class SnsPushResponseUpdater {
+
+    private final static String ENABLED = "Enabled";
+    private final static String TOKEN = "Token";
 
     private SnsClientFactory clientFactory;
 
@@ -80,14 +87,10 @@ public class SnsPushResponseUpdater {
             platformApplicationArn = config.getGoogleEndpoint();
         }
 
-        CreatePlatformEndpointResult communicationId = getEndpoint(client, platformApplicationArn, deviceId);
+        setCommunicationId(client, platformApplicationArn, deviceId, content);
 
-        if (StringUtils.isBlank(communicationId.getEndpointArn())) {
-            return false;
-        }
-
-        content.put(COMMUNICATION_ID, communicationId.getEndpointArn());
-        return true;
+        return content.get(COMMUNICATION_ID).isNotNull()
+                && !StringUtils.isBlank(content.get(COMMUNICATION_ID).asString());
     }
 
     private void updateBasicJsonContent(JsonValue content, JwtClaimsSet claims) {
@@ -102,13 +105,49 @@ public class SnsPushResponseUpdater {
         content.put(COMMUNICATION_TYPE, communicationType);
     }
 
-    private CreatePlatformEndpointResult getEndpoint(AmazonSNSClient client, String arn, String deviceId) {
+    private void setCommunicationId(AmazonSNSClient client, String arn, String deviceId, JsonValue content) {
+        Map<String, String> attributes = standardAtttributes(deviceId);
+        String answer;
 
-        CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest()
-                .withPlatformApplicationArn(arn)
-                .withToken(deviceId);
+        try {
+            CreatePlatformEndpointRequest createReq = new CreatePlatformEndpointRequest()
+                    .withPlatformApplicationArn(arn)
+                    .withAttributes(attributes)
+                    .withToken(deviceId);
 
-        return client.createPlatformEndpoint(request);
+            CreatePlatformEndpointResult result = client.createPlatformEndpoint(createReq);
+            answer = result.getEndpointArn();
+        } catch (InvalidParameterException e) {
+            //endpoint already exists, let's try to re-enable it, first we ensure we get the appropriate endpointArn
+            attributes.put(ENABLED, "false");
+
+            CreatePlatformEndpointRequest createReq = new CreatePlatformEndpointRequest()
+                    .withPlatformApplicationArn(arn)
+                    .withToken(deviceId)
+                    .withAttributes(attributes);
+            CreatePlatformEndpointResult result = client.createPlatformEndpoint(createReq);
+
+            String endpointArn = result.getEndpointArn();
+
+            attributes.put(ENABLED, "true");
+
+            //then we re-enable it, note the attribute-set
+            SetEndpointAttributesRequest attrReq = new SetEndpointAttributesRequest()
+                    .withAttributes(attributes)
+                    .withEndpointArn(endpointArn);
+
+            client.setEndpointAttributes(attrReq);
+            answer = endpointArn;
+        }
+        content.put(COMMUNICATION_ID, answer);
+
+    }
+
+    private Map<String, String> standardAtttributes(String deviceId) {
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put(ENABLED, "true");
+        attributes.put(TOKEN, deviceId);
+        return attributes;
     }
 
 }
