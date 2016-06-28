@@ -45,6 +45,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonPointer;
 
 /**
  * Validates the values of server configuration properties.
@@ -161,6 +163,14 @@ public class ServerPropertyValidator implements ServiceAttributeValidator {
         throws UnknownPropertyNameException, ConfigurationException {
 
         boolean validated = false;
+
+        try {
+            new JsonPointer(key);
+        } catch (JsonException ex) {
+            String[] param = {key};
+            throw new ConfigurationException("invalid.map.property", param);
+        }
+
         if (key.endsWith("]")) {
             int startBracket = key.indexOf('[');
             if (startBracket == -1) {
