@@ -34,7 +34,7 @@ instanceType: 4
 isSingleValued: TRUE
 objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: attributeSchema
-schemaIDGUID: smZz4LPT8kOi84rMheXCnw==
+schemaIDGUID:: 4ZFVGwkShke4/IfDuAJ4vg==
 searchFlags: 0
 systemOnly: FALSE
 
@@ -55,11 +55,23 @@ lDAPDisplayName: pushDeviceProfilesContainer
 mayContain: pushDeviceProfiles
 objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: classSchema
-objectClassCategory: 1
+objectClassCategory: 3
 rDNAttID: cn
 subClassOf: top
-schemaIDGUID: fJVEMIMq8UOg+61FI/PjNw==
+schemaIDGUID:: QiYS+E71q0qWzOCr7q2IMQ==
 systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: pushDeviceProfilesContainer
+-
 
 dn:
 changetype: modify

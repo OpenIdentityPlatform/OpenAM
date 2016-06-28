@@ -356,15 +356,15 @@ changetype: add
 adminDisplayName: oath2faEnabled
 adminDescription: Indicator for enabling of OATH 2FA
 attributeID: 1.3.6.1.4.1.36733.2.2.1.131
-attributeSyntax: 1.3.6.1.4.1.1466.115.121.1.27
+attributeSyntax: 2.5.5.9
 cn: oath2faEnabled
 instanceType: 4
 isSingleValued: FALSE
 lDAPDisplayName: oath2faEnabled
 objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: attributeSchema
-schemaIDGUID:: SUEqj1qJF0yIXSuk4gPGSw==
-oMSyntax: 22
+schemaIDGUID:: nbMoMMtlAEy+64sW1Tg94Q==
+oMSyntax: 2
 systemOnly: FALSE
 
 
