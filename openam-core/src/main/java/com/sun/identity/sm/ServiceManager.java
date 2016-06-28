@@ -1181,8 +1181,12 @@ public class ServiceManager {
             Node childNode = XMLUtils.getChildNode(schemaRoot, schemaName);
             if (childNode != null) {
                 ServiceSchemaImpl ssi = new ServiceSchemaImpl(null, childNode);
-                Map<String, Set<String>> attrs = ssi.groupDefaultExampleAttrs();
-                ssi.validateAttributes(attrs, false);
+                Map<String, Set<String>> attrs = ssi.getAttributeDefaults();
+                if (schemaName.equals(SMSUtils.GLOBAL_SCHEMA)) {
+                    ssi.validateAttributes(attrs, false);
+                } else {
+                    ssi.validateDefaults(attrs);
+                }
             }
         }
         return (true);
