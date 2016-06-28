@@ -40,9 +40,10 @@ import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.VersionUtils;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.ServicesDefaultValues;
-import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.shared.Constants;
 
 /**
  * Copies across the JCEKS keystore added in 13.5.0 to the config directory.
@@ -93,11 +94,8 @@ public final class CopyJavaCryptoExtKeyStoreStep extends AbstractUpgradeStep {
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, String> defaultValues = ServicesDefaultValues.getDefaultValues();
-
-        String basedir = defaultValues.get(SetupConstants.CONFIG_VAR_BASE_DIR);
-        String uri = defaultValues.get(SetupConstants.CONFIG_VAR_SERVER_URI);
+        String basedir = AMSetupServlet.getBaseDir();
+        String uri = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
 
         keystorePath = Paths.get(basedir, uri, KEYSTORE_NAME);
         applicability = Files.notExists(keystorePath);
