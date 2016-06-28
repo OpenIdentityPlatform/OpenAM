@@ -328,7 +328,7 @@
                             <ChoiceValue i18nKey="a753">x509</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>x509</Value>
+                            <Value>jwks_uri</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -338,7 +338,7 @@
                             syntax="string"
                             i18nKey="a722">
                         <DefaultValues>
-                            <Value></Value>
+                            <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@@AM_SERVICES_DEPLOY_URI@/oauth2@REALM@/connect/jwk_uri</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
