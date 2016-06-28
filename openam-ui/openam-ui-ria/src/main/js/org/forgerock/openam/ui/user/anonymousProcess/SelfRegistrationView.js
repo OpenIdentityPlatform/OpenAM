@@ -34,17 +34,6 @@ define([
         return response.type === "autoLoginStage" && response.tag === "end" && destination === "auto-login";
     }
 
-    function cleanUpResponse (response) {
-        // Incorrect parameter names are being  returned from backend. Remove this function once the backend is fixed
-        if (response.additions) {
-            response.additions.tokenId = response.additions.authToken;
-            response.additions.successUrl = response.additions.gotoUrl;
-            delete response.additions.authToken;
-            delete response.additions.gotoUrl;
-        }
-        return response;
-    }
-
     function AMSelfRegistrationView () { }
 
     AMSelfRegistrationView.prototype = SelfRegistrationView;
@@ -58,7 +47,6 @@ define([
         const realm = _.get(Configuration, "globalData.realm", "");
 
         if (shouldAutoLogin(response, destination)) {
-            response = cleanUpResponse(response);
             const tokenId = _.get(response, "additions.tokenId");
             SessionToken.set(tokenId);
             RESTLoginView.handleExistingSession(response.additions);

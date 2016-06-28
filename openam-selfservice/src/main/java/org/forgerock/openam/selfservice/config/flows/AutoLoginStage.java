@@ -91,8 +91,8 @@ final class AutoLoginStage implements ProgressStage<AutoLoginStageConfig> {
         String ssoToken = authContext.getSSOToken().getTokenID().toString();
         String gotoUrl = authContext.getSuccessURL();
 
-        context.putSuccessAddition("authToken", ssoToken);
-        context.putSuccessAddition("gotoUrl", gotoUrl);
+        context.putSuccessAddition("tokenId", ssoToken);
+        context.putSuccessAddition("successUrl", gotoUrl);
     }
 
     private void handleCallbacks(Callback[] callbacks, JsonValue user) throws AutoLoginException {
