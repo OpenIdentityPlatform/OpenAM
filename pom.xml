@@ -2003,6 +2003,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <updateBranchVersions>true</updateBranchVersions>
+                    <goals>install javadoc:aggregate-jar deploy</goals>
                 </configuration>
             </plugin>
 
