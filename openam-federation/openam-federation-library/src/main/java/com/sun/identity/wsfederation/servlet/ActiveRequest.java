@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
@@ -144,7 +144,8 @@ public class ActiveRequest extends WSFederationAction {
             if (DEBUG.messageEnabled()) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 soapMessage.writeTo(baos);
-                DEBUG.message("SOAP message received: " + new String(baos.toByteArray(), Charset.forName("UTF-8")));
+                DEBUG.message("SOAP message received: " + maskPassword(new String(baos.toByteArray(),
+                        StandardCharsets.UTF_8)));
             }
             parseAndValidateRequest(soapMessage, idpConfig);
             ssoToken = authenticateEndUser(soapMessage, WSFederationMetaUtils.getAttribute(idpConfig,
@@ -303,5 +304,12 @@ public class ActiveRequest extends WSFederationAction {
         } else {
             return nodeList.item(0).getTextContent();
         }
+    }
+
+    private String maskPassword(String text) {
+        int start = text.indexOf("Password>");
+        int end = text.lastIndexOf("<", text.lastIndexOf("Password>"));
+
+        return text.substring(0, start + "Password>".length()) + "### MASKED PASSWORD ###" + text.substring(end);
     }
 }
