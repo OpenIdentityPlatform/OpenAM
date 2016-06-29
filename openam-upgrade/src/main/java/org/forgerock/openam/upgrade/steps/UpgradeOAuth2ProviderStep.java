@@ -127,6 +127,9 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             final ServiceSchema serviceSchema = ssm.getOrganizationSchema();
             for (String realm : getRealmNames()) {
                 final ServiceConfig serviceConfig = scm.getOrganizationConfig(realm, null);
+                if (!serviceConfig.exists()) {
+                    continue;
+                }
                 final Map<String, Set<String>> withDefaults = serviceConfig.getAttributesForRead();
                 final Map<String, Set<String>> withoutDefaults = serviceConfig.getAttributesWithoutDefaultsForRead();
                 final Map<String, Set<String>> withoutValidators = SMSUtils.removeValidators(withDefaults,
