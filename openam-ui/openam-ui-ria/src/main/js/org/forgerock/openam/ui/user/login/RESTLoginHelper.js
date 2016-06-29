@@ -35,18 +35,11 @@ define([
         AuthNService.getRequirements(params).then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
-
-            // used in auto login from self registration
-            if (params.userName && params.password && requirements.stage === "DataStore1") {
-                populatedRequirements.callbacks[0].input[0].value = params.userName;
-                populatedRequirements.callbacks[1].input[0].value = params.password;
-            } else {
-                _.each(requirements.callbacks, function (obj, i) {
-                    if (params.hasOwnProperty(`callback_${i}`)) {
-                        populatedRequirements.callbacks[i].input[0].value = params[`callback_${i}`];
-                    }
-                });
-            }
+            _.each(requirements.callbacks, function (obj, i) {
+                if (params.hasOwnProperty(`callback_${i}`)) {
+                    populatedRequirements.callbacks[i].input[0].value = params[`callback_${i}`];
+                }
+            });
 
             AuthNService.submitRequirements(populatedRequirements, params).then(function (result) {
                 if (result.hasOwnProperty("tokenId")) {

@@ -105,6 +105,50 @@ define([
             "click input[type=submit]": "formSubmit"
         },
 
+        handleExistingSession (requirements) {
+
+            const auth = Configuration.globalData.auth;
+            // Set a variable for the realm passed into the browser so there can be a
+            // check to make sure it is the same as the current user's realm
+            auth.passedInRealm = RealmHelper.getRealm();
+            // If we have a token, let's see who we are logged in as....
+            SessionManager.getLoggedUser((user) => {
+
+                if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
+                    Configuration.setProperty("loggedUser", user);
+                    delete auth.passedInRealm;
+
+                    RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
+
+                        if (auth.urlParams && auth.urlParams.goto) {
+                            window.location.href = auth.urlParams.goto;
+                            $("body").empty();
+                            return false;
+                        }
+                        EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                            anonymousMode: false
+                        });
+
+                        // Copied from EVENT_LOGIN_REQUEST handler
+                        if (Configuration.gotoURL &&
+                            _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
+                            console.log(`Auto redirect to ${Configuration.gotoURL}`);
+                            Router.navigate(Configuration.gotoURL, { trigger: true });
+                            delete Configuration.gotoURL;
+                        } else {
+                            Router.navigate("", { trigger: true });
+                        }
+                    });
+                } else {
+                    location.href = "#confirmLogin/";
+                }
+            }, () => {
+                // There is a tokenId but it is invalid so kill it
+                RESTLoginHelper.removeSession();
+                Configuration.setProperty("loggedUser", null);
+            });
+        },
+
         autoLogin () {
             var index,
                 submitContent = {},
@@ -200,7 +244,6 @@ define([
             }
 
             AuthNService.getRequirements().then(_.bind(function (reqs) {
-                var auth = Configuration.globalData.auth;
 
                 // Clear out existing session if instructed
                 if (reqs.hasOwnProperty("tokenId") && urlParams.arg === "newsession") {
@@ -209,50 +252,12 @@ define([
                 }
 
                 // If simply by asking for the requirements, we end up with a token,
-                // then we must have auto-logged-in somehow
+                // then we must have already had a session
                 if (reqs.hasOwnProperty("tokenId")) {
-                    // Set a variable for the realm passed into the browser so there can be a
-                    // check to make sure it is the same as the current user's realm
-                    auth.passedInRealm = RealmHelper.getRealm();
-                    // If we have a token, let's see who we are logged in as....
-                    SessionManager.getLoggedUser(function (user) {
-
-                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
-                            Configuration.setProperty("loggedUser", user);
-                            delete auth.passedInRealm;
-
-                            RESTLoginHelper.setSuccessURL(reqs.tokenId, reqs.successUrl).then(function () {
-
-                                if (auth.urlParams && auth.urlParams.goto) {
-                                    window.location.href = auth.urlParams.goto;
-                                    $("body").empty();
-                                    return false;
-                                }
-                                EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
-                                    anonymousMode: false
-                                });
-
-                                // Copied from EVENT_LOGIN_REQUEST handler
-                                if (Configuration.gotoURL &&
-                                    _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
-                                    console.log(`Auto redirect to ${Configuration.gotoURL}`);
-                                    Router.navigate(Configuration.gotoURL, { trigger: true });
-                                    delete Configuration.gotoURL;
-                                } else {
-                                    Router.navigate("", { trigger: true });
-                                }
-                            });
-                        } else {
-                            location.href = "#confirmLogin/";
-                        }
-                    }, function () {
-                        // There is a tokenId but it is invalid so kill it
-                        RESTLoginHelper.removeSession();
-                        Configuration.setProperty("loggedUser", null);
-                    });
-
+                    this.handleExistingSession(reqs);
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, urlParams);
+
                     if (CookieHelper.getCookie("invalidRealm")) {
                         CookieHelper.deleteCookie("invalidRealm");
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");

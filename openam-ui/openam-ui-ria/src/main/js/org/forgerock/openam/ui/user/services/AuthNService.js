@@ -19,12 +19,14 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], ($, _, AbstractDelegate, Configuration, Constants, CookieHelper, EventManager, Messages, RealmHelper, URIUtils) => {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
+], ($, _, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
+    SessionToken, AuthenticationToken) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
@@ -42,9 +44,9 @@ define([
         }
 
         // In case user has logged in already update session
-        const tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        if (tokenCookie) {
-            urlParams.sessionUpgradeSSOTokenId = tokenCookie;
+        const sessionToken = SessionToken.get();
+        if (sessionToken) {
+            urlParams.sessionUpgradeSSOTokenId = sessionToken;
         }
 
         return urlParams;
@@ -113,19 +115,11 @@ define([
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
             Configuration.globalData.auth.currentStage = requirementList.length;
-            if (!CookieHelper.getCookie("authId") && _.find(requirements.callbacks, callbackTracking)) {
-                CookieHelper.setCookie(
-                    "authId",
-                    requirements.authId, "", "/",
-                    Configuration.globalData.auth.cookieDomains,
-                    Configuration.globalData.secureCookie);
+            if (!AuthenticationToken.get() && _.find(requirements.callbacks, callbackTracking)) {
+                AuthenticationToken.set(requirements.authId);
             }
         } else if (requirements.hasOwnProperty("tokenId")) {
-            CookieHelper.setCookie(
-                Configuration.globalData.auth.cookieName,
-                requirements.tokenId, "", "/",
-                Configuration.globalData.auth.cookieDomains,
-                Configuration.globalData.secureCookie);
+            SessionToken.set(requirements.tokenId);
         }
     };
     obj.submitRequirements = function (requirements, options) {
@@ -234,11 +228,11 @@ define([
             _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
     }
     obj.getRequirements = function (args) {
-        if (CookieHelper.getCookie("authId")) {
-            return obj.submitRequirements(_.extend({ "authId": CookieHelper.getCookie("authId") },
+        if (AuthenticationToken.get()) {
+            return obj.submitRequirements(_.extend({ authId: AuthenticationToken.get() },
                 Configuration.globalData.auth.urlParams)).done(() => {
                     knownAuth = _.clone(Configuration.globalData.auth);
-                    CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
+                    AuthenticationToken.remove();
                 });
         } else if (requirementList.length === 0 || hasRealmChanged() || hasAuthIndexChanged()) {
             obj.resetProcess();
