@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -69,7 +69,7 @@ import org.forgerock.openam.utils.CrestQuery;
  *
  * @supported.api
  */
-public final class AMIdentityRepository {
+public class AMIdentityRepository {
     private SSOToken token;
     private String organizationDN;
     private String idRealmName;

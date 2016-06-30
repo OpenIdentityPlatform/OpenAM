@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -20,6 +20,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+
+import org.forgerock.openam.core.CoreWrapper;
 
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
@@ -35,7 +38,8 @@ import com.sun.identity.sm.DNMapper;
 public class UmaIdRepoCreationListener implements IdRepoCreationListener {
 
     private final UmaPolicyApplicationListener policyApplicationListener;
-    private final Set<String> registeredRealms = new HashSet<String>();
+    private final Set<String> registeredRealms = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    private final CoreWrapper coreWrapper;
 
     /**
      * Creates a new UmaIdRepoCreationListener instance.
@@ -43,8 +47,9 @@ public class UmaIdRepoCreationListener implements IdRepoCreationListener {
      * @param policyApplicationListener An instance of the {@code UmaPolicyApplicationListener}
      */
     @Inject
-    public UmaIdRepoCreationListener(UmaPolicyApplicationListener policyApplicationListener) {
+    public UmaIdRepoCreationListener(UmaPolicyApplicationListener policyApplicationListener, CoreWrapper coreWrapper) {
         this.policyApplicationListener = policyApplicationListener;
+        this.coreWrapper = coreWrapper;
     }
 
     /**
@@ -56,7 +61,7 @@ public class UmaIdRepoCreationListener implements IdRepoCreationListener {
      */
     @Override
     public synchronized void notify(AMIdentityRepository idRepo, String realm) {
-        String normalizedRealm = DNMapper.orgNameToDN(realm);
+        String normalizedRealm = coreWrapper.convertRealmNameToOrgName(realm);
         if (!registeredRealms.contains(normalizedRealm)) {
             idRepo.addEventListener(policyApplicationListener);
             registeredRealms.add(normalizedRealm);
