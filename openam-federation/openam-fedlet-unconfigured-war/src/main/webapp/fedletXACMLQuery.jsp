@@ -124,17 +124,17 @@ function checkEmptyResource() {
 	<%
             String idpEntityID = request.getParameter("idpEntityID");
             if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpEntityID, idpEntityID,
-                "HTTPParameterValue", 2000, false)){
+                "HTTPURL", 2000, false)){
                     idpEntityID = "";
             }
             String spEntityID = request.getParameter("spEntityID");
             if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + spEntityID, spEntityID,
-                "HTTPParameterValue", 2000, false)){
+                "HTTPURL", 2000, false)){
                     spEntityID = "";
             }
             String nameIDValue = request.getParameter("nameIDValue");
             if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + nameIDValue, nameIDValue,
-                "HTTPParameterValue", 2000, false)){
+                "HTTPURL", 2000, false)){
                 nameIDValue = "";
             }
             String newNameIDValue = URLEncDec.encode(nameIDValue);
