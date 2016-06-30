@@ -14,9 +14,9 @@
     Copyright 2016 ForgeRock AS.
 --%><%@ page contentType="text/xml;charset=UTF-8" language="java" session="false"
 %><wsdl:definitions name="SecurityTokenService"
-                    targetNamespace="http://forgerock.org/ws-fed/sts"
+                    targetNamespace="http://forgerock.org/ws-fed/securitytokenservice"
                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:tns="http://forgerock.org/sts"
+                    xmlns:tns="http://forgerock.org/ws-fed/securitytokenservice"
                     xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                     xmlns:wsa10="http://www.w3.org/2005/08/addressing"
                     xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
@@ -83,7 +83,7 @@
         </wsp:ExactlyOne>
     </wsp:Policy>
     <wsdl:types>
-        <xsd:schema targetNamespace="http://forgerock.org/sts/schema">
+        <xsd:schema targetNamespace="http://forgerock.org/ws-fed/securitytokenservice/schema">
             <xsd:import namespace="http://schemas.xmlsoap.org/ws/2005/02/trust"
                         schemaLocation="${baseUrl}/wsfederation/xsd/ws-trust-1.0.xsd"/>
         </xsd:schema>

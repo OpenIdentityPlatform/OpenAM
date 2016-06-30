@@ -26,7 +26,7 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
             <wsx:MetadataSection Dialect="http://schemas.xmlsoap.org/wsdl/"
-                                 Identifier="http://forgerock.org/ws-fed/sts"
+                                 Identifier="http://forgerock.org/ws-fed/securitytokenservice"
                                  xmlns="">
                 <jsp:include page="wsdl.jsp" />
             </wsx:MetadataSection>
