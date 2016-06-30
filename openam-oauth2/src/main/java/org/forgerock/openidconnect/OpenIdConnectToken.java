@@ -411,18 +411,19 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     }
 
     private Jwt createEncryptedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
-        JweHeaderBuilder builder = jwtBuilderFactory.jwe(encryptionPublicKey).headers()
+        // As per http://openid.net/specs/openid-connect-core-1_0.html#SigningOrder, JWT should be signed first and
+        // then encrypted.
+        Jwt signedJwt = createSignedJwt(signingHandler, jwsAlgorithm, claimsSet);
+
+        JweHeaderBuilder builder = jwtBuilderFactory.jwe(encryptionPublicKey)
+                .headers()
                 .alg(JweAlgorithm.parseAlgorithm(encryptionAlgorithm))
-                .enc(EncryptionMethod.parseMethod(encryptionMethod));
+                .enc(EncryptionMethod.parseMethod(encryptionMethod))
+                .cty("JWT");
         if (encryptionKeyId != null) {
             builder.kid(encryptionKeyId);
         }
-        return builder.done().claims(claimsSet)
-                .sign(signingHandler, jwsAlgorithm)
-                .headers()
-                .kid(signingKeyId)
-                .done()
-                .asJwt();
+        return builder.done().claims(new SignedJwtClaimsSet(signedJwt.build())).asJwt();
     }
 
     private Jwt createSignedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
@@ -431,5 +432,18 @@ public class OpenIdConnectToken extends JsonValue implements Token {
             builder.kid(signingKeyId);
         }
         return builder.done().claims(claimsSet).asJwt();
+    }
+
+    private static class SignedJwtClaimsSet extends JwtClaimsSet {
+        private final String signedPayload;
+
+        SignedJwtClaimsSet(final String signedPayload) {
+            this.signedPayload = signedPayload;
+        }
+
+        @Override
+        public String build() {
+            return signedPayload;
+        }
     }
 }
