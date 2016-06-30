@@ -48,6 +48,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Node;
 
@@ -290,11 +291,11 @@ public final class WSFederationMetaUtils {
      */
     public static String getAttribute(BaseConfigType config, String key)
     {
-        List list = config.getAttribute();
-        for(Iterator iter = list.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
-            if ( avp.getName().equals(key) ) {
-                return (String)avp.getValue().get(0);
+        List<AttributeElement> list = config.getAttribute();
+
+        for (AttributeElement avp : list) {
+            if (avp.getName().equals(key)) {
+                return CollectionUtils.getFirstItem(avp.getValue());
             }
         }
 

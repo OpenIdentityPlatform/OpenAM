@@ -9,6 +9,8 @@
 package com.sun.identity.wsfederation.jaxb.entityconfig;
 
 
+import java.util.List;
+
 /**
  * Java content class for AttributeType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/wsfederation/entity-config-schema.xsd line 66)
@@ -35,18 +37,18 @@ public interface AttributeType {
      * 
      * @return
      *     possible object is
-     *     {@link java.lang.String}
+     *     {@link String}
      */
-    java.lang.String getName();
+    String getName();
 
     /**
      * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
-     *     {@link java.lang.String}
+     *     {@link String}
      */
-    void setName(java.lang.String value);
+    void setName(String value);
 
     /**
      * Gets the value of the Value property.
@@ -66,9 +68,9 @@ public interface AttributeType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link java.lang.String}
+     * {@link String}
      * 
      */
-    java.util.List getValue();
+    List<String> getValue();
 
 }
