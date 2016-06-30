@@ -40,6 +40,7 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
         attributes.add(JKWS_URI);
         attributes.add(SUPPORTED_CLAIMS);
         attributes.add(OIDC_CLAIMS_EXTENSION_SCRIPT);
+        attributes.add(SCOPE_PLUGIN_CLASS);
 
         tokenLifetimeAttributeNames.add(AUTHZ_CODE_LIFETIME_NAME);
         tokenLifetimeAttributeNames.add(REFRESH_TOKEN_LIFETIME_NAME);
@@ -78,6 +79,8 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
         } else if (tokenLifetimeAttributeNames.contains(newAttr.getName())) {
             return newAttr;
         } else if (RESPONSE_TYPE_LIST.equals(newAttr.getName())) {
+            return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
+        } else if (SCOPE_PLUGIN_CLASS.equals(newAttr.getName())) {
             return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
         }
 
