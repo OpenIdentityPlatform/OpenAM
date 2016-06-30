@@ -18,12 +18,12 @@ package org.forgerock.openam.uma.rest;
 
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.forgerock.openam.core.CoreWrapper;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -62,7 +62,7 @@ public class UmaIdRepoCreationListenerTest {
     public void testNotifyMixedCase() throws Exception {
         // Given
         AMIdentityRepository repo = mock(AMIdentityRepository.class);
-        given(coreWrapper.convertRealmNameToOrgName(or("/test", "/TEST"))).willReturn("ou=test");
+        given(coreWrapper.convertRealmNameToOrgName(or(eq("/test"), eq("/TEST")))).willReturn("ou=test");
 
         // When
         listener.notify(repo, "/test");

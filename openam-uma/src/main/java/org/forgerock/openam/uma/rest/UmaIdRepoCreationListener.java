@@ -16,17 +16,16 @@
 
 package org.forgerock.openam.uma.rest;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.forgerock.openam.core.CoreWrapper;
 
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
-import com.sun.identity.sm.DNMapper;
 
 /**
  * An implementation of a {@code IdRepoCreationListener} which adds a
