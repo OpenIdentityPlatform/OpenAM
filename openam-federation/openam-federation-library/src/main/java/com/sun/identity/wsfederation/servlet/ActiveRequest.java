@@ -176,10 +176,12 @@ public class ActiveRequest extends WSFederationAction {
             DEBUG.error("An unexpected error occurred while processing the SOAP message", ex);
             soapFault = newReceiverException(ex).getSOAPFault();
         } finally {
-            try {
-                SessionManager.getProvider().invalidateSession(ssoToken, request, response);
-            } catch (SessionException se) {
-                DEBUG.message("Unable to invalidate temporary session", se);
+            if (ssoToken != null) {
+                try {
+                    SessionManager.getProvider().invalidateSession(ssoToken, request, response);
+                } catch (SessionException se) {
+                    DEBUG.message("Unable to invalidate temporary session", se);
+                }
             }
         }
 
