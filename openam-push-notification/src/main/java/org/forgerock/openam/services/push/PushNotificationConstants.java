@@ -113,7 +113,7 @@ public final class PushNotificationConstants {
      */
 
     /** Name of the PushNotificationService. */
-    public static final String SERVICE_NAME = "iPlanetAMPushNotificationService";
+    public static final String SERVICE_NAME = "PushNotificationService";
     /** Version of the PushNotificationService. */
     public static final String SERVICE_VERSION = "1.0";
 

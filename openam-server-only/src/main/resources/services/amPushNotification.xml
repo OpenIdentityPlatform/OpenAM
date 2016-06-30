@@ -20,10 +20,10 @@
         "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
-    <Service name="iPlanetAMPushNotificationService" version="1.0">
+    <Service name="PushNotificationService" version="1.0">
 
         <Schema
-                serviceHierarchy="/DSAMEConfig/iPlanetAMPushNotificationService"
+                serviceHierarchy="/DSAMEConfig/PushNotificationService"
                 i18nFileName="amPushNotification"
                 revisionNumber="1"
                 resourceName="pushNotification"
@@ -104,8 +104,8 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="mdConcurrency" type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a070" validator="RequiredValueValidator">
+                <AttributeSchema name="mdConcurrency" type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="16" i18nKey="a070" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>16</Value>
                     </DefaultValues>
