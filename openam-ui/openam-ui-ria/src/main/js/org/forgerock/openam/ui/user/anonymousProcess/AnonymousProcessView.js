@@ -21,10 +21,12 @@ define([
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/main/EventManager"
+], ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper, EventManager) => {
 
     return AnonymousProcessView.extend({
+
         render () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
@@ -43,8 +45,7 @@ define([
 
             if (overrideRealm && overrideRealm !== "/") {
                 endpoint = `${(overrideRealm.substring(0, 1) === "/" ? overrideRealm.slice(1) : overrideRealm)}"/${
-                    endpoint
-                    }`;
+                    endpoint}`;
                 realmPath = overrideRealm;
             } else if (!overrideRealm && subRealm) {
                 endpoint = `${subRealm}/${endpoint}`;
@@ -58,7 +59,7 @@ define([
             }
 
             if (params.token) {
-                this.submitDelegate(params, function () {
+                this.submitDelegate(params, () => {
                     Router.routeTo(continueRoute, { args: [realmPath], trigger: true });
                 });
                 return;
@@ -71,6 +72,18 @@ define([
         returnToLoginPage (e) {
             e.preventDefault();
             location.href = e.target.href + RealmHelper.getSubRealm();
+        },
+
+        restartProcess (e) {
+            e.preventDefault();
+            delete this.delegate;
+            delete this.stateData;
+            const subrealm = RealmHelper.getSubRealm();
+
+            EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                route: _.extend({}, Router.currentRoute, { forceUpdate: true }),
+                args: [`/${subrealm}`]
+            });
         }
     });
 });
