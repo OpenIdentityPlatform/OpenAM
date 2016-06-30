@@ -41,11 +41,11 @@
                 resourceName="authenticatoroath">
 
             <Organization>
-                <AttributeSchema name="AlphaNumericValidator"
+                <AttributeSchema name="RequiredValueValidator"
                                  type="validator"
                                  syntax="string">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.authentication.modules.fr.oath.validators.AlphaNumericValidator</Value>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="CodeLengthValidator"
@@ -163,18 +163,18 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a515"
-                                 validator="AlphaNumericValidator"
+                                 validator="RequiredValueValidator"
                                  resourceName="oathIssuerName">
-                    <DefaultValues>
+                    <ExampleValue>
                         <Value>ForgeRock</Value>
-                    </DefaultValues>
+                    </ExampleValue>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
-                    <AttributeSchema name="AlphaNumericValidator"
+                    <AttributeSchema name="RequiredValueValidator"
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.authentication.modules.fr.oath.validators.AlphaNumericValidator</Value>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="CodeLengthValidator"
@@ -288,11 +288,11 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a515"
-                                     validator="AlphaNumericValidator"
+                                     validator="RequiredValueValidator"
                                      resourceName="oathIssuerName">
-                        <DefaultValues>
+                        <ExampleValue>
                             <Value>ForgeRock</Value>
-                        </DefaultValues>
+                        </ExampleValue>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

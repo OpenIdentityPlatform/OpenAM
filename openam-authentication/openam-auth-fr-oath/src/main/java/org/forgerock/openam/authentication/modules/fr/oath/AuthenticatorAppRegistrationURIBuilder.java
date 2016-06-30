@@ -19,6 +19,8 @@ package org.forgerock.openam.authentication.modules.fr.oath;
 import static org.forgerock.openam.authentication.modules.fr.oath.validators.CodeLengthValidator.*;
 
 import com.sun.identity.idm.AMIdentity;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -99,8 +101,6 @@ public class AuthenticatorAppRegistrationURIBuilder {
     }
 
     private String getAppRegistrationUri(OTPType otpType) throws DecoderException {
-        String appRegistrationUri;
-
         byte[] secretPlainTextBytes = Hex.decodeHex(secretHex.toCharArray());
 
         Base32 base32 = new Base32();
@@ -109,8 +109,19 @@ public class AuthenticatorAppRegistrationURIBuilder {
         String userName = id.getName();
         String realm = extractHumanReadableRealmString(id.getRealm());
 
-        appRegistrationUri = "otpauth://" + otpType.getIdentifier() + "/" + issuer + ":" + realm + userName +
-                "?secret=" + secretBase32 + "&issuer=" + issuer + "&digits=" + codeLength;
+        String appRegistrationUri;
+        try {
+            appRegistrationUri = new URI("otpauth",
+                    otpType.getIdentifier(),
+                    "/" + issuer + ":" + realm + userName, "secret=" + secretBase32 + "&issuer=" + issuer
+                            + "&digits=" + codeLength,
+                    null).toString();
+        } catch (URISyntaxException e) {
+            //just in case
+            appRegistrationUri = "otpauth://" + otpType.getIdentifier() + "/" + issuer + ":"
+                    + realm + userName + "?secret=" + secretBase32 + "&issuer="
+                    + issuer + "&digits=" + codeLength;
+        }
 
         return appRegistrationUri;
     }
