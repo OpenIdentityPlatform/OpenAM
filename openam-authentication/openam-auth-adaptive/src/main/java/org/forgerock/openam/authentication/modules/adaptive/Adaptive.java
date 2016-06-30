@@ -80,6 +80,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -886,7 +887,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (timeSinceLastLoginSave) {
                 postAuthNMap.put("LOGINNAME", timeSinceLastLoginAttribute);
                 lastLogin = formatter.format(now);
-                lastLogin = Math.random() + "|" + lastLogin + "|" + userName;
+                lastLogin = UUID.randomUUID() + "|" + lastLogin + "|" + userName;
                 lastLoginEnc = AccessController.doPrivileged(new EncodeAction(lastLogin));
                 postAuthNMap.put("LOGINVALUE", lastLoginEnc);
             }
