@@ -23,10 +23,12 @@ import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
+import org.forgerock.openam.session.SessionPLLSender;
+
+import javax.inject.Inject;
+
 import java.net.URL;
 import java.security.AccessController;
-import javax.inject.Inject;
-import org.forgerock.openam.session.SessionPLLSender;
 
 /**
  * Responsible for performing the Session based logic of sending a request.
@@ -102,16 +104,16 @@ public class Requests {
      */
     public SessionResponse getSessionResponseWithRetry(URL svcurl, SessionRequest sreq, Session session) throws SessionException {
         SessionResponse sres;
-        Object context;
+        Object context = RestrictedTokenContext.getCurrent();
 
         SSOToken appSSOToken = null;
-        if (!SystemProperties.isServerMode() && !session.getID().getComingFromAuth()) {
+        // Client side non-authentication request which does not already have a context
+        if (!SystemProperties.isServerMode() && !session.getID().getComingFromAuth() && context == null) {
             appSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             session.createContext(appSSOToken);
             context = session.getContext();
-        } else {
-            context = RestrictedTokenContext.getCurrent();
         }
+        
         try {
             if (context != null) {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
