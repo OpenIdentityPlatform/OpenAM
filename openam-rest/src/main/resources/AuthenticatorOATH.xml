@@ -111,10 +111,10 @@
                     syntax="password"
                     i18nKey="a106"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePrivateKeyPassword">
+                    <IsOptional/>
                     <DefaultValues>
                         <Value>changeit</Value>
                     </DefaultValues>
-                    <IsOptional/>
                 </AttributeSchema>
 
             </Organization>
