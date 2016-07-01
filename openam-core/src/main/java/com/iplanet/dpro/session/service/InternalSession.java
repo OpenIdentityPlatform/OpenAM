@@ -173,8 +173,6 @@ public class InternalSession implements TaskRunnable, Serializable {
     private transient final ConcurrentMap<TokenRestriction, SessionID> restrictedTokensByRestriction =
             new ConcurrentHashMap<TokenRestriction, SessionID>();
 
-    private static String superUserDN;
-
     private static boolean isEnableHostLookUp = Boolean.valueOf(
             SystemProperties.get(Constants.ENABLE_HOST_LOOKUP)).booleanValue();
 
@@ -244,8 +242,6 @@ public class InternalSession implements TaskRunnable, Serializable {
         maxDefaultIdleTime = getPropValue(
                 "com.iplanet.am.session.invalidsessionmaxtime", 3);
         purgeDelay = getPropValue("com.iplanet.am.session.purgedelay", 120);
-        superUserDN = SystemProperties
-                .get("com.sun.identity.authentication.super.user");
     }
 
     /**
@@ -1123,7 +1119,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             return false;
         }
         // Exceeded max active sessions, but allow if the user is super-admin
-        if ((sessionService.hasExceededMaxSessions()) && (!userDN.equalsIgnoreCase(superUserDN))) {
+        if ((sessionService.hasExceededMaxSessions()) && !sessionService.isSuperUser(userDN)) {
             sessionLogging.logSystemMessage(LOG_MSG_SESSION_MAX_LIMIT_REACHED, java.util.logging.Level.INFO);
             return false;
         }
