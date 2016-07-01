@@ -50,6 +50,10 @@ public final class ForceAuthSessionActivator extends DefaultSessionActivator {
 
         final InternalSession session = createSession(sessionService, loginState);
 
+        // In case of ForceAuth the session ID remains the same, but activating the session will always result in
+        // incrementing the session count. By decrementing before incrementing the count again we ensure that session
+        // limits are properly taken into account.
+        sessionService.decrementActiveSessions();
         return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject,
                 loginContext);
     }
