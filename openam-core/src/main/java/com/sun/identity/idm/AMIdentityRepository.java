@@ -591,6 +591,27 @@ public class AMIdentityRepository {
     }
 
     /**
+     * Non-javadoc, non-public methods Returns <code>true</code> if the data
+     * store has successfully authenticated the identity with the provided
+     * credentials. In case the data store requires additional credentials, the
+     * list would be returned via the <code>IdRepoException</code> exception.
+     *
+     * @param credentials
+     *            Array of callback objects containing information such as
+     *            username and password.
+     * @param idType
+     *            The type of identity to authenticate as, or null for any.
+     *
+     * @return <code>true</code> if data store authenticates the identity;
+     *         else <code>false</code>
+     */
+    public boolean authenticate(IdType idType, Callback[] credentials) throws IdRepoException,
+            com.sun.identity.authentication.spi.AuthLoginException {
+        IdServices idServices = IdServicesFactory.getDataStoreServices();
+        return idServices.authenticate(organizationDN, credentials, idType);
+    }
+
+    /**
      * @supported.api
      *
      * Adds a listener, which should receive notifications for all changes that
