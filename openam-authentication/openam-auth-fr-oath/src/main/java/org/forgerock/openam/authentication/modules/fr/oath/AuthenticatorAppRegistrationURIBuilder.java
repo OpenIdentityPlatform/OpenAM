@@ -113,13 +113,13 @@ public class AuthenticatorAppRegistrationURIBuilder {
         try {
             appRegistrationUri = new URI("otpauth",
                     otpType.getIdentifier(),
-                    "/" + issuer + ":" + realm + userName, "secret=" + secretBase32 + "&issuer=" + issuer
-                            + "&digits=" + codeLength,
+                    "/" + issuer + ":" + userName, "secret=" + secretBase32 + "&issuer=" + issuer
+                    + "&digits=" + codeLength,
                     null).toString();
         } catch (URISyntaxException e) {
             //just in case
             appRegistrationUri = "otpauth://" + otpType.getIdentifier() + "/" + issuer + ":"
-                    + realm + userName + "?secret=" + secretBase32 + "&issuer="
+                    + userName + "?secret=" + secretBase32 + "&issuer="
                     + issuer + "&digits=" + codeLength;
         }
 
