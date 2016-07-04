@@ -86,45 +86,48 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
     public OAuth2Uris get(Context context, RealmInfo realmInfo) throws NotFoundException, ServerException {
         String absoluteRealm = realmInfo.getAbsoluteRealm();
         BaseURLProvider baseURLProvider = baseURLProviderFactory.get(absoluteRealm);
-        String baseUrl;
+        String baseUrl, deploymentUrl;
         try {
-            baseUrl = baseURLProvider.getRealmURL(context.asContext(HttpContext.class), "/oauth2", absoluteRealm);
+            HttpContext httpContext = context.asContext(HttpContext.class);
+            baseUrl = baseURLProvider.getRealmURL(httpContext, "/oauth2", absoluteRealm);
+            deploymentUrl = baseURLProvider.getRootURL(httpContext);
         } catch (InvalidBaseUrlException e) {
             throw new ServerException("Configuration error");
         }
-        return get(absoluteRealm, baseUrl);
+        return get(absoluteRealm, baseUrl, deploymentUrl);
     }
 
     @Override
     public OAuth2Uris get(HttpServletRequest request, RealmInfo realmInfo) throws NotFoundException, ServerException {
         String absoluteRealm = realmInfo.getAbsoluteRealm();
         BaseURLProvider baseURLProvider = baseURLProviderFactory.get(absoluteRealm);
-        String baseUrl;
+        String baseUrl, deploymentUrl;
         try {
             baseUrl = baseURLProvider.getRealmURL(request, "/oauth2", absoluteRealm);
+            deploymentUrl = baseURLProvider.getRootURL(request);
         } catch (InvalidBaseUrlException e) {
             throw new ServerException("Configuration error");
         }
-        return get(absoluteRealm, baseUrl);
+        return get(absoluteRealm, baseUrl, deploymentUrl);
     }
 
-    private OAuth2Uris get(String absoluteRealm, String baseUrlPattern) throws NotFoundException {
-        OAuth2Uris uris = urisMap.get(baseUrlPattern);
+    private OAuth2Uris get(String absoluteRealm, String baseUrl, String deploymentUrl) throws NotFoundException {
+        OAuth2Uris uris = urisMap.get(baseUrl);
         if (uris == null) {
-            uris = getOAuth2Uris(absoluteRealm, baseUrlPattern);
+            uris = getOAuth2Uris(absoluteRealm, baseUrl, deploymentUrl);
         }
         return uris;
     }
 
-    private synchronized OAuth2Uris getOAuth2Uris(String absoluteRealm, String baseUrlPattern)
+    private synchronized OAuth2Uris getOAuth2Uris(String absoluteRealm, String baseUrl, String deploymentUrl)
             throws NotFoundException {
-        OAuth2Uris uris = urisMap.get(baseUrlPattern);
+        OAuth2Uris uris = urisMap.get(baseUrl);
         if (uris != null) {
             return uris;
         }
         OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(absoluteRealm);
-        uris = new OAuth2UrisImpl(baseUrlPattern, absoluteRealm, oAuth2ProviderSettings);
-        urisMap.put(baseUrlPattern, uris);
+        uris = new OAuth2UrisImpl(deploymentUrl, absoluteRealm, oAuth2ProviderSettings, baseUrl);
+        urisMap.put(baseUrl, uris);
         return uris;
     }
 
@@ -135,11 +138,12 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
         private final OAuth2ProviderSettings oAuth2ProviderSettings;
         private final String baseUrl;
 
-        OAuth2UrisImpl(String deploymentUrl, String absoluteRealm, OAuth2ProviderSettings oAuth2ProviderSettings) {
+        OAuth2UrisImpl(String deploymentUrl, String absoluteRealm, OAuth2ProviderSettings oAuth2ProviderSettings,
+                String baseUrl) {
             this.deploymentUrl = deploymentUrl;
             this.absoluteRealm = absoluteRealm;
             this.oAuth2ProviderSettings = oAuth2ProviderSettings;
-            this.baseUrl = deploymentUrl;
+            this.baseUrl = baseUrl;
         }
 
         @Override
