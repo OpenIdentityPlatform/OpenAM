@@ -172,7 +172,6 @@
         <jdmk.version>2007-01-10</jdmk.version>
         <jsr173_api.version>2004-30-01</jsr173_api.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
-        <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
         <freemarker.version>2.3.19</freemarker.version>
         <java-ipv6.version>0.14</java-ipv6.version>
         <json.version>20090211</json.version>
@@ -1712,13 +1711,6 @@
             </dependency>
 
             <!-- DevicePrint -->
-            <dependency>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jquery-amd</artifactId>
-                <version>${jquery-amd.version}</version>
-                <type>js</type>
-            </dependency>
-
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
