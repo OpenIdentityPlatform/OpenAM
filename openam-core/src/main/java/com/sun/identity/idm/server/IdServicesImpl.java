@@ -24,7 +24,7 @@
  *
  * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.idm.server;
@@ -859,9 +859,9 @@ public class IdServicesImpl implements IdServices {
            throw origEx;
         } else {
             Map returnMap = combineAttrMaps(attrMapsSet, true);
-            if (DEBUG.warningEnabled()) {
-                DEBUG.warning("IdServicesImpl.getAttributes exit: returnMap="
-                        + IdRepoUtils.getAttrMapWithoutPasswordAttrs(returnMap, null));
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdServicesImpl.getAttributes exit: returnMap={}",
+                        IdRepoUtils.getAttrMapWithoutPasswordAttrs(returnMap, null));
             }
             return returnMap;
        }
