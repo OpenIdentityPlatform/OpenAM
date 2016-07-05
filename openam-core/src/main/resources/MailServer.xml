@@ -36,16 +36,6 @@
                 i18nKey="forgerock-email-service-description">
 
             <Organization>
-                <!-- validators -->
-
-                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
-                    <DefaultValues>
-                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <!-- configuration settings -->
-
                 <AttributeSchema name="forgerockMailServerImplClassName"
                                  type="single"
                                  syntax="string"
@@ -59,8 +49,7 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="hostname"
-                                 i18nKey="a101"
-                                 validator="RequiredValueValidator">
+                                 i18nKey="a101">
                     <ExampleValue>
                         <Value>smtp.example.com</Value>
                     </ExampleValue>
@@ -78,8 +67,7 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="username"
-                                 i18nKey="a103"
-                                 validator="RequiredValueValidator">
+                                 i18nKey="a103">
                     <ExampleValue>
                         <Value>username</Value>
                     </ExampleValue>
@@ -88,11 +76,7 @@
                                  type="single"
                                  syntax="password"
                                  resourceName="password"
-                                 i18nKey="a104"
-                                 validator="RequiredValueValidator">
-                    <ExampleValue>
-                        <Value>**********</Value>
-                    </ExampleValue>
+                                 i18nKey="a104">
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
                                  type="single_choice"
@@ -111,8 +95,7 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="from"
-                                 i18nKey="a106"
-                                 validator="RequiredValueValidator">
+                                 i18nKey="a106">
                     <ExampleValue>
                         <Value>no-reply@example.com</Value>
                     </ExampleValue>

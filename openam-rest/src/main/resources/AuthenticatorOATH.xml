@@ -25,12 +25,11 @@
     <Schema
         serviceHierarchy="/DSAMEConfig/ForgeRockAuthenticatorOATHService"
         i18nFileName="AuthenticatorOATHService"
-        revisionNumber="2"
+        revisionNumber="1"
         resourceName="authenticatorOathService"
         i18nKey="forgerock-auth-authenticator-oath-service-description">
         <Organization>
 
-            <!-- configuration settings -->
             <AttributeSchema name="iplanet-am-auth-authenticator-oath-attr-name"
                              type="single"
                              syntax="string"
@@ -95,7 +94,6 @@
                     syntax="password"
                     i18nKey="a104"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePassword">
-                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keypair-alias"
@@ -103,7 +101,6 @@
                     syntax="string"
                     i18nKey="a105"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystoreKeyPairAlias">
-                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-privatekey-password"
@@ -114,7 +111,6 @@
                     <DefaultValues>
                         <Value>changeit</Value>
                     </DefaultValues>
-                    <IsOptional/>
                 </AttributeSchema>
 
             </Organization>
