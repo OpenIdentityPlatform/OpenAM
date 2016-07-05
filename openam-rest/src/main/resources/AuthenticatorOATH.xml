@@ -96,9 +96,6 @@
                     i18nKey="a104"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePassword">
                     <IsOptional/>
-                    <DefaultValues>
-                        <Value>changeit</Value>
-                    </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-oath-device-settings-encryption-keypair-alias"
@@ -115,6 +112,9 @@
                     i18nKey="a106"
                     resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePrivateKeyPassword">
                     <IsOptional/>
+                    <DefaultValues>
+                        <Value>changeit</Value>
+                    </DefaultValues>
                 </AttributeSchema>
 
             </Organization>

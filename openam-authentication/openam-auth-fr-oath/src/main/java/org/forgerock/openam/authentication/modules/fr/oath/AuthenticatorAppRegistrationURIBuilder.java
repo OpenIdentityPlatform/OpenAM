@@ -107,6 +107,7 @@ public class AuthenticatorAppRegistrationURIBuilder {
         String secretBase32 = new String(base32.encode(secretPlainTextBytes));
 
         String userName = id.getName();
+        String realm = extractHumanReadableRealmString(id.getRealm());
 
         String appRegistrationUri;
         try {

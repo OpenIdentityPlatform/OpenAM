@@ -28,10 +28,10 @@
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Register Device</Value>
+                    <Value>Get the App</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value>Get the App</Value>
+                    <Value>Register Device</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
