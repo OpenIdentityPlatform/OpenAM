@@ -84,10 +84,10 @@
                                  syntax="password"
                                  i18nKey="a104"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystorePassword">
-                    <IsOptional/>
                     <DefaultValues>
                         <Value>changeit</Value>
                     </DefaultValues>
+                    <IsOptional/>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-authenticator-push-device-settings-encryption-keypair-alias"
