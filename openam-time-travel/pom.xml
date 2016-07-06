@@ -31,10 +31,12 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-util</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

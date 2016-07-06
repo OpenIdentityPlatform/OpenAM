@@ -68,6 +68,13 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -79,10 +86,6 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.annotations.Action;
-import org.forgerock.json.resource.annotations.Read;
-import org.forgerock.json.resource.annotations.RequestHandler;
-import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.BundleUtils;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -111,7 +114,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 /**
  * A service to allow the modification of server properties
  */
-@RequestHandler
+@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
 public class SmsServerPropertiesResource {
 
     private static final String SCHEMA_NAME = "com-sun-identity-servers";
@@ -368,7 +371,7 @@ public class SmsServerPropertiesResource {
         return tabNames;
     }
 
-    @Action
+    @Action(operationDescription = @Operation)
     public Promise<ActionResponse, ResourceException> schema(ActionRequest request, Context serverContext) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
@@ -679,7 +682,7 @@ public class SmsServerPropertiesResource {
         return config.getSubConfig(SCHEMA_NAME);
     }
 
-    @Read
+    @Read(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> read(Context serverContext) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
@@ -891,7 +894,7 @@ public class SmsServerPropertiesResource {
         return uriVariables.get("serverName");
     }
 
-    @Update
+    @Update(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> update(Context serverContext, UpdateRequest request) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 

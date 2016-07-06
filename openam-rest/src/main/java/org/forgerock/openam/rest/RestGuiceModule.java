@@ -37,8 +37,11 @@ import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.caf.authentication.framework.AuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
+import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.CrestApplication;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -51,6 +54,8 @@ import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.forgerock.json.resource.Applications;
+import org.forgerock.json.resource.Resources;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -133,7 +138,7 @@ public class RestGuiceModule extends AbstractModule {
     @Provides
     @Named("RestHandler")
     @Singleton
-    Handler getRestHandler(@Named("ChfRootRouter") org.forgerock.http.routing.Router chfRootRouter,
+    DescribableHandler getRestHandler(@Named("ChfRootRouter") org.forgerock.http.routing.Router chfRootRouter,
             @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter,
             @Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter) {
         return Handlers.chainOf(chfRootRouter, authenticationFilter,
@@ -165,8 +170,12 @@ public class RestGuiceModule extends AbstractModule {
     org.forgerock.http.routing.Router getChfRealmRouter(@Named("CrestRealmHandler") RequestHandler crestRealmHandler,
             ContextFilter contextFilter, CrestProtocolEnforcementFilter crestProtocolEnforcementFilter) {
         org.forgerock.http.routing.Router chfRealmRouter = new org.forgerock.http.routing.Router();
+
+        ConnectionFactory connectionFactory = Resources.newInternalConnectionFactory(new FilterChain(crestRealmHandler, contextFilter));
+        CrestApplication crestApplication = Applications.simpleCrestApplication(connectionFactory, "frapi:openam", "1.0");
+
         chfRealmRouter.setDefaultRoute(Handlers.chainOf(
-                newHttpHandler(new FilterChain(crestRealmHandler, contextFilter)),
+                newHttpHandler(crestApplication),
                 crestProtocolEnforcementFilter));
         return chfRealmRouter;
     }

@@ -16,22 +16,38 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.CLIENT_ID;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.EXPIRY_TIME;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.ID;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.REALM;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.SCOPE;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.TOKEN_NAME;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.USER_NAME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.openam.cts.api.fields.OAuthTokenField.*;
-import static org.forgerock.util.query.QueryFilter.*;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
+import static org.forgerock.util.query.QueryFilter.or;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
@@ -40,9 +56,6 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Responses;
-import org.forgerock.json.resource.annotations.Delete;
-import org.forgerock.json.resource.annotations.Query;
-import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -60,13 +73,16 @@ import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * A request handler for inspecting and revoking OAuth2 applications. It requires a user and a realm to be available
  * in the request context.
  *
  * @since 13.0.0
  */
-@RequestHandler
+@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
 public class OAuth2UserApplications {
 
     private final TokenStore tokenStore;
@@ -101,7 +117,7 @@ public class OAuth2UserApplications {
      * @param request Unused but necessary for used of the {@link @Query} annotation.
      * @return A promise of a query response.
      */
-    @Query
+    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
     public Promise<QueryResponse, ResourceException> query(Context context, QueryResourceHandler queryHandler,
             QueryRequest request) {
 
@@ -164,7 +180,7 @@ public class OAuth2UserApplications {
      * @param resourceId The id of the OAuth2 client.
      * @return A promise of the removed application.
      */
-    @Delete
+    @Delete(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId) {
         String userId = contextHelper.getUserId(context);
         String realm = contextHelper.getRealm(context);

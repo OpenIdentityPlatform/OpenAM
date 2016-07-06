@@ -20,14 +20,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.http.ApiProducer;
+import org.forgerock.http.DescribedHttpApplication;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
-import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.io.Buffer;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.http.swagger.SwaggerApiProducer;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Factory;
 import org.forgerock.util.promise.NeverThrowsException;
@@ -36,13 +38,16 @@ import org.forgerock.util.promise.RuntimeExceptionHandler;
 
 import com.sun.identity.shared.debug.Debug;
 
+import io.swagger.models.Info;
+import io.swagger.models.Swagger;
+
 /**
  * OpenAM HTTP application.
  *
  * @since 13.0.0
  */
 @Singleton
-final class OpenAMHttpApplication implements HttpApplication {
+final class OpenAMHttpApplication implements DescribedHttpApplication {
 
     private static final Debug DEBUG = Debug.getInstance("frRest");
     private final Handler handler;
@@ -76,5 +81,10 @@ final class OpenAMHttpApplication implements HttpApplication {
 
     @Override
     public void stop() {
+    }
+
+    @Override
+    public ApiProducer<Swagger> getApiProducer() {
+        return new SwaggerApiProducer(new Info().title("OpenAM"), null, null);
     }
 }

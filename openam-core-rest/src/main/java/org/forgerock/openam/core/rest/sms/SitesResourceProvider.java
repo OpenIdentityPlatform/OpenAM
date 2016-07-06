@@ -34,9 +34,21 @@ import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.CountPolicy;
+import org.forgerock.api.enums.PagingMode;
+import org.forgerock.api.enums.QueryType;
+import org.forgerock.api.util.Translator;
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.PermanentException;
+import org.forgerock.openam.core.rest.sms.models.Site;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
@@ -65,6 +77,15 @@ import org.forgerock.util.promise.Promise;
 /**
  * A CREST collection resource provider that presents the global sites config in a coherent way.
  */
+@CollectionProvider(details = @Handler(
+        id = "sites:1.0",
+        title = "Sites",
+        description = "This version 1.0 sites service represents a Sites resource with CQ operations "
+                + "on the users collection and CRUDPA operations available for the site item. "
+                + "Items can have server version 1.0 subresources. ",
+        resourceSchema = @Schema(fromType = Site.class),
+        mvccSupported = false),
+        pathParam = @Parameter(name = "_id", type = "string", description = "The site name from the path"))
 public class SitesResourceProvider implements CollectionResourceProvider {
 
     private static final String SITE_NAME = "_id";
@@ -206,6 +227,24 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
+    @Query(operationDescription =
+    @Operation(
+            description = "The query operation",
+            locales = {"en-GB", "en-US"},
+            errors = {
+                    @ApiError(
+                            id = "badRequest",
+                            code = 400,
+                            description = "Indicates that the request could not be understood by "
+                                    + "the resource due to malformed syntax."),
+                    @ApiError(
+                            id = "unauthorized",
+                            code = 401,
+                            description = "Unauthorized - Missing or bad authentication")}),
+            type = QueryType.FILTER,
+            countPolicies = {CountPolicy.NONE},
+            pagingModes = {PagingMode.COOKIE, PagingMode.OFFSET},
+            queryableFields = {"_id", "url"})
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {

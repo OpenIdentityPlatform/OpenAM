@@ -16,11 +16,36 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.sm.AttributeSchema.Syntax.*;
-import static org.forgerock.json.JsonValue.*;
+import static com.sun.identity.sm.AttributeSchema.Syntax.BOOLEAN;
+import static com.sun.identity.sm.AttributeSchema.Syntax.DECIMAL;
+import static com.sun.identity.sm.AttributeSchema.Syntax.DECIMAL_NUMBER;
+import static com.sun.identity.sm.AttributeSchema.Syntax.DECIMAL_RANGE;
+import static com.sun.identity.sm.AttributeSchema.Syntax.NUMBER;
+import static com.sun.identity.sm.AttributeSchema.Syntax.NUMBER_RANGE;
+import static com.sun.identity.sm.AttributeSchema.Syntax.PERCENT;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.openam.rest.RestConstants.*;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ARRAY_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.BOOLEAN_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.DESCRIPTION;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ENUM;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.EXAMPLE_VALUE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.FORMAT;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ITEMS;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.NUMBER_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.OBJECT_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PASSWORD_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PATTERN_PROPERTIES;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PROPERTIES;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PROPERTY_ORDER;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.REQUIRED;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.STRING_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
+import static org.forgerock.openam.rest.RestConstants.COLLECTION;
+import static org.forgerock.openam.rest.RestConstants.NAME;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,6 +62,8 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Operation;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
@@ -47,7 +74,6 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -242,12 +268,12 @@ public abstract class SmsResourceProvider {
         return schema.getName();
     }
 
-    @Action
+    @Action(operationDescription = @Operation)
     public Promise<ActionResponse, ResourceException> schema(Context context) {
         return newActionResponse(createSchema(context)).asPromise();
     }
 
-    @Action
+    @Action(operationDescription = @Operation)
     public Promise<ActionResponse, ResourceException> template() {
         return newActionResponse(createTemplate()).asPromise();
     }
@@ -266,7 +292,7 @@ public abstract class SmsResourceProvider {
         return json(object());
     }
 
-    @Action
+    @Action(operationDescription = @Operation)
     public Promise<ActionResponse, ResourceException> getType(Context context) {
         try {
             return newActionResponse(getTypeValue(context)).asPromise();

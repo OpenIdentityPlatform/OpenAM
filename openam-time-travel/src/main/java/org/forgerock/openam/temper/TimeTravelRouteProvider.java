@@ -17,38 +17,29 @@
 package org.forgerock.openam.temper;
 
 import static java.lang.String.valueOf;
-import static org.forgerock.http.protocol.Response.*;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.http.HttpRoute.*;
-import static org.forgerock.openam.temper.TimeTravelTimeService.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.temper.TimeTravelTimeService.getOffset;
+import static org.forgerock.openam.temper.TimeTravelTimeService.setOffset;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.forgerock.http.Handler;
-import org.forgerock.http.protocol.Request;
-import org.forgerock.http.protocol.Response;
-import org.forgerock.http.protocol.Status;
-import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.json.JsonValue;
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.annotations.Action;
-import org.forgerock.json.resource.annotations.RequestHandler;
-import org.forgerock.json.resource.annotations.Update;
-import org.forgerock.openam.http.HttpRoute;
-import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -68,7 +59,7 @@ public class TimeTravelRouteProvider implements RestRouteProvider {
     /**
      * The actual resource provider.
      */
-    @RequestHandler
+    @RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
     public static class TimeTravelResourceProvider {
         /**
          * The {@code fastforward} action allows the time to be moved forward by a number of milliseconds.
@@ -76,7 +67,7 @@ public class TimeTravelRouteProvider implements RestRouteProvider {
          * @param request The request.
          * @return An empty JSON response.
          */
-        @Action
+        @Action(operationDescription = @Operation)
         public Promise<ActionResponse, ResourceException> fastforward(ActionRequest request) {
             setOffset(getOffset() + request.getContent().get("amount").asLong());
             return newActionResponse(json(object())).asPromise();
@@ -88,7 +79,7 @@ public class TimeTravelRouteProvider implements RestRouteProvider {
          * @param request The request.
          * @return The offset.
          */
-        @Update
+        @Update(operationDescription = @Operation)
         public Promise<ResourceResponse, ResourceException> update(UpdateRequest request) {
             Long offset = request.getContent().get("offset").asLong();
             setOffset(offset);
