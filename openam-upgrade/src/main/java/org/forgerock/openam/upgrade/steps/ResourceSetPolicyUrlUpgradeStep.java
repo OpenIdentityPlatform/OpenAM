@@ -51,6 +51,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
@@ -91,10 +92,18 @@ public class ResourceSetPolicyUrlUpgradeStep extends AbstractUpgradeStep {
 
     @Override
     public void initialize() throws UpgradeException {
+        try (Connection connection = rsConnectionFactory.create()) {
+            connection.readEntry(rootDn);
+        } catch (EntryNotFoundException e) {
+            // The resource set container does not exist, so there are no resource sets
+            return;
+        } catch (DataLayerException | LdapException e) {
+            throw new UpgradeException("Could not connect to LDAP resource set store", e);
+        }
         for (String realm : getRealmNames()) {
             Set<String> resourceSetIds = new HashSet<>();
-            try {
-                ConnectionEntryReader ids = rsConnectionFactory.create().search(
+            try (Connection connection = rsConnectionFactory.create()) {
+                ConnectionEntryReader ids = connection.search(
                         Requests.newSearchRequest(rootDn, SearchScope.SINGLE_LEVEL,
                                 and(substrings(STRING_ONE.toString(), null, asSet("oauth2/XUI"), null),
                                         equality(STRING_THREE.toString(), realm)),
