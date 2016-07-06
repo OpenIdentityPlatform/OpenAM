@@ -73,9 +73,9 @@ final class Constants {
      */
 
     /** Option begin the registration process now. */
-    public static final int START_REGISTRATION_OPTION = 1;
+    public static final int START_REGISTRATION_OPTION = 0;
     /** Option to navigate to the get the app page. */
-    public static final int GET_THE_APP_OPTION = 0;
+    public static final int GET_THE_APP_OPTION = 1;
 
     /** Index to use to access the QR callback placeholder. */
     public static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
