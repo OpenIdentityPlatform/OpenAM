@@ -257,6 +257,13 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
 
             final UserNameAttribute usrAtt = (UserNameAttribute) request.getAttribute(UserNameAttribute.class);
 
+            if (usrAtt == null) {
+                LOG.error("Request is missing USER_NAME attribute. Denying Access.");
+                rejectAccessAndTerminateProcess(response, holder);
+                LOG.message("Leaving OpenAMAuthHandler.handle()");
+                return;
+            }
+
             holder = startAuthProcess(holder, response, usrAtt, credential);
             if (holder == null || holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
                 // oops. something happened and reject message was already sent. so drop out here.
