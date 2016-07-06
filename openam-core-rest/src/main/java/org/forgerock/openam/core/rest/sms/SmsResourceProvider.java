@@ -356,7 +356,7 @@ public abstract class SmsResourceProvider {
     @SuppressWarnings("unchecked")
     protected void addGlobalAttributes(ServiceConfig config, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.GLOBAL) && config != null) {
-            converter.toJson(schema.getAttributeDefaults(), true, result);
+            converter.toJson(schema.getAttributeDefaults(), false, result);
         }
     }
 
@@ -372,7 +372,7 @@ public abstract class SmsResourceProvider {
     @SuppressWarnings("unchecked")
     protected void addOrganisationAttributes(String realm, ServiceConfig config, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.ORGANIZATION) && config != null) {
-            converter.toJson(realm, config.getAttributes(), true, result);
+            converter.toJson(realm, config.getAttributes(), false, result);
         }
     }
 
