@@ -337,6 +337,21 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>forgerock-dev</id>
+            <modules>
+                <module>openam-time-travel</module>
+            </modules>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock.openam</groupId>
+                        <artifactId>openam-time-travel</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
     </profiles>
 
     <!-- OpenAM Child Modules -->

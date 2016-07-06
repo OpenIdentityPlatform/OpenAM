@@ -620,7 +620,15 @@
                 </plugins>
             </build>
         </profile>
-
+        <profile>
+            <id>forgerock-dev</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.forgerock.openam</groupId>
+                    <artifactId>openam-time-travel</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
     <dependencies>
