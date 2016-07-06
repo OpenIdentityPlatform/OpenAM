@@ -17,15 +17,17 @@
 package org.forgerock.openam.rest.service;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.routing.AbstractRouter;
 import org.forgerock.services.routing.IncomparableRouteMatchException;
+import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.Pair;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 
-final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet> {
+final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet, Void> {
 
     private final static Debug DEBUG = Debug.getInstance("frRest");
 
@@ -46,5 +48,10 @@ final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet
             DEBUG.message(String.format("Route for '%s' not found", request.getResourceRef().getPath()));
             response.setStatus(org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND);
         }
+    }
+
+    @Override
+    protected RouteMatcher<Request> uriMatcher(RoutingMode routingMode, String s) {
+        return null;
     }
 }

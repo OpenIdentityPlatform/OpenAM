@@ -36,6 +36,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
@@ -44,8 +49,8 @@ import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.annotations.Query;
-import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -57,7 +62,7 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-@RequestHandler
+@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
 public class AuthenticationModuleRealmSmsHandler {
 
     private final SSOToken adminToken;
@@ -80,7 +85,7 @@ public class AuthenticationModuleRealmSmsHandler {
      *
      * {@inheritDoc}
      */
-    @Query
+    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 

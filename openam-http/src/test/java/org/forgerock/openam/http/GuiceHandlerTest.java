@@ -36,9 +36,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class HandlerProviderTest extends GuiceTestCase {
+public class GuiceHandlerTest extends GuiceTestCase {
 
-    private HandlerProvider handlerProvider;
+    private GuiceHandler guiceHandler;
 
     @Mock
     private Handler handler;
@@ -65,7 +65,7 @@ public class HandlerProviderTest extends GuiceTestCase {
 
     @BeforeMethod
     public void setup() {
-        handlerProvider = new HandlerProvider(key);
+        guiceHandler = new GuiceHandler(key);
         handlerReturnCount.set(0);
     }
 
@@ -77,7 +77,7 @@ public class HandlerProviderTest extends GuiceTestCase {
         Request request = new Request();
 
         //When
-        handlerProvider.handle(context, request);
+        guiceHandler.handle(context, request);
 
         //Then
         assertThat(handlerReturnCount.get()).isEqualTo(1);
@@ -92,8 +92,8 @@ public class HandlerProviderTest extends GuiceTestCase {
         Request request = new Request();
 
         //When
-        handlerProvider.handle(context, request);
-        handlerProvider.handle(context, request);
+        guiceHandler.handle(context, request);
+        guiceHandler.handle(context, request);
 
         //Then
         assertThat(handlerReturnCount.get()).isEqualTo(1);

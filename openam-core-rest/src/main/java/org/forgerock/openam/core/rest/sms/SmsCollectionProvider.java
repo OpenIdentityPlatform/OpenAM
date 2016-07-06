@@ -18,31 +18,34 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceAlreadyExistsException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceNotFoundException;
-import com.sun.identity.sm.ServiceSchema;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
@@ -56,12 +59,6 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.annotations.Create;
-import org.forgerock.json.resource.annotations.Delete;
-import org.forgerock.json.resource.annotations.Query;
-import org.forgerock.json.resource.annotations.Read;
-import org.forgerock.json.resource.annotations.RequestHandler;
-import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
@@ -70,11 +67,23 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.ResultHandler;
 
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceAlreadyExistsException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
+import com.sun.identity.sm.ServiceSchema;
+
 /**
  * A CREST collection provider for SMS schema config.
  * @since 13.0.0
  */
-@RequestHandler
+@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
 public class SmsCollectionProvider extends SmsResourceProvider {
 
     private final boolean autoCreatedAuthModule;
@@ -100,7 +109,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * new config is created using the provided name property.
      * {@inheritDoc}
      */
-    @Create
+    @Create(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> create(final Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         final String realm = realmFor(context);
@@ -153,7 +162,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * the config is deleted using the resourceId.
      * {@inheritDoc}
      */
-    @Delete
+    @Delete(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -191,7 +200,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * the config is read using the resourceId.
      * {@inheritDoc}
      */
-    @Read
+    @Read(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -217,7 +226,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * the config is updated using the resourceId.
      * {@inheritDoc}
      */
-    @Update
+    @Update(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         JsonValue content = request.getContent();
@@ -253,7 +262,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * Sorting and paging are not supported.
      * {@inheritDoc}
      */
-    @Query
+    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {

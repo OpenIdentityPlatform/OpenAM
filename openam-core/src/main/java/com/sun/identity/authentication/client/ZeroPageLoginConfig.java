@@ -16,6 +16,8 @@
 
 package com.sun.identity.authentication.client;
 
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -28,9 +30,21 @@ import static org.forgerock.json.JsonValue.*;
  * Interface to different methods for configuring Zero Page Login (ZPL). For local authentication, this uses the
  * LoginState, otherwise (DAS) it uses system properties.
  */
+@Title("Zero page login config")
+@Description("Interface to different methods for configuring Zero Page Login (ZPL). For local authentication, " +
+        "this uses the LoginState, otherwise (DAS) it uses system properties")
 public final class ZeroPageLoginConfig {
+
+    @Title("Zero Page Login Enabled")
+    @Description("True if Zero page login is enabled")
     private final boolean enabled;
+
+    @Title("Whitelist")
+    @Description("List of allowed Referer URLs")
     private final Set<String> whitelist;
+
+    @Title("Allow without referer")
+    @Description("Indicates whether ZPL requests should be allowed if the request does not include a Referer header.")
     private final boolean allowWithoutReferer;
 
     public ZeroPageLoginConfig(final boolean enabled, final Set<String> whitelist, final boolean allowWithoutReferer) {
