@@ -21,13 +21,17 @@ define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/user/login/navigateThenRefresh"
+], ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper, navigateThenRefresh) => {
 
     var LogoutView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
+        events: {
+            "click [data-return-to-login-page]" : navigateThenRefresh
+        },
         render () {
             /*
             The RESTLoginHelper.filterUrlParams returns a filtered list of the parameters from the value set within the
