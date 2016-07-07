@@ -32,20 +32,23 @@ package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.AccessController;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionCookies;
+
 import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.AccessController;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
 
 /**
  * Responsible for creating HTTP connections that identify themselves, via cookies, as belonging to a session.
@@ -88,9 +91,6 @@ public class HttpConnectionFactory {
      * @param sid SessionID
      */
     public HttpURLConnection createSessionAwareConnection(URL url, SessionID sid, String extraCookies) throws Exception {
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            return null;
-        }
 
         HttpURLConnection connection = null;
 

@@ -29,23 +29,12 @@
 
 package com.sun.identity.setup;
 
-import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.IOUtils.writeToFile;
+import static com.sun.identity.setup.AMSetupUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.IOUtils.*;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -78,6 +67,32 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseLocator;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.license.ServletContextLicenseLocator;
+import org.forgerock.openam.setup.EmbeddedOpenDJManager;
+import org.forgerock.openam.setup.ZipUtils;
+import org.forgerock.openam.upgrade.EmbeddedOpenDJBackupManager;
+import org.forgerock.openam.upgrade.OpenDJUpgrader;
+import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.config.ConfigurationFramework;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -132,20 +147,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.license.License;
-import org.forgerock.openam.license.LicenseLocator;
-import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.license.ServletContextLicenseLocator;
-import org.forgerock.openam.setup.EmbeddedOpenDJManager;
-import org.forgerock.openam.setup.ZipUtils;
-import org.forgerock.openam.upgrade.EmbeddedOpenDJBackupManager;
-import org.forgerock.openam.upgrade.OpenDJUpgrader;
-import org.forgerock.openam.upgrade.VersionUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.config.ConfigurationFramework;
 
 /**
  * This class is the first class to get loaded by the Servlet container.
@@ -369,15 +370,13 @@ public class AMSetupServlet extends HttpServlet {
            
         String loadBalancerHost = request.getParameter("LB_SITE_NAME");
         String primaryURL = request.getParameter("LB_PRIMARY_URL");
-        String sfoEnabled = request.getParameter("LB_SESSION_HA_SFO");
-        
+
         if (loadBalancerHost != null) {     
             // site configuration is passed as a map of the site 
             // information 
             Map<String, String> siteConfig = new HashMap<String, String>(5);
             siteConfig.put(SetupConstants.LB_SITE_NAME, loadBalancerHost);
             siteConfig.put(SetupConstants.LB_PRIMARY_URL, primaryURL);
-            siteConfig.put(SetupConstants.LB_SESSION_HA_SFO, sfoEnabled);
             req.addParameter(SetupConstants.CONFIG_VAR_SITE_CONFIGURATION, siteConfig);
         }
                 
@@ -550,8 +549,6 @@ public class AMSetupServlet extends HttpServlet {
                 if (siteMap != null && !siteMap.isEmpty()) {
                     String site = (String) siteMap.get( SetupConstants.LB_SITE_NAME);
                     String primaryURL = (String) siteMap.get(SetupConstants.LB_PRIMARY_URL);
-                    Boolean isSessionHASFOEnabled = Boolean.valueOf(
-                            (String) siteMap.get(SetupConstants.LB_SESSION_HA_SFO));
 
                     /*
                      * If primary url is null that means we are adding
@@ -569,10 +566,6 @@ public class AMSetupServlet extends HttpServlet {
                         ServerConfiguration.addToSite(adminToken, serverInstanceName, site);
                     }
 
-                    //configure SFO (enabled/disabled) by creating a subconfiguration for the site
-                    Map<String, Set<String>> values = new HashMap<String, Set<String>>(1);
-                    values.put(CoreTokenConstants.IS_SFO_ENABLED, asSet(isSessionHASFOEnabled.toString()));
-                    createSFOSubConfig(adminToken, site, values);
                 }
                 if (EmbeddedOpenDS.isMultiServer(map)) {
                     // Setup Replication port in SMS for each server
@@ -941,29 +934,6 @@ public class AMSetupServlet extends HttpServlet {
             throw e;
         }
         return configured;
-    }
-
-    /**
-     * Creates a SubConfiguration in the Session service that should enable/disable SFO based on the provided values.
-     *
-     * @param adminToken The admin token to use when adding the SubConfiguration.
-     * @param siteName The name of the site that has been provided for the configurator.
-     * @param values Valid values for the session subconfiguration containing the SFO settings.
-     * @throws SMSException If there was an error while creating the new SubConfiguration.
-     * @throws SSOException If the provided admin token wasn't valid.
-     */
-    private static void createSFOSubConfig(SSOToken adminToken, String siteName, Map<String, Set<String>> values)
-            throws SMSException, SSOException {
-        ServiceConfigManager scm = new ServiceConfigManager("iPlanetAMSessionService", adminToken);
-        ServiceConfig sc = scm.getGlobalConfig(null);
-        if (sc == null) {
-            throw new SMSException("Global config does not exist for iPlanetAMSessionService");
-        }
-        ServiceConfig existingSubConfig = sc.getSubConfig(siteName);
-        //if the subconfig already exists, then we shouldn't try to create it for the second time
-        if (existingSubConfig == null) {
-            sc.addSubConfig(siteName, "Site", 0, values);
-        }
     }
 
     public static String getErrorMessage() {

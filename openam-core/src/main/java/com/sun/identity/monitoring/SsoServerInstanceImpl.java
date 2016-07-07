@@ -24,16 +24,15 @@
  *
  * $Id: SsoServerInstanceImpl.java,v 1.1 2009/06/19 02:23:16 bigfatrat Exp $
  *
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.sun.identity.monitoring;
+
+import javax.management.MBeanServer;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
-import javax.management.MBeanServer;
 
 /**
  * This class extends the "SsoServerInstance" class.
@@ -66,11 +65,6 @@ public class SsoServerInstanceImpl extends SsoServerInstance {
          *  being created.
          */
         SSOServerInfo svrinfo = Agent.getAgentSvrInfo();
-        if (Agent.getSFOStatus()) {
-            SsoServerSFOStatus = "on";
-        } else {
-            SsoServerSFOStatus = "off";
-        }
 
         String temp = "embedded";
         if (!svrinfo.isEmbeddedDS) {

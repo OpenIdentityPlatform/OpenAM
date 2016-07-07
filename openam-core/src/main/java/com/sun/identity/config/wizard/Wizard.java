@@ -29,6 +29,13 @@
 
 package com.sun.identity.config.wizard;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.click.control.ActionLink;
+
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
@@ -37,12 +44,7 @@ import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-
 import com.sun.identity.shared.Constants;
-import org.apache.click.control.ActionLink;
 
 public class Wizard extends ProtectedPage implements Constants {
 
@@ -226,16 +228,9 @@ public class Wizard extends ProtectedPage implements Constants {
             SessionAttributeNames.LB_SITE_NAME);
         String primaryURL = (String)getContext().getSessionAttribute(
             SessionAttributeNames.LB_PRIMARY_URL);
-        // Assume no Session HA Failover.
-        Boolean isSessionHASFOEnabled = false;
-        if (getContext().getSessionAttribute(SessionAttributeNames.LB_SESSION_HA_SFO) != null)
-        {   isSessionHASFOEnabled = Boolean.valueOf( (Boolean)getContext().getSessionAttribute(
-                SessionAttributeNames.LB_SESSION_HA_SFO));
-        }
         if (loadBalancerHost != null) {
             siteConfig.put(SetupConstants.LB_SITE_NAME, loadBalancerHost);
             siteConfig.put(SetupConstants.LB_PRIMARY_URL, primaryURL);
-            siteConfig.put(SetupConstants.LB_SESSION_HA_SFO, isSessionHASFOEnabled.toString());
             request.addParameter(
                 SetupConstants.CONFIG_VAR_SITE_CONFIGURATION, siteConfig);
         }

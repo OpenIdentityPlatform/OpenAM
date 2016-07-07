@@ -26,10 +26,19 @@
  */
 
 /**
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2016 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.session;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -47,10 +56,7 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import com.sun.web.ui.model.CCActionTableModel;
-import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
@@ -61,14 +67,6 @@ import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 public class SMProfileViewBean
     extends SMViewBeanBase
@@ -230,13 +228,6 @@ public class SMProfileViewBean
             setPageSessionAttribute(SERVER_NAME, value);
             // Set our Sub-Tabs
             addSessionsTab(model,1);
-            // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
-            // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
-            if ( (!SystemPropertiesManager.get(CoreTokenConstants.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
-                 (SystemPropertiesManager.get(CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
-            {
-                removeSessionsTab();
-            }
         }
     }
 
@@ -246,25 +237,6 @@ public class SMProfileViewBean
         config.addSessionTabs(tabModel, model);
         registerChild(TAB_COMMON, CCTabs.class);
         tabModel.setSelectedNode(selectedNode);
-    }
-
-    // Remove all Session Tabs, since HA not available, disable associated Tabs.
-    protected void removeSessionsTab() {
-        if (tabModel != null) {
-            tabModel.clear();
-            // removeSessionsTab(551); Current Sessions, Leave!
-            removeSessionsTab(552);
-        }
-    }
-
-    private void removeSessionsTab(int tabNodeId) {
-            CCNavNodeInterface tabNode = tabModel.getNodeById(tabNodeId);
-            if (tabNode != null)
-            {
-                tabNode.setVisible(false);
-                tabNode.setAcceptsChildren(false);
-                tabNode.getParent().removeChild(tabNode);
-            }
     }
 
     /**

@@ -66,8 +66,6 @@ public class CoreTokenConstants {
             "forgerock-openam-session-expired-search-limit";
     public static final String DEBUG_NAME = "amSessionRepository";
 
-    public static final String IS_SFO_ENABLED =
-            "iplanet-am-session-sfo-enabled";
     /**
      * System property for checking whether session crosstalk is reduced. See
      * {@link com.iplanet.dpro.session.service.SessionService#isReducedCrossTalkEnabled()}.

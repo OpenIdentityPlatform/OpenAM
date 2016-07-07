@@ -314,19 +314,6 @@ public interface Constants {
             "com.iplanet.am.session.failover.httpSessionTrackingCookieName";
 
     /**
-     * property string to choose whether local or remote saving method is used
-     */
-    static final String AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD =
-            "com.iplanet.am.session.failover.useRemoteSaveMethod";
-
-    /**
-     * property string to choose whether we rely on app server load balancer to
-     * do the request routing or use our own
-     */
-    static final String AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING =
-            "com.iplanet.am.session.failover.useInternalRequestRouting";
-
-    /**
      * Property string for failover cluster state check timeout
      */
     static final String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT =

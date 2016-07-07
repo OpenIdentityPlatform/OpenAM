@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations;
 
@@ -20,6 +20,10 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -34,9 +38,6 @@ import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ServerSessionOperationStrategyTest {
 
@@ -94,25 +95,9 @@ public class ServerSessionOperationStrategyTest {
     }
 
     @Test
-    public void shouldUseRemoteForRemoteSessionsWhenCrossTalkIsEnabled() throws Exception {
-        // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-
-        // Cross-talk is enabled
-        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(false);
-
-        // When
-        SessionOperations operation = strategy.getOperation(mockSession);
-
-        // Then
-        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
-    }
-
-    @Test
     public void shouldUseCTSWhenRemoteIsDown() throws SessionException {
         // Given
         given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
 
         // Cross-talk is enabled
         given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(false);
@@ -131,23 +116,9 @@ public class ServerSessionOperationStrategyTest {
     }
 
     @Test
-    public void shouldUseRemoteWhenFailoverIsDisabled() throws SessionException {
-        // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-        given(mockSessionService.isSessionFailoverEnabled()).willReturn(false);
-
-        // When
-        SessionOperations operation = strategy.getOperation(mockSession);
-
-        // Then
-        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
-    }
-
-    @Test
     public void shouldUseCTSWhenCrossTalkDisabledCTSContainsSession() throws SessionException {
         // Given
         given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
 
         // Cross talk is disabled.
         given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(true);

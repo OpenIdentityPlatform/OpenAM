@@ -172,7 +172,6 @@ public class Agent {
     private static boolean monHtmlPortEnabled;
     private static boolean monSnmpPortEnabled;
     private static boolean monRmiPortEnabled;
-    private static boolean isSessFOEnabled;
 
     private static SimpleDateFormat sdf =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -2917,14 +2916,6 @@ public class Agent {
             String rlmSAMLSP)
     {
         return realmSAML2SPs.get(rlmSAMLSP);
-    }
-
-    public static void setSFOStatus (boolean sfoStatus) {
-        isSessFOEnabled = sfoStatus;
-    }
-
-    public static boolean getSFOStatus() {
-        return isSessFOEnabled;
     }
 
     public static void setMonitoringDisabled () {

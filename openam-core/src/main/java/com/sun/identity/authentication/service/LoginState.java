@@ -5324,7 +5324,7 @@ public class LoginState {
             return;
         }
 
-        getSession().setIsISStored(true);
+        getSession().save();
     }
 
     /**

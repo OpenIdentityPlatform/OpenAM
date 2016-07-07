@@ -201,10 +201,6 @@ DS_DIRMGRPASSWD=11111111
 ###
 ### LB_PRIMARY_URL is the load balancer URL.
 ###
-### LB_SESSION_HA_SFO specifies whether session failover should be enabled in
-### the site configuration. Set to "true" to enable SFO.
-###
 ##############################################################################
 #LB_SITE_NAME=lb
 #LB_PRIMARY_URL=http://lb.example.com:80/openam
-#LB_SESSION_HA_SFO=false

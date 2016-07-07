@@ -15,23 +15,25 @@
  */
 package org.forgerock.openam.cts.adapters;
 
-import com.iplanet.dpro.session.service.InternalSession;
+import java.lang.reflect.Field;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 
-import javax.inject.Inject;
-import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.iplanet.dpro.session.service.InternalSession;
 
 /**
  * SessionAdapter is responsible for providing conversions to and from InternalSession
@@ -143,6 +145,9 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
             //sessionHandle field is not set, then we should attempt to retrieve the value directly from the token.
             session.setSessionHandle(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField()));
         }
+        // This must be called as the InternalSession needs to know that it represents a stored session,
+        // and the value cannot default to true.
+        session.notifyStored();
 
         return session;
     }

@@ -11,22 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Singleton;
+
+import org.forgerock.guice.core.InjectorHolder;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNaming;
-import org.forgerock.guice.core.InjectorHolder;
-
-import javax.inject.Singleton;
-import java.net.URL;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ClientSDK: This code is ClientSDK aware and will only use the Server SessionService
@@ -122,12 +125,7 @@ public class SessionServiceURLService {
 
             SessionService ss = InjectorHolder.getInstance(SessionService.class);
             if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
-                if (ss.isSessionFailoverEnabled()) {
-                    return getSessionServiceURL(ss.getCurrentHostServer(sid));
-                } else {
-                    primaryId = sid.getExtension().getPrimaryID();
-                    return getSessionServiceURL(primaryId);
-                }
+                return getSessionServiceURL(ss.getCurrentHostServer(sid));
             }
         } else {
             primaryId = sid.getExtension().getPrimaryID();

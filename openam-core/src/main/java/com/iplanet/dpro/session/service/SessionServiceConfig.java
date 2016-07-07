@@ -118,18 +118,6 @@ public class SessionServiceConfig {
     private static final boolean DEFAULT_RETURN_APP_SESSION = false;
     private final boolean returnAppSession;
 
-    // Must be True to permit Session Failover HA to be available.
-    private static final boolean DEFAULT_USE_REMOTE_SAVE_METHOD = true;
-    private boolean useRemoteSaveMethod;
-
-    // Must be True to permit Session Failover HA to be available.
-    private static final boolean DEFAULT_USE_INTERNAL_REQUEST_ROUTING = true;
-    private boolean useInternalRequestRouting;
-
-    // Must be True to permit Session Failover HA to be available, but we default this to Disabled or Off for Now.
-    private static final boolean DEFAULT_SESSION_FAILOVER_ENABLED = false;
-    private volatile boolean sessionFailoverEnabled;
-
     private final int sessionFailoverClusterStateCheckTimeout;
     private final long sessionFailoverClusterStateCheckPeriod;
 
@@ -389,10 +377,6 @@ public class SessionServiceConfig {
     }
 
     private synchronized void loadSessionFailover() throws SSOException, SMSException {
-        useRemoteSaveMethod = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD, DEFAULT_USE_REMOTE_SAVE_METHOD);
-        useInternalRequestRouting = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING, DEFAULT_USE_INTERNAL_REQUEST_ROUTING);
-        sessionFailoverEnabled = SystemProperties.getAsBoolean(IS_SFO_ENABLED, DEFAULT_SESSION_FAILOVER_ENABLED);
-
         SSOToken adminToken = AccessController.doPrivileged(dsameAdminTokenProvider);
 
         ServiceConfigManager scm = new ServiceConfigManager(AM_SESSION_SERVICE_NAME, adminToken);
@@ -408,36 +392,21 @@ public class SessionServiceConfig {
         if ((subConfig != null) && subConfig.exists()) {
 
             Map sessionAttrs = subConfig.getAttributes();
-            boolean sfoEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_SFO_ENABLED, false);
 
-            // Currently, we are not allowing to default to Session Failover HA,
-            // even with a single server to enable session persistence.
-            // But can easily be turned on in the Session SubConfig.
-            if (sfoEnabled) {
+            // Determine whether crosstalk is enabled or disabled.
+            reducedCrosstalkEnabled =
+                    CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
 
-                sessionFailoverEnabled = true;
-                useRemoteSaveMethod = true;
-                useInternalRequestRouting = true;
-
-                // Determine whether crosstalk is enabled or disabled.
-                reducedCrosstalkEnabled =
-                        CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
-
-                if (reducedCrosstalkEnabled) {
-                    logoutDestroyBroadcast = valueOf(
-                            CollectionHelper.getMapAttr(
-                                    sessionAttrs, LOGOUT_DESTROY_BROADCAST, OFF.name()));
-                }
-
-                reducedCrosstalkPurgeDelay =
-                        CollectionHelper.getLongMapAttr(sessionAttrs,
-                                REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
-
+            if (reducedCrosstalkEnabled) {
+                logoutDestroyBroadcast = valueOf(
+                        CollectionHelper.getMapAttr(
+                                sessionAttrs, LOGOUT_DESTROY_BROADCAST, OFF.name()));
             }
-        }
 
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Session Failover Enabled = " + sessionFailoverEnabled);
+            reducedCrosstalkPurgeDelay =
+                    CollectionHelper.getLongMapAttr(sessionAttrs,
+                            REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
+
         }
     }
 
@@ -487,16 +456,6 @@ public class SessionServiceConfig {
                             " defaulting to " + ClusterStateService.DEFAULT_PERIOD);
             return ClusterStateService.DEFAULT_PERIOD;
         }
-    }
-
-    /**
-     * Returns true if SystemProperty "com.iplanet.am.session.failover.useRemoteSaveMethod" is true or
-     * Session Failover is enabled.
-     *
-     * @see #isSessionFailoverEnabled()
-     */
-    public boolean isUseRemoteSaveMethod() {
-        return useRemoteSaveMethod;
     }
 
     /**
@@ -633,22 +592,12 @@ public class SessionServiceConfig {
     }
 
     /**
-     * Returns true if SystemProperty or amSession.xml property "iplanet-am-session-sfo-enabled" is true.
-     *
-     * Defaults to false.
-     */
-    public boolean isSessionFailoverEnabled() {
-        return sessionFailoverEnabled;
-    }
-
-    /**
      * Returns true if amSession.xml property "iplanet-am-session-reduced-crosstalk-enabled" is true
      * (and session failover is enabled).
      *
-     * @see #isSessionFailoverEnabled()
      */
     public boolean isReducedCrossTalkEnabled() {
-        return sessionFailoverEnabled && reducedCrosstalkEnabled;
+        return reducedCrosstalkEnabled;
     }
 
     /**
@@ -710,18 +659,6 @@ public class SessionServiceConfig {
      */
     public JwtSessionMapper getJwtSessionMapper() {
         return hotSwappableSessionServiceConfig.jwtSessionMapperConfig.getJwtSessionMapper();
-    }
-
-    /**
-     * Returns true if SystemProperty "com.iplanet.am.session.failover.useInternalRequestRouting" is enabled or
-     * session failover is enabled.
-     *
-     * Defaults to true.
-     *
-     * @see #isSessionFailoverEnabled()
-     */
-    public boolean isUseInternalRequestRoutingEnabled() {
-        return sessionFailoverEnabled && useInternalRequestRouting;
     }
 
     /**

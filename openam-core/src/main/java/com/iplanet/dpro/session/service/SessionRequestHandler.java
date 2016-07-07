@@ -303,96 +303,60 @@ public class SessionRequestHandler implements RequestHandler {
                         }
                     }
 
-                    if (!serviceConfig.isSessionFailoverEnabled()) {
-                        // TODO check how this behaves in non-session failover case
-                        URL originService = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sid);
+                    // first try
+                    String hostServerID = sessionService.getCurrentHostServer(sid);
 
-                        if (!serverConfig.isLocalSessionService(originService)) {
-                            if (!serverConfig.isSiteEnabled()) {
-                                String siteID = sid.getExtension().getSiteID();
-                                if (siteID != null) {
-                                    String primaryID = sid.getExtension().getPrimaryID();
-                                    String localServerID = serverConfig.getLocalServerID();
-                                    if ( (primaryID != null) && (localServerID != null) )
-                                    {
-                                        if (primaryID.equals(localServerID)) {
-                                            throw new SessionException("invalid session id");
-                                        }
+                    if (!serverConfig.isLocalServer(hostServerID)) {
+                        try {
+                            return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req);
+                        } catch (SessionException se) {
+                            // attempt retry
+                            if (!sessionService.checkServerUp(hostServerID)) {
+                                // proceed with failover
+                                String retryHostServerID = sessionService.getCurrentHostServer(sid);
+                                if (retryHostServerID.equals(hostServerID)) {
+                                    throw se;
+                                } else {
+                                    // we have a shot at retrying here
+                                    // if it is remote, forward it
+                                    // otherwise treat it as a case of local
+                                    // case
+                                    if (!serverConfig.isLocalServer(retryHostServerID)) {
+                                        return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(retryHostServerID), req);
                                     }
                                 }
                             } else {
-                                return forward(originService, req);
+                                throw se;
                             }
                         }
-                    } else {
-                        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-                            // first try
-                            String hostServerID = sessionService.getCurrentHostServer(sid);
+                    }
 
-                            if (!serverConfig.isLocalServer(hostServerID)) {
-                                try {
-                                    return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req);
-                                } catch (SessionException se) {
-                                    // attempt retry
-                                    if (!sessionService.checkServerUp(hostServerID)) {
-                                        // proceed with failover
-                                        String retryHostServerID = sessionService.getCurrentHostServer(sid);
-                                        if (retryHostServerID.equals(hostServerID)) {
-                                            throw se;
-                                        } else {
-                                            // we have a shot at retrying here
-                                            // if it is remote, forward it
-                                            // otherwise treat it as a case of local
-                                            // case
-                                            if (!serverConfig.isLocalServer(retryHostServerID)) {
-                                                return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(retryHostServerID), req);
-                                            }
-                                        }
-                                    } else {
-                                        throw se;
-                                    }
-                                }
-                            }
-                        } else {
-                            // Likely an unreachable code block [AME-5701]:
-                            // SessionServiceConfig sets useInternalRequestRouting=true if SMS property
-                            // "iplanet-am-session-sfo-enabled" is true
-                            // To enter this block, SMS value "iplanet-am-session-sfo-enabled" must be false
-                            // and the following System Properties must be set:
-                            // com.iplanet.am.session.failover.useInternalRequestRouting=false
-                            // iplanet-am-session-sfo-enabled=true (in direct contradiction to SMS property with same name)
-                            throw new AssertionError("Unreachable code");
-                        }
+                /*
+                 * We determined that this server is the host and the
+                 * session must be found(or recovered) locally
+                 */
 
-                    /*
-                     * We determined that this server is the host and the
-                     * session must be found(or recovered) locally
-                     */
+                /*
+                 * if session is not already present locally attempt to recover session
+                 */
+                    if (!sessionService.isSessionPresent(sid)) {
+                        if (sessionService.recoverSession(sid) == null) {
+                        /*
+                         * if recovery was not successful return an exception
+                         */
 
-                    /*
-                     * if session is not already present locally attempt to
-                     * recover session if in failover mode
-                     */
-                        if (!sessionService.isSessionPresent(sid)) {
-                            if (sessionService.recoverSession(sid) == null) {
-                            /*
-                             * if not in failover mode or recovery was not
-                             * successful return an exception
-                             */
-
-                            /*
-                             * !!!!! IMPORTANT !!!!! DO NOT REMOVE "sid" FROM
-                             * EXCEPTIONMESSAGE Logic kludge in legacy Agent 2.0
-                             * code will break If it can not find SID value in
-                             * the exception message returned by Session
-                             * Service. This dependency should be eventually
-                             * removed once we migrate customers to a newer
-                             * agent code base or switch to a new version of
-                             * Session Service interface
-                             */
-                                res.setException(sid + " " + SessionBundle.getString("sessionNotObtained"));
-                                return res;
-                            }
+                        /*
+                         * !!!!! IMPORTANT !!!!! DO NOT REMOVE "sid" FROM
+                         * EXCEPTIONMESSAGE Logic kludge in legacy Agent 2.0
+                         * code will break If it can not find SID value in
+                         * the exception message returned by Session
+                         * Service. This dependency should be eventually
+                         * removed once we migrate customers to a newer
+                         * agent code base or switch to a new version of
+                         * Session Service interface
+                         */
+                            res.setException(sid + " " + SessionBundle.getString("sessionNotObtained"));
+                            return res;
                         }
                     }
 

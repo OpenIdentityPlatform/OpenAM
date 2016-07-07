@@ -28,32 +28,11 @@
  */
 package com.iplanet.dpro.session.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionEvent;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.share.SessionEncodeURL;
-import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.HeadTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
-import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.util.annotations.VisibleForTesting;
+import static java.util.concurrent.TimeUnit.*;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -74,10 +53,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionEvent;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.share.SessionEncodeURL;
+import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.HeadTaskRunnable;
+import com.sun.identity.common.SystemTimerPool;
+import com.sun.identity.common.TaskRunnable;
+import com.sun.identity.common.TimerPool;
+import com.sun.identity.session.util.SessionUtils;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal
@@ -148,7 +150,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      *  - These objects and the corresponding interfaces are for internal use
      * only. - These objects are "transient" objects which don't require
      * persisency. In other words, they won't be saved into the session
-     * repository in the SFO case. - These object are not session properties
+     * repository. - These object are not session properties
      * since they are not meant to exposed to any client.
      */
     transient private Map internalObjects = new HashMap();
@@ -161,6 +163,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     transient private HttpSession httpSession;
 
+    @JsonIgnore
     private boolean isISStored = false;
 
     Boolean cookieMode = null;
@@ -666,7 +669,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void setType(int type) {
         sessionType = type;
-        updateForFailover();
+        update();
     }
 
     /**
@@ -685,7 +688,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void setClientID(String id) {
         clientID = id;
-        updateForFailover();
+        update();
     }
 
     /**
@@ -705,7 +708,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void setClientDomain(String domain) {
         clientDomain = domain;
-        updateForFailover();
+        update();
     }
 
     /**
@@ -731,7 +734,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         if ((scheduledExecutionTime() != -1) && mayReschedule) {
             reschedule();
         }
-        updateForFailover();
+        update();
     }
 
     /**
@@ -764,7 +767,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             reschedulePossible)) {
             reschedule();
         }
-        updateForFailover();
+        update();
     }
 
     /**
@@ -784,7 +787,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void setMaxCachingTime(long t) {
         maxCachingTime = t;
-        updateForFailover();
+        update();
     }
 
     /**
@@ -1034,7 +1037,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
             sessionAuditor.auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED);
         }
-        updateForFailover();
+        update();
     }
 
     /**
@@ -1061,25 +1064,37 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * Sets the isISStored field.
-     * @param value <code>true</code> if the internal session is stored
-     *        <code>false</code> otherwise
+     * Save this InternalSession to the repository. Also sets it up to save all future changes to the repository.
      */
-    public void setIsISStored(boolean value) {
-        boolean wasISStored = isISStored;
-        isISStored = value;
-        if (isISStored && !wasISStored) {
-            updateForFailover();
-        }
+    public void save() {
+        sessionService.save(this);
+        isISStored = true;
     }
 
     /**
-     * Returns the isISStored field
+     * Delete this InternalSession from the repository. Changes will no longer trigger updates to the repository.
+     */
+    public void delete() {
+        sessionService.deleteFromRepository(this);
+        isISStored = false;
+    }
+
+    /**
+     * Returns whether the InternalSession represented has been stored. If this is true, changes to this object will
+     * update the stored version.
      * return <code>true</code> if the internal session is stored
      *        <code>false</code> otherwise
      */
-    public boolean getIsISstored() {
+    public boolean isStored() {
         return isISStored;
+    }
+
+    /**
+     * Inform this internal session that it represents a stored session. Relevant when this object has been created from
+     * a serialised form (e.g. restored from Json). Do not call in other circumstances.
+     */
+    public void notifyStored() {
+        isISStored = true;
     }
 
     /*
@@ -1272,7 +1287,6 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (!isAppSession() || serviceConfig.isReturnAppSessionEnabled()) {
             sessionService.decrementActiveSessions();
         }
-        SessionCount.decrementSessionCount(this);
         setState(INVALID);
         if (serviceConfig.isSessionTrimmingEnabled()){
             trimSession();
@@ -1343,7 +1357,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         long oldLatestAccessTime = latestAccessTime;
         latestAccessTime = currentTimeMillis() / 1000;
         if ((latestAccessTime - oldLatestAccessTime) > interval) {
-            updateForFailover();
+            update();
         }
     }
 
@@ -1354,7 +1368,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     void setState(int state) {
         sessionState = state;
-        updateForFailover();
+        update();
     }
 
     /**
@@ -1417,7 +1431,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
 
         if (sids.add(sid))  {
-            updateForFailover();
+            update();
         }
     }
 
@@ -1492,7 +1506,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         SessionID previousValue = restrictedTokensByRestriction.putIfAbsent(restriction, sid);
         if (previousValue == null) {
             restrictedTokensBySid.put(sid, restriction);
-            updateForFailover();
+            update();
             return null;
         }
         return previousValue;
@@ -1721,16 +1735,15 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * Update for the session failover
+     * Update
      */
-    private void updateForFailover() {
-        if (serviceConfig.isSessionFailoverEnabled() && isISStored) {
+    private void update() {
+        if (isISStored) {
             if (sessionState != VALID) {
-                sessionService.deleteFromRepository(sessionID);
-                isISStored = false;
+                delete();
             } else if (!isTimedOut() || purgeDelay > 0) {
-                // Only save for failover if we are not about to delete the session anyway.
-                sessionService.saveForFailover(this);
+                // Only save if we are not about to delete the session anyway.
+                save();
             }
         }
 

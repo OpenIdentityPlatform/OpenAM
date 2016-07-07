@@ -334,19 +334,6 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="Site" inheritance="multiple" i18nKey="site" resourceName="site">
-                    <AttributeSchema name="iplanet-am-session-sfo-enabled"
-                                     type="single"
-                                     syntax="boolean"
-                                     resourceName="sfoEnabled"
-                                     i18nKey="a121">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-session-reduced-crosstalk-enabled"
                                      type="single"
                                      syntax="boolean"

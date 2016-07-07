@@ -17,6 +17,13 @@
 package org.forgerock.openam.session;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.utils.StringUtils;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -26,11 +33,6 @@ import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Responsible for providing functionality around Session cookie management.
@@ -137,7 +139,7 @@ public class SessionCookies {
         if (RESET_LB_COOKIE_NAME) {
             if (SystemProperties.isServerMode()) {
                 SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-                if (sessionService.isSessionFailoverEnabled() && sessionService.isLocalSite(sid)) {
+                if (sessionService.isLocalSite(sid)) {
                     cookieValue = WebtopNaming.getLBCookieValue(sessionService.getCurrentHostServer(sid));
                 }
             } else {

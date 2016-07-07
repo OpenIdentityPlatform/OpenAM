@@ -16,9 +16,7 @@
 
 package com.iplanet.dpro.session.service;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
@@ -58,61 +56,60 @@ public class InternalSessionTest {
     }
 
     @Test
-    public void shouldNotUpdateForFailoverIfAboutToDelete() {
+    public void shouldNotUpdateIfAboutToDelete() {
         // Given
         InternalSession.setPurgeDelay(0);
-        session.setIsISStored(true);
-        given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
         session.setTimedOutAt(12345L);
+        session.save();
+        reset(mockSessionService);
 
         // When
         session.setState(SessionConstants.VALID);
 
         // Then
-        // The session should *not* be saved for failover
-        verify(mockSessionService, never()).saveForFailover(session);
+        verify(mockSessionService, never()).save(session);
     }
 
     @Test
-    public void shouldUpdateForFailoverIfNotTimedOut() {
+    public void shouldUpdateIfNotTimedOut() {
         // Given
         InternalSession.setPurgeDelay(0);
-        session.setIsISStored(true);
-        given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
+        session.setState(SessionConstants.VALID);
         session.setTimedOutAt(0);
+        session.save();
+        reset(mockSessionService);
 
         // When
-        session.setState(SessionConstants.VALID);
+        session.setClientID("CLIENT_ID");
 
         // Then
-        verify(mockSessionService).saveForFailover(session);
+        verify(mockSessionService).save(session);
     }
 
     @Test
-    public void shouldUpdateForFailoverIfTimedOutButPurgeDelayExists() {
+    public void shouldUpdateIfTimedOutButPurgeDelayExists() {
         // Given
         InternalSession.setPurgeDelay(120L);
-        session.setIsISStored(true);
-        given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
+        session.save();
         session.setTimedOutAt(12345L);
+        reset(mockSessionService);
 
         // When
         session.setState(SessionConstants.VALID);
 
         // Then
-        verify(mockSessionService).saveForFailover(session);
+        verify(mockSessionService).save(session);
     }
 
     @Test
     public void shouldDeleteSessionIfNotValid() {
         // Given
-        session.setIsISStored(true);
-        given(mockSessionServiceConfig.isSessionFailoverEnabled()).willReturn(true);
+        session.save();
 
         // When
         session.setState(SessionConstants.INVALID);
 
         // Then
-        verify(mockSessionService).deleteFromRepository(session.getID());
+        verify(mockSessionService).deleteFromRepository(session);
     }
 }

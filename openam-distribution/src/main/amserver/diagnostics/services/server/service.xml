@@ -52,7 +52,6 @@
         <category id="category_server" operation="ALL" name="all" />
         <category id="category_server" operation="get-config-info" name="server_configuration" />
         <category id="category_server" operation="get-site-info" name="site_configuration" />
-        <category id="category_server" operation="get-sfo-info" name="session_failover" />
         <category id="category_server" operation="get-saml-info" name="saml_configuration" />
     </realization>    
     

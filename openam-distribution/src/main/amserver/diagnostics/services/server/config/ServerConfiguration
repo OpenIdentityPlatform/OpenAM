@@ -29,4 +29,3 @@
 get-config-info=com.sun.identity.diagnostic.plugin.services.server.ServerConfigValidator
 get-site-info=com.sun.identity.diagnostic.plugin.services.server.SiteConfigValidator
 get-saml-info=com.sun.identity.diagnostic.plugin.services.server.SAMLConfigValidator
-get-sfo-info=com.sun.identity.diagnostic.plugin.services.server.SFOConfigValidator

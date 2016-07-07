@@ -486,11 +486,6 @@ public interface SetupConstants {
     static final String LB_PRIMARY_URL = "wizardLoadBalancerURL";
 
     /**
-     * Configuration variable for name of site configuration session HA Failover Enablement.
-     */
-    static final String LB_SESSION_HA_SFO = "wizardLoadBalancerSessionHASFO";
-
-    /**
      * Schema Template Directory.
      */
     static final String SCHEMA_TEMPLATE_DIRECTORY = "/WEB-INF/template/sms";

@@ -93,7 +93,9 @@ import com.iplanet.dpro.session.service.cluster.SingleServerClusterMonitor;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -238,20 +240,14 @@ public class SessionService {
                 maxSessionStats = null;
             }
 
-            // Currently, we are not allowing to default to Session Failover HA,
-            // even with a single server to enable session persistence.
-            // But can easily be turned on in the Session SubConfig.
-            if (serviceConfig.isSessionFailoverEnabled()) {
-
-                // **************************************************************************
-                // Now Bootstrap CoreTokenService (CTS) Implementation, if one was specified.
-                if (coreTokenService == null) {
-                    // Instantiate our Session Repository Implementation.
-                    // Allows Static Elements to Initialize.
-                    coreTokenService = getRepository();
-                    sessionDebug.message("amTokenRepository Implementation: " +
-                            ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
-                }
+            // **************************************************************************
+            // Now Bootstrap CoreTokenService (CTS) Implementation, if one was specified.
+            if (coreTokenService == null) {
+                // Instantiate our Session Repository Implementation.
+                // Allows Static Elements to Initialize.
+                coreTokenService = getRepository();
+                sessionDebug.message("amTokenRepository Implementation: " +
+                        ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
             }
 
         } catch (Exception ex) {
@@ -307,7 +303,7 @@ public class SessionService {
         }
 
         Class<? extends ClusterMonitor> monitorClass = clusterMonitor.get().getClass();
-        if (serviceConfig.isSessionFailoverEnabled()) {
+        if (isPartOfCluster()) {
             return monitorClass.isAssignableFrom(MultiServerClusterMonitor.class);
         } else {
             return monitorClass.isAssignableFrom(SingleServerClusterMonitor.class);
@@ -322,11 +318,23 @@ public class SessionService {
      * @throws Exception If there was an unexpected error in initialising the MultiClusterMonitor.
      */
     private ClusterMonitor resolveClusterMonitor() throws Exception {
-        if (serviceConfig.isSessionFailoverEnabled()) {
-            return new MultiServerClusterMonitor(this, sessionDebug, serviceConfig, serverConfig);
+        if (isPartOfCluster()) {
+        return new MultiServerClusterMonitor(this, sessionDebug, serviceConfig, serverConfig);
         } else {
             return new SingleServerClusterMonitor();
         }
+    }
+
+    private boolean isPartOfCluster() {
+        WebtopNamingQuery query = new WebtopNamingQuery();
+        try {
+            String serverId =  query.getAMServerID();
+            String siteId = query.getSiteID(serverId);
+            return siteId != null;
+        } catch (ServerEntryNotFoundException e) {
+            return false;
+        }
+
     }
 
     /**
@@ -396,24 +404,21 @@ public class SessionService {
     public String getRestrictedTokenId(String masterSid, TokenRestriction restriction) throws SessionException {
         SessionID sid = new SessionID(masterSid);
 
-        // we need to accommodate session failover situation
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            // first try
-            String hostServerID = getCurrentHostServer(sid);
+        // first try
+        String hostServerID = getCurrentHostServer(sid);
 
+        if (!serverConfig.isLocalServer(hostServerID)) {
+            if (!checkServerUp(hostServerID)) {
+                hostServerID = getCurrentHostServer(sid);
+            }
             if (!serverConfig.isLocalServer(hostServerID)) {
-                if (!checkServerUp(hostServerID)) {
-                    hostServerID = getCurrentHostServer(sid);
-                }
-                if (!serverConfig.isLocalServer(hostServerID)) {
-                    String token = getRestrictedTokenIdRemotely(
-                            sessionServiceURLService.getSessionServiceURL(hostServerID), sid, restriction);
-                    if (token == null) {
-                        // TODO consider one retry attempt
-                        throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSid);
-                    } else {
-                        return token;
-                    }
+                String token = getRestrictedTokenIdRemotely(
+                        sessionServiceURLService.getSessionServiceURL(hostServerID), sid, restriction);
+                if (token == null) {
+                    // TODO consider one retry attempt
+                    throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSid);
+                } else {
+                    return token;
                 }
             }
         }
@@ -462,7 +467,6 @@ public class SessionService {
      * @param sid Session ID
      */
     InternalSession removeInternalSession(SessionID sid) {
-        boolean isSessionStored = false;
         if (sid == null)
             return null;
         InternalSession session = cache.remove(sid);
@@ -470,40 +474,28 @@ public class SessionService {
         if (session != null) {
             remoteSessionSet.remove(sid);
             session.cancel();
-            isSessionStored = session.getIsISstored();
             // Session Constraint
             if (session.getState() == VALID) {
                 decrementActiveSessions();
-                SessionCount.decrementSessionCount(session);
             }
-        }
 
-        if (serviceConfig.isSessionFailoverEnabled() && isSessionStored) {
-            if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-                try {
-                    String tokenId = tokenIdFactory.toSessionTokenId(session);
-                    getRepository().deleteAsync(tokenId);
-                } catch (Exception e) {
-                    sessionDebug.error(
-                            "SessionService : failed deleting session ", e);
-                }
-            } else {
-                invalidateHttpSession(sid);
+            if (session.isStored()) {
+                session.delete();
             }
+
+            session.delete();
         }
 
         return session;
     }
 
-    void deleteFromRepository(SessionID sid) {
-        if (serviceConfig.isSessionFailoverEnabled()) {
-            try {
-                String tokenId = tokenIdFactory.toSessionTokenId(sid);
-                getRepository().deleteAsync(tokenId);
-            } catch (Exception e) {
-                sessionDebug.error("SessionService : failed deleting session ",
-                        e);
-            }
+    void deleteFromRepository(InternalSession session) {
+        try {
+            String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
+            getRepository().deleteAsync(tokenId);
+        } catch (Exception e) {
+            sessionDebug.error("SessionService : failed deleting session ",
+                    e);
         }
     }
 
@@ -536,16 +528,12 @@ public class SessionService {
         } else if (isSessionPresent(sid)) {
             return true;
         } else {
-            if (serviceConfig.isSessionFailoverEnabled()) {
-                String hostServerID = getCurrentHostServer(sid);
-                if (serverConfig.isLocalServer(hostServerID)) {
-                    if (recoverSession(sid) == null) {
-                        throw new SessionException(SessionBundle.getString("sessionNotObtained"));
-                    }
-                    return true;
+            String hostServerID = getCurrentHostServer(sid);
+            if (serverConfig.isLocalServer(hostServerID)) {
+                if (recoverSession(sid) == null) {
+                    throw new SessionException(SessionBundle.getString("sessionNotObtained"));
                 }
-            } else {
-                return serverConfig.isLocalSessionService(sessionServiceURLService.getSessionServiceURL(sid));
+                return true;
             }
         }
         return false;
@@ -774,9 +762,6 @@ public class SessionService {
      */
     public void destroyInternalSession(SessionID sid) {
         InternalSession sess = removeInternalSession(sid);
-        if (sess != null) {
-            sess.setIsISStored(false);
-        }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.DESTROY);
             sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
@@ -792,7 +777,7 @@ public class SessionService {
     public void logoutInternalSession(SessionID sid) {
         InternalSession sess = removeInternalSession(sid);
         if (sess != null) {
-            sess.setIsISStored(false);
+            sess.delete();
         }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.LOGOUT);
@@ -1032,26 +1017,23 @@ public class SessionService {
             throws SessionException {
         SessionID rid = new SessionID(restrictedID);
 
-        // we need to accomodate session failover situation
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            //first try
-            String hostServerID = getCurrentHostServer(rid);
+        //first try
+        String hostServerID = getCurrentHostServer(rid);
+
+        if (!serverConfig.isLocalServer(hostServerID)) {
+            if (!checkServerUp(hostServerID)) {
+                hostServerID = getCurrentHostServer(rid);
+            }
 
             if (!serverConfig.isLocalServer(hostServerID)) {
-                if (!checkServerUp(hostServerID)) {
-                    hostServerID = getCurrentHostServer(rid);
-                }
+                String masterID = deferenceRestrictedIDRemotely(
+                        s, sessionServiceURLService.getSessionServiceURL(hostServerID), rid);
 
-                if (!serverConfig.isLocalServer(hostServerID)) {
-                    String masterID = deferenceRestrictedIDRemotely(
-                            s, sessionServiceURLService.getSessionServiceURL(hostServerID), rid);
-
-                    if (masterID == null) {
-                        //TODO consider one retry attempt
-                        throw new SessionException("unable to get master id remotely " + rid);
-                    } else {
-                        return masterID;
-                    }
+                if (masterID == null) {
+                    //TODO consider one retry attempt
+                    throw new SessionException("unable to get master id remotely " + rid);
+                } else {
+                    return masterID;
                 }
             }
         }
@@ -1133,10 +1115,6 @@ public class SessionService {
      */
     // TODO: Use coreTokenService field directly since it should be set in constructor?
     protected CTSPersistentStore getRepository() {
-        if (!serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
-            return null;
-        }
         if (coreTokenService == null) {
             coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
         }
@@ -1159,12 +1137,10 @@ public class SessionService {
 
         String serverId = getClusterMonitor().getCurrentHostServer(sid);
 
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            // if we have a local session replica, discard it as hosting server instance is not supposed to be local
-            if (!serverConfig.isLocalServer(serverId)) {
-                // actively clean up duplicates
-                handleReleaseSession(sid);
-            }
+        // if we have a local session replica, discard it as hosting server instance is not supposed to be local
+        if (!serverConfig.isLocalServer(serverId)) {
+            // actively clean up duplicates
+            handleReleaseSession(sid);
         }
         return serverId;
     }
@@ -1364,7 +1340,7 @@ public class SessionService {
      */
     private boolean invalidateHttpSession(SessionID sid) {
 
-        if (!serviceConfig.isSessionFailoverEnabled() || sid.getTail() == null) {
+        if (sid.getTail() == null) {
             return true;
         }
 
@@ -1445,10 +1421,6 @@ public class SessionService {
      * @param sid session id of the session migrated
      */
     int handleReleaseSession(SessionID sid) {
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            return HttpURLConnection.HTTP_NOT_IMPLEMENTED;
-        }
-
         // switch to non-local mode for cached client side session image
         if (sessionCache.hasSession(sid)) {
             sessionCache.readSession(sid).setSessionIsLocal(false);
@@ -1483,61 +1455,29 @@ public class SessionService {
      * @param sid Session ID
      */
     InternalSession recoverSession(SessionID sid) {
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            return null;
-        }
 
         InternalSession sess = null;
 
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-
-            try {
-                String tokenId = tokenIdFactory.toSessionTokenId(sid);
-                Token token = getRepository().read(tokenId);
-                if (token == null) {
-                    return sess;
-                }
-                /**
-                 * As a side effect of deserialising an InternalSession, we must trigger
-                 * the InternalSession to reschedule its timing task to ensure it
-                 * maintains the session expiry function.
-                 */
-                sess = tokenAdapter.fromToken(token);
-                sess.setSessionServiceDependencies(
-                        this, serviceConfig, sessionLogging, sessionAuditor, sessionCookies, sessionDebug);
-                sess.scheduleExpiry();
-                updateSessionMaps(sess);
-
-            } catch (CoreTokenException e) {
-                sessionDebug.error("Failed to retrieve new session", e);
+        try {
+            String tokenId = tokenIdFactory.toSessionTokenId(sid);
+            Token token = getRepository().read(tokenId);
+            if (token == null) {
+                return sess;
             }
+            /**
+             * As a side effect of deserialising an InternalSession, we must trigger
+             * the InternalSession to reschedule its timing task to ensure it
+             * maintains the session expiry function.
+             */
+            sess = tokenAdapter.fromToken(token);
+            sess.setSessionServiceDependencies(
+                    this, serviceConfig, sessionLogging, sessionAuditor, sessionCookies, sessionDebug);
+            sess.scheduleExpiry();
+            updateSessionMaps(sess);
 
-        } else {
-
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("Recovering InternalSession from HttpSession: " + sid);
-            }
-
-            DataInputStream in = null;
-
-            try {
-                String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.RECOVER_OP;
-                URL url = serverConfig.createLocalServerURL("GetHttpSession" + query);
-                HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, sid, null);
-                in = new DataInputStream(conn.getInputStream());
-                sess = cache.getBySessionID(sid);
-                if (sess == null) {
-                    sess = resolveRestrictedToken(sid, false);
-                }
-
-            } catch (Exception ex) {
-                sessionDebug.error("Failed to retrieve new session", ex);
-            } finally {
-                IOUtils.closeIfNotNull(in);
-            }
-
+        } catch (CoreTokenException e) {
+            sessionDebug.error("Failed to retrieve new session", e);
         }
-
         return sess;
     }
 
@@ -1552,7 +1492,7 @@ public class SessionService {
      * @param sid Session ID
      */
     InternalSession retrieveSession(SessionID sid, HttpSession httpSession) {
-        if (serviceConfig.isSessionFailoverEnabled() && httpSession != null) {
+        if (httpSession != null) {
             String sessionState = (String) httpSession.getAttribute(serviceConfig.getHttpSessionPropertyName());
             if (sessionState == null) {
                 sessionDebug.message("GISFHS-No InternalSession in HttpSession");
@@ -1611,12 +1551,10 @@ public class SessionService {
             return;
 
         sess.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            SessionID sid = sess.getID();
-            String primaryID = sid.getExtension().getPrimaryID();
-            if (!serverConfig.isLocalServer(primaryID)) {
-                remoteSessionSet.add(sid);
-            }
+        SessionID sid = sess.getID();
+        String primaryID = sid.getExtension().getPrimaryID();
+        if (!serverConfig.isLocalServer(primaryID)) {
+            remoteSessionSet.add(sid);
         }
         cache.put(sess);
     }
@@ -1625,21 +1563,19 @@ public class SessionService {
      * function to remove remote sessions when primary server is up
      */
     public void cleanUpRemoteSessions() {
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            synchronized (remoteSessionSet) {
-                for (Iterator iter = remoteSessionSet.iterator(); iter.hasNext(); ) {
-                    SessionID sid = (SessionID) iter.next();
-                    // getCurrentHostServer automatically releases local
-                    // session replica if it does not belong locally
-                    String hostServer = null;
-                    try {
-                        hostServer = getCurrentHostServer(sid);
-                    } catch (Exception ex) {
-                    }
-                    // if session does not belong locally remove it
-                    if (!serverConfig.isLocalServer(hostServer)) {
-                        iter.remove();
-                    }
+        synchronized (remoteSessionSet) {
+            for (Iterator iter = remoteSessionSet.iterator(); iter.hasNext(); ) {
+                SessionID sid = (SessionID) iter.next();
+                // getCurrentHostServer automatically releases local
+                // session replica if it does not belong locally
+                String hostServer = null;
+                try {
+                    hostServer = getCurrentHostServer(sid);
+                } catch (Exception ex) {
+                }
+                // if session does not belong locally remove it
+                if (!serverConfig.isLocalServer(hostServer)) {
+                    iter.remove();
                 }
             }
         }
@@ -1688,9 +1624,6 @@ public class SessionService {
      * @param sid Session ID
      */
     boolean saveSession(SessionID sid) {
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            return false;
-        }
         if (sessionDebug.messageEnabled()) {
             sessionDebug.message("Saving internal session using remote method " + sid);
         }
@@ -1721,9 +1654,6 @@ public class SessionService {
      * @param httpSession http session
      */
     int handleSaveSession(SessionID sid, HttpSession httpSession) {
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            return HttpURLConnection.HTTP_NOT_IMPLEMENTED;
-        }
         InternalSession is = cache.getBySessionID(sid);
 
         if (is == null) {
@@ -1819,31 +1749,15 @@ public class SessionService {
      *
      * @param session Session Object
      */
-    void saveForFailover(InternalSession session) {
-
-        if (!serviceConfig.isSessionFailoverEnabled()) {
+    void save(InternalSession session) {
+        // do not save sessions which never expire
+        if (!session.willExpire()) {
             return;
         }
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            // do not save sessions which never expire
-            if (!session.willExpire()) {
-                return;
-            }
-            try {
-                getRepository().updateAsync(tokenAdapter.toToken(session));
-            } catch (Exception e) {
-                sessionDebug.error("SessionService.saveForFailover: " + "exception encountered", e);
-                // handleReleaseSession(session.getID());
-            }
-        } else {
-            if (serviceConfig.isUseRemoteSaveMethod()) {
-                saveSession(session.getID());
-            } else {
-                HttpSession httpSession = session.getHttpSession();
-                if (httpSession != null) {
-                    doSaveSession(session, httpSession);
-                }
-            }
+        try {
+            getRepository().updateAsync(tokenAdapter.toToken(session));
+        } catch (Exception e) {
+            sessionDebug.error("SessionService.save: " + "exception encountered", e);
         }
     }
 
@@ -1931,16 +1845,8 @@ public class SessionService {
         return serverConfig.isSiteEnabled();
     }
 
-    public boolean isSessionFailoverEnabled() {
-        return serviceConfig.isSessionFailoverEnabled();
-    }
-
     public boolean isReducedCrossTalkEnabled() {
         return serviceConfig.isReducedCrossTalkEnabled();
-    }
-
-    public boolean getUseInternalRequestRouting() {
-        return serviceConfig.isUseInternalRequestRoutingEnabled();
     }
 
     public boolean isLocalSite(SessionID id) {

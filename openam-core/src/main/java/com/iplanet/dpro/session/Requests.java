@@ -16,6 +16,13 @@
 
 package com.iplanet.dpro.session;
 
+import java.net.URL;
+import java.security.AccessController;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.session.SessionPLLSender;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -23,12 +30,6 @@ import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
-import org.forgerock.openam.session.SessionPLLSender;
-
-import javax.inject.Inject;
-
-import java.net.URL;
-import java.security.AccessController;
 
 /**
  * Responsible for performing the Session based logic of sending a request.
@@ -66,7 +67,7 @@ public class Requests {
      */
     public SessionResponse sendRequestWithRetry(URL svcurl, SessionRequest sreq, Session session)
             throws SessionException {
-        if (SystemProperties.isServerMode() && service.getUseInternalRequestRouting()) {
+        if (SystemProperties.isServerMode()) {
 
             try {
                 return getSessionResponseWithRetry(svcurl, sreq, session);

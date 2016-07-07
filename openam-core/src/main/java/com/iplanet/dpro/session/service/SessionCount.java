@@ -27,39 +27,22 @@
  */
 
 /**
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.session.SessionConstants.*;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.share.SessionRequest;
-import com.iplanet.dpro.session.share.SessionResponse;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.session.util.RestrictedTokenContext;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import java.net.URL;
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
@@ -70,6 +53,16 @@ import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.TimeUtils;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 
 /**
@@ -95,17 +88,6 @@ public class SessionCount {
     private static Map uuidSessionMap = Collections
             .synchronizedMap(new HashMap());
 
-    /* Single server mode*/
-    static final int SINGLE_SERVER_MODE = 1;
-
-    /* Multiserver mode */
-    static final int MULTI_SERVER_MODE = 2;
-
-    /* Directly from Session repository*/
-    static final int SFO_MODE = 3;
-
-    private static int deploymentMode = 0;
-
     private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
 
     private static SSOToken adminToken = null;
@@ -130,35 +112,13 @@ public class SessionCount {
                     + "SSOTokenManager instance.");
         }
 
-        if (serviceConfig.isSessionFailoverEnabled()) {
-            deploymentMode = SFO_MODE;
-        } else {
-            try {
-                int count = WebtopNaming.getAllServerIDs().size();
-                if (count == 1 || (count == 2
-                        && (serverConfig.isSiteEnabled()
-                        || !SiteConfiguration.getSites(getAdminToken()).isEmpty()))) {
-                    deploymentMode = SINGLE_SERVER_MODE;
-                } else {
-                    deploymentMode = MULTI_SERVER_MODE;
-                }
-            } catch (Exception ex) {
-                //If an error occurs fallback to multi server mode
-                deploymentMode = MULTI_SERVER_MODE;
-            }
-        }
-        
-        // Without this property defined the default will be false which is 
+        // Without this property defined the default will be false which is
         // backwards compatable.
         useLocalSessionsInMultiServerMode = 
                 SystemProperties.getAsBoolean(Constants.USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE);
         if (debug.messageEnabled()) {
             debug.message("SessionCount: useLocalSessionsInMultiServerMode set to " + useLocalSessionsInMultiServerMode);                        
         }
-    }
-
-    static int getDeploymentMode() {
-        return deploymentMode;
     }
 
     /**
@@ -173,29 +133,12 @@ public class SessionCount {
      *             repository.
      */
     public static Map getAllSessionsByUUID(String uuid) throws Exception {
-        Map sessions = null;
         if (!caseSensitiveUUID) {
             uuid = uuid.toLowerCase();
         }
 
-        switch (deploymentMode) {
-        case SINGLE_SERVER_MODE:
-            sessions = getSessionsFromLocalServer(uuid);
-            break;
-        case MULTI_SERVER_MODE:
-            if (useLocalSessionsInMultiServerMode()) {
-                sessions = getSessionsFromLocalServer(uuid);
-            } else {
-                sessions = getSessionsFromPeerServers(uuid);
-            }
-            break;
-        case SFO_MODE:
-            sessions = getSessionsFromRepository(uuid);
-            break;
-        default:
-            break;
-        }
-        
+        Map<String, Long> sessions = getSessionsFromRepository(uuid);
+
         if (sessions == null) {
             sessions = Collections.EMPTY_MAP;
             debug.error("Error: Unable to determine session count for user: " + uuid + 
@@ -233,46 +176,6 @@ public class SessionCount {
         }
         
         return retSessions;
-    }
-
-    /*
-     * Get user sessions from session repository
-     */
-    private static Map getSessionsFromPeerServers(String uuid) {
-
-        Map sessions = getSessionsFromLocalServer(uuid);
-        String localServerID = serverConfig.getLocalServerID();
-
-        Set serverIDs = null;
-        try {
-            serverIDs = WebtopNaming.getSiteNodes(localServerID);
-        } catch (Exception e) {
-            debug.error("Failed to get the serverIDs from " + "WebtopNaming.",
-                    e);
-            return sessions;
-        }
-
-        for (Iterator m = serverIDs.iterator(); m.hasNext();) {
-            String serverID = (String) m.next();
-            if (serverID.equals(localServerID)) {
-                continue;
-            }
-            try {
-                URL svcurl = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(serverID);
-                SessionRequest sreq = new SessionRequest(
-                        SessionRequest.GetSessionCount, getAdminToken()
-                                .getTokenID().toString(), false);
-                sreq.setUUID(uuid);
-                SessionResponse sres = getSessionResponse(svcurl, sreq);
-                sessions.putAll(sres.getSessionsForGivenUUID());
-            } catch (SessionException se) {
-                if (debug.messageEnabled()) {
-                    debug.message("SessionConstraint: "
-                            + "peer AM server is down...");
-                }
-            }
-        }
-        return sessions;
     }
 
     private static Map<String, Long> getSessionsFromRepository(String uuid) throws Exception {
@@ -322,72 +225,6 @@ public class SessionCount {
             debug.error("SessionCount.getSessionsFromRepository: "+
                 "Session repository is not available", e);            
             throw e;
-        }
-    }
-
-    /**
-     * Increments the session count
-     * @param is for the user
-     *
-     */
-    public static void incrementSessionCount(InternalSession is) {
-
-        if ((deploymentMode == SINGLE_SERVER_MODE) || 
-                (deploymentMode == MULTI_SERVER_MODE && useLocalSessionsInMultiServerMode())) {
-            Set sessions = (Set) uuidSessionMap.get((caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase());
-            if (sessions != null) {
-                sessions.add(is.getID());
-            } else {
-                sessions = Collections.synchronizedSet(new HashSet());
-                sessions.add(is.getID());
-                uuidSessionMap.put((caseSensitiveUUID) ? is.getUUID() : is.getUUID().toLowerCase(), sessions);
-            }
-        }
-    }
-
-    /**
-     * Decrements the session count
-     * @param is the <code>InternalSession</code> for the user
-     *
-     */
-    static void decrementSessionCount(InternalSession is) {
-        String uuid = is.getUUID();
-        if (!caseSensitiveUUID && uuid != null) {
-            uuid = uuid.toLowerCase();
-        }
-        SessionID sid = is.getID();
-
-        if ((deploymentMode == SINGLE_SERVER_MODE) || 
-                (deploymentMode == MULTI_SERVER_MODE && useLocalSessionsInMultiServerMode())) {
-            Set sessions = (Set) uuidSessionMap.get(uuid);
-            if (sessions != null) {
-                sessions.remove(sid);
-                if (sessions.isEmpty()) {
-                    uuidSessionMap.remove(uuid);
-                }
-            }
-
-        }
-    }
-
-    private static SessionResponse getSessionResponse(URL svcurl,
-            SessionRequest sreq) throws SessionException {
-
-        try {
-            Object context = RestrictedTokenContext.getCurrent();
-            if (context != null) {
-                sreq.setRequester(RestrictedTokenContext.marshal(context));
-            }
-
-            SessionResponse sres = sessionPLLSender.sendPLLRequest(svcurl, sreq);
-            if (sres.getException() != null) {
-                throw new SessionException(sres.getException());
-            }
-            return sres;
-        } catch (SessionException se) {
-            throw se;
-        } catch (Exception e) {
-            throw new SessionException(e);
         }
     }
 

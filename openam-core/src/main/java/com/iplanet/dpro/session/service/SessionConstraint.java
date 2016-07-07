@@ -30,24 +30,25 @@
 
 package com.iplanet.dpro.session.service;
 
-import static com.iplanet.dpro.session.service.SessionConstants.SESSION_DEBUG;
+import static com.iplanet.dpro.session.service.SessionConstants.*;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.DestroyOldestAction;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * <code>SessionConstraint</code> represents the session quota for a given user
@@ -120,18 +121,8 @@ public class SessionConstraint {
         boolean reject = false;
         int sessionCount = -1;
 
-        // Disable the session quota constraint checking if in
-        // MULTI_SERVER_MODE mode.
-        if (SessionCount.getDeploymentMode() == SessionCount.MULTI_SERVER_MODE) {
-            // Override default behaviour if using local sessions in MULTI_SERVER_MODE
-            if (!SessionCount.useLocalSessionsInMultiServerMode()) {
-                return false;
-            }
-        }
-
         // Check if it is upgrade scenario
         if (is.getIsSessionUpgrade()) {
-            SessionCount.incrementSessionCount(is);
             return false;
         }
 
@@ -181,9 +172,6 @@ public class SessionConstraint {
                         "checkQuotaAndPerformAction: " +
                         "Session quota exhausted.");
             }
-	}
-        if (!reject) {
-	    SessionCount.incrementSessionCount(is);
 	}
 	return reject;
     }

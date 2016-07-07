@@ -24,15 +24,16 @@
  *
  * $Id: Step7.java,v 1.15 2009/10/27 05:31:45 hengming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
+import org.apache.click.Context;
+
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.SetupConstants;
-import org.apache.click.Context;
 
 /**
  * This is the summary page for the values entered during the configuration
@@ -139,18 +140,6 @@ public class Step7 extends ProtectedPage {
         add("loadBalancerPort",
                 (String) ctx.getSessionAttribute(
                         SessionAttributeNames.LB_PRIMARY_URL));
-
-        // Normalize the information for Summary.
-        Boolean sessionAttribute = (Boolean) ctx.getSessionAttribute(
-                SessionAttributeNames.LB_SESSION_HA_SFO);
-        if (sessionAttribute == null) {
-            tmp = DISABLED;
-        } else if (sessionAttribute) {
-            tmp = ENABLED;
-        } else {
-            tmp = DISABLED;
-        }
-        add(SessionAttributeNames.LB_SESSION_HA_SFO, tmp);
 
         // Initialize our Parent Object.
         super.onInit();

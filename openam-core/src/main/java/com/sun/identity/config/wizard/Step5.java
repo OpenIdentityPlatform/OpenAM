@@ -24,17 +24,18 @@
  *
  * $Id: Step5.java,v 1.9 2009/01/05 23:17:10 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
-import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.apache.click.control.ActionLink;
 
-import java.net.URL;
-import java.net.MalformedURLException;
+import com.sun.identity.config.SessionAttributeNames;
+import com.sun.identity.config.util.ProtectedPage;
 
 /**
  * Wizard Step # 5: Site Name, URL and Session HA Failover indicator.
@@ -52,8 +53,6 @@ public class Step5 extends ProtectedPage {
             "validateURL", this, "validateURL");
     public ActionLink validateSiteLink = new ActionLink(
             "validateSite", this, "validateSite");
-    public ActionLink validateSessionHASFO = new ActionLink(
-            "validateSessionHASFO", this, "validateSessionHASFO");
 
     public Step5() {
     }
@@ -63,19 +62,12 @@ public class Step5 extends ProtectedPage {
                 SessionAttributeNames.LB_SITE_NAME);
         String port = (String) getContext().getSessionAttribute(
                 SessionAttributeNames.LB_PRIMARY_URL);
-        Boolean sessionHASFOEnabled = (Boolean) getContext().getSessionAttribute(
-                SessionAttributeNames.LB_SESSION_HA_SFO);
         if (host != null) {
             addModel("host", host);
         }
         if (port != null) {
             addModel("port", port);
         }
-        if (sessionHASFOEnabled == null) {
-            sessionHASFOEnabled = false;
-        }
-        // Add Session HA Failover.
-        addModel("sessionHASFOEnabled", sessionHASFOEnabled);
         // Initialize our Parent.
         super.onInit();
     }
@@ -88,7 +80,6 @@ public class Step5 extends ProtectedPage {
     public boolean clear() {
         getContext().removeSessionAttribute(SessionAttributeNames.LB_SITE_NAME);
         getContext().removeSessionAttribute(SessionAttributeNames.LB_PRIMARY_URL);
-        getContext().removeSessionAttribute(SessionAttributeNames.LB_SESSION_HA_SFO);
         setPath(null);
         return false;
     }
@@ -148,23 +139,6 @@ public class Step5 extends ProtectedPage {
                 returnVal = true;
             }
         }
-        setPath(null);
-        return returnVal;
-    }
-
-    /**
-     * Validate the Session HA Failover Indicator,
-     * based upon other required fields.
-     * @return boolean indicator false, indicates Valid | true, indicates Invalid.
-     */
-    public boolean validateSessionHASFO() {
-        boolean returnVal = false;
-        boolean sessionHASFOEnabled = toBoolean("sessionHASFOEnabled");
-         // The session HA SFO Indicator is On/Checked or Off/UnChecked, so allow the setting,
-         // regardless of other fields on form.
-         getContext().setSessionAttribute(SessionAttributeNames.LB_SESSION_HA_SFO,
-                    sessionHASFOEnabled);
-            writeValid("ok");
         setPath(null);
         return returnVal;
     }

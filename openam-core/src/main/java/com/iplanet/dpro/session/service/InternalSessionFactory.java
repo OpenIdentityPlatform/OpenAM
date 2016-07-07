@@ -24,10 +24,24 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
+
+import java.io.DataInputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpSession;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
@@ -38,18 +52,6 @@ import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.utils.IOUtils;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
-import java.io.DataInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * Responsible for creating InternalSession objects.
@@ -117,11 +119,6 @@ public class InternalSessionFactory {
     InternalSession newInternalSession(String domain, HttpSession httpSession,
                                        boolean forceHttpSessionCreation, boolean stateless)
             throws SessionException {
-
-        if (serviceConfig.isSessionFailoverEnabled() && !serviceConfig.isUseInternalRequestRoutingEnabled()
-                && httpSession == null && forceHttpSessionCreation) {
-            return createSession(domain);
-        }
 
         SessionID sid = generateSessionId(domain, null);
         return generateInternalSession(sid, httpSession, stateless);

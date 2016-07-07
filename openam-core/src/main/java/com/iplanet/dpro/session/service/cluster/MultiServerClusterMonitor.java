@@ -24,10 +24,19 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service.cluster;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -36,14 +45,6 @@ import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guava.common.annotations.VisibleForTesting;
-import org.forgerock.openam.utils.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * API for querying status of servers in cluster.
@@ -93,10 +94,6 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
             SessionServerConfig serverConfig,
             ClusterStateServiceFactory clusterStateServiceFactory) throws Exception {
 
-        if (!serviceConfig.isSessionFailoverEnabled()) {
-            throw new IllegalStateException("MultiServerClusterMonitoring only required if Session Fail-Over enabled.");
-        }
-
         this.sessionService = sessionService;
         this.sessionDebug = sessionDebug;
         this.serviceConfig = serviceConfig;
@@ -133,16 +130,12 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      */
     @Override
     public String getCurrentHostServer(SessionID sid) throws SessionException {
-        if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
-            String serverID = locateCurrentHostServer(sid);
-            if (serverID == null) {
-                // Is this block necessary? Can locateCurrentHostServer ever return null?
-                return sid.getSessionServerID();
-            }
-            return serverID;
-        } else {
+        String serverID = locateCurrentHostServer(sid);
+        if (serverID == null) {
+            // Is this block necessary? Can locateCurrentHostServer ever return null?
             return sid.getSessionServerID();
         }
+        return serverID;
     }
 
     /**

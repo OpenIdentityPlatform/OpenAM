@@ -11,10 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.operations;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -28,11 +34,6 @@ import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Server based SessionOperationStrategy implementation.
@@ -122,20 +123,17 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
             return logAndWrap(session, local, SessionMonitorType.LOCAL);
         }
 
-        if (service.isSessionFailoverEnabled()) {
+        // If cross talk is reduced... by this point, we know the session is remote.
+        // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
+        // to RemoteOperations.
+        //
+        if (service.isReducedCrossTalkEnabled()) {
+            return logAndWrap(session, cts, SessionMonitorType.CTS);
+        }
 
-            // If cross talk is reduced... by this point, we know the session is remote.
-            // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
-            // to RemoteOperations.
-            //
-            if (service.isReducedCrossTalkEnabled()) {
-                return logAndWrap(session, cts, SessionMonitorType.CTS);
-            }
-
-            // Remote Site which is known to be down
-            if (!isLocalSite(session) && !isSiteUp(getSiteId(session))) {
-                return logAndWrap(session, cts, SessionMonitorType.CTS);
-            }
+        // Remote Site which is known to be down
+        if (!isLocalSite(session) && !isSiteUp(getSiteId(session))) {
+            return logAndWrap(session, cts, SessionMonitorType.CTS);
         }
 
         return logAndWrap(session, remote, SessionMonitorType.REMOTE);

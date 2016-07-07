@@ -31,7 +31,18 @@ package com.sun.identity.common;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import com.iplanet.dpro.session.service.SessionService;
+import java.security.AccessController;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
@@ -46,29 +57,16 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.SSOServerRealmInfo;
 import com.sun.identity.monitoring.SSOServerMonConfig;
+import com.sun.identity.monitoring.SSOServerRealmInfo;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.SMSException;
-import org.forgerock.guice.core.InjectorHolder;
-
-import java.security.AccessController;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -117,21 +115,6 @@ public class ConfigMonitoring {
             debug.error(classMethod + "Could not get proper SSOToken", ssoe);
             return;
         }
-
-        boolean isSessFOEnabled = false;
-        try {
-            SessionService ssvc = InjectorHolder.getInstance(SessionService.class);
-            if (ssvc != null) {
-                isSessFOEnabled = ssvc.isSessionFailoverEnabled();
-            } else {
-                debug.error(classMethod + "unable to get session service");
-            }
-        } catch (Exception ex) {
-            debug.error(classMethod + "exception getting session service; " +
-                ex.getMessage());
-        }
-
-        Agent.setSFOStatus(isSessFOEnabled);
 
         /*
          * if monitoring disabled, go no further.  any error
