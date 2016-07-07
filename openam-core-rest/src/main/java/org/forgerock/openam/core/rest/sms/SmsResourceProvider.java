@@ -356,7 +356,7 @@ public abstract class SmsResourceProvider {
     @SuppressWarnings("unchecked")
     protected void addGlobalAttributes(ServiceConfig config, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.GLOBAL) && config != null) {
-            converter.toJson(schema.getAttributeDefaults(), false, result);
+            converter.toJson(config.getAttributes(), false, result);
         }
     }
 
