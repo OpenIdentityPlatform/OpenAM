@@ -44,8 +44,10 @@ define([
             }
 
             if (overrideRealm && overrideRealm !== "/") {
-                endpoint = `${(overrideRealm.substring(0, 1) === "/" ? overrideRealm.slice(1) : overrideRealm)}"/${
-                    endpoint}`;
+                const slicedOverrideRealm = overrideRealm.substring(0, 1) === "/"
+                    ? overrideRealm.slice(1)
+                    : overrideRealm;
+                endpoint = `${slicedOverrideRealm}/${endpoint}`;
                 realmPath = overrideRealm;
             } else if (!overrideRealm && subRealm) {
                 endpoint = `${subRealm}/${endpoint}`;
