@@ -18,8 +18,7 @@
  */
 package org.forgerock.openam.radius.server;
 
-import java.nio.ByteBuffer;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guava.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessReject;
 import org.forgerock.openam.radius.common.AccessRequest;
@@ -30,12 +29,12 @@ import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.events.AuthRequestAcceptedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestChallengedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestRejectedEvent;
+import org.forgerock.openam.radius.server.events.PacketDroppedSilentlyEvent;
+import org.forgerock.openam.radius.server.events.PacketProcessedEvent;
 import org.forgerock.openam.radius.server.spi.AccessRequestHandler;
-import org.forgerock.util.promise.ExceptionHandler;
-import org.forgerock.util.promise.ResultHandler;
 import org.joda.time.DateTime;
 
-import com.sun.identity.shared.debug.Debug;
+import java.nio.ByteBuffer;
 
 /**
  * Handles valid (ie: from approved clients) incoming radius access-request packets passing responsibility for
@@ -65,16 +64,6 @@ public class RadiusRequestHandler implements Runnable {
     private volatile RadiusProcessingException exception;
 
     /**
-     * The success handler of the promise that may be used to pass results back to the RadiusRequestListener thread.
-     */
-    private final ResultHandler<RadiusResponse> resultHandler;
-
-    /**
-     * The exception handler of the promise that is used to pass exceptions back to the RadiusRequestListener thread.
-     */
-    private final ExceptionHandler<RadiusProcessingException> errorHandler;
-
-    /**
      * The event bus is used by handlers and by this class to notify listeners of events occurring with the lifetime of
      * a radius request.
      */
@@ -92,21 +81,14 @@ public class RadiusRequestHandler implements Runnable {
      *            the radius requests.
      * @param reqCtx a <code>RadiusRequestContext</code> object. Must be non-null.
      * @param buffer an {@code ByteBuffer} containing the bytes received by a radius handler.
-     * @param resultHandler - a promise handler that this class can use to notify calling threads of the results of
-     *            processing.
-     * @param errorHandler used to notify the calling thread if an exception occurs during processing.
      * @param eventBus used to notify interested parties of events occurring during the processing of radius requests.
      */
     public RadiusRequestHandler(AccessRequestHandlerFactory accessRequestHandlerFactory,
             final RadiusRequestContext reqCtx, final ByteBuffer buffer,
-            final ResultHandler<RadiusResponse> resultHandler,
-            final ExceptionHandler<RadiusProcessingException> errorHandler,
             final EventBus eventBus) {
         LOG.message("Entering RadiusRequestHandler.RadiusRequestHandler()");
         this.requestContext = reqCtx;
         this.buffer = buffer;
-        this.resultHandler = resultHandler;
-        this.errorHandler = errorHandler;
         this.eventBus = eventBus;
         this.accessRequestHandlerFactory = accessRequestHandlerFactory;
         LOG.message("Leaving RadiusRequestHandler.RadiusRequestHandler()");
@@ -160,11 +142,9 @@ public class RadiusRequestHandler implements Runnable {
                 // Send the response to the client.
                 Packet responsePacket = response.getResponsePacket();
                 requestContext.send(responsePacket);
-
-                resultHandler.handleResult(response);
+                eventBus.post(new PacketProcessedEvent());
             } catch (final RadiusProcessingException rre) {
-                // So the processing of the request failed. Is the error recoverable or does the RADIUS server
-                // need to shutdown?
+                // So the processing of the request failed.
                 handleResponseException(rre, requestContext);
             }
 
@@ -272,13 +252,35 @@ public class RadiusRequestHandler implements Runnable {
      * @param rre
      */
     private void handleResponseException(RadiusProcessingException rre, RadiusRequestContext reqCtx) {
-        final StringBuilder sb = new StringBuilder("Failed to process a radius request for RADIUS client '");
+        final StringBuilder sb = new StringBuilder("Failed to process a radius request for RADIUS client '")
+                .append(reqCtx.getClientName()).append("'.");
         LOG.error(sb.toString());
+
         if (rre.getNature() == RadiusProcessingExceptionNature.TEMPORARY_FAILURE) {
             sendAccessReject(reqCtx);
         }
-        // Propagate the exception back to the Request Listener.
-        errorHandler.handleException(rre);
+        final RadiusProcessingExceptionNature nature = rre.getNature();
+        switch (nature) {
+        case CATASTROPHIC:
+            // currently, the only catastrophic event is thrown in RadiusRequestContext.injectResponseAuthenticator().
+            // But the listener checks for md5 and UTF-8 encoding so that we should never run into the exceptions that
+            // trigger a catastrophic event. So for completeness log it. If we ever see these then we can pass the
+            // listener into this class and call its terminate() method in this case.
+            LOG.error("Catestrophic error processing a RADIUS request.", rre);
+            eventBus.post(new PacketDroppedSilentlyEvent());
+            break;
+        case INVALID_RESPONSE:
+            LOG.error("Failed to handle request. This request will be ignored.", rre);
+            eventBus.post(new PacketDroppedSilentlyEvent());
+            break;
+        case TEMPORARY_FAILURE:
+            final String errStr = "Failed to handle request. This request could be retried, but that is"
+                    + " currently not implemented.";
+            LOG.error(errStr, rre);
+            break;
+        default:
+            break;
+        }
     }
 
     /**
@@ -291,7 +293,7 @@ public class RadiusRequestHandler implements Runnable {
         try {
             reqCtx.send(new AccessReject());
             LOG.message("Rejected access request.");
-        } catch (final RadiusProcessingException e1) {
+        } catch (final Exception e1) {
             LOG.warning("Failed to send AccessReject() response to client.");
         }
     }
