@@ -16,13 +16,6 @@
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.MessageInfo;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Arrays;
@@ -31,17 +24,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.AuthenticationException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.message.AuthException;
+import javax.security.auth.message.MessageInfo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.caf.authentication.framework.AuthenticationFramework;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
@@ -51,6 +41,20 @@ import org.forgerock.openam.authentication.modules.common.JaspiAuthModuleWrapper
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.ClientUtils;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * Authentication logic for persistent cookie authentication in OpenAM. Making use of the JASPI JwtSessionModule
@@ -72,6 +76,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     private static final String HTTP_ONLY_COOKIE_KEY = "openam-auth-persistent-cookie-http-only-cookie";
     private static final String COOKIE_NAME_KEY = "openam-auth-persistent-cookie-name";
     private static final String COOKIE_DOMAINS_KEY = "openam-auth-persistent-cookie-domains";
+    private static final String HMAC_KEY = "openam-auth-persistent-cookie-hmac-key";
 
     private static final String OPENAM_USER_CLAIM_KEY = "openam.usr";
     private static final String OPENAM_AUTH_TYPE_CLAIM_KEY = "openam.aty";
@@ -89,6 +94,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     private boolean httpOnlyCookie;
     private String cookieName;
     private Collection<String> cookieDomains;
+    private String encryptedHmacKey;
 
     private Principal principal;
 
@@ -145,10 +151,15 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
         httpOnlyCookie = CollectionHelper.getBooleanMapAttr(options, HTTP_ONLY_COOKIE_KEY, true);
         cookieName = CollectionHelper.getMapAttr(options, COOKIE_NAME_KEY);
         cookieDomains = coreWrapper.getCookieDomainsForRequest(getHttpServletRequest());
+        String hmacKey = CollectionHelper.getMapAttr(options, HMAC_KEY);
+
+        // As this key will need to be passed via session properties to the post-authentication plugin, we encrypt it
+        // here to avoid it being accidentally exposed.
+        encryptedHmacKey = AccessController.doPrivileged(new EncodeAction(hmacKey));
 
         try {
             return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP, getRequestOrg(),
-                    secureCookie, httpOnlyCookie, cookieName, cookieDomains);
+                    secureCookie, httpOnlyCookie, cookieName, cookieDomains, hmacKey);
         } catch (SMSException e) {
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
@@ -167,13 +178,14 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
      * @param realm The realm for the persistent cookie.
      * @param secureCookie {@code true} if the persistent cookie should be set as secure.
      * @param httpOnlyCookie {@code true} if the persistent cookie should be set as http only.
+     * @param hmacKey base64-encoded HMAC signing key.
      * @return A Map containing the configuration information for the JWTSessionModule.
      * @throws SMSException If there is a problem getting the key alias.
      * @throws SSOException If there is a problem getting the key alias.
      */
     private Map<String, Object> initialize(final String tokenIdleTime, final String maxTokenLife,
             final boolean enforceClientIP,  final String realm, boolean secureCookie, boolean httpOnlyCookie,
-            String cookieName, Collection<String> cookieDomains) throws SMSException, SSOException {
+            String cookieName, Collection<String> cookieDomains, String hmacKey) throws SMSException, SSOException {
 
         Map<String, Object> config = new HashMap<String, Object>();
         config.put(JwtSessionModule.KEY_ALIAS_KEY, getKeyAlias(realm));
@@ -188,6 +200,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
         config.put(ENFORCE_CLIENT_IP_SETTING_KEY, enforceClientIP);
         config.put(JwtSessionModule.SESSION_COOKIE_NAME_KEY, cookieName);
         config.put(JwtSessionModule.COOKIE_DOMAINS_KEY, cookieDomains);
+        config.put(JwtSessionModule.HMAC_SIGNING_KEY, hmacKey);
 
         return config;
     }
@@ -218,6 +231,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
                 cookieDomainsString += cookieDomain + ",";
             }
             setUserSessionProperty(COOKIE_DOMAINS_KEY, cookieDomainsString);
+            setUserSessionProperty(HMAC_KEY, encryptedHmacKey);
             final Subject clientSubject = new Subject();
             MessageInfo messageInfo = prepareMessageInfo(getHttpServletRequest(), getHttpServletResponse());
             if (process(messageInfo, clientSubject, callbacks)) {
@@ -343,9 +357,11 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             } else {
                 cookieDomains = Arrays.asList(cookieDomainsString.split(","));
             }
+            final String hmacKey = AccessController.doPrivileged(new DecodeAction(ssoToken.getProperty(HMAC_KEY)));
+            ssoToken.setProperty(HMAC_KEY, "");
 
             return initialize(tokenIdleTime, maxTokenLife, enforceClientIP, realm, secureCookie, httpOnlyCookie,
-                    cookieName, cookieDomains);
+                    cookieName, cookieDomains, hmacKey);
 
         } catch (SSOException e) {
             DEBUG.error("Could not initialise the Auth Module", e);
