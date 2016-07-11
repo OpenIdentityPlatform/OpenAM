@@ -52,6 +52,7 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -430,6 +431,9 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     public void onLogout(HttpServletRequest request, HttpServletResponse response, SSOToken ssoToken) {
         try {
             Map<String, Object> config = initialize(null, request, response, ssoToken);
+            // The HMAC signing key will be null on logout, but this is rejected by the commons auth module, so
+            // replace with a dummy value here. It is not used.
+            config.put(JwtSessionModule.HMAC_SIGNING_KEY, Base64.encode(new byte[32]));
             getServerAuthModule().initialize(createRequestMessagePolicy(), null, null, config);
             getServerAuthModule().deleteSessionJwtCookie(prepareMessageInfo(null, response));
         } catch (AuthenticationException e) {
