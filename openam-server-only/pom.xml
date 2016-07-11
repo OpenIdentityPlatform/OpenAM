@@ -200,7 +200,6 @@
                         WEB-INF/lib/jaxb-libs-1.0.6.jar,
                         WEB-INF/lib/jaxb-xjc-1.0.6.jar,
                         WEB-INF/lib/jaxp-api-1.4.2.jar,
-
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>

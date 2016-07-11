@@ -337,21 +337,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>forgerock-dev</id>
-            <modules>
-                <module>openam-time-travel</module>
-            </modules>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-time-travel</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
     </profiles>
 
     <!-- OpenAM Child Modules -->
@@ -444,6 +429,8 @@
 
         <!-- (Mobile) Push Notification Service -->
         <module>openam-push-notification</module>
+
+        <module>openam-time-travel</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -1954,6 +1941,11 @@
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
                 <version>${hikaricp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-time-travel</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
