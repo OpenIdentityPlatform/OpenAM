@@ -30,6 +30,7 @@ package com.sun.identity.console.base;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.iplanet.sso.SSOException;
@@ -79,19 +80,24 @@ public class PageTrailManager
         String randomStr = "";
         try {
             String key = token.getTokenID().toString();
-                                                                                
-            synchronized(mapTokenIDs) {
+
+            synchronized (mapTokenIDs) {
                 Map map = (Map) mapTokenIDs.get(key);
-                                                                                
+
                 if (map == null) {
                     map = new HashMap(10);
                     token.addSSOTokenListener(this);
                 }
-                                                                                
+
                 randomStr = getRandomString();
                 map.put(randomStr, pageTrail);
                 mapTokenIDs.put(key, map);
             }
+        } catch (SSOTokenListenersUnsupportedException ex) {
+            // NB. If SSOTokenListenersUnsupportedException is thrown, mapTokenIDs must not
+            // store reference to token ID as this will cause a memory leak.
+            debug.message("PageTrailManager.registerTrail(): could not add sso listener: {}", ex.getMessage());
+            randomStr = "";
         } catch (SSOException ssoe) {
             debug.warning("PageTrailManager.registerTrail()", ssoe);
             randomStr = "";

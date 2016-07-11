@@ -54,6 +54,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
@@ -1798,14 +1799,16 @@ public class PolicyEvaluator {
                         userSSOTokenIDStr))) {
                 try {
                     token.addSSOTokenListener(ssoListener);
+                    // Ensure that this token type is observable before adding it to caches; otherwise, the cache
+                    // entry will never be cleared and we'll create a memory leak.
+                    ssoListenerRegistry.put(userSSOTokenIDStr, ssoListener);
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("PolicyEvaluator.getResourceResultTree(): sso listener added .\n");
+                    }
+                } catch (SSOTokenListenersUnsupportedException ex) {
+                    DEBUG.message("PolicyEvaluator: failed to add sso token listener: {}", ex.getMessage());
                 } catch (SSOException se) {
-                    DEBUG.error("PolicyEvaluator:"
-                            + "failed to add sso token listener");
-                }
-                ssoListenerRegistry.put(userSSOTokenIDStr, ssoListener);
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("PolicyEvaluator.getResourceResultTree():"
-                            + " sso listener added .\n");
+                    DEBUG.error("PolicyEvaluator: failed to add sso token listener");
                 }
             }
             if (DEBUG.messageEnabled()) {
@@ -2416,13 +2419,21 @@ public class PolicyEvaluator {
             elem[0] = new Long(currentTimeMillis()
                     + userNSRoleCacheTTL);
             elem[1] = roleSet;
-            userNSRoleCache.put(tokenIDStr, elem);
-            if (!ssoListenerRegistry.containsKey(tokenIDStr)) {
-                token.addSSOTokenListener(ssoListener);
-                ssoListenerRegistry.put(tokenIDStr, ssoListener);
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("PolicyEvaluator.getUserNSRoleValues():"
-                            + " sso listener added .\n");
+
+            if (ssoListenerRegistry.containsKey(tokenIDStr)) {
+                userNSRoleCache.put(tokenIDStr, elem);
+            } else {
+                try {
+                    // Ensure that this token type is observable before adding it to caches; otherwise, the cache
+                    // entry will never be cleared and we'll create a memory leak.
+                    token.addSSOTokenListener(ssoListener);
+                    userNSRoleCache.put(tokenIDStr, elem);
+                    ssoListenerRegistry.put(tokenIDStr, ssoListener);
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("PolicyEvaluator.getUserNSRoleValues(): sso listener added .\n");
+                    }
+                } catch (SSOTokenListenersUnsupportedException ex) {
+                    DEBUG.message("PolicyEvaluator.getUserNSRoleValues(): could not add sso listener: {}", ex.getMessage());
                 }
             }
             return roleSet;

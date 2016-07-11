@@ -48,6 +48,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.idm.AMIdentity;
@@ -472,8 +473,14 @@ class ResourceResultCache implements SSOTokenListener {
                 scopeResultsMap = new HashMap();
                 tokenIDScopesMap.put(tokenID, scopeResultsMap);
                 if (!tokenRegistry.contains(tokenID)) {
-                    token.addSSOTokenListener(this);
-                    tokenRegistry.add(tokenID);
+                    try {
+                        token.addSSOTokenListener(this);
+                        tokenRegistry.add(tokenID);
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to tokenRegistry
+                        // scopeResultsMap will be populated and returned to the caller but not cached
+                        debug.message("ResourceResultCache.getResourceResults(): could not add sso listener: {}", ex.getMessage());
+                    }
                 }
             }
         }

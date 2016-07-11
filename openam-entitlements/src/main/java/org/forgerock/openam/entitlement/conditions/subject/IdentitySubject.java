@@ -36,6 +36,7 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.SubjectAttributesCollector;
@@ -170,7 +171,6 @@ public class IdentitySubject implements EntitlementSubject {
             }
         }
 
-        boolean listenerAdded = false;
         boolean subjectMatch = false;
 
         if (debug.messageEnabled()) {
@@ -301,20 +301,17 @@ public class IdentitySubject implements EntitlementSubject {
                                 + ", subjectValue = " + subjectValue
                                 + ", subjectMatch = " + subjectMatch);
                     }
-                    SubjectEvaluationCache.addEntry(tokenID,
-                            "IdentitySubject", subjectValue, subjectMatch);
-                    if (!listenerAdded) {
-                        if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                                tokenID)) {
-                            token.addSSOTokenListener(
-                                    PolicyEvaluator.ssoListener);
-                            PolicyEvaluator.ssoListenerRegistry.put(
-                                    tokenID, PolicyEvaluator.ssoListener);
+                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                        try {
+                            token.addSSOTokenListener(PolicyEvaluator.ssoListener);
+                            SubjectEvaluationCache.addEntry(tokenID, "IdentitySubject", subjectValue, subjectMatch);
+                            PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                             if (debug.messageEnabled()) {
-                                debug.message("IdentitySubject.isMember():"
-                                        + " sso listener added ");
+                                debug.message("IdentitySubject.isMember(): sso listener added ");
                             }
-                            listenerAdded = true;
+                        } catch (SSOTokenListenersUnsupportedException ex) {
+                            // Catching exception to avoid adding tokenID to SubjectEvaluationCache and ssoListenerRegistry
+                            debug.message("IdentitySubject.isMember(): could not add sso listener: {}", ex.getMessage());
                         }
                     }
                     if (subjectMatch) {

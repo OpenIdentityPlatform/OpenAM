@@ -34,6 +34,7 @@ import static org.forgerock.opendj.ldap.LDAPConnectionFactory.REQUEST_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
@@ -441,7 +442,6 @@ public class LDAPGroups implements Subject {
         if (token == null) {
             return false;
         }
-        boolean listenerAdded = false;
         String tokenID = token.getTokenID().toString();
         String userLocalDN = token.getPrincipal().getName();
         DN userDN = null;
@@ -492,12 +492,14 @@ public class LDAPGroups implements Subject {
                         return false;
                     }
                 }
-                if (!listenerAdded) {
-                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                    try {
                         token.addSSOTokenListener(PolicyEvaluator.ssoListener);
                         PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                         debug.message("LDAPGroups.isMember(): sso listener added .\n");
-                        listenerAdded = true;
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to ssoListenerRegistry
+                        debug.message("LDAPGroups.isMember(): could not add sso listener: {}", ex.getMessage());
                     }
                 }
                 if (isMemberOfGroup(groupDN, userDN, userRDN, token)) {

@@ -36,6 +36,7 @@ import static org.forgerock.opendj.ldap.LDAPConnectionFactory.REQUEST_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
@@ -460,7 +461,6 @@ public class LDAPRoles implements Subject {
         if (selectedRFCRoleDNs.size() > 0) {
             SearchResultEntry userEntry = null;
             Set userRoles = null;
-            boolean listenerAdded = false;
             String tokenID = token.getTokenID().toString();
             Iterator items = selectedRFCRoleDNs.iterator();
             while ( items.hasNext()) {
@@ -500,18 +500,16 @@ public class LDAPRoles implements Subject {
                 if (userRoles == null) {
                     userRoles = getUserRoles(token,userEntry);        
                 }
-                if (!listenerAdded) {
-                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                        tokenID)) 
-                    {
+                if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                    try {
                         token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                        PolicyEvaluator.ssoListenerRegistry.put(tokenID, 
-                            PolicyEvaluator.ssoListener);
+                        PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                         if (debug.messageEnabled()) {
-                           debug.message("LDAPRoles.isMember(): sso listener "
-                                + "added .\n");
+                           debug.message("LDAPRoles.isMember(): sso listener added .\n");
                         }
-                        listenerAdded = true;
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to ssoListenerRegistry
+                        debug.message("LDAPRoles.isMember(): could not add sso listener: {}", ex.getMessage());
                     }
                 }
                 if ((userRoles != null) && userRoles.size() > 0) {

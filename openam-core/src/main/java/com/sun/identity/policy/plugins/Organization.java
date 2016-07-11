@@ -32,6 +32,7 @@ package com.sun.identity.policy.plugins;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
@@ -434,10 +435,7 @@ public class Organization implements Subject {
      * checking if the user is a member of this subject
      */
 
-    public boolean isMember(SSOToken token)
-        throws SSOException, PolicyException {
-
-        boolean listenerAdded = false;
+    public boolean isMember(SSOToken token) throws SSOException, PolicyException {
 
         String userLocalDN = token.getPrincipal().getName();
         if (debug.messageEnabled()) {
@@ -483,18 +481,16 @@ public class Organization implements Subject {
                         return false;
                     }
                 }
-                if (!listenerAdded) {
-                        if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                        tokenID)) 
-                    {
+                if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                    try {
                         token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                        PolicyEvaluator.ssoListenerRegistry.put(
-                            tokenID, PolicyEvaluator.ssoListener);
+                        PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                         if (debug.messageEnabled()) {
-                            debug.message("Organization.isMember():"
-                                    + " sso listener added .\n");
+                            debug.message("Organization.isMember(): sso listener added .\n");
                         }
-                        listenerAdded = true;
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to ssoListenerRegistry
+                        debug.message("Organization.isMember(): could not add sso listener: {}", ex.getMessage());
                     }
                 }
                 if (isMemberOfOrg(valueDN, userDN, tokenID)) {

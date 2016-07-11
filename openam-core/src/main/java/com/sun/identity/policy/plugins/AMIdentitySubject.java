@@ -27,13 +27,14 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.policy.plugins;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.idm.AMIdentity;
@@ -275,7 +276,6 @@ public class AMIdentitySubject implements Subject {
             }
         }
 
-        boolean listenerAdded = false;
         boolean subjectMatch = false;
 
         if (debug.messageEnabled()) {
@@ -405,20 +405,15 @@ public class AMIdentitySubject implements Subject {
                             + ", subjectValue = " + subjectValue
                             + ", subjectMatch = " + subjectMatch);
                     }
-                    SubjectEvaluationCache.addEntry(tokenID, 
-                        "AMIdentitySubject", subjectValue, subjectMatch);
-                    if (!listenerAdded) {
-                        if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                                tokenID)) {
-                            token.addSSOTokenListener(
-                                PolicyEvaluator.ssoListener);
-                            PolicyEvaluator.ssoListenerRegistry.put(
-                                    tokenID, PolicyEvaluator.ssoListener);
-                            if (debug.messageEnabled()) {
-                                debug.message("AMIdentitySubject.isMember():"
-                                        + " sso listener added ");
-                            }
-                            listenerAdded = true;
+                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                        try {
+                            token.addSSOTokenListener(PolicyEvaluator.ssoListener);
+                            SubjectEvaluationCache.addEntry(tokenID, "AMIdentitySubject", subjectValue, subjectMatch);
+                            PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
+                            debug.message("AMIdentitySubject.isMember(): sso listener added");
+                        } catch (SSOTokenListenersUnsupportedException ex) {
+                            // Catching exception to avoid adding tokenID to SubjectEvaluationCache and ssoListenerRegistry
+                            debug.message("AMIdentitySubject.isMember(): could not add sso listener: {}", ex.getMessage());
                         }
                     }
                     if (subjectMatch) {

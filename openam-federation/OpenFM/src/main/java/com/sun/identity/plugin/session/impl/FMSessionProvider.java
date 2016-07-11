@@ -615,16 +615,16 @@ public class FMSessionProvider implements SessionProvider {
     /**
      * Registers a listener for the session.
      *
+     * If the provided session does not support listeners, calling this method will throw <code>SessionException</code>.
+     *
      * @param session the session object.
      * @param listener listener for the session invalidation event.
      * 
      * @throws SessionException if adding the listener caused an error.
      */
-    public void addListener(Object session, SessionListener listener)
-        throws SessionException {
+    public void addListener(Object session, SessionListener listener) throws SessionException {
         try {
-            ((SSOToken)session).addSSOTokenListener(
-                new SSOTokenListenerImpl(session, listener));
+            ((SSOToken)session).addSSOTokenListener(new SSOTokenListenerImpl(session, listener));
         } catch (SSOException se) {
             throw new SessionException(se);
         }

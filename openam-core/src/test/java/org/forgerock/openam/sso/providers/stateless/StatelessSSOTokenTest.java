@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sso.providers.stateless;
@@ -29,6 +29,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.providers.dpro.SSOPrincipal;
 import com.iplanet.sso.providers.dpro.SSOSessionListener;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -361,8 +362,8 @@ public class StatelessSSOTokenTest {
         // Then - exception
     }
 
-    @Test
-    public void shouldAddListenersToSession() throws Exception {
+    @Test(expectedExceptions = SSOTokenListenersUnsupportedException.class)
+    public void shouldNotSupportListeners() throws Exception {
         // Given
         SSOTokenListener listener = mock(SSOTokenListener.class);
 
@@ -370,6 +371,6 @@ public class StatelessSSOTokenTest {
         statelessSSOToken.addSSOTokenListener(listener);
 
         // Then
-        verify(mockSession).addSessionListener(any(SSOSessionListener.class));
+        // throws exception
     }
 }

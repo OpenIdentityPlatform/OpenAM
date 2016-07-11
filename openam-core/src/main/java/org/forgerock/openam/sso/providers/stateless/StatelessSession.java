@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 /*
@@ -35,6 +35,7 @@ import java.util.Set;
  */
 public class StatelessSession extends Session {
     public static final String RESTRICTED_TOKENS_UNSUPPORTED = SessionBundle.getString("restrictedTokensUnsupported");
+    public static final String SSOTOKEN_LISTENERS_UNSUPPORTED = SessionBundle.getString("ssoTokenListenersUnsupported");
 
     private final String stableId;
 

@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.samples.sso;
 
@@ -34,6 +34,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -128,6 +129,9 @@ public class SSOTokenSampleServlet extends HttpServlet {
                  */
                 SSOTokenListener myListener = new SampleTokenListener();
                 token.addSSOTokenListener(myListener);
+            } catch (SSOTokenListenersUnsupportedException e) {
+                out.println("SSO Exception: " + e);
+                e.printStackTrace();
             } catch (SSOException e) {
                 out.println("SSO Exception: " + e);
                 out.println("<p>Authenticate to OpenAM server before visiting this page.</p>");

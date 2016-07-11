@@ -30,6 +30,7 @@ package com.sun.identity.console.policy.model;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.iplanet.sso.SSOException;
@@ -86,7 +87,7 @@ public class PolicyCache
             try {
                 String key = token.getTokenID().toString();
 
-                synchronized(mapTokenIDs) {
+                synchronized (mapTokenIDs) {
                     Map map = (Map) mapTokenIDs.get(key);
 
                     if (map == null) {
@@ -98,6 +99,11 @@ public class PolicyCache
                     map.put(randomStr, policy);
                     mapTokenIDs.put(key, map);
                 }
+            } catch (SSOTokenListenersUnsupportedException ex) {
+                // NB. If SSOTokenListenersUnsupportedException is thrown, mapTokenIDs must not
+                // store reference to token ID as this will cause a memory leak.
+                AMModelBase.debug.message("PolicyCache.cachePolicy: could not add sso listener: {}", ex.getMessage());
+                randomStr = "";
             } catch (SSOException ssoe) {
                 AMModelBase.debug.warning("PolicyCache.cachePolicy", ssoe);
                 randomStr = "";
@@ -131,6 +137,8 @@ public class PolicyCache
                     mapTokenIDs.put(key, map);
                 }
             } catch (SSOException ssoe) {
+                // NB. If SSOTokenListenersUnsupportedException is thrown, mapTokenIDs must not
+                // store reference to token ID as this will cause a memory leak.
                 AMModelBase.debug.warning("PolicyCache.replacePolicy", ssoe);
             }
         }

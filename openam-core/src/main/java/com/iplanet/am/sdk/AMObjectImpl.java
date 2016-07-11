@@ -24,7 +24,7 @@
  *
  * $Id: AMObjectImpl.java,v 1.14 2009/11/20 23:52:51 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -43,6 +43,7 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.SearchControl;
 import com.sun.identity.common.DNUtils;
@@ -3301,9 +3302,12 @@ class AMObjectImpl implements AMObject {
             if (dnList == null) {
                 // No entry corressponding to session
                 // Add a new SSOTokenListener
-                AMSSOTokenListener ssoTokenListener = new AMSSOTokenListener(
-                        ssoToken.getPrincipal().getName());
-                ssoToken.addSSOTokenListener(ssoTokenListener);
+                AMSSOTokenListener ssoTokenListener = new AMSSOTokenListener(ssoToken.getPrincipal().getName());
+                try {
+                    ssoToken.addSSOTokenListener(ssoTokenListener);
+                } catch (SSOTokenListenersUnsupportedException ex) {
+                    debug.message("AMObjectImpl.addToProfileNameTable: {}", ex.getMessage());
+                }
                 dnList = new HashSet();
                 pTable.put(ssoToken.getPrincipal().getName(), dnList);
             }

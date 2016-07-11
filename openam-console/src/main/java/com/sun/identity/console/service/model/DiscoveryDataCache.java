@@ -35,6 +35,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.shared.encode.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,22 +80,24 @@ public class DiscoveryDataCache
      * @return an unique key for retrieve this discover data in future
      */
     public String cacheData(SSOToken token, SMDiscoveryServiceData data) {
-	String randomStr = "";
+	String randomStr;
 	try {
-	    String key = token.getTokenID().toString();
-	    synchronized(mapTokenIDs) {
-		Map map = (Map) mapTokenIDs.get(key);
+		String key = token.getTokenID().toString();
+		synchronized (mapTokenIDs) {
+			Map map = (Map) mapTokenIDs.get(key);
 
-		if (map == null) {
-		    map = new HashMap(10);
-		    token.addSSOTokenListener(this);
+			if (map == null) {
+				map = new HashMap(10);
+				token.addSSOTokenListener(this);
+			}
+
+			randomStr = getRandomString();
+			map.put(randomStr, data);
+			mapTokenIDs.put(key, map);
 		}
-
-		randomStr = getRandomString();
-		map.put(randomStr, data);
-		mapTokenIDs.put(key, map);
-	    }
 	} catch (SSOException ssoe) {
+		// NB. If SSOTokenListenersUnsupportedException is thrown, mapTokenIDs must not
+		// store reference to token ID as this will cause a memory leak.
 	    randomStr = "";
 	}
 	return randomStr;
