@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.core.rest;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
@@ -58,6 +57,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
@@ -201,7 +201,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
         final String realm = realmContext.getResolvedRealm();
 
         try {
-            SSOToken admin = getSSOToken(RestUtils.getToken().getTokenID().toString());
+            SSOToken admin = context.asContext(SSOTokenContext.class).getCallerSSOToken();
             IdentityServicesImpl identityServices = getIdentityServices();
             List<IdentityDetails> userDetails = null;
 
