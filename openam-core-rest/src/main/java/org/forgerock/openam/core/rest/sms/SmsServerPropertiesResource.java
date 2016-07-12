@@ -103,6 +103,7 @@ import com.sun.identity.common.configuration.UnknownPropertyNameException;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -653,10 +654,7 @@ public class SmsServerPropertiesResource {
         }
 
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            DocumentBuilder dBuilder = XMLUtils.getSafeDocumentBuilder(false);
             return dBuilder.parse(resourceStream);
         } catch (IOException | SAXException | ParserConfigurationException e) {
             throw new InternalServerErrorException("Unable to parse propertySheet for " + tabName, e);
