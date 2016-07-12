@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -122,10 +122,14 @@ public class SSOTokenContext extends AbstractContext implements SubjectContext {
      */
     public static SSOToken getSsoToken(Context context) throws SSOException {
         Reject.ifFalse(context.containsContext(SecurityContext.class), "Parent context must contain a SecurityContext");
+        SecurityContext securityContext = context.asContext(SecurityContext.class);
         if (context.containsContext(SSOTokenContext.class)) {
-            return context.asContext(SSOTokenContext.class).getCallerSSOToken();
+            SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
+            if (ssoTokenContext.asContext(SecurityContext.class) == securityContext) {
+                return ssoTokenContext.getCallerSSOToken();
+            }
         }
-        return SSOTokenManager.getInstance().createSSOToken(RestUtils.getCookieFromServerContext(context));
+        return SSOTokenManager.getInstance().createSSOToken(RestUtils.getCookieFromServerContext(securityContext));
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
@@ -124,9 +125,10 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Singleton
     @SelfService
     ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router,
-            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
+            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction, SSOTokenContext.Factory contextFactory) {
         ConnectionFactory internalConnectionFactory = newInternalConnectionFactory(router);
-        return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction);
+        return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction,
+                contextFactory);
     }
 
     @Provides
