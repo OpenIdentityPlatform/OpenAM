@@ -21,6 +21,7 @@ import static org.forgerock.json.JsonValue.object;
 
 import java.util.LinkedHashMap;
 import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
@@ -43,6 +44,7 @@ import java.util.Set;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
@@ -439,8 +441,10 @@ public class SmsJsonConverter {
 
         try {
             InputStream resource = getClass().getClassLoader().getResourceAsStream("amConsoleConfig.xml");
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resource);
-            NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate("//consoleconfig/servicesconfig/consoleservice/@realmEnableHideAttrName", doc, XPathConstants.NODESET);
+            Document doc = XMLUtils.getSafeDocumentBuilder(false).parse(resource);
+            NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate(
+                    "//consoleconfig/servicesconfig/consoleservice/@realmEnableHideAttrName", doc,
+                    XPathConstants.NODESET);
             String rawList = nodes.item(0).getNodeValue();
             hiddenAttributeNames = new ArrayList<>(Arrays.asList(rawList.split(",")));
         } catch (SAXException e) {
