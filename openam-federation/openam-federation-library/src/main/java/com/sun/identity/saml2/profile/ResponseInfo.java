@@ -30,16 +30,17 @@ package com.sun.identity.saml2.profile;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import java.util.Map;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.protocol.Response;
+import java.util.Map;
 
 /**
  * This class stores information about the response made to
  * the Service Provider.
  */
 public class ResponseInfo extends CacheObject {
+
     private Response resp = null;
     private String relayState = null;
     private String profileBinding = null; 
@@ -64,6 +65,13 @@ public class ResponseInfo extends CacheObject {
         this.profileBinding = binding;
         this.relayState = relayState;
         time = currentTimeMillis();
+    }
+
+    /**
+     * Needed for deserialization.
+     */
+    public ResponseInfo() {
+
     }
 
     /**

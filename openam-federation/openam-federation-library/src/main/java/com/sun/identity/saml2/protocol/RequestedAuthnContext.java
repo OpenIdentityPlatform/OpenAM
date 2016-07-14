@@ -24,16 +24,16 @@
  *
  * $Id: RequestedAuthnContext.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
-import java.util.List;
-
-import org.w3c.dom.Element;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.RequestedAuthnContextImpl;
+import java.util.List;
 
 /**
  * Java content class for RequestedAuthnContext element declaration.
@@ -46,6 +46,9 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * 
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = RequestedAuthnContextImpl.class)
 public interface RequestedAuthnContext {
 
     /**

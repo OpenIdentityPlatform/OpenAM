@@ -24,12 +24,15 @@
  *
  * $Id: Status.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.StatusImpl;
 
 /**
  * This class represents the <code>StatusType</code> complex type in
@@ -52,6 +55,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * @supported.all.api
  */
 
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = StatusImpl.class)
 public interface Status {
     
     /**

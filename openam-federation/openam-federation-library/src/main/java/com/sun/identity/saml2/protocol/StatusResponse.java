@@ -28,17 +28,13 @@
  */
 package com.sun.identity.saml2.protocol;
 
-import com.sun.identity.saml.xmlsig.XMLSignatureException;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.common.SAML2Exception;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.util.Date;
+import com.sun.identity.saml2.protocol.impl.StatusResponseImpl;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Set;
-
-import com.sun.identity.saml2.xmlsig.SigManager;
 
 /**
  * This class represents the <code>StatusResponseType</code> complex type in
@@ -70,6 +66,8 @@ import com.sun.identity.saml2.xmlsig.SigManager;
  *
  * @supported.all.api
  */
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = StatusResponseImpl.class)
 public interface StatusResponse {
     
     /**

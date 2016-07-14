@@ -24,15 +24,17 @@
  *
  * $Id: NewID.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
 
-import java.security.Key;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.NewIDImpl;
+import java.security.Key;
 
 /** 
  * This interface identifies the new identifier in an 
@@ -40,6 +42,9 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = NewIDImpl.class)
 public interface NewID {
     /** 
      * Returns the value of the <code>NewID</code> URI.

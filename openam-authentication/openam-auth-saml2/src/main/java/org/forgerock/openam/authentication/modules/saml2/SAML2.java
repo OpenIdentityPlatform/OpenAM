@@ -305,20 +305,22 @@ public class SAML2 extends AMLoginModule {
 
         if (!StringUtils.isBlank(key)) {
             data = (SAML2ResponseData) SAML2Store.getTokenFromStore(key);
-        }
 
-        if (data == null && SAML2FailoverUtils.isSAML2FailoverEnabled() && !StringUtils.isBlank(key)) {
-            try {
-                data = (SAML2ResponseData) SAML2FailoverUtils.retrieveSAML2Token(key);
-            } catch (SAML2TokenRepositoryException e) {
-                return processError(bundle.getString("samlFailoverError"),
-                        "SAML2.handleReturnFromRedirect : Error reading from failover map.", e);
+            if (data == null) {
+                if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                    try {
+                        data = (SAML2ResponseData) SAML2FailoverUtils.retrieveSAML2Token(key);
+                    } catch (SAML2TokenRepositoryException e) {
+                        return processError(bundle.getString("samlFailoverError"),
+                                "SAML2.handleReturnFromRedirect : Error reading from failover map.", e);
+                    }
+                }
             }
         }
 
         if (data == null) {
             return processError(bundle.getString("localLinkError"), "SAML2 :: handleReturnFromRedirect() : "
-                    + "Unable to perform local linking - response data key not found");
+                    + "Unable to perform local linking - response data not found");
         }
 
         storageKey = key;

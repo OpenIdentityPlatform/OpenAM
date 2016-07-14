@@ -24,14 +24,17 @@
  *
  * $Id: Response.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 
 package com.sun.identity.saml2.protocol;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.ResponseImpl;
+import java.util.List;
 
 /**
  * The <code>Response</code> message element is used when a response consists
@@ -53,6 +56,9 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = ResponseImpl.class)
 public interface Response extends StatusResponse {
 
     /**

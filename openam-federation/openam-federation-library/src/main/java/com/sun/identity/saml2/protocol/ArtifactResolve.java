@@ -24,13 +24,16 @@
  *
  * $Id: ArtifactResolve.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.ArtifactResolveImpl;
 
 /**
  * The <code>ArtifactResolve</code> message is used to request that a SAML
@@ -53,6 +56,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * @supported.all.api
  */
 
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = ArtifactResolveImpl.class)
 public interface ArtifactResolve extends RequestAbstract {
 
     /**
