@@ -29,9 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.jose.builders.JweHeaderBuilder;
-import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -56,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * @since 12.0.0
  */
 public class OpenIdConnectToken extends JsonValue implements Token {
+    private static final String KEY_ID_HEADER = "kid";
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
@@ -413,37 +413,20 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private Jwt createEncryptedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
         // As per http://openid.net/specs/openid-connect-core-1_0.html#SigningOrder, JWT should be signed first and
         // then encrypted.
-        Jwt signedJwt = createSignedJwt(signingHandler, jwsAlgorithm, claimsSet);
-
-        JweHeaderBuilder builder = jwtBuilderFactory.jwe(encryptionPublicKey)
-                .headers()
+        return signedJwtBuilder(signingHandler, jwsAlgorithm, claimsSet).encrypt(encryptionPublicKey).headers()
                 .alg(JweAlgorithm.parseAlgorithm(encryptionAlgorithm))
                 .enc(EncryptionMethod.parseMethod(encryptionMethod))
-                .cty("JWT");
-        if (encryptionKeyId != null) {
-            builder.kid(encryptionKeyId);
-        }
-        return builder.done().claims(new SignedJwtClaimsSet(signedJwt.build())).asJwt();
+                .headerIfNotNull(KEY_ID_HEADER, encryptionKeyId)
+                .done().asJwt();
     }
 
     private Jwt createSignedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
-        JwsHeaderBuilder builder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm);
-        if (signingKeyId != null) {
-            builder.kid(signingKeyId);
-        }
-        return builder.done().claims(claimsSet).asJwt();
+        return signedJwtBuilder(signingHandler, jwsAlgorithm, claimsSet).asJwt();
     }
 
-    private static class SignedJwtClaimsSet extends JwtClaimsSet {
-        private final String signedPayload;
-
-        SignedJwtClaimsSet(final String signedPayload) {
-            this.signedPayload = signedPayload;
-        }
-
-        @Override
-        public String build() {
-            return signedPayload;
-        }
+    private SignedJwtBuilderImpl signedJwtBuilder(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm,
+            JwtClaimsSet claimsSet) {
+        return jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm)
+                                .headerIfNotNull(KEY_ID_HEADER, signingKeyId).done().claims(claimsSet);
     }
 }
