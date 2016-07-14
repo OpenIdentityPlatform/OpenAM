@@ -176,11 +176,6 @@
         }
       }
     },
-    "babel-eslint": {
-      "version": "6.1.2",
-      "from": "babel-eslint@6.1.2",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-eslint/-/babel-eslint-6.1.2.tgz"
-    },
     "babel-generator": {
       "version": "6.11.3",
       "from": "babel-generator@>=6.9.0 <7.0.0",
@@ -403,7 +398,7 @@
     },
     "babel-runtime": {
       "version": "6.9.2",
-      "from": "babel-runtime@>=6.9.0 <7.0.0",
+      "from": "babel-runtime@>=6.0.0 <7.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-runtime/-/babel-runtime-6.9.2.tgz"
     },
     "babel-template": {
@@ -420,7 +415,7 @@
     },
     "babel-traverse": {
       "version": "6.10.4",
-      "from": "babel-traverse@>=6.0.20 <7.0.0",
+      "from": "babel-traverse@>=6.9.0 <7.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-traverse/-/babel-traverse-6.10.4.tgz",
       "dependencies": {
         "lodash": {
@@ -432,7 +427,7 @@
     },
     "babel-types": {
       "version": "6.11.1",
-      "from": "babel-types@>=6.0.19 <7.0.0",
+      "from": "babel-types@>=6.8.0 <7.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-types/-/babel-types-6.11.1.tgz",
       "dependencies": {
         "lodash": {
@@ -444,7 +439,7 @@
     },
     "babylon": {
       "version": "6.8.4",
-      "from": "babylon@>=6.0.18 <7.0.0",
+      "from": "babylon@>=6.7.0 <7.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babylon/-/babylon-6.8.4.tgz"
     },
     "backo2": {
@@ -735,19 +730,7 @@
     "cross-env": {
       "version": "2.0.0",
       "from": "cross-env@2.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/cross-env/-/cross-env-2.0.0.tgz",
-      "dependencies": {
-        "lodash.assign": {
-          "version": "3.2.0",
-          "from": "lodash.assign@>=3.2.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.assign/-/lodash.assign-3.2.0.tgz"
-        },
-        "lodash.keys": {
-          "version": "3.1.2",
-          "from": "lodash.keys@>=3.0.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keys/-/lodash.keys-3.1.2.tgz"
-        }
-      }
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/cross-env/-/cross-env-2.0.0.tgz"
     },
     "cross-spawn": {
       "version": "3.0.1",
@@ -2577,26 +2560,12 @@
     "lodash._baseassign": {
       "version": "3.2.0",
       "from": "lodash._baseassign@>=3.0.0 <4.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._baseassign/-/lodash._baseassign-3.2.0.tgz",
-      "dependencies": {
-        "lodash.keys": {
-          "version": "3.1.2",
-          "from": "lodash.keys@>=3.0.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keys/-/lodash.keys-3.1.2.tgz"
-        }
-      }
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._baseassign/-/lodash._baseassign-3.2.0.tgz"
     },
     "lodash._baseclone": {
       "version": "3.3.0",
       "from": "lodash._baseclone@>=3.0.0 <4.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._baseclone/-/lodash._baseclone-3.3.0.tgz",
-      "dependencies": {
-        "lodash.keys": {
-          "version": "3.1.2",
-          "from": "lodash.keys@>=3.0.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keys/-/lodash.keys-3.1.2.tgz"
-        }
-      }
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._baseclone/-/lodash._baseclone-3.3.0.tgz"
     },
     "lodash._basecopy": {
       "version": "3.0.1",
@@ -2607,16 +2576,6 @@
       "version": "3.0.3",
       "from": "lodash._basefor@>=3.0.0 <4.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._basefor/-/lodash._basefor-3.0.3.tgz"
-    },
-    "lodash._baseiteratee": {
-      "version": "4.7.0",
-      "from": "lodash._baseiteratee@>=4.7.0 <4.8.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._baseiteratee/-/lodash._baseiteratee-4.7.0.tgz"
-    },
-    "lodash._basetostring": {
-      "version": "4.12.0",
-      "from": "lodash._basetostring@>=4.12.0 <4.13.0",
-      "resolved": "https://registry.npmjs.org/lodash._basetostring/-/lodash._basetostring-4.12.0.tgz"
     },
     "lodash._bindcallback": {
       "version": "3.0.1",
@@ -2638,15 +2597,10 @@
       "from": "lodash._isiterateecall@>=3.0.0 <4.0.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash._isiterateecall/-/lodash._isiterateecall-3.0.9.tgz"
     },
-    "lodash._stringtopath": {
-      "version": "4.8.0",
-      "from": "lodash._stringtopath@>=4.8.0 <4.9.0",
-      "resolved": "https://registry.npmjs.org/lodash._stringtopath/-/lodash._stringtopath-4.8.0.tgz"
-    },
     "lodash.assign": {
-      "version": "4.0.9",
-      "from": "lodash.assign@>=4.0.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.assign/-/lodash.assign-4.0.9.tgz"
+      "version": "3.2.0",
+      "from": "lodash.assign@>=3.2.0 <4.0.0",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.assign/-/lodash.assign-3.2.0.tgz"
     },
     "lodash.clonedeep": {
       "version": "3.0.2",
@@ -2664,24 +2618,9 @@
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.isarray/-/lodash.isarray-3.0.4.tgz"
     },
     "lodash.keys": {
-      "version": "4.0.7",
-      "from": "lodash.keys@>=4.0.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.keys/-/lodash.keys-4.0.7.tgz"
-    },
-    "lodash.keysin": {
-      "version": "4.1.4",
-      "from": "lodash.keysin@>=4.0.0 <5.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keysin/-/lodash.keysin-4.1.4.tgz"
-    },
-    "lodash.pickby": {
-      "version": "4.4.0",
-      "from": "lodash.pickby@>=4.0.0 <5.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.pickby/-/lodash.pickby-4.4.0.tgz"
-    },
-    "lodash.rest": {
-      "version": "4.0.3",
-      "from": "lodash.rest@>=4.0.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.rest/-/lodash.rest-4.0.3.tgz"
+      "version": "3.1.2",
+      "from": "lodash.keys@>=3.0.0 <4.0.0",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keys/-/lodash.keys-3.1.2.tgz"
     },
     "lodash.restparam": {
       "version": "3.6.1",
@@ -2755,19 +2694,7 @@
     "marked-terminal": {
       "version": "1.6.1",
       "from": "marked-terminal@>=1.6.1 <2.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/marked-terminal/-/marked-terminal-1.6.1.tgz",
-      "dependencies": {
-        "lodash.assign": {
-          "version": "3.2.0",
-          "from": "lodash.assign@>=3.0.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.assign/-/lodash.assign-3.2.0.tgz"
-        },
-        "lodash.keys": {
-          "version": "3.1.2",
-          "from": "lodash.keys@>=3.0.0 <4.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/lodash.keys/-/lodash.keys-3.1.2.tgz"
-        }
-      }
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/marked-terminal/-/marked-terminal-1.6.1.tgz"
     },
     "md5-file": {
       "version": "2.0.7",

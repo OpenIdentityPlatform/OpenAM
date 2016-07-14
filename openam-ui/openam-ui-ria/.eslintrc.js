@@ -3,9 +3,9 @@ module.exports = {
     extends: [
         "forgerock"
     ],
-    parser: "babel-eslint",
     parserOptions: {
-        ecmaVersion: 6
+        ecmaVersion: 6,
+        sourceType: "module"
     },
     env: {
         amd: true,
