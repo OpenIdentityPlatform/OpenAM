@@ -77,7 +77,7 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
             redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
         }
 
-        responseTypeValidator.validate(clientRegistration,
-                splitResponseType(request.<String>getParameter(RESPONSE_TYPE)), providerSettingsFactory.get(request));
+        responseTypeValidator.validate(clientRegistration, splitResponseType(request.<String>getParameter(RESPONSE_TYPE)),
+                providerSettingsFactory.get(request), request);
     }
 }

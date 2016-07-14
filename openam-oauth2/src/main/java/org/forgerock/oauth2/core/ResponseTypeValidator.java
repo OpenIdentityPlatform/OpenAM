@@ -18,6 +18,8 @@ package org.forgerock.oauth2.core;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.OPENID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 
 import java.util.Map;
 import java.util.Set;
@@ -49,8 +51,8 @@ public class ResponseTypeValidator {
      * @throws org.forgerock.oauth2.core.exceptions.ServerException
      */
     public void validate(ClientRegistration clientRegistration, Set<String> requestedResponseTypes,
-            OAuth2ProviderSettings providerSettings) throws InvalidRequestException, UnsupportedResponseTypeException,
-            ServerException {
+            OAuth2ProviderSettings providerSettings, OAuth2Request request)
+            throws InvalidRequestException, UnsupportedResponseTypeException, ServerException {
 
         if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()) {
             throw new UnsupportedResponseTypeException("Response type is not supported.");
@@ -85,7 +87,11 @@ public class ResponseTypeValidator {
         }
 
         validateForOAuth2(clientRegistration, requestedResponseTypes);
-        validateForOpenIdConnect(clientRegistration, requestedResponseTypes);
+
+        Set<String> requestedScopes = Utils.splitScope(request.<String>getParameter(SCOPE));
+        if (Utils.isOpenIdConnectClient(clientRegistration) && requestedScopes.contains(OPENID)) {
+            validateOpenidResponseTypes(clientRegistration, requestedResponseTypes);
+        }
 
     }
 
@@ -102,11 +108,15 @@ public class ResponseTypeValidator {
         }
     }
 
-    private void validateForOpenIdConnect(ClientRegistration clientRegistration, Set<String> requestedResponseTypes)
+    /**
+      See <a href="http://openid.net/specs/openid-connect-core-1_0.html#Authentication">
+        table 'OpenID Connect "response_type" Values'
+      </a>
+     */
+    private void validateOpenidResponseTypes(ClientRegistration clientRegistration, Set<String> requestedResponseTypes)
             throws UnsupportedResponseTypeException {
 
-        if (Utils.isOpenIdConnectClient(clientRegistration)
-                && requestedResponseTypes.contains(TOKEN)
+        if (requestedResponseTypes.contains(TOKEN)
                 && !requestedResponseTypes.contains(CODE)
                 && !requestedResponseTypes.contains(ID_TOKEN)) {
 
