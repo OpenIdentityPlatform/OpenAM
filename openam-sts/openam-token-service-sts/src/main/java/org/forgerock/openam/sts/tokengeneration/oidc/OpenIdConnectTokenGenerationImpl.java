@@ -46,14 +46,12 @@ import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPK
 import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.encode.Base64;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -247,8 +245,6 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
     }
 
     private RsaJWK buildRSAJWKForPublicKey(RSAPublicKey rsaPublicKey, JwsAlgorithm jwsAlgorithm) {
-        final String kid = null, x5u = null, x5t = null;
-        final List<Base64> x5c = null;
-        return new RsaJWK(rsaPublicKey, KeyUse.SIG, jwsAlgorithm.name(), kid, x5u, x5t, x5c);
+        return new RsaJWK(rsaPublicKey, KeyUse.SIG, jwsAlgorithm.name(), null, null, null, null);
     }
 }
