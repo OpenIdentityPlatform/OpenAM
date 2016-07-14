@@ -74,9 +74,9 @@ public class CoreRestAuthenticationGuiceModule extends AbstractModule {
         org.forgerock.http.routing.Router authenticateVersionRouter = new org.forgerock.http.routing.Router();
         Handler authenticateHandlerV1 = Endpoints.from(AuthenticationServiceV1.class);
         Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
-        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)),
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 2)),
                 authenticateHandlerV1);
-        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)),
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2, 1)),
                 authenticateHandlerV2);
         return chainOf(authenticateVersionRouter, httpAuditFactory.createFilter(AUTHENTICATION));
     }

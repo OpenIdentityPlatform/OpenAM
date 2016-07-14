@@ -11,12 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
+
+import javax.inject.Inject;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.SignatureException;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -25,17 +31,13 @@ import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import java.security.SignatureException;
-import javax.inject.Inject;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.JwsSigningException;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.rest.authn.core.AuthIndexType;
 import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
 import org.forgerock.openam.core.rest.authn.core.LoginAuthenticator;
@@ -60,6 +62,7 @@ public class RestAuthenticationHandler {
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private final AuthIdHelper authIdHelper;
+    private final CoreWrapper coreWrapper;
     private final RedirectUrlValidator<String> urlValidator =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
@@ -70,15 +73,18 @@ public class RestAuthenticationHandler {
      * @param restAuthCallbackHandlerManager An instance of the RestAuthCallbackHandlerManager.
      * @param amAuthErrorCodeResponseStatusMapping An instance of the AMAuthErrorCodeResponseStatusMapping.
      * @param authIdHelper An instance of the AuthIdHelper.
+     * @param coreWrapper An instance of the CoreWrapper.
      */
     @Inject
     public RestAuthenticationHandler(LoginAuthenticator loginAuthenticator,
             RestAuthCallbackHandlerManager restAuthCallbackHandlerManager,
-            AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping, AuthIdHelper authIdHelper) {
+            AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping, AuthIdHelper authIdHelper,
+            CoreWrapper coreWrapper) {
         this.loginAuthenticator = loginAuthenticator;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
         this.amAuthErrorCodeResponseStatusMapping = amAuthErrorCodeResponseStatusMapping;
         this.authIdHelper = authIdHelper;
+        this.coreWrapper = coreWrapper;
     }
 
     /**
@@ -285,6 +291,7 @@ public class RestAuthenticationHandler {
                             loginProcess.getSuccessURL());
 
                     jsonResponseObject.put("successUrl", gotoUrl);
+                    jsonResponseObject.put("realm", coreWrapper.convertOrgNameToRealmName(loginProcess.getOrgDN()));
 
                     return jsonResponseObject.build();
 

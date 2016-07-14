@@ -73,7 +73,7 @@ define([
         ));
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
             data: "",
             url: urlAndParams,
             errorsHandlers: {
@@ -144,7 +144,7 @@ define([
         ));
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
             data: JSON.stringify(requirements),
             url: urlAndParams,
             errorsHandlers: {

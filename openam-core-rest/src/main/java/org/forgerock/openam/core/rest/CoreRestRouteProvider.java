@@ -144,9 +144,9 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
     public void addServiceRoutes(ServiceRouter rootRouter, ServiceRouter realmRouter) {
         realmRouter.route("authenticate")
                 .auditAs(AUTHENTICATION)
-                .forVersion(1, 1)
+                .forVersion(1, 2)
                 .toService(EQUALS, AuthenticationServiceV1.class)
-                .forVersion(2)
+                .forVersion(2, 1)
                 .toService(EQUALS, AuthenticationServiceV2.class);
     }
 }
