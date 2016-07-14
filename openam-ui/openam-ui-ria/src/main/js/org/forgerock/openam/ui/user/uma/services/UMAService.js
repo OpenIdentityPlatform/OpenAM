@@ -102,16 +102,6 @@ define([
                 return _.find(data.result, { _id: id });
             });
         },
-        getByName (name) {
-            return obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
-                    encodeURIComponent(Configuration.loggedUser.get("username"))
-                    }/oauth2/resources/labels?_queryFilter=true`),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).then(function (data) {
-                data = !_.any(data.result, function (label) { return label.name.toLowerCase() === name; });
-            });
-        },
         remove (id) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
