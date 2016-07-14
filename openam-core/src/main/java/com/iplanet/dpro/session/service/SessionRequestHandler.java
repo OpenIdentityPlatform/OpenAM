@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
@@ -69,24 +68,41 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
+/**
+ * Responsible for processing a PLL request and routing it to the appropriate handler which will respond to the caller
+ * the results of the operation.
+ *
+ * The operations available from this handler split into two broad categories:
+ *
+ * In the first group, the request is targeting either all LOCAL sessions or a single local session identified by another
+ * request parameter. The session ID in this case is only used to authenticate the operation. That session is not
+ * expected to be local to this server (although it might). These operations are:
+ * <ul>
+ *   <li>GetValidSessions</li>
+ *   <li>GetSessionCount</li>
+ * </ul>
+ *
+ * In the second group, the request is targeting a single session identified by a session ID, which is supposed to be
+ * hosted by this server instance. The session ID is used both as an id for the target session and to authenticate the
+ * operation (i.e. operations are performed on the callers own session). The operations in this group are:
+ * <ul>
+ *   <li>GetSession</li>
+ *   <li>Logout</li>
+ *   <li>AddSessionListener</li>
+ *   <li>SetProperty</li>
+ *   <li>DestroySession</li>
+ * </ul>
+ */
 public class SessionRequestHandler implements RequestHandler {
 
     private final SessionService sessionService;
     private final Debug sessionDebug;
     private final SessionServerConfig serverConfig;
-    private final SessionServiceConfig serviceConfig;
     private final StatelessSessionFactory statelessSessionFactory;
 
-    /*
-     * Added this property to block registration of the global notification
-     * listener (AddListenerOnAllSessions);
-     */
-    private static Boolean enableAddListenerOnAllSessions = null;
     private SSOToken clientToken = null;
 
     private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
-    private static final SessionCookies sessionCookies
-            = InjectorHolder.getInstance(SessionCookies.class);
     private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
     private static final SessionPLLSender sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
 
@@ -94,7 +110,6 @@ public class SessionRequestHandler implements RequestHandler {
         sessionService = InjectorHolder.getInstance(SessionService.class);
         sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
         serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
-        serviceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
         statelessSessionFactory = InjectorHolder.getInstance(StatelessSessionFactory.class);
     }
 
@@ -118,6 +133,7 @@ public class SessionRequestHandler implements RequestHandler {
         return sessionCache.getSession(sessionID);
     }
 
+    @Override
     public ResponseSet process(PLLAuditor auditor,
                                List<Request> requests,
                                HttpServletRequest servletRequest,
@@ -127,7 +143,7 @@ public class SessionRequestHandler implements RequestHandler {
 
         auditor.setComponent(SESSION);
         for (Request req : requests) {
-            Response res = processRequest(auditor, req, servletRequest, servletResponse);
+            Response res = processRequest(auditor, req, servletRequest);
             rset.addResponse(res);
         }
 
@@ -137,8 +153,7 @@ public class SessionRequestHandler implements RequestHandler {
     private Response processRequest(
             final PLLAuditor auditor,
             final Request req,
-            final HttpServletRequest servletRequest,
-            final HttpServletResponse servletResponse) {
+            final HttpServletRequest servletRequest) {
 
         final SessionRequest sreq = SessionRequest.parseXML(req.getContent());
         auditor.setMethod(sreq.getMethodName());
@@ -150,7 +165,7 @@ public class SessionRequestHandler implements RequestHandler {
             context = SessionUtils.getClientAddress(servletRequest);
             this.clientToken = null;
         } catch (Exception ex) {
-            sessionDebug.error("SessionRequestHandler encounterd exception", ex);
+            sessionDebug.error("SessionRequestHandler encountered exception", ex);
             sres.setException(ex.getMessage());
             return auditedExceptionResponse(auditor, sres);
         }
@@ -187,11 +202,21 @@ public class SessionRequestHandler implements RequestHandler {
             sres = (SessionResponse) RestrictedTokenContext.doUsing(context,
                     new RestrictedTokenAction() {
                         public Object run() throws Exception {
-                            return processSessionRequest(auditor, sreq, servletRequest, servletResponse);
+                            try {
+                                return processSessionRequest(auditor, sreq);
+                            } catch (ForwardSessionRequestException fsre) {
+                                return fsre.getResponse(); // This request needs to be forwarded to another server.
+                            } catch (SessionException se) {
+                                sessionDebug.message("processSessionRequest caught exception: {}", se.getMessage(), se);
+                                return handleException(sreq, new SessionID(sreq.getSessionID()), se.getMessage());
+                            } catch (SessionRequestException se) {
+                                sessionDebug.message("processSessionRequest caught exception: {}", se.getResponseMessage(), se);
+                                return handleException(sreq, se.getSid(), se.getResponseMessage());
+                            }
                         }
                     });
         } catch (Exception ex) {
-            sessionDebug.error("SessionRequestHandler encounterd exception", ex);
+            sessionDebug.error("SessionRequestHandler encountered exception", ex);
             sres.setException(ex.getMessage());
         }
 
@@ -210,226 +235,180 @@ public class SessionRequestHandler implements RequestHandler {
         return new Response(sres.toXMLString());
     }
 
-    private SessionResponse processSessionRequest(PLLAuditor auditor,
-                                                  SessionRequest req,
-                                                  HttpServletRequest servletRequest,
-                                                  HttpServletResponse servletResponse) {
-        SessionResponse res = new SessionResponse(req.getRequestID(), req.getMethodID());
+    private SessionResponse processSessionRequest(PLLAuditor auditor, SessionRequest req) throws SessionException,
+            SessionRequestException, ForwardSessionRequestException {
         SessionID sid = new SessionID(req.getSessionID());
+
         Session requesterSession = null;
 
         try {
-            /* common processing by groups of methods */
-            switch (req.getMethodID()) {
-            /*
-             * in this group of methods the request is targeting either all
-             * LOCAL sessions or a single local session identified by another
-             * request parameter sid in this case is only used to authenticate
-             * the operation Session pointed by sid is not expected to be local
-             * to this server (although it might)
-             */
-                case SessionRequest.GetValidSessions:
-                case SessionRequest.GetSessionCount:
-                    /*
-                     * note that the purpose of the following is just to check the
-                     * authentication of the caller (which can also be used as a
-                     * filter for the operation scope!)
-                     */
-                    requesterSession = resolveSession(sid);
-                    auditAccessAttempt(auditor, requesterSession);
-                    /*
-                     * also check that sid is not a restricted token
-                     */
-                    if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
-                        res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
-                        return res;
-                    }
-
-                    break;
-
-            /*
-             * In this group request is targeting a single session identified by
-             * sid which is supposed to be hosted by this server instance sid is
-             * used both as an id of a session and to authenticate the operation
-             * (performed on own session)
-             */
-                case SessionRequest.GetSession:
-                case SessionRequest.Logout:
-                case SessionRequest.AddSessionListener:
-                case SessionRequest.SetProperty:
-                case SessionRequest.DestroySession:
-                    if (req.getMethodID() == SessionRequest.DestroySession) {
-                        requesterSession = resolveSession(sid);
-                        auditAccessAttempt(auditor, requesterSession);
-                        /*
-                         * also check that sid is not a restricted token
-                         */
-                        if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
-                            res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
-                            return res;
-                        }
-                        sid = new SessionID(req.getDestroySessionID());
-                    } else {
-                        try {
-                            auditAccessAttempt(auditor, resolveSession(sid));
-                        } catch (SessionException ignored) {
-                            // ignore, we'll log the access attempt without session properties
-                            auditor.auditAccessAttempt();
-                        }
-                    }
-
-                    if (req.getMethodID() == SessionRequest.SetProperty) {
-                        /*
-                         * This fix is to avoid clients sneaking in to set
-                         * protected properties in server-2 or so through
-                         * server-1. Short circuit this operation without
-                         * forwarding it further.
-                         */
-                        try {
-                            SessionUtils.checkPermissionToSetProperty(
-                                    this.clientToken, req.getPropertyName(),
-                                    req.getPropertyValue());
-                        } catch (SessionException se) {
-                            if (sessionDebug.warningEnabled()) {
-                                sessionDebug.warning(
-                                        "SessionRequestHandler.processRequest:"
-                                                + "Client does not have permission to set"
-                                                + " - property key = " + req.getPropertyName()
-                                                + " : property value = " + req.getPropertyValue());
-                            }
-
-                            res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
-                            return res;
-                        }
-                    }
-
-                    // first try
-                    String hostServerID = sessionService.getCurrentHostServer(sid);
-
-                    if (!serverConfig.isLocalServer(hostServerID)) {
-                        try {
-                            return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req);
-                        } catch (SessionException se) {
-                            // attempt retry
-                            if (!sessionService.checkServerUp(hostServerID)) {
-                                // proceed with failover
-                                String retryHostServerID = sessionService.getCurrentHostServer(sid);
-                                if (retryHostServerID.equals(hostServerID)) {
-                                    throw se;
-                                } else {
-                                    // we have a shot at retrying here
-                                    // if it is remote, forward it
-                                    // otherwise treat it as a case of local
-                                    // case
-                                    if (!serverConfig.isLocalServer(retryHostServerID)) {
-                                        return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(retryHostServerID), req);
-                                    }
-                                }
-                            } else {
-                                throw se;
-                            }
-                        }
-                    }
-
-                /*
-                 * We determined that this server is the host and the
-                 * session must be found(or recovered) locally
-                 */
-
-                /*
-                 * if session is not already present locally attempt to recover session
-                 */
-                    if (!sessionService.isSessionPresent(sid)) {
-                        if (sessionService.recoverSession(sid) == null) {
-                        /*
-                         * if recovery was not successful return an exception
-                         */
-
-                        /*
-                         * !!!!! IMPORTANT !!!!! DO NOT REMOVE "sid" FROM
-                         * EXCEPTIONMESSAGE Logic kludge in legacy Agent 2.0
-                         * code will break If it can not find SID value in
-                         * the exception message returned by Session
-                         * Service. This dependency should be eventually
-                         * removed once we migrate customers to a newer
-                         * agent code base or switch to a new version of
-                         * Session Service interface
-                         */
-                            res.setException(sid + " " + SessionBundle.getString("sessionNotObtained"));
-                            return res;
-                        }
-                    }
-
-                    break;
-                default:
-                    res.setException(sid + " " + SessionBundle.getString("unknownRequestMethod"));
-                    return res;
-            }
-
-            /*
-             * request method-specific processing
-             */
-            switch (req.getMethodID()) {
-                case SessionRequest.GetSession:
-                    try {
-                        if (statelessSessionFactory.containsJwt(sid)) {
-                            // We need to validate the session before creating the sessioninfo to ensure that the
-                            // stateless session hasn't timed out yet, and hasn't  been blacklisted either.
-                            SSOTokenManager tokenManager = SSOTokenManager.getInstance();
-                            final SSOToken statelessToken = tokenManager.createSSOToken(req.getSessionID());
-                            if (!tokenManager.isValidToken(statelessToken)) {
-                                throw new SessionException(SessionBundle.getString("invalidSessionID")
-                                        + req.getSessionID());
-                            }
-                        }
-                        res.addSessionInfo(sessionService.getSessionInfo(sid, req.getResetFlag()));
-                    } catch (SSOException ssoe) {
-                        res.setException(SessionBundle.getString("invalidSessionID") + req.getSessionID());
-                    }
-                    break;
-
-                case SessionRequest.GetValidSessions:
-                    String pattern = req.getPattern();
-                    List<SessionInfo> infos = null;
-                    int status[] = { 0 };
-                    infos = sessionService.getValidSessions(requesterSession, pattern, status);
-                    res.setStatus(status[0]);
-                    res.setSessionInfo(infos);
-                    break;
-
-                case SessionRequest.DestroySession:
-                    sessionService.destroySession(requesterSession, new SessionID(req.getDestroySessionID()));
-                    break;
-
-                case SessionRequest.Logout:
-                    sessionService.logout(sid);
-                    break;
-
-                case SessionRequest.AddSessionListener:
-                    sessionService.addSessionListener(sid, req.getNotificationURL());
-                    break;
-
-                case SessionRequest.SetProperty:
-                    sessionService.setExternalProperty(this.clientToken, sid, req.getPropertyName(), req.getPropertyValue());
-                    break;
-
-                case SessionRequest.GetSessionCount:
-                    String uuid = req.getUUID();
-                    Object sessions = SessionCount.getSessionsFromLocalServer(uuid);
-
-                    if (sessions != null) {
-                        res.setSessionsForGivenUUID((Map) sessions);
-                    }
-
-                    break;
-
-                default:
-                    res.setException(sid + " " + SessionBundle.getString("unknownRequestMethod"));
-                    break;
-            }
+            requesterSession = resolveSession(sid);
+            auditAccessAttempt(auditor, requesterSession);
         } catch (SessionException se) {
-            sessionDebug.message("processSessionRequest caught exception: {}", se.getMessage(), se);
-            res.setException(sid + " " + se.getMessage());
+            // Log the access attempt without session properties, then continue.
+            auditor.auditAccessAttempt();
+        }
+
+        verifyValidRequest(req, requesterSession);
+        return processMethod(req, requesterSession);
+    }
+
+    private void verifyRequestingSessionIsNotRestrictedToken(Session requesterSession)
+            throws SessionException, SessionRequestException {
+        if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
+            throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("noPrivilege"));
+        }
+    }
+
+    private void verifyValidRequest(SessionRequest req, Session requesterSession) throws SessionException,
+            SessionRequestException, ForwardSessionRequestException {
+        SessionID targetSid = requesterSession.getSessionID();
+        if (req.getMethodID() == SessionRequest.DestroySession) {
+            if (requesterSession == null) {
+                throw new SessionException("Failed to resolve Session");
+            }
+            targetSid = new SessionID(req.getDestroySessionID());
+            verifyRequestingSessionIsNotRestrictedToken(requesterSession);
+        } else if (req.getMethodID() == SessionRequest.SetProperty) {
+            try {
+                SessionUtils.checkPermissionToSetProperty(
+                        this.clientToken, req.getPropertyName(),
+                        req.getPropertyValue());
+            } catch (SessionException se) {
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("SessionRequestHandler.processRequest: Client does not have permission to set"
+                                    + " - property key = " + req.getPropertyName()
+                                    + " : property value = " + req.getPropertyValue());
+                }
+                throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("noPrivilege"));
+            }
+        }
+
+        switch (req.getMethodID()) {
+            case SessionRequest.GetValidSessions:
+            case SessionRequest.GetSessionCount:
+                if (requesterSession == null) {
+                    throw new SessionException("Failed to resolve Session");
+                }
+                verifyRequestingSessionIsNotRestrictedToken(requesterSession);
+                break;
+
+            case SessionRequest.GetSession:
+            case SessionRequest.Logout:
+            case SessionRequest.AddSessionListener:
+            case SessionRequest.SetProperty:
+            case SessionRequest.DestroySession:
+                verifyTargetSessionIsLocal(req, targetSid);
+                break;
+            default:
+                throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
+        }
+    }
+
+    /**
+     *  Verify that this server is the correct host for the session and the session can be found(or recovered) locally.
+     *  This function will become much simpler with removal of home servers, or possibly no longer be required.
+     */
+    private void verifyTargetSessionIsLocal(SessionRequest req, SessionID sid) throws SessionException,
+            SessionRequestException, ForwardSessionRequestException {
+        String hostServerID = sessionService.getCurrentHostServer(sid);
+
+        if (!serverConfig.isLocalServer(hostServerID)) {
+            try {
+                throw new ForwardSessionRequestException(
+                        forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req));
+            } catch (SessionException se) {
+                // attempt retry
+                if (!sessionService.checkServerUp(hostServerID)) {
+                    // proceed with failover
+                    String retryHostServerID = sessionService.getCurrentHostServer(sid);
+                    if (retryHostServerID.equals(hostServerID)) {
+                        throw se;
+                    } else {
+                        // we have a shot at retrying here
+                        // if it is remote, forward it
+                        // otherwise treat it as a case of local
+                        // case
+                        if (!serverConfig.isLocalServer(retryHostServerID)) {
+                            throw new ForwardSessionRequestException(
+                                    forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req));
+                        }
+                    }
+                } else {
+                    throw se;
+                }
+            }
+        }
+
+        if (!sessionService.isSessionPresent(sid)) {
+            if (sessionService.recoverSession(sid) == null) {
+                throw new SessionRequestException(sid, SessionBundle.getString("sessionNotObtained"));
+            }
+        }
+    }
+
+    /**
+     * Request method-specific processing
+     */
+    private SessionResponse processMethod(SessionRequest req, Session requesterSession) throws SessionException {
+        SessionResponse res = new SessionResponse(req.getRequestID(), req.getMethodID());
+
+        switch (req.getMethodID()) {
+            case SessionRequest.GetSession:
+                try {
+                    if (statelessSessionFactory.containsJwt(requesterSession.getSessionID())) {
+                        // We need to validate the session before creating the sessioninfo to ensure that the
+                        // stateless session hasn't timed out yet, and hasn't  been blacklisted either.
+                        SSOTokenManager tokenManager = SSOTokenManager.getInstance();
+                        final SSOToken statelessToken = tokenManager.createSSOToken(req.getSessionID());
+                        if (!tokenManager.isValidToken(statelessToken)) {
+                            throw new SessionException(SessionBundle.getString("invalidSessionID")
+                                    + req.getSessionID());
+                        }
+                    }
+                    res.addSessionInfo(sessionService.getSessionInfo(requesterSession.getSessionID(), req.getResetFlag()));
+                } catch (SSOException ssoe) {
+                    return handleException(req, requesterSession.getSessionID(), SessionBundle.getString("invalidSessionID"));
+                }
+                break;
+
+            case SessionRequest.GetValidSessions:
+                String pattern = req.getPattern();
+                List<SessionInfo> infos = null;
+                int status[] = { 0 };
+                infos = sessionService.getValidSessions(requesterSession, pattern, status);
+                res.setStatus(status[0]);
+                res.setSessionInfo(infos);
+                break;
+
+            case SessionRequest.DestroySession:
+                sessionService.destroySession(requesterSession, new SessionID(req.getDestroySessionID()));
+                break;
+
+            case SessionRequest.Logout:
+                sessionService.logout(requesterSession.getSessionID());
+                break;
+
+            case SessionRequest.AddSessionListener:
+                sessionService.addSessionListener(requesterSession.getSessionID(), req.getNotificationURL());
+                break;
+
+            case SessionRequest.SetProperty:
+                sessionService.setExternalProperty(this.clientToken, requesterSession.getSessionID(), req.getPropertyName(), req.getPropertyValue());
+                break;
+
+            case SessionRequest.GetSessionCount:
+                String uuid = req.getUUID();
+                Object sessions = SessionCount.getSessionsFromLocalServer(uuid);
+
+                if (sessions != null) {
+                    res.setSessionsForGivenUUID((Map) sessions);
+                }
+
+                break;
+
+            default:
+                return handleException(req, requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
         }
         return res;
     }
@@ -467,4 +446,54 @@ public class SessionRequestHandler implements RequestHandler {
         }
     }
 
+    /**
+     * !!!!! IMPORTANT !!!!! DO NOT REMOVE "sid" FROM
+     * EXCEPTIONMESSAGE Logic kludge in legacy Agent 2.0
+     * code will break If it can not find SID value in
+     * the exception message returned by Session
+     * Service. This dependency should be eventually
+     * removed once we migrate customers to a newer
+     * agent code base or switch to a new version of
+     * Session Service interface
+     */
+    private SessionResponse handleException(SessionRequest req, SessionID sid, String error) {
+        SessionResponse response = new SessionResponse(req.getRequestID(), req.getMethodID());
+        response.setException(sid + " " + error);
+        return response;
+    }
+
+    private class SessionRequestException extends Exception {
+        private final SessionID sid;
+        private final String responseMessage;
+
+        public SessionRequestException(SessionID sid, String responseMessage) {
+
+            this.sid = sid;
+            this.responseMessage = responseMessage;
+        }
+
+        public SessionID getSid() {
+            return sid;
+        }
+
+        public String getResponseMessage() {
+            return responseMessage;
+        }
+    }
+
+    // This exception is not ideal, but will be removed when crosstalk is removed, and allows the code to better be
+    // refactored at this point in time.
+    private class ForwardSessionRequestException extends Exception {
+
+        private SessionResponse response;
+
+        public ForwardSessionRequestException(SessionResponse response) {
+
+            this.response = response;
+        }
+
+        public SessionResponse getResponse() {
+            return response;
+        }
+    }
 }
