@@ -17,6 +17,11 @@
 package org.forgerock.openam.core.rest.devices.push;
 
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PUSH_DEVICES_RESOURCE;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
@@ -26,11 +31,27 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.rest.devices.TwoFADevicesResource;
 import org.forgerock.openam.core.rest.devices.UserDevicesResource;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
@@ -47,6 +68,21 @@ import org.forgerock.util.promise.Promise;
  * @since 13.5.0
  * @see UserDevicesResource
  */
+@CollectionProvider(
+        details = @Handler(
+                title = PUSH_DEVICES_RESOURCE + TITLE,
+                description = PUSH_DEVICES_RESOURCE + DESCRIPTION,
+                mvccSupported = true,
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = PUSH_DEVICES_RESOURCE + "pathparams.user")},
+                resourceSchema = @Schema(schemaResource = "PushDevicesResource.schema.json")),
+        pathParam = @Parameter(
+                name = "uuid",
+                type = "string",
+                description = PUSH_DEVICES_RESOURCE + "pathParam." + DESCRIPTION))
 public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
 
     private final AuthenticatorDeviceServiceFactory<AuthenticatorPushService> pushServiceFactory;
@@ -79,6 +115,15 @@ public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
      * { "result" : true }
      */
     @Override
+    @Action(name = "resetPushDevice",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 500,
+                                    description = PUSH_DEVICES_RESOURCE + "error.unexpected.server.error.description")},
+                    description = PUSH_DEVICES_RESOURCE + QUERY_DESCRIPTION),
+            request = @Schema(),
+            response = @Schema(schemaResource = "PushDevicesResource.action.validate.schema.json"))
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         try {
@@ -108,4 +153,32 @@ public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
             return new InternalServerErrorException().asPromise();
         }
     }
+
+    @Override
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = PUSH_DEVICES_RESOURCE + "error.unexpected.server.error.description")},
+            description = PUSH_DEVICES_RESOURCE + DELETE_DESCRIPTION))
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
+                                                                       DeleteRequest request) {
+        return super.deleteInstance(context, resourceId, request);
+    }
+
+    @Override
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = PUSH_DEVICES_RESOURCE + "error.unexpected.server.error.description")},
+            description = PUSH_DEVICES_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
+                                                                     QueryResourceHandler handler) {
+        return super.queryCollection(context, request, handler);
+    }
+
 }

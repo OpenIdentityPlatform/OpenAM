@@ -18,7 +18,12 @@ package org.forgerock.openam.core.rest.devices.oath;
 
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.OATH_DEVICES_RESOURCE;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -28,11 +33,26 @@ import com.sun.identity.sm.SMSException;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Actions;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.rest.devices.TwoFADevicesResource;
@@ -51,6 +71,21 @@ import org.forgerock.util.promise.Promise;
  * @since 13.0.0
  * @see UserDevicesResource
  */
+@CollectionProvider(
+        details = @Handler(
+                title = OATH_DEVICES_RESOURCE + TITLE,
+                description = OATH_DEVICES_RESOURCE + DESCRIPTION,
+                mvccSupported = true,
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = OATH_DEVICES_RESOURCE + "pathparams.user")},
+                resourceSchema = @Schema(schemaResource = "OathDevicesResource.schema.json")),
+        pathParam = @Parameter(
+                name = "uuid",
+                type = "string",
+                description = OATH_DEVICES_RESOURCE + "pathParam." + DESCRIPTION))
 public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
     private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory;
@@ -75,6 +110,37 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
     }
 
     @Override
+    @Actions({
+            @Action(name = "skipOathDevice",
+                    operationDescription = @Operation(
+                            errors = {
+                                    @ApiError(
+                                            code = 500,
+                                            description = OATH_DEVICES_RESOURCE + "error.unexpected.server.error." +
+                                                    "description")},
+                            description = OATH_DEVICES_RESOURCE + "action.skipOathDevice." + DESCRIPTION),
+                    request = @Schema(schemaResource = "OathDevicesResource.action.skip.request.schema.json"),
+                    response = @Schema(schemaResource = "OathDevicesResource.action.skip.response.schema.json")),
+            @Action(name = "checkOathDevice",
+                    operationDescription = @Operation(
+                            errors = {
+                                    @ApiError(
+                                            code = 500,
+                                            description = OATH_DEVICES_RESOURCE + "error.unexpected.server.error." +
+                                                    "description")},
+                            description = OATH_DEVICES_RESOURCE + "action.checkOathDevice." + DESCRIPTION),
+                    request = @Schema(schemaResource = "OathDevicesResource.action.check.request.schema.json"),
+                    response = @Schema(schemaResource = "OathDevicesResource.action.check.response.schema.json")),
+            @Action(name = "resetOathDevice",
+                    operationDescription = @Operation(
+                            errors = {
+                                    @ApiError(
+                                            code = 500,
+                                            description = OATH_DEVICES_RESOURCE + "error.unexpected.server.error." +
+                                                    "description")},
+                            description = OATH_DEVICES_RESOURCE + "action.resetOathDevice." + DESCRIPTION),
+                    request = @Schema(schemaResource = "OathDevicesResource.action.reset.request.schema.json"),
+                    response = @Schema(schemaResource = "OathDevicesResource.action.reset.response.schema.json"))})
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         try {
@@ -140,6 +206,12 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
     }
 
     @Override
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = OATH_DEVICES_RESOURCE + "error.unexpected.server.error.description")},
+            description = OATH_DEVICES_RESOURCE + DELETE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
@@ -157,6 +229,21 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
             debug.error("OathDevicesResource :: Delete - Unable to reset identity attributes", e);
             return new InternalServerErrorException().asPromise();
         }
+    }
+
+    @Override
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = OATH_DEVICES_RESOURCE + "error.unexpected.server.error.description")},
+            description = OATH_DEVICES_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
+                                                                     QueryResourceHandler handler) {
+        return super.queryCollection(context, request, handler);
     }
 
 }

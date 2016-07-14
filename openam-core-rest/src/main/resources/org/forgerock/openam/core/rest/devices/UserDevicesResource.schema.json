@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/UserDevicesResource#schema.title",
+  "description": "i18n:api-descriptor/UserDevicesResource#schema.description",
+  "properties": {
+    "lastSelectedDate": {
+      "type": "string",
+      "title": "i18n:api-descriptor/UserDevicesResource#schema.lastSelectedDate.title",
+      "description": "i18n:api-descriptor/UserDevicesResource#schema.lastSelectedDate.description"
+    },
+    "devicePrint": {
+      "type": "object",
+      "title": "i18n:api-descriptor/UserDevicesResource#schema.devicePrint.title",
+      "description": "i18n:api-descriptor/UserDevicesResource#schema.devicePrint.description",
+      "properties": {
+        "screen": {
+          "type": "object",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.screen.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.screen.description",
+          "properties": {
+            "screenWidth": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.screenWidth.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.screenWidth.description"
+            },
+            "screenHeight": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.screenHeight.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.screenHeight.description"
+            },
+            "screenColourDepth": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.screenColourDepth.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.screenColourDepth.description"
+            }
+          }
+        },
+        "timezone": {
+          "type": "object",
+          "properties": {
+            "timezone": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.timezone.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.timezone.description"
+            }
+          }
+        },
+        "plugins": {
+          "type": "object",
+          "properties": {
+            "installedPlugins": {
+              "type": "string",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.installedPlugins.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.installedPlugins.description"
+            }
+          }
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "installedFonts": {
+              "type": "string",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.installedFonts.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.installedFonts.description"
+            }
+          }
+        },
+        "userAgent": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.userAgent.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.userAgent.description"
+        },
+        "appName": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.appName.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.appName.description"
+        },
+        "appCodeName": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.appCodeName.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.appCodeName.description"
+        },
+        "appVersion": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.appVersion.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.appVersion.description"
+        },
+        "buildID": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.buildID.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.buildID.description"
+        },
+        "platform": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.platform.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.platform.description"
+        },
+        "oscpu": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.oscpu.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.oscpu.description"
+        },
+        "product": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.product.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.product.description"
+        },
+        "productSub": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.productSub.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.productSub.description"
+        },
+        "language": {
+          "type": "string",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.language.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.language.description"
+        },
+        "geolocation": {
+          "type": "object",
+          "title": "i18n:api-descriptor/UserDevicesResource#schema.geolocation.title",
+          "description": "i18n:api-descriptor/UserDevicesResource#schema.geolocation.description",
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.longitude.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.longitude.description"
+            },
+            "latitude": {
+              "type": "number",
+              "title": "i18n:api-descriptor/UserDevicesResource#schema.latitude.title",
+              "description": "i18n:api-descriptor/UserDevicesResource#schema.latitude.description"
+            }
+          }
+        }
+      }
+    },
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/UserDevicesResource#schema.name.title",
+      "description": "i18n:api-descriptor/UserDevicesResource#schema.name.description"
+    },
+    "selectionCounter": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/UserDevicesResource#schema.selectionCounter.title",
+      "description": "i18n:api-descriptor/UserDevicesResource#schema.selectionCounter.description"
+    },
+    "uuid": {
+      "type": "string",
+      "title": "i18n:api-descriptor/UserDevicesResource#schema.uuid.title",
+      "description": "i18n:api-descriptor/UserDevicesResource#schema.uuid.description"
+    }
+  }
+}

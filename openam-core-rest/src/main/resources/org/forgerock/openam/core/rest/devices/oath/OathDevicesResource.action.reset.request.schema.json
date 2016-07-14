@@ -1,0 +1,5 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/OathDevicesResource#action.reset.request.schema.title",
+  "description": "i18n:api-descriptor/OathDevicesResource#action.reset.request.schema.description"
+}

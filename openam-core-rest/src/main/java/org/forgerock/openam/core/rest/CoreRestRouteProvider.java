@@ -61,7 +61,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("dashboard")
                 .auditAs(DASHBOARD)
-                .toCollection(DashboardResource.class);
+                .toAnnotatedCollection(DashboardResource.class);
 
         realmRouter.route("serverinfo")
                 .authenticateWith(ssoToken().exceptRead())
@@ -129,7 +129,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("tokens")
                 .auditAs(CTS)
                 .authorizeWith(CoreTokenResourceAuthzModule.class)
-                .toCollection(CoreTokenResource.class);
+                .toAnnotatedCollection(CoreTokenResource.class);
 
         rootRouter.route(RecordConstants.RECORD_REST_ENDPOINT)
                 .auditAs(RECORD)

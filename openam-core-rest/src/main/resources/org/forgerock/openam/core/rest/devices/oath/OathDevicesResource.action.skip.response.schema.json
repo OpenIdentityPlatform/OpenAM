@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/OathDevicesResource#action.skip.response.schema.title",
+  "description": "i18n:api-descriptor/OathDevicesResource#action.skip.response.schema.description",
+    "additionalProperties": {
+      "type": "object"
+    }
+}

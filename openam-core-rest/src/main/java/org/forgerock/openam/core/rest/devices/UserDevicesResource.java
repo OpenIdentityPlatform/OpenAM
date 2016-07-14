@@ -18,12 +18,19 @@ package org.forgerock.openam.core.rest.devices;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.USER_DEVICES_RESOURCE;
 
 import java.text.ParseException;
 import java.util.List;
 
-import org.forgerock.services.context.Context;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -31,7 +38,6 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -41,7 +47,9 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmAwareResource;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -65,31 +73,6 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     public UserDevicesResource(T userDevicesDao, ContextHelper contextHelper) {
         this.userDevicesDao = userDevicesDao;
         this.contextHelper = contextHelper;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
     }
 
     /**
@@ -130,15 +113,6 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         try {
@@ -157,22 +131,33 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
 
     protected abstract ResourceResponse convertValue(JsonValue queryResult) throws ParseException;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
-            ReadRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
-            UpdateRequest request) {
-        return new NotSupportedException("Not supported.").asPromise();
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String s, ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
+    @Override
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest createRequest) {
+        return RestUtils.generateUnsupportedOperation();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String s, PatchRequest patchRequest) {
+        return RestUtils.generateUnsupportedOperation();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String s, ReadRequest readRequest) {
+        return RestUtils.generateUnsupportedOperation();
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String s, UpdateRequest updateRequest) {
+        return RestUtils.generateUnsupportedOperation();
+    }
 }

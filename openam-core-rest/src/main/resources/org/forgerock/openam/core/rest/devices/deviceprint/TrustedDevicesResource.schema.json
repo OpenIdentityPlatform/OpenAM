@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/TrustedDevicesResource#schema.title",
+  "description": "i18n:api-descriptor/TrustedDevicesResource#schema.description",
+  "properties": {
+    "lastSelectedDate": {
+      "type": "string",
+      "title": "i18n:api-descriptor/TrustedDevicesResource#schema.lastSelectedDate.title",
+      "description": "i18n:api-descriptor/TrustedDevicesResource#schema.lastSelectedDate.description"
+    },
+    "devicePrint": {
+      "type": "object",
+      "title": "i18n:api-descriptor/TrustedDevicesResource#schema.devicePrint.title",
+      "description": "i18n:api-descriptor/TrustedDevicesResource#schema.devicePrint.description",
+      "properties": {
+        "screen": {
+          "type": "object",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.screen.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.screen.description",
+          "properties": {
+            "screenWidth": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.screenWidth.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.screenWidth.description"
+            },
+            "screenHeight": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.screenHeight.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.screenHeight.description"
+            },
+            "screenColourDepth": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.screenColourDepth.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.screenColourDepth.description"
+            }
+          }
+        },
+        "timezone": {
+          "type": "object",
+          "properties": {
+            "timezone": {
+              "type": "integer",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.timezone.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.timezone.description"
+            }
+          }
+        },
+        "plugins": {
+          "type": "object",
+          "properties": {
+            "installedPlugins": {
+              "type": "string",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.installedPlugins.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.installedPlugins.description"
+            }
+          }
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "installedFonts": {
+              "type": "string",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.installedFonts.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.installedFonts.description"
+            }
+          }
+        },
+        "userAgent": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.userAgent.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.userAgent.description"
+        },
+        "appName": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.appName.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.appName.description"
+        },
+        "appCodeName": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.appCodeName.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.appCodeName.description"
+        },
+        "appVersion": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.appVersion.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.appVersion.description"
+        },
+        "buildID": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.buildID.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.buildID.description"
+        },
+        "platform": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.platform.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.platform.description"
+        },
+        "oscpu": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.oscpu.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.oscpu.description"
+        },
+        "product": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.product.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.product.description"
+        },
+        "productSub": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.productSub.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.productSub.description"
+        },
+        "language": {
+          "type": "string",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.language.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.language.description"
+        },
+        "geolocation": {
+          "type": "object",
+          "title": "i18n:api-descriptor/TrustedDevicesResource#schema.geolocation.title",
+          "description": "i18n:api-descriptor/TrustedDevicesResource#schema.geolocation.description",
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.longitude.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.longitude.description"
+            },
+            "latitude": {
+              "type": "number",
+              "title": "i18n:api-descriptor/TrustedDevicesResource#schema.latitude.title",
+              "description": "i18n:api-descriptor/TrustedDevicesResource#schema.latitude.description"
+            }
+          }
+        }
+      }
+    },
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/TrustedDevicesResource#schema.name.title",
+      "description": "i18n:api-descriptor/TrustedDevicesResource#schema.name.description"
+    },
+    "selectionCounter": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/TrustedDevicesResource#schema.selectionCounter.title",
+      "description": "i18n:api-descriptor/TrustedDevicesResource#schema.selectionCounter.description"
+    },
+    "uuid": {
+      "type": "string",
+      "title": "i18n:api-descriptor/TrustedDevicesResource#schema.uuid.title",
+      "description": "i18n:api-descriptor/TrustedDevicesResource#schema.uuid.description"
+    }
+  }
+}

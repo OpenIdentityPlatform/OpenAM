@@ -94,6 +94,24 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String UMA_LABEL_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaLabelResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String DASHBOARD_RESOURCE = TRANSLATION_KEY_PREFIX + "DashboardResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String CORE_TOKEN_RESOURCE = TRANSLATION_KEY_PREFIX + "CoreTokenResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String USER_DEVICES_RESOURCE = TRANSLATION_KEY_PREFIX + "UserDevicesResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String TRUSTED_DEVICES_RESOURCE = TRANSLATION_KEY_PREFIX + "TrustedDevicesResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String PUSH_DEVICES_RESOURCE = TRANSLATION_KEY_PREFIX + "PushDevicesResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String OATH_DEVICES_RESOURCE = TRANSLATION_KEY_PREFIX + "OathDevicesResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/OathDevicesResource#action.skip.request.schema.title",
+  "description": "i18n:api-descriptor/OathDevicesResource#action.skip.request.schema.description",
+  "properties": {
+    "value": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/OathDevicesResource#action.skip.request.schema.value.title",
+      "description": "i18n:api-descriptor/OathDevicesResource#action.skip.request.schema.value.description"
+    }
+  },
+  "required": [
+      "value"
+  ]
+}

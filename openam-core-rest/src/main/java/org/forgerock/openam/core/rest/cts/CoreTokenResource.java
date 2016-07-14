@@ -16,28 +16,36 @@
 package org.forgerock.openam.core.rest.cts;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CORE_TOKEN_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
@@ -46,10 +54,12 @@ import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * CoreTokenResource is responsible for exposing the functions of the CoreTokenService via a REST
@@ -59,7 +69,18 @@ import org.forgerock.util.promise.Promise;
  * Token ID values. This ensures that the REST interface has the same feel as the API.
  *
  */
-public class CoreTokenResource implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = CORE_TOKEN_RESOURCE + TITLE,
+                description = CORE_TOKEN_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(fromType = Token.class),
+                mvccSupported = false,
+                parameters = {
+                        @Parameter(
+                                name = "tokenId",
+                                type = "string",
+                                description = CORE_TOKEN_RESOURCE + "pathParam." + DESCRIPTION)}))
+public class CoreTokenResource {
     public static final String DEBUG_HEADER = "CoreTokenResource :: ";
     // Injected
     private final JSONSerialisation serialisation;
@@ -92,6 +113,15 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param serverContext Required context.
      * @param createRequest Contains the serialised JSON value of the Token.
      */
+    @Create(operationDescription = @Operation(
+        errors = {
+            @ApiError(
+                code = 400,
+                description = CORE_TOKEN_RESOURCE + "error.unexpected.bad.request." + DESCRIPTION),
+            @ApiError(
+                code = 500,
+                description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+        description = CORE_TOKEN_RESOURCE + CREATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
@@ -126,6 +156,12 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param tokenId The TokenID of the token to delete.
      * @param deleteRequest Not used.
      */
+    @Delete(operationDescription = @Operation(
+        errors = {
+                @ApiError(
+                        code = 500,
+                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+        description = CORE_TOKEN_RESOURCE + DELETE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String tokenId,
             DeleteRequest deleteRequest) {
 
@@ -159,6 +195,12 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param tokenId The TokenID of the Token to read.
      * @param readRequest Not used.
      */
+    @Read(operationDescription = @Operation(
+        errors = {
+                @ApiError(
+                        code = 500,
+                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+            description = CORE_TOKEN_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String tokenId,
             ReadRequest readRequest) {
 
@@ -192,6 +234,12 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param tokenId The tokenId to update. This must be the same TokenId as the serialised Token.
      * @param updateRequest Contains the JSON serialised Token to update.
      */
+    @Update(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+            description = CORE_TOKEN_RESOURCE + UPDATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String tokenId,
             UpdateRequest updateRequest) {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
@@ -216,16 +264,6 @@ public class CoreTokenResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * This function is planned, however how to define the query attributes will be the question to answer.
-     */
-    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
-            QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
      * Hand generic errors which are non-recoverable.
      *
      * @param e Error to be handled.
@@ -242,36 +280,6 @@ public class CoreTokenResource implements CollectionResourceProvider {
      */
     private ResourceException generateNotFoundException(String tokenId) {
         return new NotFoundException("Token " + tokenId + " not found");
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Not supported.
-     */
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
-            PatchRequest patchRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Not supported.
-     */
-    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
-            ActionRequest actionRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Not supported.
-     */
-    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
-            ActionRequest actionRequest) {
-        return RestUtils.generateUnsupportedOperation();
     }
 
     private void debug(String format, Object... args) {

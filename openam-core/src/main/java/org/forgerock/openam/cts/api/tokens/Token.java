@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,12 +15,9 @@
  */
 package org.forgerock.openam.cts.api.tokens;
 
-import com.sun.identity.shared.encode.Base64;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.opendj.ldap.GeneralizedTime;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CORE_TOKEN_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -32,6 +29,16 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
+import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.opendj.ldap.GeneralizedTime;
+
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * A simple domain value responsible for modelling a Core Token Service Token. This container is intended
@@ -47,6 +54,8 @@ import java.util.Set;
  *
  * @author robert.wapshott@forgerock.com
  */
+@Title(CORE_TOKEN_RESOURCE + "resource.schema." + TITLE)
+@Description(CORE_TOKEN_RESOURCE + "resource.schema." + DESCRIPTION)
 public class Token {
 
     /**
@@ -54,6 +63,8 @@ public class Token {
      * rather than a CoreTokenField based key because this works better with Jackson based JSON
      * serialisation.
      */
+    @Title(CORE_TOKEN_RESOURCE + "resource.schema.property.attributes." + TITLE)
+    @Description(CORE_TOKEN_RESOURCE + "resource.schema.property.attributes." + DESCRIPTION)
     private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
     /**
