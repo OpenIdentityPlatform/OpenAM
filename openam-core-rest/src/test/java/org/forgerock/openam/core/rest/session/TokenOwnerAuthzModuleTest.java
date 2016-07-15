@@ -48,6 +48,7 @@ import org.testng.annotations.Test;
 
 public class TokenOwnerAuthzModuleTest {
 
+    public static final String EMPTY_RESOURCE_PATH = "";
     private TokenOwnerAuthzModule testModule;
     SessionService mockService;
     SSOTokenManager mockTokenManager;
@@ -71,8 +72,26 @@ public class TokenOwnerAuthzModuleTest {
             ExecutionException, InterruptedException, BadRequestException {
 
         //given
-        ActionRequest request = Requests.newActionRequest("resource", "deleteProperty");
+        ActionRequest request = Requests.newActionRequest("", "deleteProperty");
         request.setAdditionalParameter("tokenId", "token");
+
+        given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
+
+        //when
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
+
+        //then
+        assertThat(result).succeeded();
+        assertTrue(result.get().isAuthorized());
+    }
+
+
+    @Test
+    public void shouldAllowValidPathParamToken() throws SSOException,
+            ExecutionException, InterruptedException, BadRequestException {
+
+        //given
+        ActionRequest request = Requests.newActionRequest("token", "deleteProperty");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
 
@@ -89,8 +108,27 @@ public class TokenOwnerAuthzModuleTest {
             ExecutionException, InterruptedException, BadRequestException {
 
         //given
-        ActionRequest request = Requests.newActionRequest("resource", "deleteProperty");
+        ActionRequest request = Requests.newActionRequest(EMPTY_RESOURCE_PATH, "deleteProperty");
         request.setAdditionalParameter("tokenId", "token");
+
+        given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
+        given(mockService.isSuperUser(eq("john"))).willReturn(false);
+        Context otherContext = setupUser("john");
+        setupUser("universal_id");
+
+        //when
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(otherContext, request);
+
+        //then
+        assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void shouldFailDifferentOwnerPathParamToken() throws SSOException,
+            ExecutionException, InterruptedException, BadRequestException {
+
+        //given
+        ActionRequest request = Requests.newActionRequest("token", "deleteProperty");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
         given(mockService.isSuperUser(eq("john"))).willReturn(false);
@@ -109,8 +147,25 @@ public class TokenOwnerAuthzModuleTest {
             ExecutionException, InterruptedException, BadRequestException {
 
         //given
-        ActionRequest request = Requests.newActionRequest("resource", "deleteProperty");
+        ActionRequest request = Requests.newActionRequest("", "deleteProperty");
         request.setAdditionalParameter("tokenId", "token");
+
+        given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
+        given(mockTokenManager.createSSOToken(eq("token"))).willThrow(new SSOException(""));
+
+        //when
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
+
+        //then
+        assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void shouldFailInvalidPathParamToken() throws SSOException,
+            ExecutionException, InterruptedException, BadRequestException {
+
+        //given
+        ActionRequest request = Requests.newActionRequest("token", "deleteProperty");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
         given(mockTokenManager.createSSOToken(eq("token"))).willThrow(new SSOException(""));

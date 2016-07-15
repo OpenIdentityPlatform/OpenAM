@@ -41,6 +41,7 @@ import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResource;
 import org.forgerock.openam.http.authz.HttpContextFilter;
 import org.forgerock.openam.http.authz.HttpPrivilegeAuthzModule;
+import org.forgerock.openam.core.rest.session.SessionResourceV2;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
@@ -124,7 +125,10 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(SESSION)
                 .authorizeWith(AnyOfAuthzModule.class)
                 .forVersion(1, 2)
-                .toCollection(SessionResource.class);
+                .toCollection(SessionResource.class)
+                .forVersion(2, 0)
+                .toCollection(SessionResourceV2.class);
+
 
         rootRouter.route("tokens")
                 .auditAs(CTS)

@@ -31,6 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
 
+import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
@@ -41,6 +42,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +86,9 @@ public class SessionResourceTest {
     private SessionResource sessionResource;
     private SSOTokenManager ssoTokenManager;
     private AuthUtilsWrapper authUtilsWrapper;
+    private SessionResourceUtil sessionResourceUtil;
     private SessionPropertyWhitelist propertyWhitelist;
+    private WebtopNamingQuery webtopNamingQuery;
     private RealmContext realmContext;
 
     private AMIdentity amIdentity;
@@ -93,12 +97,15 @@ public class SessionResourceTest {
     private String urlResponse;
     private String cookieResponse;
 
+
+
     @BeforeMethod
-    public void setUp() throws IdRepoException, SSOException {
+    public void setUp() throws Exception {
         SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
         propertyWhitelist = mock(SessionPropertyWhitelist.class);
+        webtopNamingQuery = mock(WebtopNamingQuery.class);
         headerResponse = null;
         urlResponse = null;
         cookieResponse = null;
@@ -110,17 +117,30 @@ public class SessionResourceTest {
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         configureWhitelist();
-        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper,
-                propertyWhitelist) {
+
+        String badger = "badger";
+        String weasel = "weasel";
+        final List<String> list = Arrays.asList(badger, weasel);
+        given(webtopNamingQuery.getAllServerIDs()).willReturn(list);
+
+        sessionResourceUtil = spy(new SessionResourceUtil(ssoTokenManager, sessionQueryManager, webtopNamingQuery) {
+
             @Override
-            AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
+            public Collection<String> getAllServerIds() {return list; }
+
+            @Override
+            public AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
                 return amIdentity;
             }
 
             @Override
-            String convertDNToRealm(String dn) {
-                return "/";
+            public String convertDNToRealm(String dn) {
+                return "/example/com";
             }
+        });
+
+        sessionResource = new SessionResource(ssoTokenManager, authUtilsWrapper,
+                propertyWhitelist, sessionResourceUtil) {
 
             @Override
             protected String getTokenIdFromHeader(Context context, String cookieName) {
@@ -136,6 +156,7 @@ public class SessionResourceTest {
             protected String getTokenIdFromCookie(Context context, String cookieName) {
                 return cookieResponse;
             }
+
         };
     }
 
@@ -159,9 +180,11 @@ public class SessionResourceTest {
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
+        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
         List<String> list = Arrays.asList(badger, weasel);
-        doReturn(list).when(resource).getAllServerIds();
+        doReturn(list).when(sessionResourceUtil).getAllServerIds();
+        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
+
 
         // When
         resource.queryCollection(null, request, handler);
@@ -181,13 +204,15 @@ public class SessionResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(badger);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
+
+        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
+        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
 
         // When
         resource.queryCollection(null, request, mockHandler);
 
         // Then
-        verify(resource, times(0)).getAllServerIds();
+        verify(sessionResourceUtil, times(0)).getAllServerIds();
 
         List<String> result = Collections.singletonList(badger);
         verify(mockManager, times(1)).getAllSessions(result);
@@ -225,6 +250,7 @@ public class SessionResourceTest {
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
         given(ssoTokenManager.createSSOToken(ssoTokenId.toString())).willReturn(ssoToken);
+        given(sessionResourceUtil.convertDNToRealm(anyString())).willReturn("/");
 
         //When
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionCollection(context, request);
@@ -275,7 +301,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException, IdRepoException {
         //Given
         final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
@@ -283,11 +309,14 @@ public class SessionResourceTest {
         final SSOToken ssoToken = mock(SSOToken.class);
         final Principal principal = mock(Principal.class);
 
+
         given(request.getAction()).willReturn(VALIDATE_ACTION_ID);
         given(ssoTokenManager.createSSOToken("SSO_TOKEN_ID")).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn("PRINCIPAL");
+        given(sessionResourceUtil.convertDNToRealm(anyString())).willReturn("/");
+
 
         //When
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
@@ -823,9 +852,10 @@ public class SessionResourceTest {
 
         // When
         ActionResponse response = sessionResource.actionInstance(context, sessionId, request)
-                                                 .getOrThrowUninterruptibly();
+                .getOrThrowUninterruptibly();
 
         // Then
         assertThat(response).isNotNull().withContent().stringAt("goto").isEqualTo(logoutUrl);
     }
+
 }

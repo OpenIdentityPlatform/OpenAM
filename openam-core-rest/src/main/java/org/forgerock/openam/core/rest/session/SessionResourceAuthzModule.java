@@ -16,10 +16,16 @@
 
 package org.forgerock.openam.core.rest.session;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import javax.inject.Inject;
+
+import com.sun.identity.shared.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -33,12 +39,15 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
 
     public final static String NAME = "SessionResourceFilter";
 
+    private final SSOTokenManager ssoTokenManager;
+
     @Inject
     public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
         super("tokenId", ssoTokenManager,
                 SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
                 SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
                 SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
+        this.ssoTokenManager = ssoTokenManager;
     }
 
     @Override
@@ -59,9 +68,24 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
         return super.authorizeAction(context, request);
     }
 
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest request) {
+        try {
+            if (isTokenOwner(context, request)) {
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+            }
+        } catch (ResourceException e) {
+            return e.asPromise();
+        } catch (SSOException e) {
+            return new ForbiddenException().asPromise();
+        }
+        return new ForbiddenException().asPromise();
+    }
+
     private boolean actionCanBeInvokedByNonAdmin(String actionId) {
         return SessionResource.VALIDATE_ACTION_ID.equalsIgnoreCase(actionId) ||
-                SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId);
+                SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId) ||
+                SessionResourceV2.REFRESH_ACTION_ID.equalsIgnoreCase(actionId);
     }
 
 }

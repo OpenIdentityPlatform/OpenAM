@@ -16,6 +16,7 @@
 package com.iplanet.services.naming;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -88,6 +89,15 @@ public class WebtopNamingQuery {
      */
     public boolean isAvailable(URL url) throws Exception {
         return WebtopNaming.SiteMonitor.isAvailable(url);
+    }
+
+    /**
+     * @see WebtopNaming#getAllServerIDs()
+     * @return all server IDs.
+     * @throws Exception if an error occurs when getting all the server ids
+     */
+    public Collection<String> getAllServerIDs() throws Exception  {
+        return WebtopNaming.getAllServerIDs();
     }
 
     public SessionIDCorrector getSessionIDCorrector() {
