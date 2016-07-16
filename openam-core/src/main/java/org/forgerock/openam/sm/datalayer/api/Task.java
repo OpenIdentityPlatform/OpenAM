@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.sm.datalayer.api;
 
-
 /**
  * Represents a Task which can be performed by a the implementation.
  * Each task is intended to be self contained and should be intialised with
@@ -34,10 +33,10 @@ public interface Task {
    <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException;
 
     /**
-     * Set the task error
-     * Use for setting the error response without executing the task.
-     * if the task can't be executed, this method is called.
-     * @param error the problem that happened before processing the task
+     * Set the task error. Used for setting the error response without executing the task.
+     * If the task can't be executed, this method is called.
+     *
+     * @param error the problem that happened before processing the task.
      */
     void processError(DataLayerException error);
 }

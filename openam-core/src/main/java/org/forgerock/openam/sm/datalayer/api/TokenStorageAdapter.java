@@ -11,15 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.api;
 
 import java.util.Collection;
-
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQuery;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
@@ -83,5 +84,13 @@ public interface TokenStorageAdapter<T> {
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
     Collection<PartialToken> partialQuery(T connection, TokenFilter query) throws DataLayerException;
+
+    /**
+     * Performs a continuous query using the provided filter.
+     *
+     * @param connection Non null connection to call.
+     * @param filter The non null filter specification.
+     */
+    ContinuousQuery startContinuousQuery(T connection, TokenFilter filter, ContinuousQueryListener listener);
 
 }

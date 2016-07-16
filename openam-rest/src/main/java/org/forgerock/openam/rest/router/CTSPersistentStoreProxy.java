@@ -11,21 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest.router;
+
+import java.util.Collection;
+import java.util.Map;
+
+import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-
-import javax.inject.Singleton;
-import java.util.Collection;
-import java.util.Map;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * A proxy implementation of the CTSPersistentStore, which delegates all its calls to the "real" implementation.
@@ -103,6 +105,23 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
     @Override
     public int delete(Map<CoreTokenField, Object> query) throws CoreTokenException {
         return CTSHolder.get().delete(query);
+    }
+
+    @Override
+    public void addContinuousQueryListener(ContinuousQueryListener listener, TokenFilter filter)
+            throws CoreTokenException {
+        CTSHolder.get().addContinuousQueryListener(listener, filter);
+    }
+
+    @Override
+    public void removeContinuousQueryListener(ContinuousQueryListener listener, TokenFilter filter)
+            throws CoreTokenException {
+        CTSHolder.get().removeContinuousQueryListener(listener, filter);
+    }
+
+    @Override
+    public void stopContinuousQuery(TokenFilter filter) {
+        CTSHolder.get().stopContinuousQuery(filter);
     }
 
     @Override

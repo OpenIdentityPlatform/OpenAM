@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
@@ -74,7 +74,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      */
     @Override
     public ResultHandler<String, CoreTokenException> getDeleteHandler() {
-        return new DefaultMonitoringResultHandler<String, CoreTokenException>(factory.getDeleteHandler(), store, CTSOperation.DELETE);
+        return new DefaultMonitoringResultHandler<>(factory.getDeleteHandler(), store, CTSOperation.DELETE);
     }
 
     /**
@@ -82,7 +82,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      */
     @Override
     public ResultHandler<Collection<Token>, CoreTokenException> getQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<Token>, CoreTokenException>(
+        return new DefaultMonitoringResultHandler<>(
                 factory.getQueryHandler(), store, CTSOperation.LIST);
     }
 
@@ -91,7 +91,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      */
     @Override
     public ResultHandler<Collection<PartialToken>, CoreTokenException> getPartialQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<PartialToken>, CoreTokenException>(
+        return new DefaultMonitoringResultHandler<>(
                 factory.getPartialQueryHandler(), store, CTSOperation.LIST);
     }
 
@@ -100,7 +100,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      */
     @Override
     public ResultHandler<Collection<PartialToken>, CoreTokenException> getDeleteOnQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<PartialToken>, CoreTokenException>(
+        return new DefaultMonitoringResultHandler<>(
                 factory.getDeleteOnQueryHandler(), store, CTSOperation.LIST);
     }
 }

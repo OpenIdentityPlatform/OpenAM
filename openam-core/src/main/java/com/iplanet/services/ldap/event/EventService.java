@@ -24,7 +24,7 @@
  *
  * $Id: EventService.java,v 1.19 2009/09/28 21:47:33 ww203982 Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap.event;
@@ -57,6 +57,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ldap.LDAPEventManager;
+
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
@@ -69,7 +70,8 @@ import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
- *
+ * The EventService is responsible for listening to and dispatching to listening objects
+ * messages returning from persistent searches running in an underlying LDAP implementation.
  *
  * @supported.api
  */
@@ -143,9 +145,10 @@ public class EventService {
     }
 
     /**
-     *
+     * Returns the event service (presuming we are not in the process of shutting down).
      *
      * @supported.api
+     * @return The singleton instance of the EventService.
      */
     public synchronized static EventService getEventService() throws EventException, LdapException {
         if (isShutdownCalled) {
@@ -154,14 +157,20 @@ public class EventService {
         return Singleton.INSTANCE.getEventService();
     }
 
-    //Question: is ok to not actually restart running psearches if the listener is still enabled?
+    /**
+     * Restarts all currently registered persistent searches.
+     *
+     * Persistent searches that do not have enabled listeners are removed.
+     *
+     * Legacy Comment:
+     *      Question: is ok to not actually restart running psearches if the listener is still enabled?
+     */
     public synchronized void restartPSearches() {
         List<Class<? extends IDSEventListener>> listenersClasses = getEnabledListenersClasses();
 
         for (Iterator<Class<? extends IDSEventListener>> iterator = persistentSearches.keySet().iterator();
              iterator.hasNext();) {
             Class<? extends IDSEventListener> pSearchListenerClass = iterator.next();
-            //remove any running psearches that do not have enabled listeners
             if (!listenersClasses.contains(pSearchListenerClass)) {
                 persistentSearches.get(pSearchListenerClass).search.stopSearch();
                 iterator.remove();
@@ -183,7 +192,7 @@ public class EventService {
 
                 pSearch.addListener(listener, new BigInteger(130, new Random()).toString());
 
-                pSearch.startSearch();
+                pSearch.startQuery();
                 persistentSearches.put(listenerClass, new ListenerSearch(listener, pSearch));
                 logger.message("EventService.restartPSearches() - successfully initialized: {}", listenerClass);
                 iterator.remove();
@@ -200,6 +209,9 @@ public class EventService {
         isRunning = true;
     }
 
+    /**
+     * Removes listeners from running persistent searches and then stops their execution on the datastore.
+     */
     public synchronized void stopPSearches() {
         isShutdownCalled = true;
         for (ListenerSearch pSearch : persistentSearches.values()) {
@@ -208,10 +220,21 @@ public class EventService {
         }
     }
 
+    /**
+     * Informs the callers as to the state of the EventService.
+     *
+     * @return {@code true} if the EventService is started and the system is not shutting down.
+     */
     public static boolean isStarted() {
         return isRunning && !isShutdownCalled;
     }
 
+    /**
+     * Retrieve the listener of a specific listening class derivative type.
+     *
+     * @param listenerClass The {@link IDSEventListener} implementation class to retrieve.
+     * @return a listener of the class type provided.
+     */
     public IDSEventListener getListener(Class<? extends IDSEventListener> listenerClass) {
         return persistentSearches.get(listenerClass).listener;
     }

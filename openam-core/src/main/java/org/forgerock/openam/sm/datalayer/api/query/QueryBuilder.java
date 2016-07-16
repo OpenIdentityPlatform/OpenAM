@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.api.query;
 
@@ -20,12 +20,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.sun.identity.shared.debug.Debug;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQuery;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Fluent class responsible for constructing queries for the data store.
@@ -35,6 +37,7 @@ import com.sun.identity.shared.debug.Debug;
  *
  * Uses Token as its main means of expressing the data returned from the data store and so is
  * intended for use with the Core Token Service.
+ *
  * @param <C> The type of connection that will be used.
  * @param <F> The type of filter (if any) that will be supported.
  */
@@ -133,8 +136,6 @@ public abstract class QueryBuilder<C, F> {
      * Assign a filter to the query. This can be a complex filter and is handled
      * by the QueryFilter class.
      *
-     * @see QueryFilter For more details on generating a filter.
-     *
      * @param filter An OpenDJ SDK Filter to assign to the query.
      * @return The QueryBuilder instance.
      */
@@ -185,4 +186,14 @@ public abstract class QueryBuilder<C, F> {
         }
         return executeRawResults(connection, Token.class);
     }
+
+    /**
+     * Attaches a listener to a connection which will continually return its results. The listener will perform
+     * appropriate actions in response to the data returned from the connection.
+     *
+     * @param connection The connection used to perform the request.
+     * @param listener The listening class used to process the returned data.
+     */
+    public abstract ContinuousQuery executeContinuousQuery(C connection, ContinuousQueryListener listener);
+
 }

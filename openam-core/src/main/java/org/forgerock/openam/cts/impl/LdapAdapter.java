@@ -16,14 +16,17 @@
 
 package org.forgerock.openam.cts.impl;
 
-import com.forgerock.opendj.ldap.controls.TransactionIdControl;
-
 import java.util.Collection;
+
 import javax.inject.Inject;
+
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQuery;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
@@ -52,13 +55,17 @@ import org.forgerock.opendj.ldap.responses.SearchResultEntry;
  * hindering unit testing.
  */
 public class LdapAdapter implements TokenStorageAdapter<Connection> {
+
     private final LdapTokenAttributeConversion conversion;
     private final LdapQueryFilterVisitor queryConverter;
     private final LdapQueryFactory queryFactory;
 
     /**
      * Create an instance of this adapter.
+     *
      * @param conversion Non null, required for Token conversion.
+     * @param queryConverter For converting between CTS and LDAP.
+     * @param queryFactory Produces queries.
      */
     @Inject
     public LdapAdapter(LdapTokenAttributeConversion conversion, LdapQueryFilterVisitor queryConverter,
@@ -73,8 +80,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      *
      * @param connection The non null connection to perform this call against.
      * @param token Non null Token to create.
-     * @throws LdapException Unexpected LDAP Exception.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If the operation failed for a known reason.
+     * @throws LdapOperationFailedException If the operation failed for a known reason.
      */
     public void create(Connection connection, Token token) throws LdapOperationFailedException {
         Entry entry = conversion.getEntry(token);
@@ -91,6 +97,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      * @param connection The non null connection to perform this call against.
      * @param tokenId The id of the Token to read.
      * @return Token if found, otherwise null.
+     * @throws DataLayerException If the operation failed for a known reason.
      */
     public Token read(Connection connection,  String tokenId) throws DataLayerException {
         DN dn = conversion.generateTokenDN(tokenId);
@@ -99,7 +106,6 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
             return conversion.tokenFromEntry(resultEntry);
         } catch (LdapException e) {
             Result result = e.getResult();
-            // Check for NO_SUCH_OBJECT
             if (result != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
                 return null;
             }
@@ -114,7 +120,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      * @param previous The non null previous Token to check against.
      * @param updated The non null Token to update with.
      * @return True if the token was updated, or false if there were no changes detected.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If the operation failed for a known reason.
+     * @throws LdapOperationFailedException If the operation failed for a known reason.
      */
     public boolean update(Connection connection, Token previous, Token updated) throws LdapOperationFailedException {
         Entry currentEntry = conversion.getEntry(updated);
@@ -128,7 +134,6 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
 
         request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()));
 
-        // Test to see if there are any modifications
         if (request.getModifications().isEmpty()) {
             return false;
         }
@@ -146,8 +151,7 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
      *
      * @param connection Non null connection to call.
      * @param tokenId The non null Token ID to delete.
-     * @throws LdapException If there was an unexpected LDAP error during the process.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If the operation failed, this exception will capture the reason.
+     * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
      */
     public void delete(Connection connection, String tokenId) throws LdapOperationFailedException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
@@ -155,7 +159,6 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
             processResult(connection.delete(LDAPRequests.newDeleteRequest(dn)));
         } catch (LdapException e) {
             Result result = e.getResult();
-            // Check for NO_SUCH_OBJECT
             if (e.getResult() != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
                 return;
             }
@@ -186,10 +189,19 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
         }
     }
 
+    @Override
+    public ContinuousQuery startContinuousQuery(Connection connection, TokenFilter filter,
+                                           ContinuousQueryListener listener) {
+        return queryFactory.createInstance()
+            .withFilter(filter.getQuery().accept(queryConverter, null))
+            .executeContinuousQuery(connection, listener);
+    }
+
     /**
      * Verify if the result was successful.
+     *
      * @param result Non null.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException Thrown if the result was not successful.
+     * @throws LdapOperationFailedException Thrown if the result was not successful.
      */
     private void processResult(Result result) throws LdapOperationFailedException {
         ResultCode resultCode = result.getResultCode();

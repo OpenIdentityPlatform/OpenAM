@@ -11,30 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
-import com.google.inject.name.Named;
-import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.impl.CoreTokenAdapter;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import com.google.inject.name.Named;
+import com.sun.identity.shared.debug.Debug;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.cts.impl.CoreTokenAdapter;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * Implementation of the CTS (Core Token Store) persistence layer.
@@ -49,12 +52,12 @@ import java.util.Map;
 @Singleton
 public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
-    // Injected
     private final CoreTokenAdapter adapter;
     private final Debug debug;
 
     /**
      * Creates a default implementation of the CTSPersistentStoreImpl.
+     *
      * @param adapter Required for CTS operations.
      * @param debug Required for debugging.
      */
@@ -64,10 +67,15 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
         this.debug = debug;
     }
 
+    /**
+     * This implementation blocks until we get the results, and ignores non-exception results.
+     *
+     * @param token Non null Token to create.
+     * @throws CoreTokenException In the case of issues with
+     */
     @Override
     public void create(Token token) throws CoreTokenException {
         final ResultHandler<Token, CoreTokenException> createHandler = adapter.create(token);
-        //block until we get the results, and ignore non-exception results
         createHandler.getResults();
         debug("Token {0} created", token.getTokenId());
     }
@@ -164,6 +172,26 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
         } catch (CoreTokenException e) {
             throw new DeleteFailedException("Failed to delete Tokens", e);
         }
+    }
+
+    @Override
+    public void addContinuousQueryListener(ContinuousQueryListener listener, TokenFilter tokenFilter)
+            throws CoreTokenException {
+        debug("Add ContinuousQueryListener to {0}", tokenFilter.toString());
+        adapter.continuousQuery(listener, tokenFilter);
+    }
+
+    @Override
+    public void removeContinuousQueryListener(ContinuousQueryListener listener, TokenFilter tokenFilter)
+            throws CoreTokenException {
+        debug("Remove ContinuousQueryListener from {0}", tokenFilter.toString());
+        adapter.removeContinuousQueryListener(listener, tokenFilter);
+    }
+
+    @Override
+    public void stopContinuousQuery(TokenFilter tokenFilter) {
+        debug("Stopping ContinuousQuery for {0}", tokenFilter.toString());
+        adapter.stopContinuousQuery(tokenFilter);
     }
 
     @Override

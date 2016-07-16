@@ -17,8 +17,23 @@
 package org.forgerock.openam.idrepo.ldap;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
+
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
@@ -45,20 +60,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.sm.SchemaType;
-
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 
 import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
 import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
@@ -116,7 +117,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * connection when appropriate.
      */
     private static final Map<String, DJLDAPv3PersistentSearch> pSearchMap =
-            new HashMap<String, DJLDAPv3PersistentSearch>();
+            new HashMap<>();
     private static final String AM_AUTH = "amAuth";
     private static final Filter DEFAULT_ROLE_SEARCH_FILTER =
             Filter.valueOf("(&(objectclass=ldapsubentry)(objectclass=nsmanagedroledefinition))");
@@ -2093,7 +2094,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     pSearch.addMovedOrRenamedListener(this);
                 }
                 pSearch.addListener(idRepoListener, getSupportedTypes());
-                pSearch.startSearch();
+                pSearch.startQuery();
                 pSearchMap.put(pSearchId, pSearch);
             } else {
                 pSearch.addListener(idRepoListener, getSupportedTypes());

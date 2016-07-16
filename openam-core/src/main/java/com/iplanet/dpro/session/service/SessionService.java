@@ -108,18 +108,18 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 
 /**
- * This class represents a Session Service
+ * This class represents a Session Service.
  */
 @Singleton
 public class SessionService {
 
     /**
-     * Service name for NotificationSets
+     * Service name for NotificationSets.
      */
     public static final String SESSION_SERVICE = "session";
 
     /**
-      * Constants for delegated permissions
+      * Constants for delegated permissions.
       */
     private static final String PERMISSION_READ = "READ";
     private static final String PERMISSION_MODIFY = "MODIFY";
@@ -154,7 +154,6 @@ public class SessionService {
     private final SessionAdapter tokenAdapter;
     private final SessionInfoFactory sessionInfoFactory;
     private final InternalSessionCache cache;
-
 
     private final SessionServiceURLService sessionServiceURLService;
     private final SessionCache sessionCache;

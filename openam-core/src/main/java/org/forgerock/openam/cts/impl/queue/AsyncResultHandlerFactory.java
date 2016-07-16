@@ -11,15 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
+import com.sun.identity.shared.debug.Debug;
 import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -29,8 +28,6 @@ import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation provides an appropriate asynchronous ResultHandler implementation based on the
@@ -56,42 +53,42 @@ public class AsyncResultHandlerFactory implements ResultHandlerFactory {
      * @return Non null result handler.
      */
     public ResultHandler<Token, CoreTokenException> getCreateHandler() {
-        return new AsyncResultHandler<Token>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
     public ResultHandler<Token, CoreTokenException> getReadHandler() {
-        return new AsyncResultHandler<Token>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
     public ResultHandler<Token, CoreTokenException> getUpdateHandler() {
-        return new AsyncResultHandler<Token>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
     public ResultHandler<String, CoreTokenException> getDeleteHandler() {
-        return new AsyncResultHandler<String>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
     public ResultHandler<Collection<Token>, CoreTokenException> getQueryHandler() {
-        return new AsyncResultHandler<Collection<Token>>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
     public ResultHandler<Collection<PartialToken>, CoreTokenException> getPartialQueryHandler() {
-        return new AsyncResultHandler<Collection<PartialToken>>(config, debug);
+        return new AsyncResultHandler<>(config, debug);
     }
 
     @Override

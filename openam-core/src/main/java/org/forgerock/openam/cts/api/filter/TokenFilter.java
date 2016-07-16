@@ -38,7 +38,7 @@ public class TokenFilter {
      * way of assembling this object.
      */
     TokenFilter() {
-        returnFields = new HashSet<CoreTokenField>();
+        returnFields = new HashSet<>();
     }
 
     /**
@@ -98,5 +98,24 @@ public class TokenFilter {
                 "TokenFilter: Filter: [{0}] Attributes: {1}",
                 query,
                 a);
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        final TokenFilter that = (TokenFilter) obj;
+
+        return Objects.deepEquals(this.returnFields, that.returnFields)
+                && Objects.equals(this.query, that.query);
+    }
+
+    public int hashCode() {
+        return Objects.hash(returnFields, query);
     }
 }

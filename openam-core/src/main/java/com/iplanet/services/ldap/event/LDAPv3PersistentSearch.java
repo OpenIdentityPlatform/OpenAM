@@ -19,12 +19,6 @@ package com.iplanet.services.ldap.event;
 import static org.forgerock.openam.ldap.LDAPConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.debug.Debug;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +28,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimerPool;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.debug.Debug;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
@@ -58,7 +58,14 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
+import org.forgerock.util.annotations.VisibleForTesting;
 
+/**
+ * An abstract implementation of LDAPv3 persistent searches.
+ *
+ * @param <T> Type of listener.
+ * @param <H> Supported token types.
+ */
 public abstract class LDAPv3PersistentSearch<T, H> {
 
     private static final Debug DEBUG = Debug.getInstance("PersistentSearch");
@@ -69,7 +76,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR));
 
     private final ConnectionFactory factory;
-    private final Map<T, H> listeners = new ConcurrentHashMap<>(1);
+    private final ConcurrentHashMap<T, H> listeners = new ConcurrentHashMap<>(1);
     private final int retryInterval;
     private final DN searchBaseDN;
     private final Filter searchFilter;
@@ -85,6 +92,16 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         STANDARD, AD, NONE
     }
 
+    /**
+     * Generate a new LDAPv3PersistentSearch.
+     *
+     * @param retryInterval How frequently to reconnect (in milliseconds).
+     * @param searchBaseDN The base DN from which to perform the query.
+     * @param searchFilter The filter which forms the query's parameters.
+     * @param searchScope The scope of the search, from the searchBaseDN.
+     * @param factory A connection factory used to produce connections down to LDAP.
+     * @param attributeNames Attribute names which will be returned alongside the DN of the query-resulted objects.
+     */
     public LDAPv3PersistentSearch(int retryInterval, DN searchBaseDN, Filter searchFilter,
             SearchScope searchScope, ConnectionFactory factory, String... attributeNames) {
         this.retryInterval = retryInterval;
@@ -146,7 +163,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
      * Starts the persistent search connection against the directory. The caller must ensure that calls made to
      * startPSearch and stopPsearch are properly synchronized.
      */
-    public void startSearch() {
+    public void startQuery() {
         try {
             conn = factory.getConnection();
             startSearch(conn);
@@ -244,14 +261,23 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         return Collections.unmodifiableMap(listeners);
     }
 
+    /**
+     * This interface represents the ability of a listener to return result entries.
+     */
     protected interface SearchResultEntryHandler {
         boolean handle(SearchResultEntry entry, String dn, DN previousDn, PersistentSearchChangeType type);
     }
 
+    /**
+     * Returns the {@code SearchResultEntryHandler} for the concrete implementation.
+     *
+     * @return The {@code SearchResultEntryHandler} for this implementation.
+     */
     protected abstract SearchResultEntryHandler getSearchResultEntryHandler();
 
     private class PersistentSearchResultHandler implements SearchResultHandler {
 
+        @Override
         public boolean handleEntry(SearchResultEntry entry) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Processing persistent search response: " + entry.toString());
@@ -316,24 +342,12 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             return getSearchResultEntryHandler().handle(entry, dn, previousDn, type);
         }
 
+        @Override
         public boolean handleReference(SearchResultReference reference) {
             //ignoring references
             return true;
         }
 
-        public void handleErrorResult(LdapException error) {
-            if (!shutdown) {
-                DEBUG.error("An error occurred while executing persistent search", error);
-                DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");
-                clearCaches();
-                restartSearch();
-            } else {
-                DEBUG.message("Persistence search has been cancelled",error);
-            }
-        }
-
-        public void handleResult(Result result) {
-        }
     }
 
     private class RetryTask extends GeneralTaskRunnable {
@@ -377,5 +391,10 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 IOUtils.closeIfNotNull(conn);
             }
         }
+    }
+
+    @VisibleForTesting
+    protected boolean isShutdown() {
+        return shutdown;
     }
 }

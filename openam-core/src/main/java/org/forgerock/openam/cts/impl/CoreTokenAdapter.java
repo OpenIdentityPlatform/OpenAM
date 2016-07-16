@@ -11,30 +11,37 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
-import com.google.inject.name.Named;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.*;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.CreateFailedException;
+import org.forgerock.openam.cts.exceptions.QueryFailedException;
+import org.forgerock.openam.cts.exceptions.ReadFailedException;
+import org.forgerock.openam.cts.exceptions.SetFailedException;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * CoreTokenAdapter is the final layer before persistence. In this case it uses the
@@ -46,7 +53,7 @@ import java.util.Collection;
  * for use by the Core Token Service.
  */
 public class CoreTokenAdapter {
-    // Injected
+
     private final TokenBlobStrategy strategy;
     private final TaskDispatcher dispatcher;
     private final ResultHandlerFactory handlerFactory;
@@ -196,7 +203,7 @@ public class CoreTokenAdapter {
         try {
             attributeQueryWithHandler(filter, handler);
             Collection<PartialToken> partialTokens = handler.getResults();
-            Collection<PartialToken> results = new ArrayList<PartialToken>();
+            Collection<PartialToken> results = new ArrayList<>();
             if (filter.getReturnFields().contains(CoreTokenField.BLOB)) {
                 for (PartialToken p : partialTokens) {
                     try {
@@ -218,7 +225,7 @@ public class CoreTokenAdapter {
 
     /**
      * Queries the persistence layer using the given TokenFilter which must have the required
-     * 'return attributes' defined within it. The results os this query then will be deleted from the store.
+     * 'return attributes' defined within it. The results of this query then will be deleted from the store.
      *
      * @param filter Non null TokenFilter with return attributes defined.
      * @throws CoreTokenException If there was a problem queuing the task to be performed.
@@ -235,6 +242,41 @@ public class CoreTokenAdapter {
         }
     }
 
+    /**
+     * Sets up a continuous query on the persistence layer. The results of this query will be returned up
+     * to the listener defined. If a continuous query already exists for the provided filter, the listener
+     * will be added to the set of listeners for that filter.
+     *
+     * @param listener Receiving messages about alterations dependent on the settings of the supplied Filter.
+     * @param filter Determining which messages the datalayer will inform us about.
+     * @throws CoreTokenException In case of error starting the continuous query.
+     */
+    public void continuousQuery(ContinuousQueryListener listener, TokenFilter filter)
+            throws CoreTokenException {
+        dispatcher.continuousQuery(listener, filter);
+    }
+
+    /**
+     * Removes a listener from a continuous query on the persistence layer.
+     *
+     * @param listener The listener which no longer requires updates supplied by the underlying query.
+     * @param filter The filter which the underlying query is operating on.
+     * @throws CoreTokenException In case of error.
+     */
+    public void removeContinuousQueryListener(ContinuousQueryListener listener, TokenFilter filter)
+            throws CoreTokenException {
+        dispatcher.removeContinuousQueryListener(listener, filter);
+    }
+
+    /**
+     * Removes a listener from a continuous query on the persistence layer.
+     *
+     * @param filter The filter which the underlying query is operating on.
+     */
+    public void stopContinuousQuery(TokenFilter filter) {
+        dispatcher.stopContinuousQuery(filter);
+    }
+
     private void attributeQueryWithHandler(final TokenFilter filter,
             final ResultHandler<Collection<PartialToken>, CoreTokenException> handler) throws CoreTokenException {
         Reject.ifTrue(filter.getReturnFields().isEmpty(), "Must define return fields for attribute query.");
@@ -245,9 +287,7 @@ public class CoreTokenAdapter {
 
     private void debug(String format, Object... args) {
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER + format,
-                    args));
+            debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_HEADER + format, args));
         }
     }
 
