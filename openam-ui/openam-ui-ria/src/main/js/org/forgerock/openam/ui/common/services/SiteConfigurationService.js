@@ -16,13 +16,16 @@
 
 define([
     "jquery",
+    "store/actionCreators",
+    "store/store",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/services/ServerService",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService, RealmHelper) {
+], function ($, actionCreators, store, AbstractDelegate, Configuration, Constants, URIUtils, ServerService,
+    RealmHelper) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
         lastKnownSubRealm,
         lastKnownOverrideRealm,
@@ -46,8 +49,8 @@ define([
             try {
                 console.log("No current SUB REALM was detected. Applying from current URI values...");
                 var subRealm = RealmHelper.getSubRealm();
+                store.default.dispatch(actionCreators.setRealm(subRealm));
                 console.log(`Changing SUB REALM to '${subRealm}'`);
-
                 Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
 
                 lastKnownSubRealm = RealmHelper.getSubRealm();
@@ -77,6 +80,7 @@ define([
             if (currentSubRealm !== lastKnownSubRealm) {
                 console.log(`Changing SUB REALM from '${lastKnownSubRealm}' to '${currentSubRealm}'`);
                 Configuration.globalData.auth.subRealm = currentSubRealm;
+                store.default.dispatch(actionCreators.setRealm(currentSubRealm));
                 lastKnownSubRealm = currentSubRealm;
             }
 
