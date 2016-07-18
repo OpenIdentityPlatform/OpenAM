@@ -15,16 +15,16 @@
 */
 package org.forgerock.openam.services.push;
 
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.json.resource.Resources.newHandler;
+import static org.forgerock.openam.rest.Routers.none;
+
+import javax.inject.Inject;
+
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.services.push.sns.SnsMessageResource;
-
-import javax.inject.Inject;
-
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
-import static org.forgerock.json.resource.Resources.newAnnotatedRequestHandler;
-import static org.forgerock.openam.rest.Routers.none;
 
 /**
  * A {@link RestRouteProvider} that add routes for the audit endpoint.
@@ -52,7 +52,6 @@ public class PushNotificationRestRouteProvider extends AbstractRestRouteProvider
                 .route(ROUTE)
                 .authenticateWith(none())
                 .forVersion(1)
-                .toRequestHandler(EQUALS,
-                        newAnnotatedRequestHandler(snsMessageResource));
+                .toRequestHandler(EQUALS, newHandler(snsMessageResource));
     }
 }

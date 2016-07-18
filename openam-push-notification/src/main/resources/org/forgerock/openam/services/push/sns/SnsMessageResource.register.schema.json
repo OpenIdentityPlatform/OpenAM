@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "messageId": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SnsMessageResource#request.common.messageId.title",
+      "description": "i18n:api-descriptor/SnsMessageResource#request.common.messageId.description"
+    },
+    "jwt": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SnsMessageResource#request.common.jwt.title",
+      "description": "i18n:api-descriptor/SnsMessageResource#action.register.request.jwt.description"
+    }
+  },
+  "required": ["messageId", "jwt"]
+}
