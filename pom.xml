@@ -1176,7 +1176,6 @@
                 <artifactId>openam-i18n</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <!-- External project dependencies -->
             <dependency>
                 <groupId>org.apache.click</groupId>

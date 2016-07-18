@@ -17,11 +17,17 @@ package org.forgerock.openam.core.rest.record;
 
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
 import javax.inject.Inject;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Actions;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Schema;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -41,11 +47,16 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Rest endpoint for the record feature.
  */
+@CollectionProvider(details = @Handler(mvccSupported = false, title = RECORD_RESOURCE + TITLE,
+        description = RECORD_RESOURCE + DESCRIPTION))
 public class RecordResource implements CollectionResourceProvider {
 
     // Json label for the recording status
@@ -63,6 +74,28 @@ public class RecordResource implements CollectionResourceProvider {
     }
 
     @Override
+    @Actions({
+        @Action(name = "start",
+                operationDescription = @Operation(
+                        errors = {
+                                @ApiError(
+                                        code = 400,
+                                        description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
+                        description = RECORD_RESOURCE + "operation.start.description"),
+                request = @Schema(schemaResource = "RecordPropertiesRequest.schema.json"),
+                response = @Schema(schemaResource = "RecordStatus.schema.json")),
+        @Action(name = "status",
+                operationDescription = @Operation(
+                        description = RECORD_RESOURCE + "operation.status.description"),
+                response = @Schema(schemaResource = "RecordStatus.schema.json")),
+        @Action(name = "stop",
+                operationDescription = @Operation(
+                        errors = {
+                                @ApiError(
+                                        code = 400,
+                                        description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
+                        description = RECORD_RESOURCE + "operation.stop.description"),
+                response = @Schema(schemaResource = "RecordStatus.schema.json"))})
     public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
             ActionRequest actionRequest) {
         switch (actionRequest.getAction()) {
@@ -91,8 +124,8 @@ public class RecordResource implements CollectionResourceProvider {
             debug.message("Record json '{}' can't be parsed", jsonValue, e);
             return new BadRequestException("Record json '" + jsonValue + "' can't be parsed", e).asPromise();
         } catch (RecordException e) {
-            debug.message("Record can't be start.", e);
-            return new BadRequestException("Record can't be start.", e).asPromise();
+            debug.message("Record can't be started.", e);
+            return new BadRequestException("Record can't be started.", e).asPromise();
         }
     }
 

@@ -70,6 +70,10 @@
             <artifactId>forgerock-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-i18n</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

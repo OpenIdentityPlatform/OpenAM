@@ -11,29 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying 
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ARRAY_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ITEMS;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.OBJECT_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PROPERTIES;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.READONLY;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.STRING_TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.ConfigurationException;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Handler;
@@ -45,10 +51,6 @@ import org.forgerock.api.enums.CountPolicy;
 import org.forgerock.api.enums.PagingMode;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.json.resource.PermanentException;
-import org.forgerock.openam.core.rest.sms.models.Site;
-import org.forgerock.openam.rest.RestConstants;
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -61,6 +63,7 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -69,8 +72,19 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.rest.sms.models.Site;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ConfigurationException;
+import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.common.configuration.SiteConfiguration;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
 
 /**
  * A CREST collection resource provider that presents the global sites config in a coherent way.

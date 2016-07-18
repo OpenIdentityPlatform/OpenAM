@@ -1,0 +1,120 @@
+{
+  "issueID": {
+    "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.issueID.description",
+    "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.issueID.title",
+    "type": "integer",
+    "format": "int64"
+  },
+  "referenceID": {
+    "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.referenceID.description",
+    "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.referenceID.title",
+    "type": "string"
+  },
+  "description": {
+    "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.description.description",
+    "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.description.title",
+    "type": "string"
+  },
+  "zipEnabled": {
+    "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.zipEnabled.description",
+    "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.zipEnabled.title",
+    "type": "boolean"
+  },
+  "threadDump": {
+    "enabled": {
+      "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.threadDumpEnabled.description",
+      "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.threadDumpEnabled.title",
+      "type": "boolean"
+    },
+    "delay" : {
+      "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.threadDumpDelayInSeconds.description",
+      "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.threadDumpDelayInSeconds.title",
+      "timeUnit" : {
+        "type": "string",
+        "enum": [
+          "NANOSECONDS",
+          "MICROSECONDS",
+          "MILLISECONDS",
+          "SECONDS",
+          "MINUTES",
+          "HOURS",
+          "DAYS"
+        ]
+      },
+      "value" : {
+        "type": "integer",
+        "format": "int64"
+      }
+    },
+    "configExport" : {
+      "enabled": {
+        "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportEnabled.description",
+        "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportEnabled.title",
+        "type": "boolean"
+      },
+      "password" : {
+        "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportPassword.description",
+        "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportPassword.title",
+        "type": "string"
+      },
+      "sharePassword" : {
+        "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportSharePasswordEnabled.description",
+        "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.configExportSharePasswordEnabled.title",
+        "type": "string"
+      }
+    },
+    "debugLogs" : {
+      "debugLevel" : {
+        "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.debugLevel.description",
+        "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.debugLevel.title",
+        "type": "string",
+        "enum": [
+          "OFF",
+          "ERROR",
+          "WARNING",
+          "MESSAGE",
+          "ON"
+        ]
+      },
+      "autoStop" : {
+        "time" : {
+          "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.autoStopTimeInMS.description",
+          "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.autoStopTimeInMS.title",
+          "timeUnit": {
+            "type": "string",
+            "enum": [
+              "NANOSECONDS",
+              "MICROSECONDS",
+              "MILLISECONDS",
+              "SECONDS",
+              "MINUTES",
+              "HOURS",
+              "DAYS"
+            ]
+          },
+          "value": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "fileSize" : {
+          "description": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.autoStopFileSizeInKB.description",
+          "title": "i18n:api-descriptor/RecordProperties#record.status.record.recordProperties.autoStopFileSizeInKB.title",
+          "sizeUnit": {
+            "type": "string",
+            "enum": [
+              "GB",
+              "MB",
+              "KB",
+              "B"
+            ]
+          },
+          "value": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ package org.forgerock.openam.i18n.apidescriptor;
 public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
-    public static final String TRANSLATION_KEY_PREFIX = "i18n:";
+    public static final String TRANSLATION_KEY_PREFIX = "i18n:api-descriptor/";
 
     /** Constant used as key to API Descriptor translations **/
     public static final String TITLE = "title";
@@ -84,6 +84,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String EXAMPLE_PROVIDER = TRANSLATION_KEY_PREFIX + "ExampleProvider#";
+
+    /** Constant used as key to {@code RecordResource} resource location **/
+    public static final String RECORD_RESOURCE = TRANSLATION_KEY_PREFIX + "RecordResource#";
 
     private ApiDescriptorConstants() {
         // Constants class only

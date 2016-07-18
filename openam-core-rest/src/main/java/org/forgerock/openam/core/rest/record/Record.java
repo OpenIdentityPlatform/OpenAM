@@ -18,6 +18,8 @@ package org.forgerock.openam.core.rest.record;
 import static org.forgerock.openam.core.rest.record.RecordStatus.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 
 import java.io.File;
@@ -28,6 +30,8 @@ import java.util.TreeMap;
 /**
  * Recording the OpenAM debug logs in a separate folder to investigate an issue.
  */
+@Title("Record")
+@Description("Represents a Record")
 public class Record {
 
     private static final String STATUS_LABEL = "status";
