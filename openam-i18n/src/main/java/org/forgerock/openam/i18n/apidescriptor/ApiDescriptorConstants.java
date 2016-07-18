@@ -145,6 +145,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String OAUTH2_USER_APPLICATIONS = TRANSLATION_KEY_PREFIX + "OAuth2UserApplications#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SNS_MESSAGE_RESOURCE = TRANSLATION_KEY_PREFIX + "SnsMessageResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

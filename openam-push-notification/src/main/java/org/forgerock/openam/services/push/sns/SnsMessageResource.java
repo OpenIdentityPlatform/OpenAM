@@ -13,17 +13,22 @@
 *
 * Copyright 2016 ForgeRock AS.
 */
+
 package org.forgerock.openam.services.push.sns;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SNS_MESSAGE_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.services.push.PushNotificationConstants.ACCEPT_VALUE;
 import static org.forgerock.openam.services.push.PushNotificationConstants.DENY_LOCATION;
 import static org.forgerock.openam.services.push.PushNotificationConstants.DENY_VALUE;
 import static org.forgerock.openam.services.push.PushNotificationConstants.JWT;
 import static org.forgerock.openam.services.push.PushNotificationConstants.MESSAGE_ID_JSON_POINTER;
-import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Map;
 
@@ -31,6 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.RequestHandler;
@@ -79,11 +85,9 @@ import com.sun.identity.shared.debug.Debug;
  * {@see SnsHttpDelegate}.
  * {@see PushNotificationService}.
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@RequestHandler(@Handler(mvccSupported = false,
+        title = SNS_MESSAGE_RESOURCE + TITLE, description = SNS_MESSAGE_RESOURCE + DESCRIPTION))
 public class SnsMessageResource {
-
-    private static final String AUTHENTICATE = "authenticate";
-    private static final String REGISTER = "register";
 
     private final PushNotificationService pushNotificationService;
     private final Debug debug;
@@ -121,9 +125,13 @@ public class SnsMessageResource {
      * @param actionRequest The request triggering the dispatch.
      * @return An empty HTTP 200 if everything was okay, or an HTTP 400 if the request was malformed.
      */
-    @Action(operationDescription = @Operation)
+    @Action(operationDescription = @Operation(
+                    description = SNS_MESSAGE_RESOURCE + ACTION + "authenticate." + DESCRIPTION,
+                    errors = @ApiError(code = 400, description = SNS_MESSAGE_RESOURCE + ERROR_400_DESCRIPTION)),
+            request = @Schema(schemaResource = "SnsMessageResource.authenticate.schema.json"),
+            response = @Schema(schemaResource = "SnsMessageResource.response.schema.json"))
     public Promise<ActionResponse, ResourceException> authenticate(Context context, ActionRequest actionRequest) {
-        return handle(context, actionRequest);
+        return handle(context, actionRequest, RequestType.AUTHENTICATE);
     }
 
     /**
@@ -136,20 +144,20 @@ public class SnsMessageResource {
      * @param actionRequest The request triggering the dispatch.
      * @return An empty HTTP 200 if everything was okay, or an HTTP 400 if the request was malformed.
      */
-    @Action(operationDescription = @Operation)
+    @Action(operationDescription = @Operation(
+                    description = SNS_MESSAGE_RESOURCE + ACTION + "register." + DESCRIPTION,
+                    errors = @ApiError(code = 400, description = SNS_MESSAGE_RESOURCE + ERROR_400_DESCRIPTION)),
+            request = @Schema(schemaResource = "SnsMessageResource.register.schema.json"),
+            response = @Schema(schemaResource = "SnsMessageResource.response.schema.json"))
     public Promise<ActionResponse, ResourceException> register(Context context, ActionRequest actionRequest) {
-        return handle(context, actionRequest);
+        return handle(context, actionRequest, RequestType.REGISTER);
     }
 
-    private Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest actionRequest) {
+    private Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest actionRequest,
+            RequestType requestType) {
         Reject.ifFalse(context.containsContext(RealmContext.class));
 
         String realm = context.asContext(RealmContext.class).getRealm().asPath();
-
-        if (!actionRequest.getAction().equals(AUTHENTICATE) && !actionRequest.getAction().equals(REGISTER)) {
-            debug.warning("Received message in realm {} with invalid messageId.", realm);
-            return RestUtils.generateBadRequestException();
-        }
 
         final JsonValue actionContent = actionRequest.getContent();
 
@@ -170,7 +178,7 @@ public class SnsMessageResource {
             } catch (NotFoundException e) {
                 debug.warning("Unable to deliver message with messageId {} in realm {}.", messageId, realm, e);
                 try {
-                    attemptFromCTS(messageId, actionContent, actionRequest.getAction().equals(REGISTER));
+                    attemptFromCTS(messageId, actionContent, requestType);
                 } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
                         | CoreTokenException | NotFoundException ex) {
                     debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
@@ -185,13 +193,13 @@ public class SnsMessageResource {
             return e.asPromise();
         }
 
-        return newResultPromise(newActionResponse(json(object())));
+        return newActionResponse(json(object())).asPromise();
     }
 
     /**
      * For the in-memory equivalent, {@link MessageDispatcher#handle(String, JsonValue)}.
      */
-    private boolean attemptFromCTS(String messageId, JsonValue actionContent, boolean register)
+    private boolean attemptFromCTS(String messageId, JsonValue actionContent, RequestType requestType)
             throws CoreTokenException, ClassNotFoundException, IllegalAccessException, InstantiationException,
             NotFoundException {
         Token coreToken = coreTokenService.read(messageId);
@@ -215,7 +223,7 @@ public class SnsMessageResource {
             }
         }
 
-        if (register) {
+        if (requestType == RequestType.REGISTER) {
             addRegistrationInfo(coreToken, actionContent);
         } else {
             addDeny(coreToken, actionContent);
@@ -241,6 +249,10 @@ public class SnsMessageResource {
             coreToken.setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
         }
 
+    }
+
+    private enum RequestType {
+        AUTHENTICATE, REGISTER
     }
 
 }
