@@ -20,20 +20,13 @@ import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Key;
-
-import org.forgerock.guava.common.reflect.TypeToken;
-import org.forgerock.http.ApiProducer;
-import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
-
-import io.swagger.models.Swagger;
 
 /**
  * Encapsulates a HTTP route that will handle incoming HTTP requests which can
@@ -42,6 +35,10 @@ import io.swagger.models.Swagger;
  * @since 13.0.0
  */
 public final class HttpRoute {
+
+    private final RoutingMode mode;
+    private final String uriTemplate;
+    private final Provider<Handler> handler;
 
     /**
      * Creates a new {@code HttpRoute} for a route with the given {@code mode} and
@@ -54,21 +51,12 @@ public final class HttpRoute {
      * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Handler handler) {
-        Provider<Describable<Swagger, Request>> describableProvider = null;
-        if (handler instanceof Describable) {
-            describableProvider = new Provider<Describable<Swagger, Request>>() {
-                @Override
-                public Describable<Swagger, Request> get() {
-                    return (Describable<Swagger, Request>) handler;
-                }
-            };
-        }
-        return new HttpRoute(mode, uriTemplate, new Provider<Handler>() {
+        return newHttpRoute(mode, uriTemplate, new Provider<Handler>() {
             @Override
             public Handler get() {
                 return handler;
             }
-        }, describableProvider);
+        });
     }
 
     /**
@@ -110,26 +98,12 @@ public final class HttpRoute {
      * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Key<? extends Handler> key) {
-        Provider<? extends Describable<Swagger, Request>> describableProvider = null;
-        Provider<? extends Handler> handler;
-        if (DescribableHandler.class.isAssignableFrom(key.getTypeLiteral().getRawType())) {
-            Provider<DescribableHandler> provider = new Provider<DescribableHandler>() {
-                @Override
-                public DescribableHandler get() {
-                    return new GuiceHandler(key);
-                }
-            };
-            describableProvider = provider;
-            handler = provider;
-        } else {
-            handler =new Provider<Handler>() {
-                @Override
-                public Handler get() {
-                    return new GuiceHandler(key);
-                }
-            };
-        }
-        return new HttpRoute(mode, uriTemplate, handler, describableProvider);
+        return newHttpRoute(mode, uriTemplate, new Provider<Handler>() {
+            @Override
+            public Handler get() {
+                return new HandlerProvider(key);
+            }
+        });
     }
 
     /**
@@ -144,35 +118,13 @@ public final class HttpRoute {
      * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Provider<Handler> provider) {
-        TypeToken type = TypeToken.of(provider.getClass());
-        try {
-            Class handlerType = type.resolveType(Provider.class.getMethod("get").getGenericReturnType()).getRawType();
-            Provider<Describable<Swagger, Request>> describableProvider = null;
-            if (Describable.class.isAssignableFrom(handlerType)) {
-                describableProvider = new Provider<Describable<Swagger, Request>>() {
-                    @Override
-                    public Describable<Swagger, Request> get() {
-                        return (Describable<Swagger, Request>) provider.get();
-                    }
-                };
-            }
-            return new HttpRoute(mode, uriTemplate, provider, describableProvider);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException("Provider must have a get method", e);
-        }
+        return new HttpRoute(mode, uriTemplate, provider);
     }
 
-    private final RoutingMode mode;
-    private final String uriTemplate;
-    private final Provider<? extends Handler> handler;
-    private final Provider<? extends Describable<Swagger, Request>> describable;
-
-    private HttpRoute(RoutingMode mode, String uriTemplate, Provider<? extends Handler> handler,
-            Provider<? extends Describable<Swagger, Request>> describable) {
+    private HttpRoute(RoutingMode mode, String uriTemplate, Provider<Handler> handler) {
         this.mode = mode;
         this.uriTemplate = uriTemplate;
         this.handler = handler;
-        this.describable = describable;
     }
 
     RoutingMode getMode() {
@@ -184,31 +136,7 @@ public final class HttpRoute {
     }
 
     Handler getHandler() {
-        return new DescribableHandler() {
-            @Override
-            public Swagger api(ApiProducer<Swagger> producer) {
-                return describable != null ? describable.get().api(producer) : null;
-            }
-
-            @Override
-            public Swagger handleApiRequest(Context context, Request request) {
-                return describable != null ? describable.get().handleApiRequest(context, request) : null;
-            }
-
-            @Override
-            public void addDescriptorListener(Listener listener) {
-                if (describable != null) {
-                    describable.get().addDescriptorListener(listener);
-                }
-            }
-
-            @Override
-            public void removeDescriptorListener(Listener listener) {
-                if (describable != null) {
-                    describable.get().removeDescriptorListener(listener);
-                }
-            }
-
+        return new Handler() {
             @Override
             public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
                 return handler.get().handle(context, request);

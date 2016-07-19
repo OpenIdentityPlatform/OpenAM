@@ -20,7 +20,6 @@ import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionMatcher
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.http.ApiProducer;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.header.AcceptApiVersionHeader;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
@@ -95,16 +94,6 @@ public final class ResourceApiVersionRestlet extends Restlet {
         @Override
         public int hashCode() {
             return delegate.hashCode();
-        }
-
-        @Override
-        public String idFragment() {
-            return null;
-        }
-
-        @Override
-        public <D> D transformApi(D d, ApiProducer<D> apiProducer) {
-            return null;
         }
     }
 }

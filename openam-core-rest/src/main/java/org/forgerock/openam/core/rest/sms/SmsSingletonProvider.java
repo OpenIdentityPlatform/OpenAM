@@ -16,9 +16,7 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -33,14 +31,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.api.annotations.Create;
-import org.forgerock.api.annotations.Delete;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.Read;
-import org.forgerock.api.annotations.RequestHandler;
-import org.forgerock.api.annotations.Schema;
-import org.forgerock.api.annotations.Update;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -48,6 +38,11 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Delete;
+import org.forgerock.json.resource.annotations.Read;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
@@ -73,7 +68,7 @@ import com.sun.identity.sm.ServiceSchema;
  * A CREST singleton provider for SMS schema config.
  * @since 13.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@RequestHandler
 public class SmsSingletonProvider extends SmsResourceProvider {
 
     final ServiceSchema dynamicSchema;
@@ -103,7 +98,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
      * Reads config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Read(operationDescription = @Operation)
+    @Read
     public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext) {
         String resourceId = resourceId();
         try {
@@ -160,7 +155,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
      * Updates config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Update(operationDescription = @Operation)
+    @Update
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         String resourceId = resourceId();
@@ -188,7 +183,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
      * Deletes config for the singleton instance referenced.
      * {@inheritDoc}
      */
-    @Delete(operationDescription = @Operation)
+    @Delete
     public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
@@ -233,7 +228,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
      * Creates config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
      */
-    @Create(operationDescription = @Operation)
+    @Create
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
         final String realm = realmFor(serverContext);

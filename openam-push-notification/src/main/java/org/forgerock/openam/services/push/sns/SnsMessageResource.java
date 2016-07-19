@@ -15,26 +15,15 @@
 */
 package org.forgerock.openam.services.push.sns;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.services.push.PushNotificationConstants.ACCEPT_VALUE;
-import static org.forgerock.openam.services.push.PushNotificationConstants.DENY_LOCATION;
-import static org.forgerock.openam.services.push.PushNotificationConstants.DENY_VALUE;
-import static org.forgerock.openam.services.push.PushNotificationConstants.JWT;
-import static org.forgerock.openam.services.push.PushNotificationConstants.MESSAGE_ID_JSON_POINTER;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.services.push.PushNotificationConstants.*;
+import static org.forgerock.util.promise.Promises.*;
 
+import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.forgerock.api.annotations.Action;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.RequestHandler;
-import org.forgerock.api.annotations.Schema;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
@@ -43,6 +32,8 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.annotations.Action;
+import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -58,8 +49,6 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * An endpoint, created and attached to the Router at the point of a new {@link SnsHttpDelegate} being
@@ -79,7 +68,7 @@ import com.sun.identity.shared.debug.Debug;
  * {@see SnsHttpDelegate}.
  * {@see PushNotificationService}.
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@RequestHandler
 public class SnsMessageResource {
 
     private static final String AUTHENTICATE = "authenticate";
@@ -121,7 +110,7 @@ public class SnsMessageResource {
      * @param actionRequest The request triggering the dispatch.
      * @return An empty HTTP 200 if everything was okay, or an HTTP 400 if the request was malformed.
      */
-    @Action(operationDescription = @Operation)
+    @Action
     public Promise<ActionResponse, ResourceException> authenticate(Context context, ActionRequest actionRequest) {
         return handle(context, actionRequest);
     }
@@ -136,7 +125,7 @@ public class SnsMessageResource {
      * @param actionRequest The request triggering the dispatch.
      * @return An empty HTTP 200 if everything was okay, or an HTTP 400 if the request was malformed.
      */
-    @Action(operationDescription = @Operation)
+    @Action
     public Promise<ActionResponse, ResourceException> register(Context context, ActionRequest actionRequest) {
         return handle(context, actionRequest);
     }

@@ -19,25 +19,20 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.server.SelfServiceInfo.SelfServiceInfoBuilder;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.forgerock.api.annotations.CollectionProvider;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.Parameter;
-import org.forgerock.api.annotations.Read;
-import org.forgerock.api.annotations.Schema;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -54,7 +49,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.core.rest.server.models.ServerInfo;
 import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.ServiceConfigUtils;
@@ -65,33 +59,24 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.common.configuration.MapValueParser;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
  * <p>
  * This resources acts as a read only resource for the moment.
  */
-@CollectionProvider(details = @Handler(mvccSupported = false, title = "Server Information",
-        description = "Provides information about the OpenAM instance for machine clients to use.",
-        resourceSchema = @Schema(fromType = ServerInfo.class)),
-        pathParam = @Parameter(
-                name = "id", type = "string",
-                enumTitles = {"All data", "Cookie Domains"}, enumValues = {"*", "cookieDomains"},
-                description = "Server Information Identifier"))
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
@@ -334,7 +319,6 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    @Read(operationDescription = @Operation(description = "Read the server information instance."))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 

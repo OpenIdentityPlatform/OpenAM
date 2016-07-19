@@ -15,24 +15,11 @@
  */
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.common.configuration.ServerConfiguration.cloneServerInstance;
-import static com.sun.identity.common.configuration.ServerConfiguration.createServerInstance;
-import static com.sun.identity.common.configuration.ServerConfiguration.deleteServerInstance;
-import static com.sun.identity.common.configuration.ServerConfiguration.getServerConfigXML;
-import static com.sun.identity.common.configuration.ServerConfiguration.getServerID;
-import static com.sun.identity.common.configuration.ServerConfiguration.getServerSite;
-import static com.sun.identity.common.configuration.ServerConfiguration.getServers;
-import static com.sun.identity.common.configuration.ServerConfiguration.hasServerOrSiteId;
-import static com.sun.identity.common.configuration.ServerConfiguration.isServerInstanceExist;
+import static com.sun.identity.common.configuration.ServerConfiguration.*;
 import static java.util.Collections.emptySet;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.utils.StringUtils.isEmpty;
-import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Set;
@@ -41,17 +28,6 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.api.annotations.Action;
-import org.forgerock.api.annotations.CollectionProvider;
-import org.forgerock.api.annotations.Create;
-import org.forgerock.api.annotations.Delete;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.Query;
-import org.forgerock.api.annotations.Read;
-import org.forgerock.api.annotations.RequestHandler;
-import org.forgerock.api.annotations.Schema;
-import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -66,6 +42,12 @@ import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.annotations.Action;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Delete;
+import org.forgerock.json.resource.annotations.Query;
+import org.forgerock.json.resource.annotations.Read;
+import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -83,7 +65,7 @@ import com.sun.identity.sm.SMSException;
  *
  * Since 14.0.0
  */
-@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@RequestHandler
 public final class ServersResourceProvider {
 
     private final Debug debug;
@@ -93,7 +75,7 @@ public final class ServersResourceProvider {
         this.debug = debug;
     }
 
-    @Create(operationDescription = @Operation)
+    @Create
     public Promise<ResourceResponse, ResourceException> create(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         String id = request.getNewResourceId();
@@ -131,7 +113,7 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Delete(operationDescription = @Operation)
+    @Delete
     public Promise<ResourceResponse, ResourceException> delete(Context context, String id) {
         try {
             SSOToken token = getSsoToken(context);
@@ -147,7 +129,7 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Query(operationDescription = @Operation,type = QueryType.FILTER, queryableFields = "*")
+    @Query
     public Promise<QueryResponse, ResourceException> query(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
@@ -172,7 +154,7 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Read(operationDescription = @Operation)
+    @Read
     public Promise<ResourceResponse, ResourceException> read(Context context, String id) {
         try {
             SSOToken token = getSsoToken(context);
@@ -187,7 +169,7 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Action(operationDescription = @Operation)
+    @Action
     public Promise<ActionResponse, ResourceException> clone(
             String existingServerId, Context context, ActionRequest request) {
         try {

@@ -129,6 +129,7 @@
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
         <powermock.version>1.5</powermock.version>
+        <jackson.version>2.4.2</jackson.version>
         <slf4j.version>1.7.5</slf4j.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <click.version>2.3.0</click.version>
@@ -549,7 +550,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>commons-bom</artifactId>
-                <version>21.0.0-alpha-3</version>
+                <version>20.1.0</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -1592,6 +1593,28 @@
                 <groupId>external</groupId>
                 <artifactId>jsr173_api</artifactId>
                 <version>${jsr173_api.version}</version>
+            </dependency>
+
+            <!-- Preferred JSON Data Binding API -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
 
             <!-- Session HA Module Dependencies-->

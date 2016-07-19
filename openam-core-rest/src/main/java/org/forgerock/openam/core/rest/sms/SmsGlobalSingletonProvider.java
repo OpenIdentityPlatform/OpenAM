@@ -16,31 +16,6 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.forgerock.api.annotations.CollectionProvider;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.RequestHandler;
-import org.forgerock.api.annotations.Schema;
-import org.forgerock.api.annotations.SingletonProvider;
-import org.forgerock.api.annotations.Update;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
-import org.forgerock.services.context.Context;
-import org.forgerock.util.promise.Promise;
-
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
@@ -50,13 +25,30 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.RequestHandler;
+import org.forgerock.json.resource.annotations.Update;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST singleton provider for SMS global schema config.
  *
  * @since 13.0.0
  */
-@SingletonProvider(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@RequestHandler
 public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
 
     private final SmsJsonConverter organizationConverter;
@@ -81,7 +73,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
         }
     }
 
-    @Update(operationDescription = @Operation)
+    @Update
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         if (organizationSchema != null) {

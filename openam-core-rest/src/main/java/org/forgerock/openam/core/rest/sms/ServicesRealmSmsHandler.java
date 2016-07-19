@@ -16,29 +16,29 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.rest.RestConstants.NAME;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.rest.RestConstants.*;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.api.annotations.Create;
-import org.forgerock.api.annotations.Handler;
-import org.forgerock.api.annotations.Operation;
-import org.forgerock.api.annotations.Query;
-import org.forgerock.api.annotations.RequestHandler;
-import org.forgerock.api.annotations.Schema;
-import org.forgerock.api.enums.QueryType;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
@@ -48,21 +48,15 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.annotations.Create;
+import org.forgerock.json.resource.annotations.Query;
+import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceManager;
 
 /**
  * Endpoint to handle requests for information about specific services available
@@ -73,7 +67,7 @@ import com.sun.identity.sm.ServiceManager;
  *
  * @since 14.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@RequestHandler
 public class ServicesRealmSmsHandler {
 
     private final Debug debug;
@@ -86,7 +80,7 @@ public class ServicesRealmSmsHandler {
         this.consoleNameFilter = consoleNameFilter;
     }
 
-    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
+    @Query
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest queryRequest,
                                                                  QueryResourceHandler queryResourceHandler) {
         String searchForId;
@@ -149,7 +143,7 @@ public class ServicesRealmSmsHandler {
      * @param request The request.
      * @return The result from the downstream handler.
      */
-    @Create(operationDescription = @Operation)
+    @Create
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         UriRouterContext ctx = context.asContext(UriRouterContext.class);
         String serviceResourceId = request.getNewResourceId();

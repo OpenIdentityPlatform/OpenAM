@@ -29,7 +29,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.http.Handler;
-import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
 
@@ -58,7 +57,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
                     internalResourceRouter, rootServiceRouter, realmServiceRouter);
         }
         return Collections.singleton(
-                newHttpRoute(STARTS_WITH, "json", Key.get(DescribableHandler.class, Names.named("RestHandler"))));
+                newHttpRoute(STARTS_WITH, "json", Key.get(Handler.class, Names.named("RestHandler"))));
     }
 
     @Inject
