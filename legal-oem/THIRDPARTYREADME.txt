@@ -215,16 +215,16 @@ Copyright: Copyright 2005-2015 The Apache Software Foundation
 Version: httpcore-nio-4.4.1.jar
 Copyright: 2005-2015 The Apache Software Foundation
 
-Version: jackson-annotations-2.6.3.jar
+Version: jackson-annotations-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-core-2.6.3.jar
+Version: jackson-core-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-core-asl-1.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-databind-2.6.3.jar
+Version: jackson-databind-2.4.2.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-dataformat-csv-2.6.3.jar
@@ -233,11 +233,11 @@ Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless othe
 Version: jackson-dataformat-smile-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-xml-2.6.3.jar
-Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
+Version: jackson-dataformat-xml-2.4.2.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-yaml-2.6.3.jar
-Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
+Version: jackson-dataformat-yaml-2.4.4.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-module-jaxb-annotations-2.6.3.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
@@ -327,9 +327,6 @@ Copyright: Copyright (c) 2008-2010 Andrey Somov
 
 Version: super-csv-2.4.0.jar
 Copyright: Copyright 2007 Kasper B. Graversen
-
-Version: swagger-models-1.5.8.jar
-Copyright: Copyright 2016 SmartBear Software
 
 Version: velocity-1.7.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
