@@ -15,12 +15,35 @@
  */
 package org.forgerock.openam.scripting.rest;
 
-import static java.nio.charset.StandardCharsets.*;
-import static org.forgerock.json.JsonValue.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SCRIPT_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TRANSLATION_KEY_PREFIX;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
+import static org.forgerock.openam.scripting.ScriptConstants.JSON_UUID;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CONTEXT;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CREATED_BY;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CREATION_DATE;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_DESCRIPTION;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LANGUAGE;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LAST_MODIFIED_BY;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LAST_MODIFIED_DATE;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_TEXT;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.MISSING_SCRIPT;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.SCRIPT_DECODING_FAILED;
+import static org.forgerock.openam.scripting.ScriptConstants.getContextFromString;
+import static org.forgerock.openam.scripting.ScriptConstants.getLanguageFromString;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -28,10 +51,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import com.sun.identity.shared.encode.Base64;
-import org.forgerock.services.context.Context;
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -58,15 +88,30 @@ import org.forgerock.openam.scripting.ScriptValidator;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * A REST endpoint for managing scripts in OpenAM.
  *
  * @since 13.0.0
  */
+@CollectionProvider(
+        details = @Handler(
+                title = SCRIPT_RESOURCE + TITLE,
+                description = SCRIPT_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "ScriptResource.schema.json")),
+        pathParam = @Parameter(
+                name = "_id",
+                type = "string",
+                description = SCRIPT_RESOURCE + "pathParam." + DESCRIPTION))
 public class ScriptResource extends RealmAwareResource {
 
     private final Logger logger;
@@ -92,6 +137,18 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Action(name = "validate",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(code = 400,
+                                    description = SCRIPT_RESOURCE + "error.missing.script"),
+                            @ApiError(code = 400,
+                                    description = SCRIPT_RESOURCE + "error.script.decode"),
+                            @ApiError(code = 400,
+                                    description = SCRIPT_RESOURCE + "error.script.language.not.supported")},
+                    description = SCRIPT_RESOURCE + "validate.action" + DESCRIPTION),
+            request = @Schema(schemaResource = "ScriptResource.action.validate.request.schema.json"),
+            response = @Schema(schemaResource = "ScriptResource.action.validate.response.schema.json"))
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         if ("validate".equals(request.getAction())) {
             try {
@@ -137,6 +194,11 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.decode")},
+            description = SCRIPT_RESOURCE + CREATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         try {
              final ScriptConfiguration sc = serviceFactory
@@ -149,6 +211,21 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.cannot.find.realm"),
+                    @ApiError(code = 403,
+                            description = SCRIPT_RESOURCE + "error.cannot.delete.default.script"),
+                    @ApiError(code = 404,
+                            description = SCRIPT_RESOURCE + "error.script.not.found"),
+                    @ApiError(code = 500,
+                            description = SCRIPT_RESOURCE + "error.delete.script.used.once"),
+                    @ApiError(code = 500,
+                            description = SCRIPT_RESOURCE + "error.delete.script.used.multiple"),
+                    @ApiError(code = 500,
+                            description = SCRIPT_RESOURCE + "error.delete.failed")},
+            description = SCRIPT_RESOURCE + DELETE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
@@ -161,6 +238,10 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Query(operationDescription = @Operation(
+            description = SCRIPT_RESOURCE + QUERY_DESCRIPTION),
+        type = QueryType.FILTER,
+        queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler resultHandler) {
         final QueryFilter<JsonPointer> filter = request.getQueryFilter();
@@ -188,6 +269,12 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(code = 400,
+                            description = 
+                                    SCRIPT_RESOURCE + "error.script.not.found")},
+            description = SCRIPT_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
@@ -199,6 +286,25 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.decode"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.language.not.supported"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.type.not.found"),
+                    @ApiError(code = 404,
+                            description = SCRIPT_RESOURCE + "error.script.not.found"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.name.empty"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.not.specified"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.language.not.spec"),
+                    @ApiError(code = 400,
+                            description = SCRIPT_RESOURCE + "error.script.type.not.spec")},
+            description = SCRIPT_RESOURCE + UPDATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         try {
@@ -215,7 +321,7 @@ public class ScriptResource extends RealmAwareResource {
      * @param scriptConfig The {@code ScriptConfiguration}.
      * @return The {@code JsonValue}.
      */
-    private JsonValue asJson(ScriptConfiguration scriptConfig) throws ScriptException {
+    private JsonValue asJson(ScriptConfiguration scriptConfig) {
         return json(object(field(JSON_UUID, scriptConfig.getId()),
                 field(SCRIPT_NAME, scriptConfig.getName()),
                 field(SCRIPT_DESCRIPTION, scriptConfig.getDescription()),

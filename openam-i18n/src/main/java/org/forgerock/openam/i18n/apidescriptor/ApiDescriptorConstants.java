@@ -112,6 +112,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String OATH_DEVICES_RESOURCE = TRANSLATION_KEY_PREFIX + "OathDevicesResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SCRIPT_RESOURCE = TRANSLATION_KEY_PREFIX + "ScriptResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

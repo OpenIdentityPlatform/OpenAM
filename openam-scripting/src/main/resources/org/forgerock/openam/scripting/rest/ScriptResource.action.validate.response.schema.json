@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/ScriptResource#action.response.schema.title",
+  "description": "i18n:api-descriptor/ScriptResource#action.response.schema.description",
+  "properties": {
+    "success": {
+      "title": "i18n:api-descriptor/ScriptResource#success.title",
+      "description": "i18n:api-descriptor/ScriptResource#success.description",
+      "type": "boolean"
+    },
+    "errors": {
+      "title": "i18n:api-descriptor/ScriptResource#errors.title",
+      "description": "i18n:api-descriptor/ScriptResource#errors.description",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "title": "i18n:api-descriptor/ScriptResource#line.title",
+            "description": "i18n:api-descriptor/ScriptResource#line.description",
+            "type": "integer"
+          },
+          "column": {
+            "title": "i18n:api-descriptor/ScriptResource#column.title",
+            "description": "i18n:api-descriptor/ScriptResource#column.description",
+            "type": "integer"
+          },
+          "message": {
+            "title": "i18n:api-descriptor/ScriptResource#message.title",
+            "description": "i18n:api-descriptor/ScriptResource#message.description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line",
+          "column",
+          "message"
+        ]
+      }
+    }
+  },
+  "required": [
+    "success"
+  ]
+}

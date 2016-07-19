@@ -220,7 +220,7 @@ public class ScriptConfigurationService implements ScriptingService, ServiceList
     }
 
     @Override
-    public Set<ScriptConfiguration> getAll() throws ScriptException {
+    public Set<ScriptConfiguration> getAll() {
         Set<ScriptConfiguration> configurations = new HashSet<>();
         lock.readLock().lock();
         try {
@@ -245,7 +245,7 @@ public class ScriptConfigurationService implements ScriptingService, ServiceList
     }
 
     @Override
-    public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) throws ScriptException {
+    public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) {
         return queryFilter.accept(SCRIPT_CONFIGURATION_QUERY_FILTER_VISITOR, getAll());
     }
 

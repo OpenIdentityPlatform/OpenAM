@@ -89,7 +89,7 @@ public class ScriptResourceTest {
         }
 
         @Override
-        public Set<ScriptConfiguration> getAll() throws ScriptException {
+        public Set<ScriptConfiguration> getAll() {
             return new LinkedHashSet<>(scriptConfigSet.values());
         }
 
