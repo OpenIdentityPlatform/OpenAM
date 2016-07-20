@@ -13,11 +13,9 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             { pattern: "target/test-classes/test-main.js" },
-            { pattern: "target/test-classes/org/**/*.js", included: false },
-            { pattern: "target/compiled/org/**/*.js", included: false },
-            { pattern: "target/compiled/config/**/*.js", included: false },
-            { pattern: "target/dependencies/libs/**/*.js", included: false },
             { pattern: "target/test-classes/**/*.js", included: false },
+            { pattern: "target/compiled/**/*.js", included: false },
+            { pattern: "target/dependencies/libs/**/*.js", included: false },
             { pattern: "node_modules/chai/chai.js", included: false },
             { pattern: "node_modules/sinon-chai/lib/sinon-chai.js", included: false }
         ],
@@ -30,8 +28,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            "target/test-classes/test-main.js": ["babel"],
-            "target/test-classes/org/**/*.js": ["babel"]
+            "target/test-classes/**/*.js": ["babel"]
         },
 
 

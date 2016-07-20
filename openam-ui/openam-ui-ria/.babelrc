@@ -9,7 +9,8 @@
         "main-device.js",
         "main.js",
         "config/**/*.js",
-        "org/forgerock/openam/**/*.js"
+        "org/forgerock/openam/**/*.js",
+        "store/*.js"
     ],
     "presets": ["es2015"]
 }
