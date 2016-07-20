@@ -22,13 +22,10 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -85,6 +79,13 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
@@ -268,7 +269,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
         final KeyPair signingKeyPair = providerSettings.getSigningKeyPair(
                 JwsAlgorithm.valueOf(signingAlgorithm.toUpperCase()));
-        final PublicKey encryptionPublicKey = clientRegistration.getIDTokenEncryptionPublicKey();
+        final Key encryptionKey = clientRegistration.getIDTokenEncryptionKey();
 
         final String atHash = generateAtHash(signingAlgorithm, request, providerSettings);
         final String cHash = generateCHash(signingAlgorithm, request, providerSettings);
@@ -297,7 +298,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         }
 
         final OpenIdConnectToken oidcToken = new OpenIdConnectToken(signingKeyId, encryptionKeyId,
-                clientSecret, signingKeyPair, encryptionPublicKey, signingAlgorithm, encryptionAlgorithm,
+                clientSecret, signingKeyPair, encryptionKey, signingAlgorithm, encryptionAlgorithm,
                 encryptionMethod, clientRegistration.isIDTokenEncryptionEnabled(), iss, subId, clientId,
                 authorizationParty, MILLISECONDS.toSeconds(exp), MILLISECONDS.toSeconds(currentTimeMillis), authTime,
                 nonce, opsId, atHash, cHash, acr, amr, IdGenerator.DEFAULT.generate(), realm);

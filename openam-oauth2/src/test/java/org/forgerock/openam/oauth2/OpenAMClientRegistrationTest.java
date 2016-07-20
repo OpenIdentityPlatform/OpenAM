@@ -17,25 +17,42 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.assertj.core.api.Assertions.*;
+import static java.util.Collections.singleton;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2Client.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.mockito.Mockito.*;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import com.sun.identity.idm.AMIdentity;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.crypto.spec.SecretKeySpec;
+
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.shared.encode.Base64;
 
 public class OpenAMClientRegistrationTest {
 
@@ -47,11 +64,22 @@ public class OpenAMClientRegistrationTest {
     @Mock
     private OAuth2ProviderSettings providerSettings;
 
+    private PublicKey publicEncryptionKey;
+
+    @BeforeClass
+    public void generateKeyPair() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(1024);
+        publicEncryptionKey = keyPairGenerator.generateKeyPair().getPublic();
+    }
+
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
-        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings, failureFactory);
+        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings,
+                failureFactory);
+
     }
 
     @Test
@@ -171,4 +199,48 @@ public class OpenAMClientRegistrationTest {
         );
     }
 
+    @Test(dataProvider = "encryptionAlgorithms")
+    public void shouldReturnCorrectEncryptionKey(JweAlgorithm jweAlgorithm, Key key) throws Exception {
+        when(amIdentity.getAttribute("idTokenEncryptionAlgorithm")).thenReturn(singleton(jweAlgorithm.toString()));
+        when(amIdentity.getAttribute("idTokenPublicEncryptionKey")).thenReturn(singleton(pem(publicEncryptionKey)));
+        when(amIdentity.getAttribute("userpassword")).thenReturn(singleton("password"));
+        when(amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_TYPE)).thenReturn(singleton("CONFIDENTIAL"));
+        when(amIdentity.getAttribute("idTokenEncryptionMethod")).thenReturn(singleton("A256CBC-HS512"));
+
+        Key encryptionKey = clientRegistration.getIDTokenEncryptionKey();
+
+        assertThat(encryptionKey).isEqualTo(key);
+    }
+
+    @Test(expectedExceptions = OAuthProblemException.class)
+    public void shouldDisallowSymmetricEncryptionForPublicClients() throws Exception {
+        when(amIdentity.getAttribute("idTokenEncryptionAlgorithm")).thenReturn(singleton("dir"));
+        when(amIdentity.getAttribute("idTokenEncryptionMethod")).thenReturn(singleton("A256CBC-HS512"));
+        when(amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_TYPE)).thenReturn(singleton("PUBLIC"));
+
+        clientRegistration.getIDTokenEncryptionKey();
+    }
+
+    private String pem(PublicKey pk) {
+        return "-----BEGIN PUBLIC KEY-----" + Base64.encode(pk.getEncoded()) + "-----END PUBLIC KEY-----";
+    }
+
+    @DataProvider
+    public Object[][] encryptionAlgorithms() throws Exception {
+        return new Object[][] {
+                { JweAlgorithm.RSAES_PKCS1_V1_5, publicEncryptionKey },
+                { JweAlgorithm.RSA_OAEP, publicEncryptionKey },
+                { JweAlgorithm.RSA_OAEP_256, publicEncryptionKey },
+                { JweAlgorithm.DIRECT, hashedKey("SHA-512", "password", 64)},
+                { JweAlgorithm.A128KW, hashedKey("SHA-256", "password", 16)},
+                { JweAlgorithm.A192KW, hashedKey("SHA-256", "password", 24)},
+                { JweAlgorithm.A256KW, hashedKey("SHA-256", "password", 32)}
+        };
+    }
+
+    private Key hashedKey(String hashAlgorithm, String password, int size) throws Exception {
+        MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
+        return new SecretKeySpec(Arrays.copyOfRange(md.digest(password.getBytes(StandardCharsets.UTF_8)), 0, size),
+                "AES");
+    }
 }

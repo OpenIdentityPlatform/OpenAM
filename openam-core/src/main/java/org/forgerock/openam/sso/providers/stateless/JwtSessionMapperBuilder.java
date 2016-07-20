@@ -15,6 +15,21 @@
  */
 package org.forgerock.openam.sso.providers.stateless;
 
+import static org.forgerock.util.Reject.checkNotNull;
+
+import java.nio.charset.Charset;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
+
+import org.forgerock.json.jose.jwe.CompressionAlgorithm;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jwe.JweAlgorithmType;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
@@ -22,12 +37,8 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-import java.nio.charset.Charset;
-import java.security.KeyPair;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
+import com.sun.identity.configuration.SystemProperties;
+import com.sun.identity.shared.configuration.ISystemProperties;
 
 /**
  * Responsible for creating instances of {@link JwtSessionMapper}.
@@ -38,24 +49,37 @@ import java.security.interfaces.ECPublicKey;
  */
 @NotThreadSafe
 class JwtSessionMapperBuilder {
+    private static final String ENCRYPTION_METHOD =
+            "org.forgerock.openam.session.stateless.encryption.method";
+    private static final String DEFAULT_ENCRYPTION_METHOD = "A128CBC-HS256";
+    private static final String RSA_PADDING_METHOD = "org.forgerock.openam.session.stateless.rsa.padding";
+    private static final String DEFAULT_RSA_PADDING_METHOD = "RSA-OAEP-256";
 
     private final SigningManager signingManager;
+    private final ISystemProperties systemProperties;
 
-    private JwsAlgorithm jwsAlgorithm = JwsAlgorithm.NONE;
-    private SigningHandler signingHandler = new SigningManager().newNopSigningHandler();
-    private SigningHandler verificationHandler = new SigningManager().newNopSigningHandler();
-    private KeyPair encryptionKeyPair = null;
+    JwsAlgorithm jwsAlgorithm = JwsAlgorithm.NONE;
+    SigningHandler signingHandler = new SigningManager().newNopSigningHandler();
+    SigningHandler verificationHandler = new SigningManager().newNopSigningHandler();
+
+    JweAlgorithm jweAlgorithm = null;
+    Key encryptionKey = null;
+    Key decryptionKey = null;
+    EncryptionMethod encryptionMethod = null;
+
+    CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.NONE;
 
     @VisibleForTesting
-    JwtSessionMapperBuilder(final SigningManager signingManager) {
+    JwtSessionMapperBuilder(final SigningManager signingManager, final ISystemProperties systemProperties) {
         this.signingManager = signingManager;
+        this.systemProperties = systemProperties;
     }
 
     /**
      * Creates a blank session mapping builder with no signing or encryption modes configured.
      */
-    public JwtSessionMapperBuilder() {
-        this(new SigningManager());
+    JwtSessionMapperBuilder() {
+        this(new SigningManager(), new SystemProperties());
     }
 
     /**
@@ -68,7 +92,7 @@ class JwtSessionMapperBuilder {
      *
      * @see org.forgerock.json.jose.jws.JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingRS256(@Nonnull final KeyPair signingKeyPair) {
+    JwtSessionMapperBuilder signedUsingRS256(@Nonnull final KeyPair signingKeyPair) {
 
         Reject.ifNull(signingKeyPair, "signingKeyPair must not be null.");
 
@@ -88,7 +112,7 @@ class JwtSessionMapperBuilder {
      *
      * @see org.forgerock.json.jose.jws.JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingHS256(@Nonnull final String sharedSecret) {
+    JwtSessionMapperBuilder signedUsingHS256(@Nonnull final String sharedSecret) {
 
         signedUsingHSxxx(JwsAlgorithm.HS256, sharedSecret);
         return this;
@@ -104,7 +128,7 @@ class JwtSessionMapperBuilder {
      *
      * @see org.forgerock.json.jose.jws.JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingHS384(@Nonnull final String sharedSecret) {
+    JwtSessionMapperBuilder signedUsingHS384(@Nonnull final String sharedSecret) {
 
         signedUsingHSxxx(JwsAlgorithm.HS384, sharedSecret);
         return this;
@@ -120,7 +144,7 @@ class JwtSessionMapperBuilder {
      *
      * @see org.forgerock.json.jose.jws.JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingHS512(@Nonnull final String sharedSecret) {
+    JwtSessionMapperBuilder signedUsingHS512(@Nonnull final String sharedSecret) {
 
         signedUsingHSxxx(JwsAlgorithm.HS512, sharedSecret);
         return this;
@@ -148,7 +172,7 @@ class JwtSessionMapperBuilder {
      *
      * @see JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingES256(@Nonnull final KeyPair signingKeyPair) {
+    JwtSessionMapperBuilder signedUsingES256(@Nonnull final KeyPair signingKeyPair) {
         signedUsingESxxx(JwsAlgorithm.ES256, signingKeyPair);
         return this;
     }
@@ -162,7 +186,7 @@ class JwtSessionMapperBuilder {
      *
      * @see JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingES384(@Nonnull final KeyPair signingKeyPair) {
+    JwtSessionMapperBuilder signedUsingES384(@Nonnull final KeyPair signingKeyPair) {
         signedUsingESxxx(JwsAlgorithm.ES384, signingKeyPair);
         return this;
     }
@@ -176,7 +200,7 @@ class JwtSessionMapperBuilder {
      *
      * @see JwsAlgorithm
      */
-    public JwtSessionMapperBuilder signedUsingES512(@Nonnull final KeyPair signingKeyPair) {
+    JwtSessionMapperBuilder signedUsingES512(@Nonnull final KeyPair signingKeyPair) {
         signedUsingESxxx(JwsAlgorithm.ES512, signingKeyPair);
         return this;
     }
@@ -195,30 +219,127 @@ class JwtSessionMapperBuilder {
 
     /**
      * Instructs the builder to create instances of {@link JwtSessionMapper} that can encrypt and decrypt
-     * the JWT.
+     * the JWT using RSA encryption. The system property {@literal org.forgerock.openam.session.stateless.rsa .padding}
+     * can be used to control the RSA padding method (defaults to {@literal RSA-OAEP-256}). The system property
+     * {@literal org.forgerock.openam.session.stateless.encryption.method} can be used to control the underlying
+     * content encryption method (defaults to {@literal A128CBC-HS256}).
      *
      * @param encryptionKeyPair Non-null, public-private key-pair to use to encrypt and decrypt the JWT.
      *
      * @return this {@link JwtSessionMapperBuilder}
      *
-     * @see org.forgerock.json.jose.jwe.JweAlgorithm
+     * @see JweAlgorithm#RSA_OAEP
+     * @see JweAlgorithm#RSA_OAEP_256
+     * @see JweAlgorithm#RSAES_PKCS1_V1_5
      * @see org.forgerock.json.jose.jwe.EncryptionMethod
      */
-    public JwtSessionMapperBuilder encryptedUsingKeyPair(@Nonnull final KeyPair encryptionKeyPair) {
+    JwtSessionMapperBuilder encryptedUsingKeyPair(@Nonnull final KeyPair encryptionKeyPair) {
 
         Reject.ifNull(encryptionKeyPair, "encryptionKeyPair must not be null.");
 
-        this.encryptionKeyPair = encryptionKeyPair;
-        return this;
+        this.encryptionKey = encryptionKeyPair.getPublic();
+        this.decryptionKey = encryptionKeyPair.getPrivate();
+        this.jweAlgorithm = JweAlgorithm.parseAlgorithm(
+                systemProperties.getOrDefault(RSA_PADDING_METHOD, DEFAULT_RSA_PADDING_METHOD));
 
+        return this;
+    }
+
+    /**
+     * Instructs the builder to constuct {@link JwtSessionMapper} instances that encrypt the JWT contents using <a
+     * href="https://tools.ietf.org/html/rfc3394">AES KeyWrap</a>. A unique key is generated for each JWT and then
+     * wrapped using the provided symmetric key. The strength is determined by the size of the given key: 128-bit key
+     * corresponds to {@link JweAlgorithm#A128KW} etc. Note that key sizes greater than 128 bits will require
+     * installation of the JCE Unlimited Strength policy files in the Java Runtime Environment. The system property
+     * {@literal org.forgerock.openam.session.stateless.encryption.method} can be used to control the underlying
+     * content encryption method (defaults to {@literal A128CBC-HS256}).
+     *
+     * @param symmetricEncryptionKey the symmetric key. Must be 128, 192 or 256 bits in size.
+     * @return this {@link JwtSessionMapperBuilder}.
+     *
+     * @see JweAlgorithm#A128KW
+     * @see JweAlgorithm#A192KW
+     * @see JweAlgorithm#A256KW
+     * @see EncryptionMethod
+     */
+    JwtSessionMapperBuilder encryptedUsingKeyWrap(@Nonnull final Key symmetricEncryptionKey) {
+        Reject.ifNull(symmetricEncryptionKey, "symmetricEncryptionKey must not be null.");
+
+        this.encryptionKey = symmetricEncryptionKey;
+        this.decryptionKey = symmetricEncryptionKey;
+        switch (symmetricEncryptionKey.getEncoded().length) {
+            case 16:
+                this.jweAlgorithm = JweAlgorithm.A128KW;
+                break;
+            case 24:
+                this.jweAlgorithm = JweAlgorithm.A192KW;
+                break;
+            case 32:
+                this.jweAlgorithm = JweAlgorithm.A256KW;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid key size for AES KeyWrap: must be 128, 192 or 256 bits");
+        }
+
+        return this;
+    }
+
+    /**
+     * Instructs the builder to construct {@link JwtSessionMapper} instances that encrypt the JWT contents directly
+     * using the given AES key. The system property
+     * {@literal org.forgerock.openam.session.stateless.encryption.method} can be used to control the underlying
+     * content encryption method (defaults to {@literal A128CBC-HS256}).
+     *
+     * @param symmetricEncryptionKey the AES encryption key to use. Must be either 128, 192 or 256 bits.
+     * @return this {@link JwtSessionMapperBuilder}.
+     *
+     * @see JweAlgorithm#DIRECT
+     * @see EncryptionMethod
+     */
+    JwtSessionMapperBuilder encryptedUsingDirectKey(@Nonnull final Key symmetricEncryptionKey) {
+        Reject.ifNull(symmetricEncryptionKey, "symmetricEncryptionKey must not be null.");
+
+        this.encryptionKey = symmetricEncryptionKey;
+        this.decryptionKey = symmetricEncryptionKey;
+        this.jweAlgorithm = JweAlgorithm.DIRECT;
+
+        return this;
+    }
+
+    /**
+     * Indicates that the content should be compressed before encryption using the given algorithm.
+     *
+     * @param compressionAlgorithm the compression algorithm to use.
+     * @return this builder object.
+     */
+    JwtSessionMapperBuilder compressedUsing(CompressionAlgorithm compressionAlgorithm) {
+        this.compressionAlgorithm = checkNotNull(compressionAlgorithm);
+        return this;
     }
 
     /**
      * @return JwtSessionMapper configured to perform signing and encryption as specified.
      */
-    public JwtSessionMapper build() {
+    JwtSessionMapper build() {
 
-        return new JwtSessionMapper(jwsAlgorithm, signingHandler, verificationHandler, encryptionKeyPair);
+        Reject.ifNull(jwsAlgorithm, "jwsAlgorithm must not be null.");
+        Reject.ifNull(signingHandler, "signingHandler must not be null.");
+        Reject.ifNull(verificationHandler, "verificationHandler must not be null.");
+        if (jweAlgorithm != null) {
+            encryptionMethod = EncryptionMethod.parseMethod(
+                    systemProperties.getOrDefault(ENCRYPTION_METHOD, DEFAULT_ENCRYPTION_METHOD));
+
+            Reject.ifNull(encryptionMethod, "Encryption enabled but no EncryptionMethod specified");
+            Reject.ifNull(encryptionKey, "Encryption enabled but no encryption key specified");
+            Reject.ifNull(decryptionKey, "Encryption enabled but no decryption key specified");
+
+            Reject.ifTrue(jweAlgorithm.getAlgorithmType() == JweAlgorithmType.RSA && jwsAlgorithm == JwsAlgorithm.NONE,
+                    "RSA encryption should not be used without a signature");
+        } else {
+            Reject.ifTrue(jwsAlgorithm == JwsAlgorithm.NONE, "No encryption or signature scheme specified!");
+        }
+
+        return new JwtSessionMapper(this);
     }
 
     @VisibleForTesting

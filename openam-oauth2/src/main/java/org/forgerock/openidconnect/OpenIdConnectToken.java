@@ -20,8 +20,8 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.*;
 
+import java.security.Key;
 import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.util.HashMap;
@@ -61,7 +61,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
     private final byte[] clientSecret;
     private final KeyPair signingKeyPair;
-    private final PublicKey encryptionPublicKey;
+    private final Key encryptionKey;
     private final String signingAlgorithm;
     private final boolean isIDTokenEncryptionEnabled;
     private final String encryptionAlgorithm;
@@ -76,7 +76,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param encryptionKeyId The encryption key id.
      * @param clientSecret The client's secret.
      * @param signingKeyPair The token's signing key pair.
-     * @param encryptionPublicKey The token's encryption public key.
+     * @param encryptionKey The token's encryption key.
      * @param signingAlgorithm The signing algorithm.
      * @param encryptionAlgorithm The encryption algorithm.
      * @param encryptionMethod The encryption method.
@@ -98,7 +98,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param realm The realm.
      */
     public OpenIdConnectToken(String signingKeyId, String encryptionKeyId, byte[] clientSecret, KeyPair signingKeyPair,
-            PublicKey encryptionPublicKey, String signingAlgorithm, String encryptionAlgorithm, String encryptionMethod,
+            Key encryptionKey, String signingAlgorithm, String encryptionAlgorithm, String encryptionMethod,
             boolean isIDTokenEncryptionEnabled, String iss, String sub, String aud, String azp, long exp, long iat,
             long authTime, String nonce, String ops, String atHash, String cHash, String acr, List<String> amr,
             String auditTrackingId, String realm) {
@@ -109,7 +109,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         this.encryptionAlgorithm = encryptionAlgorithm;
         this.encryptionMethod = encryptionMethod;
         this.signingKeyPair = signingKeyPair;
-        this.encryptionPublicKey = encryptionPublicKey;
+        this.encryptionKey = encryptionKey;
         this.signingKeyId = signingKeyId;
         this.encryptionKeyId = encryptionKeyId;
         setIss(iss);
@@ -139,7 +139,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         this.encryptionAlgorithm = null;
         this.encryptionMethod = null;
         this.signingKeyPair = null;
-        this.encryptionPublicKey = null;
+        this.encryptionKey = null;
         this.signingKeyId = null;
         this.encryptionKeyId = null;
         setClaims(claims, ISS, SUB, AZP, NONCE, OPS, AT_HASH, C_HASH, ACR, AUDIT_TRACKING_ID, AUTH_TIME, AMR, REALM);
@@ -380,7 +380,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private Jwt createJwt() throws SignatureException {
         JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(signingAlgorithm);
         if (isIDTokenEncryptionEnabled && (isEmpty(encryptionAlgorithm) || isEmpty(encryptionMethod)
-                || encryptionPublicKey == null)) {
+                || encryptionKey == null)) {
             logger.info("ID Token Encryption not set. algorithm: {}, method: {}", encryptionAlgorithm,
                     encryptionMethod);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
@@ -413,11 +413,11 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private Jwt createEncryptedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {
         // As per http://openid.net/specs/openid-connect-core-1_0.html#SigningOrder, JWT should be signed first and
         // then encrypted.
-        return signedJwtBuilder(signingHandler, jwsAlgorithm, claimsSet).encrypt(encryptionPublicKey).headers()
-                .alg(JweAlgorithm.parseAlgorithm(encryptionAlgorithm))
-                .enc(EncryptionMethod.parseMethod(encryptionMethod))
-                .headerIfNotNull(KEY_ID_HEADER, encryptionKeyId)
-                .done().asJwt();
+        return signedJwtBuilder(signingHandler, jwsAlgorithm, claimsSet).encrypt(encryptionKey).headers()
+                    .alg(JweAlgorithm.parseAlgorithm(encryptionAlgorithm))
+                    .enc(EncryptionMethod.parseMethod(encryptionMethod))
+                    .headerIfNotNull(KEY_ID_HEADER, encryptionKeyId)
+                    .done().asJwt();
     }
 
     private Jwt createSignedJwt(SigningHandler signingHandler, JwsAlgorithm jwsAlgorithm, JwtClaimsSet claimsSet) {

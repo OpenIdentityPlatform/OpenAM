@@ -287,6 +287,12 @@
                         order="170">
                     <DefaultValues>
                         <Value>RSA1_5</Value>
+                        <Value>RSA-OAEP</Value>
+                        <Value>RSA-OAEP-256</Value>
+                        <Value>dir</Value>
+                        <Value>A128KW</Value>
+                        <Value>A192KW</Value>
+                        <Value>A256KW</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema
@@ -297,7 +303,11 @@
                         order="180">
                     <DefaultValues>
                         <Value>A128CBC-HS256</Value>
+                        <Value>A192CBC-HS384</Value>
                         <Value>A256CBC-HS512</Value>
+                        <Value>A128GCM</Value>
+                        <Value>A192GCM</Value>
+                        <Value>A256GCM</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema
@@ -351,10 +361,20 @@
                         <Value>HS256</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="tokenCompressionEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a138"
+                                 order="223">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
                 <AttributeSchema name="idTokenInfoClientAuthenticationEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a133"
+                                 i18nKey="a137"
                                  order="225">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>

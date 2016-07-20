@@ -17,12 +17,13 @@
 
 package org.forgerock.openam.oauth2;
 
-import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,11 +46,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
@@ -58,6 +57,9 @@ import org.forgerock.jaspi.modules.openid.helpers.JWKSetParser;
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
 import org.forgerock.jaspi.modules.openid.resolvers.SharedSecretOpenIdResolverImpl;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.json.jose.exceptions.JweException;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jwk.JWKSet;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -76,6 +78,12 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * Models an OpenAM OAuth2 and OpenId Connect client registration in the OAuth2 provider.
@@ -599,7 +607,39 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     }
 
     @Override
-    public PublicKey getIDTokenEncryptionPublicKey() {
+    public Key getIDTokenEncryptionKey() {
+        String algorithmStr = getIDTokenEncryptionResponseAlgorithm();
+        if (algorithmStr == null) {
+            return null;
+        }
+        try {
+            JweAlgorithm algorithm = JweAlgorithm.parseAlgorithm(algorithmStr);
+            switch (algorithm) {
+                case RSAES_PKCS1_V1_5:
+                case RSA_OAEP:
+                case RSA_OAEP_256:
+                    return getRSAPublicEncryptionKey();
+                case A128KW:
+                    return getSymmetricEncryptionKey(128);
+                case A192KW:
+                    return getSymmetricEncryptionKey(192);
+                case A256KW:
+                    return getSymmetricEncryptionKey(256);
+                case DIRECT:
+                    final EncryptionMethod encryptionMethod =
+                            EncryptionMethod.parseMethod(getIDTokenEncryptionResponseMethod());
+                    return getSymmetricEncryptionKey(encryptionMethod.getKeySize());
+                default:
+                    throw new JweException("Unknown JWE Algorithm: " + algorithm);
+            }
+        } catch (JweException e) {
+            logger.error("Unable to retrieve encryption key for algorithm: {}", algorithmStr, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get encryption key from repository");
+        }
+    }
+
+    private PublicKey getRSAPublicEncryptionKey() {
         try {
             Set<String> set = amIdentity.getAttribute("idTokenPublicEncryptionKey");
             if (set == null || set.isEmpty()) {
@@ -611,6 +651,25 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             logger.error("Unable to get {} from repository", "idTokenPublicEncryptionKey", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get " + "idTokenPublicEncryptionKey" + " from repository");
+        }
+    }
+
+    private SecretKey getSymmetricEncryptionKey(final int keySize) {
+        if (keySize > 512) {
+            throw new JweException("Cannot derive symmetric key for keySize > 512 bits");
+        }
+        if (!isConfidential()) {
+            throw new JweException("Symmetric encryption can only be used by confidential clients");
+        }
+        // See http://openid.net/specs/openid-connect-core-1_0.html#Encryption for the details of this algorithm
+        final String hashAlgorithm = keySize <= 256 ? "SHA-256" : keySize <= 384 ? "SHA-384" : "SHA-512";
+        final byte[] secret = getClientSecret().getBytes(StandardCharsets.UTF_8);
+        try {
+            final MessageDigest hash = MessageDigest.getInstance(hashAlgorithm);
+            final byte[] digest = Arrays.copyOfRange(hash.digest(secret), 0, keySize / 8);
+            return new SecretKeySpec(digest, "AES");
+        } catch (GeneralSecurityException e) {
+            throw new JweException(e);
         }
     }
 

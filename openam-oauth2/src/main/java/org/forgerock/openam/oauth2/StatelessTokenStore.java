@@ -45,6 +45,7 @@ import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.jwe.CompressionAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
@@ -178,16 +179,24 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString());
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
+        CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
                 .claims(claimsSetBuilder.build())
                 .headers()
                 .alg(signingAlgorithm)
+                .zip(compressionAlgorithm)
                 .done()
                 .asJwt();
         StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwt.build());
         request.setToken(AccessToken.class, accessToken);
         createStatelessTokenMetadata(jwtId, expiryTime.getMillis(), accessToken);
         return accessToken;
+    }
+
+    private CompressionAlgorithm getCompressionAlgorithm(final OAuth2Request request)
+            throws NotFoundException, ServerException {
+        return providerSettingsFactory.get(request).isTokenCompressionEnabled() ? CompressionAlgorithm.DEF :
+               CompressionAlgorithm.NONE;
     }
 
     private void createStatelessTokenMetadata(String id, long expiryTime, StatelessToken token) throws ServerException {
@@ -399,10 +408,12 @@ public class StatelessTokenStore implements TokenStore {
             claimsSetBuilder.claim(CLAIMS, validatedClaims);
         }
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
+        CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
                 .claims(claimsSetBuilder.build())
                 .headers()
                 .alg(signingAlgorithm)
+                .zip(compressionAlgorithm)
                 .done()
                 .asJwt();
 

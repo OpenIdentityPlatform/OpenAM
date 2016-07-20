@@ -24,10 +24,7 @@
  *
  * $Id: ISystemProperties.java,v 1.5 2008/06/25 05:53:00 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.shared.configuration;
@@ -46,6 +43,15 @@ public interface ISystemProperties {
      * @param key Key to the properties.
      */
     String get(String key);
+
+    /**
+     * Returns system property or the default value if not set.
+     *
+     * @param key the system property to retrieve.
+     * @param defaultValue the default value if the property is not set.
+     * @return the property value or the default.
+     */
+    String getOrDefault(String key, String defaultValue);
     
     /**
      * Returns server list.

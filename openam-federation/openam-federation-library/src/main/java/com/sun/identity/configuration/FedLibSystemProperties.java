@@ -24,10 +24,7 @@
  *
  * $Id: FedLibSystemProperties.java,v 1.7 2008/06/25 05:46:37 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.configuration;
@@ -74,6 +71,11 @@ public class FedLibSystemProperties implements ISystemProperties {
      */
     public String get(String key) {
         return systemConfigProps.getProperty(key);
+    }
+
+    @Override
+    public String getOrDefault(final String key, final String defaultValue) {
+        return systemConfigProps.getProperty(key, defaultValue);
     }
 
     /**

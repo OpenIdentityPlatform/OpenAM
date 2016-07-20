@@ -42,6 +42,21 @@
                 resourceName="session"
                 i18nKey="iplanet-am-session-service-description">
             <Global>
+                <AttributeSchema name="Base64Validator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.Base64EncodedBinaryValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="StatelessSessionSigningValidator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.StatelessSessionSigningAlgorithmValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="serviceObjectClasses"
                                  type="list"
                                  syntax="string"
@@ -194,8 +209,10 @@
                                  listOrder="insertion"
                                  syntax="string"
                                  resourceName="statelessSigningType"
-                                 i18nKey="a124">
+                                 i18nKey="a124"
+                                 validator="StatelessSessionSigningValidator">
                     <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS256">HS256</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS512">HS512</ChoiceValue>
@@ -214,7 +231,7 @@
                                  resourceName="statelessSigningHmacSecret"
                                  i18nKey="a125">
                     <DefaultValues>
-                        <Value>@128_BIT_RANDOM_SECURE@</Value>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-signing-rsa-certificate-alias"
@@ -235,6 +252,8 @@
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
                         <ChoiceValue i18nKey="choiceRSA">RSA</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceAESKeyWrap">AES_KEYWRAP</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDirect">DIRECT</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>NONE</Value>
@@ -247,6 +266,30 @@
                                  i18nKey="a128">
                     <DefaultValues>
                         <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-encryption-aes-key"
+                                 type="single"
+                                 syntax="password"
+                                 resourceName="statelessEncryptionAesKey"
+                                 i18nKey="a133"
+                                 validator="Base64Validator">
+                    <DefaultValues>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-compression-type"
+                                 type="single_choice"
+                                 listOrder="insertion"
+                                 syntax="string"
+                                 resourceName="statelessCompressionType"
+                                 i18nKey="a134">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDEFLATE">DEF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NONE</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-enable-session-blacklisting"

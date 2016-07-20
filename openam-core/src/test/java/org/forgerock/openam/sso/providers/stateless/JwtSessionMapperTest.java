@@ -11,56 +11,38 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sso.providers.stateless;
 
 import static org.testng.Assert.assertEquals;
 
-import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.json.jose.exceptions.InvalidJwtException;
-import org.forgerock.json.jose.exceptions.JwtRuntimeException;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.SigningManager;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.spec.SecretKeySpec;
+
+import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.exceptions.JwtRuntimeException;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
  * @since 13.0.0
  */
 public class JwtSessionMapperTest {
 
-    @Test
-    public void canRoundtripSessionInfoAsPlaintextJson() throws IOException {
-        // Given
-        SessionInfo inputSessionInfo = newExampleSessionInfo();
-        JwtSessionMapper jwtSessionMapper = new JwtSessionMapperBuilder().build();
-
-        // When
-        String jsonString = jwtSessionMapper.asJson(inputSessionInfo);
-        SessionInfo outputSessionInfo = jwtSessionMapper.fromJson(jsonString);
-
-        // Then
-        assertEquals(inputSessionInfo, outputSessionInfo);
-    }
-
-    @Test
-    public void canRoundtripSessionInfoAsPlaintextJwt() throws IOException {
-        // Given
-        SessionInfo inputSessionInfo = newExampleSessionInfo();
-        JwtSessionMapper jwtSessionMapper = new JwtSessionMapperBuilder().build();
-
-        // When
-        String jwtString = jwtSessionMapper.asJwt(inputSessionInfo);
-        SessionInfo outputSessionInfo = jwtSessionMapper.fromJwt(jwtString);
-
-        // Then
-        assertEquals(inputSessionInfo, outputSessionInfo);
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldRejectConfigurationWithNoEncryptionOrSigning() throws IOException {
+        new JwtSessionMapperBuilder().build();
     }
 
     @Test
@@ -78,7 +60,7 @@ public class JwtSessionMapperTest {
     }
 
     @Test
-    public void canRoundtripSessionInfoAsSignedEncryptedJwtUsingMatchingAlgs() throws IOException {
+    public void canRoundtripSessionInfoAsSignedEncryptedJwtUsingMatchingAlgs() throws Exception {
         // Given
         SessionInfo inputSessionInfo = newExampleSessionInfo();
         KeyPair keyPair = newKeyPair();
@@ -93,17 +75,31 @@ public class JwtSessionMapperTest {
         assertEquals(inputSessionInfo, outputSessionInfo);
     }
 
-    @Test
-    public void canRoundtripSessionInfoAsSignedEncryptedJwtUsingDifferentAlgs() throws IOException {
+    @Test(dataProvider = "encryptionAlgorithms")
+    public void canRoundtripSessionInfoAsSignedEncryptedJwtUsingDifferentAlgs(JweAlgorithm jweAlgorithm)
+            throws Exception {
         // Given
         SessionInfo inputSessionInfo = newExampleSessionInfo();
         KeyPair keyPair = newKeyPair();
-        JwtSessionMapper jwtSessionMapper =
-                new JwtSessionMapperBuilder().signedUsingHS256("SHARED_SECRET").encryptedUsingKeyPair(keyPair).build();
+        Key key;
+        JwtSessionMapperBuilder builder = new JwtSessionMapperBuilder().signedUsingHS256("SHARED_SECRET");
+        switch (jweAlgorithm.getAlgorithmType()) {
+            case RSA:
+                builder.encryptedUsingKeyPair(keyPair);
+                break;
+            case DIRECT:
+                key = new SecretKeySpec(new byte[32], "AES");
+                builder.encryptedUsingDirectKey(key);
+                break;
+            case AES_KEYWRAP:
+                key = new SecretKeySpec(new byte[16], "AES");
+                builder.encryptedUsingKeyWrap(key);
+                break;
+        }
 
         // When
-        String jwtString = jwtSessionMapper.asJwt(inputSessionInfo);
-        SessionInfo outputSessionInfo = jwtSessionMapper.fromJwt(jwtString);
+        String jwtString = builder.build().asJwt(inputSessionInfo);
+        SessionInfo outputSessionInfo = builder.build().fromJwt(jwtString);
 
         // Then
         assertEquals(inputSessionInfo, outputSessionInfo);
@@ -113,7 +109,7 @@ public class JwtSessionMapperTest {
     public void throwsInvalidJwtExceptionWhenAttemptingToReadStandardOpenAMTokenID() {
         // Given
         String tokenId = "AQIC5wM2LY4SfcwpSGrFolnz48kscZqlRuiOh2f1LQDHWEM.*AAJTSQACMDIAAlNLABQtNzg4MzM3MzY5MDUyOTA5MTE4MQACUzEAAjAz*";
-        JwtSessionMapper jwtSessionMapper = new JwtSessionMapperBuilder().build();
+        JwtSessionMapper jwtSessionMapper = new JwtSessionMapperBuilder().signedUsingHS256("SHARED_SECRET").build();
 
         // When
         jwtSessionMapper.fromJwt(tokenId);
@@ -126,12 +122,10 @@ public class JwtSessionMapperTest {
     public void throwsExceptionIfSignatureVerificationOfPlaintextJwtFails() {
         // Given
         SessionInfo inputSessionInfo = newExampleSessionInfo();
-        JwtSessionMapper jwtSessionMapper = new JwtSessionMapper(
-                JwsAlgorithm.HS256,
-                new SigningManager().newHmacSigningHandler("SHARED_SECRET".getBytes(Charset.forName("UTF-8"))),
-                // Using invalid key to verify valid message rather than valid key to verify invalid message
-                // Possibly a little kludgy but the code flow should be the same
-                new SigningManager().newHmacSigningHandler("INVALID_KEY".getBytes(Charset.forName("UTF-8"))), null);
+        JwtSessionMapperBuilder builder = new JwtSessionMapperBuilder().signedUsingHS256("SHARED_SECRET");
+        builder.verificationHandler = new SigningManager().newHmacSigningHandler(
+                "INVALID_KEY".getBytes(StandardCharsets.UTF_8));
+        JwtSessionMapper jwtSessionMapper = builder.build();
 
         // When
         String plaintextJwt = jwtSessionMapper.asJwt(inputSessionInfo);
@@ -147,13 +141,11 @@ public class JwtSessionMapperTest {
 
         // Given
         SessionInfo inputSessionInfo = newExampleSessionInfo();
-        JwtSessionMapper jwtSessionMapper = new JwtSessionMapper(
-                JwsAlgorithm.HS256,
-                new SigningManager().newHmacSigningHandler("SHARED_SECRET".getBytes(Charset.forName("UTF-8"))),
-                // Using invalid key to verify valid message rather than valid key to verify invalid message
-                // Possibly a little kludgy but the code flow should be the same
-                new SigningManager().newHmacSigningHandler("INVALID_KEY".getBytes(Charset.forName("UTF-8"))),
-                newKeyPair());
+        JwtSessionMapperBuilder builder = new JwtSessionMapperBuilder().signedUsingHS256("SHARED_SECRET")
+                                                                       .encryptedUsingKeyPair(newKeyPair());
+        builder.verificationHandler = new SigningManager().newHmacSigningHandler(
+                "INVALID_KEY".getBytes(StandardCharsets.UTF_8));
+        JwtSessionMapper jwtSessionMapper = builder.build();
 
         // When
         String plaintextJwt = jwtSessionMapper.asJwt(inputSessionInfo);
@@ -176,6 +168,18 @@ public class JwtSessionMapperTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void throwsExceptionIfConfigSpecifiesRsaEncryptionButDoesntProvideKeyPair() throws Exception {
         new JwtSessionMapperBuilder().encryptedUsingKeyPair(null).build();
+    }
+
+    @DataProvider
+    public Object[][] encryptionAlgorithms() {
+        // Only test algorithms that do not require JCE Unlimited Strength
+        return new Object[][] {
+                {JweAlgorithm.RSAES_PKCS1_V1_5},
+                {JweAlgorithm.RSA_OAEP},
+                {JweAlgorithm.RSA_OAEP_256},
+                {JweAlgorithm.DIRECT},
+                {JweAlgorithm.A128KW}
+        };
     }
 
     private SessionInfo newExampleSessionInfo() {
@@ -222,17 +226,11 @@ public class JwtSessionMapperTest {
      *
      * @return The public-private KeyPair.
      */
-    static KeyPair newKeyPair() {
+    static KeyPair newKeyPair() throws NoSuchAlgorithmException {
 
-        try {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(1024);
+        return keyPairGenerator.generateKeyPair();
 
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(1024);
-            return keyPairGenerator.generateKeyPair();
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

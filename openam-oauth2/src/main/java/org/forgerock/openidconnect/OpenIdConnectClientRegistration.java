@@ -18,12 +18,9 @@
 package org.forgerock.openidconnect;
 
 import java.net.URI;
-import java.security.PublicKey;
+import java.security.Key;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.idm.IdRepoException;
 import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
@@ -63,11 +60,15 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
     String getIDTokenEncryptionResponseMethod();
 
     /**
-     * Gets the encryption public key used to encrypt OpenID Connect tokens.
+     * Gets the encryption key used to encrypt OpenID Connect tokens. This will either be the public key if RSA
+     * encryption is used, or the truncated SHA-2 hash of the client secret as per section 10.2 of the OpenID Connect
+     * spec.
      *
-     * @return The OpenID Connect token encryption public key.
+     * @return The OpenID Connect token encryption key.
+     * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#Encryption">OpenID Connect 1.0 Section 10.2
+     * - Encryption</a>
      */
-    PublicKey getIDTokenEncryptionPublicKey();
+    Key getIDTokenEncryptionKey();
 
     /**
      * Gets the token_endpoint_auth_method configured for this client.

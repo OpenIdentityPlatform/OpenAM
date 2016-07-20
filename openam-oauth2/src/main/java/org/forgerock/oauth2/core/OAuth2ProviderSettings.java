@@ -216,6 +216,21 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
     }
 
     /**
+     * Determines whether token compression is enabled for stateless access and refresh tokens.
+     *
+     * @return true if compression should be enabled.
+     * @throws ServerException if an error occurs reading the settings.
+     */
+    public boolean isTokenCompressionEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, "tokenCompressionEnabled");
+        } catch (SSOException | SMSException e) {
+            logger.error("Error determining if token compression is enabled: {}", e);
+            throw new ServerException(e);
+        }
+    }
+
+    /**
      * Gets the Base64 encoded shared secret used to sign stateless access and refresh tokens.
      *
      * @return The Base64 encoded shared secret.
