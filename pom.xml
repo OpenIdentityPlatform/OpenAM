@@ -283,6 +283,37 @@
             </repositories>
         </profile>
 
+        <!-- The clover profile should be activated to generate coverage reports using Atlassian Clover -->
+        <profile>
+            <id>clover</id>
+            <properties>
+                <clover.plugin.version>4.1.1</clover.plugin.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.atlassian.maven.plugins</groupId>
+                        <artifactId>clover-maven-plugin</artifactId>
+                        <version>${clover.plugin.version}</version>
+                        <configuration>
+                            <includesTestSourceRoots>false</includesTestSourceRoots>
+                            <singleCloverDatabase>true</singleCloverDatabase>
+                            <generateHistorical>false</generateHistorical>
+                            <generateHtml>true</generateHtml>
+                            <title>OpenAM ${project.version} Coverage Report</title>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.atlassian.clover</groupId>
+                    <artifactId>clover</artifactId>
+                    <version>${clover.plugin.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
         <profile>
             <id>forgerock-release</id>
 
