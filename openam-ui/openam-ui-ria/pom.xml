@@ -138,6 +138,13 @@
             <type>js</type>
             <classifier>min</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>redux</artifactId>
+            <version>3.5.2</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
 
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>

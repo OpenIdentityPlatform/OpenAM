@@ -68,7 +68,7 @@ require.config({
         "popoverclickaway" : "libs/popover-clickaway",
         "text": "libs/text-2.0.15",
 
-        "redux": "libs/redux-3.5.2.min"
+        "redux": "libs/redux-3.5.2-min"
     },
     shim: {
         "autosizeInput": {
