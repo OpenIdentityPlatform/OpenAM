@@ -22,6 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2016 Agile Digital Engineering
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -174,6 +175,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
             <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-soap-sts-server</artifactId>
+            <type>war</type>
         </dependency>
     </dependencies>
 </project>
