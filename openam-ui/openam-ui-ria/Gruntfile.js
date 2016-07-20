@@ -80,35 +80,26 @@ module.exports = function (grunt) {
     grunt.initConfig({
         babel: {
             options: {
-                babelrc: false,
                 env: {
                     development: {
                         sourceMaps: true
                     }
                 },
+                ignore: ["libs/"],
                 presets: ["es2015"],
-                plugins: [["transform-es2015-classes", {
-                    "loose": true
-                }]]
+                plugins: [
+                    ["transform-es2015-classes", { "loose": true }]
+                ]
             },
-            transpile: {
+            transpileJS: {
                 files: [{
                     expand: true,
                     cwd: compositionDirectory,
                     src: ["**/*.js"],
                     dest: transpiledDirectory
-                }],
-                options: {
-                    only: [
-                        "main-authorize.js",
-                        "main-device.js",
-                        "main.js",
-                        "config/**/*.js",
-                        "org/forgerock/openam/**/*.js"
-                    ]
-                }
+                }]
             },
-            transpileModules: {
+            transpileJSM: {
                 files: [{
                     expand: true,
                     cwd: compositionDirectory,
@@ -119,9 +110,7 @@ module.exports = function (grunt) {
                     }
                 }],
                 options: {
-                    plugins: [["transform-es2015-classes", {
-                        "loose": true
-                    }], "transform-es2015-modules-amd"]
+                    plugins: ["transform-es2015-modules-amd"]
                 }
             }
         },
