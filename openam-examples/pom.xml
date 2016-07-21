@@ -43,6 +43,7 @@
     <modules>
         <module>openam-example-clientsdk-cli</module>
         <module>openam-example-clientsdk-war</module>
+        <module>openam-example-api-descriptor</module>
     </modules>
 </project>
 

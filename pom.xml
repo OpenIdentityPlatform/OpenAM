@@ -430,6 +430,7 @@
         <module>openam-push-notification</module>
 
         <module>openam-time-travel</module>
+        <module>openam-i18n</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -1120,6 +1121,12 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-authfilter-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-i18n</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
