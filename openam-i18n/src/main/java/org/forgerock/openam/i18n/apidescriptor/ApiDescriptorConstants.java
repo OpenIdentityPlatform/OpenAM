@@ -32,6 +32,9 @@ public final class ApiDescriptorConstants {
     public static final String DESCRIPTION = "description";
 
     /** Constant used as key to API Descriptor translations **/
+    public static final String PATH_PARAM = "pathparam.";
+
+    /** Constant used as key to API Descriptor translations **/
     public static final String CREATE = "create.";
 
     /** Constant used as key to API Descriptor translations **/
@@ -51,6 +54,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String QUERY = "query.";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR = "error.";
 
     /** Constant used as key to API Descriptor translations **/
     public static final String CREATE_DESCRIPTION = CREATE + DESCRIPTION;
@@ -74,7 +80,7 @@ public final class ApiDescriptorConstants {
     public static final String QUERY_DESCRIPTION = QUERY + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
-    public static final String ERROR_400_DESCRIPTION = "error.400." + DESCRIPTION;
+    public static final String ERROR_400_DESCRIPTION = ERROR + "400." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_404_DESCRIPTION = "error.404." + DESCRIPTION;
@@ -89,7 +95,7 @@ public final class ApiDescriptorConstants {
     public static final String ERROR_409_DESCRIPTION = "error.409." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
-    public static final String ERROR_500_DESCRIPTION = "error.500." + DESCRIPTION;
+    public static final String ERROR_500_DESCRIPTION = ERROR + "500." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String EXAMPLE_PROVIDER = TRANSLATION_KEY_PREFIX + "ExampleProvider#";
@@ -135,6 +141,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String PENDING_REQUEST_RESOURCE = TRANSLATION_KEY_PREFIX + "PendingRequestResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String OAUTH2_USER_APPLICATIONS = TRANSLATION_KEY_PREFIX + "OAuth2UserApplications#";
 
     private ApiDescriptorConstants() {
         // Constants class only

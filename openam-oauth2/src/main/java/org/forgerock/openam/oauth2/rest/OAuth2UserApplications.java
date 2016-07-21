@@ -26,6 +26,15 @@ import static org.forgerock.openam.cts.api.fields.OAuthTokenField.REALM;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.SCOPE;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.TOKEN_NAME;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.USER_NAME;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.OAUTH2_USER_APPLICATIONS;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
 import static org.forgerock.util.query.QueryFilter.and;
@@ -41,9 +50,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Delete;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
@@ -82,7 +94,17 @@ import com.sun.identity.shared.debug.Debug;
  *
  * @since 13.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@CollectionProvider(details = @Handler(
+                mvccSupported = false,
+                title = OAUTH2_USER_APPLICATIONS + TITLE,
+                description = OAUTH2_USER_APPLICATIONS + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "OAuth2UserApplications.resource.schema.json"),
+                parameters = @Parameter(name = "user", type = "string", description = OAUTH2_USER_APPLICATIONS
+                        + PATH_PARAM + "user")),
+        pathParam = @Parameter(
+                name = "clientId",
+                type = "string",
+                description = OAUTH2_USER_APPLICATIONS + PATH_PARAM + "clientid"))
 public class OAuth2UserApplications {
 
     private final TokenStore tokenStore;
@@ -117,7 +139,11 @@ public class OAuth2UserApplications {
      * @param request Unused but necessary for used of the {@link @Query} annotation.
      * @return A promise of a query response.
      */
-    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
+    @Query(operationDescription = @Operation(description = OAUTH2_USER_APPLICATIONS + QUERY_DESCRIPTION,
+                    errors = @ApiError(
+                            code = 500,
+                            description = OAUTH2_USER_APPLICATIONS + QUERY + ERROR_500_DESCRIPTION)),
+            type = QueryType.FILTER, queryableFields = {})
     public Promise<QueryResponse, ResourceException> query(Context context, QueryResourceHandler queryHandler,
             QueryRequest request) {
 
@@ -155,9 +181,6 @@ public class OAuth2UserApplications {
                 NotFoundException e) {
             debug.message("Failed to query OAuth2 clients for user {}", userId, e);
             return new InternalServerErrorException(e).asPromise();
-        } catch (InternalServerErrorException e) {
-            debug.message("Failed to query OAuth2 clients for user {}", userId, e);
-            return e.asPromise();
         }
     }
 
@@ -180,7 +203,9 @@ public class OAuth2UserApplications {
      * @param resourceId The id of the OAuth2 client.
      * @return A promise of the removed application.
      */
-    @Delete(operationDescription = @Operation)
+    @Delete(operationDescription = @Operation(
+            description = OAUTH2_USER_APPLICATIONS + DELETE_DESCRIPTION,
+            errors = @ApiError(code = 500, description = OAUTH2_USER_APPLICATIONS + DELETE + ERROR_500_DESCRIPTION)))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId) {
         String userId = contextHelper.getUserId(context);
         String realm = contextHelper.getRealm(context);
@@ -211,14 +236,11 @@ public class OAuth2UserApplications {
         } catch (InvalidClientException | NotFoundException | ServerException e) {
             debug.message("Failed to revoke access to OAuth2 client {} for user {}", resourceId, userId, e);
             return new InternalServerErrorException(e).asPromise();
-        } catch (InternalServerErrorException e) {
-            debug.message("Failed to revoke access to OAuth2 client {} for user {}", resourceId, userId, e);
-            return e.asPromise();
         }
     }
 
     private ResourceResponse getResourceResponse(Context context, String clientId, Iterable<JsonValue> tokens)
-            throws NotFoundException, InvalidClientException, ServerException, InternalServerErrorException {
+            throws NotFoundException, InvalidClientException, ServerException {
         String realm = getAttributeValue(tokens.iterator().next(), REALM.getOAuthField());
         OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(context);
 
