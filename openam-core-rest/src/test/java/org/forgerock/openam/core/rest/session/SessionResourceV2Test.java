@@ -42,6 +42,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
@@ -226,5 +227,10 @@ public class SessionResourceV2Test {
 
         //Then
         assertThat(promise).succeeded().withContent().booleanAt("valid").isFalse();
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(SessionResourceV2.class).hasValidAnnotations();
     }
 }

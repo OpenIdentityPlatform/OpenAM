@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2016 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,27 +10,45 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_401_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ID_QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ID_QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PARAMETER_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Actions;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Queries;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -70,6 +86,14 @@ import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * Represents Sessions that can queried via a REST interface.
  *
@@ -85,13 +109,29 @@ import org.forgerock.util.promise.Promise;
  * This resources acts as a read only resource for the most part, allowing only
  * specific, whitelisted properties to be set through it.
  */
+@CollectionProvider(
+    details = @Handler(
+        title = SESSION_RESOURCE + TITLE,
+        description = SESSION_RESOURCE + DESCRIPTION,
+        mvccSupported = false,
+        resourceSchema = @Schema(schemaResource = "SessionResource.schema.json")
+    ),
+    pathParam = @Parameter(
+        name = "userToken",
+        type = "string",
+        description = SESSION_RESOURCE + SessionResource.TOKEN_ID + "." + PARAMETER_DESCRIPTION
+    )
+)
 public class SessionResource implements CollectionResourceProvider {
 
     private static final Debug LOGGER = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
-    public static final String LOGOUT_ACTION_ID = "logout";
     public static final String VALIDATE_ACTION_ID = "validate";
+    public static final String LOGOUT_ACTION_ID = "logout";
     public static final String IS_ACTIVE_ACTION_ID = "isActive";
+    public static final String GET_IDLE_ACTION_ID = "getIdle";
+    public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle";
+    public static final String GET_MAX_SESSION_TIME_ACTION_ID = "getMaxSessionTime";
 
     public static final String KEYWORD_PROPERTIES = "properties";
     public static final String KEYWORD_SUCCESS = "success";
@@ -100,13 +140,9 @@ public class SessionResource implements CollectionResourceProvider {
      * @deprecated use getTimeLeft instead.
      */
     @Deprecated
-    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime"; //time remaining
-
-    public static final String GET_TIME_LEFT_ACTION_ID = "getTimeLeft"; //time remaining
-    public static final String GET_IDLE_ACTION_ID = "getIdle"; //current idle time
-    public static final String GET_MAX_IDLE_ACTION_ID = "getMaxIdle"; //max idle time
-    public static final String GET_MAX_SESSION_TIME_ID = "getMaxSessionTime"; //max session time
-
+    public static final String GET_MAX_TIME_ACTION_ID = "getMaxTime";
+    public static final String GET_MAX_SESSION_TIME_ID = "getMaxSessionTime";
+    public static final String GET_TIME_LEFT_ACTION_ID = "getTimeLeft";
     public static final String GET_PROPERTY_ACTION_ID = "getProperty";
     public static final String SET_PROPERTY_ACTION_ID = "setProperty";
     public static final String DELETE_PROPERTY_ACTION_ID = "deleteProperty";
@@ -115,8 +151,12 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String KEYWORD_RESULT = "result";
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
+    public static final String KEYWORD_SERVER_ID = "serverId";
 
     private final SessionResourceUtil sessionResourceUtil;
+    public static final String TOKEN_ID = "tokenId";
+    private final String ALL_QUERY_ID = "all";
+    private final String SERVER_QUERY_ID = "server";
     private final SSOTokenManager ssoTokenManager;
     private final AuthUtilsWrapper authUtilsWrapper;
     private final SessionPropertyWhitelist sessionPropertyWhitelist;
@@ -156,7 +196,6 @@ public class SessionResource implements CollectionResourceProvider {
         actionHandlers.put(DELETE_PROPERTY_ACTION_ID,
                 new DeletePropertyActionHandler(sessionPropertyWhitelist, sessionResourceUtil));
         actionHandlers.put(GET_PROPERTY_NAMES_ACTION_ID, new GetPropertyNamesActionHandler(sessionPropertyWhitelist));
-
     }
 
     /**
@@ -176,16 +215,206 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * Actions supported are:
      * <ul>
-     * <li>{@link #LOGOUT_ACTION_ID}</li>
-     * <li>{@link #VALIDATE_ACTION_ID}</li>
-     * <li>{@link #IS_ACTIVE_ACTION_ID}</li>
-     * <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
-     * <li>{@link #GET_IDLE_ACTION_ID}</li>
+     *     <li>{@link #VALIDATE_ACTION_ID}</li>
+     *     <li>{@link #LOGOUT_ACTION_ID}</li>
+     *     <li>{@link #IS_ACTIVE_ACTION_ID}</li>
+     *     <li>{@link #GET_IDLE_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_IDLE_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_SESSION_TIME_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
+     *     <li>{@link #GET_TIME_LEFT_ACTION_ID}</li>
+     *     <li>{@link #GET_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #SET_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #DELETE_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #GET_PROPERTY_NAMES_ACTION_ID}</li>
      * </ul>
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Actions({
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + VALIDATE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = VALIDATE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.validate.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + LOGOUT_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = LOGOUT_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.logout.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + IS_ACTIVE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = IS_ACTIVE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.active.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_IDLE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_IDLE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.idle.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_IDLE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_MAX_IDLE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.maxIdle.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_SESSION_TIME_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_MAX_SESSION_TIME_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.maxSessionTime.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_TIME_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_MAX_TIME_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.timeLeft.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_TIME_LEFT_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_TIME_LEFT_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.timeLeft.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.properties.names.values.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + SET_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 500,
+                        description = SESSION_RESOURCE + ERROR_500_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = SET_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.values.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.success.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + DELETE_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ACTION + DELETE_PROPERTY_ACTION_ID + "." + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = DELETE_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.success.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_PROPERTY_NAMES_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = TOKEN_ID, type = "string", description = SESSION_RESOURCE + TOKEN_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            name = GET_PROPERTY_NAMES_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+        )
+    })
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         final String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro");
 
@@ -238,17 +467,195 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * Actions supported are:
      * <ul>
-     *     <li>{@link #LOGOUT_ACTION_ID}</li>
      *     <li>{@link #VALIDATE_ACTION_ID}</li>
+     *     <li>{@link #LOGOUT_ACTION_ID}</li>
      *     <li>{@link #IS_ACTIVE_ACTION_ID}</li>
-     *     <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
      *     <li>{@link #GET_IDLE_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_IDLE_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_SESSION_TIME_ACTION_ID}</li>
+     *     <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
+     *     <li>{@link #GET_TIME_LEFT_ACTION_ID}</li>
+     *     <li>{@link #GET_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #SET_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #DELETE_PROPERTY_ACTION_ID}</li>
+     *     <li>{@link #GET_PROPERTY_NAMES_ACTION_ID}</li>
      * </ul>
      *
      * @param context {@inheritDoc}
      * @param tokenId The SSO Token Id.
      * @param request {@inheritDoc}
      */
+    @Actions({
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + VALIDATE_ACTION_ID + "." + ACTION_DESCRIPTION
+            ),
+            name = VALIDATE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.validate.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + LOGOUT_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = LOGOUT_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.logout.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + IS_ACTIVE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = IS_ACTIVE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.active.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_IDLE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_IDLE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.idle.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_IDLE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_MAX_IDLE_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.maxIdle.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_SESSION_TIME_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_MAX_SESSION_TIME_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.maxSessionTime.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_MAX_TIME_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_MAX_TIME_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.timeLeft.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_TIME_LEFT_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_TIME_LEFT_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.timeLeft.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.properties.names.values.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + SET_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 500,
+                        description = SESSION_RESOURCE + ERROR_500_DESCRIPTION
+                    )
+                }
+            ),
+            name = SET_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.values.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.success.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + DELETE_PROPERTY_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 400,
+                        description = SESSION_RESOURCE + ACTION + DELETE_PROPERTY_ACTION_ID + "." + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = DELETE_PROPERTY_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.properties.names.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.success.response.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_PROPERTY_NAMES_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_PROPERTY_NAMES_ACTION_ID,
+            response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+        )
+    })
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String tokenId,
             ActionRequest request) {
         return internalHandleAction(tokenId, context, request);
@@ -289,6 +696,35 @@ public class SessionResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
+    @Queries({
+        @Query(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION)
+            ),
+            type = QueryType.ID,
+            id = SERVER_QUERY_ID
+        ),
+        @Query(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            type = QueryType.ID,
+            id = ALL_QUERY_ID
+        )
+    })
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         String id = request.getQueryId();

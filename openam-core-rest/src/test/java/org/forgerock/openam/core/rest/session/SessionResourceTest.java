@@ -70,6 +70,7 @@ import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.ClientContext;
@@ -868,6 +869,11 @@ public class SessionResourceTest {
 
         // Then
         assertThat(response).isNotNull().withContent().stringAt("goto").isEqualTo(logoutUrl);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(SessionResource.class).hasValidAnnotations();
     }
 
 }

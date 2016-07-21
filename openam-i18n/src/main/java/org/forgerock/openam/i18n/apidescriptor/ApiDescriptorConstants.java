@@ -59,6 +59,15 @@ public final class ApiDescriptorConstants {
     public static final String ERROR = "error.";
 
     /** Constant used as key to API Descriptor translations **/
+    public static final String PARAMETER = "parameter.";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ID = "id.";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String FILTER = "filter.";
+
+    /** Constant used as key to API Descriptor translations **/
     public static final String CREATE_DESCRIPTION = CREATE + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
@@ -69,9 +78,6 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String DELETE_DESCRIPTION = DELETE + DESCRIPTION;
-
-    /** Constant used as key to API Descriptor translations **/
-    public static final String PATCH_DESCRIPTION = PATCH + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ACTION_DESCRIPTION = ACTION + DESCRIPTION;
@@ -90,6 +96,18 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_405_DESCRIPTION = "error.405." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ID_QUERY = ID + QUERY;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ID_QUERY_DESCRIPTION = ID_QUERY + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String PARAMETER_DESCRIPTION = PARAMETER + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_401_DESCRIPTION = "error.401." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_409_DESCRIPTION = "error.409." + DESCRIPTION;
@@ -156,6 +174,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String SELF_SERVICE_REQUEST_HANDLER = TRANSLATION_KEY_PREFIX + "SelfServiceRequestHandler_";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SESSION_RESOURCE = TRANSLATION_KEY_PREFIX + "SessionResource#";
 
     private ApiDescriptorConstants() {
         // Constants class only

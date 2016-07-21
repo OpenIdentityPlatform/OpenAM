@@ -27,7 +27,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.assertj.core.api.AbstractListAssert;
 import org.forgerock.api.annotations.Description;
@@ -146,6 +148,8 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
 
         abstract String getName();
 
+        Stack<Map<String, Object>> stack = new Stack<>();
+
         void assertValue(String value) {
             // implement in subclass
         }
@@ -162,12 +166,17 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
                     item.as(this);
                 }
             } else if (value.isMap()) {
-                if (name != null && name.equals(getName())) {
-                    assertValue(value);
+                if (stack.size() > 0) {
+                    Map<String, Object> top = stack.peek();
+                    if (name != null && name.equals(getName()) && top.containsKey("type") && top.get("type").equals("object")) {
+                        assertValue(value);
+                    }
                 }
+                stack.push(value.asMap());
                 for (String key : value.keys()) {
                     value.get(key).as(this);
                 }
+                stack.pop();
             } else if (value.isString() && name.equals(getName())) {
                 assertValue(value.asString());
             }
