@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/KbaResource#read.resource.title",
+  "description": "i18n:api-descriptor/KbaResource#read.resource.description",
+  "properties": {
+    "questions": {
+      "type": "object",
+      "title": "i18n:api-descriptor/KbaResource#read.resource.questions.list.title",
+      "description": "i18n:api-descriptor/KbaResource#read.resource.questions.list.description",
+      "properties": {
+        "*": {
+          "type": "object",
+          "title": "i18n:api-descriptor/KbaResource#read.resource.questions.id.title",
+          "description": "i18n:api-descriptor/KbaResource#read.resource.questions.id.description",
+          "properties": {
+            "*": {
+              "type": "string",
+              "title": "i18n:api-descriptor/KbaResource#read.resource.questions.title",
+              "description": "i18n:api-descriptor/KbaResource#read.resource.questions.description"
+            }
+          }
+        }
+      }
+    },
+    "minimumAnswersToDefine": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/KbaResource#read.resource.minimumAnswersToDefine.title",
+      "description": "i18n:api-descriptor/KbaResource#read.resource.minimumAnswersToDefine.description"
+    },
+    "minimumAnswersToVerify": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/KbaResource#read.resource.minimumAnswersToVerify.title",
+      "description": "i18n:api-descriptor/KbaResource#read.resource.minimumAnswersToVerify.description"
+    }
+  },
+  "required": [
+    "questions",
+    "minimumAnswersToDefine",
+    "minimumAnswersToVerify"
+  ]
+}

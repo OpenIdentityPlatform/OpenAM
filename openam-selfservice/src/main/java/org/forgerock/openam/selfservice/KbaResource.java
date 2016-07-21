@@ -11,26 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.selfservice;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.SingletonProvider;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Responses;
-import org.forgerock.json.resource.SingletonResourceProvider;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.selfservice.config.beans.SecurityQuestionTransformer;
 import org.forgerock.openam.sm.config.ConfigAttribute;
@@ -42,17 +48,17 @@ import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * KBA resource is responsible for delivering up configured security questions.
  *
  * @since 13.0.0
  */
-final class KbaResource implements SingletonResourceProvider {
+@SingletonProvider(value = @Handler(
+        title = KBA_RESOURCE + TITLE,
+        description = KBA_RESOURCE + DESCRIPTION,
+        mvccSupported = false,
+        resourceSchema = @Schema(schemaResource = "KbaResource.schema.json")))
+public final class KbaResource {
 
     private final ConsoleConfigHandler configHandler;
 
@@ -61,27 +67,24 @@ final class KbaResource implements SingletonResourceProvider {
         this.configHandler = configHandler;
     }
 
-    @Override
+    /**
+     * Read the configured security questions.
+     *
+     * @param context The request server context.
+     * @param readRequest The read request.
+     *
+     * @return A {@code Promise} containing the result of the operation.
+     */
+    @Read(operationDescription =
+        @Operation(description = KBA_RESOURCE + READ_DESCRIPTION,
+            errors = {
+                @ApiError(code = INTERNAL_ERROR, description = KBA_RESOURCE + READ + ERROR_500_DESCRIPTION)
+            }))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
         String realm = RealmContext.getRealm(context).asPath();
         JsonValue kbaJson = configHandler.getConfig(realm, KbaBuilder.class);
         ResourceResponse response = Responses.newResourceResponse("1", "1.0", kbaJson);
         return Promises.newResultPromise(response);
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, ActionRequest actionRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest patchRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest updateRequest) {
-        return new NotSupportedException().asPromise();
     }
 
     /**
