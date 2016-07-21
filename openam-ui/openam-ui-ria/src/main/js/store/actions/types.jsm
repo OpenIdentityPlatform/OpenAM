@@ -14,22 +14,5 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-define([
-    "store/reducers"
-], (reducers) => {
-    describe("store/reducers", () => {
-        describe("SET_REALM reducer", () => {
-            it("should return the initial state", () => {
-                expect(reducers.setRealm("", {})).to.equal("");
-            });
-
-            it("should handle setRealm action", () => {
-                expect(
-                    reducers.setRealm("", {
-                        "type": "SET_REALM",
-                        "absolutePath": "/realmA"
-                    })).to.equal("/realmA");
-            });
-        });
-    });
-});
+export const SESSION_ADD_REALM = "session/ADD_REALM";
+export const SESSION_REMOVE_REALM = "session/REMOVE_REALM";

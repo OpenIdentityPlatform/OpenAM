@@ -17,8 +17,8 @@
 define([
     "jquery",
     "lodash",
-    "store/actionCreators",
-    "store/store",
+    "store/actions/creators",
+    "store/index",
     "org/forgerock/commons/ui/common/main/AbstractModel",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -28,7 +28,7 @@ define([
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/openam/ui/common/util/object/flattenValues"
-], function ($, _, actionCreators, store, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper,
+], function ($, _, creators, store, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper,
     Router, ServiceInvoker, flattenValues) {
     var baseUrl = `${Constants.host}/${Constants.context}/json/__subrealm__/users`,
         UserModel = AbstractModel.extend({
@@ -169,7 +169,7 @@ define([
 
                         const realm = data.realm.slice(1);
                         Configuration.globalData.auth.subRealm = realm;
-                        store.default.dispatch(actionCreators.setRealm(realm));
+                        store.default.dispatch(creators.sessionAddRealm(data.realm));
 
                         // keep track of the current realm as a future default value, following logout:
                         Router.configuration.routes.login.defaults[0] = data.realm;

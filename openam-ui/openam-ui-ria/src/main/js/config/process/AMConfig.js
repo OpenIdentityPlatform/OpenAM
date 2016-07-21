@@ -30,9 +30,11 @@ define([
             "org/forgerock/commons/ui/common/main/Router",
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/main/SessionManager",
-            "org/forgerock/openam/ui/common/sessions/SessionValidator"
+            "org/forgerock/openam/ui/common/sessions/SessionValidator",
+            "store/actions/creators",
+            "store/index"
         ],
-        processDescription (event, router, conf, sessionManager, SessionValidator) {
+        processDescription (event, router, conf, sessionManager, SessionValidator, creators, store) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
                 urlParams = URIUtils.parseQueryString(argsURLFragment),
                 gotoURL = urlParams.goto;
@@ -40,6 +42,7 @@ define([
             SessionValidator.stop();
 
             sessionManager.logout(function (response) {
+                store.default.dispatch(creators.sessionRemoveRealm());
                 conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;

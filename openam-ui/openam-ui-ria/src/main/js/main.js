@@ -173,7 +173,7 @@ require([
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/openam/ui/main",
     "config/main",
-    "store/store"
+    "store/index"
 
 ], (Constants, EventManager) => {
     EventManager.sendEvent(Constants.EVENT_DEPENDENCIES_LOADED);

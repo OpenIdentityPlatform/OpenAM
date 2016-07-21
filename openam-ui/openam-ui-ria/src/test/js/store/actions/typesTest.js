@@ -15,17 +15,17 @@
  */
 
 define([
-    "store/actionCreators"
-], (actionCreators) => {
-    describe("store/actionCreators", () => {
-        describe("setRealm action", () => {
-            it("should create an action to set a realm", () => {
-                const absolutePath = "/realmA";
-                const expectedAction = {
-                    type: "SET_REALM",
-                    absolutePath
-                };
-                expect(actionCreators.setRealm(absolutePath)).to.deep.equal(expectedAction);
+    "store/actions/types"
+], (types) => {
+    describe("store/actions/types", () => {
+        describe(".SESSION_ADD_REALM", () => {
+            it("is expected value", () => {
+                expect(types.SESSION_ADD_REALM).equal("session/ADD_REALM");
+            });
+        });
+        describe(".SESSION_REMOVE_REALM", () => {
+            it("is expected value", () => {
+                expect(types.SESSION_REMOVE_REALM).equal("session/REMOVE_REALM");
             });
         });
     });
