@@ -74,6 +74,15 @@ public final class ApiDescriptorConstants {
     public static final String QUERY_DESCRIPTION = QUERY + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_400_DESCRIPTION = "error.400." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_409_DESCRIPTION = "error.409." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_500_DESCRIPTION = "error.500." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
     public static final String EXAMPLE_PROVIDER = TRANSLATION_KEY_PREFIX + "ExampleProvider#";
 
     private ApiDescriptorConstants() {
