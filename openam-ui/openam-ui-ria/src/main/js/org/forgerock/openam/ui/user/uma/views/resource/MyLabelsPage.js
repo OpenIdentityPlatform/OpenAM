@@ -25,10 +25,9 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/user/uma/services/UMAService"
 ], function ($, Backbone, Backgrid, BackgridUtils, BasePage, BootstrapDialog, Configuration, Constants, EventManager,
-             Router, RealmHelper, UMAService) {
+             Router, UMAService) {
     var MyLabelsPage = BasePage.extend({
         template: "templates/user/uma/views/resource/MyLabelsPageTemplate.html",
         partials: [
