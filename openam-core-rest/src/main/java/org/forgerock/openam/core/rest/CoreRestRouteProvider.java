@@ -74,7 +74,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
                 .authorizeWith(CrestPrivilegeAuthzModule.class)
-                .toSingleton(ServerVersionResource.class);
+                .toAnnotatedSingleton(ServerVersionResource.class);
 
         realmRouter.route("users")
                 .authenticateWith(ssoToken().exceptActions("register", "confirm", "forgotPassword",

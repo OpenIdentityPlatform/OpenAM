@@ -77,13 +77,13 @@ public final class ApiDescriptorConstants {
     public static final String ERROR_400_DESCRIPTION = "error.400." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
-    public static final String ERROR_403_DESCRIPTION = "error.403." + DESCRIPTION;
-
-    /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_404_DESCRIPTION = "error.404." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_405_DESCRIPTION = "error.405." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_403_DESCRIPTION = "error.403." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_409_DESCRIPTION = "error.409." + DESCRIPTION;
@@ -102,6 +102,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String UMA_LABEL_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaLabelResource#";
+    
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SERVER_VERSION_RESOURCE = TRANSLATION_KEY_PREFIX + "ServerVersionResource#";
 
     /** Constant used as key to API Descriptor translations **/
     public static final String UMA_POLICY_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaPolicyResource#";

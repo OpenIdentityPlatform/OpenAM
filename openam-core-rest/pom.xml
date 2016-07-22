@@ -51,6 +51,10 @@
             <artifactId>forgerock-selfservice-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-i18n</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
