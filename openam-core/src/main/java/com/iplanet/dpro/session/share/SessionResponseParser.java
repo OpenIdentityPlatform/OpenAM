@@ -24,7 +24,7 @@
  *
  * $Id: SessionResponseParser.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.share;
@@ -121,13 +121,6 @@ class SessionResponseParser {
         nodelist = elem.getElementsByTagName("AddSessionListener");
         if (nodelist != null && nodelist.getLength() != 0) {
             sessionResponse.setMethodID(SessionRequest.AddSessionListener);
-        }
-
-        // check AddSessionListenerOnAllSessions element
-        nodelist = elem.getElementsByTagName("AddSessionListenerOnAllSessions");
-        if (nodelist != null && nodelist.getLength() != 0) {
-            sessionResponse.setMethodID(
-                    SessionRequest.AddSessionListenerOnAllSessions);
         }
 
         // check SetProperty element

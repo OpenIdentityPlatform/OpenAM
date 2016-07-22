@@ -1004,7 +1004,6 @@
                             <Value>inetUserStatus</Value>
                             <Value>iplanet-am-auth-configuration</Value>
                             <Value>iplanet-am-user-auth-modules</Value>
-                            <Value>iplanet-am-session-add-session-listener-on-all-sessions</Value>
                             <Value>iplanet-am-session-destroy-sessions</Value>
                             <Value>iplanet-am-session-get-valid-sessions</Value>
                             <Value>iplanet-am-session-max-caching-time</Value>
@@ -1700,7 +1699,6 @@
                             <Value>inetUserHttpURL</Value>
                             <Value>inetUserStatus</Value>
                             <Value>iplanet-am-auth-configuration</Value>
-                            <Value>iplanet-am-session-add-session-listener-on-all-sessions</Value>
                             <Value> iplanet-am-session-destroy-sessions</Value>
                             <Value>iplanet-am-session-get-valid-sessions</Value>
                             <Value>iplanet-am-session-max-caching-time</Value>
@@ -2274,7 +2272,6 @@
                             <Value>inetUserStatus</Value>
                             <Value>iplanet-am-auth-configuration</Value>
                             <Value>iplanet-am-user-auth-modules</Value>
-                            <Value>iplanet-am-session-add-session-listener-on-all-sessions</Value>
                             <Value> iplanet-am-session-destroy-sessions</Value>
                             <Value>iplanet-am-session-get-valid-sessions</Value>
                             <Value>iplanet-am-session-max-caching-time</Value>
@@ -2828,7 +2825,6 @@
                             <Value>givenName</Value>
                             <Value>iplanet-am-auth-configuration</Value>
                             <Value>iplanet-am-user-auth-modules</Value>
-                            <Value>iplanet-am-session-add-session-listener-on-all-sessions</Value>
                             <Value>iplanet-am-session-destroy-sessions</Value>
                             <Value>iplanet-am-session-get-valid-sessions</Value>
                             <Value>iplanet-am-session-max-caching-time</Value>
@@ -3390,7 +3386,6 @@
                             <Value>givenName</Value>
                             <Value>iplanet-am-auth-configuration</Value>
                             <Value>iplanet-am-user-auth-modules</Value>
-                            <Value>iplanet-am-session-add-session-listener-on-all-sessions</Value>
                             <Value> iplanet-am-session-destroy-sessions</Value>
                             <Value>iplanet-am-session-get-valid-sessions</Value>
                             <Value>iplanet-am-session-max-caching-time</Value>

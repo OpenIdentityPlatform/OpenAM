@@ -62,11 +62,6 @@ attributeTypes: ( 2.16.840.1.113730.3.1.1069 NAME 'iplanet-am-session-destroy-se
 dn: cn=schema
 changetype: modify
 add: attributeTypes
-attributeTypes: ( 2.16.840.1.113730.3.1.1070 NAME 'iplanet-am-session-add-session-listener-on-all-sessions' DESC 'Add Session Listener on All Sessions' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-
-dn: cn=schema
-changetype: modify
-add: attributeTypes
 attributeTypes: ( 2.16.840.1.113730.3.1.1071 NAME 'iplanet-am-user-auth-modules' DESC 'User Auth Modules' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 
 dn: cn=schema
@@ -172,7 +167,7 @@ objectClasses: ( 1.3.6.1.4.1.1466.101.120.142 NAME 'iPlanetPreferences' AUXILIAR
 dn: cn=schema
 changetype: modify
 add: objectClasses
-objectClasses: ( 2.16.840.1.113730.3.2.175 NAME 'iplanet-am-session-service' DESC 'Session Service OC' SUP top AUXILIARY MAY ( iplanet-am-session-max-session-time $ iplanet-am-session-max-idle-time $ iplanet-am-session-max-caching-time $ iplanet-am-session-quota-limit $ iplanet-am-session-get-valid-sessions $ iplanet-am-session-destroy-sessions $ iplanet-am-session-add-session-listener-on-all-sessions $ iplanet-am-session-service-status ) )
+objectClasses: ( 2.16.840.1.113730.3.2.175 NAME 'iplanet-am-session-service' DESC 'Session Service OC' SUP top AUXILIARY MAY ( iplanet-am-session-max-session-time $ iplanet-am-session-max-idle-time $ iplanet-am-session-max-caching-time $ iplanet-am-session-quota-limit $ iplanet-am-session-get-valid-sessions $ iplanet-am-session-destroy-sessions $ iplanet-am-session-service-status ) )
 
 dn: cn=schema
 changetype: modify

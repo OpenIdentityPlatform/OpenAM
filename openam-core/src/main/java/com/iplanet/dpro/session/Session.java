@@ -978,32 +978,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     }
 
     /**
-     * Adds a session listener for all sessions residing on the same session
-     * server as this session object resides. This session is subject to access
-     * control in order to receive session events on all sessions.
-     *
-     * @param listener A reference to the Session Listener object.
-     * @exception SessionException if there was an error.
-     */
-    public void addSessionListenerOnAllSessions(SessionListener listener) throws SessionException {
-        if (!sessionPollerPool.isPollingEnabled()) {
-            try {
-                String url = WebtopNaming.getNotificationURL().toString();
-                if (sessionService != null) {
-                    sessionService.addSessionListenerOnAllSessions(this, url);
-                } else {
-                    throw new SessionException(SessionBundle.rbName,
-                            "unsupportedFunction", null);
-                }
-            } catch (Exception e) {
-                throw new SessionException(e);
-            }
-        }
-
-        localSessionEventListeners.add(listener);
-    }
-
-    /**
      * Gets the latest session from session server and updates the local cache
      * of this session.
      *

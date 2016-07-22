@@ -498,13 +498,6 @@ public interface Constants {
             "com.sun.identity.authentication.uniqueCookieDomain";
 
     /**
-     * Property string for checking if remote method
-     * <code>AddListenerOnAllSessions</code> is enabled.
-     */
-    static final String ENABLE_ADD_LISTENER_ON_ALL_SESSIONS =
-            "com.sun.am.session.enableAddListenerOnAllSessions";
-
-    /**
      * Property string for list of IP address of remote clients which are
      * considered trusted to forward the context used to check <code>restricted
      * token usage</code> is enabled.

@@ -32,6 +32,54 @@ import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.collections.Predicate;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.IOUtils;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -67,52 +115,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.stats.Stats;
-import org.apache.commons.collections.Predicate;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.session.service.SessionTimeoutHandler;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.IOUtils;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InterruptedIOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class represents a Session Service
@@ -994,33 +996,6 @@ public class SessionService {
             throw new IllegalArgumentException("Session id mismatch");
         }
         session.addSessionEventURL(url, sid);
-    }
-
-    /**
-     * Add a listener to all Internal Sessions.
-     *
-     * @param session
-     * @param url
-     * @throws SessionException
-     */
-    public void addSessionListenerOnAllSessions(Session session, String url) throws SessionException {
-        if (session.getState(false) != VALID) {
-            throw new SessionException(SessionBundle.getString("invalidSessionState") + session.getID().toString());
-        }
-        if (session.getClientID().equals(dsameAdminTokenProvider.getDsameAdminDN())) {
-            sessionNotificationSender.addListenerOnAllInternalSessions(url);
-            return;
-        }
-        try {
-            AMIdentity user = getUser(session);
-            Set attribute = user.getAttribute("iplanet-am-session-add-session-listener-on-all-sessions");
-            if (CollectionUtils.getFirstItem(attribute, "false").equals("false")) {
-                throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
-            }
-            sessionNotificationSender.addListenerOnAllInternalSessions(url);
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
     }
 
     public int getNotificationQueueSize() {

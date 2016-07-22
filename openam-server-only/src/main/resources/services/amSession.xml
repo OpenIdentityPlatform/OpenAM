@@ -472,14 +472,6 @@
                                  syntax="string"
                                  i18nKey="">
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-session-add-session-listener-on-all-sessions"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="">
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
             </Dynamic>
             <User>
                 <AttributeSchema name="iplanet-am-session-max-session-time"

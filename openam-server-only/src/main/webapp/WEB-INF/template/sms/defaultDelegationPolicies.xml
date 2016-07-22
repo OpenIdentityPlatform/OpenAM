@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2015 ForgeRock AS.
+    Portions Copyrighted 2015-2016 ForgeRock AS.
 -->
                                                                                 
 <!DOCTYPE Policies
@@ -141,7 +141,6 @@ to define the "notAttributes" AttributeValuePair.
                 <Value>iplanet-am-session-max-idle-time</Value>
                 <Value>iplanet-am-session-get-valid-sessions</Value>
                 <Value>iplanet-am-session-destroy-sessions</Value>
-                <Value>iplanet-am-session-add-session-listener-on-all-sessions
                 </Value>
                 <Value>iplanet-am-user-admin-start-dn</Value>
                 <Value>iplanet-am-auth-post-login-process-class</Value>

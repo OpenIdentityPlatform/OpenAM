@@ -28,9 +28,8 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.Component.SESSION;
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
-import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.net.URL;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -231,7 +229,6 @@ public class SessionRequestHandler implements RequestHandler {
              * to this server (although it might)
              */
                 case SessionRequest.GetValidSessions:
-                case SessionRequest.AddSessionListenerOnAllSessions:
                 case SessionRequest.GetSessionCount:
                     /*
                      * note that the purpose of the following is just to check the
@@ -448,20 +445,6 @@ public class SessionRequestHandler implements RequestHandler {
                     sessionService.addSessionListener(sid, req.getNotificationURL());
                     break;
 
-                case SessionRequest.AddSessionListenerOnAllSessions:
-                    /**
-                     * Cookie Hijacking fix to disable adding of Notification
-                     * Listener for ALL the sessions over the network to the server
-                     * instance specified by Notification URL This property can be
-                     * added and set in the AMConfig.properties file should there be
-                     * a need to add Notification Listener to ALL the sessions. The
-                     * default value of this property is FALSE
-                     */
-                    if (getEnableAddListenerOnAllSessions()) {
-                        sessionService.addSessionListenerOnAllSessions(requesterSession, req.getNotificationURL());
-                    }
-                    break;
-
                 case SessionRequest.SetProperty:
                     sessionService.setExternalProperty(this.clientToken, sid, req.getPropertyName(), req.getPropertyValue());
                     break;
@@ -520,12 +503,4 @@ public class SessionRequestHandler implements RequestHandler {
         }
     }
 
-    private static boolean getEnableAddListenerOnAllSessions() {
-        if (enableAddListenerOnAllSessions == null) {
-            enableAddListenerOnAllSessions = Boolean.valueOf(SystemProperties
-                    .get(Constants.ENABLE_ADD_LISTENER_ON_ALL_SESSIONS));
-        }
-
-        return enableAddListenerOnAllSessions.booleanValue();
-    }
 }
