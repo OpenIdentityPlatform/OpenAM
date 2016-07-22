@@ -32,7 +32,7 @@ public class UMAServiceEndpointApplication extends ServiceEndpointApplication {
      * Sets the default media type as "application/json".
      */
     public UMAServiceEndpointApplication() {
-        super(new JSONRestStatusService());
+        super(InjectorHolder.getInstance(JSONRestStatusService.class));
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
     }
 

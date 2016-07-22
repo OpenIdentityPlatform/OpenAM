@@ -16,25 +16,22 @@
 
 package org.forgerock.openam.rest.service;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.representation.Representation;
-
+import javax.inject.Inject;
 import java.util.Map;
+
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.restlet.representation.Representation;
 
 /**
  * An implementation of {@code RestStatusService} that returns a {@code JacksonRepresentation}.
  */
 public class JSONRestStatusService extends RestStatusService {
 
-    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private JacksonRepresentationFactory jacksonRepresentationFactory;
 
-    /**
-     * Default constructor - will initialise Guice objects from the {@code InjectorHolder}.
-     */
-    public JSONRestStatusService() {
-        jacksonRepresentationFactory = InjectorHolder.getInstance(JacksonRepresentationFactory.class);
+    @Inject
+    public JSONRestStatusService(JacksonRepresentationFactory jacksonRepresentationFactory) {
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     @Override

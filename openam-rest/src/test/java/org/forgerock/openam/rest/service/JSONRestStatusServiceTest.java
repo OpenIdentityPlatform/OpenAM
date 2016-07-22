@@ -16,43 +16,31 @@
 
 package org.forgerock.openam.rest.service;
 
-import java.io.IOException;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-
-import org.forgerock.guice.core.GuiceModules;
-import org.forgerock.guice.core.GuiceTestCase;
-import org.forgerock.json.resource.ResourceException;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertTrue;
 
-import org.forgerock.openam.audit.AuditCoreGuiceModule;
-import org.forgerock.openam.audit.configuration.AuditConfigurationGuiceModule;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
-import org.forgerock.openam.core.guice.DataLayerGuiceModule;
-import org.forgerock.openam.rest.RestGuiceModule;
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.shared.guice.SharedGuiceModule;
+import org.mockito.MockitoAnnotations;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.inject.AbstractModule;
+public class JSONRestStatusServiceTest {
 
-@GuiceModules({JSONRestStatusServiceTest.TestGuiceModule.class, SharedGuiceModule.class, CoreGuiceModule.class,
-        RestGuiceModule.class, AuditCoreGuiceModule.class, AuditConfigurationGuiceModule.class,
-        DataLayerGuiceModule.class})
-public class JSONRestStatusServiceTest extends GuiceTestCase {
-
-    private RestStatusService restStatusService;
+    private JSONRestStatusService restStatusService;
 
     @BeforeMethod
     public void setUp() {
-        restStatusService = new JSONRestStatusService();
+        MockitoAnnotations.initMocks(this);
+        restStatusService = new JSONRestStatusService(new JacksonRepresentationFactory(new ObjectMapper()));
     }
 
     @Test
@@ -85,13 +73,5 @@ public class JSONRestStatusServiceTest extends GuiceTestCase {
 
         //Then
         assertTrue(representation.getText().contains("\"bing\":\"bong\""));
-
-    }
-
-    public static class TestGuiceModule extends AbstractModule {
-        @Override
-        protected void configure() {
-            bind(JacksonRepresentationFactory.class);
-        }
     }
 }
