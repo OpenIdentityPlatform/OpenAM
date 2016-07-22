@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.http;
 
+import static com.sun.identity.shared.Constants.*;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -36,9 +38,11 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.RuntimeExceptionHandler;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.debug.Debug;
 
 import io.swagger.models.Info;
+import io.swagger.models.Scheme;
 import io.swagger.models.Swagger;
 
 /**
@@ -85,6 +89,9 @@ final class OpenAMHttpApplication implements DescribedHttpApplication {
 
     @Override
     public ApiProducer<Swagger> getApiProducer() {
-        return new SwaggerApiProducer(new Info().title("OpenAM"), null, null);
+        String basePath = SystemProperties.get(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        String host = SystemProperties.get(AM_SERVER_HOST) + ":" + SystemProperties.get(AM_SERVER_PORT);
+        Scheme scheme = Scheme.forValue(SystemProperties.get(AM_SERVER_PROTOCOL));
+        return new SwaggerApiProducer(new Info().title("OpenAM"), basePath, host, scheme);
     }
 }

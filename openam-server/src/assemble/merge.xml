@@ -3,6 +3,7 @@
   <wars>
     <war>org.forgerock.openam:openam-server-only</war>
     <war>org.forgerock.openam:openam-console</war>
+    <war>org.forgerock.commons:openapi-war-overlay</war>
   </wars>
   <merges>
     <merge>

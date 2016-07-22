@@ -87,6 +87,11 @@
             <artifactId>openam-console</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>openapi-war-overlay</artifactId>
+            <type>war</type>
+        </dependency>
     </dependencies>
 
     <profiles>
