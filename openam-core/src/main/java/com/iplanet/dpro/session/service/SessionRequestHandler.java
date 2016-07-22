@@ -28,6 +28,7 @@
  */
 package com.iplanet.dpro.session.service;
 
+import static com.sun.tools.doclets.internal.toolkit.util.DocPath.parent;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
@@ -38,6 +39,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HEAD;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
@@ -247,6 +249,7 @@ public class SessionRequestHandler implements RequestHandler {
         } catch (SessionException se) {
             // Log the access attempt without session properties, then continue.
             auditor.auditAccessAttempt();
+            throw se;
         }
 
         verifyValidRequest(req, requesterSession);
@@ -264,9 +267,6 @@ public class SessionRequestHandler implements RequestHandler {
             SessionRequestException, ForwardSessionRequestException {
         SessionID targetSid = requesterSession.getSessionID();
         if (req.getMethodID() == SessionRequest.DestroySession) {
-            if (requesterSession == null) {
-                throw new SessionException("Failed to resolve Session");
-            }
             targetSid = new SessionID(req.getDestroySessionID());
             verifyRequestingSessionIsNotRestrictedToken(requesterSession);
         } else if (req.getMethodID() == SessionRequest.SetProperty) {
@@ -287,9 +287,6 @@ public class SessionRequestHandler implements RequestHandler {
         switch (req.getMethodID()) {
             case SessionRequest.GetValidSessions:
             case SessionRequest.GetSessionCount:
-                if (requesterSession == null) {
-                    throw new SessionException("Failed to resolve Session");
-                }
                 verifyRequestingSessionIsNotRestrictedToken(requesterSession);
                 break;
 
