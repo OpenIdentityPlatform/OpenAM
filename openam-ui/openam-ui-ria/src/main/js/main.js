@@ -20,6 +20,7 @@ require.config({
             "Footer"            : "org/forgerock/openam/ui/common/components/Footer",
             "ThemeManager"      : "org/forgerock/openam/ui/common/util/ThemeManager",
             "LoginView"         : "org/forgerock/openam/ui/user/login/RESTLoginView",
+            "UserProfileView"   : "org/forgerock/commons/ui/user/profile/UserProfileView",
             "ForgotUsernameView": "org/forgerock/openam/ui/user/anonymousProcess/ForgotUsernameView",
             "PasswordResetView" : "org/forgerock/openam/ui/user/anonymousProcess/PasswordResetView",
             "LoginDialog"       : "org/forgerock/openam/ui/user/login/RESTLoginDialog",

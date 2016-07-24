@@ -21,18 +21,19 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/services/ServerService",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "UserProfileView"
 ], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService,
-    RealmHelper) {
+    RealmHelper, UserProfileView) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
         lastKnownSubRealm,
         lastKnownOverrideRealm,
         setRequireMapConfig = function (serverInfo) {
-            require.config({ "map": { "*": {
-                "UserProfileView" : (serverInfo.kbaEnabled === "true"
-                    ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
-                    : "org/forgerock/commons/ui/user/profile/UserProfileView")
-            } } });
+            if (serverInfo.kbaEnabled === "true") {
+                require(["org/forgerock/commons/ui/user/profile/UserProfileKBATab"], (tab) => {
+                    UserProfileView.registerTab(tab);
+                });
+            }
 
             return serverInfo;
         };
