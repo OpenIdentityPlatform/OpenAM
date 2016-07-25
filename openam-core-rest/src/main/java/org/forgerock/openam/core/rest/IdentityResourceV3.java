@@ -232,13 +232,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                     + principalName);
 
             for (IdentityDetails userDetail : userDetails) {
-                ResourceResponse resource;
-                resource = newResourceResponse(userDetail.getName(),
-                        "0",
-                        identityResourceV2.addRoleInformation(context,
-                                userDetail.getName(),
-                                identityDetailsToJsonValue(userDetail)));
-                handler.handleResource(resource);
+                handler.handleResource(
+                        this.identityResourceV2.buildResourceResponse(userDetail.getName(), context, userDetail));
             }
 
         } catch (ResourceException resourceException) {

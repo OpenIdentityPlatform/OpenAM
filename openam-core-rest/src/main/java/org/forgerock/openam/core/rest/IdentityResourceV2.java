@@ -1109,8 +1109,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                                 debug.message("IdentityResource.createInstance :: CREATE of resourceId={} in realm={} "
                                         + "performed by principalName={}", id, realm, principalName);
 
-                                ResourceResponse resource = newResourceResponse(id, "0", identityDetailsToJsonValue(dtls));
-                                return newResultPromise(resource);
+                                return newResultPromise(buildResourceResponse(id, context, dtls));
                             } else {
                                 debug.error("IdentityResource.createInstance() :: Identity not found");
                                 return new NotFoundException("Identity not found").asPromise();
@@ -1331,7 +1330,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             // read updated identity back to client
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
                     getIdentityServicesAttributes(realm, objectType), token);
-            return newResultPromise(this.identityResourceV1.buildResourceResponse(resourceId, context, checkIdent));
+            return newResultPromise(buildResourceResponse(resourceId, context, checkIdent));
         } catch (final ObjectNotFound onf) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={} : Could not find the " +
                     "resource", resourceId, onf);
@@ -1417,6 +1416,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             }
         }
         return mailscm;
+    }
+
+    protected ResourceResponse buildResourceResponse(String resourceId, Context context,
+            IdentityDetails identityDetails) {
+        return this.identityResourceV1.buildResourceResponse(resourceId, context, identityDetails);
+    }
+
+    private ResourceResponse buildResourceResponse(String resourceId, JsonValue content) {
+        return this.identityResourceV1.buildResourceResponse(resourceId, content);
     }
 
 }

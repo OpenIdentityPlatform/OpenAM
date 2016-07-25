@@ -1071,7 +1071,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                                 debug.message("IdentityResource.createInstance :: CREATE of resourceId={} in realm={} performed by " +
                                         "principalName={}", id, realm, principalName);
 
-                                return newResultPromise(newResourceResponse(id, "0", identityDetailsToJsonValue(dtls)));
+                                return newResultPromise(buildResourceResponse(id, context, dtls));
                             } else {
                                 debug.error("IdentityResource.createInstance :: Identity not found ");
                                 return new NotFoundException("Identity not found").asPromise();
@@ -1146,8 +1146,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     "principalName={}", resourceId, realm, principalName);
 
             result.put("success", "true");
-            resource = newResourceResponse(resourceId, "0", result);
-            return newResultPromise(resource);
+            return newResultPromise(buildResourceResponse(resourceId, result));
 
         } catch (final NeedMoreCredentials ex) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE resourceId={} : User does not have enough" +
@@ -1181,13 +1180,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE resourceId={} : resource failure",
                     resourceId, re);
             result.put("success", "false");
-            resource = newResourceResponse(resourceId, "0", result);
-            return newResultPromise(resource);
+            return newResultPromise(buildResourceResponse(resourceId, result));
         } catch (Exception e) {
             debug.error("IdentityResource.deleteInstance() :: Cannot DELETE resourceId={}", resourceId, e);
             result.put("success", "false");
-            resource = newResourceResponse(resourceId, "0", result);
-            return newResultPromise(resource);
+            return newResultPromise(buildResourceResponse(resourceId, result));
         }
     }
 
@@ -1226,8 +1223,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
             for (final String user : users) {
                 JsonValue val = new JsonValue(user);
-                ResourceResponse resource = newResourceResponse(user, "0", val);
-                handler.handleResource(resource);
+                handler.handleResource(buildResourceResponse(user, val));
             }
         } catch (Exception ex) {
 
@@ -1297,10 +1293,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     protected ResourceResponse buildResourceResponse(String resourceId, Context context,
             IdentityDetails identityDetails) {
-        JsonValue content = addRoleInformation(context, resourceId, identityDetailsToJsonValue(identityDetails));
+        return buildResourceResponse(resourceId,
+                addRoleInformation(context, resourceId, identityDetailsToJsonValue(identityDetails)));
+    }
+
+    protected ResourceResponse buildResourceResponse(String resourceId, JsonValue content) {
         return newResourceResponse(resourceId, String.valueOf(content.getObject().hashCode()), content);
     }
-    
+
     /*
      * package private for visibility to IdentityResourceV2.
      */
@@ -1380,8 +1380,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             IdentityDetails checkIdent = identityServices.read(dtls.getName(),
                                                                     getIdentityServicesAttributes(realm), admin);
             // handle updated resource
-            resource = newResourceResponse(resourceId, "0", identityDetailsToJsonValue(checkIdent));
-            return newResultPromise(resource);
+            return newResultPromise(buildResourceResponse(resourceId, context, checkIdent));
         } catch (final ObjectNotFound onf) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE resourceId={} : Could not find the " +
                             "resource", resourceId, onf);
