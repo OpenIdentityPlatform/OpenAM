@@ -16,16 +16,13 @@
 
 define([
     "jquery",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/services/ServerService",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "UserProfileView"
-], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService,
-    RealmHelper, UserProfileView) {
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
+], function ($, Configuration, Constants, ServerService, RealmHelper, UserProfileView) {
+    var obj = {},
         lastKnownSubRealm,
         lastKnownOverrideRealm,
         setRequireMapConfig = function (serverInfo) {
