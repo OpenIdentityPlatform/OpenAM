@@ -19,15 +19,12 @@
  */
 define([
     "jquery",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, Configuration, Constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`),
-        getPath = function () {
-            return `__subrealm__/users/${Configuration.loggedUser.get("uid")}/devices/2fa/oath/`;
-        };
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function ($, AbstractDelegate, Configuration, Constants, fetchUrl) {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     /**
      * Delete oath device by uuid
@@ -35,8 +32,9 @@ define([
      * @returns {Promise} promise that will contain the response
      */
     obj.remove = function (uuid) {
+        const loggedUserUid = Configuration.loggedUser.get("uid");
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm(getPath() + uuid),
+            url: fetchUrl.legacy(`/users/${loggedUserUid}/devices/2fa/oath/${uuid}`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true,
             method: "DELETE"
@@ -49,9 +47,10 @@ define([
      * @returns {Promise} promise that will contain the response
      */
     obj.setDevicesOathSkippable = function (skip) {
-        var skipOption = { value: skip };
+        const loggedUserUid = Configuration.loggedUser.get("uid");
+        const skipOption = { value: skip };
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(`${getPath()}?_action=skip`),
+            url: fetchUrl.legacy(`/users/${loggedUserUid}/devices/2fa/oath?_action=skip`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             data: JSON.stringify(skipOption),
             suppressEvents: true,
@@ -64,8 +63,9 @@ define([
      * @returns {Promise} promise that will contain the response
      */
     obj.checkDevicesOathSkippable = function () {
+        const loggedUserUid = Configuration.loggedUser.get("uid");
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(`${getPath()}?_action=check`),
+            url: fetchUrl.legacy(`/users/${loggedUserUid}/devices/2fa/oath?_action=check`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true,
             method: "POST"
@@ -79,8 +79,9 @@ define([
      * @returns {Promise} promise that will contain the response
      */
     obj.getAll = function () {
+        const loggedUserUid = Configuration.loggedUser.get("uid");
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm(`${getPath()}?_queryFilter=true`),
+            url: fetchUrl.legacy(`/users/${loggedUserUid}/devices/2fa/oath?_queryFilter=true`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             suppressEvents: true
         }).then((value) => value.result);

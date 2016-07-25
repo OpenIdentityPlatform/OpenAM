@@ -21,12 +21,12 @@ define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Promise"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/authentication`);
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getModuleUrl (id) {
         return id === "core" ? "" : `/modules/${id}`;
@@ -35,14 +35,14 @@ define([
     obj.authentication = {
         getAll () {
             return obj.serviceCall({
-                url: "/modules?_action=getAllTypes",
+                url: fetchUrl.legacy("/global-config/authentication/modules?_action=getAllTypes", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((data) => _.sortBy(data.result, "name"));
         },
         schema () {
             const serviceCall = (action) => obj.serviceCall({
-                url: `?_action=${action}`,
+                url: fetchUrl.legacy(`/global-config/authentication?_action=${action}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
@@ -53,14 +53,16 @@ define([
             }));
         },
         get: (id) => {
+            const moduleUrl = getModuleUrl(id);
+
             const getSchema = () => obj.serviceCall({
-                url: `${getModuleUrl(id)}?_action=schema`,
+                url: fetchUrl.legacy(`/global-config/authentication${moduleUrl}?_action=schema`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((response) => new JSONSchema(response));
 
             const getValues = () => obj.serviceCall({
-                url: getModuleUrl(id),
+                url: fetchUrl.legacy(`/global-config/authentication${moduleUrl}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) => new JSONValues(response));
 
@@ -72,7 +74,7 @@ define([
         },
         update (id, data) {
             return obj.serviceCall({
-                url: getModuleUrl(id),
+                url: fetchUrl.legacy(`/global-config/authentication${getModuleUrl(id)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: new JSONValues(data).toJSON()

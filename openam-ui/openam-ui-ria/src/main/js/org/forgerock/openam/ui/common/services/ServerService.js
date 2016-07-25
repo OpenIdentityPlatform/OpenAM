@@ -14,23 +14,22 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
- /**
-  * @module org/forgerock/openam/ui/common/services/ServerService
-  */
+/**
+ * @module org/forgerock/openam/ui/common/services/ServerService
+ */
 define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, RealmHelper) {
-
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function ($, _, AbstractDelegate, Constants, fetchUrl) {
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     obj.getVersion = function () {
         return obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/version")
+            url: fetchUrl.legacy("/serverinfo/version")
         }).then(function (data) {
             return `OpenAM ${data.version} ${$.t("common.form.build")} ${data.revision} (${data.date})`;
         });
@@ -39,7 +38,7 @@ define([
     obj.getConfiguration = function (callParams) {
         return obj.serviceCall(_.extend({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*")
+            url: fetchUrl.legacy("/serverinfo/*")
         }, callParams));
     };
 
