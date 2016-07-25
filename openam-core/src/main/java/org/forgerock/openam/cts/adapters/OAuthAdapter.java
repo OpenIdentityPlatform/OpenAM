@@ -119,7 +119,8 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
                     if (OAuthTokenField.ID.getOAuthField().equals(key)) {
                         continue;
                     }
-                    if (OAuthTokenField.EXPIRY_TIME.getOAuthField().equals(key)) {
+                    if (OAuthTokenField.EXPIRY_TIME.getOAuthField().equals(key) ||
+                            OAuthTokenField.AUTH_TIME.getOAuthField().equals(key)) {
 
                         if (!Collection.class.isAssignableFrom(value.getClass())) {
                             throw new IllegalStateException("Date must be in a collection");

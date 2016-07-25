@@ -98,12 +98,12 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
         RefreshToken refreshToken = null;
         if (providerSettings.issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
-                    resourceOwner.getId(), null, validatedScope, request, validatedClaims);
+                    resourceOwner.getId(), null, validatedScope, request, validatedClaims, resourceOwner.getAuthTime());
         }
 
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
                 resourceOwner.getId(), clientRegistration.getClientId(), null, validatedScope,
-                refreshToken, null, validatedClaims, request);
+                refreshToken, null, validatedClaims, request, resourceOwner.getAuthTime());
 
         if (refreshToken != null) {
             accessToken.addExtraData(REFRESH_TOKEN, refreshToken.toString());

@@ -238,6 +238,8 @@ public class OAuth2Constants {
         public static final String OAUTH_TOKEN_ADAPTER = "oauthTokenAdapter";
         public static final String RESOURCE_SET_TOKEN_ADAPTER = "resourceSetTokenAdapter";
         public static final String AUTH_GRANT_ID = "authGrantId";
+
+        public static final String AUTH_TIME = "auth_time";
     }
 
     public class Token {

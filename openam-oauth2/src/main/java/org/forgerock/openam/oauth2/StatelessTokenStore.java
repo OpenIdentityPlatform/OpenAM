@@ -29,6 +29,7 @@ import static org.forgerock.openam.utils.Time.newDate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Collection;
@@ -38,8 +39,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -144,6 +147,16 @@ public class StatelessTokenStore implements TokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
             resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
             String nonce, String claims, OAuth2Request request) throws ServerException, NotFoundException {
+        return createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId, clientId,
+                redirectUri, scope, refreshToken, nonce, claims, request,
+                TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+    }
+
+    @Override
+    public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
+            resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
+            String nonce, String claims, OAuth2Request request, long authTime) 
+                    throws ServerException, NotFoundException {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         Duration currentTime = Duration.millis(currentTimeMillis());
@@ -177,7 +190,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(OAUTH_TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
-                .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString());
+                .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
+                .claim(AUTH_TIME, authTime);
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
@@ -336,6 +350,14 @@ public class StatelessTokenStore implements TokenStore {
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims)
             throws ServerException, NotFoundException {
+        return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
+                validatedClaims, TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+    }
+
+    @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, long authTime)
+            throws ServerException, NotFoundException {
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
         String authGrantId;
         if (authorizationCode != null &&  authorizationCode.getAuthGrantId() != null  ) {
@@ -344,12 +366,22 @@ public class StatelessTokenStore implements TokenStore {
             authGrantId = UUID.randomUUID().toString();
         }
         return createRefreshToken(grantType, clientId, resourceOwnerId, redirectUri, scope, request,
-                validatedClaims, authGrantId);
+                validatedClaims, authGrantId, authTime);
     }
 
     @Override
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException {
+        return createRefreshToken(grantType, clientId, resourceOwnerId,
+                redirectUri, scope, request, validatedClaims, authGrantId,
+                TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+    }
+
+    @Override
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims,
+            String authGrantId, long authTime)
             throws ServerException, NotFoundException {
         String realm = null;
         try {
@@ -382,7 +414,8 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(EXPIRES_IN, lifeTime.getMillis())
                 .claim(TOKEN_NAME, OAUTH_REFRESH_TOKEN)
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
-                .claim(AUTH_GRANT_ID, authGrantId);
+                .claim(AUTH_GRANT_ID, authGrantId)
+                .claim(AUTH_TIME, authTime);
 
         String authModules = null;
         String acr = null;

@@ -39,15 +39,6 @@ public class ResourceOwner {
     private final long authTime;
 
     /**
-     * Constructs a new OpenAMResourceOwner with their authTime set to now.
-     *  @param id The resource owner's id.
-     * @param amIdentity The resource owner's identity.
-     */
-    ResourceOwner(String id, AMIdentity amIdentity) {
-        this(id, amIdentity, currentTimeMillis());
-    }
-
-    /**
      * Constructs a new OpenAMResourceOwner.
      *  @param id The resource owner's id.
      * @param amIdentity The resource owner's identity.

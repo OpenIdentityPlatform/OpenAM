@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import static com.sun.identity.shared.Constants.AM_CTX_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,6 +26,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
+
 import java.security.AccessController;
 import java.util.ArrayList;
 
@@ -37,6 +39,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -133,7 +136,7 @@ public class ResourceOwnerAuthenticator {
                     SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
                     final AMIdentity id = IdUtils.getIdentity(adminToken, universalId);
                     req.getAttributes().put(AM_CTX_ID, loginState.getSession().getProperty(AM_CTX_ID));
-                    ret = new ResourceOwner(id.getName(), id);
+                    ret = new ResourceOwner(id.getName(), id, currentTimeMillis());
                 } catch (Exception e) {
                     logger.error("Unable to get SSOToken", e);
                     // we're going to throw a generic error

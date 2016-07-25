@@ -217,8 +217,8 @@ public class AccessTokenServiceTest {
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
-                .willReturn(accessToken);
+                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request), 
+                anyLong())).willReturn(accessToken);
 
         //When
         AccessToken actualAccessToken = accessTokenService.refreshToken(request);
@@ -249,7 +249,8 @@ public class AccessTokenServiceTest {
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
+                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request),
+                anyLong()))
                 .willReturn(accessToken);
 
         //When
@@ -288,12 +289,12 @@ public class AccessTokenServiceTest {
 
         given(providerSettings.issueRefreshTokensOnRefreshingToken()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                eq(request), isNull(String.class), anyString())).willReturn(newRefreshToken);
+                eq(request), isNull(String.class), anyString(), anyLong())).willReturn(newRefreshToken);
         given(newRefreshToken.toString()).willReturn(newRefreshTokenId);
 
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), anyString(), eq(request)))
-                .willReturn(accessToken);
+                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), anyString(), eq(request),
+                anyLong())).willReturn(accessToken);
 
         //When
         AccessToken actualAccessToken = accessTokenService.refreshToken(request);

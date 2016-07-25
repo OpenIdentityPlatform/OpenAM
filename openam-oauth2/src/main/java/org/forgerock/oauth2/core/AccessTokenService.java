@@ -182,7 +182,7 @@ public class AccessTokenService {
         if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
             newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
                     refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request,
-                    validatedClaims, refreshToken.getAuthGrantId());
+                    validatedClaims, refreshToken.getAuthGrantId(), refreshToken.getAuthTimeSeconds());
 
             tokenStore.deleteRefreshToken(request, refreshToken.toString());
         }
@@ -190,7 +190,7 @@ public class AccessTokenService {
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER, null,
                 refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), refreshToken.getRedirectUri(),
                 validatedScope, newRefreshToken == null ? refreshToken : newRefreshToken,
-                null, validatedClaims, request);
+                null, validatedClaims, request, refreshToken.getAuthTimeSeconds());
 
         if (newRefreshToken != null) {
             accessToken.addExtraData(REFRESH_TOKEN, newRefreshToken.toString());

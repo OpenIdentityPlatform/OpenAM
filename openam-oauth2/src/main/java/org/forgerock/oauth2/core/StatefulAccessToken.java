@@ -23,12 +23,14 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -94,6 +96,34 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
             String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
             String tokenName, String grantType, String nonce, String realm, String claims,
             String auditTrackingId) {
+        this(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshToken,
+            tokenName, grantType, nonce, realm, claims, auditTrackingId,
+            TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+    }
+
+    /**
+     * Constructs a new AccessToken.
+     *
+     * @param id The token id.
+     * @param authorizationCode The authorization code.
+     * @param resourceOwnerId The resource owner's id.
+     * @param clientId The client's id.
+     * @param redirectUri The redirect uri.
+     * @param scope The scope.
+     * @param expiryTime The expiry time.
+     * @param refreshToken The refresh token.
+     * @param tokenName The token name.
+     * @param grantType The grant type.
+     * @param nonce The nonce.
+     * @param realm The realm.
+     * @param claims The requested claims.
+     * @param auditTrackingId The tracking ID, used for tracking tokens throughout the audit logs.
+     * @param authTime The end user's original auth time.
+     */
+    public StatefulAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
+            String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
+            String tokenName, String grantType, String nonce, String realm, String claims,
+            String auditTrackingId, long authTime) {
         super(new HashMap<String, Object>());
         setId(id);
         setAuthorizationCode(authorizationCode);
@@ -112,6 +142,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         setNonce(nonce);
         setRealm(realm);
         setAuditTrackingId(auditTrackingId);
+        setAuthTime(authTime);
 
         if (!StringUtils.isBlank(claims)) {
             setClaims(claims);
@@ -466,6 +497,24 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
     @Override
     public String getAuditTrackingId() {
         return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setAuthTime(long authTime) {
+        put(OAuth2Constants.CoreTokenParams.AUTH_TIME, stringToSet(String.valueOf(authTime)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getAuthTimeSeconds() {
+        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.AUTH_TIME);
+        final long defaultVal = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
+        return Long.parseLong(CollectionUtils.getFirstItem(value, String.valueOf(defaultVal)));
     }
 
     /**

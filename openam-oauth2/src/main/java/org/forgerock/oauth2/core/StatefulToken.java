@@ -124,6 +124,16 @@ public abstract class StatefulToken extends JsonValue {
     }
 
     /**
+     * Sets the end user's original authentication
+     * time in seconds since epoch.
+     *
+     * @param authTime The authentication time.
+     */
+    protected void setAuthTime(long authTime) {
+        put(AUTH_TIME, authTime);
+    }
+
+    /**
      * Gets the scope.
      *
      * @return The scope.
@@ -182,6 +192,15 @@ public abstract class StatefulToken extends JsonValue {
 
     public String getAuditTrackingId() {
         return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    /**
+     * Gets the end user's authentication time in seconds.
+     *
+     * @return The authentication time.
+     */
+    public long getAuthTimeSeconds() {
+        return get(AUTH_TIME).asLong();
     }
 
     /**

@@ -20,12 +20,8 @@ import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.GOTO;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.PROMPT;
 import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.USER_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACR_VALUES;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.MAX_AGE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.FRAGMENT;
 import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.QUERY;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -35,6 +31,7 @@ import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -49,6 +46,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -59,8 +57,10 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
@@ -243,7 +243,7 @@ public class ResourceOwnerSessionValidator {
 
     private ResourceOwner getResourceOwner(IntrospectableToken token) {
         return new ResourceOwner(token.getResourceOwnerId(), IdUtils.getIdentity(token.getResourceOwnerId(),
-                token.getRealm()));
+                token.getRealm()), TimeUnit.SECONDS.toMillis(token.getAuthTimeSeconds()));
     }
 
     private boolean isRefreshToken(OAuth2Request request) {

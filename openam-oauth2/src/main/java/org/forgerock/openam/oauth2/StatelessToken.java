@@ -21,6 +21,7 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
@@ -88,6 +90,11 @@ public class StatelessToken {
 
     public long getExpiryTime() {
         return jwt.getClaimsSet().getExpirationTime().getTime();
+    }
+
+    public long getAuthTimeSeconds() {
+        final JsonValue value = jwt.getClaimsSet().get(AUTH_TIME);
+        return value.isNull() ? TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) : value.asLong();
     }
 
     public String getTokenType() {

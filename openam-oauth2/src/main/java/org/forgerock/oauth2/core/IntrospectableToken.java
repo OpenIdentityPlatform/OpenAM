@@ -66,4 +66,11 @@ public interface IntrospectableToken extends Token {
      * @return The token's scopes.
      */
     Set<String> getScope();
+
+    /**
+     * Gets the end user's authentication time in seconds.
+     *
+     * @return The authentication time.
+     */
+    long getAuthTimeSeconds();
 }

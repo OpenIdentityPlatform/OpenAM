@@ -86,6 +86,30 @@ public interface TokenStore {
             throws ServerException, NotFoundException;
 
     /**
+     * Creates an Access Token and stores it in the OAuth2 Provider's store.
+     *
+     * @param grantType         The grant type.
+     * @param accessTokenType   The access token type.
+     * @param authorizationCode The authorization code.
+     * @param resourceOwnerId   The resource owner's id.
+     * @param clientId          The client's id.
+     * @param redirectUri       The redirect uri.
+     * @param scope             The requested scope.
+     * @param refreshToken      The refresh token. May be {@code null}.
+     * @param nonce             The nonce.
+     * @param claims            Additional claims requested (for id_token or userinfo).
+     * @param request           The OAuth2 request.
+     * @param authTime        The end user's authentication time.
+     * @return An Access Token.
+     * @throws ServerException   If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     */
+    AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
+            String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
+            RefreshToken refreshToken, String nonce, String claims, OAuth2Request request, long authTime)
+            throws ServerException, NotFoundException;
+
+    /**
      * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
      *
      * @param grantType       The OAuth2 Grant Type.
@@ -130,6 +154,25 @@ public interface TokenStore {
      * @param scope           The requested scope.
      * @param request         The OAuth2 request.
      * @param validatedClaims The validated claims.
+     * @param authTime        The end user's authentication time.
+     * @return A RefreshToken
+     * @throws ServerException   If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     */
+    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, long authTime)
+            throws ServerException, NotFoundException;
+
+    /**
+     * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
+     *
+     * @param grantType       The OAuth2 Grant Type.
+     * @param clientId        The client's id.
+     * @param resourceOwnerId The resource owner's Id.
+     * @param redirectUri     The redirect uri.
+     * @param scope           The requested scope.
+     * @param request         The OAuth2 request.
+     * @param validatedClaims The validated claims.
      * @param authGrantId     The authorization grant Id.
      * @return A RefreshToken
      * @throws ServerException   If any internal server error occurs.
@@ -137,6 +180,27 @@ public interface TokenStore {
      */
     RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
             String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, String authGrantId)
+            throws ServerException, NotFoundException;
+
+    /**
+     * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
+     *
+     * @param grantType       The OAuth2 Grant Type.
+     * @param clientId        The client's id.
+     * @param resourceOwnerId The resource owner's Id.
+     * @param redirectUri     The redirect uri.
+     * @param scope           The requested scope.
+     * @param request         The OAuth2 request.
+     * @param validatedClaims The validated claims.
+     * @param authGrantId     The authorization grant Id.
+     * @param authTime        The end user's authentication time.
+     * @return A RefreshToken
+     * @throws ServerException   If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     */
+    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request, String validatedClaims, 
+            String authGrantId, long authTime)
             throws ServerException, NotFoundException;
 
     /**

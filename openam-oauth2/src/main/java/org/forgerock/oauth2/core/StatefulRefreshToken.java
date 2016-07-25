@@ -20,17 +20,20 @@ import static org.forgerock.oauth2.core.Utils.stringToSet;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Models a OAuth2 Refresh Token.
@@ -66,13 +69,41 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      * @param tokenType The token type.
      * @param tokenName The token name.
      * @param grantType The grant type.
-     * @param authModules The pipe-separated list of auth modules.
      * @param realm The realm.
+     * @param authModules The pipe-separated list of auth modules.
+     * @param acr The authentication context.
      * @param auditId The audit id, used for tracking tokens throughout the audit logs.
+     * @param authGrantId The authorization grant id.
      */
     public StatefulRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             long expiryTime, String tokenType, String tokenName, String grantType, String realm,
             String authModules, String acr, String auditId, String authGrantId) {
+        this (id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType, realm,
+            authModules, acr, auditId, authGrantId, TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+    }
+
+    /**
+     * Constructs a new RefreshToken.
+     *
+     * @param id The token id.
+     * @param resourceOwnerId The resource owner's id.
+     * @param clientId The client's id.
+     * @param redirectUri The redirect uri.
+     * @param scope The scope.
+     * @param expiryTime The expiry time.
+     * @param tokenType The token type.
+     * @param tokenName The token name.
+     * @param grantType The grant type.
+     * @param realm The realm.
+     * @param authModules The pipe-separated list of auth modules.
+     * @param acr The authentication context.
+     * @param auditId The audit id, used for tracking tokens throughout the audit logs.
+     * @param authGrantId The authorization grant id.
+     * @param authTime The end user's original auth time in seconds.
+     */
+    public StatefulRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
+            long expiryTime, String tokenType, String tokenName, String grantType, String realm,
+            String authModules, String acr, String auditId, String authGrantId, long authTime) {
         super(new HashMap<String, Object>());
         setId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -88,6 +119,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
         setAuthenticationContextClassReference(acr);
         setRealm(realm);
         setAuditTrackingId(auditId);
+        setAuthTime(authTime);
     }
 
     /**
@@ -328,6 +360,24 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
     @Override
     public String getAuditTrackingId() {
         return getStringProperty(AUDIT_TRACKING_ID);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setAuthTime(long authTime) {
+        put(OAuth2Constants.CoreTokenParams.AUTH_TIME, stringToSet(String.valueOf(authTime)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getAuthTimeSeconds() {
+        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.AUTH_TIME);
+        final long defaultVal = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
+        return Long.parseLong(CollectionUtils.getFirstItem(value, String.valueOf(defaultVal)));
     }
 
     @Override

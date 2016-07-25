@@ -215,7 +215,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                eq(request), isNull(String.class))).willReturn(refreshToken);
+                eq(request), isNull(String.class), anyLong())).willReturn(refreshToken);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
