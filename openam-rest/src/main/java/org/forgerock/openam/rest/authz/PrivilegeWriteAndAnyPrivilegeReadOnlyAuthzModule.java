@@ -36,6 +36,7 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 
@@ -59,8 +60,9 @@ public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeA
     @Inject
     public PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule(DelegationEvaluator evaluator,
             Map<String, PrivilegeDefinition> actionToDefinition, DelegationPermissionFactory permissionFactory,
-            SessionCache sessionCache, CoreWrapper coreWrapper, AnyPrivilegeAuthzModule anyPrivilegeAuthzModule) {
-        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper);
+            SessionCache sessionCache, CoreWrapper coreWrapper, AnyPrivilegeAuthzModule anyPrivilegeAuthzModule,
+            SSOTokenManager ssoTokenManager) {
+        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper, ssoTokenManager);
         this.anyPrivilegeAuthzModule = anyPrivilegeAuthzModule;
     }
 

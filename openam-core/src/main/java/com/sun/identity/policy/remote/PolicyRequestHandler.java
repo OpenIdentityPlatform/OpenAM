@@ -43,6 +43,7 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
@@ -63,6 +64,7 @@ import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SMSException;
+
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -70,6 +72,7 @@ import javax.security.auth.Subject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -759,20 +762,19 @@ public class PolicyRequestHandler implements RequestHandler {
     /**
      * Returns sso token based on the sso token id string.
      */
-    private SSOToken getSSOToken(String idString, SSOToken context)
-        throws PolicyException
-    {
+    private SSOToken getSSOToken(String idString, SSOToken context) throws PolicyException {
         SSOToken token = null;
-
         // Get the user's SSO token based on the token id string
         try {
-            token = RestrictedTokenHelper.resolveRestrictedToken(
-                idString, context);
+            token = RestrictedTokenHelper.resolveRestrictedToken(idString, context);
+            if (token != null && SSOTokenManager.getInstance().isValidToken(token)) {
+                return token;
+            } else {
+                throw new PolicyException("Invalid token");
+            }
         } catch (Exception e) {
-            throw new PolicyException(ResBundleUtils.rbName,
-                "invalid_sso_token", null, e);
+            throw new PolicyException(ResBundleUtils.rbName, "invalid_sso_token", null, e);
         }
-        return token;
     }
 
     /**

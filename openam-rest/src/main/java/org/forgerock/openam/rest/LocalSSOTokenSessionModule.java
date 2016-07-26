@@ -167,7 +167,7 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
                             return validate(request, messageInfo, clientSubject);
                         }
                     });
-                    return newResultPromise((AuthStatus) o);
+                    return (o instanceof Promise) ? (Promise)o : newResultPromise((AuthStatus) o);
                 }
             } catch (Exception ex) {
                 return newExceptionPromise(

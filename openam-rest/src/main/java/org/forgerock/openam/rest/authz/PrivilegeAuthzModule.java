@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -51,6 +51,8 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
@@ -81,17 +83,20 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
     private final DelegationPermissionFactory permissionFactory;
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
+    private final SSOTokenManager ssoTokenManager;
 
     @Inject
     public PrivilegeAuthzModule(final DelegationEvaluator evaluator,
             final Map<String, PrivilegeDefinition> actionToDefinition,
             final DelegationPermissionFactory permissionFactory,
-            SessionCache sessionCache, CoreWrapper coreWrapper) {
+            SessionCache sessionCache, CoreWrapper coreWrapper, 
+            SSOTokenManager ssoTokenManager) {
         this.evaluator = evaluator;
         this.actionToDefinition = actionToDefinition;
         this.permissionFactory = permissionFactory;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
+        this.ssoTokenManager = ssoTokenManager;
     }
 
     @Override
@@ -179,6 +184,13 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
                 // you don't have a session so return access denied
                 return Promises.newResultPromise(AuthorizationResult.accessDenied("No session for request."));
             }
+
+            // check session status using SSOTokenManager and refresh if necessary
+            SSOToken token = subjectContext.getCallerSSOToken();
+            if (!ssoTokenManager.isValidToken(token)) {
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("No valid session in request."));
+            }
+
             final String loggedInRealm =
                     coreWrapper.convertOrgNameToRealmName(callerSession.getClientDomain());
 
@@ -195,7 +207,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
             return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
         } catch (SSOException e) {
             //you don't have a user so return access denied
-            return Promises.newResultPromise(AuthorizationResult.accessDenied("No user supplied in request."));
+            return Promises.newResultPromise(AuthorizationResult.accessDenied("No valid user supplied in request."));
         }
 
         return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));

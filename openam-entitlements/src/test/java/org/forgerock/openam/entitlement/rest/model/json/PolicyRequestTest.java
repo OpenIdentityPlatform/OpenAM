@@ -105,7 +105,8 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
         SSOToken token = mock(SSOToken.class);
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("Fred");
-            given(tokenManager.createSSOToken(anyString())).willReturn(token);
+        given(tokenManager.createSSOToken(anyString())).willReturn(token);
+        given(tokenManager.isValidToken(token)).willReturn(true);
 
         // When...
         Context context = buildContextStructure("/abc");

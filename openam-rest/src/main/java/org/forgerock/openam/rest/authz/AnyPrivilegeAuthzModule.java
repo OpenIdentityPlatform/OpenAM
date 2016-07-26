@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.session.SessionCache;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 
@@ -35,8 +36,9 @@ public class AnyPrivilegeAuthzModule extends PrivilegeAuthzModule {
 
     @Inject
     public AnyPrivilegeAuthzModule(DelegationEvaluator evaluator, Map<String, PrivilegeDefinition> actionToDefinition,
-            DelegationPermissionFactory permissionFactory, SessionCache sessionCache, CoreWrapper coreWrapper) {
-        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper);
+            DelegationPermissionFactory permissionFactory, SessionCache sessionCache, CoreWrapper coreWrapper,
+            SSOTokenManager ssoTokenManager) {
+        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper, ssoTokenManager);
     }
 
     @Override

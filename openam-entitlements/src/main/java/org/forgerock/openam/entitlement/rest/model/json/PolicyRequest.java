@@ -201,7 +201,9 @@ public abstract class PolicyRequest {
                     try {
                         String tokenId = subject.get("ssoToken").asString();
                         SSOToken ssoToken = tokenManager.createSSOToken(tokenId);
-                        policySubject = SubjectUtils.createSubject(ssoToken);
+                        if (tokenManager.isValidToken(ssoToken)) {
+                            policySubject = SubjectUtils.createSubject(ssoToken);
+                        }
                     } catch (SSOException e) {
                         policySubject = null;
                     }

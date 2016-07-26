@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -34,10 +34,12 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
+
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.openam.core.CoreWrapper;
@@ -120,6 +122,8 @@ public class PrivilegeAuthzModuleTest {
     private Session session;
     @Mock
     private SessionCache sessionCache;
+    @Mock
+    private SSOTokenManager ssoTokenManager;
 
     private CrestAuthorizationModule module;
 
@@ -135,11 +139,13 @@ public class PrivilegeAuthzModuleTest {
         given(coreWrapper.convertOrgNameToRealmName("realmdn")).willReturn("/abc");
         given(sessionCache.getSession(any(SessionID.class))).willReturn(session);
 
-        module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper);
+        module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper, ssoTokenManager);
 
         Session session = mock(Session.class);
         given(subjectContext.getCallerSession()).willReturn(session);
         given(session.getClientDomain()).willReturn("realmdn");
+
+        given(subjectContext.getCallerSSOToken()).willReturn(token);
     }
 
     @Test
@@ -153,6 +159,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(token, permission, ENVIRONMENT)).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -183,6 +190,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
         Promise<QueryResponse, ResourceException> promise = Promises.newResultPromise(Responses.newQueryResponse("abc-def"));
@@ -215,6 +223,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -246,6 +255,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -277,6 +287,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -308,6 +319,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -339,6 +351,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
@@ -360,6 +373,38 @@ public class PrivilegeAuthzModuleTest {
     }
 
     @Test
+    public void crestActionEvaluateWithInvalidSession() throws SSOException, DelegationException {
+        // Given...
+        final Set<String> actions = new HashSet<>(Arrays.asList("READ"));
+        final DelegationPermission permission = new DelegationPermission(
+                "/abc", "rest", "1.0", "policies", "evaluate", actions, EXTENSIONS, DUMB_FUNC);
+        given(factory.newInstance("/abc", "rest", "1.0", "policies", "evaluate", actions, EXTENSIONS))
+                .willReturn(permission);
+
+        given(subjectContext.getCallerSSOToken()).willReturn(token);
+        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+
+        Session session = mock(Session.class);
+        given(subjectContext.getCallerSession()).willReturn(session);
+
+        given(ssoTokenManager.isValidToken(token)).willReturn(false);
+        given(session.getClientDomain()).willReturn("realmdn");
+
+        // When...
+        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
+        final Router router = new Router();
+        router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
+
+        final RealmContext context = new RealmContext(subjectContext);
+        context.setSubRealm("abc", "abc");
+        final ActionRequest request = Requests.newActionRequest("/policies", "evaluate");
+        Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
+
+        // Then...
+        assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
     public void crestActionBlowupIsAllowed() throws SSOException, DelegationException {
         // Given...
         final Set<String> actions = new HashSet<>(Arrays.asList("MODIFY"));
@@ -370,6 +415,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
@@ -416,6 +462,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(false);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         // When...
         final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
