@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -147,7 +147,7 @@ public class ResourceOwnerSessionValidator {
 
         SSOToken token = getResourceOwnerSession(request);
         try {
-            if (token != null) {
+            if (token != null && ssoTokenManager.isValidToken(token)) {
                 try {
                     // As the organization in the token is stored in lowercase, we need to lower case the auth2realm
                     String auth2Realm = dnWrapper.orgNameToDN(

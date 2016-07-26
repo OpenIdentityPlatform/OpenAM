@@ -144,6 +144,7 @@ public class ResourceOwnerSessionValidatorTest {
         //Given
         mockPrompt("login");
         mockSSOToken(ACTIVE_SESSION_TOKEN);
+        mockSSOTokenValid(ACTIVE_SESSION_TOKEN);
 
         try {
             //When
@@ -164,6 +165,7 @@ public class ResourceOwnerSessionValidatorTest {
         //Given
         mockPrompt("login consent");
         mockSSOToken(ACTIVE_SESSION_TOKEN);
+        mockSSOTokenValid(ACTIVE_SESSION_TOKEN);
 
         try {
             //When
@@ -376,6 +378,10 @@ public class ResourceOwnerSessionValidatorTest {
 
     private void mockSSOToken(SSOToken ssoToken) throws SSOException {
         given(mockSSOTokenManager.createSSOToken(mockHttpServletRequest)).willReturn(ssoToken);
+    }
+
+    private void mockSSOTokenValid(SSOToken ssoToken) throws SSOException {
+        given(mockSSOTokenManager.isValidToken(ssoToken)).willReturn(true);
     }
 
     private void mockAcrValuesMap(Map<String, AuthenticationMethod> mapping) throws Exception {
