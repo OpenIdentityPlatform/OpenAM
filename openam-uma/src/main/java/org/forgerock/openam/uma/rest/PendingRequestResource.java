@@ -16,47 +16,78 @@
 
 package org.forgerock.openam.uma.rest;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
-import org.forgerock.services.context.Context;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PENDING_REQUEST_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * CREST resource for UMA Pending Requests.
  *
  * @since 13.0.0
  */
-public class PendingRequestResource implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = PENDING_REQUEST_RESOURCE + TITLE,
+                description = PENDING_REQUEST_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = PENDING_REQUEST_RESOURCE + "pathparams.user")},
+                resourceSchema = @Schema(schemaResource = "PendingRequestResource.schema.json")),
+        pathParam = @Parameter(
+                name = "pendingRequestId",
+                type = "string",
+                description = PENDING_REQUEST_RESOURCE + "pathParam." + DESCRIPTION))
+public class PendingRequestResource {
 
     private static final String APPROVE_ACTION_ID = "approve";
     private static final String DENY_ACTION_ID = "deny";
@@ -72,47 +103,100 @@ public class PendingRequestResource implements CollectionResourceProvider {
         this.contextHelper = contextHelper;
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
+    @Action(name = "approveAll",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 500,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_500_DESCRIPTION
+                            )},
+                    description = PENDING_REQUEST_RESOURCE + "action.approveAll." + DESCRIPTION
+            ),
+            request = @Schema(schemaResource = "PendingRequestResource.action.approve.request.schema.json"),
+            response = @Schema())
+    public Promise<ActionResponse, ResourceException> approveAll(Context context, ActionRequest request) {
         try {
-            if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                List<Promise<Void, ResourceException>> promises = new ArrayList<>();
-                JsonValue content = request.getContent();
-                for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    promises.add(service.approvePendingRequest(context, pendingRequest.getId(),
-                            content.get(pendingRequest.getId()), ServerContextUtils.getRealm(context)));
-                }
-                return handlePendingRequestApproval(promises);
-            } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    service.denyPendingRequest(pendingRequest.getId(), ServerContextUtils.getRealm(context));
-                }
-                return newResultPromise(newActionResponse((json(object()))));
-            } else {
-                return new NotSupportedException("Action, " + request.getAction() + ", is not supported.").asPromise();
+            List<Promise<Void, ResourceException>> promises = new ArrayList<>();
+            JsonValue content = request.getContent();
+            for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
+                promises.add(service.approvePendingRequest(context, pendingRequest.getId(),
+                        content.get(pendingRequest.getId()), ServerContextUtils.getRealm(context)));
             }
+            return handlePendingRequestApproval(promises);
         } catch (ResourceException e) {
             return e.asPromise();
         }
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
+    @Action(name = "denyAll",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_400_DESCRIPTION
+                            ),
+                            @ApiError(
+                                    code = 500,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_500_DESCRIPTION
+                            )},
+                    description = PENDING_REQUEST_RESOURCE + "action.denyAll." + DESCRIPTION
+            ),
+            request = @Schema(),
+            response = @Schema())
+    public Promise<ActionResponse, ResourceException> denyAll(Context context, ActionRequest request) {
         try {
-            if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                return handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
-                                ServerContextUtils.getRealm(context)));
-            } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                service.denyPendingRequest(resourceId, ServerContextUtils.getRealm(context));
-                return newResultPromise(newActionResponse(json(object())));
-            } else {
-                return new NotSupportedException("Action, " + request.getAction() + ", is not supported.").asPromise();
-            }
+                for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
+                    service.denyPendingRequest(pendingRequest.getId(), ServerContextUtils.getRealm(context));
+                }
+                return newResultPromise(newActionResponse((json(object()))));
         } catch (ResourceException e) {
             return e.asPromise();
         }
     }
+
+    @Action(name = APPROVE_ACTION_ID,
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_400_DESCRIPTION
+                            )
+                    },
+                    description = PENDING_REQUEST_RESOURCE + "action.approve." + DESCRIPTION
+            ),
+            request = @Schema(schemaResource = "PendingRequestResource.action.approve.request.schema.json"),
+            response = @Schema())
+    public Promise<ActionResponse, ResourceException> approve(Context context, String resourceId,
+                                                                     ActionRequest request) {
+        return handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
+                ServerContextUtils.getRealm(context)));
+    }
+
+    @Action(name = DENY_ACTION_ID,
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_400_DESCRIPTION
+                            ),
+                            @ApiError(
+                                    code = 500,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_500_DESCRIPTION
+                            )},
+                    description = PENDING_REQUEST_RESOURCE + "action.deny." + DESCRIPTION
+            ),
+            request = @Schema(),
+            response = @Schema())
+    public Promise<ActionResponse, ResourceException> deny(Context context, String resourceId,
+                                                              ActionRequest request) {
+        try {
+            service.denyPendingRequest(resourceId, ServerContextUtils.getRealm(context));
+            return newResultPromise(newActionResponse(json(object())));
+        } catch (ResourceException e) {
+            return e.asPromise();
+        }
+    }
+
 
     private Promise<ActionResponse, ResourceException> handlePendingRequestApproval(Promise<Void, ResourceException> promise) {
         return handlePendingRequestApproval(Collections.singletonList(promise));
@@ -128,7 +212,15 @@ public class PendingRequestResource implements CollectionResourceProvider {
                 });
     }
 
-    @Override
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = PENDING_REQUEST_RESOURCE + ERROR_500_DESCRIPTION
+                    )},
+            description = PENDING_REQUEST_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (request.getQueryFilter() == null) {
@@ -152,7 +244,12 @@ public class PendingRequestResource implements CollectionResourceProvider {
         }
     }
 
-    @Override
+    @Read(operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 500,
+                                    description = PENDING_REQUEST_RESOURCE + ERROR_500_DESCRIPTION)},
+                    description = PENDING_REQUEST_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
@@ -170,26 +267,4 @@ public class PendingRequestResource implements CollectionResourceProvider {
         return newResourceResponse(request.getId(), String.valueOf(request.hashCode()), request.asJson());
     }
 
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
-            DeleteRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
-            UpdateRequest request) {
-        return new NotSupportedException().asPromise();
-    }
 }

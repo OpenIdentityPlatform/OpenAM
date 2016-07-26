@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/PendingRequestResource#schema.action.approve.request.title",
+  "description": "i18n:api-descriptor/PendingRequestResource#schema.action.approve.request.description",
+  "properties": {
+    "scopes": {
+      "type": "array",
+      "title": "i18n:api-descriptor/PendingRequestResource#schema.action.approve.request.scopes.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema.action.approve.request.scopes.description",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "scopes"
+  ]
+}
