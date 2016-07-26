@@ -28,6 +28,7 @@
  */
 package com.sun.identity.sm;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import com.google.inject.assistedinject.Assisted;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 
@@ -139,7 +141,8 @@ public class OrganizationConfigManager {
      *             <code>OrganizationConfigManager
      *                      </code>.
      */
-    public OrganizationConfigManager(SSOToken token, String orgName)
+    @Inject
+    public OrganizationConfigManager(@Assisted SSOToken token, @Assisted String orgName)
             throws SMSException {
         // Copy instance variables
         this.token = token;

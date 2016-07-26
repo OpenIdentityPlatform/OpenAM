@@ -86,6 +86,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -849,14 +850,14 @@ public class AuthD implements ConfigurationListener {
 
     /**
      * get inetDomainStatus attribute for the org
-     * @param orgName org name to check inetDomainStatus
+     * @param realm org name to check inetDomainStatus
      * @return true if org is active
      * @throws IdRepoException if can not can any information for org
      * @throws SSOException if can not use <code>SSOToken</code> for admin
      */
-    boolean getInetDomainStatus(String orgName)
+    boolean getInetDomainStatus(String realm)
         throws IdRepoException, SSOException {
-        return IdUtils.isOrganizationActive(ssoAuthSession,orgName);
+        return IdUtils.isOrganizationActive(ssoAuthSession, realm);
     }
     
     /**

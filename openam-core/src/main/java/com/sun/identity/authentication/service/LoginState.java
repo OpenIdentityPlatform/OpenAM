@@ -72,6 +72,7 @@ import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrade
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
+import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;

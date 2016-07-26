@@ -39,6 +39,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.core.realms.Realm;
 
 /**
  * A wrapper class around core static class and methods.
@@ -195,13 +196,13 @@ public class CoreServicesWrapper {
      *
      * {@link com.sun.identity.idm.IdUtils#isOrganizationActive(SSOToken, String)}
      *
-     * @param orgDN The organization DN to check the status of.
+     * @param realm The organization DN to check the status of.
      * @return True if organization is active, otherwise false.
      * @throws IdRepoException If cannot find any information for organization.
      * @throws SSOException If there is a problem with the admin SSOToken.
      */
-    public boolean isOrganizationActive(String orgDN) throws IdRepoException, SSOException {
-        return IdUtils.isOrganizationActive(getAdminToken(), orgDN);
+    public boolean isOrganizationActive(String realm) throws IdRepoException, SSOException {
+        return IdUtils.isOrganizationActive(getAdminToken(), realm);
     }
 
     /**

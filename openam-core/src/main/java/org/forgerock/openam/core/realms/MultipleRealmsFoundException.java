@@ -16,33 +16,22 @@
 
 package org.forgerock.openam.core.realms;
 
-import com.sun.identity.idm.IdRepoBundle;
-import com.sun.identity.shared.locale.L10NMessageImpl;
+import com.sun.identity.idm.IdRepoErrorCode;
 
 /**
- * Signals that the {@literal realm} {@code String} used to lookup a realm failed due to it being
- * an invalid realm identifier or the lookup operation failed.
+ * Signals that the {@literal realm} {@code String} used to lookup a realm failed due to it mapping
+ * to multiple realms.
  *
  * @since 14.0.0
  */
-public class RealmLookupException extends L10NMessageImpl {
+public class MultipleRealmsFoundException extends RealmLookupException {
 
     /**
      * Constructs a new exception with the specified detail message and cause.
      *
-     * @param errorCode Key to the {@link IdRepoBundle#BUNDLE_NAME} resource bundle.
-     * @param realm The realm.
+     * @param realm The realm identifier that maps to multiple realms.
      */
-    public RealmLookupException(String errorCode, String realm) {
-        super(IdRepoBundle.BUNDLE_NAME, errorCode, new Object[]{realm});
-    }
-
-    /**
-     * Constructs a new exception with the specified {@code Throwable}.
-     *
-     * @param cause The cause.
-     */
-    public RealmLookupException(Throwable cause) {
-        super(cause);
+    public MultipleRealmsFoundException(String realm) {
+        super(IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, realm);
     }
 }

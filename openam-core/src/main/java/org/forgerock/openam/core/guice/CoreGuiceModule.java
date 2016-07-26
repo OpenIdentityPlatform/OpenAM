@@ -81,6 +81,7 @@ import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.validation.URLValidator;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.OrganizationConfigManagerFactory;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -90,6 +91,7 @@ import com.sun.identity.sm.ldap.ConfigAuditorFactory;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.realms.RealmGuiceModule;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
@@ -319,6 +321,12 @@ public class CoreGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(EntitlementConfiguration.class, EntitlementService.class)
                 .build(EntitlementConfigurationFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(OrganizationConfigManager.class, OrganizationConfigManager.class)
+                .build(OrganizationConfigManagerFactory.class));
+
+        install(new RealmGuiceModule());
     }
 
     @Provides
@@ -548,6 +556,12 @@ public class CoreGuiceModule extends AbstractModule {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
         }
+    }
+
+    @Provides
+    @Named("AdminToken")
+    SSOToken provideAdminSSOToken(Provider<PrivilegedAction<SSOToken>> adminTokenActionProvider) {
+        return AccessController.doPrivileged(adminTokenActionProvider.get());
     }
 
     // provides our stored servlet context to classes which require it

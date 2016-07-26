@@ -19,6 +19,12 @@
  */
 package org.forgerock.openam.core.rest.authn.core;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -28,13 +34,6 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;

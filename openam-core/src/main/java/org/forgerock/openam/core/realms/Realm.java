@@ -16,14 +16,9 @@
 
 package org.forgerock.openam.core.realms;
 
-import java.security.AccessController;
+import javax.inject.Inject;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.core.CoreWrapper;
 
 /**
  * Models a valid realm within OpenAM.
@@ -36,12 +31,47 @@ import com.sun.identity.sm.DNMapper;
  *
  * @since 14.0.0
  */
-public final class Realm {
+public class Realm {
+
+    @Inject
+    private static RealmLookup realmLookup;
+    @Inject
+    private static CoreWrapper coreWrapper;
+
+    private static Realm root;
 
     /**
-     * The root realm.
+     * Gets the root realm.
+     *
+     * @return The root realm.
      */
-    public static final Realm ROOT = new Realm(DNMapper.orgNameToDN("/"));
+    public static Realm root() {
+        // Ok if this creates more than one instance. Intended as best effort.
+        if (root == null) {
+            root = new Realm(convertRealmPathToDN("/"));
+        }
+        return root;
+    }
+
+    /**
+     * Returns realm in DN format for the provided realm in path format.
+     *
+     * @param realmPath realm in path format.
+     * @return The realm in DN format.
+     */
+    static String convertRealmPathToDN(String realmPath) {
+        return coreWrapper.convertRealmNameToOrgName(realmPath);
+    }
+
+    /**
+     * Returns realm in path format for the provided realm in DN format.
+     *
+     * @param realmDN realm in DN format.
+     * @return The realm in path format.
+     */
+    static String convertRealmDNToPath(String realmDN) {
+        return coreWrapper.convertOrgNameToRealmName(realmDN);
+    }
 
     /**
      * Uses the {@literal realm} {@code String} to lookup the Realm.
@@ -52,22 +82,14 @@ public final class Realm {
      * resolved.
      */
     public static Realm of(String realm) throws RealmLookupException {
-        try {
-            return new Realm(IdUtils.getOrganization(getAdminToken(), realm));
-        } catch (IdRepoException | SSOException e) {
-            throw new RealmLookupException("Failed to resolve realm: " + realm, e);
-        }
-    }
-
-    private static SSOToken getAdminToken() {
-        return AccessController.doPrivileged(AdminTokenAction.getInstance());
+        return realmLookup.lookup(realm);
     }
 
     private final String path;
     private final String realmDN;
 
-    private Realm(String realmDN) {
-        this.path = DNMapper.orgNameToRealmName(realmDN);
+    Realm(String realmDN) {
+        this.path = convertRealmDNToPath(realmDN);
         this.realmDN = realmDN;
     }
 
