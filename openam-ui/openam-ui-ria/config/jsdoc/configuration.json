@@ -8,6 +8,6 @@
         "include": [
             "src/main/js"
         ],
-        "includePattern": "\\.(js|jsm)$"
+        "includePattern": "\\.(js|jsm|jsx)$"
     }
 }

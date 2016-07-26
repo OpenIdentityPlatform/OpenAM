@@ -5,12 +5,18 @@ module.exports = {
     ],
     parserOptions: {
         ecmaVersion: 6,
-        sourceType: "module"
+        sourceType: "module",
+        ecmaFeatures: {
+            jsx: true
+        }
     },
     env: {
         amd: true,
         browser: true
     },
+    "plugins": [
+        "react"
+    ],
     rules: {
         /*
          * --------------------------------------------------------------------------------
@@ -131,6 +137,14 @@ module.exports = {
          * TODO: Remove them from eslint-config-forgerock
          */
         "no-empty-label": 0,
-        "space-return-throw-case": 0
+        "space-return-throw-case": 0,
+
+        /*
+         * --------------------------------------------------------------------------------
+         * REACT RULES
+         * --------------------------------------------------------------------------------
+         */
+         "react/jsx-uses-react": 1,
+         "react/jsx-uses-vars": 1
     }
 };

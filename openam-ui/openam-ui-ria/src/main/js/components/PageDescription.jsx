@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,17 +14,19 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define([
-     "jquery",
-     "org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView",
-     "org/forgerock/openam/ui/admin/services/global/AuthenticationService"
- ], ($, createConfigurationListView, AuthenticationService) => {
+import React from "react";
 
-     const ListAuthenticationView = createConfigurationListView(
-         $.t("config.AppConfiguration.Navigation.links.configure.authentication"),
-         AuthenticationService.authentication.getAll,
-         "templates/admin/views/configuration/authentication/ListAuthenticationConfigurationTemplate.html"
-     );
+/**
+ * A page description.
+ * @module components/PageDescription
+ * @param {Object} props Properties passed to this component
+ * @param {string} props.text Text to display for the page description
+ * @returns {ReactElement} Renderable React element
+ */
+const PageDescription = ({ text }) => <p className="page-description">{text}</p>;
 
-     return new ListAuthenticationView();
- });
+PageDescription.propTypes = {
+    text: React.PropTypes.string.isRequired
+};
+
+export default PageDescription;

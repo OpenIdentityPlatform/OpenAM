@@ -17,11 +17,13 @@
   "devDependencies": {
     "babel-plugin-transform-es2015-modules-amd": "6.8.0",
     "babel-preset-es2015": "6.13.2",
+    "babel-preset-react": "6.11.1",
     "chai": "3.5.0",
     "cross-env": "2.0.0",
     "eslint": "3.2.2",
     "eslint-config-forgerock": "1.1.1",
     "eslint-formatter-warning-summary": "1.0.1",
+    "eslint-plugin-react": "5.2.2",
     "grunt": "1.0.1",
     "grunt-babel": "6.0.0",
     "grunt-cli": "1.2.0",

@@ -145,6 +145,13 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>react-bootstrap</artifactId>
+            <version>0.30.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
 
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>

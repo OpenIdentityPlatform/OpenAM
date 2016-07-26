@@ -14,9 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
- /**
-  * @module org/forgerock/openam/ui/common/util/array/arrayify
-  */
+/**
+ * @module org/forgerock/openam/ui/common/util/array/arrayify
+ */
 define(() => {
     /**
      * Wraps any value in an array.

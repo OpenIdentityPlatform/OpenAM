@@ -86,7 +86,7 @@ module.exports = function (grunt) {
                     }
                 },
                 ignore: ["libs/"],
-                presets: ["es2015"],
+                presets: ["es2015", "react"],
                 plugins: [
                     ["transform-es2015-classes", { "loose": true }]
                 ]
@@ -103,10 +103,10 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: compositionDirectory,
-                    src: "**/*.jsm",
+                    src: ["**/*.jsm", "**/*.jsx"],
                     dest: transpiledDirectory,
                     rename: function (dest, src) {
-                        return dest + "/" + src.replace(".jsm", ".js");
+                        return dest + "/" + src.replace(".jsm", ".js").replace(".jsx", ".js");
                     }
                 }],
                 options: {

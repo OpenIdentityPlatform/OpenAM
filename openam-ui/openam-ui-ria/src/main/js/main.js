@@ -68,8 +68,10 @@ require.config({
         "microplugin" : "libs/microplugin-0.0.3",
         "popoverclickaway" : "libs/popover-clickaway",
         "text": "libs/text-2.0.15",
-
-        "redux": "libs/redux-3.5.2-min"
+        "redux": "libs/redux-3.5.2-min",
+        "react": "libs/react-15.2.1-min",
+        "react-dom": "libs/react-dom-15.2.1-min",
+        "react-bootstrap": "libs/react-bootstrap-0.30.1-min"
     },
     shim: {
         "autosizeInput": {
