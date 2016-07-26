@@ -31,6 +31,7 @@ package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.AttributeSchema;
@@ -49,8 +51,11 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import java.security.AccessController;
 import java.util.LinkedHashSet;
+
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * This is the base case for <code>ServerConfiguration</code> and
@@ -76,81 +81,44 @@ public abstract class ConfigurationBase {
 
     protected static String getNextId(SSOToken ssoToken) 
         throws SMSException, SSOException {
-        Set currentIds = new HashSet();
-        
-        currentIds.addAll(getServerConfigurationId(getRootServerConfig(ssoToken)));
-        currentIds.addAll(getSiteConfigurationId(getRootSiteConfig(ssoToken)));
+        Set<String> currentIds = new HashSet<String>();
+
+        ServiceConfig rootServerConfig = getRootServerConfig(ssoToken);
+        if (rootServerConfig == null || !rootServerConfig.isValid()) {
+            //Because SMS classes are wrapped and cached as class variable,
+            //there is no way to "lock" these classes from getting cleared
+            //by SMSNotificationManager if these objects are being used. 
+            //The best we can do at the moment is to retry just one more time
+            rootServerConfig = getRootServerConfig(ssoToken);
+        }
+        Set<String> serverConfigIds = getServerConfigurationId(rootServerConfig);
+        currentIds.addAll(serverConfigIds);
+
+        ServiceConfig rootSiteConfig = getRootSiteConfig(ssoToken);
+        if (rootSiteConfig == null || !rootSiteConfig.isValid()) {
+            //retry just one more time
+            rootSiteConfig = getRootSiteConfig(ssoToken);
+        }
+        Set<String> siteConfigIds = getSiteConfigurationId(rootSiteConfig);
+        currentIds.addAll(siteConfigIds);
 
         return getNextId(currentIds);
     }
     
-    protected static Set getServerConfigurationId(ServiceConfig svc) 
-        throws SMSException, SSOException {
-        Set currentIds = new HashSet();
-        Set names = svc.getSubConfigNames("*");
-        
-        if ((names != null) && !names.isEmpty()) {
-            for (Iterator i = names.iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
-                ServiceConfig sc = svc.getSubConfig(name);
-                Map map = sc.getAttributes();
-                Set set = (Set)map.get(ATTR_SERVER_ID);
-                if ((set != null) && !set.isEmpty()) {
-                    currentIds.add(set.iterator().next());
-                }
-            }
-        }
-        return currentIds;
-    }
+    protected static Set<String> getServerConfigurationId(ServiceConfig svc) throws SMSException, SSOException {
+        Set<String> currentIds = new HashSet<String>();
 
-    protected static Set getSiteConfigurationId(
-        ServiceConfig svc
-    ) throws SMSException, SSOException {
-        Set currentIds = new HashSet();
-        Set names = svc.getSubConfigNames("*");
-        
-        if ((names != null) && !names.isEmpty()) {
-            for (Iterator i = names.iterator(); i.hasNext(); ) {
-                String name = (String)i.next();
-                currentIds.addAll(
-                    getSiteConfigurationIds(null, svc, name, false));
-            }
-        }
-        return currentIds;
-    }
-
-    protected static Set getSiteConfigurationIds(
-        SSOToken ssoToken,
-        ServiceConfig rootNode,
-        String name,
-        boolean bPrimaryOnly
-    ) throws SMSException, SSOException {
-        if (rootNode == null) {
-            rootNode = getRootSiteConfig(ssoToken);
-        }
-
-        ServiceConfig sc = rootNode.getSubConfig(name);
-        if (sc == null) {
-            return Collections.EMPTY_SET;
-        }
-
-        Set currentIds = new LinkedHashSet();
-        ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
-
-        Map map = accessPoint.getAttributes();
-        Set set = (Set)map.get(ATTR_PRIMARY_SITE_ID);
-        currentIds.add(set.iterator().next());
-        
-        if (!bPrimaryOnly) {
-            Set failovers = accessPoint.getSubConfigNames("*");
-            if ((failovers != null) && !failovers.isEmpty()) {
-                for (Iterator i = failovers.iterator(); i.hasNext(); ) {
-                    String foName = (String)i.next();
-                    ServiceConfig s = accessPoint.getSubConfig(foName);
-                    Map mapValues = s.getAttributes();
-                    set = (Set)mapValues.get(ATTR_SEC_ID);
-                    if ((set != null) && !set.isEmpty()) {
-                        currentIds.add(set.iterator().next());
+        if (svc != null && svc.isValid()) {
+            Set<String> names = svc.getSubConfigNames("*");
+            if (CollectionUtils.isNotEmpty(names)) {
+                for (String name : names) {
+                    ServiceConfig sc = svc.getSubConfig(name);
+                    if (sc != null && sc.isValid()) {
+                        Map<String, Set<String>> map = sc.getAttributes();
+                        Set<String> set = map.get(ATTR_SERVER_ID);
+                        if (CollectionUtils.isNotEmpty(set)) {
+                            currentIds.add(set.iterator().next());
+                        }
                     }
                 }
             }
@@ -158,12 +126,62 @@ public abstract class ConfigurationBase {
         return currentIds;
     }
 
-    protected static String getNextId(Set currentIds) {
+    protected static Set<String> getSiteConfigurationId(ServiceConfig svc) throws SMSException, SSOException {
+        Set<String> currentIds = new HashSet<String>();
+        if (svc != null && svc.isValid()) {
+            Set<String> names = svc.getSubConfigNames("*");
+            if (CollectionUtils.isNotEmpty(names)) {
+                for (String name : names) {
+                    currentIds.addAll(getSiteConfigurationIds(null, svc, name, false));
+                }
+            }
+        }
+        return currentIds;
+    }
+
+    protected static Set<String> getSiteConfigurationIds(SSOToken ssoToken, ServiceConfig rootNode, 
+            String name, boolean bPrimaryOnly) throws SMSException, SSOException {
+        if (rootNode == null) {
+            rootNode = getRootSiteConfig(ssoToken);
+        }
+
+        Set<String> currentIds = new LinkedHashSet<String>();
+        if (rootNode != null && rootNode.isValid()) {
+            ServiceConfig sc = rootNode.getSubConfig(name);
+
+            if (sc != null && sc.isValid()) {
+                ServiceConfig accessPoint = sc.getSubConfig(SUBCONFIG_ACCESS_URL);
+                if (accessPoint != null && accessPoint.isValid()) {
+                    Map<String, Set<String>> map = accessPoint.getAttributes();
+                    Set<String> set = map.get(ATTR_PRIMARY_SITE_ID);
+                    currentIds.add(set.iterator().next());
+
+                    if (!bPrimaryOnly) {
+                        Set<String> failovers = accessPoint.getSubConfigNames("*");
+                        if (CollectionUtils.isNotEmpty(failovers)) {
+                            for (String foName : failovers) {
+                                ServiceConfig s = accessPoint.getSubConfig(foName);
+                                if (s != null && s.isValid()) {
+                                    Map<String, Set<String>> mapValues = s.getAttributes();
+                                    set = mapValues.get(ATTR_SEC_ID);
+                                    if (CollectionUtils.isNotEmpty(set)) {
+                                        currentIds.add(set.iterator().next());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return currentIds;
+    }
+
+    protected static String getNextId(Set<String> currentIds) {
         String id = null;
-        if (!currentIds.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(currentIds)) {
             for (int i = 1; (id == null); i++) {
-                String test =  (i < 10) ? "0" + Integer.toString(i)
-                : Integer.toString(i);
+                String test =  (i < 10) ? "0" + Integer.toString(i) : Integer.toString(i);
                 if (!currentIds.contains(test)) {
                     id = test;
                 }
@@ -172,11 +190,8 @@ public abstract class ConfigurationBase {
         return (id == null) ? "01" : id;
     }
 
-    protected static void updateOrganizationAlias(
-        SSOToken ssoToken,
-        String instanceName,
-        boolean bAdd
-    ) throws SMSException {
+    protected static void updateOrganizationAlias(SSOToken ssoToken, String instanceName, boolean bAdd)
+            throws SMSException {
         String hostName = null;
         try {
             URL url = new URL(instanceName);
@@ -184,46 +199,49 @@ public abstract class ConfigurationBase {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e.getMessage());
         }
-        OrganizationConfigManager ocm = new OrganizationConfigManager(
-            ssoToken, "/");
-        Map allAttrs = ocm.getAttributes(ServiceManager.REALM_SERVICE);
-        Set values = (Set)allAttrs.get(OrganizationConfigManager.SUNORG_ALIAS);
-        if (bAdd) {
-            if (!values.contains(hostName)) {
-                values.add(hostName);
-                ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
-            }
-        } else {
-            if (values.contains(hostName)) {
-                values.remove(hostName);
-                ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
+        OrganizationConfigManager ocm = new OrganizationConfigManager(ssoToken, "/");
+        Map<String, Set<String>> allAttrs = ocm.getAttributes(ServiceManager.REALM_SERVICE);
+        Set<String> values = allAttrs.get(OrganizationConfigManager.SUNORG_ALIAS);
+        if (CollectionUtils.isNotEmpty(values)) {
+            if (bAdd) {
+                if (!values.contains(hostName)) {
+                    values.add(hostName);
+                    ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
+                }
+            } else {
+                if (values.contains(hostName)) {
+                    values.remove(hostName);
+                    ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
+                }
             }
         }
     }
 
     protected static ServiceConfig getRootServerConfig(SSOToken ssoToken)
         throws SMSException, SSOException {
-        ServiceConfigManager scm = new ServiceConfigManager(
-            Constants.SVC_NAME_PLATFORM, ssoToken);
+        ServiceConfigManager scm = new ServiceConfigManager(Constants.SVC_NAME_PLATFORM, ssoToken);
         ServiceConfig globalSvcConfig = scm.getGlobalConfig(null);
-        return (globalSvcConfig != null) ?
-            globalSvcConfig.getSubConfig(CONFIG_SERVERS) : null;
+        if (globalSvcConfig != null && globalSvcConfig.isValid()) {
+            return globalSvcConfig.getSubConfig(CONFIG_SERVERS);
+        }
+        return null;
     }
     
-    protected static ServiceConfig getServerConfig(
-        SSOToken ssoToken, 
-        String name
-    ) throws SMSException, SSOException {
+    protected static ServiceConfig getServerConfig(SSOToken ssoToken, String name) throws SMSException, SSOException {
         ServiceConfig sc = getRootServerConfig(ssoToken);
-        return (sc != null) ? sc.getSubConfig(name) : null;
+        if (sc == null || !sc.isValid()) {
+            //give one more chance
+            sc = getRootServerConfig(ssoToken);
+        }
+        return (sc != null && sc.isValid()) ? sc.getSubConfig(name) : null;
     }
     
-    protected static ServiceConfig getRootSiteConfig(SSOToken ssoToken) 
-        throws SMSException, SSOException {
-        ServiceConfigManager scm = new ServiceConfigManager(
-            Constants.SVC_NAME_PLATFORM, ssoToken);
+    protected static ServiceConfig getRootSiteConfig(SSOToken ssoToken) throws SMSException, SSOException {
+        ServiceConfigManager scm = new ServiceConfigManager(Constants.SVC_NAME_PLATFORM, ssoToken);
         ServiceConfig globalSvcConfig = scm.getGlobalConfig(null);
-        return (globalSvcConfig != null) ?
-            globalSvcConfig.getSubConfig(CONFIG_SITES) : null;
+        if (globalSvcConfig != null && globalSvcConfig.isValid()) {
+            return globalSvcConfig.getSubConfig(CONFIG_SITES);
+        }
+        return null;
     }
 }
