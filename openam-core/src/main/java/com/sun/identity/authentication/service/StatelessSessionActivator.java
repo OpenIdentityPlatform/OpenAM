@@ -79,7 +79,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
 
     @Override
     protected InternalSession createSession(SessionService sessionService, LoginState loginState) {
-        return sessionService.newInternalSession(loginState.getOrgDN(), null, true);
+        return sessionService.newInternalSession(loginState.getOrgDN(), true);
     }
 
     @Override

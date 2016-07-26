@@ -32,6 +32,23 @@ package com.iplanet.dpro.session.service;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Named;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.IOUtils;
+
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.dpro.session.SessionException;
@@ -43,22 +60,6 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.IOUtils;
-
-import javax.inject.Named;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This servlet class is used as a helper to aid SessionService to perform
@@ -82,16 +83,6 @@ public final class GetHttpSession extends HttpServlet {
     public static final String OP = "op";
 
     public static final String NO_OP = "";
-
-    public static final String CREATE_OP = "create";
-
-    public static final String RECOVER_OP = "recover";
-
-    public static final String SAVE_OP = "save";
-
-    public static final String INVALIDATE_OP = "invalidate";
-
-    public static final String RELEASE_OP = "release";
 
     public static final String GET_RESTRICTED_TOKEN_OP = "get_restricted_token";
 
@@ -164,85 +155,7 @@ public final class GetHttpSession extends HttpServlet {
             return;
         }
         String op = request.getParameter(OP);
-        if (op.equals(RECOVER_OP)) {
-            HttpSession httpSession = request.getSession(false);
-            if (httpSession != null) {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("GetHttpSession.recover: Old HttpSession is obtained");
-                }
-                SessionID sid = new SessionID(request);
-                if (!sid.isNull()) {
-                    sessionService.retrieveSession(sid, httpSession);
-                }
-            } else {
-                sessionDebug.error("GetHttpSession.recover: Old  HttpSession is not obtained");
-            }
-        } else if (op.equals(SAVE_OP)) {
-            HttpSession httpSession = request.getSession(false);
-            if (httpSession != null) {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("GetHttpSession.save: HttpSession is obtained");
-                }
-                SessionID sid = new SessionID(request);
-                if (!sid.isNull()) {
-                    int status = sessionService.handleSaveSession(sid, httpSession);
-                    response.setStatus(status);
-                }
-            } else {
-                sessionDebug.error("GetHttpSession.save: HttpSession is not obtained");
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            }
-        } else if (op.equals(CREATE_OP)) {
-            HttpSession httpSession = request.getSession(true);
-            String domain = request.getParameter(DOMAIN);
-
-            InternalSession is = sessionService.newInternalSession(domain, httpSession, false);
-
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("GetHttpSession.create: Created new session=" + is.getID());
-            }
-            DataOutputStream out = new DataOutputStream(response
-                    .getOutputStream());
-            out.writeUTF(is.getID().toString());
-            out.flush();
-            out.close();
-        } else if (op.equals(INVALIDATE_OP)) {
-
-            HttpSession httpSession = request.getSession(false);
-            if (httpSession != null) {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("GetHttpSession.invalidate: HttpSession is obtained");
-                }
-
-                try {
-                    httpSession.invalidate();
-                } catch (IllegalStateException ise) {
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("Exception:invalidateSession: the web containers session timeout could be "
-                                + "shorter than the OpenSSO session timeout", ise);
-                    }
-                }
-            } else {
-                if (sessionDebug.warningEnabled()) {
-                    sessionDebug.warning("GetHttpSession.invalidate: session is not obtained");
-                }
-            }
-
-        } else if (op.equals(RELEASE_OP)) {
-            SessionID sid = new SessionID(request);
-            if (!sid.isNull()) {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("GetHttpSession.release: releasing session=" + sid);
-                }
-
-                int status = sessionService.handleReleaseSession(sid);
-                response.setStatus(status);
-            } else {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("GetHttpSession.release: missing session id");
-                }
-            }
-        } else if (op.equals(GET_RESTRICTED_TOKEN_OP)) {
+        if (op.equals(GET_RESTRICTED_TOKEN_OP)) {
             DataInputStream in = null;
             DataOutputStream out = null;
             SessionID sid = new SessionID(request);

@@ -940,7 +940,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         try {
             int status;
             int totalResultCount;
-            List<SessionInfo> infos = null;
+            Set<SessionInfo> infos = null;
 
             boolean isLocal = false;
             if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
@@ -958,12 +958,12 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
                 }
 
                 SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, this);
-                infos = sres.getSessionInfo();
+                infos = new HashSet<>(sres.getSessionInfo());
                 totalResultCount = infos.size();
                 status = sres.getStatus();
             }
 
-            List<Session> sessions = new ArrayList<>();
+            Set<Session> sessions = new HashSet<>();
 
             for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.getSessionID());

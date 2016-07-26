@@ -31,6 +31,20 @@ package com.sun.identity.liberty.ws.soapbinding;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import java.security.AccessController;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.guice.core.InjectorHolder;
+
 import com.iplanet.am.util.Cache;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
@@ -44,19 +58,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.guice.core.InjectorHolder;
-
-import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
-import java.security.AccessController;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
     private static final String PRINCIPAL_PROP = "Principal";
@@ -203,7 +204,7 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
         
         String authInstant = null;
         try {
-            InternalSession is = InjectorHolder.getInstance(SessionService.class).newInternalSession(null, null, false);
+            InternalSession is = InjectorHolder.getInstance(SessionService.class).newInternalSession(null, false);
             is.activate("");
             Map attrs = sessionSchema.getAttributeDefaults();
             is.setMaxSessionTime(CollectionHelper.getIntMapAttr(

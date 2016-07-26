@@ -24,10 +24,20 @@
  *
  * $Id: SSOTokenManager.java,v 1.7 2009/02/18 23:59:36 qcheng Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.iplanet.sso;
+
+import java.security.Principal;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
@@ -36,14 +46,6 @@ import com.iplanet.services.util.I18n;
 import com.iplanet.sso.providers.dpro.SSOProviderBundle;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.Set;
 
 /**
  * SSOTokenManager is the final class that is the mediator between the SSO APIs

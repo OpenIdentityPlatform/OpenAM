@@ -16,19 +16,20 @@
 
 package com.sun.identity.authentication.service;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
 
 public class StatelessSessionActivatorTest {
 
@@ -59,7 +60,7 @@ public class StatelessSessionActivatorTest {
         testActivator.createSession(mockSessionService, mockLoginState);
 
         // When
-        verify(mockSessionService).newInternalSession(orgDn, null, true);
+        verify(mockSessionService).newInternalSession(orgDn, true);
     }
 
     @Test

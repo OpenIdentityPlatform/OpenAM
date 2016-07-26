@@ -11,32 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.authentication.util.ISAuthConstants;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.security.auth.Subject;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
-import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.authentication.util.ISAuthConstants;
 
 public class DefaultSessionActivatorTest {
     private static final String ORGDN = "testdn";
@@ -59,7 +61,7 @@ public class DefaultSessionActivatorTest {
         MockitoAnnotations.initMocks(this);
 
         given(mockState.getOrgDN()).willReturn(ORGDN);
-        given(mockSessionService.newInternalSession(eq(ORGDN), any(HttpSession.class), eq(false)))
+        given(mockSessionService.newInternalSession(eq(ORGDN), eq(false)))
                 .willReturn(mockNewSession);
         given(mockNewSession.getID()).willReturn(SID);
     }
@@ -73,7 +75,7 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
 
         // Then
-        verify(mockSessionService).newInternalSession(eq(ORGDN), any(HttpSession.class), anyBoolean());
+        verify(mockSessionService).newInternalSession(eq(ORGDN), anyBoolean());
     }
 
     @Test

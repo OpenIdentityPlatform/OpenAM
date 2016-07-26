@@ -38,6 +38,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
@@ -274,7 +275,7 @@ public class SessionCommand extends AuthenticatedCommand {
                 output.printlnMessage(warning);
             }
 
-            List<Session> sessions = result.getSearchResults();
+            Set<Session> sessions = result.getSearchResults();
             boolean isCurrentSession = false;
             int i = 0;
                                                                                 

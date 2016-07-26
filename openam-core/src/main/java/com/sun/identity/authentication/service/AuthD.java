@@ -31,6 +31,29 @@ package com.sun.identity.authentication.service;
 
 import static org.forgerock.openam.ldap.LDAPUtils.*;
 
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.opendj.ldap.DN;
+
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
@@ -69,28 +92,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.core.realms.Realm;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.opendj.ldap.DN;
 
 
 /**
@@ -545,14 +546,12 @@ public class AuthD implements ConfigurationListener {
      * Creates a new session.
      *
      * @param domain Domain Name.
-     * @param httpSession HTTP Session.
      * @return new <code>InternalSession</code>
      */
     public static InternalSession newSession(
-        String domain, 
-        HttpSession httpSession,
+        String domain,
         boolean stateless) {
-        return getSessionService().newInternalSession(domain, httpSession, stateless);
+        return getSessionService().newInternalSession(domain, stateless);
     }
     
     /**
@@ -813,7 +812,7 @@ public class AuthD implements ConfigurationListener {
     }
 
     private Session initAuthSession() throws SSOException, SessionException {
-        final Session authSession = getSessionService().getAuthenticationSession(defaultOrg, null);
+        final Session authSession = getSessionService().getAuthenticationSession(defaultOrg);
         if (authSession == null) {
             debug.error("AuthD failed to get auth session");
             throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);

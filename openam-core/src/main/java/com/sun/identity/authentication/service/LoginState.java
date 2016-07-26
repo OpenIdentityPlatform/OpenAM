@@ -1833,7 +1833,7 @@ public class LoginState {
         SessionID sid = null;
 
         DEBUG.message("Save authContext in InternalSession");
-        session = LazyConfig.AUTHD.newSession(getOrgDN(), null, false);
+        session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
         //save the AuthContext object in Session
         sid = session.getID();
         session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);

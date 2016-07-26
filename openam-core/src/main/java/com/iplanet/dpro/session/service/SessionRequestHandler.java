@@ -32,6 +32,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -370,9 +371,11 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetValidSessions:
                 String pattern = req.getPattern();
-                SearchResults<SessionInfo> infos = sessionService.getValidSessions(requesterSession, pattern);
-                res.setStatus(infos.getErrorCode());
-                res.setSessionInfo(infos.getSearchResults());
+                SearchResults<SessionInfo> infoSearchResults = sessionService.getValidSessions(requesterSession, pattern);
+                res.setStatus(infoSearchResults.getErrorCode());
+                List<SessionInfo> sessionInfo = new ArrayList<>();
+                sessionInfo.addAll(infoSearchResults.getSearchResults());
+                res.setSessionInfo(sessionInfo);
                 break;
 
             case SessionRequest.DestroySession:

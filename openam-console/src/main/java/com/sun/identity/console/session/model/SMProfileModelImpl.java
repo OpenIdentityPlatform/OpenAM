@@ -113,7 +113,7 @@ public class SMProfileModelImpl extends AMModelBase
                     new SessionID(getUserSSOToken().getTokenID().toString()));
             SearchResults<Session> result = session.getValidSessions(
                 serverName, pattern);
-            List<Session> sessions = result.getSearchResults();
+            Set<Session> sessions = result.getSearchResults();
             String errorMessage =
                 AMAdminUtils.getSearchResultWarningMessage(result, this);
             smSessionCache = new SMSessionCache(sessions, errorMessage, this);
@@ -146,7 +146,7 @@ public class SMProfileModelImpl extends AMModelBase
 
         try {
             SearchResults<Session> result = session.getValidSessions(serverName, pattern);
-            List<Session> validSessions = result.getSearchResults();
+            Set<Session> validSessions = result.getSearchResults();
 
             if ((validSessions != null) && !validSessions.isEmpty()) {
                 sessions = new HashMap<>(validSessions.size());

@@ -32,18 +32,12 @@ import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,7 +54,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
@@ -96,7 +89,6 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.WebtopNamingQuery;
-import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -110,12 +102,9 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.stats.Stats;
 
 /**
@@ -337,19 +326,17 @@ public class SessionService {
      * Returns the Internal Session used by the Auth Services.
      *
      * @param domain      Authentication Domain
-     * @param httpSession HttpSession
      */
     // TODO: Pull out into  new AuthSessionFactory class? This method is only called by AuthD.initAuthSessions
     //       and AuthD then keeps a local copy of the returned Session. The authSession reference may
     //       be getting stored as a field on this object to avoid it being garbage collected? Since
     //       we're not using authSession anywhere else in this class and it isn't referenced by the returned
     //       Session, it probably wouldn't matter if it was garbage collected.
-    public Session getAuthenticationSession(String domain,
-                                            HttpSession httpSession) {
+    public Session getAuthenticationSession(String domain) {
         try {
             if (authSession == null) {
                 // Create a special InternalSession for Authentication Service
-                authSession = getServiceSession(domain, httpSession);
+                authSession = getServiceSession(domain);
             }
             return authSession != null ? sessionCache.getSession(authSession.getID()) : null;
         } catch (Exception e) {
@@ -362,10 +349,9 @@ public class SessionService {
      * Returns the Internal Session which can be used by services
      *
      * @param domain      Authentication Domain
-     * @param httpSession HttpSession
      */
     // TODO: Also pull this method out into new AuthSessionFactory class
-    private InternalSession getServiceSession(String domain, HttpSession httpSession) {
+    private InternalSession getServiceSession(String domain) {
         try {
             // Create a special InternalSession which can be used as
             // service token
@@ -374,7 +360,7 @@ public class SessionService {
             // more over creating an HTTP session by making a self-request
             // results in dead-lock if called from within synchronized
             // section in getSessionService()
-            InternalSession session = internalSessionFactory.newInternalSession(domain, httpSession, false, false);
+            InternalSession session = internalSessionFactory.newInternalSession(domain, false);
             session.setType(APPLICATION_SESSION);
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
@@ -453,8 +439,8 @@ public class SessionService {
         return restrictedSid.toString();
     }
 
-    public InternalSession newInternalSession(String domain, HttpSession httpSession, boolean stateless) {
-        return internalSessionFactory.newInternalSession(domain, httpSession, stateless);
+    public InternalSession newInternalSession(String domain, boolean stateless) {
+        return internalSessionFactory.newInternalSession(domain, stateless);
     }
 
     /**
@@ -649,8 +635,8 @@ public class SessionService {
      */
     private SearchResults<InternalSession> getValidInternalSessions(String pattern)
             throws SessionException {
-        List<InternalSession> sessions = new ArrayList<>();
-        int status = SearchResults.SUCCESS;
+        Set<InternalSession> sessions = new HashSet<>();
+        int errorCode = SearchResults.SUCCESS;
 
         if (pattern == null) {
             pattern = "*";
@@ -683,14 +669,14 @@ public class SessionService {
                 }
 
                 if (sessions.size() == serviceConfig.getMaxSessionListSize()) {
-                    status = SearchResults.SIZE_LIMIT_EXCEEDED;
+                    errorCode = SearchResults.SIZE_LIMIT_EXCEEDED;
                     break;
                 }
                 sessions.add(sess);
 
                 if ((currentTimeMillis() - startTime) >=
                         serviceConfig.getSessionRetrievalTimeout()) {
-                    status = SearchResults.TIME_LIMIT_EXCEEDED;
+                    errorCode = SearchResults.TIME_LIMIT_EXCEEDED;
                     break;
                 }
             }
@@ -699,7 +685,7 @@ public class SessionService {
                     + "Unable to get Session Information ", e);
             throw new SessionException(e);
         }
-        return new SearchResults<>(sessions.size(), sessions, status);
+        return new SearchResults<>(sessions.size(), sessions, errorCode);
     }
 
     /**
@@ -855,7 +841,7 @@ public class SessionService {
             }
 
             SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
-            List<SessionInfo> infos = new ArrayList<>(sessions.getSearchResults().size());
+            Set<SessionInfo> infos = new HashSet<>(sessions.getSearchResults().size());
 
             // top level admin gets all sessions
             boolean isTopLevelAdmin = hasTopLevelAdminRole(s);
@@ -1325,88 +1311,6 @@ public class SessionService {
     }
 
     /**
-     * This functions invalidates the http session associated with identity
-     * session specified by sid
-     *
-     * @param sid
-     * @return
-     */
-    private boolean invalidateHttpSession(SessionID sid) {
-
-        if (sid.getTail() == null) {
-            return true;
-        }
-
-        DataInputStream in = null;
-        URL url = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.INVALIDATE_OP;
-            url = serverConfig.createLocalServerURL("GetHttpSession" + query);
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, sid, null);
-            in = new DataInputStream(conn.getInputStream());
-            return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
-
-        } catch (ConnectException ex) {
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("invalidateHttpSesion: failed to connect to " + url);
-            }
-            return true;
-
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to invalidate session", ex);
-
-        } finally {
-            IOUtils.closeIfNotNull(in);
-        }
-
-        return false;
-    }
-
-    /**
-     * Removes InternalSession from the session table so that another server
-     * instance can be an owner This is used to help work around persistent
-     * association of OpenAM session ID and HTTP session ID which
-     * some loadbalancers (like Weblogic) use to make routing decisions. This
-     * helps to deal with the case where a session is migrated while the current
-     * owner is still alive to avoid having redundant copies of the session.
-     * This is the client side of distributed invocation.
-     *
-     * @param owner URL of the server instance who previously owned the session
-     * @param sid   session ID of the session migrated
-     */
-    private boolean releaseSession(URL owner, SessionID sid) {
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Attempting to release InternalSession " + sid + " from server instance: " + owner);
-        }
-
-        DataInputStream in = null;
-        URL url = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.RELEASE_OP;
-            url = serverConfig.createServerURL(owner, "GetHttpSession" + query);
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, sid, null);
-            in = new DataInputStream(conn.getInputStream());
-            return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
-
-        } catch (ConnectException ex) {
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("releaseSession: failed to connect to " + url);
-            }
-            return true;
-
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to release session", ex);
-
-        } finally {
-            IOUtils.closeIfNotNull(in);
-        }
-
-        return false;
-    }
-
-    /**
      * Removes InternalSession from the session table so that another server
      * instance can be an owner This is the server side of distributed
      * invocation initiated by calling releaseSession()
@@ -1431,20 +1335,8 @@ public class SessionService {
     }
 
     /**
-     * If InternalSession is not present, we attempt to recover its state from
-     * associated HttpSession. We have to set the session tracking cookie to
-     * HttpID which is present in the SessionID object. This will work in the
-     * fail over cases. We first get the HttpSession by invoking the
-     * GetHttpSession Servlet on the SAME server instance this code is invoked.
-     * This should trigger the Web container to perform recovery of the
-     * associated Http session
-     * <p/>
-     * We also pass the SessionID to the servlet to double check the match
-     * between the session id and Http session
-     * <p/>
-     * This is the "client side" of the remote invocation. The servlet will call
-     * retrieveSession() to complete the work
-     *
+     * This will recover the specified session from the repository, and add it to the cache.
+     * Returns null if no session was recovered.
      * @param sid Session ID
      */
     InternalSession recoverSession(SessionID sid) {
@@ -1455,7 +1347,7 @@ public class SessionService {
             String tokenId = tokenIdFactory.toSessionTokenId(sid);
             Token token = getRepository().read(tokenId);
             if (token == null) {
-                return sess;
+                return null;
             }
             /**
              * As a side effect of deserialising an InternalSession, we must trigger
@@ -1472,61 +1364,6 @@ public class SessionService {
             sessionDebug.error("Failed to retrieve new session", e);
         }
         return sess;
-    }
-
-    /**
-     * This is the "server side" of the remote invocation for recoverSession()
-     * It is being called by GetHttpSession servlet to complete the work
-     * <p/>
-     * If recovery is possible we need to first notify existing server instance
-     * "owning" the session (if any) to release the session instance otherwise
-     * we end up with duplicates
-     *
-     * @param sid Session ID
-     */
-    InternalSession retrieveSession(SessionID sid, HttpSession httpSession) {
-        if (httpSession != null) {
-            String sessionState = (String) httpSession.getAttribute(serviceConfig.getHttpSessionPropertyName());
-            if (sessionState == null) {
-                sessionDebug.message("GISFHS-No InternalSession in HttpSession");
-                return null;
-            } else {
-                InternalSession sess = decrypt(sessionState);
-
-                if (sess == null || (sess.getRestrictionForToken(sid) == null && !sess.getID().equals(sid))) {
-                    return null;
-                }
-
-                // tell all previously registered owners of this session
-                // who might still potentially have a copy to release it
-                // (we do not expect a session to migrate more than one
-                // time so typically this list will have a size of 2).
-
-                Set ownerList = (Set) httpSession.getAttribute(serviceConfig.getHttpSessionOwnerListPropertyName());
-                if (ownerList == null) {
-                    ownerList = new HashSet();
-                    httpSession.setAttribute(serviceConfig.getHttpSessionOwnerListPropertyName(), ownerList);
-                }
-                for (Iterator iter = ownerList.iterator(); iter.hasNext(); ) {
-                    URL formerOwner = (URL) iter.next();
-                    if (serverConfig.isLocalSessionService(formerOwner))
-                        continue;
-
-                    if (!releaseSession(formerOwner, sess.getID())) {
-                        return null;
-                    }
-                }
-
-                ownerList.add(serverConfig.getLocalServerSessionServiceURL());
-                // add current server to the list of former owners
-                httpSession.setAttribute(serviceConfig.getHttpSessionOwnerListPropertyName(), ownerList);
-
-                sess.setHttpSession(httpSession);
-                updateSessionMaps(sess);
-                return sess;
-            }
-        }
-        return null;
     }
 
     /**
@@ -1599,67 +1436,6 @@ public class SessionService {
             }
         }
         return shouldDestroy;
-    }
-
-    /**
-     * This is used to save session state using remote method rather than
-     * directly using a reference to HttpSession saved in the InternalSession
-     * which is not guaranteed to survive across http requests. We set the
-     * session tracking cookie to HttpID which is present in the SessionID
-     * object. We first get the HttpSession by invoking the GetHttpSession
-     * Servlet on the SAME server instance this code is invoked. This should
-     * trigger the Web container to provide a valid instance of the associated
-     * Http session and then use it to save the session
-     * <p/>
-     * This is the "client side" of the remote invocation. The servlet will call
-     * handleSaveSession() to complete the work
-     *
-     * @param sid Session ID
-     */
-    boolean saveSession(SessionID sid) {
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Saving internal session using remote method " + sid);
-        }
-
-        InputStream in = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.SAVE_OP;
-            URL url = serverConfig.createLocalServerURL("GetHttpSession" + query);
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, sid, null);
-            in = conn.getInputStream();
-            return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
-
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to save session", ex);
-
-        } finally {
-            IOUtils.closeIfNotNull(in);
-        }
-        return false;
-    }
-
-    /**
-     * This is the "server side" of the remote invocation for saveSession() It
-     * is being called by GetHttpSession servlet to complete the work
-     *
-     * @param sid         master Session ID
-     * @param httpSession http session
-     */
-    int handleSaveSession(SessionID sid, HttpSession httpSession) {
-        InternalSession is = cache.getBySessionID(sid);
-
-        if (is == null) {
-            sessionDebug.error("handleSaveSession: session not found " + sid);
-            return HttpURLConnection.HTTP_NOT_FOUND;
-        }
-        if (!is.getID().getTail().equals(httpSession.getId())) {
-            sessionDebug.error("handleSaveSession: http session id does not match sid " + sid);
-            return HttpURLConnection.HTTP_INTERNAL_ERROR;
-        }
-        doSaveSession(is, httpSession);
-
-        return HttpURLConnection.HTTP_OK;
     }
 
     /**
@@ -1737,8 +1513,7 @@ public class SessionService {
     }
 
     /**
-     * This method is used to update the HttpSession when InternalSession
-     * property changes.
+     * Writes the current state of the token down to the repository.
      *
      * @param session Session Object
      */
@@ -1752,86 +1527,6 @@ public class SessionService {
         } catch (Exception e) {
             sessionDebug.error("SessionService.save: " + "exception encountered", e);
         }
-    }
-
-    /**
-     * Save identity session state in associated http session
-     *
-     * @param session
-     * @param httpSession
-     */
-    private void doSaveSession(InternalSession session, HttpSession httpSession) {
-        try {
-            httpSession.setAttribute(serviceConfig.getHttpSessionPropertyName(), encrypt(session));
-        } catch (Exception e) {
-            sessionDebug.error("SessionService.doSaveSession: exception encountered", e);
-        }
-    }
-
-    /**
-     * This method is used to encrypt the InternalSession object before storing
-     * into HttpSession.
-     *
-     * @param obj Object to be encrypted
-     */
-    private String encrypt(Object obj) {
-        String strUnEncrypted, strEncrypted;
-        ByteArrayOutputStream byteOut;
-        ObjectOutputStream objOutStream;
-        try {
-            byteOut = new ByteArrayOutputStream();
-            objOutStream = new ObjectOutputStream(byteOut);
-
-            // convert object to byte using streams
-            objOutStream.writeObject(obj);
-
-            // convert byte to string
-            strUnEncrypted = Base64.encode(byteOut.toByteArray());
-            // encrypt string
-            strEncrypted = AccessController.doPrivileged(
-                    new EncodeAction(strUnEncrypted, Crypt.getHardcodedKeyEncryptor()));
-
-        } catch (Exception e) {
-            sessionDebug
-                    .message("Error in encrypting the Internal Session object");
-            return null;
-        }
-        return strEncrypted;
-    }
-
-    /**
-     * This method is used to decrypt the InternalSession object, after
-     * obtaining from HttpSession.
-     *
-     * @param strEncrypted Object to be decrypted
-     */
-    private InternalSession decrypt(String strEncrypted) {
-
-        if (strEncrypted == null)
-            return null;
-        String strDecrypted;
-        byte byteDecrypted[] = null;
-        ByteArrayInputStream byteIn;
-        ObjectInputStream objInStream;
-        Object tempObject = null;
-        try {
-            // decrypt string
-            strDecrypted = AccessController.doPrivileged(
-                    new DecodeAction(strEncrypted, Crypt.getHardcodedKeyEncryptor()));
-            // convert string to byte
-            byteDecrypted = Base64.decode(strDecrypted);
-            // convert byte to object using streams
-            byteIn = new ByteArrayInputStream(byteDecrypted);
-            objInStream = new ObjectInputStream(byteIn);
-            tempObject = objInStream.readObject();
-        } catch (Exception e) {
-            sessionDebug.message("Error in decrypting the Internal Session object" + e.getMessage());
-            return null;
-        }
-        if (tempObject == null) {
-            return null;
-        }
-        return (InternalSession) tempObject;
     }
 
     public boolean isSiteEnabled() {

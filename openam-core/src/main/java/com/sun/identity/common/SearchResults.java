@@ -30,6 +30,7 @@
 package com.sun.identity.common;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class encapsulates search results data. 
@@ -64,7 +65,7 @@ public class SearchResults<T> {
     /**
      * Set of search results.
      */
-    private final List<T> searchResults;
+    private final Set<T> searchResults;
 
     /**
      * Error Code.
@@ -78,18 +79,18 @@ public class SearchResults<T> {
      * @param results Set of <code> DNs </code> from the search.
      * @param errorCode Error Code.
      */
-    public SearchResults(int count, List<T> results, int errorCode) {
+    public SearchResults(int count, Set<T> results, int errorCode) {
         this.count = count;
         searchResults = results;
         this.errorCode = errorCode;
     }
 
     /**
-     * Returns the search results. 
+     * Returns the search results.
      *
      * @return Search results.
      */
-    public List<T> getSearchResults() {
+    public Set<T> getSearchResults() {
         return searchResults;
     }
 

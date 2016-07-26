@@ -29,19 +29,13 @@
 
 package com.iplanet.dpro.session.service;
 
-import java.io.DataInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
@@ -51,7 +45,6 @@ import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.URLEncDec;
 
 /**
  * Responsible for creating InternalSession objects.
@@ -94,40 +87,21 @@ public class InternalSessionFactory {
      * Creates a new Internal Session
      *
      * @param domain      Authentication Domain
-     * @param httpSession Http Session
      * @param stateless   Indicates whether or not this session should be issued as a stateless session.
      */
-    public InternalSession newInternalSession(String domain, HttpSession httpSession, boolean stateless) {
+    public InternalSession newInternalSession(String domain, boolean stateless) {
         try {
-            return newInternalSession(domain, httpSession, true, stateless);
+            final SessionID sessionID = generateSessionId(domain, null);
+            return generateInternalSession(sessionID, stateless);
         } catch (SessionException e) {
             sessionDebug.error("Error creating new session", e);
             return null;
         }
     }
 
-    /**
-     * Creates a new Internal Session
-     *
-     * @param domain                   Authentication Domain
-     * @param httpSession              Http Session
-     * @param forceHttpSessionCreation in session failover mode if this parameter is true and
-     *                                 httpSession is null, it will cause SessionService to create a
-     *                                 new Http session for failover purposes
-     * @param stateless   Indicates whether or not this session should be issued as a stateless session.
-     */
-    InternalSession newInternalSession(String domain, HttpSession httpSession,
-                                       boolean forceHttpSessionCreation, boolean stateless)
-            throws SessionException {
-
-        SessionID sid = generateSessionId(domain, null);
-        return generateInternalSession(sid, httpSession, stateless);
-    }
-
-    private InternalSession generateInternalSession(SessionID sid, HttpSession httpSession, boolean stateless) throws SessionException {
+    private InternalSession generateInternalSession(SessionID sid, boolean stateless) throws SessionException {
 
         InternalSession session = new InternalSession(sid);
-        session.setHttpSession(httpSession);
 
         String sessionHandle = sid.generateSessionHandle(serverConfig);
         session.setSessionHandle(sessionHandle);
@@ -144,7 +118,6 @@ public class InternalSessionFactory {
             }
         }
 
-        session.setCreationTime();
         session.setLatestAccessTime();
         String amCtxId = SessionID.generateAmCtxID(serverConfig);
         session.putProperty(Constants.AM_CTX_ID, amCtxId);
@@ -153,47 +126,6 @@ public class InternalSessionFactory {
             session.reschedule();
         }
         return session;
-    }
-
-    /**
-     * Creates InternalSession which is always coupled with Http session This is
-     * only used in session failover mode to ensure that every internal session
-     * is associated with Http session used as fail-over store
-     *
-     * @param domain authentication domain passed to newInternalSession
-     */
-
-    private InternalSession createSession(String domain) {
-
-        DataInputStream in = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.CREATE_OP;
-
-            if (domain != null) {
-                query += "&" + GetHttpSession.DOMAIN + "=" + URLEncDec.encode(domain);
-            }
-
-            String routingCookie = null;
-
-            URL url = serverConfig.createLocalServerURL("GetHttpSession" + query);
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, null, routingCookie);
-            in = new DataInputStream(conn.getInputStream());
-
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            SessionID sid = new SessionID(in.readUTF());
-            return cache.getBySessionID(sid);
-
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to retrieve new session", ex);
-        } finally {
-            IOUtils.closeIfNotNull(in);
-        }
-
-        return null;
     }
 
     /**

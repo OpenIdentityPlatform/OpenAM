@@ -32,17 +32,17 @@
 
 package com.sun.identity.authentication.service;
 
+import java.security.Principal;
+import java.util.Enumeration;
+
+import javax.security.auth.Subject;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.Enumeration;
 
 /**
  * The default session activator: creates a new session, sets that as the current session,
@@ -120,7 +120,7 @@ public class DefaultSessionActivator implements SessionActivator {
     }
 
     protected InternalSession createSession(SessionService sessionService, LoginState loginState) {
-        return sessionService.newInternalSession(loginState.getOrgDN(), null, false);
+        return sessionService.newInternalSession(loginState.getOrgDN(), false);
     }
 
     protected boolean activateSession(InternalSession session, LoginState loginState) throws SessionException {

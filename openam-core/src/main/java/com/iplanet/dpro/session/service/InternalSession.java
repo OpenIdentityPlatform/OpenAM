@@ -54,7 +54,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
@@ -160,8 +159,6 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /** holds latest accesstime*/
     private long latestAccessTime;// in seconds
-
-    transient private HttpSession httpSession;
 
     @JsonIgnore
     private boolean isISStored = false;
@@ -381,6 +378,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         timerPool = SystemTimerPool.getTimerPool();
         sessionProperties = new Properties();
         willExpireFlag = true;
+        setCreationTime();
     }
 
     /**
@@ -757,12 +755,6 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
         maxIdleTime = t;
         reschedulePossible = (maxDefaultIdleTime > maxIdleTime) || (maxDefaultIdleTime > maxSessionTime);
-        if (httpSession != null) {
-            int httpIdleTime = httpSession.getMaxInactiveInterval();
-            if (maxIdleTime > httpIdleTime) {
-                httpSession.setMaxInactiveInterval(((int) maxIdleTime) * 60);
-            }
-        }
         if ((scheduledExecutionTime() != -1) && (mayReschedule ||
             reschedulePossible)) {
             reschedule();
@@ -1483,15 +1475,11 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * Sets the creation time of the Internal Ssession, as the number of seconds
+     * Sets the creation time of the Internal Session, as the number of seconds
      * since midnight January 1, 1970 GMT.
      */
-    public void setCreationTime() {
-        if (httpSession != null) {
-            creationTime = httpSession.getCreationTime() / 1000;
-        } else {
-            creationTime = currentTimeMillis() / 1000;
-        }
+    private void setCreationTime() {
+        creationTime = currentTimeMillis() / 1000;
     }
 
     /**
@@ -1716,22 +1704,6 @@ public class InternalSession implements TaskRunnable, Serializable {
             debug.message("InternalSession: getCookieSupport: " + cookieSupport);
         }
         return cookieSupport;
-    }
-
-    /**
-     * Sets the HttpSession into the Internal Session.
-     *
-     * @param hSession
-     */
-    void setHttpSession(HttpSession hSession) {
-        httpSession = hSession;
-    }
-
-    /**
-     * Returns the HttpSession stored in the Internal Session.
-     */
-    HttpSession getHttpSession() {
-        return (httpSession);
     }
 
     /**
