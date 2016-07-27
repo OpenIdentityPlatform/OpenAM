@@ -106,6 +106,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1485,7 +1486,11 @@ public class IDPSSOUtil {
         if (authnReq != null) {
             remoteEntityID = authnReq.getIssuer().getValue();
             NameIDPolicy nameIDPolicy = authnReq.getNameIDPolicy();
-            if (nameIDPolicy != null) {
+            boolean hasNameIDPolicy = nameIDPolicy != null &&
+                    (StringUtils.isNotEmpty(nameIDPolicy.getSPNameQualifier())
+                    || StringUtils.isNotEmpty(nameIDPolicy.getFormat()));
+
+            if (hasNameIDPolicy) {
                 // this will take care of affiliation
                 allowCreate = nameIDPolicy.isAllowCreate();
                 spNameQualifier = nameIDPolicy.getSPNameQualifier();
