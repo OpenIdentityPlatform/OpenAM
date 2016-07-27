@@ -118,7 +118,9 @@ public final class AuditConstants {
         /** SAML2 audit event component. */
         SAML2("SAML2"),
         /** Self Service audit event component. */
-        SELF_SERVICE("Self Service");
+        SELF_SERVICE("Self Service"),
+        /** Documentation audit event component. */
+        DOCUMENTATION("Documentation");
 
         private final String name;
 

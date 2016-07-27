@@ -13,7 +13,7 @@
  *
  * Copyright 2014 ForgeRock Inc.
  */
-package org.forgerock.openam.rest.authz;
+package org.forgerock.openam.authz;
 
 import java.util.Arrays;
 import java.util.EnumSet;

@@ -31,6 +31,8 @@ import java.util.Set;
 
 import com.google.inject.Key;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.authz.filter.http.HttpAuthorizationFilter;
+import org.forgerock.authz.filter.http.api.HttpAuthorizationModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
@@ -581,10 +583,9 @@ public class Routers {
         private final org.forgerock.http.routing.Router router;
         private final HttpAccessAuditFilterFactory httpAuditFactory;
         private final String uriTemplate;
+        private final List<org.forgerock.http.Filter> filters = new ArrayList<>();
 
-        private org.forgerock.http.Filter authenticationEnforcer;
         private org.forgerock.http.Filter auditFilter;
-        private List<org.forgerock.http.Filter> filters;
 
         ServiceRoute(org.forgerock.http.routing.Router router, HttpAccessAuditFilterFactory httpAuditFactory,
                 String uriTemplate) {
@@ -609,6 +610,7 @@ public class Routers {
                 throw new IllegalStateException("Audit component has already been set!");
             }
             this.auditFilter = httpAuditFactory.createFilter(component);
+            this.filters.add(auditFilter);
             return this;
         }
 
@@ -629,6 +631,7 @@ public class Routers {
                 throw new IllegalStateException("Audit component has already been set!");
             }
             this.auditFilter = httpAuditFactory.createFilter(component);
+            this.filters.add(auditFilter);
             return this;
         }
 
@@ -636,24 +639,27 @@ public class Routers {
          * Specifies filters that the request must pass through before reaching
          * the endpoint.
          *
-         * <p>Can only be set <strong>once</strong>, attempt to do so twice
-         * will result in an {@code IllegalStateException}.</p>
-         *
          * @param filters The filters.
          * @return This route.
-         * @throws IllegalStateException If attempted to be set twice.
          */
         @SafeVarargs
         public final ServiceRoute through(Class<? extends org.forgerock.http.Filter>... filters) {
             Reject.ifNull(filters);
-            if (this.filters != null) {
-                throw new IllegalStateException("Filters have already been set!");
-            } else {
-                this.filters = new ArrayList<>();
-            }
             for (Class<? extends org.forgerock.http.Filter> filterClass : filters) {
                 this.filters.add(InjectorHolder.getInstance(filterClass));
             }
+            return this;
+        }
+
+        /**
+         * Add an authorization module to use when authorizing requests to the endpoint.
+         *
+         * @param authorizationModule The authorization module.
+         * @return This route.
+         */
+        public final ServiceRoute authorizeWith(Class<? extends HttpAuthorizationModule> authorizationModule) {
+            Reject.ifNull(authorizationModule);
+            filters.add(new HttpAuthorizationFilter(InjectorHolder.getInstance(authorizationModule)));
             return this;
         }
 
@@ -700,19 +706,10 @@ public class Routers {
         }
 
         private void addRoute(RoutingMode mode, Handler resource) {
-            if (filters != null) {
+            if (!filters.isEmpty()) {
                 resource = Handlers.chainOf(resource, filters);
             }
-            resource = Handlers.chainOf(resource, getFilters());
             router.addRoute(requestUriMatcher(mode, uriTemplate), resource);
-        }
-
-        private List<org.forgerock.http.Filter> getFilters() {
-            List<org.forgerock.http.Filter> filters = new ArrayList<>();
-            if (auditFilter != null) {
-                filters.add(auditFilter);
-            }
-            return filters;
         }
 
         @Override

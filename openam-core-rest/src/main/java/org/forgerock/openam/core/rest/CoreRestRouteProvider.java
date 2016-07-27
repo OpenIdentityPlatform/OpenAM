@@ -22,6 +22,7 @@ import static org.forgerock.openam.rest.Routers.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
@@ -31,18 +32,21 @@ import org.forgerock.openam.core.rest.dashboard.DashboardResource;
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
 import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
+import org.forgerock.openam.core.rest.docs.api.ApiDocsService;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
 import org.forgerock.openam.core.rest.server.ServerVersionResource;
 import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResource;
+import org.forgerock.openam.http.authz.HttpContextFilter;
+import org.forgerock.openam.http.authz.HttpPrivilegeAuthzModule;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.services.MailService;
 
@@ -68,7 +72,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("serverinfo/version")
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toSingleton(ServerVersionResource.class);
 
         realmRouter.route("users")
@@ -148,5 +152,12 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .toService(EQUALS, AuthenticationServiceV1.class)
                 .forVersion(2, 1)
                 .toService(EQUALS, AuthenticationServiceV2.class);
+
+        realmRouter.route("docs/api")
+                .auditAs(DOCUMENTATION)
+                .through(HttpContextFilter.class)
+                .authorizeWith(HttpPrivilegeAuthzModule.class)
+                .forVersion(1, 0)
+                .toService(EQUALS, ApiDocsService.class);
     }
 }

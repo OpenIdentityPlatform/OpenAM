@@ -23,15 +23,16 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.authz.PrivilegeDefinition;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.RestConstants;
-import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
@@ -46,7 +47,7 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  *
  * @since 13.0.0
  */
-public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeAuthzModule {
+public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends CrestPrivilegeAuthzModule {
 
     private static final Set<String> READ_ONLY_ACTIONS = asSet(
             RestConstants.SCHEMA,
@@ -59,10 +60,10 @@ public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeA
     private final AnyPrivilegeAuthzModule anyPrivilegeAuthzModule;
     @Inject
     public PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule(DelegationEvaluator evaluator,
-            Map<String, PrivilegeDefinition> actionToDefinition, DelegationPermissionFactory permissionFactory,
-            SessionCache sessionCache, CoreWrapper coreWrapper, AnyPrivilegeAuthzModule anyPrivilegeAuthzModule,
-            SSOTokenManager ssoTokenManager) {
-        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper, ssoTokenManager);
+            @Named("CrestPrivilegeDefinitions") Map<String, PrivilegeDefinition> actionToDefinition,
+            DelegationPermissionFactory permissionFactory, CoreWrapper coreWrapper,
+            AnyPrivilegeAuthzModule anyPrivilegeAuthzModule,SSOTokenManager ssoTokenManager) {
+        super(evaluator, actionToDefinition, permissionFactory, coreWrapper, ssoTokenManager);
         this.anyPrivilegeAuthzModule = anyPrivilegeAuthzModule;
     }
 
@@ -86,7 +87,8 @@ public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeA
     }
 
     private Promise<AuthorizationResult, ResourceException> evaluateReadOnly(Context context) {
-        return super.evaluate(context, READ).thenAsync(new PermitAnyPrivilegedRead(anyPrivilegeAuthzModule, context));
+        return super.evaluateAsPromise(context, READ)
+                .thenAsync(new PermitAnyPrivilegedRead(anyPrivilegeAuthzModule, context));
     }
 
     private static class PermitAnyPrivilegedRead
@@ -104,7 +106,7 @@ public class PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule extends PrivilegeA
         public Promise<? extends AuthorizationResult, ? extends ResourceException> apply(
                 AuthorizationResult result) throws ResourceException {
             Promise<AuthorizationResult, ResourceException> resultPromise = newResultPromise(result);
-            return result.isAuthorized() ? resultPromise : anyPrivilegeAuthzModule.evaluate(context, READ);
+            return result.isAuthorized() ? resultPromise : anyPrivilegeAuthzModule.evaluateAsPromise(context, READ);
         }
     }
 

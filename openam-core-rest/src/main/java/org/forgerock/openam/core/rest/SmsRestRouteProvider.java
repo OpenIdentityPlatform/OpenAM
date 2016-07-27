@@ -28,7 +28,7 @@ import org.forgerock.openam.core.rest.sms.SmsServerPropertiesResource;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 
 /**
  * A {@link RestRouteProvider} that add routes for all the SMS endpoints.
@@ -44,12 +44,12 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("realms")
                 .auditAs(REALMS)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toCollection(RealmResource.class);
 
         realmRouter.route("realm-config")
                 .auditAs(CONFIG)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toRequestHandler(STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
 
         rootRouter.route("global-config")
@@ -58,7 +58,7 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
 
         rootRouter.route("global-config/servers/{serverName}/properties/{tab}")
                 .auditAs(CONFIG)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toAnnotatedSingleton(SmsServerPropertiesResource.class);
     }
 

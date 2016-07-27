@@ -14,7 +14,7 @@
  * Copyright 2014-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.authz;
+package org.forgerock.openam.authz;
 
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
@@ -22,34 +22,19 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.forgerock.authz.filter.api.AuthorizationResult;
-import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.authz.PrivilegeDefinition.Action;
 import org.forgerock.openam.rest.resource.SubjectContext;
-import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
-import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -64,96 +49,39 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  *
  * @since 12.0.0
  */
-public class PrivilegeAuthzModule implements CrestAuthorizationModule {
+public abstract class PrivilegeAuthzModule {
 
     public static final String NAME = "DelegationFilter";
-
-    private static final PrivilegeDefinition MODIFY = PrivilegeDefinition
-            .getInstance("modify", PrivilegeDefinition.Action.MODIFY);
-    static final PrivilegeDefinition READ = PrivilegeDefinition
-            .getInstance("read", PrivilegeDefinition.Action.READ);
+    public static final PrivilegeDefinition MODIFY = PrivilegeDefinition.getInstance("modify", Action.MODIFY);
+    public static final PrivilegeDefinition READ = PrivilegeDefinition.getInstance("read", Action.READ);
 
     private static final ActionToStringMapper ACTION_TO_STRING_MAPPER = new ActionToStringMapper();
-
     private static final String REST = "rest";
     private static final String VERSION = "1.0";
 
     private final DelegationEvaluator evaluator;
-    private final Map<String, PrivilegeDefinition> actionToDefinition;
     private final DelegationPermissionFactory permissionFactory;
-    private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private final SSOTokenManager ssoTokenManager;
 
-    @Inject
-    public PrivilegeAuthzModule(final DelegationEvaluator evaluator,
-            final Map<String, PrivilegeDefinition> actionToDefinition,
-            final DelegationPermissionFactory permissionFactory,
-            SessionCache sessionCache, CoreWrapper coreWrapper, 
-            SSOTokenManager ssoTokenManager) {
+    protected final Map<String, PrivilegeDefinition> actionToDefinition;
+
+    /**
+     * Create a new instance of {@link PrivilegeAuthzModule}.
+     *
+     * @param evaluator The Delegation Evaluator.
+     * @param actionToDefinition The action to definition map.
+     * @param permissionFactory The Delegation Permission Factory.
+     * @param coreWrapper The Core Wrapper.
+     * @param ssoTokenManager The SSOToken manager.
+     */
+    public PrivilegeAuthzModule(DelegationEvaluator evaluator, Map<String, PrivilegeDefinition> actionToDefinition,
+            DelegationPermissionFactory permissionFactory, CoreWrapper coreWrapper, SSOTokenManager ssoTokenManager) {
         this.evaluator = evaluator;
         this.actionToDefinition = actionToDefinition;
         this.permissionFactory = permissionFactory;
-        this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
         this.ssoTokenManager = ssoTokenManager;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(
-            Context serverContext, ReadRequest readRequest) {
-        return evaluate(serverContext, READ);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(
-            Context serverContext, QueryRequest queryRequest) {
-        return evaluate(serverContext, READ);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(
-            Context serverContext, CreateRequest createRequest) {
-        return evaluate(serverContext, MODIFY);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(
-            Context serverContext, UpdateRequest updateRequest) {
-        return evaluate(serverContext, MODIFY);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(
-            Context serverContext, DeleteRequest deleteRequest) {
-        return evaluate(serverContext, MODIFY);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizePatch(
-            Context serverContext, PatchRequest patchRequest) {
-        return evaluate(serverContext, MODIFY);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeAction(
-            Context serverContext, ActionRequest actionRequest) {
-
-        // Get the privilege definition for the CREST action.
-        final String crestAction = actionRequest.getAction();
-        final PrivilegeDefinition definition = actionToDefinition.get(crestAction);
-
-        if (definition == null) {
-            return Promises.newResultPromise(
-                    AuthorizationResult.accessDenied("No privilege mapping for requested action " + crestAction));
-        }
-
-        return evaluate(serverContext, definition);
     }
 
     /**
@@ -166,8 +94,8 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
      *
      * @return the authorisation result
      */
-    protected Promise<AuthorizationResult, ResourceException> evaluate(final Context context,
-                                                                     final PrivilegeDefinition definition) {
+    protected AuthorizationResult evaluate(Context context, PrivilegeDefinition definition)
+            throws InternalServerErrorException {
 
         // If no realm is specified default to the root realm.
         final String realm = (context.containsContext(RealmContext.class)) ?
@@ -182,13 +110,13 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
             Session callerSession = subjectContext.getCallerSession();
             if (callerSession == null) {
                 // you don't have a session so return access denied
-                return Promises.newResultPromise(AuthorizationResult.accessDenied("No session for request."));
+                return AuthorizationResult.accessDenied("No session for request.");
             }
 
             // check session status using SSOTokenManager and refresh if necessary
             SSOToken token = subjectContext.getCallerSSOToken();
             if (!ssoTokenManager.isValidToken(token)) {
-                return Promises.newResultPromise(AuthorizationResult.accessDenied("No valid session in request."));
+                return AuthorizationResult.accessDenied("No valid session in request.");
             }
 
             final String loggedInRealm =
@@ -201,16 +129,16 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,
                     Collections.<String, Set<String>>emptyMap()) && loggedIntoValidRealm(realm, loggedInRealm)) {
                 // Authorisation has been approved.
-                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+                return AuthorizationResult.accessPermitted();
             }
         } catch (DelegationException dE) {
-            return new InternalServerErrorException("Attempt to authorise the user has failed", dE).asPromise();
+            throw new InternalServerErrorException("Attempt to authorise the user has failed", dE);
         } catch (SSOException e) {
             //you don't have a user so return access denied
-            return Promises.newResultPromise(AuthorizationResult.accessDenied("No valid user supplied in request."));
+            return AuthorizationResult.accessDenied("No valid user supplied in request.");
         }
 
-        return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));
+        return AuthorizationResult.accessDenied("The user has insufficient privileges");
     }
 
     /**
@@ -228,11 +156,10 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
     /**
      * Function converts an action to a string representation.
      */
-    private final static class ActionToStringMapper implements
-            Function<PrivilegeDefinition.Action, String, NeverThrowsException> {
+    private final static class ActionToStringMapper implements Function<Action, String, NeverThrowsException> {
 
         @Override
-        public String apply(final PrivilegeDefinition.Action action) {
+        public String apply(final Action action) {
             return action.toString();
         }
 

@@ -61,7 +61,7 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.RealmContextFilter;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -130,7 +130,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
-            PrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
+            CrestPrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
             PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler,
             SitesResourceProvider sitesResourceProvider, ServersResourceProvider serversResourceProvider)
             throws SMSException, SSOException {

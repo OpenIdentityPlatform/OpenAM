@@ -25,7 +25,6 @@ import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAs
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 
@@ -42,6 +41,7 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
 
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.openam.authz.PrivilegeDefinition;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
@@ -85,7 +85,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Unit test for {@link org.forgerock.openam.rest.authz.PrivilegeAuthzModule}.
+ * Unit test for {@link CrestPrivilegeAuthzModule}.
  *
  * @since 12.0.0
  */
@@ -139,7 +139,7 @@ public class PrivilegeAuthzModuleTest {
         given(coreWrapper.convertOrgNameToRealmName("realmdn")).willReturn("/abc");
         given(sessionCache.getSession(any(SessionID.class))).willReturn(session);
 
-        module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper, ssoTokenManager);
+        module = new CrestPrivilegeAuthzModule(evaluator, definitions, factory, coreWrapper, ssoTokenManager);
 
         Session session = mock(Session.class);
         given(subjectContext.getCallerSession()).willReturn(session);

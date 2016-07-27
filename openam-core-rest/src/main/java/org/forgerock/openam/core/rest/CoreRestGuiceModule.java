@@ -21,6 +21,7 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.core.rest.authn.CoreRestAuthenticationGuiceModule;
 import org.forgerock.openam.core.rest.cts.CoreRestCtsGuiceModule;
 import org.forgerock.openam.core.rest.devices.CoreRestDevicesGuiceModule;
+import org.forgerock.openam.core.rest.docs.CoreRestDocsGuiceModule;
 import org.forgerock.openam.core.rest.record.CoreRestRecordGuiceModule;
 import org.forgerock.openam.core.rest.session.CoreRestSessionGuiceModule;
 import org.forgerock.openam.core.rest.sms.CoreRestSmsGuiceModule;
@@ -42,5 +43,6 @@ public class CoreRestGuiceModule extends AbstractModule {
         install(new CoreRestIdentityGuiceModule());
         install(new CoreRestDevicesGuiceModule());
         install(new CoreRestRecordGuiceModule());
+        install(new CoreRestDocsGuiceModule());
     }
 }

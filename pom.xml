@@ -1798,6 +1798,18 @@
                 <version>0.9.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctorj</artifactId>
+                <version>1.5.4</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.beust</groupId>
+                        <artifactId>jcommander</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!--
               required by the STS and SAML libraries
               -->

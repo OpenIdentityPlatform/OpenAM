@@ -25,7 +25,7 @@ import com.google.inject.Provides;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 
 /**
  * Guice module for binding the Session REST endpoints.
@@ -41,7 +41,7 @@ public class CoreRestSessionGuiceModule extends AbstractModule {
     @Provides
     @Inject
     public AnyOfAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
-            PrivilegeAuthzModule privilegeAuthzModule,
+            CrestPrivilegeAuthzModule privilegeAuthzModule,
             AdminOnlyAuthzModule adminOnlyAuthzModule) {
         SessionResourceAuthzModule sessionResourceAuthzModule = new SessionResourceAuthzModule(ssoTokenManager);
         List<CrestAuthorizationModule> authzList = new ArrayList<>(3);

@@ -21,7 +21,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.PoliciesAuditFilter;
 
@@ -37,7 +37,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("policies")
                 .auditAs(POLICY, PoliciesAuditFilter.class)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(PolicyV1Filter.class)
                 .toCollection(PolicyResource.class)
@@ -48,7 +48,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("applications")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(ApplicationV1Filter.class)
                 .toCollection(ApplicationsResource.class)
@@ -57,12 +57,12 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("subjectattributes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toCollection(SubjectAttributesResourceV1.class);
 
         realmRouter.route("resourcetypes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .toCollection(ResourceTypesResource.class);
 
         rootRouter.route("applicationtypes")

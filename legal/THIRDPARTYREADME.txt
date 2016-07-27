@@ -4,6 +4,9 @@ DO NOT TRANSLATE OR LOCALIZE
 Apache Software License, Version 2.0
 ***************************************************************************
 
+Version: asciidoctorj-1.5.4.jar
+Copyright: Copyright 2012-2016 Dan Allen, Ryan Waldron and the Asciidoctor Project
+
 Version: aws-java-sdk-core-1.10.72.jar
 Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
 
@@ -1793,6 +1796,9 @@ Eclipse Public License (EPL) Version 1.0
 
 Version: jgrapht-core-0.9.1.jar
 Copyright: Copyright 2003-2015, by Barak Naveh and Contributors. All rights reserved.
+
+Version: jruby-complete-1.7.21.jar
+Copyright: Copyright (c) 2007-2016 The JRuby project
 
 ==================
 Full license text:
