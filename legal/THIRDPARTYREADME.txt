@@ -125,9 +125,6 @@ Copyright: Copyright 2003-2010 Terracotta, Inc.
 Version: FastInfoset-1.2.13.jar
 Copyright: Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
 
-Version: guava-16.0.1.jar
-Copyright: Copyright 2010 The Guava Authors
-
 Version: forgerock-guava-annotations-18.0.3.jar
 Copyright: Copyright 2010 The Guava Authors
 
@@ -198,13 +195,13 @@ Copyright: Copyright 2001-2016 The Apache Software Foundation
 Version: groovy-jsr223-2.4.6.jar
 Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: guice-4.0-no_aop.jar
+Version: guice-3.0-no_aop.jar
 Copyright: Copyright 2009 Google Inc
 
-Version: guice-assistedinject-4.0.jar
+Version: guice-assistedinject-3.0.jar
 Copyright: Copyright 2009 Google Inc
 
-Version: guice-multibindings-4.0.jar
+Version: guice-multibindings-3.0.jar
 Copyright: Copyright 2009 Google Inc
 
 Version: HikariCP-2.4.1.jar
