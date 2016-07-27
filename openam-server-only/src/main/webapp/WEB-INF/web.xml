@@ -20,10 +20,6 @@
     </listener>
 
     <context-param>
-        <param-name>com.google.inject.Stage</param-name>
-        <param-value>DEVELOPMENT</param-value>
-    </context-param>
-    <context-param>
         <param-name>jato:enforceStrictSessionTimeout</param-name>
         <param-value>true</param-value>
     </context-param>

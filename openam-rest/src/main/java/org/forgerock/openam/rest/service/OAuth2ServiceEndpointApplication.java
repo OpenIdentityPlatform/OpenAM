@@ -32,7 +32,7 @@ public class OAuth2ServiceEndpointApplication extends ServiceEndpointApplication
      * Sets the default media type as "application/json".
      */
     public OAuth2ServiceEndpointApplication() {
-        super(InjectorHolder.getInstance(JSONRestStatusService.class));
+        super(new JSONRestStatusService());
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
     }
 

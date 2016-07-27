@@ -123,12 +123,12 @@
 
         <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
         <forgerock.ui.version>14.0.0</forgerock.ui.version>
-        <forgerock.guice.version>2.0.0</forgerock.guice.version>
+        <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.openapi.war.overlay.version>21.0.0-SNAPSHOT</forgerock.openapi.war.overlay.version>
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
-        <guice.version>4.0</guice.version>
+        <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
         <powermock.version>1.5</powermock.version>
         <slf4j.version>1.7.5</slf4j.version>
