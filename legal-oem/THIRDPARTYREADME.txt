@@ -195,19 +195,30 @@ Copyright: Copyright 2009 Google Inc
 Version: HikariCP-2.4.1.jar
 Copyright: Copyright (C) 2013-2015 Brett Wooldridge
 
-Version: httpasyncclient-4.1.jar
+Version: httpasyncclient-osgi-4.1.2.jar
+Copyright: Copyright 2010-2015 The Apache Software Foundation
+
+Version: httpasyncclient-osgi-4.5.2.jar
 Copyright: Copyright 2010-2015 The Apache Software Foundation
 
 Version: httpclient-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
-Version: httpclient-4.4.1.jar
+Version: httpclient-4.3.6.jar
+Copyright: Copyright 1999-2015 The Apache Software Foundation
+
+Version: httpclient-osgi-4.5.2.jar
 Copyright: Copyright 1999-2015 The Apache Software Foundation
 
 Version: httpcore-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
-Version: httpcore-4.4.1.jar
+Version: httpcore-4.3.3.jar
+Copyright: Copyright 2005-2015 The Apache Software Foundation
+           This project contains annotations derived from JCIP-ANNOTATIONS
+           Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
+
+Version: httpcore-osgi-4.4.5.jar
 Copyright: Copyright 2005-2015 The Apache Software Foundation
            This project contains annotations derived from JCIP-ANNOTATIONS
            Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
@@ -215,34 +226,34 @@ Copyright: Copyright 2005-2015 The Apache Software Foundation
 Version: httpcore-nio-4.4.1.jar
 Copyright: 2005-2015 The Apache Software Foundation
 
-Version: jackson-annotations-2.6.3.jar
+Version: jackson-annotations-2.6.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-core-2.6.3.jar
+Version: jackson-core-2.6.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-core-asl-1.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-databind-2.6.3.jar
+Version: jackson-databind-2.6.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-dataformat-csv-2.6.3.jar
+Version: jackson-dataformat-csv-2.6.7.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-dataformat-smile-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-xml-2.6.3.jar
+Version: jackson-dataformat-xml-2.6.7.jar
 Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-yaml-2.6.3.jar
+Version: jackson-dataformat-yaml-2.6.7.jar
 Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jaxb-annotations-2.6.3.jar
+Version: jackson-module-jaxb-annotations-2.6.7.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jsonSchema-2.6.3.jar
+Version: jackson-module-jsonSchema-2.6.7.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: java-ipv6-0.14.jar
@@ -328,7 +339,7 @@ Copyright: Copyright (c) 2008-2010 Andrey Somov
 Version: super-csv-2.4.0.jar
 Copyright: Copyright 2007 Kasper B. Graversen
 
-Version: swagger-models-1.5.8.jar
+Version: swagger-models-1.5.9.jar
 Copyright: Copyright 2016 SmartBear Software
 
 Version: velocity-1.7.jar

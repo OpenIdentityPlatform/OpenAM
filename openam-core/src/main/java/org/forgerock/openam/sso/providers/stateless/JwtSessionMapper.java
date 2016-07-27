@@ -27,8 +27,8 @@ import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.EncryptedThenSignedJwt;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.SignedEncryptedJwt;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
@@ -133,7 +133,7 @@ public final class JwtSessionMapper {
         if (encryptionKeyPair != null) {
 
             // could throw JwtRuntimeException
-            SignedEncryptedJwt signedEncryptedJwt = jwtBuilderFactory.reconstruct(jwtString, SignedEncryptedJwt.class);
+            EncryptedThenSignedJwt signedEncryptedJwt = jwtBuilderFactory.reconstruct(jwtString, EncryptedThenSignedJwt.class);
             signedEncryptedJwt.decrypt(encryptionKeyPair.getPrivate());
             signedJwt = signedEncryptedJwt;
 
