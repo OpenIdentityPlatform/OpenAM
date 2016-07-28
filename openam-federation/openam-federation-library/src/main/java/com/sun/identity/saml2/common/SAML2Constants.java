@@ -1206,8 +1206,11 @@ public interface SAML2Constants {
     public String CACHE_CLEANUP_INTERVAL = 
                 "com.sun.identity.saml2.cacheCleanUpInterval";
 
-    // default Cache cleanup interval in seconds
-    public int CACHE_CLEANUP_INTERVAL_DEFAULT = 3600;
+    // default Cache cleanup interval in seconds.
+    public int CACHE_CLEANUP_INTERVAL_DEFAULT = 600;
+
+    // minimum Cache cleanup interval in seconds (5 mins).
+    public int CACHE_CLEANUP_INTERVAL_MINIMUM = 300;
 
     // IDP SLO parameter name for logout all sessions
     public String LOGOUT_ALL = "logoutAll";

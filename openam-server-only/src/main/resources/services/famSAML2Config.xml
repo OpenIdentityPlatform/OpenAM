@@ -45,7 +45,8 @@
             <Global> 
                 <AttributeSchema name="CacheCleanupInterval"
                     type="single" 
-                    syntax="number" 
+                    syntax="number_range"
+                    rangeStart="300" rangeEnd="2147483647"
                     i18nKey="a100"
                     resourceName="cacheCleanupInterval">
                     <DefaultValues>

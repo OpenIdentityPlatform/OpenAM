@@ -24,13 +24,15 @@
  *
  * $Id: SPCache.java,v 1.17 2009/06/09 20:28:32 exu Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.profile;
 
 import java.util.Hashtable;
+
+import org.forgerock.openam.utils.StringUtils;
 
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -45,33 +47,24 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 public class SPCache {
 
     public static int interval = SAML2Constants.CACHE_CLEANUP_INTERVAL_DEFAULT;
-    public static boolean isFedlet = false; 
-    
+    public static boolean isFedlet = false;
+
+    private static final String FEDLET_CLASS = "com.sun.identity.plugin.configuration.impl.FedletConfigurationImpl";
+
     static {
-        String intervalStr = SystemPropertiesManager.get(
-            SAML2Constants.CACHE_CLEANUP_INTERVAL);
-        try {
-            if (intervalStr != null && intervalStr.length() != 0) {
-                interval = Integer.parseInt(intervalStr);
-                if (interval < 0) {
-                    interval = 
-                        SAML2Constants.CACHE_CLEANUP_INTERVAL_DEFAULT;
-                }
-            }
-        } catch (NumberFormatException e) {
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("SPCache.constructor: "
-                    + "invalid cleanup interval. Using default.");
-            }
-        }
+        // if interval is manually configured and if it's less than minimum of 5 mins, then set it to minimum.
+        // minimum is defined via service config 'CacheCleanupInterval' value. See serverAttributeMap.properties
+        interval = SystemPropertiesManager.getAsInt(SAML2Constants.CACHE_CLEANUP_INTERVAL, SAML2Constants.CACHE_CLEANUP_INTERVAL_DEFAULT);
+        if (interval < SAML2Constants.CACHE_CLEANUP_INTERVAL_MINIMUM) {
+            SAML2Utils.debug.message("SPCache.constructor: Cleanup interval shouldn't be less than {} seconds."
+                            + " Setting to minimum value.", SAML2Constants.CACHE_CLEANUP_INTERVAL_MINIMUM);
+            interval = SAML2Constants.CACHE_CLEANUP_INTERVAL_MINIMUM;
+        } 
         // use the configuration implementation class to determine
         // if this is Fedlet, this could be done using a dedicate property
         // in the future 
-        String configClass = SystemPropertiesManager.get(
-            "com.sun.identity.plugin.configuration.class");
-        if ((configClass != null) && (configClass.trim().equals(
-        "com.sun.identity.plugin.configuration.impl.FedletConfigurationImpl"))){
-            //this is a Fedlet
+        String configClass = SystemPropertiesManager.get("com.sun.identity.plugin.configuration.class");
+        if (StringUtils.isNotEmpty(configClass) && configClass.trim().equals(FEDLET_CLASS)){
             isFedlet = true;
         } 
     }
