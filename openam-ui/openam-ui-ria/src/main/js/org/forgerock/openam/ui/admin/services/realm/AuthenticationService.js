@@ -23,27 +23,18 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
-    "org/forgerock/openam/ui/common/util/Promise",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], ($, _, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/Promise"
+], ($, _, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
-
-    function scopedByRealm (realm, path) {
-        var encodedRealm = "";
-
-        if (realm !== "/") {
-            encodedRealm = RealmHelper.encodeRealm(realm);
-        }
-        return `${encodedRealm}/realm-config/${path}`;
-    }
 
     obj.authentication = {
         get (realm) {
-            return SMSServiceUtils.schemaWithValues(obj, scopedByRealm(realm, "authentication"));
+            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.legacy("/realm-config/authentication", { realm }));
         },
         update (realm, data) {
             return obj.serviceCall({
-                url: scopedByRealm(realm, "authentication"),
+                url: fetchUrl.legacy("/realm-config/authentication", { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
@@ -51,18 +42,19 @@ define([
         },
         chains: {
             all (realm) {
-                var url = scopedByRealm(realm, "authentication");
-
-                return $.when(
+                return Promise.all([
                     obj.serviceCall({
-                        url: `${url}/chains?_queryFilter=true`,
+                        url: fetchUrl.legacy("/realm-config/authentication/chains?_queryFilter=true", { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url,
+                        url: fetchUrl.legacy("/realm-config/authentication", { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     })
-                ).then(function (chainsData, authenticationData) {
+                ]).then((response) => {
+                    const chainsData = response[0];
+                    const authenticationData = response[1];
+
                     _.each(chainsData[0].result, function (chainData) {
 
                         if (chainData._id === authenticationData[0].adminAuthModule) {
@@ -83,30 +75,32 @@ define([
             },
             create (realm, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/chains?_action=create"),
+                    url: fetchUrl.legacy("/realm-config/authentication/chains?_action=create", { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST",
                     data: JSON.stringify(data)
                 });
             },
             get (realm, name) {
-                var moduleName,
-                    url = scopedByRealm(realm, "authentication");
+                var moduleName;
 
-                return $.when(
+                return Promise.all([
                     obj.serviceCall({
-                        url,
+                        url: fetchUrl.legacy("/realm-config/authentication", { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url: `${url}/chains/${name}`,
+                        url: fetchUrl.legacy(`/realm-config/authentication/chains/${name}`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     }),
                     obj.serviceCall({
-                        url: `${url}/modules?_queryFilter=true`,
+                        url: fetchUrl.legacy("/realm-config/authentication/modules?_queryFilter=true", { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     })
-                ).then(function (authenticationData, chainData, modulesData) {
+                ]).then((response) => {
+                    const authenticationData = response[0];
+                    const chainData = response[1];
+                    const modulesData = response[2];
 
                     if (chainData[0]._id === authenticationData[0].adminAuthModule) {
                         chainData[0].adminAuthModule = true;
@@ -134,14 +128,14 @@ define([
             },
             remove (realm, name) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/chains/${name}`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/chains/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update (realm, name, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/chains/${name}`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/chains/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
@@ -151,13 +145,13 @@ define([
         modules: {
             all (realm) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules?_queryFilter=true"),
+                    url: fetchUrl.legacy("/realm-config/authentication/modules?_queryFilter=true", { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).done(SMSServiceUtils.sortResultBy("_id"));
             },
             create (realm, data, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/modules/${type}?_action=create`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/modules/${type}?_action=create`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST",
                     data: JSON.stringify(data)
@@ -165,7 +159,7 @@ define([
             },
             get (realm, name, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/modules/${type}/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 }).then(function (data) {
                     return data;
@@ -174,7 +168,9 @@ define([
             exists (realm, name) {
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
-                        url: scopedByRealm(realm, `authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`),
+                        url: fetchUrl.legacy(
+                            `/realm-config/authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`, { realm }
+                        ),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
 
@@ -185,14 +181,14 @@ define([
             },
             remove (realm, name, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/modules/${type}/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "DELETE"
                 });
             },
             update (realm, name, type, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/modules/${type}/${name}`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/modules/${type}/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "PUT",
                     data: JSON.stringify(data)
@@ -201,7 +197,7 @@ define([
             types: {
                 all (realm) {
                     return obj.serviceCall({
-                        url: scopedByRealm(realm, "authentication/modules?_action=getAllTypes"),
+                        url: fetchUrl.legacy("/realm-config/authentication/modules?_action=getAllTypes", { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).done(SMSServiceUtils.sortResultBy("name"));
@@ -215,7 +211,7 @@ define([
             },
             schema (realm, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, `authentication/modules/${type}?_action=schema`),
+                    url: fetchUrl.legacy(`/realm-config/authentication/modules/${type}?_action=schema`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then(function (data) {

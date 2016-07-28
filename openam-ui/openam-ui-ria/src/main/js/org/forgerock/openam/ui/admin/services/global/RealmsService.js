@@ -22,10 +22,11 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/realms`);
+], (_, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl, Promise, RealmHelper) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getRealmPath (realm) {
         if (realm.parentPath === "/") {
@@ -44,7 +45,7 @@ define([
          */
         all () {
             return obj.serviceCall({
-                url: "?_queryFilter=true",
+                url: fetchUrl.legacy("/global-config/realms?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
                 data.result = _(data.result).each((realm) => {
@@ -60,7 +61,7 @@ define([
          */
         create (data) {
             return obj.serviceCall({
-                url: "?_action=create",
+                url: fetchUrl.legacy("/global-config/realms?_action=create", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 suppressEvents: true,
@@ -74,7 +75,11 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            return SMSServiceUtils.schemaWithValues(obj, `${RealmHelper.encodeRealm(path)}`);
+            const encodedRealmPath = RealmHelper.encodeRealm(path);
+
+            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.legacy(`/global-config/realms${encodedRealmPath}`, {
+                realm: false
+            }));
         },
 
         /**
@@ -82,7 +87,7 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, "");
+            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.legacy("/global-config/realms", { realm: false }));
         },
 
         /**
@@ -92,7 +97,7 @@ define([
          */
         remove (path) {
             return obj.serviceCall({
-                url: `${RealmHelper.encodeRealm(path)}`,
+                url: fetchUrl.legacy(`/global-config/realms${RealmHelper.encodeRealm(path)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -106,7 +111,8 @@ define([
          */
         update (data) {
             return obj.serviceCall({
-                url: `${RealmHelper.encodeRealm(getRealmPath(data))}`,
+                url: fetchUrl.legacy(
+                    `/global-config/realms${RealmHelper.encodeRealm(getRealmPath(data))}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data),

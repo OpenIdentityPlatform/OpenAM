@@ -29,7 +29,7 @@ define([
     obj.getVersion = function () {
         return obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-            url: fetchUrl.legacy("/serverinfo/version")
+            url: fetchUrl.legacy("/serverinfo/version", { realm: false })
         }).then(function (data) {
             return `OpenAM ${data.version} ${$.t("common.form.build")} ${data.revision} (${data.date})`;
         });
@@ -38,7 +38,7 @@ define([
     obj.getConfiguration = function (callParams) {
         return obj.serviceCall(_.extend({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: fetchUrl.legacy("/serverinfo/*")
+            url: fetchUrl.legacy("/serverinfo/*", { realm: false })
         }, callParams));
     };
 
