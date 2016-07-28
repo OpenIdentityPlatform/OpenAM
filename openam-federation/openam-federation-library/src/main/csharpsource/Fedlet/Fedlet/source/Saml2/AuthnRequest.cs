@@ -31,6 +31,7 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -43,7 +44,8 @@ namespace Sun.Identity.Saml2
     /// Class representing the SAMLv2 AuthnRequest message for use in the
     /// SP initiated SSO profile.
     /// </summary>
-    public class AuthnRequest
+    [Serializable]
+    public class AuthnRequest : ISerializable
     {
         #region Members
         /// <summary>
@@ -185,6 +187,59 @@ namespace Sun.Identity.Saml2
             this.xml.LoadXml(rawXml.ToString());
         }
 
+        /// <summary>
+        /// Initializes a new instance of the AuthnRequest class.
+        /// This method is used by the de-serializer to reconstruct the object.
+        /// </summary>
+        /// <param name="info">The serialized version of the object.</param>
+        /// <param name="context">Describes the source and destination of the serialized stream.</param>
+        public AuthnRequest(SerializationInfo info, StreamingContext context)
+        {
+            this.xml = new XmlDocument();
+            this.xml.PreserveWhitespace = true;
+            this.nsMgr = new XmlNamespaceManager(this.xml.NameTable);
+            this.nsMgr.AddNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
+            this.nsMgr.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+
+            string sourceXml = info.GetString("AuthnRequestXMLParams");
+            if (!string.IsNullOrEmpty(sourceXml))
+            {
+                this.xml.LoadXml(sourceXml);
+            }
+
+            this.Id = info.GetString("AuthnRequestId");
+            this.IssueInstant = info.GetString("AuthnRequestIssueInstant");
+            this.Issuer = info.GetString("AuthnRequestIssuer");
+            this.AllowCreate = info.GetBoolean("AuthnRequestAllowCreate");
+            this.AssertionConsumerServiceIndex = info.GetString("AuthnRequestACSI");
+            this.Binding = info.GetString("AuthnRequestBinding");
+            this.Consent = info.GetString("AuthnRequestConsent");
+            this.Destination = info.GetString("AuthnRequestDestination");
+            this.ForceAuthn = info.GetBoolean("AuthnRequestForceAuthn");
+            this.IsPassive = info.GetBoolean("AuthnRequestIsPassive");
+        }
+        #endregion
+
+        #region ISerializable Members
+        /// <summary>
+        /// Converts an AuthnRequest object into its serialized form.
+        /// </summary>
+        /// <param name="info">The serialized version of the object.</param>
+        /// <param name="context">Describes the source and destination of the serialized stream.</param>
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("AuthnRequestXMLParams", ((this.xml != null)?this.xml.OuterXml:(string)null));
+            info.AddValue("AuthnRequestId", this.Id);
+            info.AddValue("AuthnRequestIssueInstant", this.IssueInstant);
+            info.AddValue("AuthnRequestIssuer", this.Issuer);
+            info.AddValue("AuthnRequestAllowCreate", this.AllowCreate);
+            info.AddValue("AuthnRequestACSI", this.AssertionConsumerServiceIndex);
+            info.AddValue("AuthnRequestBinding", this.Binding);
+            info.AddValue("AuthnRequestConsent", this.Consent);
+            info.AddValue("AuthnRequestDestination", this.Destination);
+            info.AddValue("AuthnRequestForceAuthn", this.ForceAuthn);
+            info.AddValue("AuthnRequestIsPassive", this.IsPassive);
+        }
         #endregion
 
         #region Properties
