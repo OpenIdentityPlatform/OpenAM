@@ -22,8 +22,9 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (_, AbstractDelegate, Constants, AdministeredRealmsHelper, RealmHelper) {
+], function (_, AbstractDelegate, Constants, AdministeredRealmsHelper, fetchUrl, RealmHelper) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`),
         getCurrentAdministeredRealm = function () {
             var realm = AdministeredRealmsHelper.getCurrentRealm();
@@ -32,76 +33,70 @@ define([
 
     obj.getApplicationType = function (type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`/applicationtypes/${type}`),
+            url: fetchUrl.legacy(`/applicationtypes/${type}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getDecisionCombiners = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/decisioncombiners/?_queryId=&_fields=title"),
+            url: fetchUrl.legacy("/decisioncombiners/?_queryId=&_fields=title", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getEnvironmentConditions = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/conditiontypes?_queryId=&_fields=title,logical,config"),
+            url: fetchUrl.legacy("/conditiontypes?_queryId=&_fields=title,logical,config", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getSubjectConditions = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/subjecttypes?_queryId=&_fields=title,logical,config"),
+            url: fetchUrl.legacy("/subjecttypes?_queryId=&_fields=title,logical,config", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${
-                getCurrentAdministeredRealm()
-                }/subjectattributes?_queryFilter=true`),
+            url: fetchUrl.legacy("/subjectattributes?_queryFilter=true", { realm: getCurrentAdministeredRealm() }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.queryIdentities = function (name, query) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${
-                getCurrentAdministeredRealm()
-                }/${name}?_queryId=${query}*`),
+            url: fetchUrl.legacy(`/${name}?_queryId=${query}*`, { realm: getCurrentAdministeredRealm() }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getUniversalId = function (name, type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${
-                getCurrentAdministeredRealm()
-                }/${type}/${name}?_fields=universalid`),
+            url: fetchUrl.legacy(`/${type}/${name}?_fields=universalid`, { realm: getCurrentAdministeredRealm() }),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0" }
         });
     };
 
     obj.getDataByType = function (type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${getCurrentAdministeredRealm()}/${type}?_queryFilter=true`),
+            url: fetchUrl.legacy(`/${type}?_queryFilter=true`, { realm: getCurrentAdministeredRealm() }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getScriptById = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${getCurrentAdministeredRealm()}/scripts/${id}`),
+            url: fetchUrl.legacy(`/scripts/${id}`, { realm: getCurrentAdministeredRealm() }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.getAllRealms = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/realms?_queryFilter=true"),
+            url: fetchUrl.legacy("/realms?_queryFilter=true", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
@@ -109,7 +104,7 @@ define([
     obj.importPolicies = function (data) {
         return obj.serviceCall({
             serviceUrl: `${Constants.host}/${Constants.context}`,
-            url: RealmHelper.decorateURLWithOverrideRealm(`/xacml${getCurrentAdministeredRealm()}/policies`),
+            url: fetchUrl.legacy(`/xacml${getCurrentAdministeredRealm()}/policies`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data
@@ -118,9 +113,9 @@ define([
 
     obj.listResourceTypes = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm(`${
-                getCurrentAdministeredRealm()
-                }/resourcetypes?_queryFilter=name+eq+${encodeURIComponent('"^(?!Delegation Service$).*"')}`),
+            url: fetchUrl.legacy(
+                `/resourcetypes?_queryFilter=name+eq+${encodeURIComponent('"^(?!Delegation Service$).*"')}`,
+                { realm: getCurrentAdministeredRealm() }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };

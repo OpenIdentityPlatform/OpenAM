@@ -20,10 +20,9 @@
 define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (Messages, AbstractDelegate, Configuration, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function (Messages, AbstractDelegate, Constants, fetchUrl) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getLocalizedResponse (response) {
@@ -35,7 +34,7 @@ define([
 
     obj.validateScript = function (data) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/scripts/?_action=validate"),
+            url: fetchUrl.legacy("/scripts/?_action=validate", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data),

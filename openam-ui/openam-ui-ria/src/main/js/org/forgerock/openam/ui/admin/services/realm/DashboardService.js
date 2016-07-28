@@ -20,23 +20,14 @@
 define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], (AbstractDelegate, Constants, RealmHelper) => {
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], (AbstractDelegate, Constants, fetchUrl) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
-
-    const scopedByRealm = (realm, path) => {
-        let encodedRealm = "";
-
-        if (realm !== "/") {
-            encodedRealm = RealmHelper.encodeRealm(realm);
-        }
-        return `${encodedRealm}/realm-config/${path}`;
-    };
 
     obj.dashboard = {
         commonTasks: {
             all: (realm) => obj.serviceCall({
-                url: scopedByRealm(realm, "commontasks?_queryFilter=true"),
+                url: fetchUrl.legacy("/realm-config/commontasks?_queryFilter=true", { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             })
         }
