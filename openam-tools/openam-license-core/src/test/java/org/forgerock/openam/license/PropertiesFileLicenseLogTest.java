@@ -81,6 +81,12 @@ public class PropertiesFileLicenseLogTest {
             throw new SkipException("Unable to make log dir non-writeable");
         }
 
+        if (logDir.canWrite()) {
+            // On some platforms the JVM can still write even when directories are made read-only: see javadoc for
+            // File#canWrite
+            throw new SkipException("Directory is still writeable despite making it read-only");
+        }
+
         // Then
         new PropertiesFileLicenseLog(logDir);
     }
