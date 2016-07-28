@@ -55,7 +55,7 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(ResourceSetResource.class);
+                .toAnnotatedCollection(ResourceSetResource.class);
 
         realmRouter.route("users/{user}/oauth2/resources/labels")
                 .auditAs(OAUTH)

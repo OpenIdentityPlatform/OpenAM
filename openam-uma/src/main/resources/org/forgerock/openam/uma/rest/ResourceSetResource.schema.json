@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/ResourceSetResource#schema.title",
+  "description": "i18n:api-descriptor/ResourceSetResource#schema.description",
+  "properties": {
+    "scopes": {
+      "type": "array",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.scopes.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.scopes.description",
+      "items": {
+        "type": "string"
+      }
+    },
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema._id.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema._id.description"
+    },
+    "resourceServer": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.resourceServer.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.resourceServer.description"
+    },
+    "labels": {
+      "type": "array",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.labels.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.labels.description",
+      "items": {
+        "type": "string"
+      }
+    },
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.name.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.name.description"
+    },
+    "icon_uri": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.icon_uri.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.icon_uri.description"
+    },
+    "resourceOwnerId": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.resourceOwnerId.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.resourceOwnerId.description"
+    },
+    "type": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ResourceSetResource#schema.type.title",
+      "description": "i18n:api-descriptor/ResourceSetResource#schema.type.description"
+    }
+  }
+}

@@ -20,7 +20,18 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_405_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.RESOURCE_SET_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -31,6 +42,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
 import org.forgerock.services.context.Context;
@@ -74,7 +96,24 @@ import org.forgerock.util.query.QueryFilterVisitor;
  *
  * @since 13.0.0
  */
-public class ResourceSetResource implements CollectionResourceProvider {
+
+//update query action read
+@CollectionProvider(
+        details = @Handler(
+                title = RESOURCE_SET_RESOURCE + TITLE,
+                description = RESOURCE_SET_RESOURCE + DESCRIPTION,
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = RESOURCE_SET_RESOURCE + "pathparams.user")},
+                resourceSchema = @Schema(schemaResource = "ResourceSetResource.schema.json"),
+                mvccSupported = false),
+        pathParam = @Parameter(
+                name = "resourceSetId",
+                type = "string",
+                description = RESOURCE_SET_RESOURCE + "pathParam." + DESCRIPTION))
+    public class ResourceSetResource {
 
     private static final String ID = "_id";
 
@@ -104,20 +143,17 @@ public class ResourceSetResource implements CollectionResourceProvider {
     }
 
     /**
-     * Not supported.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
      * {@inheritDoc}
      */
-    @Override
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_SET_RESOURCE + ERROR_500_DESCRIPTION
+                    )
+            },
+            description = RESOURCE_SET_RESOURCE + READ_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         boolean augmentWithPolicies = augmentWithPolicies(request);
@@ -144,7 +180,12 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
-    @Override
+    @Action(name = "revokeAll",
+            operationDescription = @Operation(
+                    description = RESOURCE_SET_RESOURCE + "action.revokeAll." + DESCRIPTION
+            ),
+            request = @Schema(),
+            response = @Schema())
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         if ("revokeAll".equalsIgnoreCase(request.getAction())) {
@@ -168,7 +209,23 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
-    @Override
+    @Query(operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = RESOURCE_SET_RESOURCE + QUERY + ERROR_400_DESCRIPTION
+                            ),
+                            @ApiError(
+                                    code = 405,
+                                    description = RESOURCE_SET_RESOURCE + QUERY + ERROR_405_DESCRIPTION
+                            ),
+                            @ApiError(
+                                    code = 500,
+                                    description = RESOURCE_SET_RESOURCE + ERROR_500_DESCRIPTION
+                            )},
+                    description = RESOURCE_SET_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(final Context context, final QueryRequest request,
             final QueryResourceHandler handler) {
 
@@ -517,7 +574,18 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
-    @Override
+    @Update(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = RESOURCE_SET_RESOURCE + UPDATE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_SET_RESOURCE + ERROR_500_DESCRIPTION
+                    )},
+            description = RESOURCE_SET_RESOURCE + UPDATE_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
 
@@ -566,42 +634,6 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
     private boolean isSystemLabel(ResourceSetLabel label) {
         return label.getId().contains("/");
-    }
-
-    /**
-     * Not supported.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
-            DeleteRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * Not supported.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * Not supported.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return new NotSupportedException().asPromise();
     }
 
     /**

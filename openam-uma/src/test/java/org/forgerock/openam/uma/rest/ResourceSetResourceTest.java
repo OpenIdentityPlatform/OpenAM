@@ -104,62 +104,7 @@ public class ResourceSetResourceTest {
         //Then
         assertThat(readPromise).succeeded().withObject().isNotNull();
     }
-
-    @Test
-    public void createShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        CreateRequest request = mock(CreateRequest.class);
-        //When
-        Promise<ResourceResponse, ResourceException> instancePromise = resource.createInstance(context, request);
-
-        //Then
-        assertThat(instancePromise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void deleteShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        DeleteRequest request = mock(DeleteRequest.class);
-
-        //When
-        Promise<ResourceResponse, ResourceException> promise = resource.deleteInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void patchShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        PatchRequest request = mock(PatchRequest.class);
-
-        //When
-        Promise<ResourceResponse, ResourceException> promise = resource.patchInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void actionInstanceShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = mock(ActionRequest.class);
-
-        //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
+    
     @Test
     public void actionCollectionShouldNotBeSupported() {
 

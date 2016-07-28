@@ -77,6 +77,9 @@ public final class ApiDescriptorConstants {
     public static final String ERROR_400_DESCRIPTION = "error.400." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_405_DESCRIPTION = "error.405." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_409_DESCRIPTION = "error.409." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
@@ -114,6 +117,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String SCRIPT_RESOURCE = TRANSLATION_KEY_PREFIX + "ScriptResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String RESOURCE_SET_RESOURCE = TRANSLATION_KEY_PREFIX + "ResourceSetResource#";
 
     private ApiDescriptorConstants() {
         // Constants class only
