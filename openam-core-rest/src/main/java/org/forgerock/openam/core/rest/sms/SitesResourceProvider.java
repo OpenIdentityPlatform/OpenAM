@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying 
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -44,7 +44,9 @@ import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.enums.CountPolicy;
 import org.forgerock.api.enums.PagingMode;
 import org.forgerock.api.enums.QueryType;
+import org.forgerock.api.util.Translator;
 import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.openam.core.rest.sms.models.Site;
 import org.forgerock.openam.rest.RestConstants;

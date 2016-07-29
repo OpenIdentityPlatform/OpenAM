@@ -15,14 +15,15 @@
  */
 package org.forgerock.openam.i18n.apidescriptor;
 
-import static org.forgerock.util.i18n.LocalizableString.TRANSLATION_KEY_PREFIX;
-
 /**
  * Constants for Api Descriptor I18N used across OpenAM.
  *
  * @since 14.0.0
  */
 public final class ApiDescriptorConstants {
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String TRANSLATION_KEY_PREFIX = "i18n:";
 
     /** Constant used as key to API Descriptor translations **/
     public static final String TITLE = "title";

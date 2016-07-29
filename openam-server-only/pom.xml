@@ -779,11 +779,6 @@
             <artifactId>openam-selfservice</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-i18n</artifactId>
-        </dependency>
-
         <!-- Include all Authentication Modules -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

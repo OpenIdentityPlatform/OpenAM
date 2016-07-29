@@ -93,6 +93,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         //when
         Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
@@ -115,13 +116,14 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("register");
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
         given(mockCTS.read("asdf")).willReturn(mockToken);
         given(mockToken.getBlob()).willReturn("{ }".getBytes());
         given(mockSerialisation.serialise(any())).willReturn("");
 
         //when
-        Promise<ActionResponse, ResourceException> result = messageResource.register(realmContext, request);
+        Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
 
         //then
         assertThat(result.get()).isNotNull();
@@ -145,6 +147,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
         given(mockCTS.read("asdf")).willReturn(mockToken);
         given(mockToken.getBlob()).willReturn("{ }".getBytes());
@@ -174,6 +177,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         //when
         Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
@@ -194,6 +198,7 @@ public class SnsMessageResourceTest {
 
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("authenticate");
 
         doThrow(new PredicateNotMetException("")).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
 
@@ -217,6 +222,7 @@ public class SnsMessageResourceTest {
         ActionRequest request = mock(ActionRequest.class);
         given(request.getContent()).willReturn(content);
         given(mockCTS.read("asdf")).willReturn(null);
+        given(request.getAction()).willReturn("authenticate");
 
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
 
