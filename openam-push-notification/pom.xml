@@ -43,7 +43,6 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sns</artifactId>
-            <version>1.10.72</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
