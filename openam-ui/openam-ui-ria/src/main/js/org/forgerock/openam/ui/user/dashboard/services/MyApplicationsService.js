@@ -18,11 +18,11 @@
 
 define([
     "lodash",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (_, Constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function (_, AbstractDelegate, Constants, fetchUrl) {
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function sortApps (apps) {
         return _.map(_.sortBy(_.keys(apps), function (key) { return key; }), function (key) {
@@ -36,14 +36,14 @@ define([
 
     obj.getMyApplications = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/assigned"),
+            url: fetchUrl.legacy("/dashboard/assigned"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(sortApps);
     };
 
     obj.getAvailableApplications = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/available"),
+            url: fetchUrl.legacy("/dashboard/available"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(sortApps);
     };

@@ -16,29 +16,25 @@
 
 
 define([
-    "jquery",
-    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
-    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function (AbstractDelegate, Configuration, Constants, fetchUrl) {
+    var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     obj.getApplications = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
-                encodeURIComponent(Configuration.loggedUser.get("username"))
-                }/oauth2/applications?_queryFilter=true`),
+            url: fetchUrl.legacy(`/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))}/oauth2/applications?_queryFilter=true`),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.revokeApplication = function (id) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithRealm(`__subrealm__/users/${
-                encodeURIComponent(Configuration.loggedUser.get("username"))
-                }/oauth2/applications/${id}`),
+            url: fetchUrl.legacy(
+                `/users/${encodeURIComponent(Configuration.loggedUser.get("username"))}/oauth2/applications/${id}`),
             type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });

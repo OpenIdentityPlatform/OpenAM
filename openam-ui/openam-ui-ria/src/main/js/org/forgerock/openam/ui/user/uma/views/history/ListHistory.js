@@ -26,10 +26,10 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/BackgridUtils"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, AbstractView,
-             Configuration, Constants, BackgridUtils, RealmHelper) {
+             Configuration, Constants, fetchUrl, BackgridUtils) {
     var HistoryView = AbstractView.extend({
         template: "templates/user/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -42,9 +42,8 @@ define([
                 paginator;
 
             collection = new (Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
-                    Configuration.loggedUser.get("username")
-                    }/uma/auditHistory`),
+                url: `/${Constants.context}/json${
+                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/auditHistory`)}`,
                 state: {
                     pageSize: 10,
                     sortKey: "eventTime",

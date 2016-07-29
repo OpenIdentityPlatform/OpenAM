@@ -18,23 +18,20 @@
  * @module org/forgerock/openam/ui/user/oauth2/OAuth2ConsentPageHelper
  */
 define([
-    "jquery",
-    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/main/ServiceInvoker"
-], function ($, _, AbstractDelegate, Constants, RealmHelper, CookieHelper, ServiceInvoker) {
-
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], function (AbstractDelegate, ServiceInvoker, Constants, CookieHelper, fetchUrl) {
     const oauth2ContextPath = "oauth2";
     const uriContextParts = Constants.context.split("/");
     const uriContext = uriContextParts.slice(0, uriContextParts.indexOf(oauth2ContextPath));
-    const obj = new AbstractDelegate(`${Constants.host}/${uriContext}/json/`);
+    const obj = new AbstractDelegate(`${Constants.host}/${uriContext}/json`);
     const getConfiguration = () => {
         return obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*")
+            url: fetchUrl.legacy("/serverinfo/*")
         });
     };
 

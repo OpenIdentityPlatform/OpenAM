@@ -16,18 +16,18 @@
 
 define([
     "jquery",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "org/forgerock/commons/ui/common/backgrid/Backgrid",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/user/uma/views/backgrid/cells/PermissionsCell",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/user/uma/services/UMAService",
-    "org/forgerock/commons/ui/common/main/Router"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper,
-             PermissionsCell, UMAService, Router) {
+    "org/forgerock/openam/ui/user/uma/views/backgrid/cells/PermissionsCell"
+], function ($, Backbone, Backgrid, AbstractView, Configuration, Router, Constants, fetchUrl, BackgridUtils,
+             UMAService, PermissionsCell) {
     var EditRequest = AbstractView.extend({
         template: "templates/user/uma/views/request/EditRequestTemplate.html",
         events: {
@@ -63,9 +63,9 @@ define([
             id = args[0];
 
             RequestCollection = Backbone.Collection.extend({
-                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
-                     Configuration.loggedUser.get("username")
-                    }/uma/pendingrequests/${id}`)
+                url: `/${Constants.context}/json${
+                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests/${id}`)
+                }`
             });
 
             columns = [{

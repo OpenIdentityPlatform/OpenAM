@@ -22,14 +22,14 @@ define([
     "org/forgerock/commons/ui/common/backgrid/Backgrid",
     "org/forgerock/commons/ui/common/backgrid/extension/ThemeablePaginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/user/uma/views/backgrid/cells/PermissionsCell",
-    "org/forgerock/openam/ui/user/uma/services/UMAService"
-], function ($, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator,
-             AbstractView, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMAService) {
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/user/uma/services/UMAService",
+    "org/forgerock/openam/ui/user/uma/views/backgrid/cells/PermissionsCell"
+], function ($, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, AbstractView, Configuration,
+             Constants, fetchUrl, BackgridUtils, UMAService, PermissionsCell) {
     var ListRequest = AbstractView.extend({
         template: "templates/user/uma/views/request/ListRequestTemplate.html",
 
@@ -41,9 +41,8 @@ define([
                 RequestsCollection;
 
             RequestsCollection = Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${
-                     Configuration.loggedUser.get("username")
-                    }/uma/pendingrequests`),
+                url: `/${Constants.context}/json${
+                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests`)}`,
                 state: {
                     pageSize: 10,
                     sortKey: "user"
