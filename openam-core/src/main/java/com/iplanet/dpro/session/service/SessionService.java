@@ -827,11 +827,10 @@ public class SessionService {
         // Session is not stateless, continue through the code...
 
         InternalSession sess = resolveToken(sid);
-        SessionInfo info = sessionInfoFactory.getSessionInfo(sess, sid);
         if (reset) {
             sess.setLatestAccessTime();
         }
-        return info;
+        return sessionInfoFactory.getSessionInfo(sess, sid);
     }
 
     /**

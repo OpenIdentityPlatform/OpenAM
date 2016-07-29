@@ -414,7 +414,7 @@ public final class SSOProviderImpl implements SSOProvider {
         try {
             SSOTokenID tokenId = token.getTokenID();
             SessionID sid = new SessionID(tokenId.toString());
-            Session session = sessionCache.getSession(sid);
+            Session session = sessionCache.getSession(sid, false, false); //Get session without refreshing idle time
             session.refresh(possiblyResetIdleTime);
         } catch (Exception e) {
             debug.error("Error in refreshing the session from sessions server");

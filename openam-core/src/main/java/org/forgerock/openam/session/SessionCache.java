@@ -290,7 +290,10 @@ public class SessionCache {
             }
             if (!sessionPollerPool.getCacheBasedPolling() && session.maxCachingTimeReached()) {
                 session.refresh(false);
+            } else  if (!allowInvalidSessions && possiblyResetIdleTime) {
+                session.refresh(true);
             }
+
             return session;
         }
 
