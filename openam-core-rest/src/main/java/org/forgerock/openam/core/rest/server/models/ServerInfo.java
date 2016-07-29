@@ -16,6 +16,8 @@
 package org.forgerock.openam.core.rest.server.models;
 
 
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SERVER_INFO_RESOURCE;
+
 import java.util.List;
 import java.util.Set;
 
@@ -28,60 +30,67 @@ import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 /**
  * ServerInfo bean.
  */
-@Title("Site")
-@Description("Represents server information")
+@Title(SERVER_INFO_RESOURCE + "serverinfo.title")
+@Description(SERVER_INFO_RESOURCE + "serverinfo.description")
 public class ServerInfo {
 
-    @Title("Cookie domains")
-    @Description("")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.domains.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.domains.description")
     public Set<String> domains;
 
-    @Title("Protected user attributes")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.protectedUserAttributes.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.protectedUserAttributes.description")
     public Set<String> protectedUserAttributes;
 
-    @Title("Cookie Name")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.cookieName.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.cookieName.description")
     public String cookieName;
 
-    @Title("Secure Cookie")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.secureCookie.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.secureCookie.description")
     public boolean secureCookie;
 
-    @Title("Forgot password")
-    @Description("True if forgotten password is enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.forgotPassword.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.forgotPassword.description")
     public String forgotPassword;
 
-    @Title("Forgot username")
-    @Description("True if forgotten username is enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.forgotUsername.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.forgotUsername.description")
     public String forgotUsername;
 
-    @Title("Security Question")
-    @Description("True if security questions are enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.kbaEnabled.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.kbaEnabled.description")
     public String kbaEnabled;
 
-    @Title("User self registration")
-    @Description("True if user self registration is enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.selfRegistration.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.selfRegistration.description")
     public String selfRegistration;
 
-    @Title("Locale")
-    @Description("The locale")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.lang.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.lang.description")
     public String lang;
 
-    @Title("Successful user registration destination")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.successfulUserRegistrationDestination.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.successfulUserRegistrationDestination.description")
     public String successfulUserRegistrationDestination;
 
-    @Title("Social authentication implementations")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.socialImplementations.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.socialImplementations.description")
     public List<SocialAuthenticationImplementation> socialImplementations;
 
-    @Title("Referrals enabled")
-    @Description("True if referrals are enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.referralsEnabled.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.referralsEnabled.description")
     public String referralsEnabled;
 
-    @Title("Zero page login config")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.zeroPageLogin.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.zeroPageLogin.description")
     public ZeroPageLoginConfig zeroPageLogin;
 
-    @Title("Realm")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.realm.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.realm.description")
     public String realm;
 
-    @Title("XUI user session validation enabled")
-    @Description("True if XUI user session validation is enabled")
+    @Title(SERVER_INFO_RESOURCE + "serverinfo.xuiUserSessionValidationEnabled.title")
+    @Description(SERVER_INFO_RESOURCE + "serverinfo.xuiUserSessionValidationEnabled.description")
     public boolean xuiUserSessionValidationEnabled;
 }

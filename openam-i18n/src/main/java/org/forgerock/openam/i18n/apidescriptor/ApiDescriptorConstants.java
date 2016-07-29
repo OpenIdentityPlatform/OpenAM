@@ -88,6 +88,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to {@code RecordResource} resource location **/
     public static final String RECORD_RESOURCE = TRANSLATION_KEY_PREFIX + "RecordResource#";
 
+    /** Constant used as key to Locate ServerInfo resource translations **/
+    public static final String SERVER_INFO_RESOURCE = TRANSLATION_KEY_PREFIX + "ServerInfoResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

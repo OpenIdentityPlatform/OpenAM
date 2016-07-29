@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.server;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.server.SelfServiceInfo.SelfServiceInfoBuilder;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -32,12 +33,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.api.annotations.Action;
 import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -85,13 +88,14 @@ import com.sun.identity.sm.ServiceConfigManager;
  * <p>
  * This resources acts as a read only resource for the moment.
  */
-@CollectionProvider(details = @Handler(mvccSupported = false, title = "Server Information",
-        description = "Provides information about the OpenAM instance for machine clients to use.",
+@CollectionProvider(details = @Handler(mvccSupported = false,
+        title = SERVER_INFO_RESOURCE + TITLE,
+        description = SERVER_INFO_RESOURCE + DESCRIPTION,
         resourceSchema = @Schema(fromType = ServerInfo.class)),
         pathParam = @Parameter(
                 name = "id", type = "string",
                 enumTitles = {"All data", "Cookie Domains"}, enumValues = {"*", "cookieDomains"},
-                description = "Server Information Identifier"))
+                description = SERVER_INFO_RESOURCE + "pathParam.description"))
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
@@ -334,7 +338,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    @Read(operationDescription = @Operation(description = "Read the server information instance."))
+    @Read(operationDescription = @Operation(description = SERVER_INFO_RESOURCE + "operation.read.description"))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
