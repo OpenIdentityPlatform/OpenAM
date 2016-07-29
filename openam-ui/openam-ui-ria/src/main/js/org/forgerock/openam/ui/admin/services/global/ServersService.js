@@ -21,12 +21,12 @@ define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Promise"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, JSONSchema, JSONValues, Promise) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/servers`);
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     const DEFAULT_SERVER = "server-default";
     const ADVANCED_SECTION = "advanced";
     const isDefaultServer = (serverId) => serverId === "server-defaults";
@@ -41,13 +41,13 @@ define([
     }, {});
 
     const getSchema = (server, section) => obj.serviceCall({
-        url: `/${server}/properties/${section}?_action=schema`,
+        url: fetchUrl.legacy(`/global-config/servers/${server}/properties/${section}?_action=schema`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST"
     }).then((response) => new JSONSchema(response));
 
     const getValues = (server, section) => obj.serviceCall({
-        url: `/${server}/properties/${section}`,
+        url: fetchUrl.legacy(`/global-config/servers/${server}/properties/${section}`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
     }).then((response) => {
         if (section === ADVANCED_SECTION) {
@@ -62,7 +62,7 @@ define([
             modifiedData = arrayToObject(data[ADVANCED_SECTION]);
         }
         return obj.serviceCall({
-            url: `/${id}/properties/${section}`,
+            url: fetchUrl.legacy(`/global-config/servers/${id}/properties/${section}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(modifiedData)
@@ -71,7 +71,7 @@ define([
 
     obj.servers = {
         clone: (id, clonedUrl) => obj.serviceCall({
-            url: `/${id}?_action=clone`,
+            url: fetchUrl.legacy(`/global-config/servers/${id}?_action=clone`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify({ clonedUrl })
@@ -101,20 +101,20 @@ define([
             });
         },
         getUrl: (id) => obj.serviceCall({
-            url: `/${id}`,
+            url: fetchUrl.legacy(`/global-config/servers/${id}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then((response) => response.url, () => undefined),
         getAll: () => obj.serviceCall({
-            url: "?_queryFilter=true",
+            url: fetchUrl.legacy("/global-config/servers?_queryFilter=true", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then((response) => _.reject(response.result, { "_id" : DEFAULT_SERVER })),
         remove: (id) => obj.serviceCall({
-            url: `/${id}`,
+            url: fetchUrl.legacy(`/global-config/servers/${id}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "DELETE"
         }),
         create:  (data) => obj.serviceCall({
-            url: "?_action=create",
+            url: fetchUrl.legacy("/global-config/servers?_action=create", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data)

@@ -23,14 +23,15 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Promise"
-], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, Promise) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/sites`);
+], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
 
     const getSchema = () => obj.serviceCall({
-        url: "?_action=schema",
+        url: fetchUrl.legacy("/global-config/sites?_action=schema", { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST",
         success: (data) => {
@@ -41,7 +42,7 @@ define([
     });
 
     const getValues = (id) => obj.serviceCall({
-        url: `/${id}`,
+        url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         success: (data, jqXHR) => {
             data.etag = jqXHR.getResponseHeader("ETag");
@@ -51,7 +52,7 @@ define([
 
     const getTemplate = () =>
         obj.serviceCall({
-            url: "?_action=template",
+            url: fetchUrl.legacy("/global-config/sites?_action=template", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -59,7 +60,7 @@ define([
     obj.sites = {
         getAll: () =>
             obj.serviceCall({
-                url: "?_queryFilter=true",
+                url: fetchUrl.legacy("/global-config/sites?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((data) => _.sortBy(data.result, "_id")),
         get: (id) =>
@@ -69,21 +70,21 @@ define([
             })),
         create: (data) =>
             obj.serviceCall({
-                url: "?_action=create",
+                url: fetchUrl.legacy("/global-config/sites?_action=create", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(_.omit(data, ["servers"]))
             }),
         update: (id, data, etag) =>
             obj.serviceCall({
-                url: `/${id}`,
+                url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "PUT",
                 data: JSON.stringify(filterUnEditableProperties(data))
             }),
         remove: (id, etag) => {
             const remove = (id, etag) => obj.serviceCall({
-                url: `/${id}`,
+                url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
             });

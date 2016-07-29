@@ -18,14 +18,11 @@
  * @module org/forgerock/openam/ui/admin/services/global/ScriptsService
  */
 define([
-    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
-    "org/forgerock/openam/ui/common/util/Promise",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, Promise, RealmHelper) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/global-config/services/scripting`);
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], (AbstractDelegate, Constants, fetchUrl) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     obj.scripts = {
         /**
@@ -34,7 +31,7 @@ define([
          */
         getAllContexts () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm("/contexts?_queryFilter=true"),
+                url: fetchUrl.legacy("/global-config/services/scripting/contexts?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
@@ -45,7 +42,7 @@ define([
          */
         getDefaultGlobalContext () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm(""),
+                url: fetchUrl.legacy("/global-config/services/scripting", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
@@ -56,7 +53,7 @@ define([
          */
         getSchema () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm("?_action=schema"),
+                url: fetchUrl.legacy("/global-config/services/scripting?_action=schema", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
@@ -68,7 +65,7 @@ define([
          */
         getContextSchema () {
             return obj.serviceCall({
-                url: RealmHelper.decorateURLWithOverrideRealm("/contexts?_action=schema"),
+                url: fetchUrl.legacy("/global-config/services/scripting/contexts?_action=schema", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
