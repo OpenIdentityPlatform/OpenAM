@@ -38,6 +38,9 @@
         <property name="version.set" value="${openam.version}"/>
         <property name="opendj.repackage.dir" value="${project.build.directory}/repackage-opendj"/>
 
+
+        <filter token="FULL_VERSION_INFO" value="${full.version.information}"/>
+
         <filter token="DATESTAMP" value="${war.time.stamp}"/>
         <filter token="VERSION" value="${version.set}"/>
         <filter token="REVISION" value="${git.short.sha1}"/>

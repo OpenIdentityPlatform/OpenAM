@@ -50,6 +50,8 @@
         <third.party.legal.directory>legal</third.party.legal.directory>
         <!-- Default value for whether the build is running in oem mode -->
         <is.oem.build>false</is.oem.build>
+
+        <full.version.information>@VERSION@ Build @REVISION@ (@DATESTAMP@)</full.version.information>
     </properties>
 
     <!-- Build -->
@@ -627,6 +629,12 @@
                     <artifactId>openam-time-travel</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>suppress-upgrade</id>
+            <properties>
+                <full.version.information></full.version.information>
+            </properties>
         </profile>
     </profiles>
 
