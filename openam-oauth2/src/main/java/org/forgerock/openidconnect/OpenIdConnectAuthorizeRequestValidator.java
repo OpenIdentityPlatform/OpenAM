@@ -93,8 +93,8 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
             if (CollectionUtils.isEmpty(requestedScopes)) {
                 requestedScopes = clientRegistration.getDefaultScopes();
             }
-            if (requestedScopes.contains(OPENID) != responseTypes.contains(ID_TOKEN)) {
-                throw new InvalidRequestException("Expected the openid scope with the response type Id_token",
+            if (!requestedScopes.contains(OPENID) && responseTypes.contains(ID_TOKEN)) {
+                throw new InvalidRequestException("Missing expected scope=openid from request",
                         Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
             } else if (requestedScopes.contains(OPENID)) {
                 validateNonce(request, responseTypes);
