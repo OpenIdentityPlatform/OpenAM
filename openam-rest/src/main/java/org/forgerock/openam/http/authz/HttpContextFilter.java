@@ -15,18 +15,26 @@
  */
 package org.forgerock.openam.http.authz;
 
-import javax.inject.Inject;
+import static org.forgerock.caf.authentication.framework.AuthenticationFramework.ATTRIBUTE_AUTH_CONTEXT;
 
-import org.forgerock.authz.filter.http.api.HttpAuthorizationContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * A Filter implementation that injects the required OpenAM contexts into the context hierarchy.
@@ -35,10 +43,12 @@ import org.forgerock.util.promise.Promise;
  */
 public class HttpContextFilter implements Filter {
 
+    private final Debug debug;
     private final SSOTokenContext.Factory ssoTokenContextFactory;
 
     @Inject
-    public HttpContextFilter(SSOTokenContext.Factory ssoTokenContextFactory) {
+    public HttpContextFilter(@Named("frRest") Debug debug, SSOTokenContext.Factory ssoTokenContextFactory) {
+        this.debug = debug;
         this.ssoTokenContextFactory = ssoTokenContextFactory;
     }
 
@@ -53,9 +63,10 @@ public class HttpContextFilter implements Filter {
 
     private Context addSecurityContext(Context context) {
         if (!context.containsContext(SecurityContext.class)) {
-            HttpAuthorizationContext authorizationContext = HttpAuthorizationContext.forRequest(context);
-            String tokenId = authorizationContext.getAttribute("tokenId");
-            context = new SecurityContext(context, tokenId, authorizationContext.getAttributes());
+            Map<String, Object> attributes = context.asContext(AttributesContext.class).getAttributes();
+            Map<String, Object> contextMap = asMap(attributes.get(ATTRIBUTE_AUTH_CONTEXT));
+            String tokenId = (String) contextMap.get("tokenId");
+            context = new SecurityContext(context, tokenId, contextMap);
         }
         return context;
     }
@@ -65,5 +76,15 @@ public class HttpContextFilter implements Filter {
             context = ssoTokenContextFactory.create(context);
         }
         return context;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> asMap(Object object) {
+        try {
+            return (Map) object;
+        } catch (ClassCastException e) {
+            debug.error("Invalid object found in authorization context attribute", e);
+            return new LinkedHashMap<>();
+        }
     }
 }

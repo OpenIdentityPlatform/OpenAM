@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.http.authz;
 
-import static org.forgerock.authz.filter.api.AuthorizationResult.accessDenied;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Map;
@@ -23,18 +22,20 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.authz.filter.api.AuthorizationContext;
-import org.forgerock.authz.filter.api.AuthorizationException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
-import org.forgerock.authz.filter.http.api.HttpAuthorizationModule;
+import org.forgerock.http.Filter;
+import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.authz.PrivilegeDefinition;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
@@ -45,7 +46,7 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  *
  * @since 14.0.0
  */
-public class HttpPrivilegeAuthzModule extends PrivilegeAuthzModule implements HttpAuthorizationModule {
+public class HttpPrivilegeAuthzModule extends PrivilegeAuthzModule implements Filter {
 
     /**
      * Create a new instance of {@link HttpAuthorizationModule}.
@@ -64,23 +65,26 @@ public class HttpPrivilegeAuthzModule extends PrivilegeAuthzModule implements Ht
     }
 
     @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public Promise<AuthorizationResult, AuthorizationException> authorize(Context context, Request request,
-            AuthorizationContext authorizationContext) {
+    public Promise<Response, NeverThrowsException> filter(Context context, Request request, Handler next) {
         String method = request.getMethod();
         PrivilegeDefinition definition = actionToDefinition.get(method);
         if (definition == null) {
-            return newResultPromise(accessDenied("No privilege mapping for requested method " + method));
+            return asPromise(new ForbiddenException("No privilege mapping for requested method " + method));
         }
 
         try {
-            return newResultPromise(evaluate(context, definition));
+            AuthorizationResult result = evaluate(context, definition);
+            if (result.isAuthorized()) {
+                return next.handle(context, request);
+            } else {
+                return asPromise(new ForbiddenException(result.getReason()));
+            }
         } catch (InternalServerErrorException e) {
-            return Promises.newExceptionPromise(new AuthorizationException(e.getMessage(), e));
+            return asPromise(new ForbiddenException(e.getMessage(), e));
         }
+    }
+
+    private Promise<Response, NeverThrowsException> asPromise(ForbiddenException e) {
+        return newResultPromise(new Response(Status.FORBIDDEN).setEntity(e.toJsonValue().getObject()));
     }
 }

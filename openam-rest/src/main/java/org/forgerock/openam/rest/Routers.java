@@ -31,8 +31,6 @@ import java.util.Set;
 
 import com.google.inject.Key;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.authz.filter.http.HttpAuthorizationFilter;
-import org.forgerock.authz.filter.http.api.HttpAuthorizationModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
@@ -657,9 +655,9 @@ public class Routers {
          * @param authorizationModule The authorization module.
          * @return This route.
          */
-        public final ServiceRoute authorizeWith(Class<? extends HttpAuthorizationModule> authorizationModule) {
+        public final ServiceRoute authorizeWith(Class<? extends org.forgerock.http.Filter> authorizationModule) {
             Reject.ifNull(authorizationModule);
-            filters.add(new HttpAuthorizationFilter(InjectorHolder.getInstance(authorizationModule)));
+            filters.add(InjectorHolder.getInstance(authorizationModule));
             return this;
         }
 
