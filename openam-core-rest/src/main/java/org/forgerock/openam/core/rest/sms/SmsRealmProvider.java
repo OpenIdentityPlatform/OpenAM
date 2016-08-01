@@ -222,7 +222,7 @@ public class SmsRealmProvider implements RequestHandler {
 
             realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
-            StringBuilder realmPath = new StringBuilder(realmContext.getResolvedRealm());
+            StringBuilder realmPath = new StringBuilder(realmContext.getRealm().asPath());
             String location = jsonContent.get(new JsonPointer(PATH_ATTRIBUTE_NAME)).asString();
 
             if (realmPath.length() > 1) {
@@ -331,7 +331,7 @@ public class SmsRealmProvider implements RequestHandler {
     public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext,
             DeleteRequest request) {
         RealmContext realmContext = serverContext.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         try {
 
@@ -425,7 +425,7 @@ public class SmsRealmProvider implements RequestHandler {
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         if(!request.getResourcePath().isEmpty()) {
             //if the resource path is not empty, the realm has not resolved correctly
@@ -504,19 +504,18 @@ public class SmsRealmProvider implements RequestHandler {
 
     private boolean isActive(OrganizationConfigManager realmManager) throws SMSException {
         Set result = (Set) realmManager.getAttributes(ROOT_SERVICE).get("sunidentityrepositoryservice-sunOrganizationStatus");
-        return result.contains(ACTIVE_VALUE);
+        return result == null || result.contains(ACTIVE_VALUE);
     }
 
     private Set<String> getAliases(OrganizationConfigManager realmManager) throws SMSException {
         Set<String> result = (Set<String>) realmManager.getAttributes(ROOT_SERVICE).get("sunidentityrepositoryservice-sunOrganizationAliases");
-
         return result == null ? (Set) Collections.emptySet() : result;
     }
 
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         try {
             checkValues(request.getContent());

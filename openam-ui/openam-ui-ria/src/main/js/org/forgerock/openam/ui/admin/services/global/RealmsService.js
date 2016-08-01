@@ -22,10 +22,8 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
-    "org/forgerock/openam/ui/common/services/fetchUrl",
-    "org/forgerock/openam/ui/common/util/Promise",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl, Promise, RealmHelper) => {
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], (_, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getRealmPath (realm) {
@@ -38,6 +36,23 @@ define([
         }
     }
 
+    function newEncodeRealm (path) {
+        const encodedPath = [];
+        const realmPath = path.split("/");
+        encodedPath.push("realms");
+        encodedPath.push("root");
+
+        _.each(realmPath, function (pathFragment) {
+            if (pathFragment !== "") {
+                encodedPath.push("realms");
+                encodedPath.push(encodeURIComponent(pathFragment));
+            }
+        });
+
+        return `/${encodedPath.join("/")}`;
+    }
+
+
     obj.realms = {
         /**
          * Gets all realms.
@@ -45,7 +60,7 @@ define([
          */
         all () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/realms?_queryFilter=true", { realm: false }),
+                url: fetchUrl.legacy("/global-config/realms/root?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
                 data.result = _(data.result).each((realm) => {
@@ -61,7 +76,7 @@ define([
          */
         create (data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/realms?_action=create", { realm: false }),
+                url: fetchUrl.legacy("/global-config/realms/root?_action=create", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 suppressEvents: true,
@@ -75,11 +90,8 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            const encodedRealmPath = RealmHelper.encodeRealm(path);
-
-            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.legacy(`/global-config/realms${encodedRealmPath}`, {
-                realm: false
-            }));
+            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.legacy(
+                `/global-config${newEncodeRealm(path)}`, { realm: false }));
         },
 
         /**
@@ -87,7 +99,9 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.legacy("/global-config/realms", { realm: false }));
+            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.legacy("/global-config/realms/root", {
+                realm: false
+            }));
         },
 
         /**
@@ -97,7 +111,7 @@ define([
          */
         remove (path) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/realms${RealmHelper.encodeRealm(path)}`, { realm: false }),
+                url: fetchUrl.legacy(`/global-config${newEncodeRealm(path)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -112,7 +126,7 @@ define([
         update (data) {
             return obj.serviceCall({
                 url: fetchUrl.legacy(
-                    `/global-config/realms${RealmHelper.encodeRealm(getRealmPath(data))}`, { realm: false }),
+                    `/global-config${newEncodeRealm(getRealmPath(data))}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data),

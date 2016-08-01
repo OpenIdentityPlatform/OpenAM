@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest;
 
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AbstractContext;
 import org.forgerock.openam.utils.StringUtils;
@@ -29,6 +31,7 @@ import org.forgerock.util.Pair;
 public class RealmContext extends AbstractContext {
 
     private static final String ROOT_REALM = "/";
+    private final Realm realm;
 
     private Pair<String, String> dnsAliasRealm;
     private Pair<String, String> relativeRealmPath = Pair.of("/", "/");
@@ -39,8 +42,14 @@ public class RealmContext extends AbstractContext {
      *
      * @param parent The parent context.
      */
+    @Deprecated
     public RealmContext(Context parent) {
+        this(parent, null);
+    }
+
+    public RealmContext(Context parent, Realm realm) {
         super(parent, "realm");
+        this.realm = realm;
     }
 
     /**
@@ -52,7 +61,11 @@ public class RealmContext extends AbstractContext {
      *
      * @return The resolved full realm path.
      */
+    @Deprecated
     public String getResolvedRealm() {
+        if (realm != null) {
+            return realm.asPath();
+        }
         if (overrideRealm != null) {
             return overrideRealm;
         }
@@ -76,6 +89,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return True if the resolved realm is the top level realm, false otherwise.
      */
+    @Deprecated
     public boolean isRootRealm() {
         return getResolvedRealm().equals(ROOT_REALM);
     }
@@ -86,6 +100,7 @@ public class RealmContext extends AbstractContext {
      * @param dnsAlias The DNS.
      * @param realmPath The resolved realm.
      */
+    @Deprecated
     public void setDnsAlias(String dnsAlias, String realmPath) {
         dnsAliasRealm = Pair.of(dnsAlias, realmPath);
     }
@@ -97,6 +112,7 @@ public class RealmContext extends AbstractContext {
      * @param realmUri The URI realm path element.
      * @param realm The resolved realm.
      */
+    @Deprecated
     public void setSubRealm(String realmUri, String realm) {
         if ("/".equals(relativeRealmPath.getSecond())) { //Could be a realm alias or a realm path
             realm = getRealm("/", realm);
@@ -112,6 +128,7 @@ public class RealmContext extends AbstractContext {
      *
      * @param realm The resolved realm.
      */
+    @Deprecated
     public void setOverrideRealm(String realm) {
         this.overrideRealm = realm;
     }
@@ -138,6 +155,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return The base realm.
      */
+    @Deprecated
     public String getBaseRealm() {
         if (dnsAliasRealm == null || dnsAliasRealm.getSecond().equals("/")) {
             return relativeRealmPath.getSecond();
@@ -150,6 +168,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return The relative realm.
      */
+    @Deprecated
     public String getRelativeRealm() {
        return relativeRealmPath.getSecond();
     }
@@ -159,6 +178,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return an absolute path-style realm.
      */
+    @Deprecated
     public String getDnsAliasRealm() {
         if (dnsAliasRealm != null) {
             return dnsAliasRealm.getSecond();
@@ -171,6 +191,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return The full rebased realm.
      */
+    @Deprecated
     String getRebasedRealm() {
         if (dnsAliasRealm == null || dnsAliasRealm.getSecond().equals("/")) {
             return relativeRealmPath.getSecond();
@@ -184,8 +205,25 @@ public class RealmContext extends AbstractContext {
      *
      * @return The override realm.
      */
+    @Deprecated
     String getOverrideRealm() {
         return overrideRealm;
+    }
+
+    /**
+     * Gets the realm.
+     *
+     * @return The realm.
+     */
+    public Realm getRealm() {
+        if (realm == null) {
+            try {
+                return Realm.of(getResolvedRealm());
+            } catch (RealmLookupException ignored) {
+                //Cannot happen as validated upfront
+            }
+        }
+        return realm;
     }
 
     /**
@@ -196,6 +234,7 @@ public class RealmContext extends AbstractContext {
      *
      * @return passed realm else defaults to the root realm
      */
+    @Deprecated
     public static String getRealm(Context context) {
         if (!context.containsContext(RealmContext.class)) {
             return ROOT_REALM;

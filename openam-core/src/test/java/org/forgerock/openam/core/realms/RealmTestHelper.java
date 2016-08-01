@@ -17,6 +17,8 @@
 package org.forgerock.openam.core.realms;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -129,6 +131,23 @@ public class RealmTestHelper {
     }
 
     /**
+     * Mocks a {@link Realm} that is mapped to a hostname.
+     *
+     * @param dns The name of the host that maps to the realm.
+     * @param realmParts An array of path elements of the realm to create. Elements cannot contain '/'.
+     * @return A {@code Realm} instance for the provided realm path.
+     */
+    public Realm mockDnsAlias(String dns, String... realmParts) {
+        Realm realm = mockRealm(realmParts);
+        try {
+            when(realmLookup.lookup(dns)).thenReturn(realm);
+            return realm;
+        } catch (RealmLookupException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Mocks a {@link Realm} for the provided realm path.
      *
      * @param realmParts An array of path elements of the realm to create. Elements cannot contain '/'.
@@ -153,6 +172,32 @@ public class RealmTestHelper {
         try {
             when(realmLookup.lookup(realmPath)).thenReturn(realm);
             return realm;
+        } catch (RealmLookupException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Mocks an invalid realm that will cause a {@code RealmLookupException} to be thrown when the
+     * realm is used.
+     *
+     * @param realmParts An array of path elements of the realm to create. Elements cannot contain '/'.
+     */
+    public void mockInvalidRealm(String... realmParts) {
+        Reject.ifNull(realmParts);
+        for (String realm : realmParts) {
+            Reject.ifTrue(realm.contains("/"), "realm part cannot contain '/'");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String realm : realmParts) {
+            sb.append(REALM_DN_PREFIX).append(realm).append(",");
+        }
+        sb.append(SERVICES_DN).append(",").append(BASE_DN);
+        String realmPath = "/" + StringUtils.join(realmParts, "/");
+        try {
+            RealmLookupException exception = mock(RealmLookupException.class);
+            when(exception.getRealm()).thenReturn(realmPath);
+            doThrow(exception).when(realmLookup).lookup(realmPath);
         } catch (RealmLookupException e) {
             throw new RuntimeException(e);
         }

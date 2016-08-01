@@ -27,6 +27,8 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  */
 public class RealmLookupException extends L10NMessageImpl {
 
+    private final String realm;
+
     /**
      * Constructs a new exception with the specified detail message and cause.
      *
@@ -35,6 +37,7 @@ public class RealmLookupException extends L10NMessageImpl {
      */
     public RealmLookupException(String errorCode, String realm) {
         super(IdRepoBundle.BUNDLE_NAME, errorCode, new Object[]{realm});
+        this.realm = realm;
     }
 
     /**
@@ -44,5 +47,15 @@ public class RealmLookupException extends L10NMessageImpl {
      */
     public RealmLookupException(Throwable cause) {
         super(cause);
+        this.realm = null;
+    }
+
+    /**
+     * Gets the realm that could not be found.
+     *
+     * @return The realm.
+     */
+    public String getRealm() {
+        return realm;
     }
 }

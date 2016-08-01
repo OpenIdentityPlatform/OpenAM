@@ -67,6 +67,7 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
+@Deprecated
 public class RealmContextFilter implements Filter, org.forgerock.json.resource.Filter {
 
     private final CoreWrapper coreWrapper;
@@ -218,6 +219,10 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
     private Context evaluate(Context context, String hostname, List<String> requestUri,
             List<String> overrideRealmParameter) throws ResourceException {
+
+        if (context.containsContext(RealmContext.class)) {
+            return context;
+        }
 
         if (!coreWrapper.isValidFQDN(hostname)) {
             throw new BadRequestException("FQDN \"" + hostname + "\" is not valid.");

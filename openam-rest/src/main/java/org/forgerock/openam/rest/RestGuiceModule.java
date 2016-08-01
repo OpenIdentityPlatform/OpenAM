@@ -17,8 +17,16 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
+import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionContextFilter;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
+import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -28,7 +36,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
@@ -40,27 +47,21 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.json.resource.Applications;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.CrestApplication;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.forgerock.json.resource.Applications;
-import org.forgerock.json.resource.Resources;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Guice module for bindings for the REST routers and route registration.
@@ -158,8 +159,12 @@ public class RestGuiceModule extends AbstractModule {
     @Singleton
     org.forgerock.http.routing.Router getChfRootRouter(
             @Named("ChfRealmRouter") org.forgerock.http.routing.Router chfRealmRouter,
-            RealmContextFilter realmContextFilter) {
+            RealmContextFilter realmContextFilter, RealmRoutingFactory realmRoutingFactory) {
         org.forgerock.http.routing.Router chfRootRouter = new org.forgerock.http.routing.Router();
+        chfRootRouter.addRoute(requestUriMatcher(STARTS_WITH, REALM_ROUTE),
+                Handlers.chainOf(realmRoutingFactory.createRouter(chfRootRouter),
+                        realmRoutingFactory.createHostnameFilter()));
+
         chfRootRouter.setDefaultRoute(Handlers.chainOf(chfRealmRouter, realmContextFilter));
         return chfRootRouter;
     }

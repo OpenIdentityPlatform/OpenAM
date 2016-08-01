@@ -16,11 +16,16 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.http.routing.RoutingMode.*;
-import static org.forgerock.json.resource.Resources.*;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.resource.Resources.newAnnotatedRequestHandler;
+import static org.forgerock.json.resource.Resources.newCollection;
 import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
+import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -33,41 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Predicate;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
-import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
-import org.forgerock.openam.rest.RealmContextFilter;
-import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.RealmNormaliser;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.routing.RouteMatcher;
-import org.forgerock.util.promise.Promise;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
@@ -85,6 +55,36 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.routing.RoutingMode;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.openam.rest.RealmRoutingFactory;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.routing.RouteMatcher;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -110,7 +110,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
-    private final RealmContextFilter realmContextFilter;
+    private final RealmRoutingFactory realmRoutingFactory;
     private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceSingletons = new HashMap<>();
     private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceCollections = new HashMap<>();
     private final RealmNormaliser realmNormaliser;
@@ -128,7 +128,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
-            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
+            RealmRoutingFactory realmRoutingFactory, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
             CrestPrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
             PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler,
@@ -143,7 +143,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.coreWrapper = coreWrapper;
         this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
-        this.realmContextFilter = realmContextFilter;
+        this.realmRoutingFactory = realmRoutingFactory;
         this.servicesRealmSmsHandler = servicesRealmSmsHandler;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
@@ -216,11 +216,11 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
-    //routes under global-config/realms route
+    //routes under global-config/realms/{realms} route
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(new SmsRealmProvider(
-                    sessionCache, coreWrapper, realmNormaliser), realmContextFilter));
+            routeTree.addRoute(RoutingMode.STARTS_WITH, REALM_ROUTE, realmRoutingFactory.createRouter(
+                    new SmsRealmProvider(sessionCache, coreWrapper, realmNormaliser)));
         }
     }
 

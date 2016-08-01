@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.audit.rest;
 
-import static org.forgerock.http.routing.RoutingMode.*;
-import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.openam.audit.AuditConstants.Component.AUDIT;
 
 import javax.inject.Inject;
 
@@ -38,7 +38,6 @@ import org.forgerock.openam.audit.AMAuditService;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.authz.SpecialOrAdminOrAgentAuthzModule;
@@ -79,7 +78,6 @@ public class AuditRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(AUDIT, AuditEndpointAuditFilter.class)
                 .authorizeWith(SpecialOrAdminOrAgentAuthzModule.class)
                 .forVersion(1)
-                .through(RealmContextFilter.class)
                 .toRequestHandler(
                         STARTS_WITH, new RequestHandler() {
                             @Override

@@ -19,6 +19,7 @@ package org.forgerock.openam.core.realms;
 import javax.inject.Inject;
 
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.util.Reject;
 
 /**
  * Models a valid realm within OpenAM.
@@ -83,6 +84,31 @@ public class Realm {
      */
     public static Realm of(String realm) throws RealmLookupException {
         return realmLookup.lookup(realm);
+    }
+
+    /**
+     * Uses the {@literal realm} as the parent realm and the {@literal subRealm} as sub-realm to
+     * lookup the Realm.
+     *
+     * @param realm The parent realm.
+     * @param subRealm The sub-realm.
+     * @return A {@code Realm} instance of the concatenation of {@literal realm} and
+     * {@literal subRealm}.
+     * @throws RealmLookupException If the provided {@literal realm} and {@literal subRealm} do not
+     * constitute a valid realm or failed to be resolved/
+     */
+    public static Realm of(Realm realm, String subRealm) throws RealmLookupException {
+        return realmLookup.lookup(concatenateRealmElements(realm, subRealm));
+    }
+
+    private static String concatenateRealmElements(Realm parentRealm, String realmElement) {
+        Reject.ifNull(parentRealm, realmElement);
+        Reject.ifTrue(realmElement.contains("/"), "realmElement cannot contain '/'");
+        if (parentRealm.equals(root())) {
+            return root().asPath() + realmElement;
+        } else {
+            return parentRealm.asPath() + "/" + realmElement;
+        }
     }
 
     private final String path;
