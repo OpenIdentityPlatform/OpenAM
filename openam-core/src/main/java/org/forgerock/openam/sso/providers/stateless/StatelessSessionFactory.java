@@ -129,6 +129,7 @@ public class StatelessSessionFactory {
     public SessionInfo getSessionInfo(SessionID sessionID) throws SessionException {
         String jwt = getJWTFromSessionID(sessionID, true);
         if (cache.contains(jwt)) {
+            debug.message("StatelessSessionFactory.getSessionInfo: JWT {} found in cache", jwt);
             return cache.getSessionInfo(jwt);
         }
 
@@ -136,6 +137,7 @@ public class StatelessSessionFactory {
         try {
             sessionInfo = getJwtSessionMapper().fromJwt(jwt);
         } catch (JwtRuntimeException e) {
+            debug.message("StatelessSessionFactory.getSessionInfo: JWT {} Does not map to passed sessionID {}", jwt, sessionID, e);
             throw new SessionException(e);
         }
         cache.cache(sessionInfo, jwt);
@@ -217,7 +219,7 @@ public class StatelessSessionFactory {
             }
             return statelessSession.getTimeLeft() >= 0;
         } catch (SessionException e) {
-            debug.message("Failed to validate JWT {0}", tokenId, e);
+            debug.message("Failed to validate JWT {}", tokenId, e);
             return false;
         }
     }
