@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -29,6 +29,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.OAuth2ProviderNotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.OAuth2Constants;
@@ -127,7 +128,7 @@ public class OAuth2ProviderSettingsFactory implements ServiceListener {
                 if (providerSettings.exists()) {
                     providerSettingsMap.put(realm, providerSettings);
                 } else {
-                    throw new NotFoundException("No OpenID Connect provider for realm " + realm);
+                    throw new OAuth2ProviderNotFoundException("No OpenID Connect provider for realm " + realm);
                 }
             }
             return providerSettings;

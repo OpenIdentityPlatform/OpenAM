@@ -29,6 +29,7 @@ import org.forgerock.oauth2.core.exceptions.CsrfException;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.OAuth2ProviderNotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
@@ -133,6 +134,9 @@ public class AuthorizeResource extends ConsentRequiredResource {
                     request.<String>getParameter("state"));
         } catch (DuplicateRequestParameterException e) {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
+                    request.<String>getParameter("state"));
+        } catch (OAuth2ProviderNotFoundException e) {
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
