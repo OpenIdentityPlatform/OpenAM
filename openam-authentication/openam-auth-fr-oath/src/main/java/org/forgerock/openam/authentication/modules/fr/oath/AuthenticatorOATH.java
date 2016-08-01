@@ -19,6 +19,31 @@ package org.forgerock.openam.authentication.modules.fr.oath;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.codec.DecoderException;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.qr.GenerationUtils;
+
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
@@ -39,28 +64,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.codec.DecoderException;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
-import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.qr.GenerationUtils;
 
 /**
  * Implements the OATH specification. OATH uses a OTP to authenticate
@@ -120,6 +123,8 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final int TOTP = 1;
     private static final int ERROR = 2;
     private int algorithm = 0;
+
+    private boolean outOfSync = false;
 
     protected String amAuthOATH = null;
 
@@ -432,10 +437,14 @@ public class AuthenticatorOATH extends AMLoginModule {
             //the OTP is out of the window or incorrect
             if (++attempt >= TOTAL_ATTEMPTS) {
                 setFailureID(userName);
-                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                if (outOfSync) {
+                    throw new InvalidPasswordException(amAuthOATH, "outOfSync", null);
+                } else {
+                    throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                }
             }
 
-            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            replaceHeader(state, MODULE_NAME + " Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
             return state;
         }
     }
@@ -681,7 +690,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
                 if (lastLoginTimeStep == localTime) {
                     debug.error("OATH.checkOTP(): Login failed attempting to use the same OTP in same Time Step: " + localTime);
-                    throw new InvalidPasswordException(amAuthOATH, "authFailed", null, userName, null);
+                    return false;
                 }
 
                 boolean sameWindow = false;
@@ -700,8 +709,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                 otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(localTime), passLenStr);
 
                 if (isEqual(otpGen, otp)) {
-                    setLoginTime(id, localTime, settings);
-                    return true;
+                    return setLoginTime(id, localTime, settings);
                 }
 
                 for (int i = 1; i <= totpStepsInWindow; i++) {
@@ -712,8 +720,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                     otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(time1), passLenStr);
 
                     if (isEqual(otpGen, otp)) {
-                        setLoginTime(id, time1, settings);
-                        return true;
+                        return setLoginTime(id, time1, settings);
                     }
 
                     //check time step before current time
@@ -724,8 +731,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                                 "than the current times OTP");
                         return false;
                     } else if (isEqual(otpGen, otp) && !sameWindow) {
-                        setLoginTime(id, time2, settings);
-                        return true;
+                        return setLoginTime(id, time2, settings);
                     }
                 }
 
@@ -780,25 +786,28 @@ public class AuthenticatorOATH extends AMLoginModule {
     }
 
     /**
-     * Sets the last login time of a user.
+     * Sets the last login time of a user after checking that the clock drift hasn't spread too far from the config's
+     * allowed settings.
      *
      * @param id   The id of the user to set the attribute of.
      * @param time The time <strong>step</strong> to set the attribute to.
      * @param settings The settings to store the value in.
+     * @return {@code false} if the device is out of drift range, {@code true} if device profile has been saved.
      */
-    private void setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
+    private boolean setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
             throws AuthLoginException, IOException {
-        settings.setLastLogin(time * totpTimeStep, TimeUnit.SECONDS);
 
         // Update the observed time-step drift for resynchronisation
         long drift = time - (this.time / totpTimeStep);
         if (Math.abs(drift) > totpMaxClockDrift) {
-            setFailureID(userName);
-            throw new AuthLoginException(amAuthOATH, "outOfSync", null);
+            outOfSync = true;
+            return false;
         }
 
+        settings.setLastLogin(time * totpTimeStep, TimeUnit.SECONDS);
         settings.setClockDriftSeconds((int) drift * totpTimeStep);
         oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
+        return true;
     }
 
     /**

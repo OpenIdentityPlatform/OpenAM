@@ -156,7 +156,7 @@
                                  i18nKey="a514"
                                  resourceName="totpMaximumClockDrift">
                     <DefaultValues>
-                        <Value>0</Value>
+                        <Value>5</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-fr-oath-issuer-name"
@@ -281,7 +281,7 @@
                                     i18nKey="a514"
                                     resourceName="totpMaximumClockDrift">
                         <DefaultValues>
-                            <Value>0</Value>
+                            <Value>5</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-fr-oath-issuer-name"
