@@ -557,7 +557,7 @@ public class QueryClient {
                         LogUtil.INVALID_ISSUER_RESPONSE,
                         args);
                 throw new SAML2Exception(
-                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuerInResponse");
+                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuerInResponse", args);
             }
             // verify signed response
             verifySignedResponse(pepEntityID,pdpEntityID, samlResponse);
