@@ -25,6 +25,7 @@
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.saml2.profile;
 
@@ -675,10 +676,10 @@ public class SPACSUtils {
                         data,
                         null);
             SAMLUtils.sendError(request, response, 
-                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuer",
-                SAML2Utils.bundle.getString("invalidIssuer"));
+                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuerInResponse",
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
             throw new SAML2Exception(
-                SAML2Utils.bundle.getString("invalidIssuer"));
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
         }
 
         // check time?

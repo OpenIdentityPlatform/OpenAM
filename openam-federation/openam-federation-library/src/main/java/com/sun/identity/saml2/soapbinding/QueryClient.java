@@ -25,6 +25,7 @@
  * $Id: QueryClient.java,v 1.9 2009/10/29 00:19:21 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.saml2.soapbinding;
 
@@ -548,15 +549,15 @@ public class QueryClient {
             if (!isTrusted) {
                 if (debug.messageEnabled()) {
                     debug.message(classMethod +
-                            "Issuer in Request is not valid.");
+                            "Issuer in Response is not valid.");
                 }
                 String[] args = {realm, pepEntityID, issuerID};
                 
                 LogUtil.error(Level.INFO,
-                        LogUtil.INVALID_ISSUER_IN_PEP_REQUEST,
+                        LogUtil.INVALID_ISSUER_RESPONSE,
                         args);
                 throw new SAML2Exception(
-                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuer",args);
+                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuerInResponse");
             }
             // verify signed response
             verifySignedResponse(pepEntityID,pdpEntityID, samlResponse);
