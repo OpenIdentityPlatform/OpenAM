@@ -91,6 +91,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to Locate ServerInfo resource translations **/
     public static final String SERVER_INFO_RESOURCE = TRANSLATION_KEY_PREFIX + "ServerInfoResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String UMA_LABEL_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaLabelResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

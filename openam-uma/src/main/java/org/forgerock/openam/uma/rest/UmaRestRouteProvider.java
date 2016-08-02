@@ -61,6 +61,6 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(UmaLabelResource.class);
+                .toAnnotatedCollection(UmaLabelResource.class);
     }
 }
