@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api;
 
@@ -58,10 +58,6 @@ public class CoreTokenConstants {
     /**
      * Globals public Constants, so not to pollute entire product.
      */
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX =
-            "iplanet-am-session-sfo-store-root-suffix";
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
-            "iplanet-am-session-sfo-store-type";
     public static final String SYS_PROPERTY_EXPIRED_SEARCH_LIMIT =
             "forgerock-openam-session-expired-search-limit";
     public static final String DEBUG_NAME = "amSessionRepository";

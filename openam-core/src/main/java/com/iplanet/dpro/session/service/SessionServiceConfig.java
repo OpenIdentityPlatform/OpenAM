@@ -356,7 +356,7 @@ public class SessionServiceConfig {
                 @Override
                 public void performUpdate() {
                     try {
-                        loadSessionFailover();
+                        loadReducedCrosstalkProperties();
                         hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
                     } catch (SSOException | SMSException e) {
                         throw new IllegalStateException(e);
@@ -367,7 +367,7 @@ public class SessionServiceConfig {
                     .global(action)
                     .schema(action).listen();
 
-            loadSessionFailover();
+            loadReducedCrosstalkProperties();
 
         } catch (Exception ex) {
             sessionDebug.error("SessionService: Initialization Failed", ex);
@@ -376,7 +376,7 @@ public class SessionServiceConfig {
         }
     }
 
-    private synchronized void loadSessionFailover() throws SSOException, SMSException {
+    private synchronized void loadReducedCrosstalkProperties() throws SSOException, SMSException {
         SSOToken adminToken = AccessController.doPrivileged(dsameAdminTokenProvider);
 
         ServiceConfigManager scm = new ServiceConfigManager(AM_SESSION_SERVICE_NAME, adminToken);

@@ -29,6 +29,23 @@
 
 package com.sun.identity.cli;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.SessionCache;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -37,22 +54,6 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.DisplayUtils;
 import com.sun.identity.common.SearchResults;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.session.SessionCache;
-
-import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-
-import static org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP;
 
 /**
  * Displays active sessions.
@@ -267,22 +268,19 @@ public class SessionCommand extends AuthenticatedCommand {
         try {
             String currentSessionHandler = curSession.getProperty(
                 SESSION_HANDLE_PROP);
-            SearchResults result = curSession.getValidSessions(name, null);
+            SearchResults<Session> result = curSession.getValidSessions(name, null);
             String warning = getSearchResultWarningMessage(result);
             if (warning.length() > 0) {
                 output.printlnMessage(warning);
             }
 
-            Map<String, Session> sessions = (Map<String, Session>) result.getResultAttributes();
+            List<Session> sessions = result.getSearchResults();
             boolean isCurrentSession = false;
             int i = 0;
                                                                                 
-            for (Iterator iter = (Iterator)sessions.values().iterator();
-                iter.hasNext();
-            ) {
+            for (Session sess : sessions) {
                 boolean isCurr = false;
-                Session sess = (Session)iter.next();
-                                                                                
+
                 // need to check current session only if we have not found it.
                 if (!isCurrentSession) {
                     try {

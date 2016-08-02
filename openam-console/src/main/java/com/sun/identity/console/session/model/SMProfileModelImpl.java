@@ -24,12 +24,28 @@
  *
  * $Id: SMProfileModelImpl.java,v 1.5 2008/06/25 05:43:21 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.session.model;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -41,19 +57,6 @@ import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.sm.SMSException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
 
 /* - LOG COMPLETE - */
 
@@ -108,13 +111,12 @@ public class SMProfileModelImpl extends AMModelBase
         try {
             Session session = sessionCache.getSession(
                     new SessionID(getUserSSOToken().getTokenID().toString()));
-            SearchResults result = session.getValidSessions(
+            SearchResults<Session> result = session.getValidSessions(
                 serverName, pattern);
-            Map<String, Session> sessions = (Map<String, Session>) result.getResultAttributes();
+            List<Session> sessions = result.getSearchResults();
             String errorMessage =
                 AMAdminUtils.getSearchResultWarningMessage(result, this);
-            smSessionCache = new SMSessionCache(
-                sessions.values(), errorMessage, this);
+            smSessionCache = new SMSessionCache(sessions, errorMessage, this);
             logEvent("SUCCEED_GET_CURRENT_SESSIONS", params);
         } catch (SessionException se) {
             String strError = getErrorString(se);
@@ -143,13 +145,13 @@ public class SMProfileModelImpl extends AMModelBase
         Map<String, Session> sessions = Collections.emptyMap();
 
         try {
-            SearchResults result = session.getValidSessions(serverName, pattern);
-            Map<String, Session> validSessions = result.getResultAttributes();
+            SearchResults<Session> result = session.getValidSessions(serverName, pattern);
+            List<Session> validSessions = result.getSearchResults();
 
             if ((validSessions != null) && !validSessions.isEmpty()) {
-                sessions = new HashMap<String, Session>(validSessions.size());
+                sessions = new HashMap<>(validSessions.size());
 
-                for (Session s : validSessions.values()) {
+                for (Session s : validSessions) {
                     if (s != null) {
                         sessions.put(s.getID().toString(), s);
                     }

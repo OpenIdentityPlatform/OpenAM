@@ -101,13 +101,13 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.DNUtils;
+import com.sun.identity.common.SearchResults;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.DecodeAction;
@@ -240,11 +240,7 @@ public class SessionService {
                 maxSessionStats = null;
             }
 
-            // **************************************************************************
-            // Now Bootstrap CoreTokenService (CTS) Implementation, if one was specified.
             if (coreTokenService == null) {
-                // Instantiate our Session Repository Implementation.
-                // Allows Static Elements to Initialize.
                 coreTokenService = getRepository();
                 sessionDebug.message("amTokenRepository Implementation: " +
                         ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
@@ -651,9 +647,10 @@ public class SessionService {
     /**
      * Get all valid Internal Sessions matched with pattern.
      */
-    private List<InternalSession> getValidInternalSessions(String pattern, int[] status)
+    private SearchResults<InternalSession> getValidInternalSessions(String pattern)
             throws SessionException {
-        List<InternalSession> sessions = new ArrayList<InternalSession>();
+        List<InternalSession> sessions = new ArrayList<>();
+        int status = SearchResults.SUCCESS;
 
         if (pattern == null) {
             pattern = "*";
@@ -686,14 +683,14 @@ public class SessionService {
                 }
 
                 if (sessions.size() == serviceConfig.getMaxSessionListSize()) {
-                    status[0] = IdSearchResults.SIZE_LIMIT_EXCEEDED;
+                    status = SearchResults.SIZE_LIMIT_EXCEEDED;
                     break;
                 }
                 sessions.add(sess);
 
                 if ((currentTimeMillis() - startTime) >=
                         serviceConfig.getSessionRetrievalTimeout()) {
-                    status[0] = IdSearchResults.TIME_LIMIT_EXCEEDED;
+                    status = SearchResults.TIME_LIMIT_EXCEEDED;
                     break;
                 }
             }
@@ -702,7 +699,7 @@ public class SessionService {
                     + "Unable to get Session Information ", e);
             throw new SessionException(e);
         }
-        return sessions;
+        return new SearchResults<>(sessions.size(), sessions, status);
     }
 
     /**
@@ -844,8 +841,7 @@ public class SessionService {
      * @param s
      * @throws SessionException
      */
-    public List<SessionInfo> getValidSessions(Session s, String pattern, int[] status)
-            throws SessionException {
+    public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
         if (s.getState(false) != VALID) {
             throw new SessionException(SessionBundle
                     .getString("invalidSessionState")
@@ -854,28 +850,26 @@ public class SessionService {
 
         try {
             AMIdentity user = getUser(s);
-            Set orgList = user.getAttribute(
-                    "iplanet-am-session-get-valid-sessions");
+            Set orgList = user.getAttribute("iplanet-am-session-get-valid-sessions");
             if (orgList == null) {
                 orgList = Collections.EMPTY_SET;
             }
 
-            List<InternalSession> sessions = getValidInternalSessions(pattern, status);
-            List<SessionInfo> infos = new ArrayList<SessionInfo>(sessions.size());
+            SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
+            List<SessionInfo> infos = new ArrayList<>(sessions.getSearchResults().size());
 
             // top level admin gets all sessions
             boolean isTopLevelAdmin = hasTopLevelAdminRole(s);
 
-            for (InternalSession sess : sessions) {
+            for (InternalSession sess : sessions.getSearchResults()) {
                 if (isTopLevelAdmin || orgList.contains(sess.getClientDomain())) {
                     SessionInfo info = sess.toSessionInfo();
-                    // replace session id with session handle to prevent from
-                    // impersonation
+                    // replace session id with session handle to prevent impersonation
                     info.setSessionID(sess.getSessionHandle());
                     infos.add(info);
                 }
             }
-            return infos;
+            return new SearchResults<>(sessions.getTotalResultCount(), infos, sessions.getErrorCode());
         } catch (Exception e) {
             throw new SessionException(e);
         }

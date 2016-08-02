@@ -32,6 +32,29 @@ package com.iplanet.dpro.session;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.net.URL;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.blacklist.Blacklistable;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionMeta;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionPollerSender;
+import org.forgerock.openam.session.SessionServiceURLService;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
@@ -55,30 +78,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BlacklistException;
-import org.forgerock.openam.blacklist.Blacklistable;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionMeta;
-import org.forgerock.openam.session.SessionPLLSender;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionPollerSender;
-import org.forgerock.openam.session.SessionServiceURLService;
-
-import java.net.URL;
-import java.security.AccessController;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The <code>Session</code> class represents a session. It contains session
@@ -893,7 +892,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      * @exception SessionException if there was an error during
      *                communication with session service.
      */
-    public SearchResults getValidSessions(String server, String pattern)
+    public SearchResults<Session> getValidSessions(String server, String pattern)
             throws SessionException {
         String protocol = sessionID.getSessionServerProtocol();
         String host = server;
@@ -936,15 +935,19 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      * @param svcurl Session Service URL.
      * @exception SessionException
      */
-    private SearchResults getValidSessions(URL svcurl, String pattern)
+    private SearchResults<Session> getValidSessions(URL svcurl, String pattern)
             throws SessionException {
         try {
-            int status[] = { 0 };
+            int status;
+            int totalResultCount;
             List<SessionInfo> infos = null;
 
             boolean isLocal = false;
             if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
-                infos = sessionService.getValidSessions(this, pattern, status);
+                SearchResults<SessionInfo> searchResults = sessionService.getValidSessions(this, pattern);
+                infos = searchResults.getSearchResults();
+                totalResultCount = searchResults.getTotalResultCount();
+                status = searchResults.getErrorCode();
                 isLocal = true;
             } else {
                 SessionRequest sreq =
@@ -956,21 +959,21 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
 
                 SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, this);
                 infos = sres.getSessionInfo();
-                status[0] = sres.getStatus();
+                totalResultCount = infos.size();
+                status = sres.getStatus();
             }
 
-            Map<String, Session> sessions = new HashMap<String, Session>();
-            Session session = null;
+            List<Session> sessions = new ArrayList<>();
 
             for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.getSessionID());
-                session = new Session(sid, isLocal);
+                Session session = new Session(sid, isLocal);
                 session.sessionServiceURL = svcurl;
                 session.update(info);
-                sessions.put(info.getSessionID(), session);
+                sessions.add(session);
             }
 
-            return new SearchResults(sessions.size(), sessions.keySet(), status[0], sessions);
+            return new SearchResults<>(totalResultCount, sessions, status);
         } catch (Exception ex) {
             sessionDebug.error("Session:getValidSession : ", ex);
             throw new SessionException(SessionBundle.rbName, "getValidSessionsError", null);

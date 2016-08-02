@@ -64,6 +64,7 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.SearchResults;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
@@ -371,11 +372,9 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetValidSessions:
                 String pattern = req.getPattern();
-                List<SessionInfo> infos = null;
-                int status[] = { 0 };
-                infos = sessionService.getValidSessions(requesterSession, pattern, status);
-                res.setStatus(status[0]);
-                res.setSessionInfo(infos);
+                SearchResults<SessionInfo> infos = sessionService.getValidSessions(requesterSession, pattern);
+                res.setStatus(infos.getErrorCode());
+                res.setSessionInfo(infos.getSearchResults());
                 break;
 
             case SessionRequest.DestroySession:

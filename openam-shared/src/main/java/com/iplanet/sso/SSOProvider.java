@@ -24,7 +24,7 @@
  *
  * $Id: SSOProvider.java,v 1.2 2008/06/25 05:41:42 qcheng Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.iplanet.sso;
@@ -184,6 +184,6 @@ public interface SSOProvider {
      * @return Set The set of Valid Sessions
      * @exception SSOException thrown if the there was an error during communication with session service.
      */
-    public Set getValidSessions(SSOToken requester, String server)
+    public Set<SSOToken> getValidSessions(SSOToken requester, String server)
             throws SSOException;
 }

@@ -24,21 +24,17 @@
  *
  * $Id: SearchResults.java,v 1.2 2008/06/25 05:42:26 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 /**
  * This class encapsulates search results data. 
  */
-public class SearchResults {
+public class SearchResults<T> {
 
     /**
      * Successful search.
@@ -63,68 +59,37 @@ public class SearchResults {
     /**
      * Total result size.
      */
-    private int count;
+    private final int count;
 
     /**
      * Set of search results.
      */
-    private Set searchResults;
-
-    /**
-     * Map of Identifier to a map of attribute name to set of its values.
-     */
-    private Map resultsMap;
+    private final List<T> searchResults;
 
     /**
      * Error Code.
      */
-    private int errorCode;
+    private final int errorCode;
 
     /**
      * Constructs the <code>SearchResults</code> object.
      *
-     * @param count Number of entries.
+     * @param count Number of entries which match the search criteria.
      * @param results Set of <code> DNs </code> from the search.
      * @param errorCode Error Code.
      */
-    public SearchResults(int count, Set results, int errorCode) {
+    public SearchResults(int count, List<T> results, int errorCode) {
         this.count = count;
         searchResults = results;
         this.errorCode = errorCode;
     }
-
-    /**
-     * Constructs the <code>SearchResults</code> object.
-     *
-     * @param count Number of entries.
-     * @param results Set of <code> DNs </code> from the search.
-     * @param errorCode Error Code.
-     * @param map Map of attributes and values if requested for.
-     */
-    public SearchResults(int count, Set results, int errorCode, Map map) {
-        this.count = count;
-        searchResults = results;
-        this.errorCode = errorCode;
-        resultsMap = map;
-    }
-
-    /**
-     * Returns the search results. A map of attribute name to map of
-     * attribute name to a set of attribute values.
-     *
-     * @return A map of attribute name to map of attribute name to a set of
-     *         attribute values.
-     */
-    public Map getResultAttributes() {
-        return resultsMap;
-    }    
 
     /**
      * Returns the search results. 
      *
      * @return Search results.
      */
-    public Set getSearchResults() {
+    public List<T> getSearchResults() {
         return searchResults;
     }
 

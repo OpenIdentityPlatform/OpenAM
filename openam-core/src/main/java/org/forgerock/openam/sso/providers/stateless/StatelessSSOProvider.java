@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sso.providers.stateless;
 
-import static com.sun.identity.authentication.util.ISAuthConstants.AUTH_SERVICE_NAME;
+import static com.sun.identity.authentication.util.ISAuthConstants.*;
 
 import java.security.AccessController;
 import java.security.Principal;
@@ -27,22 +27,25 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import com.iplanet.dpro.session.Session;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.sm.*;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
 
+import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOProvider;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BlacklistException;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 
 /**
  * A provider for explicitly stateless SSO tokens. Exists as a service listener to ensure
@@ -208,7 +211,7 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
     }
 
     @Override
-    public Set getValidSessions(SSOToken requester, String server) throws SSOException {
+    public Set<SSOToken> getValidSessions(SSOToken requester, String server) throws SSOException {
         return null;
     }
 
