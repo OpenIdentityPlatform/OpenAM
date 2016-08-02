@@ -8,7 +8,8 @@
     <div class="form-group">
         <label class="control-label col-sm-4">{{t "openam.authDevices.deviceDetailsDialog.recoveryCodes"}}</label>
         <div class="col-sm-7">
-            <pre class="text-center">{{#each recoveryCodes}}{{this}}<br>{{/each}}</pre>
+            <textarea class="text-center" rows="12" readonly>{{#each recoveryCodes}}{{this}}
+{{/each}}</textarea>
             <span>{{t "openam.authDevices.deviceDetailsDialog.copyRecoveryCodes"}}</span>
         </div>
     </div>
