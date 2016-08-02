@@ -20,6 +20,7 @@
 import RealmHelper from "org/forgerock/openam/ui/common/util/RealmHelper";
 import store from "store/index";
 
+const ROOT_REALM_IDENTIFIER = "/root"; // TODO "root" is a placeholder. Identifier for a root realm yet undecided.
 const hasLeadingSlash = (value) => value[0] === "/";
 const throwIfNotAbsoluteRealm = (realm) => {
     if (!hasLeadingSlash(realm)) {
@@ -31,17 +32,23 @@ const throwIfPathHasNoLeadingSlash = (path) => {
         throw new Error(`[fetchUrl] Path must start with forward slash. "${path}"`);
     }
 };
-const prefixWithRealmsPath = (realm) => realm.replace(/\//g, "/realms/");
-const redesignateIfRootRealm = (realm, to) => { return realm === "/" ? to : realm; };
+const normaliseRealmResourcePath = (realm) => realm.replace(/\//g, "/realms/");
+const redesignateRootRealm = (realm, rootIdentifier) => {
+    const isRootRealm = realm === "/";
+    return isRootRealm ? rootIdentifier : `${rootIdentifier}${realm}`;
+};
 
 /**
  * Fetch a URL using the newer method of laying realm information into the URL (e.g. Redux).
+ *
  * @param {string} path Path to the resource. Must start with a forward slash.
  * @param {Object} [options] Options to pass to this function.
  * @param {string} [options.realm=store.getState().session.realm] The realm to use when constructing the URL. Must be absolute.
  * @returns {string} URL string to be appended after the <code>.../json</code> path.
+ *
  * @throws {Error} If path does not start with a forward slash.
  * @throws {Error} If realm is not absolute (does not start with a forward slash).
+ *
  * @example // With session on the root realm
  * fetchUrl.default("/authentication") => "/realms/root/authentication"
  * @example // With session on a sub realm
@@ -56,20 +63,23 @@ const fetchUrl = (path, { realm = store.getState().session.realm } = {}) => {
     if (!realm) { return path; }
 
     throwIfNotAbsoluteRealm(realm);
-    realm = redesignateIfRootRealm(realm, "root"); // TODO "root" is a placeholder. Identifier for a root realm yet undecided.
-    realm = prefixWithRealmsPath(realm);
+    realm = redesignateRootRealm(realm, ROOT_REALM_IDENTIFIER);
+    realm = normaliseRealmResourcePath(realm);
 
     return realm + path;
 };
 
 /**
  * Fetch a URL using the legacy method of laying realm information into the URL (e.g. RealmHelper and global data).
+ *
  * @param {string} path Path to the resource. Must start with a forward slash.
  * @param {Object} [options] Options to pass to this function.
  * @param {string} [options.realm=/__subrealm__] The realm to use when constructing the URL. Must be absolute.
  * @returns {string} URL string to be appended after the <code>.../json</code> path.
+ *
  * @throws {Error} If path does not start with a forward slash.
  * @throws {Error} If realm is not absolute (does not start with a forward slash).
+ *
  * @example // With session on the root realm
  * fetchUrl.legacy("/authentication") => "/authentication"
  * @example // With session on a sub realm
@@ -84,7 +94,7 @@ const fetchUrlLegacy = (path, { realm = "/__subrealm__" } = {}) => {
     if (!realm) { return path; }
 
     throwIfNotAbsoluteRealm(realm);
-    realm = redesignateIfRootRealm(realm, "");
+    realm = redesignateRootRealm(realm, "");
 
     return RealmHelper.decorateURIWithRealm(`${realm}${path}`);
 };
