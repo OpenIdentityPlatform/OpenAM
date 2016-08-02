@@ -28,7 +28,6 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static com.sun.tools.doclets.internal.toolkit.util.DocPath.parent;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
@@ -39,7 +38,6 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HEAD;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
