@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -81,11 +81,11 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
      * @param realm The realm for which profile state should be looked-up - will be the realm for the principal for
      *              whom the token is being generated - the realm value corresponds to the realm passed in the super.getAttributes call
      *              above.
-     * @return whether the dynamic or ignored profile has been set up for user accounts in this realm
+     * @return whether the ignored profile has been set up for user accounts in this realm
      */
     @Override
-    protected boolean isDynamicalOrIgnoredProfile(String realm) {
-        return SAML2PluginsUtils.isDynamicalOrIgnoredProfile(realm);
+    protected boolean isIgnoredProfile(String realm) {
+        return SAML2PluginsUtils.isIgnoredProfile(realm);
     }
 
     /**
