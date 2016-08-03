@@ -34,6 +34,8 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -143,10 +145,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             } else {
                 throw failureFactory.getException(request, "Client authentication failed");
             }
-        } catch (SSOException e) {
-            logger.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw failureFactory.getException(request, "Client authentication failed");
-        } catch (IdRepoException e) {
+        } catch (SSOException | IdRepoException | LocalizedIllegalArgumentException e) {
             logger.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw failureFactory.getException(request, "Client authentication failed");
         }
