@@ -1,13 +1,12 @@
 {
+  "type": "object",
   "recording": {
     "type": "boolean",
     "description": "i18n:api-descriptor/RecordProperties#record.status.recording.description",
     "title": "i18n:api-descriptor/RecordProperties#record.status.recording.title"
   },
   "record": {
-    "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "id": "urn:jsonschema:org:forgerock:openam:core:rest:record:Record",
     "description": "i18n:api-descriptor/RecordProperties#record.status.record.description",
     "title": "i18n:api-descriptor/RecordProperties#record.status.record.title",
     "properties": {
