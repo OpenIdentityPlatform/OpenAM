@@ -66,7 +66,7 @@ public class UmaUserUiRolePredicate implements UiRolePredicate {
             if (sessionService.get().isSuperUser(id)) {
                 return false;
             }
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            String realm = context.asContext(RealmContext.class).getRealm().asPath();
             return checkIfUmaConfigExists(realm);
         } catch (SMSException | SSOException e) {
             serviceConfigManager = null;

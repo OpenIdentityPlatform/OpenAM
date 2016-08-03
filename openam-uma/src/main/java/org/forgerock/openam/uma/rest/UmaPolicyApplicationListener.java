@@ -44,6 +44,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
@@ -271,14 +273,17 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void removeApplication(String realm, String resourceServerId) throws NotFoundException, ServerException {
         OpenAMSettingsImpl umaSettings = new OpenAMSettingsImpl(UmaConstants.SERVICE_NAME, UmaConstants.SERVICE_VERSION);
         if (onDeleteResourceServerDeletePolicies(umaSettings, realm)) {
-            deletePolicies(realm, resourceServerId);
             try {
+                deletePolicies(realm, resourceServerId);
                 Subject adminSubject = SubjectUtils.createSuperAdminSubject();
                 ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
                 if (appService.getApplication(resourceServerId) != null) {
                     appService.deleteApplication(resourceServerId);
                 }
             } catch (EntitlementException e) {
+                logger.error("Failed to remove policy application", e);
+            } catch (RealmLookupException e) {
+                //Should never happen as realm would have already been validated
                 logger.error("Failed to remove policy application", e);
             }
         }
@@ -311,9 +316,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         }
     }
 
-    private void deletePolicies(String realm, String resourceServerId) {
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.setDnsAlias("/", realm);
+    private void deletePolicies(String realm, String resourceServerId) throws RealmLookupException {
+        RealmContext realmContext = new RealmContext(new RootContext(), Realm.of(realm));
         final Context context = new AdminSubjectContext(logger, sessionCache, realmContext);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));

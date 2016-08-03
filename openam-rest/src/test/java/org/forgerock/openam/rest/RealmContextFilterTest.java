@@ -28,6 +28,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -49,6 +51,8 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.query.QueryResponseHandler;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.services.context.AttributesContext;
@@ -58,12 +62,10 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoException;
 
 public class RealmContextFilterTest {
 
@@ -89,6 +91,7 @@ public class RealmContextFilterTest {
     private RestRealmValidator realmValidator;
     @Mock
     private Handler handler;
+    private RealmTestHelper realmTestHelper;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
@@ -98,6 +101,14 @@ public class RealmContextFilterTest {
 
         given(coreWrapper.getOrganization(any(SSOToken.class), eq(ENDPOINT_PATH_ELEMENT)))
                 .willThrow(IdRepoException.class);
+
+        realmTestHelper = new RealmTestHelper(coreWrapper);
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -115,7 +126,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyRealmContext(contextCaptor.getValue(), Realm.root());
         verifyUriRouterContext(contextCaptor.getValue(), "");
     }
 
@@ -126,6 +137,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(DNS_ALIAS_HOSTNAME, ENDPOINT_PATH_ELEMENT);
 
+        Realm realm = realmTestHelper.mockRealm(DNS_ALIS_SUB_REALM);
         mockDnsAlias(DNS_ALIAS_HOSTNAME, "/" + DNS_ALIS_SUB_REALM);
 
         //When
@@ -134,7 +146,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/" + DNS_ALIS_SUB_REALM, "", null);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), "");
     }
 
@@ -161,6 +173,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
 
+        Realm realm = realmTestHelper.mockRealm(SUB_REALM);
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias("/" + SUB_REALM, "/" + SUB_REALM);
 
@@ -170,7 +183,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, null);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
     }
 
@@ -181,6 +194,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM_ALIAS + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, SUB_REALM_ALIAS + "/" + ENDPOINT_PATH_ELEMENT);
 
+        Realm realm = realmTestHelper.mockRealm(SUB_REALM);
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias(SUB_REALM_ALIAS, "/" + SUB_REALM);
 
@@ -190,7 +204,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, null);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM_ALIAS);
     }
 
@@ -210,7 +224,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyRealmContext(contextCaptor.getValue(), Realm.root());
         verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
     }
 
@@ -221,6 +235,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(DNS_ALIAS_HOSTNAME, SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
 
+        Realm realm = realmTestHelper.mockRealm(DNS_ALIS_SUB_REALM, SUB_REALM);
         mockDnsAlias(DNS_ALIAS_HOSTNAME, "/" + DNS_ALIS_SUB_REALM);
         mockRealmAlias("/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM, "/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM);
 
@@ -230,7 +245,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/" + DNS_ALIS_SUB_REALM, "/" + SUB_REALM, null);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
     }
 
@@ -261,6 +276,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM + "/");
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias(OVERRIDE_REALM, OVERRIDE_REALM);
 
@@ -270,7 +286,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/", "", OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), "");
     }
 
@@ -281,6 +297,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM_ALIAS);
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias(OVERRIDE_REALM_ALIAS, OVERRIDE_REALM);
 
@@ -290,7 +307,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/", "", OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), "");
     }
 
@@ -318,6 +335,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(DNS_ALIAS_HOSTNAME, ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM);
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(DNS_ALIAS_HOSTNAME, "/" + DNS_ALIS_SUB_REALM);
         mockRealmAlias(OVERRIDE_REALM, OVERRIDE_REALM);
 
@@ -327,7 +345,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/" + DNS_ALIS_SUB_REALM, "", OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), "");
     }
 
@@ -338,6 +356,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM);
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias("/" + SUB_REALM, "/" + SUB_REALM);
         mockRealmAlias(OVERRIDE_REALM_ALIAS, OVERRIDE_REALM);
@@ -348,7 +367,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
     }
 
@@ -359,6 +378,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM_ALIAS + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(HOSTNAME, SUB_REALM_ALIAS + "/" + ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM);
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias(SUB_REALM_ALIAS, "/" + SUB_REALM);
         mockRealmAlias(OVERRIDE_REALM, OVERRIDE_REALM);
@@ -369,7 +389,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM_ALIAS);
     }
 
@@ -380,6 +400,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
         Request request = createRequest(DNS_ALIAS_HOSTNAME, SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT + "?realm=" + OVERRIDE_REALM);
 
+        Realm realm = realmTestHelper.mockRealm(OVERRIDE_REALM.substring(1));
         mockDnsAlias(DNS_ALIAS_HOSTNAME, "/" + DNS_ALIS_SUB_REALM);
         mockRealmAlias("/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM, "/" + DNS_ALIS_SUB_REALM + "/" + SUB_REALM);
         mockRealmAlias(OVERRIDE_REALM, OVERRIDE_REALM);
@@ -390,7 +411,7 @@ public class RealmContextFilterTest {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(handler).handle(contextCaptor.capture(), eq(request));
-        verifyRealmContext(contextCaptor.getValue(), "/" + DNS_ALIS_SUB_REALM, "/" + SUB_REALM, OVERRIDE_REALM);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
     }
 
@@ -436,7 +457,7 @@ public class RealmContextFilterTest {
 
         collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
 
-        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyRealmContext(contextCaptor.getValue(), Realm.root());
         verifyUriRouterContext(contextCaptor.getValue(), "");
         verifyResolvedResourcePath(requestCaptor.getValue(), ENDPOINT_PATH_ELEMENT);
     }
@@ -450,6 +471,7 @@ public class RealmContextFilterTest {
         Context context = mockContext(path);
         request.setUri(createRequestURI(HOSTNAME, path, postURIString));
 
+        Realm realm = realmTestHelper.mockRealm(SUB_REALM);
         mockDnsAlias(HOSTNAME, "/");
         mockRealmAlias("/" + SUB_REALM, "/" + SUB_REALM);
 
@@ -463,11 +485,10 @@ public class RealmContextFilterTest {
 
         collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
 
-        verifyRealmContext(contextCaptor.getValue(), "", "/" + SUB_REALM, null);
+        verifyRealmContext(contextCaptor.getValue(), realm);
         verifyUriRouterContext(contextCaptor.getValue(), SUB_REALM);
         verifyResolvedResourcePath(requestCaptor.getValue(), ENDPOINT_PATH_ELEMENT);
     }
-
 
     @Test(dataProvider = "CRUDPAQ")
     public void filterShouldConsumeRealmFromCRUDPAQRequestWithInvalidSubrealm(Request request, String postURIString) throws Exception {
@@ -491,7 +512,7 @@ public class RealmContextFilterTest {
 
         collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
 
-        verifyRealmContext(contextCaptor.getValue(), "", "/", null);
+        verifyRealmContext(contextCaptor.getValue(), Realm.root());
         verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
         verifyResolvedResourcePath(requestCaptor.getValue(), INVALID_SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
     }
@@ -528,21 +549,10 @@ public class RealmContextFilterTest {
         doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq(alias));
     }
 
-    private void verifyRealmContext(Context context, String expectedDnsAliasRealm,
-            String expectedRelativeRealm, String expectedOverrideRealm) {
+    private void verifyRealmContext(Context context, Realm expectedRealm) {
         assertThat(context.containsContext(RealmContext.class)).isTrue();
         RealmContext realmContext = context.asContext(RealmContext.class);
-        if (expectedDnsAliasRealm.isEmpty()) {
-            assertThat(realmContext.getBaseRealm()).isEqualTo(expectedRelativeRealm);
-        } else {
-            assertThat(realmContext.getBaseRealm()).isEqualTo(expectedDnsAliasRealm);
-        }
-        assertThat(realmContext.getRelativeRealm()).isEqualTo(expectedRelativeRealm.isEmpty() ? "/" : expectedRelativeRealm);
-        if (expectedOverrideRealm == null) {
-            assertThat(realmContext.getResolvedRealm()).isEqualTo(expectedDnsAliasRealm + expectedRelativeRealm);
-        } else {
-            assertThat(realmContext.getResolvedRealm()).isEqualTo(expectedOverrideRealm);
-        }
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     private void verifyUriRouterContext(Context context, String matchedUri) {

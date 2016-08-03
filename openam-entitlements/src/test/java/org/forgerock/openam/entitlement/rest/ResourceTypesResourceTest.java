@@ -44,6 +44,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.guice.EntitlementRestGuiceModule;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
@@ -60,6 +62,7 @@ import org.forgerock.util.promise.Promise;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -106,6 +109,7 @@ public class ResourceTypesResourceTest {
     private ResourceTypesResource resourceTypesResource;
     private ResourceTypeService resourceTypeService;
     private Subject callerSubject;
+    private RealmTestHelper realmTestHelper;
 
     private abstract class MockResourceTypeService implements ResourceTypeService {
         ResourceType resourceType;
@@ -140,7 +144,7 @@ public class ResourceTypesResourceTest {
     }
 
     @BeforeMethod
-    public void setUp() throws ResourceException {
+    public void setUp() throws Exception {
 
         callerSubject = new Subject();
 
@@ -158,8 +162,9 @@ public class ResourceTypesResourceTest {
             }
         };
 
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("/", "/");
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+        RealmContext realmContext = new RealmContext(subjectContext, Realm.root());
 
         mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
@@ -177,6 +182,11 @@ public class ResourceTypesResourceTest {
         rawData.put("patterns", Collections.singleton("http://example.com:80/*"));
         rawData.put("creationDate", Collections.singleton(String.valueOf(newDate().getTime())));
         rawData.put("lastModifiedDate", Collections.singleton(String.valueOf(newDate().getTime())));
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test

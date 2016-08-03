@@ -267,6 +267,6 @@ public class ServerContextUtils {
      * @return The resolved realm.
      */
     public static String getRealm(Context context) {
-        return context.asContext(RealmContext.class).getResolvedRealm();
+        return context.asContext(RealmContext.class).getRealm().asPath();
     }
 }

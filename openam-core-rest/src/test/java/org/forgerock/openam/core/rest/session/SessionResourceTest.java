@@ -64,6 +64,8 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -75,6 +77,7 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -90,6 +93,7 @@ public class SessionResourceTest {
     private SessionPropertyWhitelist propertyWhitelist;
     private WebtopNamingQuery webtopNamingQuery;
     private RealmContext realmContext;
+    private RealmTestHelper realmTestHelper;
 
     private AMIdentity amIdentity;
 
@@ -112,7 +116,10 @@ public class SessionResourceTest {
 
         given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
 
-        realmContext = new RealmContext(mockContext);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+
+        realmContext = new RealmContext(mockContext, Realm.root());
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
@@ -158,6 +165,11 @@ public class SessionResourceTest {
             }
 
         };
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     private void configureWhitelist() {

@@ -27,6 +27,8 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
@@ -34,6 +36,7 @@ import org.forgerock.util.test.assertj.Conditions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -74,6 +77,7 @@ public class SmsResourceProviderTest {
     private ServiceConfig mockServiceConfig;
     @Mock
     private ServiceConfig mockServiceSubConfig;
+    private RealmTestHelper realmTestHelper;
 
     private Locale local = new Locale("Test");
 
@@ -86,17 +90,25 @@ public class SmsResourceProviderTest {
         }
     };
 
-
     @BeforeMethod
     public void initMocks() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(localeContext.getLocale()).thenReturn(local);
         when(mockContext.asContext(LocaleContext.class)).thenReturn(localeContext);
 
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+        Realm realm = realmTestHelper.mockRealm(RESOLVED_REALM);
+
         when(mockContext.containsContext(RealmContext.class)).thenReturn(true);
         when(mockContext.asContext(RealmContext.class)).thenReturn(mockRealmContext);
-        when(mockRealmContext.getResolvedRealm()).thenReturn(RESOLVED_REALM);
-        when(mockServiceConfigManager.getOrganizationConfig(RESOLVED_REALM, null)).thenReturn(mockServiceConfig);
+        when(mockRealmContext.getRealm()).thenReturn(realm);
+        when(mockServiceConfigManager.getOrganizationConfig("/" + RESOLVED_REALM, null)).thenReturn(mockServiceConfig);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -118,7 +130,7 @@ public class SmsResourceProviderTest {
         String returnedRealm = resourceProvider.realmFor(mockContext);
 
         // Then
-        Assertions.assertThat(returnedRealm).isEqualTo(RESOLVED_REALM);
+        Assertions.assertThat(returnedRealm).isEqualTo("/" + RESOLVED_REALM);
     }
 
     @Test

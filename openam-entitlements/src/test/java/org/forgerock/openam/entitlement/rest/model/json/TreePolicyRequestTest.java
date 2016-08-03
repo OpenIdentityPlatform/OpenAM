@@ -20,12 +20,15 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -50,13 +53,21 @@ public class TreePolicyRequestTest {
     private ActionRequest actionRequest;
     @Mock
     private SSOTokenManager tokenManager;
+    private RealmTestHelper realmTestHelper;
 
     private Subject restSubject;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         restSubject = new Subject();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -67,9 +78,10 @@ public class TreePolicyRequestTest {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resource", "/resource/a");
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         TreePolicyRequest request = TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
 
         // Then...
@@ -87,9 +99,10 @@ public class TreePolicyRequestTest {
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
     }
 
@@ -99,14 +112,15 @@ public class TreePolicyRequestTest {
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         TreePolicyRequest.getTreePolicyRequest(context, actionRequest, tokenManager);
     }
 
-    private Context buildContextStructure(final String realm) {
-        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
+    private Context buildContextStructure(final Realm realm) {
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext, realm));
     }
 
 }

@@ -50,7 +50,7 @@ public class DefaultRealmLookupTest {
     private Set<String> foundRealmAliases = new HashSet<>();
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         realmTestHelper = new RealmTestHelper(coreWrapper);
         realmTestHelper.setupRealmClass();

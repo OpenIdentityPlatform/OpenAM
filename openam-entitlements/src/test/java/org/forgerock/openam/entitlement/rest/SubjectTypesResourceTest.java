@@ -36,6 +36,8 @@ import com.sun.identity.entitlement.LogicalSubject;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.SubjectDecision;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -49,6 +51,7 @@ import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -58,13 +61,16 @@ public class SubjectTypesResourceTest {
     ObjectMapper mockMapper = mock(ObjectMapper.class);
     EntitlementRegistry mockRegistry = new EntitlementRegistry();
     Debug mockDebug = mock(Debug.class);
+    RealmTestHelper realmTestHelper;
 
     private final String TEST_CONDITION_WITH_NAME = "testConditionWithName";
     private final String TEST_LOGICAL_CONDITION = "testLogicalCondition";
 
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         mockRegistry.registerSubjectType(TEST_CONDITION_WITH_NAME, TestSubjectTypeWithName.class);
         mockRegistry.registerSubjectType(TEST_LOGICAL_CONDITION, TestLogicalSubjectTypeWithName.class);
@@ -72,11 +78,16 @@ public class SubjectTypesResourceTest {
         testResource = new SubjectTypesResource(mockDebug, mockRegistry);
     }
 
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
+    }
+
     @Test
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -99,7 +110,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws Exception {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -126,7 +137,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndReadAndSubjectNamePropertyRemoved() throws Exception {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -154,7 +165,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndLogicalIsCorrect() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();

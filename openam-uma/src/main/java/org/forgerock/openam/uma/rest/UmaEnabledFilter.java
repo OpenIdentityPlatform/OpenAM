@@ -59,7 +59,7 @@ public class UmaEnabledFilter implements Filter {
 
     private Promise<Void, ResourceException> enabled(Context serverContext) {
         try {
-            String realm = RealmContext.getRealm(serverContext);
+            String realm = RealmContext.getRealm(serverContext).asPath();
             UmaProviderSettings settings = umaProviderSettingsFactory.get(realm);
             if (settings.isEnabled()) {
                 return newResultPromise(null);

@@ -38,6 +38,8 @@ import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -49,6 +51,7 @@ import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,9 +63,10 @@ public class SnsMessageResourceTest {
     CTSPersistentStore mockCTS;
     JSONSerialisation mockSerialisation;
     JwtReconstruction mockReconstructor;
+    RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void theSetUp() { //you need this
+    public void theSetUp() throws Exception { //you need this
 
         mockService = mock(PushNotificationService.class);
         Debug mockDebug = mock(Debug.class);
@@ -76,8 +80,15 @@ public class SnsMessageResourceTest {
         } catch (NotFoundException e) {
             //does not happen
         }
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         messageResource = new SnsMessageResource(mockCTS, mockService, mockSerialisation, mockDebug, mockReconstructor);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -85,9 +96,9 @@ public class SnsMessageResourceTest {
             ExecutionException, InterruptedException {
 
         //given
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
 
@@ -108,9 +119,9 @@ public class SnsMessageResourceTest {
             ExecutionException, InterruptedException, CoreTokenException {
         //given
         Token mockToken = mock(Token.class);
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
 
@@ -139,9 +150,9 @@ public class SnsMessageResourceTest {
         Jwt mockJwt = mock(Jwt.class);
         JwtClaimsSet mockClaimSet = mock(JwtClaimsSet.class);
         Token mockToken = mock(Token.class);
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
 
@@ -169,9 +180,9 @@ public class SnsMessageResourceTest {
     public void shouldFailWhenNoMessageId() throws ResourceException, InterruptedException {
 
         //given
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("test", "test")));
 
@@ -190,9 +201,9 @@ public class SnsMessageResourceTest {
     public void shouldFailWhenPredicateNotMet() throws ResourceException, InterruptedException,
             PredicateNotMetException {
         //given
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
 
@@ -213,9 +224,9 @@ public class SnsMessageResourceTest {
     public void shouldFailWhenLocalAndCTSReadsFail() throws ResourceException, InterruptedException,
             PredicateNotMetException, CoreTokenException {
         //given
+        Realm realm = realmTestHelper.mockRealm("realm");
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("realm", "realm");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
 
         JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
 

@@ -76,7 +76,7 @@ public class GetPropertyActionHandler implements ActionHandler {
         final JsonValue result = json(object());
         try {
             final SSOToken caller = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             final SSOToken target = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
 
             if (request.getContent() == null || request.getContent().get(SessionResource.KEYWORD_PROPERTIES).isNull()) {

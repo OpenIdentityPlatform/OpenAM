@@ -27,10 +27,9 @@ import org.forgerock.openam.rest.RealmContext;
 public abstract class RealmAwareResource extends SubjectAwareResource {
 
     protected final String EMPTY = "";
-    protected final String ROOT = "/";
 
     /**
-     * Retrieves the Realm from a provided {@link org.forgerock.http.Context}.
+     * Retrieves the Realm from a provided {@link org.forgerock.services.context.Context}.
      *
      * Returns null if there's no RealmContext in the provided Context.
      *
@@ -46,11 +45,7 @@ public abstract class RealmAwareResource extends SubjectAwareResource {
 
         final RealmContext rc = context.asContext(RealmContext.class);
 
-        if (rc.getResolvedRealm().equals(EMPTY)) {
-            return ROOT;
-        }
-
-        return rc.getResolvedRealm();
+        return rc.getRealm().asPath();
     }
 
 }

@@ -24,6 +24,8 @@ import javax.security.auth.Subject;
 
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -136,11 +138,15 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
             throw new ServerException(e);
         }
 
-        policyService.deletePolicy(createAdminContext(realm, resourceSet.getResourceOwnerId()), resourceSet.getId());
-
         try {
+            policyService.deletePolicy(createAdminContext(realm, resourceSet.getResourceOwnerId()), resourceSet.getId());
+
             resourceTypeService.deleteResourceType(adminSubject, realm, resourceTypeUUID);
         } catch (EntitlementException e) {
+            logger.error("Failed to delete Resource Type " + resourceTypeUUID, e);
+            throw new ServerException(e);
+        } catch (RealmLookupException e) {
+            //Should never happen as realm would have been validated already
             logger.error("Failed to delete Resource Type " + resourceTypeUUID, e);
             throw new ServerException(e);
         }
@@ -153,14 +159,12 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
      * @param resourceOwnerId The owner of the ResourceSet that the policies are for.
      * @return The generated context.
      */
-    private Context createAdminContext(String realm, String resourceOwnerId) {
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.setSubRealm(realm, realm);
+    private Context createAdminContext(String realm, String resourceOwnerId) throws RealmLookupException {
+        RealmContext realmContext = new RealmContext(new RootContext(), Realm.of(realm));
         SubjectContext subjectContext = new AdminSubjectContext(logger, sessionCache,realmContext);
 
         Map<String, String> templateVariables = new HashMap<>();
         templateVariables.put("user", resourceOwnerId);
-        UriRouterContext routerContext = new UriRouterContext(subjectContext, "", "", templateVariables);
-        return routerContext;
+        return new UriRouterContext(subjectContext, "", "", templateVariables);
     }
 }

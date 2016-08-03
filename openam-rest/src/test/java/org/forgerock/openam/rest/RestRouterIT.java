@@ -83,6 +83,8 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.http.HttpGuiceModule;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -99,6 +101,7 @@ import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -133,12 +136,13 @@ public class RestRouterIT extends GuiceTestCase {
     private AuthUtilsWrapper authUtilsWrapper;
     private CoreWrapper coreWrapper;
     private RestRealmValidator realmValidator;
+    private RealmTestHelper realmTestHelper;
 
     @Mock
     private PrivilegedAction<SSOToken> ssoTokenAction;
 
     @BeforeMethod
-    public void setupMocks() {
+    public void setupMocks() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         configResource = mock(SingletonResourceProvider.class);
@@ -167,6 +171,13 @@ public class RestRouterIT extends GuiceTestCase {
         given(coreWrapper.getAdminToken()).willReturn(adminToken);
         given(coreWrapper.isValidFQDN(anyString())).willReturn(true);
         realmValidator = mock(RestRealmValidator.class);
+        realmTestHelper = new RealmTestHelper(coreWrapper);
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @BeforeMethod(dependsOnMethods = "setupMocks")
@@ -273,7 +284,7 @@ public class RestRouterIT extends GuiceTestCase {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(usersResource).readInstance(contextCaptor.capture(), eq("demo"), any(ReadRequest.class));
-        assertThat(contextCaptor.getValue().asContext(RealmContext.class).getResolvedRealm()).isEqualTo("/");
+        assertThat(contextCaptor.getValue().asContext(RealmContext.class).getRealm()).isEqualTo(Realm.root());
     }
 
     @Test
@@ -284,6 +295,7 @@ public class RestRouterIT extends GuiceTestCase {
         Request request = newRequest("GET", "/json/subrealm/users/demo");
 
         auditingOff();
+        Realm realm = realmTestHelper.mockRealm("subrealm");
         mockRealm("/subrealm");
 
         //When
@@ -292,7 +304,7 @@ public class RestRouterIT extends GuiceTestCase {
         //Then
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
         verify(usersResource).readInstance(contextCaptor.capture(), eq("demo"), any(ReadRequest.class));
-        assertThat(contextCaptor.getValue().asContext(RealmContext.class).getResolvedRealm()).isEqualTo("/subrealm");
+        assertThat(contextCaptor.getValue().asContext(RealmContext.class).getRealm()).isEqualTo(realm);
     }
 
     @Test

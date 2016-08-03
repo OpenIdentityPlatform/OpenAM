@@ -27,6 +27,8 @@ import java.util.List;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
@@ -44,6 +46,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -71,6 +74,7 @@ public class PolicyResourceEvaluationTest {
 
     private Subject restSubject;
     private Subject policySubject;
+    private RealmTestHelper realmTestHelper;
 
     private PolicyResource policyResource;
 
@@ -79,6 +83,8 @@ public class PolicyResourceEvaluationTest {
         MockitoAnnotations.initMocks(this);
         restSubject = new Subject();
         policySubject = new Subject();
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
         EntitlementsExceptionMappingHandler resourceErrorHandler =
@@ -88,12 +94,18 @@ public class PolicyResourceEvaluationTest {
                 mock(PolicyStoreProvider.class), resourceErrorHandler);
     }
 
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
+    }
+
     @Test
     public void shouldMakeBatchEvaluation() throws EntitlementException {
         // Given...
         given(request.getAction()).willReturn("evaluate");
+        Realm realm = realmTestHelper.mockRealm("abc");
 
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         given(requestFactory.buildRequest(PolicyAction.EVALUATE, context, request)).willReturn(policyRequest);
         given(policyRequest.getRestSubject()).willReturn(restSubject);
         given(policyRequest.getApplication()).willReturn("some-application");
@@ -128,8 +140,9 @@ public class PolicyResourceEvaluationTest {
     public void shouldMakeTreeEvaluation() throws EntitlementException {
         // Given...
         given(request.getAction()).willReturn("evaluateTree");
+        Realm realm = realmTestHelper.mockRealm("abc");
 
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         given(requestFactory.buildRequest(PolicyAction.TREE_EVALUATE, context, request)).willReturn(policyRequest);
         given(policyRequest.getRestSubject()).willReturn(restSubject);
         given(policyRequest.getApplication()).willReturn("some-application");
@@ -165,8 +178,9 @@ public class PolicyResourceEvaluationTest {
     public void shouldHandleEntitlementExceptions() throws EntitlementException {
         // Given...
         given(request.getAction()).willReturn("evaluate");
+        Realm realm = realmTestHelper.mockRealm("abc");
 
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         EntitlementException eE = new EntitlementException(EntitlementException.INVALID_VALUE);
         given(requestFactory.buildRequest(PolicyAction.EVALUATE, context, request)).willThrow(eE);
         given(request.getRequestType()).willReturn(RequestType.ACTION);
@@ -188,9 +202,10 @@ public class PolicyResourceEvaluationTest {
     public void shouldHandleUnknownAction() {
         // Given...
         given(request.getAction()).willReturn("unknownAction");
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         policyResource.actionCollection(context, request);
 
         // Then...
@@ -210,8 +225,8 @@ public class PolicyResourceEvaluationTest {
      *
      * @return the server context hierarchy
      */
-    private Context buildContextStructure(final String realm) {
-        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
+    private Context buildContextStructure(final Realm realm) {
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext, realm));
     }
 
     /**

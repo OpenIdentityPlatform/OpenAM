@@ -241,7 +241,7 @@ public abstract class PolicyRequest {
         }
 
         private String getRealm(final RealmContext context) {
-            return StringUtils.ifNullOrEmpty(context.getResolvedRealm(), ROOT_REALM);
+            return StringUtils.ifNullOrEmpty(context.getRealm().asPath(), ROOT_REALM);
         }
 
         private Map<String, Set<String>> getEnvironment(final JsonValue value) {

@@ -72,7 +72,7 @@ public class DeletePropertyActionHandler implements ActionHandler {
             final ActionRequest request) {
         try {
             final SSOToken caller = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();;
+            final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             final SSOToken target = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
 
             JsonValue content = request.getContent().get(SessionResource.KEYWORD_PROPERTIES);

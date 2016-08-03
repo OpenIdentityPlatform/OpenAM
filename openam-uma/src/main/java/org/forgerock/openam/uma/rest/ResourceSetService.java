@@ -136,7 +136,7 @@ public class ResourceSetService {
                             final Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         final Set<ResourceSetDescription> sharedResourceSets = new HashSet<>();
 
-                        String realm = RealmContext.getRealm(context);
+                        String realm = RealmContext.getRealm(context).asPath();
                         try {
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
                                 if (!sharedResourceSets.contains(sharedPolicy.getResourceSet())) {
@@ -393,7 +393,7 @@ public class ResourceSetService {
                     resourceSet = resourceSetsById.get(entry.getKey());
                 } else {
                     RealmContext realmContext = context.asContext(RealmContext.class);
-                    resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
+                    resourceSet = resourceSetStoreFactory.create(realmContext.getRealm().asPath())
                             .read(entry.getKey(), resourceOwnerId);
                 }
                 if (augmentWithPolicies) {

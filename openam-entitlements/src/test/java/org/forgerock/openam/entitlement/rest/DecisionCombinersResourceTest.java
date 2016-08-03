@@ -30,6 +30,9 @@ import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -43,6 +46,7 @@ import org.forgerock.openam.entitlement.rest.DecisionCombinersResource;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -52,22 +56,30 @@ public class DecisionCombinersResourceTest {
     ObjectMapper mockMapper = mock(ObjectMapper.class);
     EntitlementRegistry mockRegistry = new EntitlementRegistry();
     Debug mockDebug = mock(Debug.class);
+    RealmTestHelper realmTestHelper;
 
     private final String TEST_COMBINER = "testCombiner";
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         mockRegistry.registerDecisionCombiner(TEST_COMBINER, TestCombiner.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         testResource = new DecisionCombinersResource(mockDebug, mockRegistry);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test (expectedExceptions = NotFoundException.class)
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException, ResourceException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -90,7 +102,7 @@ public class DecisionCombinersResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -113,7 +125,7 @@ public class DecisionCombinersResourceTest {
     public void testSuccessfulJsonificationAndReadAndNamePropertyRemoved() throws JsonMappingException, ResourceException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();

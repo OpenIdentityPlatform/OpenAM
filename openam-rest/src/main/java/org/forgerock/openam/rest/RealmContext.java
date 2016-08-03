@@ -17,11 +17,8 @@
 package org.forgerock.openam.rest;
 
 import org.forgerock.openam.core.realms.Realm;
-import org.forgerock.openam.core.realms.RealmLookupException;
-import org.forgerock.services.context.Context;
 import org.forgerock.services.context.AbstractContext;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.Pair;
+import org.forgerock.services.context.Context;
 
 /**
  * A CREST Context for holding realm information from the Request.
@@ -30,58 +27,18 @@ import org.forgerock.util.Pair;
  */
 public class RealmContext extends AbstractContext {
 
-    private static final String ROOT_REALM = "/";
     private final Realm realm;
 
-    private Pair<String, String> dnsAliasRealm;
-    private Pair<String, String> relativeRealmPath = Pair.of("/", "/");
-    private String overrideRealm;
-
     /**
-     * Constructs a new empty RealmContext instance.
+     * Constructs a new RealmContext.
      *
      * @param parent The parent context.
+     * @param realm The realm.
+     * @since 14.0.0
      */
-    @Deprecated
-    public RealmContext(Context parent) {
-        this(parent, null);
-    }
-
     public RealmContext(Context parent, Realm realm) {
         super(parent, "realm");
         this.realm = realm;
-    }
-
-    /**
-     * Gets the full resolved realm path.
-     *
-     * <p>If an override query realm parameter was specified on the request then that is returned,
-     * otherwise the realm specified in the URI is rebased on top of the realm that the DNS
-     * resolves to.</p>
-     *
-     * @return The resolved full realm path.
-     */
-    @Deprecated
-    public String getResolvedRealm() {
-        if (realm != null) {
-            return realm.asPath();
-        }
-        if (overrideRealm != null) {
-            return overrideRealm;
-        }
-        StringBuilder resolvedRealm = new StringBuilder();
-        if (dnsAliasRealm != null) {
-            final String dnsAlias = dnsAliasRealm.getSecond();
-            if(!dnsAlias.equals("/")) {
-                resolvedRealm.append(dnsAlias);
-            }
-        }
-        resolvedRealm.append(relativeRealmPath.getSecond());
-        String realmPath = resolvedRealm.toString();
-        if (!"/".equals(realmPath) && realmPath.endsWith("/")) {
-            realmPath = realmPath.substring(0, realmPath.length() - 1);
-        }
-        return realmPath;
     }
 
     /**
@@ -89,165 +46,29 @@ public class RealmContext extends AbstractContext {
      *
      * @return True if the resolved realm is the top level realm, false otherwise.
      */
-    @Deprecated
     public boolean isRootRealm() {
-        return getResolvedRealm().equals(ROOT_REALM);
-    }
-
-    /**
-     * Adds a mapping from the DNS to the resolved DNS realm alias.
-     *
-     * @param dnsAlias The DNS.
-     * @param realmPath The resolved realm.
-     */
-    @Deprecated
-    public void setDnsAlias(String dnsAlias, String realmPath) {
-        dnsAliasRealm = Pair.of(dnsAlias, realmPath);
-    }
-
-    /**
-     * Adds a mapping for the URI realm path to the resolved realm, taking in consideration any
-     * realm alias'.
-     *
-     * @param realmUri The URI realm path element.
-     * @param realm The resolved realm.
-     */
-    @Deprecated
-    public void setSubRealm(String realmUri, String realm) {
-        if ("/".equals(relativeRealmPath.getSecond())) { //Could be a realm alias or a realm path
-            realm = getRealm("/", realm);
-            relativeRealmPath = Pair.of(realmUri, realm);
-        } else { //Is not a realm alias, it must be a realm path
-            String a = getRealm(relativeRealmPath.getSecond(), realm);
-            relativeRealmPath = Pair.of(a, a);
-        }
-    }
-
-    /**
-     * Sets the realm resolved from the request realm query parameter.
-     *
-     * @param realm The resolved realm.
-     */
-    @Deprecated
-    public void setOverrideRealm(String realm) {
-        this.overrideRealm = realm;
-    }
-
-    private String getRealm(String realm, String subrealm) {
-        if (subrealm == null || subrealm.isEmpty()) {
-            return realm;
-        }
-        if (subrealm.startsWith("/")) {
-            subrealm = subrealm.substring(1);
-        }
-        if (subrealm.endsWith("/")) {
-            subrealm = subrealm.substring(0, subrealm.length() - 1);
-        }
-
-        return realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
-    }
-
-    /**
-     * Gets the base resolved realm.
-     *
-     * <p>If a DNS alias, that resolves to a sub-realm, was used then that is returned, otherwise
-     * the resolved realm from the URI realm is returned.</p>
-     *
-     * @return The base realm.
-     */
-    @Deprecated
-    public String getBaseRealm() {
-        if (dnsAliasRealm == null || dnsAliasRealm.getSecond().equals("/")) {
-            return relativeRealmPath.getSecond();
-        }
-        return dnsAliasRealm.getSecond();
-    }
-
-    /**
-     * Gets the relative resolved realm which is rebased on top of the base DNS realm.
-     *
-     * @return The relative realm.
-     */
-    @Deprecated
-    public String getRelativeRealm() {
-       return relativeRealmPath.getSecond();
-    }
-
-    /**
-     * Gets the realm associated with the dns alias. If none exists, return the root realm.
-     *
-     * @return an absolute path-style realm.
-     */
-    @Deprecated
-    public String getDnsAliasRealm() {
-        if (dnsAliasRealm != null) {
-            return dnsAliasRealm.getSecond();
-        }
-        return "/";
-    }
-
-    /**
-     * Gets the full rebased realm, including the DNS realm and the URI realm.
-     *
-     * @return The full rebased realm.
-     */
-    @Deprecated
-    String getRebasedRealm() {
-        if (dnsAliasRealm == null || dnsAliasRealm.getSecond().equals("/")) {
-            return relativeRealmPath.getSecond();
-        } else {
-            return dnsAliasRealm.getSecond() + relativeRealmPath.getSecond();
-        }
-    }
-
-    /**
-     * Gets the realm specified by the override query parameter.
-     *
-     * @return The override realm.
-     */
-    @Deprecated
-    String getOverrideRealm() {
-        return overrideRealm;
+        return realm.equals(Realm.root());
     }
 
     /**
      * Gets the realm.
      *
      * @return The realm.
+     * @since 14.0.0
      */
     public Realm getRealm() {
-        if (realm == null) {
-            try {
-                return Realm.of(getResolvedRealm());
-            } catch (RealmLookupException ignored) {
-                //Cannot happen as validated upfront
-            }
-        }
         return realm;
     }
 
     /**
-     * Given the context will return an appropriate realm.
+     * Gets the realm for the given context.
      *
-     * @param context
-     *         the http context
-     *
-     * @return passed realm else defaults to the root realm
+     * @param context The context.
+     * @return The realm from the context.
+     * @since 14.0.0
      */
-    @Deprecated
-    public static String getRealm(Context context) {
-        if (!context.containsContext(RealmContext.class)) {
-            return ROOT_REALM;
-        }
-
+    public static Realm getRealm(Context context) {
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realm = realmContext.getResolvedRealm();
-
-        if (StringUtils.isEmpty(realm)) {
-            realm = ROOT_REALM;
-        }
-
-        return realm;
+        return realmContext.getRealm();
     }
-
 }

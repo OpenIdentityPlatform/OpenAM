@@ -99,7 +99,7 @@ final public class RestUtils {
     public static boolean isAdmin(Context context, String role) {
         boolean isAdmin = false;
         try {
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            String realm = context.asContext(RealmContext.class).getRealm().asPath();
             SSOToken userSSOToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
 
             String universalId = userSSOToken.getPrincipal().getName();

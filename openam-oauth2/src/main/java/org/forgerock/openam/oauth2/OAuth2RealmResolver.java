@@ -62,7 +62,7 @@ public class OAuth2RealmResolver {
     public String resolveFrom(Context context) {
         Reject.ifFalse(context.containsContext(RealmContext.class), "Must contain a RealmContext cannot be null");
         Reject.ifNull(context, "Context cannot be null");
-        return RealmContext.getRealm(context);
+        return RealmContext.getRealm(context).asPath();
     }
 
 }

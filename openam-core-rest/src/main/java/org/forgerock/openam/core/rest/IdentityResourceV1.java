@@ -584,7 +584,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final ActionRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
         RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         final String action = request.getAction();
@@ -1033,7 +1033,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final CreateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
             // anyone can create an account add
@@ -1126,7 +1126,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final String resourceId, final DeleteRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -1205,7 +1205,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final QueryRequest request, final QueryResourceHandler handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
             SSOToken admin = getSSOToken(getCookieFromServerContext(context));
@@ -1240,7 +1240,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final String resourceId, final ReadRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         IdentityDetails dtls;
         SSOToken admin = null;
@@ -1321,7 +1321,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         try {
             SSOToken ssoToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
             String requestRealm =
-                    coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class).getResolvedRealm());
+                    coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class).getRealm().asPath());
             return resourceId.equalsIgnoreCase(ssoToken.getProperty("UserId"))
                     && requestRealm.equalsIgnoreCase(ssoToken.getProperty(Constants.ORGANIZATION));
         } catch (SSOException e) {
@@ -1336,7 +1336,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final String resourceId, final UpdateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         final JsonValue jsonValue = request.getContent();
         final String rev = request.getRevision();

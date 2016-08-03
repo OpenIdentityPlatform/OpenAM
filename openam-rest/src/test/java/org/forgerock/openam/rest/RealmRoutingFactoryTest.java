@@ -51,7 +51,7 @@ public class RealmRoutingFactoryTest {
     private RealmRoutingFactory realmRoutingFactory;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
 

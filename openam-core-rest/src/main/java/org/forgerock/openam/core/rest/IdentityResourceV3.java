@@ -198,7 +198,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             final QueryRequest request, final QueryResourceHandler handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
             SSOToken admin = context.asContext(SSOTokenContext.class).getCallerSSOToken();
@@ -266,7 +266,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
         }
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
             if (!isAdmin(context)) {

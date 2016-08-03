@@ -44,6 +44,8 @@ import javax.security.auth.Subject;
 
 import com.sun.identity.shared.Constants;
 import org.assertj.core.api.Assertions;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
@@ -113,6 +115,7 @@ public class UmaPolicyServiceImplDelegationTest {
     private CoreServicesWrapper coreServicesWrapper;
     @Mock
     UmaSettings umaSettings;
+    private RealmTestHelper realmTestHelper;
 
     private AMIdentity loggedInUser;
     private String loggedInUserId;
@@ -148,10 +151,14 @@ public class UmaPolicyServiceImplDelegationTest {
                 extensionFilterManager);
 
         given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
+
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
     }
 
     @AfterMethod
     public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
         loggedInUser = null;
         loggedInUserId = null;
         loggedInRealm = null;
@@ -457,7 +464,7 @@ public class UmaPolicyServiceImplDelegationTest {
         given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(loggedInUserId);
-        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext, Realm.root()));
     }
 
     @SuppressWarnings("unchecked")

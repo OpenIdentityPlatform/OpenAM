@@ -38,6 +38,9 @@ import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTest;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesDao;
 import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
 import org.forgerock.openam.rest.RealmContext;
@@ -47,6 +50,7 @@ import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,9 +60,10 @@ public class TrustedDevicesResourceTest {
 
     private TrustedDevicesDao dao;
     private ContextHelper contextHelper;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         dao = mock(TrustedDevicesDao.class);
         contextHelper = mock(ContextHelper.class);
@@ -66,14 +71,20 @@ public class TrustedDevicesResourceTest {
         resource = new TrustedDevicesResource(dao, contextHelper);
 
         given(contextHelper.getUserId((Context) anyObject())).willReturn("demo");
+
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();;
     }
 
     private Context ctx() {
         SSOTokenContext ssoTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(ssoTokenContext);
-        Context serverContext = ClientContext.newInternalClientContext(realmContext);
-
-        return serverContext;
+        RealmContext realmContext = new RealmContext(ssoTokenContext, Realm.root());
+        return ClientContext.newInternalClientContext(realmContext);
     }
 
     @Test

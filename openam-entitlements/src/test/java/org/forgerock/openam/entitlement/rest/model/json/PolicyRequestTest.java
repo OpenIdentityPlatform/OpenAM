@@ -39,6 +39,8 @@ import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.shared.Constants;
 
 import org.fest.assertions.Condition;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
@@ -54,6 +56,7 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -70,13 +73,21 @@ public class PolicyRequestTest {
     private ActionRequest actionRequest;
     @Mock
     private SSOTokenManager tokenManager;
+    private RealmTestHelper realmTestHelper;
 
     private Subject restSubject;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         restSubject = new Subject();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -86,7 +97,8 @@ public class PolicyRequestTest {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullRequest() throws EntitlementException {
-        Context context = buildContextStructure("/abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        Context context = buildContextStructure(realm);
         getRequest(context, null);
     }
 
@@ -107,9 +119,10 @@ public class PolicyRequestTest {
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("Fred");
         given(tokenManager.createSSOToken(anyString())).willReturn(token);
         given(tokenManager.isValidToken(token)).willReturn(true);
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
@@ -129,9 +142,10 @@ public class PolicyRequestTest {
     public void shouldRejectInvalidRestSubject() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(null);
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         getRequest(context, actionRequest);
     }
 
@@ -144,9 +158,10 @@ public class PolicyRequestTest {
         properties.put("subject", "some-value");
 
         given(actionRequest.getContent()).willReturn(json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         getRequest(context, actionRequest);
     }
 
@@ -157,9 +172,10 @@ public class PolicyRequestTest {
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
@@ -179,9 +195,10 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
         final JsonValue jwt = getJsonSubject(subjectName);
         given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("claims", jwt.asMap()))))));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then
@@ -199,9 +216,10 @@ public class PolicyRequestTest {
         Jwt jwt = getJwtSubject(subjectName);
 
         given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("jwt", jwt.build()))))));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then
@@ -232,9 +250,10 @@ public class PolicyRequestTest {
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // When...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
@@ -255,7 +274,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        Context context = buildContextStructure("");
+        Context context = buildContextStructure(Realm.root());
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
@@ -276,7 +295,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        Context context = buildContextStructure("");
+        Context context = buildContextStructure(Realm.root());
         PolicyRequest request = getRequest(context, actionRequest);
 
         // Then...
@@ -289,9 +308,8 @@ public class PolicyRequestTest {
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
 
-    private Context buildContextStructure(final String realm) {
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm(realm, realm);
+    private Context buildContextStructure(final Realm realm) {
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         return ClientContext.newInternalClientContext(realmContext);
     }
 

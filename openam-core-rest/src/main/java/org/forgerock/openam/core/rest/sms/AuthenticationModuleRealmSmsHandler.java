@@ -102,7 +102,7 @@ public class AuthenticationModuleRealmSmsHandler {
 
         try {
             SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            String realm = context.asContext(RealmContext.class).getRealm().asPath();
             AMAuthenticationManager mgr = new AMAuthenticationManager(ssoToken, realm);
             Set<AMAuthenticationInstance> moduleInstances = mgr.getAuthenticationInstances();
 

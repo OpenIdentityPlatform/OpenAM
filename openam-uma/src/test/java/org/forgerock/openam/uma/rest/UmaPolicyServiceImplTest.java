@@ -43,6 +43,9 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import com.sun.identity.shared.Constants;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTest;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.uma.ResourceSetAcceptAllFilter;
 import org.forgerock.openam.uma.extensions.ResourceDelegationFilter;
@@ -82,6 +85,7 @@ import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -105,6 +109,7 @@ public class UmaPolicyServiceImplTest {
     private CoreServicesWrapper coreServicesWrapper;
     private UmaSettings umaSettings;
     private ResourceDelegationFilter resourceDelegationFilter;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -157,6 +162,14 @@ public class UmaPolicyServiceImplTest {
         AMIdentity identity = mock(AMIdentity.class);
         given(identity.getUniversalId()).willReturn("uid=RESOURCE_OWNER_ID,ou=REALM,dc=forgerock,dc=org");
         given(coreServicesWrapper.getIdentity(RESOURCE_OWNER_ID, "REALM")).willReturn(identity);
+
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     private Context createContext() throws SSOException {
@@ -171,7 +184,7 @@ public class UmaPolicyServiceImplTest {
         given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + userShortName + ",ou=REALM,dc=forgerock,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(userShortName);
-        return ClientContext.newInternalClientContext(new RealmContext(subjectContext));
+        return ClientContext.newInternalClientContext(new RealmContext(subjectContext, Realm.root()));
     }
 
     private static JsonValue createUmaPolicyJson(String resourceSetId, String... subjectTwoScopes) {

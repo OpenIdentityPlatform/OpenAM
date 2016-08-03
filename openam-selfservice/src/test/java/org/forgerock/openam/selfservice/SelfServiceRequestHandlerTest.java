@@ -28,14 +28,19 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.selfservice.config.SelfServiceConsoleConfig;
 import org.forgerock.openam.selfservice.config.ServiceConfigProvider;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.selfservice.core.config.ProcessInstanceConfig;
+import org.forgerock.services.context.Context;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -63,19 +68,27 @@ public final class SelfServiceRequestHandlerTest {
     @Mock
     private RequestHandler underlyingService;
 
-    private HttpContext context;
+    private RealmTestHelper realmTestHelper;
+    private Context context;
 
     private RequestHandler selfServiceHandler;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        context = new HttpContext(json(object(field("headers", Collections.emptyMap()),
-                field("parameters", Collections.emptyMap()))), null);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+        context = new RealmContext(new HttpContext(json(object(field("headers", Collections.emptyMap()),
+                field("parameters", Collections.emptyMap()))), null), Realm.root());
 
         selfServiceHandler = new SelfServiceRequestHandler<>(MockBuilder.class,
                 consoleConfigHandler, providerFactory, serviceFactory);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test

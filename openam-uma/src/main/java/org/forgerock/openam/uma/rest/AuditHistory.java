@@ -98,7 +98,7 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     private AMIdentity getIdentity(Context context) {
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        String realm = context.asContext(RealmContext.class).getRealm().asPath();
         final String user = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
         return IdUtils.getIdentity(user, realm);
     }

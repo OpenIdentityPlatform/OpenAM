@@ -106,7 +106,7 @@ final class SelfServiceRequestHandler<C extends SelfServiceConsoleConfig>
     }
 
     private RequestHandler getService(Context context) throws NotSupportedException {
-        String realm = RealmContext.getRealm(context).toLowerCase();
+        String realm = RealmContext.getRealm(context).asPath().toLowerCase();
         RequestHandler service = serviceCache.get(realm);
 
         if (service == null) {

@@ -99,7 +99,7 @@ public abstract class PrivilegeAuthzModule {
 
         // If no realm is specified default to the root realm.
         final String realm = (context.containsContext(RealmContext.class)) ?
-                context.asContext(RealmContext.class).getResolvedRealm() : "/";
+                context.asContext(RealmContext.class).getRealm().asPath() : "/";
         final SubjectContext subjectContext = context.asContext(SubjectContext.class);
         final UriRouterContext routerContext = context.asContext(UriRouterContext.class);
 

@@ -83,7 +83,7 @@ class CrestAuditor {
         this.startTime = context.asContext(RequestAuditContext.class).getRequestReceivedTime();
 
         if (context.containsContext(RealmContext.class)) {
-            this.realm = context.asContext(RealmContext.class).getResolvedRealm();
+            this.realm = context.asContext(RealmContext.class).getRealm().asPath();
         } else {
             this.realm = NO_REALM;
         }

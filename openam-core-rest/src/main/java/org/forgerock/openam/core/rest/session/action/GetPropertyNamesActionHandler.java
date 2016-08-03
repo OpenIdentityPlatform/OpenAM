@@ -60,7 +60,7 @@ public class GetPropertyNamesActionHandler implements ActionHandler {
             final ActionRequest request) {
         try {
             final SSOToken caller = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-            final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             return newResultPromise(newActionResponse(json(object(field(SessionResource.KEYWORD_PROPERTIES,
                     sessionPropertyWhitelist.getAllListedProperties(realm))))));
         } catch (Exception e) {

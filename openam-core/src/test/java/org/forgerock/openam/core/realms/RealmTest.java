@@ -36,7 +36,7 @@ public class RealmTest {
     private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         realmTestHelper = new RealmTestHelper(realmLookup, coreWrapper);
         realmTestHelper.setupRealmClass();

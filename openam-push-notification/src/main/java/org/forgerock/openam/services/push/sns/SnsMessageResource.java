@@ -144,7 +144,7 @@ public class SnsMessageResource {
     private Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest actionRequest) {
         Reject.ifFalse(context.containsContext(RealmContext.class));
 
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        String realm = context.asContext(RealmContext.class).getRealm().asPath();
 
         if (!actionRequest.getAction().equals(AUTHENTICATE) && !actionRequest.getAction().equals(REGISTER)) {
             debug.warning("Received message in realm {} with invalid messageId.", realm);

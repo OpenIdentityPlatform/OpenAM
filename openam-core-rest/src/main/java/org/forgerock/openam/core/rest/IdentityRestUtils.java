@@ -169,7 +169,7 @@ public final class IdentityRestUtils {
             return;
         }
 
-        final String realm = RealmContext.getRealm(context);
+        final String realm = RealmContext.getRealm(context).asPath();
 
         if (validUserAttributes == null || validUserAttributes.isEmpty()) {
             throw new BadRequestException("Null/empty whitelist of valid attributes for self service user creation");

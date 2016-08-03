@@ -54,6 +54,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SortKey;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.entitlement.guice.EntitlementRestGuiceModule;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationWrapper;
@@ -70,6 +72,7 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -90,9 +93,10 @@ public class ApplicationsResourceTest {
     private ApplicationWrapper applicationWrapper;
     private EntitlementsExceptionMappingHandler resourceErrorHandler
             = new EntitlementsExceptionMappingHandler(EntitlementRestGuiceModule.getEntitlementsErrorHandlers());
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         debug = mock(Debug.class);
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
@@ -100,6 +104,8 @@ public class ApplicationsResourceTest {
         when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
         applicationTypeManagerWrapper = mock(ApplicationTypeManagerWrapper.class);
         applicationWrapper = mock(ApplicationWrapper.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         applicationsResource = new ApplicationsResource(debug, applicationServiceFactory, applicationTypeManagerWrapper,
                 resourceErrorHandler) {
 
@@ -116,13 +122,18 @@ public class ApplicationsResourceTest {
         };
     }
 
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
+    }
+
     @Test (expectedExceptions = BadRequestException.class)
     public void shouldReturnNullIfSubjectNullOnCreate() throws ResourceException {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
 
@@ -140,8 +151,8 @@ public class ApplicationsResourceTest {
     public void shouldThrowBadRequestIfApplicationWrapperCannotBeCreated() throws ResourceException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
@@ -170,8 +181,7 @@ public class ApplicationsResourceTest {
     public void shouldThrowInternalIfApplicationClassCannotBeInstantiated() throws ResourceException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("/", "/");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, Realm.root());
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
 
@@ -199,8 +209,7 @@ public class ApplicationsResourceTest {
     public void shouldThrowInternalErrorIfResourceWillNotSave() throws EntitlementException, ResourceException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("/", "/");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, Realm.root());
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
@@ -219,8 +228,7 @@ public class ApplicationsResourceTest {
     public void shouldReturnBadRequestIfCannotReturnResource() throws EntitlementException, ResourceException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("/", "/");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, Realm.root());
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject subject = null;
 
@@ -239,8 +247,7 @@ public class ApplicationsResourceTest {
     public void shouldCreateApplication() throws ExecutionException, ResourceException, EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("/", "/");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, Realm.root());
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject mockSubject = new Subject();
         Application application = mock(Application.class);
@@ -262,8 +269,7 @@ public class ApplicationsResourceTest {
     public void shouldNotCreateApplicationWithInvalidCharactersInName() throws ResourceException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("/", "/");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, Realm.root());
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
@@ -281,8 +287,8 @@ public class ApplicationsResourceTest {
     public void shouldThrowBadRequestIfSubjectNotFoundOnRead() throws ResourceException {
         // Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         given(subjectContext.getCallerSubject()).willReturn(null);
 
@@ -299,8 +305,8 @@ public class ApplicationsResourceTest {
         String resourceID = "iPlanetAMWebAgentService";
 
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("badger", "badger");
+        Realm realm = realmTestHelper.mockRealm("badger");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
@@ -320,11 +326,11 @@ public class ApplicationsResourceTest {
     public void shouldUseRealmFromContextSubjectOnRead() throws EntitlementException {
         // Given
         String resourceID = "ferret";
-        String realmID = "/badger";
+        String realmID = "badger";
 
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm(realmID, realmID);
+        Realm realm = realmTestHelper.mockRealm(realmID);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
@@ -346,8 +352,8 @@ public class ApplicationsResourceTest {
         String resourceID = "ferret";
 
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("badger", "badger");
+        Realm realm = realmTestHelper.mockRealm("badger");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
@@ -368,8 +374,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "RESOURCE_ID";
         DeleteRequest request = mock(DeleteRequest.class);
@@ -391,8 +397,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         Application application = mock(Application.class);
@@ -441,8 +447,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "RESOURCE_ID";
         DeleteRequest request = mock(DeleteRequest.class);
@@ -463,8 +469,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -501,8 +507,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -526,8 +532,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -556,8 +562,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -584,8 +590,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "RESOURCE_ID";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -610,8 +616,8 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm("REALM", "REALM");
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         Context context = ClientContext.newInternalClientContext(realmContext);
         String resourceId = "RESOURCE_ID";
         UpdateRequest request = mock(UpdateRequest.class);
@@ -660,8 +666,8 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
-        realmContext.setSubRealm("abc", "abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        RealmContext realmContext = new RealmContext(mockSubjectContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         // Set the page size to be three starting from the second item.
@@ -730,8 +736,8 @@ public class ApplicationsResourceTest {
 
         // Given...
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
-        realmContext.setSubRealm("abc", "abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        RealmContext realmContext = new RealmContext(mockSubjectContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         QueryRequest request = mock(QueryRequest.class);
@@ -765,8 +771,8 @@ public class ApplicationsResourceTest {
     public void shouldHandleApplicationFindFailure() throws EntitlementException, ResourceException {
         // Given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
-        realmContext.setSubRealm("abc", "abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        RealmContext realmContext = new RealmContext(mockSubjectContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         // Set the page size to be three starting from the second item.
@@ -821,8 +827,8 @@ public class ApplicationsResourceTest {
 
         // Given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
-        realmContext.setSubRealm("abc", "abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        RealmContext realmContext = new RealmContext(mockSubjectContext, realm);
         Context serverContext = ClientContext.newInternalClientContext(realmContext);
 
         // Set the page size to be three starting from the second item.

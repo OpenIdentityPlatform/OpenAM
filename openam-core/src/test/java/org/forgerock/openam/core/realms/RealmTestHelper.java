@@ -105,7 +105,7 @@ public class RealmTestHelper {
      *
      * <p>MUST ensure {@link #tearDownRealmClass()} is called when tearing down test class.</p>
      */
-    public void setupRealmClass() {
+    public void setupRealmClass() throws Exception {
         lastSetup = Thread.currentThread().getStackTrace();
         Guice.createInjector(new AbstractModule() {
             @Override
@@ -125,9 +125,11 @@ public class RealmTestHelper {
         lastSetup = null;
     }
 
-    private void mockRootRealm() {
+    private void mockRootRealm() throws Exception {
         when(coreWrapper.convertRealmNameToOrgName(ROOT_REALM_PATH)).thenReturn(BASE_DN);
         when(coreWrapper.convertOrgNameToRealmName(BASE_DN)).thenReturn(ROOT_REALM_PATH);
+        Realm rootRealm = new Realm(BASE_DN);
+        when(realmLookup.lookup(ROOT_REALM_PATH)).thenReturn(rootRealm);
     }
 
     /**

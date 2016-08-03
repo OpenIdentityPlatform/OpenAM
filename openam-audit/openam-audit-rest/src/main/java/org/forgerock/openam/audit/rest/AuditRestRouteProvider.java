@@ -124,7 +124,7 @@ public class AuditRestRouteProvider extends AbstractRestRouteProvider {
                             }
 
                             private AMAuditService getAuditService(Context context) {
-                                String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                                String realm = context.asContext(RealmContext.class).getRealm().asPath();
 
                                 if (StringUtils.isEmpty(realm)) {
                                     logger.warn("Context contained RealmContext but had an empty resolved realm");

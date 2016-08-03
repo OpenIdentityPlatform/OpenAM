@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 
 import javax.inject.Provider;
 
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -36,9 +35,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
@@ -57,9 +55,6 @@ public class RequesterTest {
 
     @BeforeTest
     private void theSetUp() { // you need this
-        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.setSubRealm("REALM", "REALM");
         mockServerContext = mock(Context.class);
     }
 

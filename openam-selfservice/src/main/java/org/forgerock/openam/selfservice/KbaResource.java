@@ -63,7 +63,7 @@ final class KbaResource implements SingletonResourceProvider {
 
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
-        String realm = RealmContext.getRealm(context);
+        String realm = RealmContext.getRealm(context).asPath();
         JsonValue kbaJson = configHandler.getConfig(realm, KbaBuilder.class);
         ResourceResponse response = Responses.newResourceResponse("1", "1.0", kbaJson);
         return Promises.newResultPromise(response);

@@ -101,7 +101,7 @@ public class ServicesRealmSmsHandler {
         }
 
         final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
-        final String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        final String realm = context.asContext(RealmContext.class).getRealm().asPath();
         final List<ResourceResponse> resourceResponses = new ArrayList<>();
 
         try {

@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.entitlement.rest;
 
-import static org.forgerock.json.JsonValue.array;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -37,6 +40,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.DecoratedCollectionResourceProvider;
 import org.forgerock.services.context.Context;
@@ -44,14 +49,6 @@ import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Adds additional behaviour to the existing {@link PolicyResource} to support the move and copy of policies.
@@ -112,11 +109,11 @@ final class PolicyResourceWithCopyMoveSupport extends DecoratedCollectionResourc
             throw new BadRequestException("to definition is missing");
         }
 
-        String sourceRealm = RealmContext.getRealm(context);
+        Realm sourceRealm = RealmContext.getRealm(context);
 
         String destinationRealm = to
                 .get("realm")
-                .defaultTo(sourceRealm)
+                .defaultTo(sourceRealm.asPath())
                 .asString();
 
         String destinationApplication = to
@@ -220,7 +217,7 @@ final class PolicyResourceWithCopyMoveSupport extends DecoratedCollectionResourc
 
     private ActionResponse copyPolicy(
             Context context, String resourceId, ActionRequest request) throws ResourceException {
-        String sourceRealm = RealmContext.getRealm(context);
+        String sourceRealm = RealmContext.getRealm(context).asPath();
         JsonValue payload = request.getContent().get("to");
 
         if (payload.isNull()) {
@@ -263,8 +260,12 @@ final class PolicyResourceWithCopyMoveSupport extends DecoratedCollectionResourc
         policy.put("applicationName", destinationApplication);
         policy.put("resourceTypeUuid", destinationResourceTypeId);
 
-        RealmContext updatedContext = new RealmContext(context);
-        updatedContext.setOverrideRealm(destinationRealm);
+        RealmContext updatedContext;
+        try {
+            updatedContext = new RealmContext(context, Realm.of(destinationRealm));
+        } catch (RealmLookupException e) {
+            throw new BadRequestException("Invalid destination realm: " + e.getRealm(), e);
+        }
 
         CreateRequest createRequest = Requests.newCreateRequest("policies", policy);
         JsonValue copiedPolicy = router.handleCreate(updatedContext, createRequest)

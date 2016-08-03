@@ -49,6 +49,8 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesDao;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
@@ -62,6 +64,7 @@ import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -82,21 +85,30 @@ public class PushDevicesResourceTest {
     private AuthenticatorDeviceServiceFactory pushServiceFactory;
     @Mock
     private AuthenticatorPushService pushService;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() throws SMSException, SSOException {
+    public void setUp() throws Exception {
 
         MockitoAnnotations.initMocks(this);
         resource = new PushDevicesResourceTestClass(dao, contextHelper, debug, pushServiceFactory);
 
         given(contextHelper.getUserId((Context) anyObject())).willReturn(USER_ID);
         given(pushServiceFactory.create(anyString())).willReturn(pushService);
+
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     private Context ctx() throws SSOException {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         given(mockSubjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
-        return ClientContext.newInternalClientContext(new RealmContext(mock(SSOTokenContext.class)));
+        return ClientContext.newInternalClientContext(new RealmContext(mock(SSOTokenContext.class), Realm.root()));
     }
 
     @Test
