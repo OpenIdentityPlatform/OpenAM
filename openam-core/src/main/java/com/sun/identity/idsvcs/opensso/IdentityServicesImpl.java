@@ -1025,21 +1025,19 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
 
    private AMIdentity getAMIdentity(SSOToken ssoToken, AMIdentityRepository repo, String guid, IdType idType)
             throws IdRepoException, SSOException {
-        if (isOperationSupported(repo, idType, IdOperation.READ)) {
-            try {
-                if (LDAPUtils.isDN(guid)) {
-                    return new AMIdentity(ssoToken, guid);
-                } else {
-                    return new AMIdentity(ssoToken, guid, idType, repo.getRealmIdentity().getRealm(), null);
-                }
-            } catch (IdRepoException ex) {
-                String errCode = ex.getErrorCode();
+        try {
+            if (LDAPUtils.isDN(guid)) {
+                return new AMIdentity(ssoToken, guid);
+            } else {
+                return new AMIdentity(ssoToken, guid, idType, repo.getRealmIdentity().getRealm(), null);
+            }
+        } catch (IdRepoException ex) {
+            String errCode = ex.getErrorCode();
 
-                // If it is error code 215, ignore the error as this indicates
-                // an invalid uid.
-                if (!IdRepoErrorCode.ILLEGAL_UNIVERSAL_IDENTIFIER.equals(errCode)) {
-                    throw ex;
-                }
+            // If it is error code 215, ignore the error as this indicates
+            // an invalid uid.
+            if (!IdRepoErrorCode.ILLEGAL_UNIVERSAL_IDENTIFIER.equals(errCode)) {
+                throw ex;
             }
         }
         return null;
