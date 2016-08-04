@@ -24,11 +24,12 @@ require.config({
         }
     },
     paths: {
-        "lodash":       "libs/lodash-3.10.1-min",
-        "handlebars":   "libs/handlebars-4.0.5",
-        "i18next":      "libs/i18next-1.7.3-min",
-        "jquery":       "libs/jquery-2.1.1-min",
-        "text":         "libs/text-2.0.15"
+        "handlebars": "libs/handlebars-4.0.5",
+        "i18next": "libs/i18next-1.7.3-min",
+        "jquery": "libs/jquery-2.1.1-min",
+        "lodash": "libs/lodash-3.10.1-min",
+        "redux": "libs/redux-3.5.2-min",
+        "text": "libs/text-2.0.15"
     },
     shim: {
         "handlebars": {
