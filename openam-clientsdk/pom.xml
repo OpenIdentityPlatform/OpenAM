@@ -226,6 +226,8 @@
                                 <include>com/sun/identity/configuration/SystemProperties*</include>
                                 <include>com/sun/identity/delegation/DelegationManager*</include>
                                 <include>com/sun/identity/delegation/DelegationException*</include>
+                                <include>com/sun/identity/delegation/DelegationPermission*</include>
+                                <include>com/sun/identity/delegation/DelegationPrivilege*</include>
                                 <include>com/sun/identity/delegation/ResBundleUtils*</include>
                                 <include>com/sun/identity/entitlement/**</include>
                                 <include>com/sun/identity/entity/*</include>
