@@ -1044,6 +1044,12 @@
                 <type>zip</type>
             </dependency>
             <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-api</artifactId>
+                <version>${project.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
                 <groupId>org.forgerock.commons.ui.libs</groupId>
                 <artifactId>jquery.qrcode</artifactId>
                 <version>0.11.0</version>

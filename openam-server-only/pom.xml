@@ -110,6 +110,13 @@
                                     <outputDirectory>${project.build.directory}/XUI</outputDirectory>
                                     <includes>**/*</includes>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-ui-api</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/api</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -257,6 +264,14 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>XUI</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/api/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>api</targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -671,6 +686,12 @@
             <artifactId>openam-ui-ria</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ui-api</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>

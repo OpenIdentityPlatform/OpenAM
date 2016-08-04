@@ -27,5 +27,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>openam-ui-ria</module>
+        <module>openam-ui-api</module>
     </modules>
 </project>
