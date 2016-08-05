@@ -474,7 +474,7 @@ public class SessionService {
     void deleteFromRepository(InternalSession session) {
         try {
             String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
-            getRepository().deleteAsync(tokenId);
+            getRepository().delete(tokenId);
         } catch (Exception e) {
             sessionDebug.error("SessionService : failed deleting session ",
                     e);
@@ -1522,7 +1522,7 @@ public class SessionService {
             return;
         }
         try {
-            getRepository().updateAsync(tokenAdapter.toToken(session));
+            getRepository().update(tokenAdapter.toToken(session));
         } catch (Exception e) {
             sessionDebug.error("SessionService.save: " + "exception encountered", e);
         }
