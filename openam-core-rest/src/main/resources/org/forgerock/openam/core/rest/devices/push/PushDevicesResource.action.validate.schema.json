@@ -4,7 +4,8 @@
   "description": "i18n:api-descriptor/PushDevicesResource#action.validate.schema.description",
   "properties": {
     "result": {
-      "constant": true
+      "constant": true,
+      "type": "string"
     }
   }
 }

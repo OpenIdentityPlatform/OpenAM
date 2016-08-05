@@ -6,7 +6,8 @@
     "result": {
       "constant": true,
       "title": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.result.title",
-      "description": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.result.description"
+      "description": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.result.description",
+      "type": "string"
     }
   }
 }
