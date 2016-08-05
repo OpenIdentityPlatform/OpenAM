@@ -16,6 +16,8 @@
 define([
     "jquery",
     "lodash",
+    "store/actions/creators",
+    "store/index",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
@@ -25,7 +27,7 @@ define([
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
-], ($, _, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
+], ($, _, creators, store, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
     SessionToken, AuthenticationToken) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
     let requirementList = [];
@@ -65,6 +67,11 @@ define([
         const delimiter = url.indexOf("?") === -1 ? "?" : "&";
         return `${url}${delimiter}${queryString}`;
     }
+
+    function addRealmToStore (realm) {
+        store.default.dispatch(creators.sessionAddRealm(realm));
+    }
+
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
         const urlAndParams = addQueryStringToUrl(
@@ -112,14 +119,18 @@ define([
                 value: true
             });
         }
+
+        const isAuthenticated = requirements.hasOwnProperty("tokenId");
+
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
             Configuration.globalData.auth.currentStage = requirementList.length;
             if (!AuthenticationToken.get() && _.find(requirements.callbacks, callbackTracking)) {
                 AuthenticationToken.set(requirements.authId);
             }
-        } else if (requirements.hasOwnProperty("tokenId")) {
+        } else if (isAuthenticated) {
             SessionToken.set(requirements.tokenId);
+            addRealmToStore(requirements.realm);
         }
     };
     obj.submitRequirements = function (requirements, options) {
