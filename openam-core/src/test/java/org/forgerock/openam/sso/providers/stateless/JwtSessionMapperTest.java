@@ -184,7 +184,7 @@ public class JwtSessionMapperTest {
 
     private SessionInfo newExampleSessionInfo() {
         SessionInfo sessionInfo = new SessionInfo();
-        sessionInfo.setSessionID("AQIC5wM2LY4SfczvH7ej82FoQ5tx4Ixjpd4sBrP5aYHXvf0.*AAJTSQACMDMAAlNLABQtNDE0OTU2OTM4NjY2Mzk3Mjg3MgACUzEAAjAx*");
+        sessionInfo.setSessionID(null);
         sessionInfo.setSessionType("user");
         sessionInfo.setClientID("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
         sessionInfo.setClientDomain("dc=openam,dc=forgerock,dc=org");
@@ -201,7 +201,6 @@ public class JwtSessionMapperTest {
         sessionInfo.getProperties().put("successURL", "/openam/console");
         sessionInfo.getProperties().put("cookieSupport", "true");
         sessionInfo.getProperties().put("AuthLevel", "0");
-        sessionInfo.getProperties().put("SessionHandle", "shandle:AQIC5wM2LY4Sfcz2r0heYum8JSnH9eXYDQ0lx9-s9ZE7ma8.*AAJTSQACMDMAAlMxAAIwMQACU0sAFC00MTQ5NTY5Mzg2NjYzOTcyODcy*");
         sessionInfo.getProperties().put("UserToken", "amadmin");
         sessionInfo.getProperties().put("loginURL", "/openam/UI/Login");
         sessionInfo.getProperties().put("Principals", "amadmin");

@@ -1066,7 +1066,7 @@ public class InternalSession implements Serializable {
         }
 
         info.setProperties((Hashtable<String, String>) sessionProperties.clone());
-        if (withIds) {
+        if (withIds && sessionHandle != null) {
             //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
             info.getProperties().put(SESSION_HANDLE_PROP, sessionHandle);
         }

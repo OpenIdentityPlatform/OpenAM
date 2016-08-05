@@ -29,6 +29,21 @@
 
 package com.iplanet.dpro.session;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.utils.PerThreadCache;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
@@ -39,18 +54,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
-import org.forgerock.openam.utils.PerThreadCache;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.util.Map;
 
 /**
  * The <code>SessionID</code> class is used to identify a Session object. It
@@ -693,17 +696,49 @@ public class SessionID implements Serializable {
      *
      * @param serverConfig Required server configuration
      * @param domain session domain
-     * @param jwt The JWT to encode as part of Stateless Sessions.
      *
      * @return newly generated session id
      * @throws SessionException
      */
-    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain, String jwt) throws SessionException {
+    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain) throws SessionException {
 
-        SessionID sid;
         String encryptedID = generateEncryptedID(serverConfig);
 
         String siteID = serverConfig.getPrimaryServerID();
+        String primaryID = getPrimaryId(serverConfig);
+        // AME-129, always set a Storage Key regardless of persisting or not.
+        String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());
+        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, storageKey);
+
+        String sessionID = SessionID.makeSessionID(encryptedID, ext, null);
+
+        return new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
+    }
+
+    /**
+     * Generates a new stateless session ID.
+     *
+     * @param serverConfig Required server configuration.
+     * @param domain session domain.
+     * @param jwt the stateless session JWT.
+     * @return the stateless session ID.
+     * @throws SessionException if an error occurs encoding the session ID.
+     */
+    public static SessionID generateStatelessSessionID(SessionServerConfig serverConfig, String domain, String jwt)
+            throws SessionException {
+        Reject.ifNull(jwt);
+
+        String siteID = serverConfig.getPrimaryServerID();
+        String primaryID = getPrimaryId(serverConfig);
+        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, null);
+
+        final String sessionId = makeSessionID("", ext, jwt);
+
+        return new SessionID(sessionId, serverConfig.getLocalServerID(), domain);
+    }
+
+
+    private static String getPrimaryId(SessionServerConfig serverConfig) {
         String primaryID = "";
         // AME-129 Required for Automatic Session Failover Persistence
         if (serverConfig.isSiteEnabled() &&
@@ -712,16 +747,9 @@ public class SessionID implements Serializable {
 
             primaryID = serverConfig.getLocalServerID();
         }
-        // AME-129, always set a Storage Key regardless of persisting or not.
-        String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());
-        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, storageKey);
-
-        String sessionID = SessionID.makeSessionID(encryptedID, ext, jwt);
-
-        sid = new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
-
-        return sid;
+        return primaryID;
     }
+
 
     private SessionID(String sid, String serverID, String domain) {
         this(sid);

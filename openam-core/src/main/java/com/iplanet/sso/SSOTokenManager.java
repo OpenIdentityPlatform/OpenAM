@@ -582,7 +582,9 @@ public class SSOTokenManager {
      * @return True if the object contained a JWT.
      */
     private boolean containsJwt(Object object) {
-        if (!SystemProperties.isServerMode()) return false;
+        if (!SystemProperties.isServerMode()) {
+            return false;
+        }
 
         try {
             if (object instanceof HttpServletRequest) {

@@ -91,7 +91,7 @@ public class InternalSessionFactory {
      */
     public InternalSession newInternalSession(String domain, boolean stateless) {
         try {
-            final SessionID sessionID = generateSessionId(domain, null);
+            final SessionID sessionID = generateSessionId(domain);
             return generateInternalSession(sessionID, stateless);
         } catch (SessionException e) {
             sessionDebug.error("Error creating new session", e);
@@ -103,10 +103,10 @@ public class InternalSessionFactory {
 
         InternalSession session = new InternalSession(sid);
 
-        String sessionHandle = sid.generateSessionHandle(serverConfig);
-        session.setSessionHandle(sessionHandle);
-
         if (!stateless) {
+            String sessionHandle = sid.generateSessionHandle(serverConfig);
+            session.setSessionHandle(sessionHandle);
+
             cache.put(session);
 
             if (SystemProperties.isServerMode()) {
@@ -135,10 +135,10 @@ public class InternalSessionFactory {
      * @return newly generated session id
      * @throws SessionException
      */
-    private SessionID generateSessionId(String domain, String jwt) throws SessionException {
+    private SessionID generateSessionId(String domain) throws SessionException {
         SessionID sid;
         do {
-            sid = SessionID.generateSessionID(serverConfig, domain, jwt);
+            sid = SessionID.generateSessionID(serverConfig, domain);
         } while (cache.getBySessionID(sid) != null || cache.getByHandle(sid.toString()) != null);
         return sid;
     }

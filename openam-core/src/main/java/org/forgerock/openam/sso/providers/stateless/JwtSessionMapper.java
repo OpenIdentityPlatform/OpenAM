@@ -34,13 +34,13 @@ import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
@@ -52,7 +52,8 @@ import com.iplanet.dpro.session.share.SessionInfo;
 public final class JwtSessionMapper {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            .setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
+            .configure(SerializationFeature.INDENT_OUTPUT, false);
     private static final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
     };
@@ -100,11 +101,10 @@ public final class JwtSessionMapper {
      */
     String asJwt(@Nonnull SessionInfo sessionInfo) {
 
-        Reject.ifNull(sessionInfo, "sessionInfo must not ne null.");
+        Reject.ifNull(sessionInfo, "sessionInfo must not be null.");
 
-        final Map<String, Object> attrMap = MAPPER.convertValue(sessionInfo, MAP_TYPE);
-        JwtClaimsSet claims = new JwtClaimsSet(attrMap);
-        claims.setIssuedAtTime(Time.newDate());
+        final Map<String, Object> claimMap = MAPPER.convertValue(sessionInfo, MAP_TYPE);
+        final JwtClaimsSet claims = new JwtClaimsSet(claimMap);
 
         if (jweAlgorithm != null) {
             EncryptedJwtBuilder jwtBuilder = jwtBuilderFactory.jwe(encryptionKey)
@@ -194,10 +194,7 @@ public final class JwtSessionMapper {
     private static Map<String, Object> toMap(JwtClaimsSet claims) {
         final Map<String, Object> map = new TreeMap<>();
         for (String key : claims.keys()) {
-            if ("iat".equals(key)) {
-                continue;
-            }
-            map.put(key, claims.getClaim(key));
+            map.put(key, claims.get(key).getObject());
         }
         return map;
     }

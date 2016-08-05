@@ -28,15 +28,17 @@
  */
 package com.iplanet.dpro.session.share;
 
-import static java.util.concurrent.TimeUnit.*;
-import static org.forgerock.openam.utils.Time.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.identity.shared.xml.XMLUtils;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * <code>SessionInfo</code> class holds all the information about the
@@ -49,16 +51,16 @@ public class SessionInfo {
 
     private String sid;
     private String secret;
-    private String stype;
+    private String stype = "user";
     private String cid;
     private String cdomain;
-    private long maxtime;
-    private long maxidle;
-    private long maxcaching;
-    private long expiryTime;
-    private long lastActivityTime;
-    private String state;
-    private Hashtable<String, String> properties = new Hashtable<String, String>();
+    private long maxtime = 120;
+    private long maxidle = 30;
+    private long maxcaching = 3;
+    private long expiryTimeSeconds;
+    private long lastActivityTimeSeconds;
+    private String state = "valid";
+    private Hashtable<String, String> properties = new Hashtable<>();
 
     /**
      * Constructs <code> SessionInfo </code>
@@ -118,6 +120,7 @@ public class SessionInfo {
         this.sid = sid;
     }
 
+    @JsonProperty("jti")
     public String getSecret() {
         return secret;
     }
@@ -140,6 +143,7 @@ public class SessionInfo {
     /**
      * <code>Cookie</code> id
      */
+    @JsonProperty("sub")
     public String getClientID() {
         return cid;
     }
@@ -151,6 +155,7 @@ public class SessionInfo {
     /**
      * <code> Cookie</code> domain
      */
+    @JsonProperty("iss")
     public String getClientDomain() {
         return cdomain;
     }
@@ -195,12 +200,21 @@ public class SessionInfo {
     /**
      * Time at which this session will expire in milliseconds from the UTC epoch.
      */
-    public long getExpiryTime() {
-        return expiryTime;
+    public long getExpiryTime(TimeUnit unit) {
+        return unit.convert(expiryTimeSeconds, SECONDS);
     }
 
-    public void setExpiryTime(final long expiryTime) {
-        this.expiryTime = expiryTime;
+    public void setExpiryTime(final long expiryTime, TimeUnit unit) {
+        this.expiryTimeSeconds = TimeUnit.SECONDS.convert(expiryTime, unit);
+    }
+
+    @JsonProperty("exp")
+    long getExpiryTimeSeconds() {
+        return expiryTimeSeconds;
+    }
+
+    void setExpiryTimeSeconds(final long expiryTime) {
+        this.expiryTimeSeconds = expiryTime;
     }
 
     /**
@@ -210,26 +224,28 @@ public class SessionInfo {
      */
     public void setNeverExpiring(final boolean neverExpiring) {
         if (neverExpiring) {
-            this.expiryTime = Long.MAX_VALUE;
+            this.expiryTimeSeconds = Long.MAX_VALUE;
         }
     }
 
     /**
      * Whether the session will ever expire or not.
      */
+    @JsonIgnore
     public boolean isNeverExpiring() {
-        return this.expiryTime == Long.MAX_VALUE;
+        return this.expiryTimeSeconds == Long.MAX_VALUE;
     }
 
     /**
-     * Time at which there was last activity on this session as milliseconds from the UTC epoch.
+     * Time at which there was last activity on this session as seconds from the UTC epoch.
      */
-    public long getLastActivityTime() {
-        return lastActivityTime;
+    @JsonProperty
+    long getLastActivityTime() {
+        return lastActivityTimeSeconds;
     }
 
-    public void setLastActivityTime(final long lastActivityTime) {
-        this.lastActivityTime = lastActivityTime;
+    void setLastActivityTime(final long lastActivityTime) {
+        this.lastActivityTimeSeconds = lastActivityTime;
     }
 
     /**
@@ -240,12 +256,12 @@ public class SessionInfo {
         if (isNeverExpiring()) {
             return 0;
         } else {
-            return TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis() - lastActivityTime);
+            return TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) - lastActivityTimeSeconds;
         }
     }
 
     public void setTimeIdle(final long timeidle) {
-        this.lastActivityTime = currentTimeMillis() - SECONDS.toMillis(timeidle);
+        this.lastActivityTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) - timeidle;
     }
 
     /**
@@ -256,15 +272,15 @@ public class SessionInfo {
         if (isNeverExpiring()) {
             return Long.MAX_VALUE;
         } else {
-            return TimeUnit.MILLISECONDS.toSeconds(expiryTime - currentTimeMillis());
+            return expiryTimeSeconds - MILLISECONDS.toSeconds(currentTimeMillis());
         }
     }
 
     public void setTimeLeft(final long timeleft) {
-        expiryTime = SECONDS.toMillis(timeleft) + currentTimeMillis();
+        expiryTimeSeconds = timeleft + MILLISECONDS.toSeconds(currentTimeMillis());
         // Check for overflow - expiryTime should always be positive
-        if (expiryTime < 0) {
-            expiryTime = Long.MAX_VALUE;
+        if (expiryTimeSeconds < 0) {
+            expiryTimeSeconds = Long.MAX_VALUE;
         }
     }
 
@@ -279,6 +295,7 @@ public class SessionInfo {
         this.state = state;
     }
 
+    @JsonProperty("props")
     public Hashtable<String, String> getProperties() {
         return properties;
     }
@@ -299,7 +316,8 @@ public class SessionInfo {
         final SessionInfo that = (SessionInfo) o;
 
         return maxcaching == that.maxcaching && maxidle == that.maxidle && maxtime == that.maxtime
-                && lastActivityTime == that.lastActivityTime && expiryTime == that.expiryTime
+                && lastActivityTimeSeconds == that.lastActivityTimeSeconds
+                && expiryTimeSeconds == that.expiryTimeSeconds
                 && !(cdomain != null ? !cdomain.equals(that.cdomain) : that.cdomain != null)
                 && !(cid != null ? !cid.equals(that.cid) : that.cid != null)
                 && !(properties != null ? !properties.equals(that.properties) : that.properties != null)
@@ -320,8 +338,8 @@ public class SessionInfo {
         result = 31 * result + (int) (maxtime ^ (maxtime >>> 32));
         result = 31 * result + (int) (maxidle ^ (maxidle >>> 32));
         result = 31 * result + (int) (maxcaching ^ (maxcaching >>> 32));
-        result = 31 * result + (int) (lastActivityTime ^ (lastActivityTime >>> 32));
-        result = 31 * result + (int) (expiryTime ^ (expiryTime >>> 32));
+        result = 31 * result + (int) (lastActivityTimeSeconds ^ (lastActivityTimeSeconds >>> 32));
+        result = 31 * result + (int) (expiryTimeSeconds ^ (expiryTimeSeconds >>> 32));
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (properties != null ? properties.hashCode() : 0);
         return result;
@@ -339,8 +357,8 @@ public class SessionInfo {
                 ", maxtime=" + maxtime +
                 ", maxidle=" + maxidle +
                 ", maxcaching=" + maxcaching +
-                ", expiryTime=" + expiryTime +
-                ", lastActivityTime=" + lastActivityTime +
+                ", expiryTime=" + expiryTimeSeconds +
+                ", lastActivityTime=" + lastActivityTimeSeconds +
                 ", state='" + state + '\'' +
                 ", properties=" + properties +
                 '}';

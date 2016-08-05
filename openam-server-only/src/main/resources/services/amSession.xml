@@ -256,7 +256,7 @@
                         <ChoiceValue i18nKey="choiceDirect">DIRECT</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>NONE</Value>
+                        <Value>DIRECT</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-encryption-rsa-certificate-alias"

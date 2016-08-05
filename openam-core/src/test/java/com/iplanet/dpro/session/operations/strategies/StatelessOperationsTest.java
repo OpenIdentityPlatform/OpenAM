@@ -24,6 +24,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.concurrent.TimeUnit;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
@@ -78,7 +80,7 @@ public class StatelessOperationsTest {
     public void shouldRefreshFromStatelessSessionFactory() throws Exception {
         // Given
         SessionInfo info = new SessionInfo();
-        info.setExpiryTime(currentTimeMillis() + (1000 * 60 * 10));
+        info.setExpiryTime(currentTimeMillis() + TimeUnit.MINUTES.toMillis(10), TimeUnit.MILLISECONDS);
         given(mockSessionFactory.getSessionInfo(sid)).willReturn(info);
 
         // When

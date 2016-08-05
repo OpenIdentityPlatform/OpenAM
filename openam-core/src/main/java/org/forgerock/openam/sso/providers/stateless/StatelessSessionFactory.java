@@ -20,13 +20,12 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
-import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -159,7 +158,7 @@ public class StatelessSessionFactory {
         // It is safer to generate the JWT based on the updated state of the SessionInfo.
 
         String jwt = getJwtSessionMapper().asJwt(info);
-        SessionID sessionID = SessionID.generateSessionID(sessionServerConfig, info.getClientDomain(), jwt);
+        SessionID sessionID = SessionID.generateStatelessSessionID(sessionServerConfig, info.getClientDomain(), jwt);
         cache.cache(info, jwt);
 
         return new StatelessSession(sessionID, info);
@@ -173,10 +172,6 @@ public class StatelessSessionFactory {
     public StatelessSession generate(InternalSession internalSession) throws SessionException {
         SessionInfo sessionInfo = internalSession.toSessionInfo(false);
 
-        sessionInfo.getProperties().put(
-                org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP,
-                internalSession.getSessionHandle());
-
         return generate(sessionInfo);
     }
 
@@ -188,40 +183,6 @@ public class StatelessSessionFactory {
     public StatelessSession generate(SessionID sessionID) throws SessionException {
         SessionInfo sessionInfo = getSessionInfo(sessionID);
         return new StatelessSession(sessionID, sessionInfo);
-    }
-
-    /**
-     * @param tokenId Possibly null, empty, or timed out JWT.
-     * @return True if the TokenID JWT represents a valid SessionInfo which has not timed out.
-     */
-    private boolean isValidJwt(String tokenId) {
-        if (StringUtils.isEmpty(tokenId)) {
-            return false;
-        }
-        try {
-            StatelessSession statelessSession;
-            if (cache.contains(tokenId)) {
-                /**
-                 * NB: We cannot use the JWTCache to map in the reverse direction (SessionInfo-JWT)
-                 * because the SessionInfo object can change contents, but remain the same reference
-                 * in the cache. Therefore the only way to maintain consistent state is to generate
-                 * the JWT from the SessionInfo each time.
-                 *
-                 * We can re-evaluate this if it becomes a hot-spot.
-                 */
-                statelessSession = generate(cache.getSessionInfo(tokenId));
-            } else {
-                SessionID sessionID = new SessionID(tokenId);
-                if (!containsJwt(sessionID)) {
-                    return false;
-                }
-                statelessSession = generate(sessionID);
-            }
-            return statelessSession.getTimeLeft() >= 0;
-        } catch (SessionException e) {
-            debug.message("Failed to validate JWT {}", tokenId, e);
-            return false;
-        }
     }
 
     /**

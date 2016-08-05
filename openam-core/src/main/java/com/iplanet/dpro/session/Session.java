@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.forgerock.guice.core.InjectorHolder;
@@ -1063,7 +1064,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         maxIdleTime = info.getMaxIdle();
         maxCachingTime = info.getMaxCaching();
         sessionIdleTime = info.getTimeIdle();
-        sessionExpiryTime = info.getExpiryTime();
+        sessionExpiryTime = info.getExpiryTime(TimeUnit.MILLISECONDS);
         sessionTimeLeft = info.getTimeLeft();
         if (info.getState().equals("invalid")) {
             sessionState = INVALID;
