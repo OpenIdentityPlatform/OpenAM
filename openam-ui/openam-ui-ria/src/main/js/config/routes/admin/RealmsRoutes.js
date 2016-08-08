@@ -260,6 +260,20 @@ define(function () {
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
+            },
+            apiExplorerView : {
+                view: "org/forgerock/openam/ui/admin/views/api/ApiExplorerView",
+                role: "ui-global-admin",
+                url: /^api\/explorer$/,
+                pattern: "api/explorer",
+                navGroup: "admin"
+            },
+            apiDocView : {
+                view: "org/forgerock/openam/ui/admin/views/api/ApiDocView",
+                role: "ui-global-admin",
+                url: /^api\/doc/,
+                pattern: "api/doc",
+                navGroup: "admin"
             }
         };
 
