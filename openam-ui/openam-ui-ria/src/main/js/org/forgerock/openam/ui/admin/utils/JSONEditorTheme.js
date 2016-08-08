@@ -26,6 +26,8 @@ define([
         const container = document.createElement("div");
         const label = document.createElement("label");
         const span = document.createElement("span");
+        checkbox.style.width = "1px";
+        checkbox.style.height = "1px";
         label.appendChild(checkbox);
         label.appendChild(span);
         div.setAttribute("class", `checkbox checkbox-slider-primary
