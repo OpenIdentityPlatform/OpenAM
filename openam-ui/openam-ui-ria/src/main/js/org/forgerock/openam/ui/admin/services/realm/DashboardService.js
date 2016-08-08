@@ -27,7 +27,7 @@ define([
     obj.dashboard = {
         commonTasks: {
             all: (realm) => obj.serviceCall({
-                url: fetchUrl.legacy("/realm-config/commontasks?_queryFilter=true", { realm }),
+                url: fetchUrl.default("/realm-config/commontasks?_queryFilter=true", { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             })
         }

@@ -31,7 +31,7 @@ define([
     const filterUnEditableProperties = (data) => _.pick(data, ["url", "secondaryURLs"]);
 
     const getSchema = () => obj.serviceCall({
-        url: fetchUrl.legacy("/global-config/sites?_action=schema", { realm: false }),
+        url: fetchUrl.default("/global-config/sites?_action=schema", { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST",
         success: (data) => {
@@ -42,7 +42,7 @@ define([
     });
 
     const getValues = (id) => obj.serviceCall({
-        url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
+        url: fetchUrl.default(`/global-config/sites/${id}`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         success: (data, jqXHR) => {
             data.etag = jqXHR.getResponseHeader("ETag");
@@ -52,7 +52,7 @@ define([
 
     const getTemplate = () =>
         obj.serviceCall({
-            url: fetchUrl.legacy("/global-config/sites?_action=template", { realm: false }),
+            url: fetchUrl.default("/global-config/sites?_action=template", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         });
@@ -60,7 +60,7 @@ define([
     obj.sites = {
         getAll: () =>
             obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/sites?_queryFilter=true", { realm: false }),
+                url: fetchUrl.default("/global-config/sites?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((data) => _.sortBy(data.result, "_id")),
         get: (id) =>
@@ -70,21 +70,21 @@ define([
             })),
         create: (data) =>
             obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/sites?_action=create", { realm: false }),
+                url: fetchUrl.default("/global-config/sites?_action=create", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(_.omit(data, ["servers"]))
             }),
         update: (id, data, etag) =>
             obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/sites/${id}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "PUT",
                 data: JSON.stringify(filterUnEditableProperties(data))
             }),
         remove: (id, etag) => {
             const remove = (id, etag) => obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/sites/${id}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/sites/${id}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "If-Match": etag },
                 type: "DELETE"
             });

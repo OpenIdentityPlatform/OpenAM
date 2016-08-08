@@ -31,7 +31,7 @@ define([
          */
         getAllContexts () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services/scripting/contexts?_queryFilter=true", { realm: false }),
+                url: fetchUrl.default("/global-config/services/scripting/contexts?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
@@ -42,7 +42,7 @@ define([
          */
         getDefaultGlobalContext () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services/scripting", { realm: false }),
+                url: fetchUrl.default("/global-config/services/scripting", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
         },
@@ -53,7 +53,7 @@ define([
          */
         getSchema () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services/scripting?_action=schema", { realm: false }),
+                url: fetchUrl.default("/global-config/services/scripting?_action=schema", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
@@ -65,7 +65,7 @@ define([
          */
         getContextSchema () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services/scripting/contexts?_action=schema", { realm: false }),
+                url: fetchUrl.default("/global-config/services/scripting/contexts?_action=schema", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });

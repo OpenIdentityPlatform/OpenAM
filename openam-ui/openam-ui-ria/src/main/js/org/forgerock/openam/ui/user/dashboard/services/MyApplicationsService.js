@@ -36,14 +36,14 @@ define([
 
     obj.getMyApplications = function () {
         return obj.serviceCall({
-            url: fetchUrl.legacy("/dashboard/assigned"),
+            url: fetchUrl.default("/dashboard/assigned"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(sortApps);
     };
 
     obj.getAvailableApplications = function () {
         return obj.serviceCall({
-            url: fetchUrl.legacy("/dashboard/available"),
+            url: fetchUrl.default("/dashboard/available"),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(sortApps);
     };

@@ -41,13 +41,14 @@ define([
     }, {});
 
     const getSchema = (server, section) => obj.serviceCall({
-        url: fetchUrl.legacy(`/global-config/servers/${server}/properties/${section}?_action=schema`, { realm: false }),
+        url: fetchUrl.default(`/global-config/servers/${server}/properties/${section}?_action=schema`,
+            { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
         type: "POST"
     }).then((response) => new JSONSchema(response));
 
     const getValues = (server, section) => obj.serviceCall({
-        url: fetchUrl.legacy(`/global-config/servers/${server}/properties/${section}`, { realm: false }),
+        url: fetchUrl.default(`/global-config/servers/${server}/properties/${section}`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
     }).then((response) => {
         if (section === ADVANCED_SECTION) {
@@ -62,7 +63,7 @@ define([
             modifiedData = arrayToObject(data[ADVANCED_SECTION]);
         }
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/global-config/servers/${id}/properties/${section}`, { realm: false }),
+            url: fetchUrl.default(`/global-config/servers/${id}/properties/${section}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(modifiedData)
@@ -71,7 +72,7 @@ define([
 
     obj.servers = {
         clone: (id, clonedUrl) => obj.serviceCall({
-            url: fetchUrl.legacy(`/global-config/servers/${id}?_action=clone`, { realm: false }),
+            url: fetchUrl.default(`/global-config/servers/${id}?_action=clone`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify({ clonedUrl })
@@ -101,20 +102,20 @@ define([
             });
         },
         getUrl: (id) => obj.serviceCall({
-            url: fetchUrl.legacy(`/global-config/servers/${id}`, { realm: false }),
+            url: fetchUrl.default(`/global-config/servers/${id}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then((response) => response.url, () => undefined),
         getAll: () => obj.serviceCall({
-            url: fetchUrl.legacy("/global-config/servers?_queryFilter=true", { realm: false }),
+            url: fetchUrl.default("/global-config/servers?_queryFilter=true", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then((response) => _.reject(response.result, { "_id" : DEFAULT_SERVER })),
         remove: (id) => obj.serviceCall({
-            url: fetchUrl.legacy(`/global-config/servers/${id}`, { realm: false }),
+            url: fetchUrl.default(`/global-config/servers/${id}`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "DELETE"
         }),
         create:  (data) => obj.serviceCall({
-            url: fetchUrl.legacy("/global-config/servers?_action=create", { realm: false }),
+            url: fetchUrl.default("/global-config/servers?_action=create", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data)

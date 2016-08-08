@@ -32,14 +32,14 @@ define([
 
     const getServiceSchema = function (realm, type) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/realm-config/services/${type}?_action=schema`, { realm }),
+            url: fetchUrl.default(`/realm-config/services/${type}?_action=schema`, { realm }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((response) => new JSONSchema(response));
     };
     const getServiceSubSchema = function (realm, serviceType, subSchemaType) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/realm-config/services/${serviceType}/${subSchemaType}?_action=schema`, { realm }),
+            url: fetchUrl.default(`/realm-config/services/${serviceType}/${subSchemaType}?_action=schema`, { realm }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((response) => new JSONSchema(response));
@@ -48,14 +48,14 @@ define([
     obj.instance = {
         getAll (realm) {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/realm-config/services?_queryFilter=true", { realm }),
+                url: fetchUrl.default("/realm-config/services?_queryFilter=true", { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) => _.sortBy(response.result, "name"));
         },
         get (realm, type) {
             function getInstance () {
                 return obj.serviceCall({
-                    url: fetchUrl.legacy(`/realm-config/services/${type}`, { realm }),
+                    url: fetchUrl.default(`/realm-config/services/${type}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                 });
             }
@@ -69,7 +69,7 @@ define([
         getInitialState (realm, type) {
             function getTemplate () {
                 return obj.serviceCall({
-                    url: fetchUrl.legacy(`/realm-config/services/${type}?_action=template`, { realm }),
+                    url: fetchUrl.default(`/realm-config/services/${type}?_action=template`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then((response) => new JSONValues(response));
@@ -82,7 +82,7 @@ define([
         },
         remove (realm, types) {
             const promises = _.map(arrayify(types), (type) => obj.serviceCall({
-                url: fetchUrl.legacy(`/realm-config/services/${type}`, { realm }),
+                url: fetchUrl.default(`/realm-config/services/${type}`, { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE"
             }));
@@ -91,7 +91,7 @@ define([
         },
         update (realm, type, data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/realm-config/services/${type}`, { realm }),
+                url: fetchUrl.default(`/realm-config/services/${type}`, { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: new JSONValues(data).toJSON()
@@ -99,7 +99,7 @@ define([
         },
         create (realm, type, data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/realm-config/services/${type}?_action=create`, { realm }),
+                url: fetchUrl.default(`/realm-config/services/${type}?_action=create`, { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: new JSONValues(data).toJSON()
@@ -110,7 +110,7 @@ define([
     obj.type = {
         getCreatables (realm) {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/realm-config/services?_action=getCreatableTypes&forUI=true", { realm }),
+                url: fetchUrl.default("/realm-config/services?_action=getCreatableTypes&forUI=true", { realm }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((response) => _.sortBy(response.result, "name"));
@@ -119,14 +119,14 @@ define([
             type: {
                 getAll (realm, serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(`/realm-config/services/${serviceType}?_action=getAllTypes`, { realm }),
+                        url: fetchUrl.default(`/realm-config/services/${serviceType}?_action=getAllTypes`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => response.result);
                 },
                 getCreatables (realm, serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/realm-config/services/${serviceType}?_action=getCreatableTypes`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
@@ -136,7 +136,7 @@ define([
             instance: {
                 getAll (realm, serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/realm-config/services/${serviceType}?_action=nextdescendents`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
@@ -145,7 +145,7 @@ define([
                 get (realm, serviceType, subSchemaType, subSchemaInstance) {
                     function getInstance () {
                         return obj.serviceCall({
-                            url: fetchUrl.legacy(
+                            url: fetchUrl.default(
                                 `/realm-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`, { realm }
                             ),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -162,7 +162,7 @@ define([
                 getInitialState (realm, serviceType, subSchemaType) {
                     function getTemplate (serviceType, subSchemaType) {
                         return obj.serviceCall({
-                            url: fetchUrl.legacy(
+                            url: fetchUrl.default(
                                 `/realm-config/services/${serviceType}/${subSchemaType}?_action=template`, { realm }),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                             type: "POST"
@@ -180,7 +180,7 @@ define([
 
                 remove (realm, serviceType, subSchemaType, subSchemaInstance) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/realm-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "DELETE"
@@ -189,7 +189,7 @@ define([
 
                 update (realm, serviceType, subSchemaType, subSchemaInstance, data) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/realm-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "PUT",
@@ -199,7 +199,7 @@ define([
 
                 create (realm, serviceType, subSchemaType, data) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/realm-config/services/${serviceType}/${subSchemaType}?_action=create`, { realm }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST",

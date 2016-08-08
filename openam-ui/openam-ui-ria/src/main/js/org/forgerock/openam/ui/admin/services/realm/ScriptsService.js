@@ -34,7 +34,7 @@ define([
 
     obj.validateScript = function (data) {
         return obj.serviceCall({
-            url: fetchUrl.legacy("/scripts/?_action=validate", { realm: false }),
+            url: fetchUrl.default("/scripts/?_action=validate", { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST",
             data: JSON.stringify(data),

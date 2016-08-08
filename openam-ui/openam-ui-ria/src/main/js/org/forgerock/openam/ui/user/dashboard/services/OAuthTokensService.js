@@ -25,7 +25,7 @@ define([
 
     obj.getApplications = function () {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/users/${
+            url: fetchUrl.default(`/users/${
                 encodeURIComponent(Configuration.loggedUser.get("username"))}/oauth2/applications?_queryFilter=true`),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
@@ -33,7 +33,7 @@ define([
 
     obj.revokeApplication = function (id) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(
+            url: fetchUrl.default(
                 `/users/${encodeURIComponent(Configuration.loggedUser.get("username"))}/oauth2/applications/${id}`),
             type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }

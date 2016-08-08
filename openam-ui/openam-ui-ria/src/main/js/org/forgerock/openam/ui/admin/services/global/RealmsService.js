@@ -60,7 +60,7 @@ define([
          */
         all () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/realms/root?_queryFilter=true", { realm: false }),
+                url: fetchUrl.default("/global-config/realms/root?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
                 data.result = _(data.result).each((realm) => {
@@ -76,7 +76,7 @@ define([
          */
         create (data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/realms/root?_action=create", { realm: false }),
+                url: fetchUrl.default("/global-config/realms/root?_action=create", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 suppressEvents: true,
@@ -90,7 +90,7 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.legacy(
+            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.default(
                 `/global-config${newEncodeRealm(path)}`, { realm: false }));
         },
 
@@ -99,7 +99,7 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.legacy("/global-config/realms/root", {
+            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.default("/global-config/realms/root", {
                 realm: false
             }));
         },
@@ -111,7 +111,7 @@ define([
          */
         remove (path) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config${newEncodeRealm(path)}`, { realm: false }),
+                url: fetchUrl.default(`/global-config${newEncodeRealm(path)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -125,7 +125,7 @@ define([
          */
         update (data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(
+                url: fetchUrl.default(
                     `/global-config${newEncodeRealm(getRealmPath(data))}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",

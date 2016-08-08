@@ -64,7 +64,7 @@ define([
 
             RequestCollection = Backbone.Collection.extend({
                 url: `/${Constants.context}/json${
-                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests/${id}`)
+                    fetchUrl.default(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests/${id}`)
                 }`
             });
 

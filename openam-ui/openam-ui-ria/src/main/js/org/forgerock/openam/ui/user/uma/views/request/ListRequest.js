@@ -42,7 +42,7 @@ define([
 
             RequestsCollection = Backbone.PageableCollection.extend({
                 url: `/${Constants.context}/json${
-                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests`)}`,
+                    fetchUrl.default(`/users/${Configuration.loggedUser.get("username")}/uma/pendingrequests`)}`,
                 state: {
                     pageSize: 10,
                     sortKey: "user"

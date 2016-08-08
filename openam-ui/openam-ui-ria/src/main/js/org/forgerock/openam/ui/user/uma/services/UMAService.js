@@ -25,7 +25,7 @@ define([
 
     obj.getUmaConfig = function () {
         return obj.serviceCall({
-            url: fetchUrl.legacy("/serverinfo/uma"),
+            url: fetchUrl.default("/serverinfo/uma"),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         }).then(function (data) {
             Configuration.globalData.auth.uma = Configuration.globalData.auth.uma || {};
@@ -37,7 +37,7 @@ define([
 
     obj.unshareAllResources = function () {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/users/${
+            url: fetchUrl.default(`/users/${
                 encodeURIComponent(Configuration.loggedUser.get("username"))
                 }/oauth2/resources/sets?_action=revokeAll`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -47,7 +47,7 @@ define([
 
     obj.approveRequest = function (id, permissions) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/users/${
+            url: fetchUrl.default(`/users/${
                 encodeURIComponent(Configuration.loggedUser.get("username"))
                 }/uma/pendingrequests/${id}?_action=approve`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -60,7 +60,7 @@ define([
 
     obj.denyRequest = function (id) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/users/${
+            url: fetchUrl.default(`/users/${
                 encodeURIComponent(Configuration.loggedUser.get("username"))
                 }/uma/pendingrequests/${id}?_action=deny`),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -72,7 +72,7 @@ define([
     obj.labels = {
         all () {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/users/${
+                url: fetchUrl.default(`/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
                     }/oauth2/resources/labels?_queryFilter=true`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -80,7 +80,7 @@ define([
         },
         create (name, type) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/users/${
+                url: fetchUrl.default(`/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
                     }/oauth2/resources/labels?_action=create`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -93,7 +93,7 @@ define([
         },
         get (id) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/users/${
+                url: fetchUrl.default(`/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
                     }/oauth2/resources/labels?_queryFilter=true`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -103,7 +103,7 @@ define([
         },
         remove (id) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/users/${
+                url: fetchUrl.default(`/users/${
                     encodeURIComponent(Configuration.loggedUser.get("username"))
                     }/oauth2/resources/labels/${encodeURIComponent(id)}`),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },

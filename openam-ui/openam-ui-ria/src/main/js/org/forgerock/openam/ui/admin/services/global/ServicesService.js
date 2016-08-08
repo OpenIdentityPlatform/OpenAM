@@ -31,7 +31,7 @@ define([
 
     const getServiceSchema = function (type) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(`/global-config/services/${type}?_action=schema`, { realm: false }),
+            url: fetchUrl.default(`/global-config/services/${type}?_action=schema`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((response) => {
@@ -41,7 +41,7 @@ define([
     };
     const getServiceSubSchema = function (serviceType, subSchemaType) {
         return obj.serviceCall({
-            url: fetchUrl.legacy(
+            url: fetchUrl.default(
                 `/global-config/services/${serviceType}/${subSchemaType}?_action=schema`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
@@ -51,7 +51,7 @@ define([
     obj.instance = {
         getAll () {  // TODO this is the only difference in GLOBAL and REALM service rest calls
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services?_action=nextdescendents", { realm: false }),
+                url: fetchUrl.default("/global-config/services?_action=nextdescendents", { realm: false }),
                 type: "POST",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) =>
@@ -63,7 +63,7 @@ define([
         },
         get (type) {
             const getInstance = () => obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/services/${type}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/services/${type}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             });
 
@@ -76,7 +76,7 @@ define([
         getInitialState (type) {
             function getTemplate () {
                 return obj.serviceCall({
-                    url: fetchUrl.legacy(`/global-config/services/${type}?_action=template`, { realm: false }),
+                    url: fetchUrl.default(`/global-config/services/${type}?_action=template`, { realm: false }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                     type: "POST"
                 }).then((response) => new JSONValues(response));
@@ -89,7 +89,7 @@ define([
         },
         update (type, data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/services/${type}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/services/${type}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data)
@@ -97,7 +97,7 @@ define([
         },
         create (type, data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/services/${type}?_action=create`, { realm: false }),
+                url: fetchUrl.default(`/global-config/services/${type}?_action=create`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 data: JSON.stringify(data)
@@ -108,7 +108,7 @@ define([
     obj.type = {
         getCreatables () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/services?_action=getCreatableTypes&forUI=true", { realm: false }),
+                url: fetchUrl.default("/global-config/services?_action=getCreatableTypes&forUI=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((response) => _.sortBy(response.result, "name"));
@@ -117,7 +117,7 @@ define([
             type: {
                 getAll (serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}?_action=getAllTypes`, { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
@@ -125,7 +125,7 @@ define([
                 },
                 getCreatables (serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}?_action=getCreatableTypes`, { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
@@ -135,7 +135,7 @@ define([
             instance: {
                 getAll (serviceType) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}?_action=nextdescendents`, { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
@@ -144,7 +144,7 @@ define([
                 get (serviceType, subSchemaType, subSchemaInstance) {
                     function getInstance () {
                         return obj.serviceCall({
-                            url: fetchUrl.legacy(
+                            url: fetchUrl.default(
                                 `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`,
                                 { realm: false }),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
@@ -161,7 +161,7 @@ define([
                 getInitialState (serviceType, subSchemaType) {
                     function getTemplate (serviceType, subSchemaType) {
                         return obj.serviceCall({
-                            url: fetchUrl.legacy(
+                            url: fetchUrl.default(
                                 `/global-config/services/${serviceType}/${subSchemaType}?_action=template`,
                                 { realm: false }),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -180,7 +180,7 @@ define([
 
                 remove (serviceType, subSchemaType, subSchemaInstance) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`,
                             { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -190,7 +190,7 @@ define([
 
                 update (serviceType, subSchemaType, subSchemaInstance, data) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}`,
                             { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
@@ -201,7 +201,7 @@ define([
 
                 create (serviceType, subSchemaType, data) {
                     return obj.serviceCall({
-                        url: fetchUrl.legacy(
+                        url: fetchUrl.default(
                             `/global-config/services/${serviceType}/${subSchemaType}?_action=create`, { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST",

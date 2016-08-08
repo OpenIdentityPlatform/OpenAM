@@ -31,7 +31,7 @@ define([
     const getConfiguration = () => {
         return obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: fetchUrl.legacy("/serverinfo/*")
+            url: fetchUrl.default("/serverinfo/*")
         });
     };
 

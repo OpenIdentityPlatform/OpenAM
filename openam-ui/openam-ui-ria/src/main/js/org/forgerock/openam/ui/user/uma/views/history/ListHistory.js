@@ -43,7 +43,7 @@ define([
 
             collection = new (Backbone.PageableCollection.extend({
                 url: `/${Constants.context}/json${
-                    fetchUrl.legacy(`/users/${Configuration.loggedUser.get("username")}/uma/auditHistory`)}`,
+                    fetchUrl.default(`/users/${Configuration.loggedUser.get("username")}/uma/auditHistory`)}`,
                 state: {
                     pageSize: 10,
                     sortKey: "eventTime",

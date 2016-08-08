@@ -35,14 +35,14 @@ define([
     obj.authentication = {
         getAll () {
             return obj.serviceCall({
-                url: fetchUrl.legacy("/global-config/authentication/modules?_action=getAllTypes", { realm: false }),
+                url: fetchUrl.default("/global-config/authentication/modules?_action=getAllTypes", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((data) => _.sortBy(data.result, "name"));
         },
         schema () {
             const serviceCall = (action) => obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/authentication?_action=${action}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/authentication?_action=${action}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             });
@@ -56,13 +56,13 @@ define([
             const moduleUrl = getModuleUrl(id);
 
             const getSchema = () => obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/authentication${moduleUrl}?_action=schema`, { realm: false }),
+                url: fetchUrl.default(`/global-config/authentication${moduleUrl}?_action=schema`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST"
             }).then((response) => new JSONSchema(response));
 
             const getValues = () => obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/authentication${moduleUrl}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/authentication${moduleUrl}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) => new JSONValues(response));
 
@@ -74,7 +74,7 @@ define([
         },
         update (id, data) {
             return obj.serviceCall({
-                url: fetchUrl.legacy(`/global-config/authentication${getModuleUrl(id)}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/authentication${getModuleUrl(id)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: new JSONValues(data).toJSON()
