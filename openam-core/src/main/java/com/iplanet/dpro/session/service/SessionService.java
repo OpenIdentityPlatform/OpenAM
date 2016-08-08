@@ -364,7 +364,7 @@ public class SessionService {
             session.setType(APPLICATION_SESSION);
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
-            session.setExpire(false);
+            session.setNonExpiring();
             session.setState(VALID);
             incrementActiveSessions();
             return session;
@@ -1356,7 +1356,7 @@ public class SessionService {
              */
             sess = tokenAdapter.fromToken(token);
             sess.setSessionServiceDependencies(
-                    this, serviceConfig, sessionLogging, sessionAuditor, sessionCookies, sessionDebug);
+                    this, serviceConfig, sessionLogging, sessionAuditor, sessionDebug);
             sess.scheduleExpiry();
             updateSessionMaps(sess);
 
@@ -1377,7 +1377,7 @@ public class SessionService {
         if (sess == null)
             return;
 
-        if (checkIfShouldDestroy(sess))
+        if (destroySessionIfNecessary(sess))
             return;
 
         sess.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
@@ -1413,29 +1413,28 @@ public class SessionService {
 
     /**
      * Utility method to check if session has to be destroyed and to remove it
-     * if so Note that contrary to the name sess.shouldDestroy() has non-trivial
-     * side effects of changing session state and sending notification messages!
+     * if so.
      *
      * @param sess session object
      * @return true if session should (and has !) been destroyed
      */
-    boolean checkIfShouldDestroy(InternalSession sess) {
-        boolean shouldDestroy = false;
+    boolean destroySessionIfNecessary(InternalSession sess) {
+        boolean wasDestroyed = false;
         try {
-            shouldDestroy = sess.shouldDestroy();
+            wasDestroyed = sess.destroyIfNecessary();
         } catch (Exception ex) {
-            sessionDebug.error("Exception in session shouldDestroy() : ", ex);
-            shouldDestroy = true;
+            sessionDebug.error("Exception in session destroyIfNecessary() : ", ex);
+            wasDestroyed = true;
         }
 
-        if (shouldDestroy) {
+        if (wasDestroyed) {
             try {
                 removeInternalSession(sess.getID());
             } catch (Exception ex) {
                 sessionDebug.error("Exception while removing session : ", ex);
             }
         }
-        return shouldDestroy;
+        return wasDestroyed;
     }
 
     /**

@@ -72,8 +72,8 @@ import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrade
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.utils.ClientUtils;
@@ -1435,7 +1435,7 @@ public class LoginState {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("setSessionProperties for non-expiring session");
                     }
-                    session.setExpire(false);
+                    session.setNonExpiring();
                 }
             } else {
                 DEBUG.message("request: in putProperty stuff");
@@ -1920,11 +1920,11 @@ public class LoginState {
 
         String encodedURL;
         if (URL_REWRITE_IN_PATH) {
-            encodedURL = session.encodeURL(
-                    url, SessionUtils.SEMICOLON, false, cookieName);
+            encodedURL = SessionURL.getInstance().encodeInternalSessionURL(
+                    url, SessionUtils.SEMICOLON, false, cookieName, session);
         } else {
-            encodedURL = session.encodeURL(
-                    url, SessionUtils.QUERY, false, cookieName);
+            encodedURL = SessionURL.getInstance().encodeInternalSessionURL(
+                    url, SessionUtils.QUERY, false, cookieName, session);
         }
 
         if (DEBUG.messageEnabled()) {

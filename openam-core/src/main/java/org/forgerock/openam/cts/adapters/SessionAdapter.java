@@ -145,10 +145,6 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
             //sessionHandle field is not set, then we should attempt to retrieve the value directly from the token.
             session.setSessionHandle(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField()));
         }
-        // This must be called as the InternalSession needs to know that it represents a stored session,
-        // and the value cannot default to true.
-        session.notifyStored();
-
         return session;
     }
 

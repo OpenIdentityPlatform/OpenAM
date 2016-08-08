@@ -19,7 +19,6 @@ package com.iplanet.dpro.session.service;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.AfterMethod;
@@ -37,9 +36,6 @@ public class InternalSessionTest {
     @Mock
     private SessionLogging mockSessionLogging;
 
-    @Mock
-    private SessionCookies mockSessionCookies;
-
     private InternalSession session;
 
     @BeforeMethod
@@ -47,7 +43,7 @@ public class InternalSessionTest {
         MockitoAnnotations.initMocks(this);
         session = new InternalSession();
         session.setSessionServiceDependencies(mockSessionService, mockSessionServiceConfig, mockSessionLogging,
-                null, mockSessionCookies, null);
+                null, null);
     }
 
     @AfterMethod

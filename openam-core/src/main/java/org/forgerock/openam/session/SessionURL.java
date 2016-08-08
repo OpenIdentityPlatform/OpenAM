@@ -16,13 +16,15 @@
 
 package org.forgerock.openam.session;
 
-import com.google.inject.Singleton;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.share.SessionEncodeURL;
-import com.sun.identity.session.util.SessionUtils;
+import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.servlet.http.HttpServletResponse;
+import com.google.inject.Singleton;
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.share.SessionEncodeURL;
+import com.sun.identity.session.util.SessionUtils;
 
 /**
  * Ex-Sun class, pulled out from Session.java.
@@ -88,7 +90,7 @@ public class SessionURL {
      */
     public String encodeURL(HttpServletResponse res, String url, String cookieName, Session session) {
         String httpEncodeUrl = res.encodeURL(url);
-        return encodeURL(httpEncodeUrl, SessionUtils.QUERY, true, cookieName, session);
+        return encodeSessionURL(httpEncodeUrl, SessionUtils.QUERY, true, cookieName, session);
     }
 
     /**
@@ -121,7 +123,7 @@ public class SessionURL {
      *         cookies are supported.
      */
     public String encodeURL(String url, boolean escape, String cookieName, Session session) {
-        return encodeURL(url, SessionUtils.QUERY, escape, cookieName, session);
+        return encodeSessionURL(url, SessionUtils.QUERY, escape, cookieName, session);
     }
 
     /**
@@ -147,7 +149,7 @@ public class SessionURL {
      *         cookies are supported.
      */
     public String encodeURL(String url, String cookieName, Session session) {
-        return encodeURL(url, SessionUtils.QUERY, true, cookieName, session);
+        return encodeSessionURL(url, SessionUtils.QUERY, true, cookieName, session);
     }
 
     /**
@@ -167,7 +169,7 @@ public class SessionURL {
      *         cookies are supported.
      */
     public String encodeURL(String url, short encodingScheme, boolean escape, Session session) {
-        return encodeURL(url, encodingScheme, escape, sessionCookies.getCookieName(), session);
+        return encodeSessionURL(url, encodingScheme, escape, sessionCookies.getCookieName(), session);
     }
 
     /**
@@ -187,7 +189,7 @@ public class SessionURL {
      * @return the encoded URL if cookies are not supported or the URL if
      *         cookies are supported.
      */
-    public String encodeURL(String url, short encodingScheme, boolean escape, String cookieName, Session session) {
+    public String encodeSessionURL(String url, short encodingScheme, boolean escape, String cookieName, Session session) {
         String encodedURL = url;
         String cookieStr = session.getCookieStr();
 
@@ -202,6 +204,78 @@ public class SessionURL {
             }
         }
 
+        return encodedURL;
+    }
+
+    /**
+     * Encodes the url by adding the cookiename=sid to it.
+     * if cookie support is true returns without encoding
+     *
+     * <p>
+     * The cookie Value is written in the URL based on the encodingScheme
+     * specified. The Cookie Value could be written as path info separated
+     * by either a "/" OR  ";" or as a query string.
+     *
+     * <p>
+     * If the encoding scheme is SLASH then the  cookie value would be
+     * written in the URL as extra path info in the following format:
+     * <pre>
+     * protocol://server:port/servletpath/&lt;cookieName>=&lt;cookieValue>?
+     *       queryString
+     * </pre>
+     * <p>
+     * Note that this format works only if the path is a servlet, if a
+     * a jsp file is specified then webcontainers return with
+     * "File Not found" error. To rewrite links which are JSP files with
+     * cookie value use the SEMICOLON OR QUERY encoding scheme.
+     *
+     * <p>
+     * If the encoding scheme is SEMICOLON then the cookie value would be
+     * written in the URL as extra path info in the following format:
+     * <pre>
+     * protocol://server:port/path;&lt;cookieName=cookieValue>?queryString
+     * </pre>
+     * Note that this is not supported in the servlet specification and
+     * some web containers do not support this.
+     *
+     * <p>
+     * If the encoding scheme is QUERY then the cookie value would be
+     * written in the URL in the following format:
+     * <pre>
+     * protocol://server:port/path?&lt;cookieName>=&lt;cookieValue>
+     * protocol://server:port/path?queryString&&lt;cookieName>=&lt;cookieValue>
+     * </pre>
+     * <p>
+     * This is the default and OpenAM always encodes in this format
+     * unless otherwise specified. If the URL passed in has query parameter then
+     * entity escaping of ampersand will be done before appending the cookie
+     * if the escape is true.  Only the ampersand before appending
+     * cookie parameter
+     * will be entity escaped.
+     * <p>
+     * @param url the url to be encoded
+     * @param encodingScheme possible values are QUERY,SLASH,SEMICOLON
+     * @param escape entity escaping of ampersand when appending the
+     *        SSOToken ID to request query string.
+     * @param cookieName
+     * @return encoded URL with cookie value (session id) based
+     *         on the encoding scheme or the url itself if there is an error.
+     */
+    public String encodeInternalSessionURL(String url, short encodingScheme, boolean escape, String cookieName,
+                                           InternalSession internalSession) {
+        String encodedURL = url;
+        String cookieStr = internalSession.getCachedCookieString();
+
+        if (!StringUtils.isBlank(url) && (!internalSession.getCookieSupport())) {
+            if (!StringUtils.isBlank(cookieStr) && (sessionCookies.containsCookie(cookieStr, cookieName))) {
+                encodedURL = SessionEncodeURL.buildCookieString(url, cookieStr, encodingScheme, escape);
+            } else { // cookie str not set so call encodeURL
+                if (internalSession.getSessionID() != null) {
+                    internalSession.cacheCookieString(SessionEncodeURL.createCookieString(cookieName, internalSession.getSessionID().toString()));
+                    encodedURL = SessionEncodeURL.encodeURL(internalSession.getCachedCookieString(), url, encodingScheme, escape);
+                }
+            }
+        }
         return encodedURL;
     }
 
