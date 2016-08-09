@@ -72,7 +72,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.oauth2.ClientCredentials;
 import org.forgerock.openam.oauth2.ClientCredentialsReader;
 import org.forgerock.openam.oauth2.OAuth2Constants;
@@ -105,10 +105,10 @@ public class ResourceOwnerSessionValidator {
     private final ClientDAO clientDAO;
     private final ClientCredentialsReader clientCredentialsReader;
     private RealmNormaliser realmNormaliser = new RealmNormaliser();
-    private CoreGuiceModule.DNWrapper dnWrapper;
+    private DNWrapper dnWrapper;
 
     @Inject
-    public ResourceOwnerSessionValidator(CoreGuiceModule.DNWrapper dnWrapper, SSOTokenManager ssoTokenManager,
+    public ResourceOwnerSessionValidator(DNWrapper dnWrapper, SSOTokenManager ssoTokenManager,
             OAuth2ProviderSettingsFactory providerSettingsFactory, ClientDAO clientDAO,
             ClientCredentialsReader clientCredentialsReader) {
         this.ssoTokenManager = ssoTokenManager;

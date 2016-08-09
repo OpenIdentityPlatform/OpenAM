@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.config;
 
@@ -21,7 +21,7 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import com.google.inject.Injector;
 import com.sun.identity.sm.ServiceListener;
-import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+import org.forgerock.openam.core.DNWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

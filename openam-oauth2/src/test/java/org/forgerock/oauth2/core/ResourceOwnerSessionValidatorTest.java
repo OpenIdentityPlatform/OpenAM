@@ -35,16 +35,12 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import org.forgerock.oauth2.core.AuthenticationMethod;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
+
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.oauth2.ClientCredentialsReader;
 import org.forgerock.openam.oauth2.OpenAMAuthenticationMethod;
 import org.forgerock.openidconnect.ClientDAO;
@@ -79,7 +75,7 @@ public class ResourceOwnerSessionValidatorTest {
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
-        CoreGuiceModule.DNWrapper dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
+        DNWrapper dnWrapper = mock(DNWrapper.class);
         ClientDAO mockClientDAO = mock(ClientDAO.class);
         ClientCredentialsReader mockClientCredentialsReader = mock(ClientCredentialsReader.class);
 

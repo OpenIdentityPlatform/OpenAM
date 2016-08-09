@@ -18,7 +18,8 @@ package org.forgerock.openam.entitlement.configuration;
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.*;
 import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.*;
-import static org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+
+import org.forgerock.openam.core.DNWrapper;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 
 import java.text.MessageFormat;

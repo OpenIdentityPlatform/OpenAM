@@ -17,7 +17,7 @@ package org.forgerock.openam.entitlement.service;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.core.guice.CoreGuiceModule;
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfigurationImpl;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeServiceConfig;
 
@@ -47,7 +47,7 @@ public final class ApplicationServiceFactoryImpl implements ApplicationServiceFa
         };
 
         applicationService = new ApplicationServiceImpl(subject, realm, factory, new ResourceTypeServiceImpl(
-                new ResourceTypeConfigurationImpl(new CoreGuiceModule.DNWrapper(), new ResourceTypeServiceConfig())));
+                new ResourceTypeConfigurationImpl(new DNWrapper(), new ResourceTypeServiceConfig())));
 
         return applicationService;
     }

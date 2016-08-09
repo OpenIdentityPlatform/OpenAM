@@ -79,7 +79,6 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.validation.URLValidator;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.OrganizationConfigManagerFactory;
 import com.sun.identity.sm.SMSEntry;
@@ -91,6 +90,7 @@ import com.sun.identity.sm.ldap.ConfigAuditorFactory;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.core.realms.RealmGuiceModule;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.auditors.SMSAuditFilter;
@@ -614,26 +614,4 @@ public class CoreGuiceModule extends AbstractModule {
         return StatelessAdminRestriction.createAuthDDelegate();
     }
 
-    /**
-     * Wrapper class to remove coupling to DNMapper static methods.
-     * <p/>
-     * Until DNMapper is refactored, this class can be used to assist with DI.
-     */
-    public static class DNWrapper {
-
-        /**
-         * @see com.sun.identity.sm.DNMapper#orgNameToDN(String)
-         */
-        public String orgNameToDN(String orgName) {
-            return DNMapper.orgNameToDN(orgName);
-        }
-
-        /**
-         * @see DNMapper#orgNameToRealmName(String)
-         */
-        public String orgNameToRealmName(String orgName) {
-            return DNMapper.orgNameToRealmName(orgName);
-        }
-
-    }
 }
