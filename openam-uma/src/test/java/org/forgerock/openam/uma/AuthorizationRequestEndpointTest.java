@@ -48,6 +48,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.RealmOAuth2ProviderSettings;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
@@ -178,7 +179,7 @@ public class AuthorizationRequestEndpointTest {
         given(umaProviderSettings.getUmaTokenStore()).willReturn(umaTokenStore);
 
         OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        OAuth2ProviderSettings oauth2ProviderSettings = mock(OAuth2ProviderSettings.class);
+        OAuth2ProviderSettings oauth2ProviderSettings = mock(RealmOAuth2ProviderSettings.class);
         given(oauth2ProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(oauth2ProviderSettings);
         given(oauth2ProviderSettings.getResourceSetStore()).willReturn(resourceSetStore);
 

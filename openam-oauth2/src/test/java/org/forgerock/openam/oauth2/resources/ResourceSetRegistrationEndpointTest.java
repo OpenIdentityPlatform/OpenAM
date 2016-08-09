@@ -41,6 +41,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.RealmOAuth2ProviderSettings;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
@@ -111,7 +112,7 @@ public class ResourceSetRegistrationEndpointTest {
                 .willReturn(Collections.singletonList(resourceRegistrationFilter));
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
+        OAuth2ProviderSettings providerSettings = mock(RealmOAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(store);
 

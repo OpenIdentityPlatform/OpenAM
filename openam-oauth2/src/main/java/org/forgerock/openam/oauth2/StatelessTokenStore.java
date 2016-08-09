@@ -503,7 +503,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(jwt);
+                verifySignature(jwt, request);
                 verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
@@ -526,7 +526,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(jwt);
+                verifySignature(jwt, request);
                 verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 blacklist(tokenId, jwt.getClaimsSet().getExpirationTime().getTime());
@@ -549,7 +549,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(jwt);
+                verifySignature(jwt, request);
                 verifyTokenType(OAUTH_ACCESS_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwtString);
@@ -573,7 +573,7 @@ public class StatelessTokenStore implements TokenStore {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(jwtString, SignedJwt.class);
             String tokenId = jwt.getClaimsSet().getJwtId();
             if (!isBlacklisted(tokenId)) {
-                verifySignature(jwt);
+                verifySignature(jwt, request);
                 verifyTokenType(OAUTH_REFRESH_TOKEN, jwt);
                 validateTokenRealm(jwt.getClaimsSet().getClaim("realm", String.class), request);
                 StatelessRefreshToken refreshToken = new StatelessRefreshToken(jwt, jwtString);
@@ -686,10 +686,9 @@ public class StatelessTokenStore implements TokenStore {
         }
     }
 
-    private void verifySignature(SignedJwt jwt) throws InvalidGrantException, ServerException,
-            NotFoundException {
-        String realm = jwt.getClaimsSet().getClaim("realm", String.class);
-        verifySignature(providerSettingsFactory.get(realm), jwt);
+    private void verifySignature(SignedJwt jwt, OAuth2Request request)
+            throws NotFoundException, InvalidGrantException, ServerException {
+        verifySignature(providerSettingsFactory.get(request), jwt);
     }
 
     private void verifySignature(OAuth2ProviderSettings providerSettings, SignedJwt jwt) throws InvalidGrantException, ServerException,

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -29,9 +29,10 @@
 
 package com.sun.identity.authentication.spi;
 
-import static com.sun.identity.authentication.util.ISAuthConstants.*;
+import static com.sun.identity.authentication.util.ISAuthConstants.LOGIN_IGNORE;
+import static com.sun.identity.authentication.util.ISAuthConstants.LOGIN_SUCCEED;
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
-import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -64,6 +65,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.iplanet.am.sdk.AMException;
@@ -2470,7 +2472,7 @@ public abstract class AMLoginModule implements LoginModule {
                  }
 
                  String userDN = null;
-                 userDN = normalizeDN(IdUtils.getDN(amIdUser));
+                 userDN = normalizeDN(IdentityUtils.getDN(amIdUser));
 
                  if (acInfo == null) {
                      acInfo = isAccountLockout.getAcInfo(userDN,amIdUser);

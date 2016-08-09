@@ -45,6 +45,7 @@ import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthorizationCode;
+import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -313,22 +314,22 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             logger.message("Can't add claims for the client credentials flow.");
         } else if (providerSettings.isAlwaysAddClaimsToToken() ||
                     (responseType != null && responseType.trim().equals(OAuth2Constants.JWTTokenParams.ID_TOKEN))) {
-            appendIdTokenClaims(request, providerSettings, oidcToken);
+            appendIdTokenClaims(clientRegistration, request, providerSettings, oidcToken);
         } else if (providerSettings.getClaimsParameterSupported()) {
-            appendRequestedIdTokenClaims(request, providerSettings, oidcToken);
+            appendRequestedIdTokenClaims(clientRegistration, request, providerSettings, oidcToken);
         }
 
         return oidcToken;
     }
 
     //return all claims from scopes + claims requested in the id_token
-    private void appendIdTokenClaims(OAuth2Request request, OAuth2ProviderSettings providerSettings,
-                                     OpenIdConnectToken oidcToken)
+    private void appendIdTokenClaims(ClientRegistration clientRegistration, OAuth2Request request,
+                                     OAuth2ProviderSettings providerSettings, OpenIdConnectToken oidcToken)
             throws ServerException, NotFoundException, InvalidClientException {
 
         try {
             AccessToken accessToken = request.getToken(AccessToken.class);
-            Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request).getValues();
+            Map<String, Object> userInfo = providerSettings.getUserInfo(clientRegistration, accessToken, request).getValues();
 
             for (Map.Entry<String, Object> claim : userInfo.entrySet()) {
                 oidcToken.put(claim.getKey(), claim.getValue());
@@ -341,8 +342,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     }
 
     //See spec section 5.5. - add claims to id_token based on 'claims' parameter in the access token
-    private void appendRequestedIdTokenClaims(OAuth2Request request, OAuth2ProviderSettings providerSettings,
-                                              OpenIdConnectToken oidcToken)
+    private void appendRequestedIdTokenClaims(ClientRegistration clientRegistration, OAuth2Request request,
+                                              OAuth2ProviderSettings providerSettings, OpenIdConnectToken oidcToken)
             throws ServerException, NotFoundException, InvalidClientException {
 
         AccessToken accessToken = request.getToken(AccessToken.class);
@@ -357,7 +358,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             try {
                 JSONObject claimsObject = new JSONObject(claims);
                 JSONObject idTokenClaimsRequest = claimsObject.getJSONObject(OAuth2Constants.JWTTokenParams.ID_TOKEN);
-                Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request).getValues();
+                Map<String, Object> userInfo = providerSettings.getUserInfo(clientRegistration, accessToken, request).getValues();
 
                 Iterator<String> it = idTokenClaimsRequest.keys();
                 while (it.hasNext()) {

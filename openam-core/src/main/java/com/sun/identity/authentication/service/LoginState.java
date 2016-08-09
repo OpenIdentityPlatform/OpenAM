@@ -30,11 +30,11 @@
 
 package com.sun.identity.authentication.service;
 
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableSet;
 import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.newDate;
 
 import java.net.InetAddress;
 import java.security.AccessController;
@@ -72,6 +72,7 @@ import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
@@ -5551,7 +5552,7 @@ public class LoginState {
 
         if (returnUserDN == null || (returnUserDN.length() == 0)) {
             if (amIdentityUser != null) {
-                returnUserDN = IdUtils.getDN(amIdentityUser);
+                returnUserDN = IdentityUtils.getDN(amIdentityUser);
             } else if (userDN != null) {
                 returnUserDN = userDN;
             } else {

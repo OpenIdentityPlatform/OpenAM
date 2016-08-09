@@ -65,7 +65,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         grantTypeHandler = new AuthorizationCodeGrantTypeHandler(requestValidators, clientAuthenticator, tokenStore,
                 tokenInvalidator, providerSettingsFactory, urisFactory, accessTokenGenerator);
 
-        providerSettings = mock(OAuth2ProviderSettings.class);
+        providerSettings = mock(RealmOAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);

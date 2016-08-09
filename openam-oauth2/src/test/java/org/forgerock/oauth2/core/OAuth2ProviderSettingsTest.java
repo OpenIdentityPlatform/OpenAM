@@ -46,7 +46,7 @@ public class OAuth2ProviderSettingsTest {
         given(key.getParams()).willReturn(curve.getParameters());
 
         // When
-        final Map<String, Object> jwk = OAuth2ProviderSettings.createECJWK(alias, key, KeyUse.SIG);
+        final Map<String, Object> jwk = RealmOAuth2ProviderSettings.createECJWK(alias, key, KeyUse.SIG);
 
         // Then
         assertThat(jwk).containsEntry("kty", "EC")

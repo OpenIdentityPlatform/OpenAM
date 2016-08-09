@@ -252,7 +252,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         @Override
         public Boolean byRealm(String realm) {
             try {
-                return providerSettings.get(realm).isStatelessTokensEnabled();
+                return providerSettings.getRealmProviderSettings(realm).isStatelessTokensEnabled();
             } catch (ServerException | NotFoundException e) {
                 return false;
             }

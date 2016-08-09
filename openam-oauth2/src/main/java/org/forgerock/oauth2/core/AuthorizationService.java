@@ -180,7 +180,10 @@ public class AuthorizationService {
 
                 UserInfoClaims userInfo = null;
                 try {
-                    userInfo = providerSettings.getUserInfo(request.getToken(AccessToken.class), request);
+                    userInfo = providerSettings.getUserInfo(
+                            clientRegistration,
+                            request.getToken(AccessToken.class),
+                            request);
                 } catch (UnauthorizedClientException e) {
                     logger.debug("Couldn't get user info - continuing to display consent page without claims.", e);
                 }

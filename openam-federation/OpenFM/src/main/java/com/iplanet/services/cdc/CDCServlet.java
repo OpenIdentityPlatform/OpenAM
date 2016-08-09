@@ -26,13 +26,13 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
-
 package com.iplanet.services.cdc;
 
 import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.TokenRestrictionFactory;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
@@ -63,6 +63,7 @@ import com.sun.identity.saml.assertion.SubjectLocality;
 import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.protocol.Status;
 import com.sun.identity.saml.protocol.StatusCode;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -76,6 +77,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.AccessController;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,13 +98,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.agent.TokenRestrictionResolver;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.owasp.esapi.ESAPI;
 
 /**
- * The <code>CDCServlet</code> is the heart of the Cross Domain Single
- * Signon mechanism of OpenAM.
+ * The {@code CDCServlet} is the heart of the Cross Domain Single Signon mechanism of OpenAM.
  * <p>
  * The following is the algorithm used by the program.
  * <ol>
@@ -110,10 +113,8 @@ import org.owasp.esapi.ESAPI;
  *      the auth service</li>
  * <li> if request contains SSO related cookie
  *      <ul>
- *      <li>Retrieve the cookie related to SSO namely
- *          <code>iPlanetDirectoryPro</code> from request.</li>
- *      <li> Create Liberty <code>AuthnResponse</code> with the SSO cookie as
- *           the Name Identifier.</li>
+ *      <li>Retrieve the cookie related to SSO namely {@code iPlanetDirectoryPro} from request.</li>
+ *      <li> Create Liberty {@code AuthnResponse} with the SSO cookie as the Name Identifier.</li>
  *      <li>Send the Response as Form POST to the original request
  *          requested using the goto parameter in the query string.</li>
  *      </ul>
@@ -121,8 +122,8 @@ import org.owasp.esapi.ESAPI;
  * </ol>
  */
 public class CDCServlet extends HttpServlet {
-    private static final String UNIQUE_COOKIE_NAME =
-        "sunIdentityServerAuthNServer";
+
+    private static final String UNIQUE_COOKIE_NAME = "sunIdentityServerAuthNServer";
     private static final String DEFAULT_DEPLOY_URI = "/amserver";
     private static final String GOTO_PARAMETER = "goto";
     private static final String TARGET_PARAMETER = "TARGET";
@@ -131,39 +132,36 @@ public class CDCServlet extends HttpServlet {
     private static final String PROVIDER_ID = "ProviderID";
     private static final String REQUEST_ID = "RequestID";
     private static final String RELAY_STATE = "RelayState";
-    private static final String SELF_PROVIDER_ID =
-        FSServiceUtils.getBaseURL() + CDCURI;
+    private static final String SELF_PROVIDER_ID = FSServiceUtils.getBaseURL() + CDCURI;
     private static final String LOGIN_URI = "loginURI";
-    private static final String RESPONSE_HEADER_ALERT =
-            "X-DSAME-Assertion-Form";
-    private static final String RESPONSE_HEADER_ALERT_VALUE =
-            "true";
+    private static final String RESPONSE_HEADER_ALERT = "X-DSAME-Assertion-Form";
+    private static final String RESPONSE_HEADER_ALERT_VALUE = "true";
     private static final String FORBIDDEN_STR_MATCH = "#403x";
     private static final String SERVER_ERROR_STR_MATCH = "#500x";
-    
     private static final List adviceParams = new ArrayList();
-    private static final Set<String> INVALID_SET = new HashSet<String>();
-    private static final Set<String> VALID_LOGIN_URIS = new HashSet<String>();
-    private static final String LEFT_ANGLE              = "<";
-    private static final String RIGHT_ANGLE             = ">";
-    private static final String URLENC_RIGHT_ANGLE      = "%3e";
-    private static final String URLENC_LEFT_ANGLE       = "%3c";
-    private static final String URLENC_JAVASCRIPT       = "javascript%3a";
-    private static final String JAVASCRIPT              = "javascript:";
-    private static final String DELIM                   = ",";
-    private static final String DEBUG_FILE_NAME         = "amCDC";
-    private static final char	QUESTION_MARK           = '?';
-    private static final char	AMP                     = '&';
-    private static final char	EQUALS                  = '=';
-    static Debug  debug = Debug.getInstance(DEBUG_FILE_NAME);
+    private static final Set<String> INVALID_SET = new HashSet<>();
+    private static final Set<String> VALID_LOGIN_URIS = new HashSet<>();
+    private static final String LEFT_ANGLE = "<";
+    private static final String RIGHT_ANGLE = ">";
+    private static final String URLENC_RIGHT_ANGLE = "%3e";
+    private static final String URLENC_LEFT_ANGLE = "%3c";
+    private static final String URLENC_JAVASCRIPT = "javascript%3a";
+    private static final String JAVASCRIPT = "javascript:";
+    private static final String DELIM = ",";
+    private static final String DEBUG_FILE_NAME = "amCDC";
+    private static final char QUESTION_MARK = '?';
+    private static final char AMP = '&';
+    private static final char EQUALS = '=';
+    private static Debug debug = Debug.getInstance(DEBUG_FILE_NAME);
 
     static {
         initConfig();
     }
-    
+
+    private volatile TokenRestrictionResolver tokenRestrictionResolver;
+
     private SSOTokenManager tokenManager;
     private SessionService sessionService;
-    private SPValidator spValidator;
     private String DNSAddress = "localhost";
     private String IPAddress = "127.0.0.1";
     private String authURLCookieName;
@@ -186,7 +184,9 @@ public class CDCServlet extends HttpServlet {
         try {
             tokenManager = SSOTokenManager.getInstance();
             sessionService = InjectorHolder.getInstance(SessionService.class);
-            spValidator = new LdapSPValidator();
+            tokenRestrictionResolver = new TokenRestrictionResolver(
+                    InjectorHolder.getInstance(AMIdentityRepositoryFactory.class),
+                    InjectorHolder.getInstance(TokenRestrictionFactory.class));
             
             DNSAddress = SystemConfigurationUtil.getProperty(
                 Constants.AM_SERVER_HOST);
@@ -200,8 +200,7 @@ public class CDCServlet extends HttpServlet {
             
             // Check if CDC needs to generate restricted SSO Tokens
             uniqueCookieEnabled = Boolean.valueOf(
-                SystemConfigurationUtil.getProperty(
-                Constants.IS_ENABLE_UNIQUE_COOKIE, "false")).booleanValue();
+                    SystemConfigurationUtil.getProperty(Constants.IS_ENABLE_UNIQUE_COOKIE, "false"));
             
             if (debug.messageEnabled()) {
                 debug.message("CDCServlet init params:" +
@@ -217,7 +216,6 @@ public class CDCServlet extends HttpServlet {
             debug.error("CDCServlet.init", e);
             throw new ServletException(e.getMessage());
         }
-        
     }
     
     /**
@@ -370,24 +368,25 @@ public class CDCServlet extends HttpServlet {
                 String inResponseTo = request.getParameter(REQUEST_ID);
                 String spDescriptor = request.getParameter(PROVIDER_ID);
                 
-                String resTokenID = null;
+                String restrictedTokenID;
                 /**
-                 * validateAndGetRestriction throws an exception if an agent
+                 * resolve throws an exception if an agent
                  * profile with provider id and goto url is not present
                  */
-                TokenRestriction tokenRes = 
-                    spValidator.validateAndGetRestriction(
-                            FSAuthnRequest.parseURLEncodedRequest(request),
-                            gotoURL);
+                TokenRestriction tokenRestriction = tokenRestrictionResolver.resolve(
+                        FSAuthnRequest.parseURLEncodedRequest(request).getProviderId(),
+                        gotoURL,
+                        AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                        uniqueCookieEnabled);
                 if (uniqueCookieEnabled) {
-                    resTokenID = sessionService.getRestrictedTokenId(
-                        token.getTokenID().toString(), tokenRes);
+                    restrictedTokenID = sessionService.getRestrictedTokenId(
+                        token.getTokenID().toString(), tokenRestriction);
                 } else {
-                    resTokenID = token.getTokenID().toString();
+                    restrictedTokenID = token.getTokenID().toString();
                 }
                 
                 FSAssertion assertion = createAssertion(spDescriptor,
-                    SELF_PROVIDER_ID,  resTokenID, token.getAuthType(),
+                    SELF_PROVIDER_ID,  restrictedTokenID, token.getAuthType(),
                     token.getProperty("authInstant"),
                     token.getPrincipal().getName(), inResponseTo);
                 
@@ -413,7 +412,6 @@ public class CDCServlet extends HttpServlet {
                 debug.error("CDCServlet.doGetPost", ssoe);
             } catch (Exception e) {
                 debug.error("CDCServlet.doGetPost", e);
-                spValidator = new LdapSPValidator();
                 showError(response, FORBIDDEN_STR_MATCH);
             }
         }

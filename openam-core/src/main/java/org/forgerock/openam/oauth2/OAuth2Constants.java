@@ -70,122 +70,77 @@ public class OAuth2Constants {
     /**
      * The OAuth Parameters Registry's initial contents.
      */
-    public class Params {
+    public static class Params {
 
-        /**
-         * Parameter usage location: authorization request, token request
-         */
+        /** Parameter usage location: authorization request, token request. */
         public static final String CLIENT_ID = "client_id";
 
         public static final String ID = "id";
 
-        /**
-         * Parameter usage location: token request
-         */
+        /** Parameter usage location: token request. */
         public static final String CLIENT_SECRET = "client_secret";
 
-        /**
-         * Parameter usage location: authorization request
-         */
+        /** Parameter usage location: authorization request. */
         public static final String RESPONSE_TYPE = "response_type";
 
-        /**
-         * Parameter usage location: authoization request
-         */
+        /** Parameter usage location: authorization request. */
         public static final String MAX_AGE = "max_age";
 
-        /**
-         * Delimiter that seperates the response_type values
-         */
+        /** Delimiter that separates the response_type values. */
         public static final String RESPONSE_TYPE_DELIMITER = " ";
 
-        /**
-         * Parameter usage location: authorization request, token request
-         */
+        /** Parameter usage location: authorization request, token request. */
         public static final String REDIRECT_URI = "redirect_uri";
 
-        /**
-         * Parameter usage location: authorization request, authorization
-         */
+        /** Parameter usage location: authorization request, authorization. */
         public static final String SCOPE = "scope";
 
-        /**
-         * Parameter usage location: authorization request, authorization
-         */
+        /** Parameter usage location: authorization request, authorization. */
         public static final String STATE = "state";
 
-        /**
-         * Parameter usage location: authorization response, token request
-         */
+        /** Parameter usage location: authorization response, token request. */
         public static final String CODE = "code";
 
-        /**
-         * Parameter usage location: token response, userinfo response
-         */
+        /** Parameter usage location: token response, userinfo response. */
         public static final String VALUE = "value";
 
-        /**
-         * Parameter usage location: token response, userinfo response
-         */
+        /** Parameter usage location: token response, userinfo response. */
         public static final String VALUES = "values";
 
-        /**
-         * Parameter usage location: authorization response, token response
-         */
+        /** Parameter usage location: authorization response, token response. */
         public static final String ERROR = "error";
-        /**
-         * Parameter usage location: authorization response, token response
-         */
+
+        /** Parameter usage location: authorization response, token response. */
         public static final String ERROR_DESCRIPTION = "error_description";
 
-        /**
-         * Parameter usage location: authorization response, token response
-         */
+        /** Parameter usage location: authorization response, token response. */
         public static final String ERROR_URI = "error_uri";
 
-        /**
-         * Parameter usage location: token request
-         */
+        /** Parameter usage location: token request. */
         public static final String GRANT_TYPE = "grant_type";
 
-        /**
-         * Parameter usage location: authorization response, token response, user info form
-         */
+        /** Parameter usage location: authorization response, token response, user info form. */
         public static final String ACCESS_TOKEN = "access_token";
 
-        /**
-         * Parameter usage locationon: authorization response, token response
-         */
+        /** Parameter usage locationon: authorization response, token response. */
         public static final String TOKEN_TYPE = "token_type";
 
-        /**
-         * Parameter usage location: authorization response, token response
-         */
+        /** Parameter usage location: authorization response, token response. */
         public static final String EXPIRES_IN = "expires_in";
 
-        /**
-         * Parameter usage location: token request
-         */
+        /** Parameter usage location: token request. */
         public static final String USERNAME = "username";
 
-        /**
-         * Parameter usage location: token request
-         */
+        /** Parameter usage location: token request. */
         public static final String PASSWORD = "password";
 
-        /**
-         * Parameter usage location: token request, token response
-         */
+        /** Parameter usage location: token request, token response. */
         public static final String REFRESH_TOKEN = "refresh_token";
 
-        /**
-         * Parameter usage location: token request
-         */
+        /** Parameter usage location: token request. */
         public static final String REALM = "realm";
 
-        /**
-         * Parameter usage location: OpenId Connect request, as value in scope
-         */
+        /** Parameter usage location: OpenId Connect request, as value in scope. */
         public static final String OPENID = "openid";
 
         /**
@@ -197,29 +152,20 @@ public class OAuth2Constants {
          */
         public static final String ACR_VALUES = "acr_values";
         
-        /**
-         * Parameter usage location: OpenId Connect request
-         */
+        /** Parameter usage location: OpenId Connect request. */
         public static final String LOGIN_HINT = "login_hint";
 
-        /**
-         * Parameter usage location: OpenId Connect End Session request
-         */
+        /** Parameter usage location: OpenId Connect End Session request. */
         public static final String END_SESSION_ID_TOKEN_HINT = "id_token_hint";
 
-        /**
-         * Parameter usage location: OpenId Connect End Session request
-         */
+        /** Parameter usage location: OpenId Connect End Session request. */
         public static final String POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri";
 
-        /**
-         * Parameter usage location: Specify the authentication chain to use
-         */
+        /** Parameter usage location: Specify the authentication chain to use. */
         public static final String AUTH_CHAIN = "auth_chain";
     }
 
-    public class CoreTokenParams{
-
+    public static class CoreTokenParams{
         public static final String EXPIRE_TIME = "expireTime";
         public static final String SCOPE = "scope";
         public static final String PARENT = "parent";
@@ -234,15 +180,13 @@ public class OAuth2Constants {
         public static final String TOKEN_NAME = "tokenName";
         public static final String AUTH_MODULES = "authModules";
         public static final String AUDIT_TRACKING_ID = "auditTrackingId";
-
         public static final String OAUTH_TOKEN_ADAPTER = "oauthTokenAdapter";
         public static final String RESOURCE_SET_TOKEN_ADAPTER = "resourceSetTokenAdapter";
         public static final String AUTH_GRANT_ID = "authGrantId";
-
         public static final String AUTH_TIME = "auth_time";
     }
 
-    public class Token {
+    public static class Token {
         public static final String OAUTH_ACCESS_TOKEN = "access_token";
         public static final String OAUTH_EXPIRES_IN = "expires_in";
         public static final String OAUTH_REFRESH_TOKEN = "refresh_token";
@@ -250,7 +194,7 @@ public class OAuth2Constants {
         public static final String OAUTH_CODE_TYPE = "access_code";
     }
 
-    public class StoredToken {
+    public static class StoredToken {
         public static final String EXPIRY_TIME = "expiry_time";
         public static final String EXPIRYTIME = "expirytime";
         public static final String ISSUED = "issued";
@@ -258,7 +202,7 @@ public class OAuth2Constants {
         public static final String TYPE = "type";
     }
 
-    public class UserinfoEndpoint {
+    public static class UserinfoEndpoint {
         public static final String USERINFO = "userinfo";
         public static final String USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg";
         public static final String USERINFO_ENCRYPTED_RESPONSE_ALG = "userinfo_encrypted_response_alg";
@@ -271,7 +215,7 @@ public class OAuth2Constants {
      * @see <a href="">11.3. The OAuth Authorization Endpoint Response Type
      *      Registry</a>
      */
-    public class AuthorizationEndpoint {
+    public static class AuthorizationEndpoint {
         /**
          * @see <a
          *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.1">4.1.1.
@@ -292,7 +236,7 @@ public class OAuth2Constants {
     /**
      * grant_type Registry
      */
-    public class TokenEndpoint {
+    public static class TokenEndpoint {
         /**
          * @see <a
          *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.3">4.1.3.
@@ -333,7 +277,7 @@ public class OAuth2Constants {
     /**
      * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-introspection-04">Token Introspection standard</a>.
      */
-    public class IntrospectionEndpoint {
+    public static class IntrospectionEndpoint {
         public static final String TOKEN = "token";
         public static final String TOKEN_TYPE_HINT = "token_type_hint";
         public static final String ACCESS_TOKEN_TYPE = "access_token";
@@ -349,7 +293,7 @@ public class OAuth2Constants {
      *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-5.2.1">5.2.1.
      *      The "Bearer" Authentication Scheme</a>
      */
-    public class Bearer {
+    public static class Bearer {
         /**
          * 5.2.1. The "Bearer" Authentication Scheme
          * <p/>
@@ -365,7 +309,7 @@ public class OAuth2Constants {
      *      href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer">SAML
      *      2.0 Bearer Assertion Profiles for OAuth 2.0</a>
      */
-    public class SAML20 {
+    public static class SAML20 {
         /**
          * The value of the "client_assertion" parameter MUST contain a single
          * SAML 2.0 Assertion. The SAML Assertion XML data MUST be encoded using
@@ -391,7 +335,7 @@ public class OAuth2Constants {
      * @see <a
      *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac"></a>
      */
-    public class MAC {
+    public static class MAC {
 
         /**
          * Mac
@@ -516,20 +460,15 @@ public class OAuth2Constants {
      *
      * @see <a href="http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html">OAuth2 Jwt Bearer</a>
      */
-    public class JwtProfile {
-        /**
-         * The parameter name for the client assertion type.
-         */
+    public static class JwtProfile {
+
+        /** The parameter name for the client assertion type. */
         public static final String CLIENT_ASSERTION_TYPE = "client_assertion_type";
 
-        /**
-         * The parameter name for the client assertion.
-         */
+        /** The parameter name for the client assertion. */
         public static final String CLIENT_ASSERTION = "client_assertion";
 
-        /**
-         * The parameter value for the JWT Bearer client assertion type.
-         */
+        /** The parameter value for the JWT Bearer client assertion type. */
         public static final String JWT_PROFILE_CLIENT_ASSERTION_TYPE
                 = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
     }
@@ -539,7 +478,7 @@ public class OAuth2Constants {
      * href="http://tools.ietf.org/html/draft-ietf-oauth-v2-25#section-11.4"
      * >11.4. The OAuth Extensions Error Registry</a>
      */
-    public class Error {
+    public static class Error {
         /**
          * A single error code
          */
@@ -742,7 +681,7 @@ public class OAuth2Constants {
         public static final String REDIRECT_TEMPORARY = "redirection_temporary";
     }
 
-    public class Custom {
+    public static class Custom {
         /**
          * This optional parameter indicates whether the user should be prompted
          * for re-authentication and consent to grant account access to your
@@ -804,7 +743,6 @@ public class OAuth2Constants {
         public static final String LOCALE = "locale";
         public static final String UI_LOCALES = "ui_locales";
         public static final String GOTO = "goto";
-
         public static final String AUDIENCE = "audience";
         public static final String USER_ID = "user_id";
 
@@ -822,7 +760,7 @@ public class OAuth2Constants {
     /**
      * Constants relating to the device code flow.
      */
-    public class DeviceCode {
+    public static class DeviceCode {
         public static final String DEVICE_CODE = "device_code";
         public static final String USER_CODE = "user_code";
         public static final String VERIFICATION_URL = "verification_url";
@@ -841,7 +779,7 @@ public class OAuth2Constants {
      * Stores the constants for the OAuth2 Provider Service
      * @author Jason Lemay
      */
-    public class OAuth2ProviderService {
+    public static class OAuth2ProviderService {
         //service name and version
         public static final String NAME = "OAuth2Provider";
         public static final String VERSION = "1.0";
@@ -852,17 +790,21 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
         public static final String JWT_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-jwt-token-lifetime";
         public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
-        public static final String ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN = "forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token";
+        public static final String ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN =
+                "forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token";
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
         public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
         public static final String STATELESS_TOKENS_ENABLED = "statelessTokensEnabled";
-        public static final String ID_TOKEN_INFO_CLIENT_AUTHENTICATION_ENABLED = "idTokenInfoClientAuthenticationEnabled";
+        public static final String ID_TOKEN_INFO_CLIENT_AUTHENTICATION_ENABLED =
+                "idTokenInfoClientAuthenticationEnabled";
         public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
-        public static final String OIDC_CLAIMS_EXTENSION_SCRIPT = "forgerock-oauth2-provider-oidc-claims-extension-script";
+        public static final String OIDC_CLAIMS_EXTENSION_SCRIPT =
+                "forgerock-oauth2-provider-oidc-claims-extension-script";
         public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
-        public static final String CREATED_TIMESTAMP_ATTRIBUTE_NAME = "forgerock-oauth2-provider-created-attribute-name";
+        public static final String CREATED_TIMESTAMP_ATTRIBUTE_NAME =
+                "forgerock-oauth2-provider-created-attribute-name";
         public static final String MODIFIED_TIMESTAMP_ATTRIBUTE_NAME =
                 "forgerock-oauth2-provider-modified-attribute-name";
         public static final String SUBJECT_TYPES_SUPPORTED = "forgerock-oauth2-provider-subject-types-supported";
@@ -870,8 +812,10 @@ public class OAuth2Constants {
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
         public static final String TOKEN_SIGNING_RSA_KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
         public static final String TOKEN_SIGNING_ECDSA_KEYSTORE_ALIAS = "tokenSigningECDSAKeyAlias";
-        public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED = "forgerock-oauth2-provider-allow-open-dynamic-registration";
-        public static final String GENERATE_REGISTRATION_ACCESS_TOKENS = "forgerock-oauth2-provider-generate-registration-access-tokens";
+        public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED =
+                "forgerock-oauth2-provider-allow-open-dynamic-registration";
+        public static final String GENERATE_REGISTRATION_ACCESS_TOKENS =
+                "forgerock-oauth2-provider-generate-registration-access-tokens";
         public static final String AMR_VALUE_MAPPING = "forgerock-oauth2-provider-amr-mappings";
         public static final String ACR_VALUE_MAPPING = "forgerock-oauth2-provider-loa-mapping";
         public static final String DEFAULT_ACR = "forgerock-oauth2-provider-default-acr";
@@ -898,6 +842,16 @@ public class OAuth2Constants {
         public static final String DEVICE_COMPLETION_URL = "completionUrl";
         public static final String DEVICE_CODE_LIFETIME = "deviceCodeLifetime";
         public static final String DEVICE_CODE_POLL_INTERVAL = "devicePollInterval";
+        public static final String OPENID_CONNECT_VERSION = "3.0";
+    }
+
+    public static class AgentOAuth2ProviderService {
+        public static final String NAME = "AgentOAuth2Provider";
+        public static final String VERSION = "1.0";
+        public static final long AUTHORIZATION_CODE_LIFETIME = 120;
+        public static final long REFRESH_TOKEN_LIFETIME = 604800;
+        public static final long ACCESS_TOKEN_LIFETIME = 3600;
+        public static final long OPENID_CONNECT_JWT_TOKEN_LIFETIME = 3600;
     }
 
     /**
@@ -907,7 +861,7 @@ public class OAuth2Constants {
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
     public static final String DEBUG_LOG_NAME = "OAuth2Provider";
 
-    public class OAuth2Client {
+    public static class OAuth2Client {
         public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";
         public static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
         public static final String CLAIMS = "com.forgerock.openam.oauth2provider.claims";
@@ -919,21 +873,32 @@ public class OAuth2Constants {
         public static final String RESPONSE_TYPES = "com.forgerock.openam.oauth2provider.responseTypes";
         public static final String CONTACTS = "com.forgerock.openam.oauth2provider.contacts";
         public static final String LOGO_URI = "com.forgerock.openam.oauth2provider.logoURI";
-        public static final String TOKEN_ENDPOINT_AUTH_METHOD = "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod";
-        public static final String TOKEN_ENDPOINT_AUTH_SIGNING_ALG = "com.forgerock.openam.oauth2provider.tokenEndPointAuthSigningAlg";
+        public static final String TOKEN_ENDPOINT_AUTH_METHOD =
+                "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod";
+        public static final String TOKEN_ENDPOINT_AUTH_SIGNING_ALG =
+                "com.forgerock.openam.oauth2provider.tokenEndPointAuthSigningAlg";
         public static final String POLICY_URI = "com.forgerock.openam.oauth2provider.policyURI";
         public static final String TOS_URI = "com.forgerock.openam.oauth2provider.tosURI";
         public static final String SECTOR_IDENTIFIER_URI = "com.forgerock.openam.oauth2provider.sectorIdentifierURI";
         public static final String SUBJECT_TYPE = "com.forgerock.openam.oauth2provider.subjectType";
-        public static final String REQUEST_OBJECT_SIGNING_ALG = "com.forgerock.openam.oauth2provider.requestObjectSigningAlg";
-        public static final String REQUEST_OBJECT_ENCRYPTION_ALG = "com.forgerock.openam.oauth2provider.requestObjectEncryptionAlg";
-        public static final String REQUEST_OBJECT_ENCRYPTION_ENC = "com.forgerock.openam.oauth2provider.requestObjectEncryptionEnc";
-        public static final String USERINFO_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoSignedResponseAlg";
-        public static final String USERINFO_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseAlg";
-        public static final String USERINFO_SIGN_AND_ENC_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseEnc";
-        public static final String IDTOKEN_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg";
-        public static final String IDTOKEN_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg";
-        public static final String IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseEnc";
+        public static final String REQUEST_OBJECT_SIGNING_ALG =
+                "com.forgerock.openam.oauth2provider.requestObjectSigningAlg";
+        public static final String REQUEST_OBJECT_ENCRYPTION_ALG =
+                "com.forgerock.openam.oauth2provider.requestObjectEncryptionAlg";
+        public static final String REQUEST_OBJECT_ENCRYPTION_ENC =
+                "com.forgerock.openam.oauth2provider.requestObjectEncryptionEnc";
+        public static final String USERINFO_SIGNED_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.userinfoSignedResponseAlg";
+        public static final String USERINFO_ENCRYPTED_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseAlg";
+        public static final String USERINFO_SIGN_AND_ENC_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseEnc";
+        public static final String IDTOKEN_SIGNED_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg";
+        public static final String IDTOKEN_ENCRYPTED_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg";
+        public static final String IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG =
+                "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseEnc";
         public static final String DEFAULT_MAX_AGE = "com.forgerock.openam.oauth2provider.defaultMaxAge";
         public static final String DEFAULT_MAX_AGE_ENABLED = "com.forgerock.openam.oauth2provider.defaultMaxAgeEnabled";
         public static final String REQUIRE_AUTH_TIME = "com.forgerock.openam.oauth2provider.requireAuthTime";
@@ -957,13 +922,14 @@ public class OAuth2Constants {
         public static final String CLIENT_JWT_PUBLIC_KEY = "com.forgerock.openam.oauth2provider.clientJwtPublicKey";
         public static final String PUBLIC_KEY_SELECTOR = "com.forgerock.openam.oauth2provider.publicKeyLocation";
 
-        public static final String AUTHORIZATION_CODE_LIFE_TIME = "com.forgerock.openam.oauth2provider.authorizationCodeLifeTime";
+        public static final String AUTHORIZATION_CODE_LIFE_TIME =
+                "com.forgerock.openam.oauth2provider.authorizationCodeLifeTime";
         public static final String ACCESS_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.accessTokenLifeTime";
         public static final String REFRESH_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.refreshTokenLifeTime";
         public static final String JWT_TOKEN_LIFE_TIME = "com.forgerock.openam.oauth2provider.jwtTokenLifeTime";
     }
 
-    public class JWTTokenParams {
+    public static class JWTTokenParams {
 
         public static final String JWT_TOKEN = "JWTToken";
         public static final String ID_TOKEN = "id_token";
@@ -1026,7 +992,6 @@ public class OAuth2Constants {
         POST_LOGOUT_REDIRECT_URIS("post_logout_redirect_uris"),
         REGISTRATION_ACCESS_TOKEN("registration_access_token"),
         CLIENT_SESSION_URI("client_session_uri"),
-
         CLIENT_ID("client_id"),
         CLIENT_SECRET("client_secret"),
         CLIENT_TYPE("client_type"),
@@ -1037,11 +1002,11 @@ public class OAuth2Constants {
         REALM("realm"),
         PUBLIC_KEY_SELECTOR("public_key_selector"),
         X509("x509"),
-
         AUTHORIZATION_CODE_LIFE_TIME("authorization_code_lifetime"),
         ACCESS_TOKEN_LIFE_TIME("access_token_lifetime"),
         REFRESH_TOKEN_LIFE_TIME("refresh_token_lifetime"),
         JWT_TOKEN_LIFE_TIME("jwt_token_lifetime");
+
         private String name;
 
         ShortClientAttributeNames(String name) {
@@ -1070,6 +1035,7 @@ public class OAuth2Constants {
     public enum UrlLocation {
         /** The query part of the URL. */
         QUERY,
+
         /** The fragment part of the URL. */
         FRAGMENT
     }
@@ -1091,12 +1057,33 @@ public class OAuth2Constants {
     /**
      * Constants for scripting implementation
      */
-    public class ScriptParams {
+    public static class ScriptParams {
         public static final String SCOPES = "scopes";
         public static final String IDENTITY = "identity";
         public static final String LOGGER = "logger";
         public static final String CLAIMS = "claims";
         public static final String SESSION = "session";
         public static final String REQUESTED_CLAIMS = "requestedClaims";
+    }
+
+    /**
+     * Constants for supported scopes
+     */
+    public static class Scopes {
+
+        /** OpenId scope. */
+        public static final String OPENID = "openid";
+
+        /** Email scope. */
+        public static final String EMAIL = "email";
+
+        /** Address scope. */
+        public static final String ADDRESS = "address";
+
+        /** Phone scope. */
+        public static final String PHONE = "phone";
+
+        /** Profile scope. */
+        public static final String PROFILE = "profile";
     }
 }

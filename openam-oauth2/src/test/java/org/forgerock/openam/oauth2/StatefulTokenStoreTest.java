@@ -41,6 +41,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.RealmOAuth2ProviderSettings;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -97,7 +98,8 @@ public class StatefulTokenStoreTest {
         failureFactory = mock(ClientAuthenticationFailureFactory.class);
         recoveryCodeGenerator = mock(RecoveryCodeGenerator.class);
 
-        oAuth2RequestFactory = new OAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()));
+        oAuth2RequestFactory = new OAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()),
+                clientRegistrationStore);
 
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         InvalidClientException expectedResult = mock(InvalidClientException.class);
@@ -223,7 +225,7 @@ public class StatefulTokenStoreTest {
     @Test
     public void shouldCreateDeviceCode() throws Exception {
         // Given
-        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
+        OAuth2ProviderSettings providerSettings = mock(RealmOAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));

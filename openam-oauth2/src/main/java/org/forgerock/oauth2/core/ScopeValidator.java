@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 
 import java.util.Map;
 import java.util.Set;
@@ -82,13 +83,14 @@ public interface ScopeValidator {
     /**
      * Gets the resource owners information based on an issued access token.
      *
+     * @param clientRegistration The client registration.
      * @param token The access token.
      * @param request The OAuth2 request.
      * @return A {@code Map<String, Object>} of the resource owner's information.
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException, NotFoundException;
+    UserInfoClaims getUserInfo(ClientRegistration clientRegistration, AccessToken token, OAuth2Request request) throws UnauthorizedClientException, NotFoundException;
 
     /**
      * Gets the specified access token's information.

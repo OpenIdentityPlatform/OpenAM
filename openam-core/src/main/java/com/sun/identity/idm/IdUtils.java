@@ -432,10 +432,12 @@ public final class IdUtils {
     /**
      * Returns the matching DN from the AM SDK for this entry. This utility is
      * required by auth.
-     * 
+     *
      * @param id  <code>AMIdentity</code> object.
      * @return <code>DN</code> of the object, as represented in the datastore.
+     * @deprecated use {@link org.forgerock.openam.identity.idm.IdentityUtils#getDN(AMIdentity)} instead.
      */
+    @Deprecated
     public static String getDN(AMIdentity id) {
         if (id.getDN() != null) {
             return id.getDN();

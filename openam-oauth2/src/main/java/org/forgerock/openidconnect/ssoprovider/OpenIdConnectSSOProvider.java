@@ -135,7 +135,7 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
 
         final String realm = idToken.getSignedJwt().getClaimsSet().get(REALM).defaultTo("/").asString();
         try {
-            final OAuth2ProviderSettings settings = providerSettingsFactory.get(realm);
+            final OAuth2ProviderSettings settings = providerSettingsFactory.getRealmProviderSettings(realm);
             return settings != null && settings.isOpenIDConnectSSOProviderEnabled();
         } catch (NotFoundException | ServerException e) {
             LOGGER.debug("OpenIdConnectSSOProvider: Error looking up OAuth2 provider settings for realm {}", realm, e);

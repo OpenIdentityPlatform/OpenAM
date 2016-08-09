@@ -25,9 +25,9 @@ package com.sun.identity.workflow;
 
 import static java.text.MessageFormat.format;
 import static java.util.Collections.singleton;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
@@ -60,6 +60,7 @@ import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
 import org.forgerock.util.query.QueryFilter;
@@ -87,10 +88,10 @@ public class ConfigureOAuth2 extends Task {
 
     private static final Map<String, String> OIDC_SCOPES = new ImmutableMap.Builder<String, String>()
             .put("openid", "")
-            .put("email", "openidconnect.scopes.email")
-            .put("address", "openidconnect.scopes.address")
-            .put("phone", "openidconnect.scopes.phone")
-            .put("profile", "openidconnect.scopes.profile")
+            .put(OAuth2Constants.Scopes.EMAIL, "openidconnect.scopes.email")
+            .put(OAuth2Constants.Scopes.ADDRESS, "openidconnect.scopes.address")
+            .put(OAuth2Constants.Scopes.PHONE, "openidconnect.scopes.phone")
+            .put(OAuth2Constants.Scopes.PROFILE, "openidconnect.scopes.profile")
             .build();
 
     private static final Map<String, String> OIDC_CLAIMS = new ImmutableMap.Builder<String, String>()

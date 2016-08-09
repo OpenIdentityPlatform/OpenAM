@@ -90,14 +90,16 @@ public class UmaProviderSettingsFactory {
         synchronized (providerSettingsMap) {
             UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
-                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm);
+                OAuth2ProviderSettings oAuth2ProviderSettings =
+                        oAuth2ProviderSettingsFactory.getRealmProviderSettings(realm);
                 providerSettings = getUmaProviderSettings(realm, oAuth2ProviderSettings);
             }
             return providerSettings;
         }
     }
 
-    private UmaProviderSettingsImpl getUmaProviderSettings(String realm, OAuth2ProviderSettings oAuth2ProviderSettings) throws NotFoundException {
+    private UmaProviderSettingsImpl getUmaProviderSettings(String realm, OAuth2ProviderSettings oAuth2ProviderSettings)
+            throws NotFoundException {
         UmaProviderSettingsImpl providerSettings;UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
         providerSettings = new UmaProviderSettingsImpl(realm, tokenStore, oAuth2ProviderSettings);
         providerSettingsMap.put(realm, providerSettings);

@@ -16,28 +16,30 @@
 
 package org.forgerock.oauth2.core;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2ProviderNotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.oauth2.CookieExtractor;
+import org.forgerock.openam.oauth2.AgentClientRegistration;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.oauth2.OAuthProblemException;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.sm.ServiceConfigManagerFactory;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
+
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 
 /**
  * A factory for creating/retrieving OAuth2ProviderSettings instances.
@@ -52,31 +54,32 @@ public class OAuth2ProviderSettingsFactory implements ServiceListener {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<>();
-    private final CookieExtractor cookieExtractor;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
     private final OAuth2RealmResolver realmResolver;
+    private final ServiceConfigManagerFactory serviceConfigManagerFactory;
+    private volatile AgentOAuth2ProviderSettings agentProviderSettings = null;
 
     /**
-     * Constructs a new OpenAMOAuth2ProviderSettingsFactory.
+     * Constructs a new {@code OpenAMOAuth2ProviderSettingsFactory} instance.
      *
-     * @param cookieExtractor An instance of the CookieExtractor.
-     * @param resourceSetStoreFactory An instance of the ResourceSetStoreFactory.
-     * @param realmResolver An instance of the RealmResolver
+     * @param resourceSetStoreFactory Factory for creating {@code ResourceSetStore} instances.
+     * @param realmResolver Used to resolve the realm.
+     * @param serviceConfigManagerFactory Factory for creating {@code ServiceConfigManager} instances.
      */
     @Inject
-    public OAuth2ProviderSettingsFactory(CookieExtractor cookieExtractor,
-            ResourceSetStoreFactory resourceSetStoreFactory, OAuth2RealmResolver realmResolver) {
-        this.cookieExtractor = cookieExtractor;
+    public OAuth2ProviderSettingsFactory(ResourceSetStoreFactory resourceSetStoreFactory,
+            OAuth2RealmResolver realmResolver, ServiceConfigManagerFactory serviceConfigManagerFactory) {
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.realmResolver = realmResolver;
+        this.serviceConfigManagerFactory = serviceConfigManagerFactory;
         addServiceListener();
     }
 
     private void addServiceListener() {
         try {
-            final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            final ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token,
-                    OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            final ServiceConfigManager serviceConfigManager =
+                    serviceConfigManagerFactory.create(OAuth2Constants.OAuth2ProviderService.NAME,
+                            OAuth2Constants.OAuth2ProviderService.VERSION);
             if (serviceConfigManager.addListener(this) == null) {
                 logger.error("Could not add listener to ServiceConfigManager instance. OAuth2 provider service " +
                         "removals will not be dynamically updated");
@@ -89,13 +92,13 @@ public class OAuth2ProviderSettingsFactory implements ServiceListener {
     }
 
     /**
-     * Gets a OAuth2ProviderSettings instance.
+     * Gets the instance of the OAuth2ProviderSettings defined in the realm.
      *
-     * @param request The OAuth2 request.
-     * @return A OAuth2ProviderSettings instance.
+     * @param realm The realm.
+     * @return The OAuth2ProviderSettings instance.
      */
-    public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        return get(realmResolver.resolveFrom(request));
+    public OAuth2ProviderSettings getRealmProviderSettings(String realm) throws NotFoundException {
+        return getRealmOAuth2ProviderSettings(realm);
     }
 
     /**
@@ -105,26 +108,42 @@ public class OAuth2ProviderSettingsFactory implements ServiceListener {
      * @return The OAuth2ProviderSettings instance.
      */
     public OAuth2ProviderSettings get(Context context) throws NotFoundException {
-        return get(realmResolver.resolveFrom(context));
+        return getRealmOAuth2ProviderSettings(realmResolver.resolveFrom(context));
     }
 
     /**
-     * Gets the instance of the OAuth2ProviderSettings.
+     * Gets the instance of the OAuth2ProviderSettings
      *
-     * @param realm The realm.
+     * @param request The OAuth2 request.
      * @return The OAuth2ProviderSettings instance.
      */
-    public OAuth2ProviderSettings get(String realm) throws NotFoundException {
-        Reject.ifNull(realm, "realm cannot be null");
-        return getProviderSettings(realm);
+    public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
+        return isAgentRequest(request)
+                ? getAgentOAuth2ProviderSettings()
+                : getRealmOAuth2ProviderSettings(realmResolver.resolveFrom(request));
     }
 
-    private OAuth2ProviderSettings getProviderSettings(String realm) throws NotFoundException {
+    private boolean isAgentRequest(OAuth2Request request) {
+        return (request.getClientRegistration() instanceof AgentClientRegistration);
+    }
+
+    private OAuth2ProviderSettings getAgentOAuth2ProviderSettings() {
+        if (agentProviderSettings == null) {
+            agentProviderSettings = new AgentOAuth2ProviderSettings();
+        }
+        return agentProviderSettings;
+    }
+
+    private OAuth2ProviderSettings getRealmOAuth2ProviderSettings(String realm) throws OAuth2ProviderNotFoundException {
+        Reject.ifNull(realm, "realm cannot be null");
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
                 ResourceSetStore resourceSetStore = resourceSetStoreFactory.create(realm);
-                providerSettings = new OAuth2ProviderSettings(realm, resourceSetStore, cookieExtractor);
+                OpenAMSettings settings = new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME,
+                        OAuth2Constants.OAuth2ProviderService.VERSION);
+                providerSettings = new RealmOAuth2ProviderSettings(settings, realm,
+                        resourceSetStore, serviceConfigManagerFactory);
                 if (providerSettings.exists()) {
                     providerSettingsMap.put(realm, providerSettings);
                 } else {
@@ -141,7 +160,8 @@ public class OAuth2ProviderSettingsFactory implements ServiceListener {
     }
 
     @Override
-    public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent, int type) {
+    public void globalConfigChanged(String serviceName, String version, String groupName,
+                                    String serviceComponent, int type) {
 
     }
 

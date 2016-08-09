@@ -121,7 +121,7 @@ public class OpenIdConnectSSOProviderTest {
     public void shouldBeApplicableToAValidJwt() throws Exception {
         String tokenId = "a valid jwt";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         assertThat(ssoProvider.isApplicable(tokenId)).isTrue();
     }
@@ -132,7 +132,7 @@ public class OpenIdConnectSSOProviderTest {
         String realm = "universe";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         claimsSet.setClaim(REALM, realm);
-        given(mockProviderSettingsFactory.get(realm)).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings(realm)).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(false);
         assertThat(ssoProvider.isApplicable(tokenId)).isFalse();
     }
@@ -143,7 +143,8 @@ public class OpenIdConnectSSOProviderTest {
         String realm = "universe";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         claimsSet.setClaim(REALM, realm);
-        given(mockProviderSettingsFactory.get(realm)).willThrow(new OAuth2ProviderNotFoundException(""));
+        given(mockProviderSettingsFactory.getRealmProviderSettings(realm))
+                .willThrow(new OAuth2ProviderNotFoundException(""));
         assertThat(ssoProvider.isApplicable(tokenId)).isFalse();
     }
 
@@ -152,7 +153,7 @@ public class OpenIdConnectSSOProviderTest {
         String tokenId = "a valid jwt";
         given(mockCookieExtractor.extract(mockRequest, COOKIE_NAME)).willReturn(tokenId);
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         assertThat(ssoProvider.isApplicable(mockRequest)).isTrue();
     }
@@ -163,7 +164,7 @@ public class OpenIdConnectSSOProviderTest {
         String tokenId = "a valid jwt";
         String clientId = "unknown_client";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         given(mockClientStore.get(clientId, "/", null)).willThrow(new NotFoundException("test_message"));
@@ -194,7 +195,7 @@ public class OpenIdConnectSSOProviderTest {
         String clientId = "client_id";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
@@ -213,7 +214,7 @@ public class OpenIdConnectSSOProviderTest {
         String clientId = "client_id";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         // no OPS claim
@@ -234,7 +235,7 @@ public class OpenIdConnectSSOProviderTest {
         String ops = "session identifier";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
@@ -257,7 +258,7 @@ public class OpenIdConnectSSOProviderTest {
         JsonValue token = json(object());
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
@@ -281,7 +282,7 @@ public class OpenIdConnectSSOProviderTest {
 
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
@@ -306,7 +307,7 @@ public class OpenIdConnectSSOProviderTest {
 
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(SSOTOKEN, sessionId);
@@ -328,7 +329,8 @@ public class OpenIdConnectSSOProviderTest {
         String tokenId = "a valid jwt";
         given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
         given(mockJwt.isExpired()).willReturn(false);
-        given(mockProviderSettingsFactory.get("/")).willThrow(new OAuth2ProviderNotFoundException(""));
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/"))
+                .willThrow(new OAuth2ProviderNotFoundException(""));
 
         // When
         ssoProvider.createSSOToken(tokenId);

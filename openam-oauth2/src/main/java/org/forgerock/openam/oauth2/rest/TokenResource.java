@@ -571,7 +571,7 @@ public class TokenResource implements CollectionResourceProvider {
         OAuth2ProviderSettings oAuth2ProviderSettings;
         final String realm = getAttributeValue(token, "realm");
         try {
-            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm);
+            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.getRealmProviderSettings(realm);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }

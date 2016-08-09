@@ -80,7 +80,7 @@ public class UmaUrisFactory {
 
     public UmaUris get(OAuth2Request request) throws NotFoundException, ServerException {
         Realm realm = request.getParameter(RestletRealmRouter.REALM_OBJECT);
-        return get(ServletUtils.getRequest(request.<Request>getRequest()), realm);
+        return get(request, realm);
     }
 
     /**
@@ -88,12 +88,14 @@ public class UmaUrisFactory {
      *
      * <p>Cache each provider settings on the realm it was created for.</p>
      *
-     * @param request The request instance from which the base URL can be deduced.
+     * @param oAuth2Request The request instance from which the base URL can be deduced.
      * @param realm The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public UmaUris get(HttpServletRequest request, Realm realm) throws NotFoundException, ServerException {
+    public UmaUris get(OAuth2Request oAuth2Request, Realm realm) throws NotFoundException, ServerException {
+
         String baseUrl;
+        HttpServletRequest request = ServletUtils.getRequest(oAuth2Request.<Request>getRequest());
         try {
             baseUrl = baseURLProviderFactory.get(realm.asPath()).getRealmURL(request, "/uma", realm);
         } catch (InvalidBaseUrlException e) {
@@ -101,7 +103,7 @@ public class UmaUrisFactory {
         }
         UmaUris uris = urisMap.get(baseUrl);
         if (uris == null) {
-            OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(request, realm);
+            OAuth2Uris oAuth2Uris = oAuth2UriFactory.get(oAuth2Request, realm);
             uris = getUmaUris(realm.asPath(), oAuth2Uris, baseUrl);
         }
         return uris;

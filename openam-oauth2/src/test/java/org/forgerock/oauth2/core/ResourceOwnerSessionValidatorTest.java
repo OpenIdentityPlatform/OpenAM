@@ -70,7 +70,7 @@ public class ResourceOwnerSessionValidatorTest {
 
         mockSSOTokenManager = mock(SSOTokenManager.class);
         mockProviderSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        providerSettings = mock(OAuth2ProviderSettings.class);
+        providerSettings = mock(RealmOAuth2ProviderSettings.class);
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
@@ -380,7 +380,7 @@ public class ResourceOwnerSessionValidatorTest {
     }
 
     private void mockAcrValuesMap(Map<String, AuthenticationMethod> mapping) throws Exception {
-        final OAuth2ProviderSettings mockSettings = mock(OAuth2ProviderSettings.class);
+        final OAuth2ProviderSettings mockSettings = mock(RealmOAuth2ProviderSettings.class);
         given(mockProviderSettingsFactory.get(mockOAuth2Request)).willReturn(mockSettings);
         given(mockSettings.getAcrMapping()).willReturn(mapping);
     }

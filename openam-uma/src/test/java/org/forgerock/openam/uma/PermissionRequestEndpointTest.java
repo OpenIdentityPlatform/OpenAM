@@ -32,6 +32,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.RealmOAuth2ProviderSettings;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -43,12 +44,9 @@ import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
@@ -73,7 +71,7 @@ public class PermissionRequestEndpointTest {
         umaTokenStore = mock(UmaTokenStore.class);
 
         OAuth2ProviderSettingsFactory providerSettingFactory = mock(OAuth2ProviderSettingsFactory.class);
-        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
+        OAuth2ProviderSettings providerSettings = mock(RealmOAuth2ProviderSettings.class);
 
         given(providerSettingFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(resourceSetStore);

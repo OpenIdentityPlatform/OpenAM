@@ -28,23 +28,24 @@
  */
 package com.sun.identity.authentication.service;
 
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.newDate;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import com.sun.identity.common.AccountLockoutInfo;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.ISAccountLockout;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
-import java.util.Date;
-import java.util.Set;
-import java.util.Map;
-
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.utils.Time.*;
-
-import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * <code>AMAccountLockout</code> contains the utility methods to retrieve and set account lockout related information
@@ -120,7 +121,7 @@ class AMAccountLockout {
                 AMIdentity amIdentity = null;
                 if (isAccountLockout.getStoreInvalidAttemptsInDS() || !isAccountLockout.isMemoryLocking()) {
                     amIdentity = AuthD.getAuth().getIdentity(IdType.USER, username, loginState.getOrgDN());
-                    userDN = normalizeDN(IdUtils.getDN(amIdentity));
+                    userDN = normalizeDN(IdentityUtils.getDN(amIdentity));
                 } else {
                     userDN = normalizeDN(username);
                 }
@@ -192,7 +193,7 @@ class AMAccountLockout {
                 AMIdentity amIdentity = null;
                 if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
                     amIdentity = AuthD.getAuth().getIdentity(IdType.USER, token, loginState.getOrgDN());
-                    userDN = normalizeDN(IdUtils.getDN(amIdentity));
+                    userDN = normalizeDN(IdentityUtils.getDN(amIdentity));
                 } else {
                     userDN = normalizeDN(token);
                 }
@@ -263,7 +264,7 @@ class AMAccountLockout {
             AMIdentity amIdentity = null;
             if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
                 amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
-                userDN = normalizeDN(IdUtils.getDN(amIdentity));
+                userDN = normalizeDN(IdentityUtils.getDN(amIdentity));
             } else {
                 userDN = aUserName;
             }
@@ -307,7 +308,7 @@ class AMAccountLockout {
             AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
             String userDN = normalizeDN(aUserName);
             if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
-                userDN = normalizeDN(IdUtils.getDN(amIdentity));
+                userDN = normalizeDN(IdentityUtils.getDN(amIdentity));
             }
             if (acInfo == null) {
                 acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);

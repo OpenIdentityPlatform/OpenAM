@@ -48,16 +48,17 @@ import org.slf4j.LoggerFactory;
 public class OAuth2Request {
 
     private final ClassToInstanceMap<Token> tokens = MutableClassToInstanceMap.create();
-    private String sessionId;
-
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final Request request;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private String sessionId;
     private JsonValue body;
+    private ClientRegistration clientRegistration;
 
     /**
      * Constructs a new RestletOAuth2Request.
      *
+     * @param jacksonRepresentationFactory The factory class for {@link JacksonRepresentation}.
      * @param request The Restlet request.
      */
     @Inject
@@ -249,6 +250,15 @@ public class OAuth2Request {
     }
 
     /**
+     * Get the OAuth2 client registration of the request.
+     *
+     * @return The client registration.
+     */
+    public ClientRegistration getClientRegistration() {
+        return clientRegistration;
+    }
+
+    /**
      * Creates an {@code OAuth2Request} which holds the provided realm only.
      *
      * @param realm The request realm.
@@ -256,6 +266,15 @@ public class OAuth2Request {
      */
     public static OAuth2Request forRealm(String realm) {
         return new RealmOnlyOAuth2Request(realm);
+    }
+
+    /**
+     * Set the OAuth2 client registration.
+     *
+     * @param clientRegistration The client registration.
+     */
+    public void setClientRegistration(ClientRegistration clientRegistration) {
+        this.clientRegistration = clientRegistration;
     }
 
     private static class RealmOnlyOAuth2Request extends OAuth2Request {

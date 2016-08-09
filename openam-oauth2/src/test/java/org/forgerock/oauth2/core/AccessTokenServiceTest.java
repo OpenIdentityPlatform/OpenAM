@@ -69,7 +69,7 @@ public class AccessTokenServiceTest {
         accessTokenService = new AccessTokenService(grantTypeHandlers, clientAuthenticator, tokenStore,
                 providerSettingsFactory, urisFactory);
 
-        providerSettings = mock(OAuth2ProviderSettings.class);
+        providerSettings = mock(RealmOAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);

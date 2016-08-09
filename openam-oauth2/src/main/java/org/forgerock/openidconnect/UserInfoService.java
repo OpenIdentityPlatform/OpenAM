@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -24,6 +24,8 @@ import javax.inject.Named;
 
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -47,23 +49,27 @@ public class UserInfoService {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final AccessTokenVerifier headerTokenVerifier;
     private final AccessTokenVerifier formTokenVerifier;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     /**
      * Constructs a new UserInfoServiceImpl.
      *
-     * @param tokenStore An instance of the TokenStore.
+     * @param tokenStore              An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
-     * @param headerTokenVerifier An instance of the AccessTokenVerifier to validate Authorization header.
-     * @param formTokenVerifier An instance of the AccessTokenVerifier to validate form body.
+     * @param headerTokenVerifier     An instance of the AccessTokenVerifier to validate Authorization header.
+     * @param formTokenVerifier       An instance of the AccessTokenVerifier to validate form body.
+     * @param clientRegistrationStore An instance of the client registration store.
      */
     @Inject
     public UserInfoService(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
-            @Named(FORM_BODY) AccessTokenVerifier formTokenVerifier) {
+                           @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
+                           @Named(FORM_BODY) AccessTokenVerifier formTokenVerifier,
+                           ClientRegistrationStore clientRegistrationStore) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.headerTokenVerifier = headerTokenVerifier;
         this.formTokenVerifier = formTokenVerifier;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     /**
@@ -87,11 +93,10 @@ public class UserInfoService {
         }
 
         final String tokenId = headerToken.isValid() ? headerToken.getTokenId() : formToken.getTokenId();
-
         final AccessToken token = tokenStore.readAccessToken(request, tokenId);
-
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(token.getClientId(), request);
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
-        return new JsonValue(providerSettings.getUserInfo(token, request).getValues());
+        return new JsonValue(providerSettings.getUserInfo(clientRegistration, token, request).getValues());
     }
 }

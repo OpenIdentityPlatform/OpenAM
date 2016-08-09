@@ -57,6 +57,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.agent.TokenRestrictionResolver;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
@@ -68,7 +69,6 @@ import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
-import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,6 +76,10 @@ import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
 import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -87,6 +91,7 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -111,8 +116,9 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final OpenIDTokenIssuer openIDTokenIssuer;
     private final OpenAMSettings openAMSettings;
     private final ScriptEvaluator scriptEvaluator;
-    private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final ScriptingServiceFactory scriptingServiceFactory;
+    private final TokenRestrictionResolver agentValidator;
+    private final SessionService sessionService;
 
     /**
      * Constructs a new OpenAMScopeValidator.
@@ -122,22 +128,25 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * @param providerSettingsFactory An instance of the CTSPersistentStore.
      * @param openAMSettings An instance of the OpenAMSettings.
      * @param scriptEvaluator An instance of the OIDC Claims ScriptEvaluator.
-     * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
      * @param scriptingServiceFactory An instance of the ScriptingServiceFactory.
+     * @param agentValidator An instance of {@code LDAPAgentValidator} used to retrieve the token restriction.
+     * @param sessionService An instance of {@code SessionService}.
      */
     @Inject
     public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
-            @Named(OIDC_CLAIMS_NAME) ScriptEvaluator scriptEvaluator,
-            OpenIdConnectClientRegistrationStore clientRegistrationStore,
-            ScriptingServiceFactory scriptingServiceFactory) {
+                                OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
+                                @Named(OIDC_CLAIMS_NAME) ScriptEvaluator scriptEvaluator,
+                                ScriptingServiceFactory scriptingServiceFactory,
+                                TokenRestrictionResolver agentValidator,
+                                SessionService sessionService) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
         this.providerSettingsFactory = providerSettingsFactory;
         this.openAMSettings = openAMSettings;
         this.scriptEvaluator = scriptEvaluator;
-        this.clientRegistrationStore = clientRegistrationStore;
         this.scriptingServiceFactory = scriptingServiceFactory;
+        this.agentValidator = agentValidator;
+        this.sessionService = sessionService;
     }
 
     /**
@@ -190,35 +199,24 @@ public class OpenAMScopeValidator implements ScopeValidator {
     /**
      * {@inheritDoc}
      */
-    public UserInfoClaims getUserInfo(AccessToken token, OAuth2Request request)
+    public UserInfoClaims getUserInfo(ClientRegistration clientRegistration, AccessToken token, OAuth2Request request)
             throws UnauthorizedClientException, NotFoundException {
 
         Map<String, Object> response = new HashMap<>();
         Bindings scriptVariables = new SimpleBindings();
         SSOToken ssoToken = getUsersSession(request);
-        String realm;
         Set<String> scopes;
+        String realm;
         AMIdentity id;
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         Map<String, Set<String>> requestedClaimsValues = gatherRequestedClaims(providerSettings, request, token);
 
         try {
             if (token != null) {
-
-                OpenIdConnectClientRegistration clientRegistration;
-                try {
-                    clientRegistration = clientRegistrationStore.get(token.getClientId(), request);
-                } catch (InvalidClientException e) {
-                    logger.message("Unable to retrieve client from store.");
-                    throw new NotFoundException("No valid client registration found.");
-                }
-                final String subId = clientRegistration.getSubValue(token.getResourceOwnerId(), providerSettings);
-
                 realm = token.getRealm(); //data comes from token when we have one
                 scopes = token.getScope();
                 id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), realm);
-
-                response.put(OAuth2Constants.JWTTokenParams.SUB, subId);
+                addSubToResponseIfOpenIdConnect(clientRegistration, token, response, providerSettings);
                 response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
                         token.getRealm(), request));
             } else {
@@ -238,21 +236,65 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
             ScriptObject script = getOIDCClaimsExtensionScript(realm);
             try {
-                return scriptEvaluator.evaluateScript(script, scriptVariables);
+                final UserInfoClaims userInfoClaims = scriptEvaluator.evaluateScript(script, scriptVariables);
+
+                return isAgentRequest(clientRegistration)
+                        ? addRestrictedSSOTokenToUserInfoClaims(userInfoClaims, clientRegistration, realm, ssoToken)
+                        : userInfoClaims;
             } catch (ScriptException e) {
                 logger.message("Error running OIDC claims script", e);
                 throw new ServerException("Error running OIDC claims script: " + e.getMessage());
             }
-        } catch (ServerException e) {
+        } catch (ServerException | SSOException e) {
             //API does not allow ServerExceptions to be thrown!
-            throw new NotFoundException(e.getMessage());
-        } catch (SSOException e) {
             throw new NotFoundException(e.getMessage());
         }
     }
 
+    private void addSubToResponseIfOpenIdConnect(ClientRegistration clientRegistration, AccessToken token,
+                                                 Map<String, Object> response,
+                                                 OAuth2ProviderSettings providerSettings) {
+        if (clientRegistration instanceof OpenIdConnectClientRegistration) {
+            final String subId = ((OpenIdConnectClientRegistration) clientRegistration)
+                    .getSubValue(token.getResourceOwnerId(), providerSettings);
+            response.put(OAuth2Constants.JWTTokenParams.SUB, subId);
+        }
+    }
+
+    private boolean isAgentRequest(ClientRegistration clientRegistration) {
+        return clientRegistration instanceof AgentClientRegistration;
+    }
+
+    private UserInfoClaims addRestrictedSSOTokenToUserInfoClaims(UserInfoClaims userInfoClaims,
+                                                                 ClientRegistration clientRegistration,
+                                                                 String realm,
+                                                                 SSOToken ssoToken) {
+        String restrictedTokenId = getRestrictedTokenId(clientRegistration, realm, ssoToken);
+        final Map<String, Object> values = userInfoClaims.getValues();
+        values.put(OAuth2Constants.JWTTokenParams.SSOTOKEN, restrictedTokenId);
+        return new UserInfoClaims(values, userInfoClaims.getCompositeScopes());
+    }
+
     private Set<String> getScriptFriendlyScopes(Set<String> scopes) {
         return scopes == null ? new HashSet<String>() : new HashSet<>(scopes);
+    }
+
+    private String getRestrictedTokenId(ClientRegistration clientRegistration, String realm, SSOToken ssoToken) {
+        if (!SystemProperties.getAsBoolean(Constants.IS_ENABLE_UNIQUE_COOKIE)) {
+            return ssoToken.getTokenID().toString();
+        }
+
+        try {
+            TokenRestriction tokenRes = agentValidator.resolve(
+                    clientRegistration.getClientId(),
+                    realm,
+                    AccessController.doPrivileged(AdminTokenAction.getInstance()));
+
+            return sessionService.getRestrictedTokenId(ssoToken.getTokenID().toString(), tokenRes);
+        } catch (SSOException | IdRepoException | SMSException | SessionException e) {
+            logger.warning("Failed to get restricted session token", e);
+            return null;
+        }
     }
 
     private Map<String, Set<String>> gatherRequestedClaims(OAuth2ProviderSettings providerSettings,

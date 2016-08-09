@@ -23,15 +23,19 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.utils.CollectionUtils.asList;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -51,10 +55,17 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.encode.Base64;
 
 public class OpenAMClientRegistrationTest {
+
+    private static final String REDIRECT_URI = "http://redirection.uri";
+    private static final String POST_LOGOUT_URI = "http://post.logout.uri";
+    private static final String RESPONSE_TYPE = "response type";
+    private static final String ANOTHER_RESPONSE_TYPE = "another response type";
 
     @Mock
     private AMIdentity amIdentity;
@@ -79,7 +90,70 @@ public class OpenAMClientRegistrationTest {
         ClientAuthenticationFailureFactory failureFactory = mock(ClientAuthenticationFailureFactory.class);
         clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), resolver, providerSettings,
                 failureFactory);
+    }
 
+    @Test
+    public void canGetRedirectUris() throws IdRepoException, SSOException {
+        final String redirectUri = OAuth2Constants.OAuth2Client.REDIRECT_URI + "=" + REDIRECT_URI;
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI, redirectUri);
+
+        assertThat(clientRegistration.getRedirectUris())
+                .isEqualTo(new HashSet<>(Collections.singletonList(URI.create(REDIRECT_URI))));
+    }
+
+    @Test(expectedExceptions = OAuthProblemException.class)
+    public void throwExceptionIfCannotGetRedirectUris() throws IdRepoException, SSOException {
+        setUpAgentToThrowExceptionForAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI);
+
+        clientRegistration.getRedirectUris();
+    }
+
+    @Test
+    public void canGetPostLogoutRedirectUris() throws IdRepoException, SSOException {
+        final String logoutUri = OAuth2Constants.OAuth2Client.POST_LOGOUT_URI + "=" + POST_LOGOUT_URI;
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI, logoutUri);
+
+        assertThat(clientRegistration.getPostLogoutRedirectUris())
+                .isEqualTo(new HashSet<>(Collections.singletonList(URI.create(POST_LOGOUT_URI))));
+    }
+
+    @Test(expectedExceptions = OAuthProblemException.class)
+    public void throwExceptionIfCannotGetPostLogoutRedirectUris() throws IdRepoException, SSOException {
+        setUpAgentToThrowExceptionForAttribute(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI);
+
+        clientRegistration.getPostLogoutRedirectUris();
+    }
+
+    @Test
+    public void canGetAllowedResponseTypes() throws IdRepoException, SSOException {
+        final String responseType = OAuth2Constants.OAuth2Client.RESPONSE_TYPES + "=" + RESPONSE_TYPE;
+        final String anotherResponseType = OAuth2Constants.OAuth2Client.RESPONSE_TYPES + "=" + ANOTHER_RESPONSE_TYPE;
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.RESPONSE_TYPES, responseType, anotherResponseType);
+
+        assertThat(clientRegistration.getAllowedResponseTypes())
+                .isEqualTo(new HashSet<>(Arrays.asList(RESPONSE_TYPE, ANOTHER_RESPONSE_TYPE)));
+    }
+
+    @Test(expectedExceptions = OAuthProblemException.class)
+    public void throwExceptionIfCannotGetAllowedResponseTypes() throws IdRepoException, SSOException {
+        setUpAgentToThrowExceptionForAttribute(OAuth2Constants.OAuth2Client.RESPONSE_TYPES);
+
+        clientRegistration.getAllowedResponseTypes();
+    }
+
+    @Test
+    public void canGetClientSecret() throws IdRepoException, SSOException {
+        final String SECRET = "client secret";
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.USERPASSWORD, SECRET);
+
+        assertThat(clientRegistration.getClientSecret()).isEqualTo(SECRET);
+    }
+
+    @Test
+    public void canGetAccessTokenType() {
+        final String accessTokenType = clientRegistration.getAccessTokenType();
+
+        assertThat(accessTokenType).isEqualTo("Bearer");
     }
 
     @Test
@@ -242,5 +316,16 @@ public class OpenAMClientRegistrationTest {
         MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
         return new SecretKeySpec(Arrays.copyOfRange(md.digest(password.getBytes(StandardCharsets.UTF_8)), 0, size),
                 "AES");
+    }
+
+    private void setUpAgentWithAttribute(String attributeName, String... attributeValues)
+            throws IdRepoException, SSOException {
+        given(amIdentity.getAttribute(attributeName))
+                .willReturn(new HashSet<>(Arrays.asList(attributeValues)));
+    }
+
+    private void setUpAgentToThrowExceptionForAttribute(String attributeName) throws IdRepoException, SSOException {
+        given(amIdentity.getAttribute(attributeName))
+                .willThrow(new SSOException("exception!"));
     }
 }

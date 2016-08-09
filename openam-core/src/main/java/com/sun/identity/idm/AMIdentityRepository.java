@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 
@@ -110,7 +111,7 @@ public class AMIdentityRepository {
      * @param realmName Name of the realm (can be a Fully qualified DN).
      */
     @Inject
-    public AMIdentityRepository(@Assisted String realmName, @Assisted SSOToken ssoToken) {
+    public AMIdentityRepository(@Assisted @Nullable String realmName, @Assisted SSOToken ssoToken) {
         token = ssoToken;
         idRealmName = realmName;
         organizationDN = DNMapper.orgNameToDN(realmName);

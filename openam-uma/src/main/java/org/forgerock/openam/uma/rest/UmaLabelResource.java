@@ -221,8 +221,7 @@ public class UmaLabelResource {
     }
 
     private String resolveResourceServerName(String resourceServerId, final String realm, LocaleContext
-            localeContext, Context serverContext)
-            throws InternalServerErrorException {
+            localeContext, Context serverContext) throws InternalServerErrorException {
         try {
             ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, realm, serverContext);
             return clientRegistration.getDisplayName(localeContext.getLocale());

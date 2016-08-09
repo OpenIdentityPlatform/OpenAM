@@ -79,6 +79,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -358,7 +360,7 @@ public class AMModelBase
         String dn = "";
         if (userDN != null) {
             try {
-                dn = IdUtils.getDN(IdUtils.getIdentity(ssoToken));
+                dn = IdentityUtils.getDN(IdUtils.getIdentity(ssoToken));
             } catch (SSOException e) {
                 debug.error("AMModelBase.getUserDN", e);
             } catch (IdRepoException e) {

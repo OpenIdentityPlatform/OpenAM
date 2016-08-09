@@ -67,8 +67,7 @@ public class OAuth2UrisFactory {
      */
     public OAuth2Uris get(final OAuth2Request request) throws NotFoundException, ServerException {
         Realm realm = request.getParameter(RestletRealmRouter.REALM_OBJECT);
-        HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        return get(req, realm);
+        return get(request, realm);
     }
 
     /**
@@ -88,10 +87,11 @@ public class OAuth2UrisFactory {
         } catch (InvalidBaseUrlException e) {
             throw new ServerException("Configuration error");
         }
-        return get(realm.asPath(), baseUrl, deploymentUrl);
+        return get(realm.asPath(), baseUrl, deploymentUrl, oAuth2ProviderSettingsFactory.get(context));
     }
 
-    public OAuth2Uris get(HttpServletRequest request, Realm realm) throws NotFoundException, ServerException {
+    public OAuth2Uris get(OAuth2Request oAuth2Request, Realm realm) throws NotFoundException, ServerException {
+        HttpServletRequest request = ServletUtils.getRequest(oAuth2Request.<Request>getRequest());
         BaseURLProvider baseURLProvider = baseURLProviderFactory.get(realm.asPath());
         String baseUrl, deploymentUrl;
         try {
@@ -100,25 +100,26 @@ public class OAuth2UrisFactory {
         } catch (InvalidBaseUrlException e) {
             throw new ServerException("Configuration error");
         }
-        return get(realm.asPath(), baseUrl, deploymentUrl);
+        return get(realm.asPath(), baseUrl, deploymentUrl, oAuth2ProviderSettingsFactory.get(oAuth2Request));
     }
 
-    private OAuth2Uris get(String absoluteRealm, String baseUrl, String deploymentUrl) throws NotFoundException {
+    private OAuth2Uris get(String absoluteRealm, String baseUrl, String deploymentUrl,
+                           OAuth2ProviderSettings providerSettings) throws NotFoundException {
         OAuth2Uris uris = urisMap.get(baseUrl);
         if (uris == null) {
-            uris = getOAuth2Uris(absoluteRealm, baseUrl, deploymentUrl);
+            uris = getOAuth2Uris(absoluteRealm, baseUrl, deploymentUrl, providerSettings);
         }
         return uris;
     }
 
-    private synchronized OAuth2Uris getOAuth2Uris(String absoluteRealm, String baseUrl, String deploymentUrl)
+    private synchronized OAuth2Uris getOAuth2Uris(String absoluteRealm, String baseUrl, String deploymentUrl,
+                                                  OAuth2ProviderSettings providerSettings)
             throws NotFoundException {
         OAuth2Uris uris = urisMap.get(baseUrl);
         if (uris != null) {
             return uris;
         }
-        OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(absoluteRealm);
-        uris = new OAuth2UrisImpl(deploymentUrl, absoluteRealm, oAuth2ProviderSettings, baseUrl);
+        uris = new OAuth2UrisImpl(deploymentUrl, absoluteRealm, providerSettings, baseUrl);
         urisMap.put(baseUrl, uris);
         return uris;
     }
