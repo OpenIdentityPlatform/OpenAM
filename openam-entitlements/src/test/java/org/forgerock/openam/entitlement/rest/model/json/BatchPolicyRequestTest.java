@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest.model.json;
@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
@@ -74,6 +75,7 @@ public class BatchPolicyRequestTest {
     @Test
     public void shouldConstructBatchPolicyRequest() throws EntitlementException {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resources", Arrays.asList("/resource/a", "/resource/b"));
@@ -87,6 +89,7 @@ public class BatchPolicyRequestTest {
         assertThat(request.getResources()).containsOnly("/resource/a", "/resource/b");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest, times(2)).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }

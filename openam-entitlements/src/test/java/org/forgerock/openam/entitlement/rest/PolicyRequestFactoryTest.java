@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.openam.core.realms.Realm;
@@ -79,6 +80,7 @@ public class PolicyRequestFactoryTest {
     public void shouldRetrieveBatchRequest() throws EntitlementException {
         // When...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resources", Arrays.asList("/resource/a", "/resource/b"));
@@ -97,6 +99,7 @@ public class PolicyRequestFactoryTest {
         assertThat(batchRequest.getResources()).containsOnly("/resource/a", "/resource/b");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest, times(2)).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -105,6 +108,7 @@ public class PolicyRequestFactoryTest {
     public void shouldRetrieveTreeRequest() throws EntitlementException {
         // When...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resource", "/resource/a");
@@ -123,6 +127,7 @@ public class PolicyRequestFactoryTest {
         assertThat(treeRequest.getResource()).isEqualTo("/resource/a");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest, times(2)).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest.model.json;
@@ -24,6 +24,8 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -153,7 +155,19 @@ public abstract class PolicyRequest {
             final JsonValue jsonValue = request.getContent();
             Reject.ifNull(jsonValue);
 
-            policySubject = getPolicySubject(jsonValue, restSubject);
+            try {
+                policySubject = RestrictedTokenContext.doUsing(subjectContext.getCallerSSOToken(),
+                        new RestrictedTokenAction<Subject>() {
+                            @Override
+                            public Subject run() throws EntitlementException {
+                                return getPolicySubject(jsonValue, restSubject);
+                            }
+                        });
+            } catch (EntitlementException | RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new IllegalStateException("Shouldn't be able to get exception", e);
+            }
             application = getApplication(jsonValue);
             realm = getRealm(realmContext);
             environment = getEnvironment(jsonValue);

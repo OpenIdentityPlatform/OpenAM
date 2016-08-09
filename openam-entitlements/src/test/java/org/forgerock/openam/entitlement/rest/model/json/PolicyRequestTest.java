@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest.model.json;
@@ -115,6 +115,7 @@ public class PolicyRequestTest {
 
         given(actionRequest.getContent()).willReturn(json(properties));
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
         SSOToken token = mock(SSOToken.class);
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("Fred");
         given(tokenManager.createSSOToken(anyString())).willReturn(token);
@@ -134,6 +135,7 @@ public class PolicyRequestTest {
         assertThat(request.getEnvironment()).is(new EnvMapCondition(env));
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -169,6 +171,7 @@ public class PolicyRequestTest {
     public void shouldDefaultToAdminSubject() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
@@ -184,6 +187,7 @@ public class PolicyRequestTest {
         assertThat(request.getPolicySubject()).isEqualTo(restSubject);
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -247,6 +251,7 @@ public class PolicyRequestTest {
     public void shouldDefaultToApplication() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
@@ -261,6 +266,7 @@ public class PolicyRequestTest {
         assertThat(request.getApplication()).isEqualTo("iPlanetAMWebAgentService");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -269,6 +275,7 @@ public class PolicyRequestTest {
     public void shouldDefaultToRealm() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
@@ -282,6 +289,7 @@ public class PolicyRequestTest {
         assertThat(request.getRealm()).isEqualTo("/");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -290,6 +298,7 @@ public class PolicyRequestTest {
     public void shouldDefaultToEmptyEnvironment() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         given(actionRequest.getContent()).willReturn(json(properties));
@@ -304,6 +313,7 @@ public class PolicyRequestTest {
         assertThat(request.getEnvironment()).isEmpty();
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
