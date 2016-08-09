@@ -36,7 +36,8 @@
             lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
             sinon: "/base/target/test-classes/libs/sinon-1.15.4",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
-            squire: "/base/target/test-classes/libs/squire-0.2.0"
+            squire: "/base/target/test-classes/libs/squire-0.2.0",
+            redux: "/base/target/dependencies/libs/redux-3.5.2-min"
         },
         shim: {
             "lodash": {

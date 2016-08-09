@@ -22,13 +22,13 @@ define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
-    "org/forgerock/openam/ui/common/util/object/flattenValues"
-], ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper,
-    Router, ServiceInvoker, flattenValues) => {
-    var baseUrl = `${Constants.host}/${Constants.context}/json/__subrealm__/users`,
+    "org/forgerock/openam/ui/common/util/object/flattenValues",
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, Router, ServiceInvoker, flattenValues,
+    fetchUrl) => {
+    var baseUrl = `${Constants.host}/${Constants.context}/json`,
         UserModel = AbstractModel.extend({
             idAttribute: "id",
             defaults: {
@@ -57,7 +57,7 @@ define([
                     if (_.has(this.changed, "password")) {
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
-                            url: RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}?_action=changePassword`),
+                            url: baseUrl + fetchUrl.default(`/users/${this.id}?_action=changePassword`),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
                             suppressEvents: true,
@@ -89,7 +89,7 @@ define([
                                         .value()
                                 ),
                                 suppressEvents: true,
-                                url: RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}`),
+                                url: baseUrl + fetchUrl.default(`/users/${this.id}`),
                                 headers: {
                                     "If-Match": this.getMVCCRev(),
                                     "Accept-API-Version": "protocol=1.0,resource=2.0",
@@ -103,7 +103,7 @@ define([
                     // The only other supported operation is read
                     return ServiceInvoker.restCall(_.extend(
                         {
-                            "url" : RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}`),
+                            "url" : baseUrl + fetchUrl.default(`/users/${this.id}`),
                             "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
@@ -154,28 +154,8 @@ define([
 
                 return user;
             },
-            getProfile () {
-                return ServiceInvoker.restCall({
-                    url: RealmHelper.decorateURIWithRealm(`${baseUrl}?_action=idFromSession`),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-                    type: "POST",
-                    errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
-                }).then(
-                    _.bind(function (data) {
-                        Configuration.globalData.auth.successURL = data.successURL;
-                        Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
-
-                        const realm = data.realm.slice(1);
-                        Configuration.globalData.auth.subRealm = realm;
-
-                        // keep track of the current realm as a future default value, following logout:
-                        Router.configuration.routes.login.defaults[0] = data.realm;
-                        this.set("id", data.id);
-                        return this.fetch().then(_.bind(function () {
-                            return this;
-                        }, this));
-                    }, this)
-                );
+            fetchById (id) {
+                return this.set({ id }, { silent: true }).fetch().then(() => { return this; });
             },
             getProtectedAttributes () {
                 return ["password"].concat(Configuration.globalData.protectedUserAttributes);

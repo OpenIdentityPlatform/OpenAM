@@ -17,17 +17,21 @@
 define([
     "jquery",
     "lodash",
+    "store/actions/creators",
+    "store/index",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/openam/ui/user/services/AuthNService",
-    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/ServiceInvoker",
+    "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/services/SessionService",
+    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, Constants, SessionService,
-             URIUtils, UserModel, ViewManager) {
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/user/services/AuthNService",
+    "org/forgerock/openam/ui/user/services/SessionService",
+    "org/forgerock/openam/ui/user/UserModel"
+], ($, _, creators, store, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants,
+    CookieHelper, URIUtils, fetchUrl, AuthNService, SessionService, UserModel) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -76,7 +80,8 @@ define([
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        return UserModel.getProfile().then(successCallback, function (xhr) {
+        const tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        const noSessionHandler = (xhr) => {
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
             obj.removeSessionCookie();
 
@@ -85,7 +90,28 @@ define([
             } else {
                 errorCallback();
             }
+        };
+        // TODO AME-11593 Call to idFromSession is required to populate the fullLoginURL, which we use later to
+        // determine the parameters you logged in with. We should remove the support of fragment parameters and use
+        // persistent url query parameters instead.
+        ServiceInvoker.restCall({
+            url: `${Constants.host}/${Constants.context}/json${
+                fetchUrl.default("/users?_action=idFromSession")}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            type: "POST",
+            errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
+        }).then((data) => {
+            Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
+
+        if (tokenCookie) {
+            return SessionService.getSessionInfo(tokenCookie).then((data) => {
+                store.default.dispatch(creators.sessionAddRealm(data.realm));
+                return UserModel.fetchById(data.uid).then(successCallback);
+            }, noSessionHandler);
+        } else {
+            noSessionHandler();
+        }
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
@@ -98,29 +124,29 @@ define([
         return URIUtils.parseQueryString(successfulLoginURLParams);
     };
 
-    obj.setSuccessURL = function (tokenId, newSuccessUrl) {
-        var promise = $.Deferred(),
-            urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
-            url = newSuccessUrl ? newSuccessUrl : Configuration.globalData.auth.successURL,
-            context = "";
+    obj.setSuccessURL = function (tokenId, successUrl) {
+        const promise = $.Deferred();
+        const urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
+        let context = "";
+
         if (urlParams && urlParams.goto) {
-            AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+            AuthNService.setGoToUrl(tokenId, urlParams.goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf(`/${Constants.context}`) !== 0) {
                     context = `/${Constants.context}`;
                 }
                 Configuration.globalData.auth.urlParams.goto = context + data.successURL;
                 promise.resolve();
-            }, function () {
+            }, () => {
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH) {
+            if (successUrl !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
                 if (!Configuration.globalData.auth.urlParams.goto) {
-                    Configuration.globalData.auth.urlParams.goto = url;
+                    Configuration.globalData.auth.urlParams.goto = successUrl;
                 }
             }
             promise.resolve();
