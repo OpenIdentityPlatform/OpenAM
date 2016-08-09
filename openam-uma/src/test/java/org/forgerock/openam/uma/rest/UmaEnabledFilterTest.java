@@ -41,7 +41,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.RealmContext;

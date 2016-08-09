@@ -22,6 +22,9 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.MessageDigest;
@@ -35,10 +38,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -50,7 +55,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.StatefulAccessToken;
@@ -62,7 +66,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -79,13 +82,6 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
@@ -104,7 +100,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     private final OAuth2AuditLogger auditLogger;
     private final OAuthTokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2UrisFactory<RealmInfo> oauth2UrisFactory;
+    private final OAuth2UrisFactory oauth2UrisFactory;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final RealmNormaliser realmNormaliser;
     private final SSOTokenManager ssoTokenManager;
@@ -125,7 +121,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
      */
     @Inject
     public StatefulTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
+            OAuth2UrisFactory oauth2UrisFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom,

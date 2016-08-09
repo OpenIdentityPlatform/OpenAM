@@ -17,13 +17,12 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.*;
+import static org.forgerock.oauth2.core.Utils.joinScope;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.Utils.*;
-
-import java.util.Set;
 
 import javax.inject.Inject;
+import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
@@ -35,6 +34,7 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 
 /**
  * Implementation of the JwtBearerGrantTypeHandler for the JWT Bearer grant.

@@ -16,13 +16,9 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
-import static org.forgerock.oauth2.core.Utils.splitScope;
+import static org.forgerock.oauth2.core.Utils.*;
 import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.OAUTH2_GRANT;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REFRESH_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -45,6 +41,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

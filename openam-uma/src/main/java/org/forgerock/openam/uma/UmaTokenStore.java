@@ -17,7 +17,7 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,10 +25,8 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;

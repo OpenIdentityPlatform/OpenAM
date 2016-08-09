@@ -16,25 +16,21 @@
 
 package org.forgerock.openam.xui;
 
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.Map;
-
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
 
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
-
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.guice.core.InjectorHolder;
 import org.owasp.esapi.ESAPI;
@@ -49,9 +45,10 @@ import org.owasp.esapi.errors.EncodingException;
  */
 public class XUIFilter implements Filter {
 
-    private String xuiLoginPath;
-    private String xuiLogoutPath;
-    private String profilePage;
+    private String xuiBasePath;
+    private static final String LOGIN_PATH = "#login/";
+    private static final String LOGOUT_PATH = "#logout/";
+    private static final String PROFILE_PAGE_PATH = "#profile/";
     protected volatile boolean initialized;
     private ServiceSchemaManager scm = null;
     private XUIState xuiState;
@@ -72,9 +69,7 @@ public class XUIFilter implements Filter {
             xuiState = InjectorHolder.getInstance(XUIState.class);
         }
         ServletContext ctx = filterConfig.getServletContext();
-        xuiLoginPath = ctx.getContextPath() + "/XUI/#login/";
-        xuiLogoutPath = ctx.getContextPath() + "/XUI/#logout/";
-        profilePage = ctx.getContextPath() + "/XUI/#profile/";
+        xuiBasePath = ctx.getContextPath() + "/XUI";
     }
 
     /**
@@ -96,40 +91,34 @@ public class XUIFilter implements Filter {
 
         if (xuiState.isXUIEnabled() && request.getRequestURI() != null) {
             String query = request.getQueryString();
-
-            // prepare query
-            if (query != null) {
-                if (!query.startsWith("&")) {
-                    query = "&" + query;
-                }
-            } else {
-                query = "";
-            }
-
-            // redirect to correct location
             if (request.getRequestURI().contains("UI/Logout")) {
-                response.sendRedirect(xuiLogoutPath + query);
+                sendRedirect(response, xuiBasePath, query, LOGOUT_PATH);
             } else if (request.getRequestURI().contains("idm/EndUser")) {
-                response.sendRedirect(profilePage + query);
+                sendRedirect(response, xuiBasePath, query, PROFILE_PAGE_PATH);
             } else {
-                String compositeAdvice = (String)request.getParameter(Constants.COMPOSITE_ADVICE);
-                
+                String compositeAdvice = request.getParameter(Constants.COMPOSITE_ADVICE);
                 if (compositeAdvice != null) {
                     try {
-                        compositeAdvice = ESAPI.encoder().encodeForURL(compositeAdvice);
-                        
-                        final String authIndexType  = "authIndexType=composite_advice";
-                        final String authIndexValue = "authIndexValue=" + compositeAdvice;
-                        query = removeCompositeAdviceFromRequest(request) + "&" + authIndexType + "&" + authIndexValue;
+                        query = mapCompositeAdviceFromRequest(request);
                     } catch (EncodingException e) {
                         DEBUG.error("XUIFilter.doFilter::  failed to encode composite_advice : " + compositeAdvice, e);
                     }
                 }
-                response.sendRedirect(xuiLoginPath + query);
+                sendRedirect(response, xuiBasePath, query, LOGIN_PATH);
             }
         } else {
             chain.doFilter(servletRequest, servletResponse);
         }
+    }
+
+    private void sendRedirect(HttpServletResponse response, String xuiBasePath, String queryString, String xuiHash)
+            throws IOException {
+        if (queryString == null) {
+            queryString = "";
+        } else {
+            queryString = "?" + queryString;
+        }
+        response.sendRedirect(xuiBasePath + queryString + xuiHash);
     }
 
     /**
@@ -139,21 +128,23 @@ public class XUIFilter implements Filter {
         xuiState.destroy();
     }
 
-    private String removeCompositeAdviceFromRequest(HttpServletRequest request) 
+    private String mapCompositeAdviceFromRequest(HttpServletRequest request)
             throws ServletException, EncodingException {
         Map<String, String[]> parameterNames = request.getParameterMap();
-        StringBuilder query = new StringBuilder();
+        String queryString = "";
 
         if (parameterNames != null) {
-            for (Map.Entry<String, String[]> entry : parameterNames.entrySet())
-            {
+            for (Map.Entry<String, String[]> entry : parameterNames.entrySet()) {
                 String paramName = entry.getKey();
                 String[] paramValues = entry.getValue();
                 if (paramName != null && !paramName.equalsIgnoreCase(Constants.COMPOSITE_ADVICE)) {
                     try {
                         if (paramValues != null) {
-                            for(String paramValue : paramValues) {
-                                query.append("&" + paramName + "=" + ESAPI.encoder().encodeForURL(paramValue));
+                            for (String paramValue : paramValues) {
+                                if (!queryString.isEmpty()) {
+                                    queryString += "&";
+                                }
+                                queryString += paramName + "=" + ESAPI.encoder().encodeForURL(paramValue);
                             }
                         }
                     } catch (EncodingException e) {
@@ -162,6 +153,14 @@ public class XUIFilter implements Filter {
                 }
             }
         }
-        return query.toString();
+
+        String compositeAdvice = ESAPI.encoder().encodeForURL(request.getParameter(Constants.COMPOSITE_ADVICE));
+        String authIndexType  = "authIndexType=composite_advice";
+        String authIndexValue = "authIndexValue=" + compositeAdvice;
+        if (queryString.isEmpty()) {
+            return authIndexType + "&" + authIndexValue;
+        } else {
+            return queryString + "&" + authIndexType + "&" + authIndexValue;
+        }
     }
 }

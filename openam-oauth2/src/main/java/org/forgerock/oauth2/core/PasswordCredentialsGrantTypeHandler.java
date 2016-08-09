@@ -16,13 +16,14 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 
-import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Set;
+
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -31,6 +32,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

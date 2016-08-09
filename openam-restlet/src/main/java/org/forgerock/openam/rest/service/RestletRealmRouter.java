@@ -17,14 +17,9 @@
 package org.forgerock.openam.rest.service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.ConcurrentMap;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoException;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -40,27 +35,21 @@ import org.restlet.routing.TemplateRoute;
  * A Restlet router which will route to service endpoints, dynamically handling realm URI parameters.
  *
  * @since 12.0.0
+ * @deprecated Use {@code RealmRoutingFactory#createRouter(Restlet)} instead.
  */
+@Deprecated
 public class RestletRealmRouter extends Router {
 
     public static final String REALM = "realm";
-    public static final String REALM_INFO = "realmInfo";
+    public static final String REALM_OBJECT = "realmObject";
     public static final String REALM_URL = "realmUrl";
 
-    private final RestRealmValidator realmValidator;
-    private final CoreWrapper coreWrapper;
     private final TemplateRoute delegateRoute;
 
     /**
      * Constructs a new RealmRouter instance.
-     *
-     * @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
      */
-    public RestletRealmRouter(RestRealmValidator realmValidator, CoreWrapper coreWrapper) {
-        this.realmValidator = realmValidator;
-        this.coreWrapper = coreWrapper;
-
+    public RestletRealmRouter() {
         Delegate delegate = new Delegate(this);
         delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
         super.setDefaultRoute(delegateRoute);
@@ -82,53 +71,46 @@ public class RestletRealmRouter extends Router {
      */
     @Override
     protected void doHandle(Restlet next, Request request, Response response) {
-        RealmInfo realmInfo = getRealmFromURI(request);
-
-        if (realmInfo == null) {
-            realmInfo = getRealmFromServerName(request);
+        if (request.getAttributes().containsKey("realmId")) {
+            super.doHandle(next, request, response);
+            return;
         }
-        if (next != delegateRoute) {
-            String overrideRealm = getRealmFromQueryString(request);
-            if (overrideRealm != null) {
-                realmInfo = realmInfo.withOverrideRealm(overrideRealm);
+
+        try {
+            Realm realm = getRealmFromURI(request);
+
+            if (realm == null) {
+                realm = getRealmFromServerName(request);
             }
-            request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
-        }
-
-        // Check that the path references an existing realm
-        if (!realmValidator.isRealm(realmInfo.getAbsoluteRealm())) {
-            String realm = realmInfo.getAbsoluteRealm();
-            try {
-                SSOToken adminToken = coreWrapper.getAdminToken();
-                //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
-                if (realmInfo.getAbsoluteRealm().startsWith("/")) {
-                    realm = realm.substring(1);
+            if (next != delegateRoute) {
+                String overrideRealm = getRealmFromQueryString(request);
+                if (overrideRealm != null) {
+                    realm = Realm.of(overrideRealm);
                 }
-                String orgDN = coreWrapper.getOrganization(adminToken, realm);
-                realmInfo = realmInfo.withAbsoluteRealm(coreWrapper.convertOrgNameToRealmName(orgDN));
-            } catch (IdRepoException | SSOException e) {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid realm, " + realm);
+                request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
             }
+
+            request.getAttributes().put(REALM, realm.asPath());
+            request.getAttributes().put(REALM_OBJECT, realm);
+            HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+            httpRequest.setAttribute(REALM, realm.asPath());
+            httpRequest.setAttribute(REALM_OBJECT, realm);
+            request.getAttributes().remove("subrealm");
+
+            super.doHandle(next, request, response);
+        } catch (RealmLookupException e) {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Realm \"" + e.getRealm() + "\" not found", e);
         }
-
-        request.getAttributes().put(REALM, realmInfo.getAbsoluteRealm());
-        request.getAttributes().put(REALM_INFO, realmInfo);
-        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        httpRequest.setAttribute(REALM, realmInfo.getAbsoluteRealm());
-        httpRequest.setAttribute(REALM_INFO, realmInfo);
-        request.getAttributes().remove("subrealm");
-
-        super.doHandle(next, request, response);
     }
 
-    private RealmInfo getRealmFromURI(Request request) {
-        RealmInfo realmInfo = (RealmInfo) request.getAttributes().get(REALM_INFO);
+    private Realm getRealmFromURI(Request request) throws RealmLookupException {
+        Realm realm = (Realm) request.getAttributes().get(REALM_OBJECT);
         String subrealm = (String) request.getAttributes().get("subrealm");
         if (subrealm != null && !subrealm.isEmpty()) {
-            if (realmInfo == null) {
-                throw new IllegalStateException("RealmInfo is null! Has not been set from server name");
+            if (realm == null) {
+                throw new IllegalStateException("Realm is null! Has not been set from server name");
             } else {
-                return realmInfo.appendUriRealm(subrealm);
+                return Realm.of(realm, subrealm);
             }
         }
         return null;
@@ -142,13 +124,11 @@ public class RestletRealmRouter extends Router {
         return realm;
     }
 
-    private RealmInfo getRealmFromServerName(Request request) {
+    private Realm getRealmFromServerName(Request request) {
         String serverName = request.getHostRef().getHostDomain();
         try {
-            SSOToken adminToken = coreWrapper.getAdminToken();
-            String orgDN = coreWrapper.getOrganization(adminToken, serverName);
-            return new RealmInfo(coreWrapper.convertOrgNameToRealmName(orgDN));
-        } catch (IdRepoException | SSOException e) {
+            return Realm.of(serverName);
+        } catch (RealmLookupException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
         }
     }
@@ -160,11 +140,11 @@ public class RestletRealmRouter extends Router {
      * @return Null if no realm was found, otherwise the given Realm as a String.
      */
     public static String getRealmFromRequest(Request request) {
-        ConcurrentMap<String, Object> attributes = request.getAttributes();
-        if (attributes == null || attributes.get(REALM) == null) {
+        String realm = (String) request.getAttributes().get(REALM);
+        if (realm == null) {
             return null;
         }
-        return attributes.get(REALM).toString();
+        return realm;
     }
 
     /**

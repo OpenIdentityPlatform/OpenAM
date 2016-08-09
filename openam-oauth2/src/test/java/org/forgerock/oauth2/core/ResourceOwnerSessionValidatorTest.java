@@ -35,7 +35,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;

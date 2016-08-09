@@ -25,11 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.core.RealmInfo;
-import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -37,6 +35,7 @@ import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.engine.adapter.HttpRequest;
 import org.restlet.ext.servlet.internal.ServletCall;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -82,86 +81,81 @@ public class RestletRealmRouterTest {
      */
 
     private RestletRealmRouter router;
-    private RestRealmValidator realmValidator;
-    private CoreWrapper coreWrapper;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
-        realmValidator = mock(RestRealmValidator.class);
-        coreWrapper = mock(CoreWrapper.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+        realmTestHelper.mockRealm("realm");
 
-        router = new RestletRealmRouter(realmValidator, coreWrapper);
+        router = new RestletRealmRouter();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @DataProvider(name = "realmRoutingDataProvider")
     private Object[][] realmRoutingDataProvider() {
         return new Object[][]{
-                {"dns", false},
-                {"query", false},
-                {"query", true},
-                {"uri", false},
-                {"uri", true}
+                {"dns"},
+                {"query"},
+                {"uri"},
         };
     }
 
     @Test(dataProvider = "realmRoutingDataProvider")
-    public void shouldRouteToRealm(String realmLocation, boolean isRealmAlias) throws Exception {
+    public void shouldRouteToRealm(String realmLocation) throws Exception {
 
         //Given
-        SSOToken adminToken = mock(SSOToken.class);
         Restlet next = mock(Restlet.class);
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        Request request = setUpRequest(httpRequest, adminToken);
+        Request request = setUpRequest(httpRequest);
         Response response = mock(Response.class);
 
-        String realm;
-        if (!isRealmAlias) {
-            realm = "REALM";
-        } else {
-            realm = "REALM_ALIAS";
-        }
+        String realm = "realm";
 
         if ("dns".equalsIgnoreCase(realmLocation)) {
             //set up server name
-            setUpServerName(request, adminToken, realm);
+            setUpServerName(request, realm);
         }
 
         if ("query".equalsIgnoreCase(realmLocation)) {
             //set up query string
-            setUpServerName(request, adminToken, "/");
+            setUpServerName(request);
             setUpQueryString(request, realm);
         }
 
         if ("uri".equalsIgnoreCase(realmLocation)) {
             //set up uri
-            setUpServerName(request, adminToken, "/");
+            setUpServerName(request);
             setUpUri(request, realm);
         }
-
-        //set up validate realm
-        setUpRealmValidator(realm, isRealmAlias, adminToken);
 
         //When
         router.doHandle(next, request, response);
 
         //Then
-        assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
-        verify(httpRequest).setAttribute("realm", "/REALM");
+        assertThat(request.getAttributes()).containsEntry("realm", "/realm");
+        assertThat(request.getAttributes()).containsEntry("realmObject", Realm.of("/realm"));
+        verify(httpRequest).setAttribute("realm", "/realm");
+        verify(httpRequest).setAttribute("realmObject", Realm.of("/realm"));
         assertThat(request.getAttributes()).containsEntry("realmUrl", "The base url");
     }
 
     @Test
-    public void shouldHandleQueryParamRealmWithNoLeadingSlash() throws IdRepoException, SSOException {
+    public void shouldHandleQueryParamRealmWithNoLeadingSlash() throws Exception {
 
         //Given
-        SSOToken adminToken = mock(SSOToken.class);
         Restlet next = mock(Restlet.class);
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        Request request = setUpRequest(httpRequest, adminToken);
+        Request request = setUpRequest(httpRequest);
         Response response = mock(Response.class);
 
-        setUpServerName(request, adminToken, "/");
+        setUpServerName(request);
 
         Reference reference = mock(Reference.class);
         given(request.getResourceRef()).willReturn(reference);
@@ -171,18 +165,19 @@ public class RestletRealmRouterTest {
         Form queryForm = mock(Form.class);
         given(reference.getQueryAsForm()).willReturn(queryForm);
         given(queryForm.getFirstValue("realm")).willReturn("REALM");
-
-        setUpRealmValidator("REALM", false, adminToken);
+        realmTestHelper.mockRealmAlias("REALM", "realm");
 
         //When
         router.doHandle(next, request, response);
 
         //Then
-        assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
-        verify(httpRequest).setAttribute("realm", "/REALM");
+        assertThat(request.getAttributes()).containsEntry("realm", "/realm");
+        assertThat(request.getAttributes()).containsEntry("realmObject", Realm.of("/realm"));
+        verify(httpRequest).setAttribute("realm", "/realm");
+        verify(httpRequest).setAttribute("realmObject", Realm.of("/realm"));
     }
 
-    private Request setUpRequest(HttpServletRequest httpRequest, SSOToken adminToken) {
+    private Request setUpRequest(HttpServletRequest httpRequest) {
 
         HttpRequest request = generateRequest();
 
@@ -198,38 +193,28 @@ public class RestletRealmRouterTest {
         given(reference.getBaseRef()).willReturn(baseReference);
         given(baseReference.toString()).willReturn("The base url");
 
-        given(coreWrapper.getAdminToken()).willReturn(adminToken);
-
         return request;
     }
 
-    private void setUpServerName(Request request, SSOToken adminToken, String realm) throws IdRepoException, SSOException {
+    private void setUpServerName(Request request, String... realmParts) throws IdRepoException, SSOException {
         Reference reference = request.getResourceRef();
         given(request.getHostRef()).willReturn(reference);
         given(reference.getHostDomain()).willReturn("HOST_DOMAIN");
 
-        given(coreWrapper.getOrganization(adminToken, "HOST_DOMAIN")).willReturn("REALM_HOST_DN");
-        given(coreWrapper.convertOrgNameToRealmName("REALM_HOST_DN")).willReturn(realm.equals("/") ? realm : "/" + realm);
-        request.getAttributes().put(RestletRealmRouter.REALM_INFO, new RealmInfo("/"));
+        realmTestHelper.mockDnsAlias("HOST_DOMAIN", realmParts);
     }
 
     private void setUpQueryString(Request request, String realm) {
         Form form = request.getResourceRef().getQueryAsForm();
         given(form.getFirstValue("realm")).willReturn("/" + realm);
+        realmTestHelper.mockRealm(realm);
     }
 
     private void setUpUri(Request request, String realm) {
         request.getAttributes().put("realm", "/");
+        request.getAttributes().put("realmObject", Realm.root());
         request.getAttributes().put("subrealm", realm);
-    }
-
-    private void setUpRealmValidator(String realm, boolean isRealmAlias, SSOToken adminToken) throws IdRepoException, SSOException {
-        given(realmValidator.isRealm(realm)).willReturn(!isRealmAlias);
-        given(realmValidator.isRealm("/" + realm)).willReturn(!isRealmAlias);
-        if (isRealmAlias) {
-            given(coreWrapper.getOrganization(adminToken, "REALM_ALIAS")).willReturn("REALM_DN");
-            given(coreWrapper.convertOrgNameToRealmName("REALM_DN")).willReturn("/REALM");
-        }
+        realmTestHelper.mockRealm(realm);
     }
 
     private static HttpRequest generateRequest() {

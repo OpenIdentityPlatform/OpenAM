@@ -16,21 +16,18 @@
 
 package org.forgerock.openam.services.baseurl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.iplanet.sso.SSOException;
-import com.sun.identity.idm.IdRepoException;
 
 /**
  * Provides the base URL for the OpenAM instance. Subclasses may use the HttpServletRequest
@@ -99,9 +96,13 @@ public abstract class BaseURLProvider {
      * @throws InvalidBaseUrlException When the realm is not a subrealm or the same realm as that deduced from
      * the root URL for the base URL provider.
      */
-    public String getRealmURL(HttpServletRequest request, String basePath, String realm) throws InvalidBaseUrlException {
-        String rootUrl = getRootURL(request);
-        return rootUrl + realmSubPath(realm, basePath, rootUrl);
+    public String getRealmURL(HttpServletRequest request, String basePath, Realm realm) throws InvalidBaseUrlException {
+        try {
+            Realm dnsRealm = Realm.of(URI.create(request.getRequestURI()).getHost());
+            return getRealmURL(getRootURL(request), basePath, dnsRealm, realm);
+        } catch (RealmLookupException e) {
+            throw new InvalidBaseUrlException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -114,9 +115,22 @@ public abstract class BaseURLProvider {
      * @throws InvalidBaseUrlException When the realm is not a subrealm or the same realm as that deduced from
      * the root URL for the base URL provider.
      */
-    public String getRealmURL(HttpContext context, String basePath, String realm) throws InvalidBaseUrlException {
-        String rootUrl = getRootURL(context);
-        return rootUrl + realmSubPath(realm, basePath, rootUrl);
+    public String getRealmURL(HttpContext context, String basePath, Realm realm) throws InvalidBaseUrlException {
+        try {
+            Realm dnsRealm = Realm.of(URI.create(context.asContext(HttpContext.class).getPath()).getHost());
+            return getRealmURL(getRootURL(context), basePath, dnsRealm, realm);
+        } catch (RealmLookupException e) {
+            throw new InvalidBaseUrlException(e.getMessage(), e);
+        }
+    }
+
+    private String getRealmURL(String rootUrl, String basePath, Realm dnsRealm, Realm absoluteRealm)
+            throws InvalidBaseUrlException {
+        if (dnsRealm.equals(absoluteRealm)) {
+            return rootUrl + basePath;
+        } else {
+            return rootUrl + realmSubPath(absoluteRealm.asPath(), basePath);
+        }
     }
 
     /**
@@ -142,44 +156,16 @@ public abstract class BaseURLProvider {
         return baseUrl;
     }
 
-    private String realmSubPath(String realm, String basePath, String rootUrl) throws InvalidBaseUrlException {
+    private String realmSubPath(String realm, String basePath) throws InvalidBaseUrlException {
         Reject.ifFalse(basePath.startsWith("/"), "basePath must start with a / character");
         Reject.ifTrue(basePath.endsWith("/"), "basePath must not end with a / character");
-        String hostName;
-        try {
-            hostName = new URL(rootUrl).getHost();
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("URL from base url provider is malformed", e);
+        StringBuilder sb = new StringBuilder(basePath);
+        sb.append("/realms/root");
+        for (String realmPart : realm.split("/")) {
+            if (!StringUtils.isEmpty(realmPart)) {
+                sb.append("/realms/").append(realmPart);
+            }
         }
-        try {
-            String orgDN = coreWrapper.getOrganization(coreWrapper.getAdminToken(), hostName);
-            String dnsRealmPath = coreWrapper.convertOrgNameToRealmName(orgDN);
-            if ("/".equals(dnsRealmPath)) {
-                return "/".equals(realm) ? basePath : basePath + realm;
-            }
-            if (!realm.startsWith(dnsRealmPath)) {
-                logger.error("BaseURLProvider Configuration error: Realm {} is not a subrealm or same as {}, " +
-                        "from base url provider hostname {} as dns alias", realm,  dnsRealmPath, hostName);
-                throw new InvalidBaseUrlException("Realm " + realm + " is not a subrealm or same as " + dnsRealmPath);
-            }
-            String subrealmPath = realm.substring(dnsRealmPath.length());
-            if (subrealmPath.length() == 0) {
-                return basePath;
-            }
-            if (!subrealmPath.startsWith("/")) {
-                logger.error("BaseURLProvider Configuration error: Realm {} is not a subrealm or same as {}, " +
-                        "from base url provider hostname {}", realm,  dnsRealmPath, hostName);
-                throw new InvalidBaseUrlException("Realm " + realm + " is not a subrealm or same as " + dnsRealmPath);
-            }
-            if (subrealmPath.endsWith("/")) {
-                subrealmPath = subrealmPath.substring(0, subrealmPath.length() - 1);
-            }
-            return basePath + subrealmPath;
-        } catch (IdRepoException | SSOException e) {
-            logger.error("BaseURLProvider Configuration error: Realm does not exist for dns alias " +
-                    "from base url provider hostname {}", hostName);
-            throw new InvalidBaseUrlException("Realm does not exist: " + hostName, e);
-        }
+        return sb.toString();
     }
-
 }

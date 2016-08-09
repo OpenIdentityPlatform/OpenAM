@@ -16,12 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.*;
 
 import javax.inject.Inject;
 import java.util.Comparator;
@@ -29,12 +25,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 
 /**
  * A service for introspecting tokens.

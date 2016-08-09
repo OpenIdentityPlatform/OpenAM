@@ -187,5 +187,11 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

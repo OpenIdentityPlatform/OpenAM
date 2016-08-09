@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -43,15 +42,12 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.extensions.ResourceRegistrationFilter;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
@@ -73,7 +69,6 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Conditions;
 import org.restlet.data.Status;
 import org.restlet.data.Tag;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
@@ -101,7 +96,7 @@ public class ResourceSetRegistrationEndpointTest {
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
-    public void setup() throws ServerException, InvalidGrantException, NotFoundException {
+    public void setup() throws Exception {
 
         store = mock(ResourceSetStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);

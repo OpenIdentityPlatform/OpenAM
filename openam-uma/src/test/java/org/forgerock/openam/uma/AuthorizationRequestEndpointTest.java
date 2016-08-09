@@ -19,7 +19,7 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.Matchers.anyBoolean;
@@ -39,7 +39,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import org.forgerock.json.JsonValue;
@@ -49,15 +48,12 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -65,16 +61,12 @@ import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.uma.extensions.RequestAuthorizationFilter;
 import org.forgerock.util.query.QueryFilter;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -116,7 +108,7 @@ public class AuthorizationRequestEndpointTest {
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
                 TokenStore oauth2TokenStore, OAuth2RequestFactory requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
-                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
+                OAuth2UrisFactory oAuth2UrisFactory,
                 UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
                 Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
                 UmaExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
@@ -144,7 +136,7 @@ public class AuthorizationRequestEndpointTest {
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
-    public void setup() throws ServerException, InvalidGrantException, NotFoundException, EntitlementException, JSONException {
+    public void setup() throws Exception {
         requestFactory = mock(OAuth2RequestFactory.class);
         OAuth2Request oAuth2Request = mock(OAuth2Request.class);
         given(requestFactory.create(any(Request.class))).willReturn(oAuth2Request);
@@ -190,7 +182,7 @@ public class AuthorizationRequestEndpointTest {
         given(oauth2ProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(oauth2ProviderSettings);
         given(oauth2ProviderSettings.getResourceSetStore()).willReturn(resourceSetStore);
 
-        OAuth2UrisFactory<RealmInfo> oauth2UrisFactory = mock(OAuth2UrisFactory.class);
+        OAuth2UrisFactory oauth2UrisFactory = mock(OAuth2UrisFactory.class);
         OAuth2Uris oauth2Uris = mock(OAuth2Uris.class);
         given(oauth2UrisFactory.get(any(OAuth2Request.class))).willReturn(oauth2Uris);
         given(oauth2Uris.getIssuer()).willReturn("ISSUER");

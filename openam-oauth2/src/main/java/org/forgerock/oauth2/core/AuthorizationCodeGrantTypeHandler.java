@@ -16,13 +16,16 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.joinScope;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -31,11 +34,10 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.util.encode.Base64url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
  * Implementation of the GrantTypeHandler for the OAuth2 Authorization Code grant.

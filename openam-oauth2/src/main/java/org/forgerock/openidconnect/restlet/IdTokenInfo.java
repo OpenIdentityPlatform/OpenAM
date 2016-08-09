@@ -35,14 +35,15 @@ import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -119,6 +120,9 @@ public class IdTokenInfo extends ServerResource {
                     "no registered client matches audience of id_token", null);
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
+        } catch (RealmLookupException e) {
+            throw new OAuth2RestletException(Status.BAD_REQUEST.getCode(), "Invalid realm",
+                    "Invalid realm: " + e.getRealm(), null);
         }
     }
 
@@ -128,9 +132,10 @@ public class IdTokenInfo extends ServerResource {
      * @param request the request containing an id_token to validate.
      * @return the validated id_token.
      * @throws OAuth2Exception if the token is not valid or an error occurs.
+     * @throws RealmLookupException If the realm is invalid.
      */
     @VisibleForTesting
-    OAuth2Jwt validateIdToken(OAuth2Request request) throws OAuth2Exception {
+    OAuth2Jwt validateIdToken(OAuth2Request request) throws OAuth2Exception, RealmLookupException {
         final String jwt = request.getParameter(OAuth2Constants.JWTTokenParams.ID_TOKEN);
         if (StringUtils.isBlank(jwt)) {
             throw new BadRequestException("no id_token in request");
@@ -177,11 +182,12 @@ public class IdTokenInfo extends ServerResource {
      *
      * @param request the request.
      * @param realm the realm taken from the token.
+     * @throws RealmLookupException If the realm is invalid.
      */
-    private void setRealmOnRequest(OAuth2Request request, String realm) {
+    private void setRealmOnRequest(OAuth2Request request, String realm) throws RealmLookupException {
         ConcurrentMap<String, Object> attributes = request.<Request>getRequest().getAttributes();
         attributes.put(OAuth2Constants.Custom.REALM, realm);
-        attributes.put(RestletRealmRouter.REALM_INFO, new RealmInfo(realm));
+        attributes.put(RestletRealmRouter.REALM_OBJECT, Realm.of(realm));
         HttpServletRequest httpRequest = ServletUtils.getRequest(request.<Request>getRequest());
         httpRequest.setAttribute(ISAuthConstants.REALM_PARAM, realm);
     }

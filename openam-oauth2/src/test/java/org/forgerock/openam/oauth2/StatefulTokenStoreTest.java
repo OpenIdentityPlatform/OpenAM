@@ -16,26 +16,23 @@
 
 package org.forgerock.openam.oauth2;
 
-import static java.util.Collections.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.utils.Time.*;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.anyString;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.verify;
-import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.DeviceCode;
@@ -43,14 +40,12 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -67,7 +62,7 @@ public class StatefulTokenStoreTest {
 
     private OAuthTokenStore tokenStore;
     private OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
+    private OAuth2UrisFactory oAuth2UrisFactory;
     private OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private RealmNormaliser realmNormaliser;
     private SSOTokenManager ssoTokenManager;

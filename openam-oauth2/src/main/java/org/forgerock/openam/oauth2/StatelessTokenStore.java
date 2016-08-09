@@ -29,7 +29,6 @@ import static org.forgerock.openam.utils.Time.newDate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Collection;
@@ -42,7 +41,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.sun.identity.shared.debug.Debug;
-
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -59,7 +57,6 @@ import org.forgerock.oauth2.core.DeviceCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
@@ -71,7 +68,6 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.blacklist.Blacklistable;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -97,7 +93,7 @@ public class StatelessTokenStore implements TokenStore {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final RealmNormaliser realmNormaliser;
-    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
+    private final OAuth2UrisFactory oAuth2UrisFactory;
     private final Blacklist<Blacklistable> tokenBlacklist;
     private final CTSPersistentStore cts;
     private final TokenAdapter<StatelessTokenMetadata> tokenAdapter;
@@ -121,7 +117,7 @@ public class StatelessTokenStore implements TokenStore {
     public StatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
             OAuth2ProviderSettingsFactory providerSettingsFactory, @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
+            OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
             CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
         this.statefulTokenStore = statefulTokenStore;
         this.jwtBuilder = jwtBuilder;

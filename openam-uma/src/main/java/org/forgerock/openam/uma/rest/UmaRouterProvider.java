@@ -30,10 +30,8 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.audit.UMAAccessAuditFilter;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
 import org.restlet.Restlet;
@@ -47,8 +45,6 @@ import org.restlet.routing.Router;
  */
 public class UmaRouterProvider implements Provider<Router> {
 
-    private final RestRealmValidator realmValidator;
-    private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
     private final OAuth2RequestFactory requestFactory;
@@ -56,18 +52,13 @@ public class UmaRouterProvider implements Provider<Router> {
     /**
      * Constructs a new RestEndpoints instance.
      *
-     * @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
      * @param requestFactory The factory that provides access to OAuth2Request.
      */
     @Inject
-    public UmaRouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+    public UmaRouterProvider(AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
             OAuth2RequestFactory requestFactory) {
-        this.realmValidator = realmValidator;
-        this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
         this.requestFactory = requestFactory;
@@ -75,7 +66,7 @@ public class UmaRouterProvider implements Provider<Router> {
 
     @Override
     public Router get() {
-        Router router = new RestletRealmRouter(realmValidator, coreWrapper);
+        Router router = new RestletRealmRouter();
         router.attach("/permission_request", auditWithUmaFilter(getRestlet(PERMISSION_REQUEST_ENDPOINT),
                 jsonAuditor(RESOURCE_SET_ID, SCOPES), noBodyAuditor()));
         router.attach("/authz_request", auditWithUmaFilter(getRestlet(AUTHORIZATION_REQUEST_ENDPOINT),

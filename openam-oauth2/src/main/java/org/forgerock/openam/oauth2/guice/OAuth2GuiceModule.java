@@ -69,7 +69,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2TokenIntrospectionHandler;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
@@ -96,7 +95,7 @@ import org.forgerock.openam.blacklist.BloomFilterBlacklist;
 import org.forgerock.openam.blacklist.CTSBlacklist;
 import org.forgerock.openam.blacklist.CachingBlacklist;
 import org.forgerock.openam.blacklist.NoOpBlacklist;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
@@ -107,9 +106,9 @@ import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2GlobalSettings;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
-import org.forgerock.openam.oauth2.OpenAMOAuth2UrisFactory;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.StatefulTokenStore;
@@ -223,8 +222,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
         install(new LabelsGuiceModule());
 
-        bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
-        bind(new TypeLiteral<OAuth2UrisFactory<RealmInfo>>() {}).to(OpenAMOAuth2UrisFactory.class);
         bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessCheck.class);
         bind(new TypeLiteral<TokenAdapter<StatelessTokenMetadata>>(){}).to(StatelessTokenCtsAdapter.class);
     }
@@ -318,7 +315,7 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Named(REALM_AGNOSTIC_TOKEN_STORE)
     @Singleton
     TokenStore getRealmAgnosticTokenStore(OAuthTokenStore oauthTokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
+            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory oauth2UrisFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
@@ -381,7 +378,7 @@ public class OAuth2GuiceModule extends AbstractModule {
     public static class RealmAgnosticStatefulTokenStore extends StatefulTokenStore {
 
         public RealmAgnosticStatefulTokenStore(OAuthTokenStore tokenStore,
-                OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
+                OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory oauth2UrisFactory,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
                 Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory) {
@@ -400,7 +397,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         public RealmAgnosticStatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
                 OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
+                OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
                 CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
             super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
                     realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter);

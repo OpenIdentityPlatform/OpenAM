@@ -35,11 +35,10 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +57,14 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
-    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
+    private final OAuth2UrisFactory oAuth2UrisFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final JwtReconstruction jwtReconstruction;
     private final SigningManager signingManager;
 
     @Inject
     public IdTokenClaimGatherer(OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory,
-            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, ClientRegistrationStore clientRegistrationStore,
+            OAuth2UrisFactory oAuth2UrisFactory, ClientRegistrationStore clientRegistrationStore,
             JwtReconstruction jwtReconstruction, SigningManager signingManager) {
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
         this.oAuth2UrisFactory = oAuth2UrisFactory;

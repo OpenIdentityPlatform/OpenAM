@@ -16,9 +16,10 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

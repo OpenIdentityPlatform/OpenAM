@@ -20,12 +20,12 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

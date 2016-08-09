@@ -17,6 +17,10 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
+import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM_OBJECT;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
@@ -48,6 +52,9 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+import org.restlet.Restlet;
+import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.routing.TemplateRoute;
 
 /**
  * Factory for providing realm routers for CHF and CREST.
@@ -56,7 +63,8 @@ import org.forgerock.util.promise.Promises;
  */
 public class RealmRoutingFactory {
 
-    public static final String REALM_ROUTE = "realms/{realm}";
+    private static final String REALM_TEMPLATE_PARAMETER = "realmId";
+    public static final String REALM_ROUTE = "realms/{" + REALM_TEMPLATE_PARAMETER + "}";
 
     /**
      * Creates a CHF {@link Filter} for resolving the hostname to a realm.
@@ -68,9 +76,9 @@ public class RealmRoutingFactory {
     }
 
     /**
-     * Creates a CHF {@link Handler} for recursively matching the {@literal /realms/{realm}} route.
+     * Creates a CHF {@link Handler} for recursively matching the {@literal /realms/{realmId}} route.
      *
-     * <p>This handler MUST be registered at the route {@literal /realms/{realm}}.</p>
+     * <p>This handler MUST be registered at the route {@literal /realms/{realmId}}.</p>
      *
      * @param next The next {@code Handler} that the realm handler should route to after parsing
      * the realm from the URI.
@@ -81,10 +89,10 @@ public class RealmRoutingFactory {
     }
 
     /**
-     * Creates a CREST {@link RequestHandler} for recursivelt matching the
-     * {@literal /realms/{realm}} route.
+     * Creates a CREST {@link RequestHandler} for recursively matching the
+     * {@literal /realms/{realmId}} route.
      *
-     * <p>This request handler MUST be registered at the route {@literal /realms/{realm}}.</p>
+     * <p>This request handler MUST be registered at the route {@literal /realms/{realmId}}.</p>
      *
      * @param next The next {@code RequestHandler} that the realm handler should route to after
      * parsing the realm from the URI.
@@ -92,6 +100,20 @@ public class RealmRoutingFactory {
      */
     public RequestHandler createRouter(RequestHandler next) {
         return new CrestRealmRouter(next);
+    }
+
+    /**
+     * Creates a Restlet {@link org.restlet.routing.Router} for recursively matching the
+     * {@literal /realms/{realmId}} route.
+     *
+     * <p>This {@code Restlet} MUST be registered at the route {@literal /realms/{realmId}}.</p>
+     *
+     * @param next The next {@code Restlet} that the realm handler should route to after
+     * parsing the realm from the URI.
+     * @return A {@code Restlet}.
+     */
+    public Restlet createRouter(org.restlet.routing.Router next) {
+        return new RestletRealmRouter(next);
     }
 
     private static final class HostnameFilter implements Filter {
@@ -206,8 +228,69 @@ public class RealmRoutingFactory {
         }
     }
 
+    private static final class RestletRealmRouter extends org.restlet.routing.Router {
+
+        private RestletRealmRouter(org.restlet.routing.Router next) {
+            attach("/" + REALM_ROUTE, new Delegate(this));
+            setDefaultRoute(new TemplateRoute(next, "", new Delegate(next)));
+        }
+
+        @Override
+        protected void doHandle(Restlet next, org.restlet.Request request, org.restlet.Response response) {
+
+            String realmPathElement = (String) request.getAttributes().get(REALM_TEMPLATE_PARAMETER);
+
+            Realm realm;
+            try {
+                if ("root".equalsIgnoreCase(realmPathElement)) {
+                    realm = Realm.root();
+                } else if (request.getAttributes().containsKey(REALM_OBJECT)) {
+                    Realm currentRealm = (Realm) request.getAttributes().get(REALM_OBJECT);
+                    realm = Realm.of(currentRealm, realmPathElement);
+                } else {
+                    throw new NoRealmFoundException(realmPathElement);
+                }
+            } catch (RealmLookupException e) {
+                throw new org.restlet.resource.ResourceException(org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND,
+                        "Realm \"" + e.getRealm() + "\" not found", e);
+            }
+
+            request.getAttributes().put(REALM, realm.asPath());
+            request.getAttributes().put(REALM_OBJECT, realm);
+            HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+            httpRequest.setAttribute(REALM, realm.asPath());
+            httpRequest.setAttribute(REALM_OBJECT, realm);
+
+            super.doHandle(next, request, response);
+        }
+
+        /**
+         * Restlet eagerly starts/loads its routes so cannot have a direct route back to itself as causes a stack overflow.
+         * To get round this adding in a delegate to lazy start/load the dynamic realm route back to itself.
+         *
+         * @since 12.0.0
+         */
+        private static final class Delegate extends Restlet {
+
+            private final Restlet restlet;
+
+            private Delegate(Restlet restlet) {
+                this.restlet = restlet;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void handle(org.restlet.Request request, org.restlet.Response response) {
+                restlet.handle(request, response);
+            }
+        }
+    }
+
     private static Realm getRealm(Context context) throws RealmLookupException {
-        String realmPathElement = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("realm");
+        String realmPathElement = context.asContext(UriRouterContext.class).getUriTemplateVariables()
+                .get(REALM_TEMPLATE_PARAMETER);
         if ("root".equalsIgnoreCase(realmPathElement)) {
             return Realm.root();
         } else if (context.containsContext(RealmContext.class)) {

@@ -42,11 +42,10 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -78,7 +77,7 @@ public class IdTokenClaimGathererTest {
     public void setup() throws Exception {
         initMocks(this);
         OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory = mockOAuth2ProviderSettings();
-        OAuth2UrisFactory<RealmInfo> oauth2UrisFactory = mockOAuth2Uris();
+        OAuth2UrisFactory oauth2UrisFactory = mockOAuth2Uris();
         ClientRegistrationStore clientRegistrationStore = mockClientRegistrationStore();
         claimGatherer = spy(new IdTokenClaimGatherer(oAuth2ProviderSettingsFactory, oauth2UrisFactory,
                 clientRegistrationStore, jwtReconstruction, signingManager));
@@ -96,8 +95,8 @@ public class IdTokenClaimGathererTest {
         return oAuth2ProviderSettingsFactory;
     }
 
-    private OAuth2UrisFactory<RealmInfo> mockOAuth2Uris() throws NotFoundException, ServerException {
-        OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
+    private OAuth2UrisFactory mockOAuth2Uris() throws NotFoundException, ServerException {
+        OAuth2UrisFactory oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
         given(oAuth2UrisFactory.get(oAuth2Request)).willReturn(oAuth2Uris);
         PublicKey publicKey = mock(PublicKey.class);
         KeyPair keyPair = new KeyPair(publicKey, null);

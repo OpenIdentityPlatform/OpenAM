@@ -29,6 +29,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 
 /**
  * Handler for a specific OAuth2 grant type, i.e. Authorization Code, Client Credentials, Password Credentials.

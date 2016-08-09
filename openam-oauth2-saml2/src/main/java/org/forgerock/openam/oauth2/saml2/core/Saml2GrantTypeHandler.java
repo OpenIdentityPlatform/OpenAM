@@ -47,7 +47,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -55,6 +54,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64url;
 import org.slf4j.Logger;
@@ -67,7 +67,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 
 /**
  * @since 12.0.0

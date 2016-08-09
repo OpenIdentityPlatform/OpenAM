@@ -155,8 +155,7 @@ public class OAuth2Request {
      * @return The attribute value, may be {@code null}
      */
     private Object getAttribute(Request request, String name) {
-        final Object value = request.getAttributes().get(name);
-        return value;
+        return request.getAttributes().get(name);
     }
 
     /**

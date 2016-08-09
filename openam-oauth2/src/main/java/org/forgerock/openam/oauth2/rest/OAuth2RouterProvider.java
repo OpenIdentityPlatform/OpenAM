@@ -43,12 +43,11 @@ import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.rest.RealmRoutingFactory;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
@@ -67,8 +66,6 @@ import org.restlet.routing.Router;
  */
 public class OAuth2RouterProvider implements Provider<Router> {
 
-    private final RestRealmValidator realmValidator;
-    private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
     private final OAuth2RequestFactory requestFactory;
@@ -76,20 +73,15 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
     /**
      * Constructs a new RestEndpoints instance.
-     *  @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
      * @param requestFactory The factory that provides access to OAuth2Request.
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+    public OAuth2RouterProvider(AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
             OAuth2RequestFactory requestFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
-        this.realmValidator = realmValidator;
-        this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
         this.requestFactory = requestFactory;
@@ -98,7 +90,8 @@ public class OAuth2RouterProvider implements Provider<Router> {
 
     @Override
     public Router get() {
-        final Router router = new RestletRealmRouter(realmValidator, coreWrapper);
+        final Router router = new RestletRealmRouter();
+        router.attach("/" + RealmRoutingFactory.REALM_ROUTE, new RealmRoutingFactory().createRouter(router));
 
         // Standard OAuth2 endpoints
 

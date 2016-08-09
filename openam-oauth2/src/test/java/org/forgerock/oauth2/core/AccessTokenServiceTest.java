@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.isNull;
 import static org.mockito.Mockito.anySetOf;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

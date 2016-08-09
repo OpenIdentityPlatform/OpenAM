@@ -24,9 +24,7 @@ import org.forgerock.oauth2.restlet.GuicedRestlet;
 import org.forgerock.oauth2.restlet.OAuth2StatusService;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -41,8 +39,6 @@ import org.restlet.routing.Router;
  */
 public class WebFinger extends Application {
 
-    private final RestRealmValidator realmValidator;
-    private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
     private final OAuth2RequestFactory requestFactory;
@@ -54,8 +50,6 @@ public class WebFinger extends Application {
      * {@link OAuth2StatusService}.
      */
     public WebFinger() {
-        realmValidator = InjectorHolder.getInstance(RestRealmValidator.class);
-        coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
         eventPublisher = InjectorHolder.getInstance(AuditEventPublisher.class);
         eventFactory = InjectorHolder.getInstance(AuditEventFactory.class);
         requestFactory = InjectorHolder.getInstance(OAuth2RequestFactory.class);
@@ -72,7 +66,7 @@ public class WebFinger extends Application {
      */
     @Override
     public Restlet createInboundRoot() {
-        final Router root = new RestletRealmRouter(realmValidator, coreWrapper);
+        final Router root = new RestletRealmRouter();
 
         /**
          * For now we only use webfinger for OpenID Connect. Once the standard is finalized

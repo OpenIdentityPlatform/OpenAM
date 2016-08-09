@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Map;
 
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
@@ -36,6 +37,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
@@ -45,6 +47,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class RealmRoutingFactoryTest {
+
+    private static final Map<String, String> BASE_URI_ROUTER_CONTEXT = Collections.singletonMap("realmId", "root");
 
     private RealmTestHelper realmTestHelper;
 
@@ -88,7 +92,7 @@ public class RealmRoutingFactoryTest {
 
         Handler next = mock(Handler.class);
         Handler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", BASE_URI_ROUTER_CONTEXT);
         Request request = new Request().setUri(URI.create("http://HOSTNAME/realms/root/RESOURCE"));
 
         router.handle(context, request);
@@ -106,7 +110,7 @@ public class RealmRoutingFactoryTest {
 
         Handler next = mock(Handler.class);
         Handler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "realms/subrealm/realms/otherrealm/RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "realms/subrealm/realms/otherrealm/RESOURCE", BASE_URI_ROUTER_CONTEXT);
         Request request = new Request().setUri(URI.create("http://HOSTNAME/realms/root/realms/subrealm/realms/otherrealm/RESOURCE"));
 
         realmTestHelper.mockRealm("subrealm");
@@ -127,7 +131,7 @@ public class RealmRoutingFactoryTest {
 
         Handler next = mock(Handler.class);
         Handler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "realms/invalidrealm/RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "realms/invalidrealm/RESOURCE", BASE_URI_ROUTER_CONTEXT);
         Request request = new Request().setUri(URI.create("http://HOSTNAME/realms/root/realms/invalidrealm/RESOURCE"));
 
         realmTestHelper.mockInvalidRealm("invalidrealm");
@@ -144,7 +148,7 @@ public class RealmRoutingFactoryTest {
 
         RequestHandler next = mock(RequestHandler.class);
         RequestHandler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", BASE_URI_ROUTER_CONTEXT);
         ActionRequest request = mock(ActionRequest.class);
         given(request.getResourcePathObject()).willReturn(ResourcePath.resourcePath("RESOURCE"));
 
@@ -163,7 +167,7 @@ public class RealmRoutingFactoryTest {
 
         RequestHandler next = mock(RequestHandler.class);
         RequestHandler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", BASE_URI_ROUTER_CONTEXT);
         ActionRequest request = mock(ActionRequest.class);
         given(request.getResourcePathObject()).willReturn(ResourcePath.resourcePath("realms/subrealm/realms/otherrealm/RESOURCE"));
 
@@ -185,7 +189,7 @@ public class RealmRoutingFactoryTest {
 
         RequestHandler next = mock(RequestHandler.class);
         RequestHandler router = realmRoutingFactory.createRouter(next);
-        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", Collections.singletonMap("realm", "root"));
+        Context context = new UriRouterContext(new RootContext(), "realms/root", "RESOURCE", BASE_URI_ROUTER_CONTEXT);
         ActionRequest request = mock(ActionRequest.class);
         given(request.getResourcePathObject()).willReturn(ResourcePath.resourcePath("realms/invalidrealm/RESOURCE"));
 

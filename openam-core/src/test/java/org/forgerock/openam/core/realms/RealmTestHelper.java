@@ -17,9 +17,7 @@
 package org.forgerock.openam.core.realms;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
@@ -150,6 +148,23 @@ public class RealmTestHelper {
     }
 
     /**
+     * Mocks a {@link Realm} that with an alias.
+     *
+     * @param alias The alias of the realm.
+     * @param realmParts An array of path elements of the realm to create. Elements cannot contain '/'.
+     * @return A {@code Realm} instance for the provided realm path.
+     */
+    public Realm mockRealmAlias(String alias, String... realmParts) {
+        Realm realm = mockRealm(realmParts);
+        try {
+            when(realmLookup.lookup(alias)).thenReturn(realm);
+            return realm;
+        } catch (RealmLookupException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Mocks a {@link Realm} for the provided realm path.
      *
      * @param realmParts An array of path elements of the realm to create. Elements cannot contain '/'.
@@ -159,6 +174,9 @@ public class RealmTestHelper {
         Reject.ifNull(realmParts);
         for (String realm : realmParts) {
             Reject.ifTrue(realm.contains("/"), "realm part cannot contain '/'");
+        }
+        if (realmParts.length == 0) {
+            return Realm.root();
         }
         StringBuilder sb = new StringBuilder();
         for (String realm : realmParts) {
