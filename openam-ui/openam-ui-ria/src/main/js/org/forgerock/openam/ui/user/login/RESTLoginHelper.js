@@ -24,14 +24,14 @@ define([
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel"
 ], ($, _, creators, store, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants,
-    CookieHelper, URIUtils, fetchUrl, AuthNService, SessionService, UserModel) => {
+    SessionToken, URIUtils, fetchUrl, AuthNService, SessionService, UserModel) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -80,10 +80,10 @@ define([
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        const tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        const sessionToken = SessionToken.get();
         const noSessionHandler = (xhr) => {
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
-            obj.removeSessionCookie();
+            SessionToken.remove();
 
             if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
                 errorCallback("loggedIn");
@@ -104,8 +104,8 @@ define([
             Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
 
-        if (tokenCookie) {
-            return SessionService.getSessionInfo(tokenCookie).then((data) => {
+        if (sessionToken) {
+            return SessionService.getSessionInfo(sessionToken).then((data) => {
                 store.default.dispatch(creators.sessionAddRealm(data.realm));
                 return UserModel.fetchById(data.uid).then(successCallback);
             }, noSessionHandler);
@@ -159,46 +159,24 @@ define([
         return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
-    obj.logout = function (successCallback, errorCallback) {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionService.isSessionValid(tokenCookie).then(function (result) {
+    obj.logout = function (successCallback = function () {}, errorCallback = function () {}) {
+        const sessionToken = SessionToken.get();
+        SessionService.isSessionValid(sessionToken).then((result) => {
             if (result.valid) {
-                SessionService.logout(tokenCookie).then(function (response) {
-                    obj.removeSessionCookie();
-
+                SessionService.logout(sessionToken).then((response) => {
+                    SessionToken.remove();
                     successCallback(response);
                     return true;
-
-                }, obj.removeSessionCookie);
+                }, () => {
+                    SessionToken.remove();
+                });
             } else {
-                obj.removeSessionCookie();
+                SessionToken.remove();
                 successCallback();
             }
-        }, function () {
-            if (errorCallback) {
-                errorCallback();
-            }
+        }, () => {
+            errorCallback();
         });
-    };
-
-    obj.removeSession = function () {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionService.isSessionValid(tokenCookie).then(function (result) {
-            if (result.valid) {
-                SessionService.logout(tokenCookie).then(function () {
-                    obj.removeSessionCookie();
-                });
-            }
-        });
-    };
-
-    obj.removeSessionCookie = function () {
-        CookieHelper.deleteCookie(Configuration.globalData.auth.cookieName, "/",
-            Configuration.globalData.auth.cookieDomains);
-    };
-
-    obj.removeAuthCookie = function () {
-        CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
     };
 
     return obj;

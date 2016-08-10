@@ -21,8 +21,8 @@ define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/user/services/SessionService",
-    "org/forgerock/commons/ui/common/util/CookieHelper"
-], function ($, AbstractView, Configuration, restLoginHelper, SessionService, cookieHelper) {
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken"
+], function ($, AbstractView, Configuration, restLoginHelper, SessionService, SessionToken) {
 
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",
@@ -52,9 +52,8 @@ define([
             return false;
         },
         logout () {
-            var tokenCookie = cookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-            SessionService.logout(tokenCookie).then(function () {
-                restLoginHelper.removeSessionCookie();
+            SessionService.logout(SessionToken.get()).then(function () {
+                SessionToken.remove();
                 var realm = (Configuration.globalData.auth.passedInRealm != null)
                                 ? Configuration.globalData.auth.passedInRealm
                                 : Configuration.globalData.auth.subRealm;

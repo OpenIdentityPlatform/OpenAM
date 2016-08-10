@@ -41,3 +41,7 @@ export function set (token) {
 export function get () {
     return CookieHelper.getCookie(cookieName());
 }
+
+export function remove () {
+    return CookieHelper.deleteCookie(cookieName(), "/", cookieDomains());
+}

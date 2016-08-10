@@ -21,8 +21,9 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/openam/ui/user/login/navigateThenRefresh"
-], ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper, navigateThenRefresh) => {
+    "org/forgerock/openam/ui/user/login/navigateThenRefresh",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken"
+], ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper, navigateThenRefresh, SessionToken) => {
 
     var SessionExpiredView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
@@ -42,7 +43,7 @@ define([
             this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
             delete Configuration.globalData.auth.fullLoginURL;
 
-            RESTLoginHelper.removeSessionCookie();
+            SessionToken.remove();
             Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });

@@ -162,7 +162,7 @@ define([
                 }
             }, () => {
                 // There is a tokenId but it is invalid so kill it
-                RESTLoginHelper.removeSession();
+                RESTLoginHelper.logout();
                 Configuration.setProperty("loggedUser", null);
             });
         },
@@ -263,7 +263,7 @@ define([
 
                 // Clear out existing session if instructed
                 if (reqs.hasOwnProperty("tokenId") && urlParams.arg === "newsession") {
-                    RESTLoginHelper.removeSession();
+                    RESTLoginHelper.logout();
                     Configuration.setProperty("loggedUser", null);
                 }
 
