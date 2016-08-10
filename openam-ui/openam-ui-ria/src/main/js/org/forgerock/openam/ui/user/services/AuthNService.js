@@ -16,34 +16,33 @@
 define([
     "jquery",
     "lodash",
-    "store/actions/creators",
-    "store/index",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/Constants",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
-    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
-], ($, _, creators, store, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
-    SessionToken, AuthenticationToken) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    "store/actions/creators",
+    "store/index"
+], ($, _, Messages, AbstractDelegate, Configuration, EventManager, URIUtils, fetchUrl, Constants, AuthenticationToken,
+    SessionToken, creators, store) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
     let knownAuth = {};
     function getURLParameters () {
         const query = URIUtils.getCurrentCompositeQueryString();
-        const urlParams = _.object(_.map(query.split("&"), (pair) => pair.split("=", 2)));
+        const urlParams = _.isEmpty(query) ? {} : _.object(_.map(query.split("&"), (pair) => pair.split("=", 2)));
 
         if (Configuration.globalData.auth.urlParams) {
             _.extend(urlParams, Configuration.globalData.auth.urlParams);
         }
 
-        if (RealmHelper.getOverrideRealm()) {
-            urlParams.realm = RealmHelper.getOverrideRealm();
-        }
+        // Call to getCurrentCompositeQueryString may have picked up a realm param, explicitly remove
+        delete urlParams.realm;
 
         // In case user has logged in already update session
         const sessionToken = SessionToken.get();
@@ -75,7 +74,7 @@ define([
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
         const urlAndParams = addQueryStringToUrl(
-            RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate"),
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.info.realm }),
             urlParamsFromObject(getURLParameters()
         ));
         const serviceCall = {
@@ -150,7 +149,7 @@ define([
             }
         };
         const urlAndParams = addQueryStringToUrl(
-            RealmHelper.decorateURIWithRealm("__subrealm__/authenticate"),
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.info.realm }),
             urlParamsFromObject(getURLParameters()
         ));
         const serviceCall = {

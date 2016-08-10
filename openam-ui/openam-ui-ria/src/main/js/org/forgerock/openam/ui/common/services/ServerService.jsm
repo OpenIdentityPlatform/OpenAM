@@ -19,10 +19,12 @@
  */
 import { t } from "i18next";
 import _ from "lodash";
+import { serverAddInfo } from "store/actions/creators";
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
-import URIUtils from "org/forgerock/commons/ui/common/util/URIUtils";
 import fetchUrl from "./fetchUrl";
+import store from "store/index";
+import URIUtils from "org/forgerock/commons/ui/common/util/URIUtils";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
@@ -44,5 +46,9 @@ export function getConfiguration (callParams) {
     return obj.serviceCall(_.extend({
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
         url: fetchUrl("/serverinfo/*", { realm: getRealmParameter() })
-    }, callParams));
+    }, callParams)).then((response) => {
+        store.dispatch(serverAddInfo(response));
+
+        return response;
+    });
 }

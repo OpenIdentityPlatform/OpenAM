@@ -15,7 +15,7 @@
  */
 
 import {
-    SERVER_ADD_REALM,
+    SERVER_ADD_INFO,
     SESSION_ADD_REALM,
     SESSION_REMOVE_REALM
 } from "./types";
@@ -29,7 +29,7 @@ export const sessionRemoveRealm = () => ({
     type: SESSION_REMOVE_REALM
 });
 
-export const serverAddRealm = (absolutePath) => ({
-    type: SERVER_ADD_REALM,
-    absolutePath
+export const serverAddInfo = (info) => ({
+    type: SERVER_ADD_INFO,
+    info
 });

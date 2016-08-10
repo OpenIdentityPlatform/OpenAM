@@ -15,16 +15,16 @@
  */
 
 import {
-    SERVER_ADD_REALM
+    SERVER_ADD_INFO
 } from "../actions/types";
 
 const initialState = {
-    realm: undefined
+    info: undefined
 };
 
 const server = function (state = initialState, action) {
     switch (action.type) {
-        case SERVER_ADD_REALM: return { realm: action.absolutePath };
+        case SERVER_ADD_INFO: return { info: action.info };
         default: return state;
     }
 };
