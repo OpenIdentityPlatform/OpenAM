@@ -17,23 +17,21 @@
 define([
     "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/services/ServerService",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
+    "org/forgerock/openam/ui/user/services/SessionService",
+    "store/index",
     "UserProfileView"
-], function ($, Configuration, Constants, ServerService, RealmHelper, UserProfileView) {
-    var obj = {},
-        lastKnownSubRealm,
-        lastKnownOverrideRealm,
-        setRequireMapConfig = function (serverInfo) {
-            if (serverInfo.kbaEnabled === "true") {
-                require(["org/forgerock/commons/ui/user/profile/UserProfileKBATab"], (tab) => {
-                    UserProfileView.registerTab(tab);
-                });
-            }
-
-            return serverInfo;
-        };
+], ($, Configuration, ServerService, SessionToken, SessionService, store, UserProfileView) => {
+    const obj = {};
+    const setRequireMapConfig = function (serverInfo) {
+        if (serverInfo.kbaEnabled === "true") {
+            require(["org/forgerock/commons/ui/user/profile/UserProfileKBATab"], (tab) => {
+                UserProfileView.registerTab(tab);
+            });
+        }
+        return serverInfo;
+    };
 
     /**
      * Makes a HTTP request to the server to get its configuration
@@ -41,20 +39,6 @@ define([
      * @param {Function} errorCallback   Error callback function
      */
     obj.getConfiguration = function (successCallback, errorCallback) {
-        if (!Configuration.globalData.auth.subRealm) {
-            try {
-                console.log("No current SUB REALM was detected. Applying from current URI values...");
-                var subRealm = RealmHelper.getSubRealm();
-                console.log(`Changing SUB REALM to '${subRealm}'`);
-                Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
-
-                lastKnownSubRealm = RealmHelper.getSubRealm();
-                lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
-            } catch (error) {
-                console.log("Unable to applying sub realm from URI values");
-            }
-        }
-
         ServerService.getConfiguration({ suppressEvents: true }).then((response) => {
             setRequireMapConfig(response);
             successCallback(response);
@@ -62,33 +46,21 @@ define([
     };
 
     /**
-     * Checks for a change of realm
-     * @returns {Promise} If the realm has changed then a promise that will contain the response from the
-     * serverinfo/* REST call, otherwise an empty successful promise.
+     * Checks if realm has changed. Redirects to switch realm page if so.
+     * @returns {Promise} promise empty promise
      */
     obj.checkForDifferences = function () {
-        var currentSubRealm = RealmHelper.getSubRealm(),
-            currentOverrideRealm = RealmHelper.getOverrideRealm(),
-            subRealmChanged = lastKnownSubRealm !== currentSubRealm,
-            overrideRealmChanged = lastKnownOverrideRealm !== currentOverrideRealm;
-        if (subRealmChanged || overrideRealmChanged) {
-            if (currentSubRealm !== lastKnownSubRealm) {
-                console.log(`Changing SUB REALM from '${lastKnownSubRealm}' to '${currentSubRealm}'`);
-                Configuration.globalData.auth.subRealm = currentSubRealm;
-                lastKnownSubRealm = currentSubRealm;
-            }
+        const sessionToken = SessionToken.get();
 
-            lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
+        if (sessionToken) {
+            return SessionService.getSessionInfo(sessionToken).then(() => {
+                const sessionInfoIntendedRealm = store.default.getState().server.realm;
+                const authenticatedRealm = store.default.getState().session.realm;
 
-            return ServerService.getConfiguration({
-                errorsHandlers: {
-                    "unauthorized": { status: "401" },
-                    "Bad Request": {
-                        status: "400",
-                        event: Constants.EVENT_INVALID_REALM
-                    }
+                if (sessionInfoIntendedRealm !== authenticatedRealm) {
+                    location.href = "#confirmLogin/";
                 }
-            }).then(setRequireMapConfig);
+            });
         } else {
             return $.Deferred().resolve();
         }

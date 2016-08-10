@@ -33,10 +33,11 @@ define([
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
-            Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
-            URIUtils) => {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "store/index"
+], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
+    Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils, URIUtils,
+    store) => {
 
     function populateTemplate () {
         var self = this,
@@ -124,17 +125,15 @@ define([
         },
 
         handleExistingSession (requirements) {
-
             const auth = Configuration.globalData.auth;
-            // Set a variable for the realm passed into the browser so there can be a
-            // check to make sure it is the same as the current user's realm
-            auth.passedInRealm = RealmHelper.getRealm();
+
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
+                const sessionInfoIntendedRealm = store.default.getState().server.realm;
+                const authenticatedRealm = store.default.getState().session.realm;
 
-                if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
+                if (sessionInfoIntendedRealm === authenticatedRealm) {
                     Configuration.setProperty("loggedUser", user);
-                    delete auth.passedInRealm;
 
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
 
@@ -143,6 +142,7 @@ define([
                             $("body").empty();
                             return false;
                         }
+
                         EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
                             anonymousMode: false
                         });

@@ -17,21 +17,19 @@
 define([
     "jquery",
     "lodash",
-    "store/actions/creators",
-    "store/index",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel"
-], ($, _, creators, store, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants,
-    SessionToken, URIUtils, fetchUrl, AuthNService, SessionService, UserModel) => {
+], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -106,7 +104,6 @@ define([
 
         if (sessionToken) {
             return SessionService.getSessionInfo(sessionToken).then((data) => {
-                store.default.dispatch(creators.sessionAddRealm(data.realm));
                 return UserModel.fetchById(data.uid).then(successCallback);
             }, noSessionHandler);
         } else {

@@ -17,8 +17,10 @@
 define([
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/util/Constants"
-], (_, AbstractDelegate, Constants) => {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "store/actions/creators",
+    "store/index"
+], (_, AbstractDelegate, Constants, creators, store) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/sessions`);
 
     function performServiceCall (options) {
@@ -49,6 +51,9 @@ define([
             url: `/${token}`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             errorsHandlers: { "Unauthorized": { status: 401 } }
+        }).then((response) => {
+            store.default.dispatch(creators.sessionAddRealm(response.realm));
+            return response;
         });
     };
 
