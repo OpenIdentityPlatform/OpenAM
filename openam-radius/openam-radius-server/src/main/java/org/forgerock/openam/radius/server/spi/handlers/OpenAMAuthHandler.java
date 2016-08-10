@@ -831,7 +831,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             sb.append(header);
             String prompt = cc.getPrompt();
             if (prompt != null) {
-               sb.append(prompt);
+                sb.append(prompt);
             }
             if (cc.getDefaultOption() >= 0) {
                 // ugh. ditto on above translation concern

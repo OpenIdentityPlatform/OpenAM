@@ -147,15 +147,15 @@ public class RadiusRequestListener implements Runnable {
         try {
             MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required MD5 " +
-                    "MessageDigest type.", e);
+            throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required MD5 "
+                    + "MessageDigest type.", e);
         }
         if (Charset.isSupported("UTF-8")) {
             try {
                 Charset.forName("UTF-8");
             } catch (UnsupportedCharsetException e) {
-                throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required UTF-8 " +
-                        "Charset.", e);
+                throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required UTF-8 "
+                        + "Charset.", e);
             }
         }
 
