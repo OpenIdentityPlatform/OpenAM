@@ -40,6 +40,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.utils.PerThreadCache;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
@@ -394,8 +395,8 @@ public class SessionID implements Serializable {
             }
 
         } catch (Exception e) {
-            debug.error("Invalid sessionid format:["+serverID+"]", e);
-            throw new IllegalArgumentException("Invalid sessionid format:["+serverID+"]" + e);
+            debug.error("Invalid sessionid format:[" + encryptedString + "]", e);
+            throw new IllegalArgumentException("Invalid sessionid format:[" + encryptedString + "]" + e);
         }
         isParsed = true;
     }
@@ -747,7 +748,10 @@ public class SessionID implements Serializable {
         String siteID = getExtension().getSiteID();
         String primaryID = getExtension().getPrimaryID();
         String errorMessage = null;
-        if (primaryID == null) {
+
+        if (StringUtils.isEmpty(siteID)) {
+            errorMessage = "Invalid session ID, Site ID is null or empty";
+        } else if (primaryID == null) {
             //In this case by definition the server is not assigned to a site, so we want to ensure that the
             //SITE_ID points to a server
             if (!WebtopNaming.isServer(siteID)) {
