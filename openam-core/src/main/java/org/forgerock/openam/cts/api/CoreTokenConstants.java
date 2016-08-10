@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.cts.api;
 
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+
 /**
  * Responsible for collecting together all constants used in the Core Token Service.
  */
@@ -64,7 +66,7 @@ public class CoreTokenConstants {
 
     /**
      * System property for checking whether session crosstalk is reduced. See
-     * {@link com.iplanet.dpro.session.service.SessionService#isReducedCrossTalkEnabled()}.
+     * {@link com.iplanet.dpro.session.service.SessionServiceConfig#isReducedCrossTalkEnabled()}.
      */
     public static final String IS_REDUCED_CROSSTALK_ENABLED = "iplanet-am-session-reduced-crosstalk-enabled";
     public static final String OBJECT_CLASS = "objectClass";

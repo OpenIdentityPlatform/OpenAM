@@ -11,13 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import static com.sun.identity.shared.Constants.AM_CTX_ID;
-import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static com.sun.identity.shared.Constants.*;
+import static org.forgerock.oauth2.core.Utils.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,15 +28,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.oauth2.core.exceptions.InvalidClientAuthZHeaderException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -46,6 +42,11 @@ import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.ext.servlet.ServletUtils;
+
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Authenticates OAuth2 clients by extracting the client's identifier and secret from the request.
@@ -179,7 +180,7 @@ public class ClientAuthenticator {
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 request.<Request>getRequest().getAttributes().put(AM_CTX_ID,
-                        lc.getAuthContextLocal().getLoginState().getSession().getProperty(AM_CTX_ID));
+                        lc.getAuthContextLocal().getLoginState().getActivatedSessionTrackingId());
                 return true;
             } else {
                 throw failureFactory.getException(request, "Client authentication failed");

@@ -11,95 +11,141 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
+
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.forgerock.openam.session.service.SessionAccessManager;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.MonitoringOperations;
+import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.SessionLogging;
+import com.iplanet.dpro.session.service.SessionNotificationSender;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 public class LocalOperationsTest {
 
+    public static final String TEST_TOKEN_ID = "TEST_TOKEN_ID";
     private LocalOperations local;
-    private SessionService mockService;
+    @Mock
     private Session mockRequester;
+    @Mock
     private Session mockSession;
+    @Mock
     private SessionID mockSessionID;
+    @Mock
     private InternalSession mockInternalSession;
+    @Mock
+    private SessionAccessManager sessionAccessManager;
+    @Mock
+    private SessionInfoFactory sessionInfoFactory;
+    @Mock
+    private ServicesClusterMonitorHandler servicesClusterMonitorHandler;
+    @Mock
+    private SessionServerConfig serverConfig;
+    @Mock
+    private TokenIdFactory tokenIdFactory;
+    @Mock
+    private CTSPersistentStore coreTokenService;
+    @Mock
+    private SessionAdapter tokenAdapter;
+    @Mock
+    private MonitoringOperations monitoringOperations;
+    @Mock
+    private SessionCookies sessionCookies;
+    @Mock
+    private SessionChangeAuthorizer sessionChangeAuthorizer;
 
     @BeforeMethod
     public void setup() {
-        mockSessionID = mock(SessionID.class);
-        mockRequester = mock(Session.class);
-        mockSession = mock(Session.class);
+        MockitoAnnotations.initMocks(this);
         given(mockSession.getID()).willReturn(mockSessionID);
-        mockInternalSession = mock(InternalSession.class);
         given(mockInternalSession.getID()).willReturn(mockSessionID);
+        given(mockInternalSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
+        given(sessionAccessManager.removeInternalSession(mockSessionID)).willReturn(mockInternalSession);
+        given(mockSession.getID()).willReturn(mockSessionID);
 
-        mockService = mock(SessionService.class);
-
-        local = new LocalOperations(mock(Debug.class), mockService);
+        local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory,
+                servicesClusterMonitorHandler, serverConfig, tokenIdFactory, coreTokenService, tokenAdapter,
+                mock(SessionNotificationSender.class),
+                mock(SessionLogging.class), mock(SessionAuditor.class), sessionChangeAuthorizer);
     }
 
     @Test
-    public void shouldUseSessionServiceForRefresh() throws SessionException {
+    public void shouldNotSetLastAccessTimeWhenResetFlagIsFalse() throws SessionException {
+        // Given
+        boolean flag = false;
+        // When
+        local.refresh(mockSession, flag);
+        // Then
+        verify(mockInternalSession, times(0)).setLatestAccessTime();
+    }
+
+    @Test
+    public void shouldSetLastAccessTimeWhenResetFlagIsTrue() throws SessionException {
         // Given
         boolean flag = true;
         // When
         local.refresh(mockSession, flag);
         // Then
-        verify(mockService).getSessionInfo(eq(mockSessionID), eq(flag));
+        verify(mockInternalSession).setLatestAccessTime();
     }
 
     @Test
     public void shouldReturnSessionInfoOnRefresh() throws SessionException {
         // Given
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
-        given(mockService.getSessionInfo(any(SessionID.class), anyBoolean())).willReturn(mockSessionInfo);
+
+        given(sessionInfoFactory.getSessionInfo(mockInternalSession, mockInternalSession.getSessionID()))
+                .willReturn(mockSessionInfo);
         // When
-        SessionInfo result = local.refresh(mock(Session.class), true);
+        SessionInfo result = local.refresh(mockSession, true);
         // Then
         assertThat(result).isEqualTo(mockSessionInfo);
     }
 
     @Test
-    public void shouldUseSessionServiceForLogout() throws SessionException {
+    public void shouldDeleteSessionTokenOnLogout() throws Exception {
         // Given
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(mockSession.getID()).willReturn(mockSessionID);
+        given(tokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TEST_TOKEN_ID);
         // When
         local.logout(mockSession);
         // Then
-        verify(mockService).logout(eq(mockSessionID));
+        verify(coreTokenService).delete(TEST_TOKEN_ID);
     }
 
     @Test
-    public void shouldUseSessionServiceForDestroy() throws SessionException {
+    public void shouldRemoveSessionFromSessionAccessManagerOnDestroy() throws SessionException {
         // Given
-        given(mockService.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
         // When
         local.destroy(mockRequester, mockSession);
         // Then
-        verify(mockService).destroySession(eq(mockRequester), eq(mockSessionID));
+        verify(sessionAccessManager).removeSessionId(eq(mockSessionID));
     }
 
-    @Test
-    public void shouldUseSessionServiceForSetProperty() throws SessionException {
-        // Given
-        String name = "name";
-        String value = "value";
-        // When
-        local.setProperty(mockSession, name, value);
-        // Then
-        verify(mockService).setProperty(eq(mockSessionID), eq(name), eq(value));
-    }
 }

@@ -22,9 +22,10 @@ import java.security.AccessController;
 import javax.inject.Inject;
 
 import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOToken;
@@ -41,17 +42,20 @@ import com.sun.identity.session.util.RestrictedTokenContext;
  * The response accordingly is generic and needs to be inspected for the required return
  * values from the request.
  *
- * This code has been refactored from the Session class as part of tidying up
- * the Session code base.
  */
 public class Requests {
 
-    private final SessionService service;
+    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
+    private final ForeignSessionHandler foreignSessionHandler;
     private final SessionPLLSender pllSender;
 
     @Inject
-    public Requests(SessionService service, SessionPLLSender pllSender) {
-        this.service = service;
+    public Requests(
+                    final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
+                    final ForeignSessionHandler foreignSessionHandler,
+                    final SessionPLLSender pllSender) {
+        this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
+        this.foreignSessionHandler = foreignSessionHandler;
         this.pllSender = pllSender;
     }
 
@@ -73,8 +77,8 @@ public class Requests {
                 return getSessionResponseWithRetry(svcurl, sreq, session);
             } catch (SessionException e) {
                 // attempt retry if appropriate
-                String hostServer = service.getCurrentHostServer(session.getID());
-                if (!service.checkServerUp(hostServer)) {
+                String hostServer = foreignSessionHandler.getCurrentHostServer(session.getID());
+                if (!servicesClusterMonitorHandler.checkServerUp(hostServer)) {
                     // proceed with retry
                     // Note that there is a small risk of repeating request
                     // twice (e.g., normal exception followed by server failure)

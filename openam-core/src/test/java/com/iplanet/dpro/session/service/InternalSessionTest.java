@@ -17,10 +17,8 @@
 package com.iplanet.dpro.session.service;
 
 import static java.util.concurrent.TimeUnit.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
 
-import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionMeta;
 import org.forgerock.openam.utils.TimeTravelUtil;
 import org.forgerock.openam.utils.TimeTravelUtil.FrozenTimeService;
@@ -56,70 +54,8 @@ public class InternalSessionTest {
     }
 
     @Test
-    public void shouldNotUpdateIfAboutToDelete() {
-        // Given
-        final InternalSession session = createSession();
-        InternalSession.setPurgeDelayInSeconds(0);
-        session.setTimedOutAt(12345L);
-        session.save();
-        reset(mockSessionService);
-
-        // When
-        session.setState(SessionConstants.VALID);
-
-        // Then
-        verify(mockSessionService, never()).save(session);
-    }
-
-    @Test
-    public void shouldUpdateIfNotTimedOut() {
-        // Given
-        final InternalSession session = createSession();
-        InternalSession.setPurgeDelayInSeconds(0);
-        session.setState(SessionConstants.VALID);
-        session.setTimedOutAt(0);
-        session.save();
-        reset(mockSessionService);
-
-        // When
-        session.setClientID("CLIENT_ID");
-
-        // Then
-        verify(mockSessionService).save(session);
-    }
-
-    @Test
-    public void shouldUpdateIfTimedOutButPurgeDelayExists() {
-        // Given
-        final InternalSession session = createSession();
-        InternalSession.setPurgeDelayInSeconds(120L);
-        session.save();
-        session.setTimedOutAt(12345L);
-        reset(mockSessionService);
-
-        // When
-        session.setState(SessionConstants.VALID);
-
-        // Then
-        verify(mockSessionService).save(session);
-    }
-
-    @Test
-    public void shouldDeleteSessionIfNotValid() {
-        // Given
-        final InternalSession session = createSession();
-        session.save();
-
-        // When
-        session.setState(SessionConstants.INVALID);
-
-        // Then
-        verify(mockSessionService).deleteFromRepository(session);
-    }
-
-    @Test
     public void shouldSetDefaultTimeoutsWhenConstructed() {
-        // Given
+        // Give
 
         // When
         final InternalSession session = createSession();

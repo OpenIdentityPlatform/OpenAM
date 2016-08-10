@@ -43,6 +43,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -53,7 +54,7 @@ import com.sun.identity.shared.debug.Debug;
 public class DefaultSessionActivator implements SessionActivator {
     static final DefaultSessionActivator INSTANCE = new DefaultSessionActivator();
 
-    protected static final Debug DEBUG = AuthD.debug;
+    protected static final Debug DEBUG = Debug.getInstance(ISAuthConstants.AUTH_BUNDLE_NAME);
 
     protected DefaultSessionActivator() {
     }
@@ -91,7 +92,7 @@ public class DefaultSessionActivator implements SessionActivator {
         putAllPropertiesFromAuthSession(authSession, sessionToActivate);
 
         //destroying the authentication session
-        sessionService.destroyInternalSession(authSessionId);
+        sessionService.destroyAuthenticationSession(authSessionId);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Activating session: " + newSession);

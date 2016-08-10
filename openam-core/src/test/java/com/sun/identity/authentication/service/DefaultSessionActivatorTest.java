@@ -42,6 +42,7 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 
 public class DefaultSessionActivatorTest {
+
     private static final String ORGDN = "testdn";
     private static final SessionID SID = new SessionID("test");
 
@@ -121,7 +122,7 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
 
         // Then
-        verify(mockSessionService).destroyInternalSession(authSessionID);
+        verify(mockSessionService).destroyAuthenticationSession(authSessionID);
     }
 
     @Test

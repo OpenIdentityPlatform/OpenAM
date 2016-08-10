@@ -51,6 +51,7 @@ import com.google.inject.name.Names;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -101,6 +102,8 @@ public class SessionRequestHandler implements RequestHandler {
     private final Debug sessionDebug;
     private final SessionServerConfig serverConfig;
     private final StatelessSessionManager statelessSessionManager;
+    private final SessionCount sessionCount;
+    private final ForeignSessionHandler foreignSessionHandler;
 
     private SSOToken clientToken = null;
 
@@ -113,6 +116,8 @@ public class SessionRequestHandler implements RequestHandler {
         sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
         serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
         statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
+        sessionCount = InjectorHolder.getInstance(SessionCount.class);
+        foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
     }
 
     /**
@@ -312,7 +317,7 @@ public class SessionRequestHandler implements RequestHandler {
             return;
         }
 
-        String hostServerID = sessionService.getCurrentHostServer(sid);
+        String hostServerID = foreignSessionHandler.getCurrentHostServer(sid);
 
         if (!serverConfig.isLocalServer(hostServerID)) {
             try {
@@ -322,7 +327,7 @@ public class SessionRequestHandler implements RequestHandler {
                 // attempt retry
                 if (!sessionService.checkServerUp(hostServerID)) {
                     // proceed with failover
-                    String retryHostServerID = sessionService.getCurrentHostServer(sid);
+                    String retryHostServerID = foreignSessionHandler.getCurrentHostServer(sid);
                     if (retryHostServerID.equals(hostServerID)) {
                         throw se;
                     } else {
@@ -341,10 +346,8 @@ public class SessionRequestHandler implements RequestHandler {
             }
         }
 
-        if (!sessionService.isSessionPresent(sid)) {
-            if (sessionService.recoverSession(sid) == null) {
-                throw new SessionRequestException(sid, SessionBundle.getString("sessionNotObtained"));
-            }
+        if (!sessionService.checkSessionLocal(sid)) {
+            throw new SessionRequestException(sid, SessionBundle.getString("sessionNotObtained"));
         }
     }
 
@@ -387,7 +390,7 @@ public class SessionRequestHandler implements RequestHandler {
                 break;
 
             case SessionRequest.Logout:
-                sessionService.logout(requesterSession.getSessionID());
+                sessionService.logout(requesterSession);
                 break;
 
             case SessionRequest.AddSessionListener:
@@ -400,7 +403,7 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetSessionCount:
                 String uuid = req.getUUID();
-                Map sessions =  SessionCount.getAllSessionsByUUID(uuid);
+                Map sessions =  sessionCount.getAllSessionsByUUID(uuid);
                 if (sessions != null) {
                     res.setSessionsForGivenUUID(sessions);
                 }

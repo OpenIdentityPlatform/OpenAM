@@ -15,16 +15,17 @@
  */
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.dpro.session.SessionID;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.forgerock.openam.utils.SingleValueMapper;
 import org.forgerock.util.Reject;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
+import com.iplanet.dpro.session.SessionID;
 
 /**
  * Responsible for caching and providing access to {@link com.iplanet.dpro.session.service.InternalSession} objects.
@@ -42,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * when they are no longer referenced by the InternalSession.
  */
 @Singleton
-class InternalSessionCache {
+public class InternalSessionCache {
     private final ConcurrentHashMap<SessionID, InternalSession> cache;
     private final SingleValueMapper<String, InternalSession> handle = new SingleValueMapper<>();
     private final SingleValueMapper<SessionID, InternalSession> restricted = new SingleValueMapper<>();
@@ -56,15 +57,20 @@ class InternalSessionCache {
         cache = new ConcurrentHashMap<>(config.getMaxSessions());
     }
 
-    InternalSession getBySessionID(SessionID sessionID) {
+    public InternalSession getBySessionID(SessionID sessionID) {
         return cache.get(sessionID);
     }
 
-    InternalSession getByHandle(String sessionHandle) {
+    public InternalSession getByHandle(String sessionHandle) {
         return handle.get(sessionHandle);
     }
 
-    InternalSession getByRestrictedID(SessionID sessionID) {
+    /**
+     * Gets a restricted session from a given SessionID.
+     * @param sessionID the ID of the restricted session to retrieve
+     * @return a restricted Internal Session
+     */
+    public InternalSession getByRestrictedID(SessionID sessionID) {
         return restricted.get(sessionID);
     }
 
@@ -77,7 +83,7 @@ class InternalSessionCache {
      *
      * @param session Non null InternalSession to store.
      */
-    void put(InternalSession session) {
+    public void put(InternalSession session) {
         Reject.ifNull(session);
         cache.put(session.getID(), session);
 
@@ -99,7 +105,7 @@ class InternalSessionCache {
      *
      * @return The InternalSession that was removed from the cache.
      */
-    InternalSession remove(SessionID sessionID) {
+    public InternalSession remove(SessionID sessionID) {
         InternalSession remove = cache.remove(sessionID);
 
         if (remove == null) {
@@ -123,28 +129,28 @@ class InternalSessionCache {
      * @param session The InternalSession to remove.
      * @return Non null InternalSession removed from the cache.
      */
-    InternalSession remove(InternalSession session) {
+    public InternalSession remove(InternalSession session) {
         return remove(session.getID());
     }
 
     /**
      * @return Current number of sessions stored in the cache.
      */
-    int size() {
+    public int size() {
         return cache.size();
     }
 
     /**
      * @return <tt>true</tt> if this cache is empty.
      */
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return cache.isEmpty();
     }
 
     /**
      * @return Unmodifiable collection of all Sessions that are stored in the cache.
      */
-    Collection<InternalSession> getAllSessions() {
+    public Collection<InternalSession> getAllSessions() {
         return Collections.unmodifiableCollection(cache.values());
     }
 }

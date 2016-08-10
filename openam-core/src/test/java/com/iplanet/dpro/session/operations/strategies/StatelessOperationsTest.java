@@ -32,9 +32,9 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
@@ -47,9 +47,6 @@ public class StatelessOperationsTest {
 
     @Mock
     private StatelessSSOProvider mockSsoProvider;
-
-    @Mock
-    private SessionService mockSessionService;
 
     @Mock
     private StatelessSessionManager mockSessionFactory;
@@ -67,13 +64,19 @@ public class StatelessOperationsTest {
 
     private StatelessOperations statelessOperations;
 
+    @Mock
+    private SessionChangeAuthorizer mockSessionChangeAuthorizer;
+
     @BeforeMethod
     public void setup() {
         MockitoAnnotations.initMocks(this);
         sid = new SessionID("test");
         given(mockSession.getID()).willReturn(sid);
+        given(mockSession.getSessionID()).willReturn(sid);
         statelessOperations = new StatelessOperations(
-                mockSessionService, mockSessionFactory, mockSessionBlacklist, mockSessionLogging, null);
+                null, mockSessionFactory,
+                mockSessionBlacklist, mockSessionLogging, null,
+                mockSessionChangeAuthorizer);
     }
 
     @Test
@@ -125,7 +128,7 @@ public class StatelessOperationsTest {
         statelessOperations.destroy(requester, mockSession);
 
         // Then
-        verify(mockSessionService).checkPermissionToDestroySession(requester, sid);
+        verify(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, sid);
     }
 
     @Test
@@ -147,7 +150,7 @@ public class StatelessOperationsTest {
         // Given
         Session requester = mock(Session.class);
         SessionException ex = new SessionException("test");
-        willThrow(ex).given(mockSessionService).checkPermissionToDestroySession(requester, sid);
+        willThrow(ex).given(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, sid);
 
         // When
         try {

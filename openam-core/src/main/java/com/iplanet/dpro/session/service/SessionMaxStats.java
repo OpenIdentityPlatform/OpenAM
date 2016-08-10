@@ -24,9 +24,14 @@
  *
  * $Id: SessionMaxStats.java,v 1.4 2008/06/25 05:41:31 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.service.SessionAccessManager;
 
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.stats.StatsListener;
@@ -36,9 +41,10 @@ import com.sun.identity.shared.stats.StatsListener;
  * and provides the information of the total number of sessions in the session 
  * table and the number of active sessions in the table.
  */
+@Singleton
 public class SessionMaxStats implements StatsListener {
 
-    private final InternalSessionCache internalSessionCache;
+    private final SessionAccessManager sessionAccessManager;
     private final MonitoringOperations monitoringOperations;
     private final SessionNotificationSender sessionNotificationSender;
     private final Stats stats;
@@ -48,18 +54,19 @@ public class SessionMaxStats implements StatsListener {
 
    /**
     * Creates a new SessionMaxStats
-    * @param internalSessionCache session internalSessionCache
+    * @param sessionAccessManager session accessManagement
     * @param monitoringOperations
     * @param sessionNotificationSender
     * @param stats
     */
+   @Inject
    public SessionMaxStats(
-           InternalSessionCache internalSessionCache,
+           SessionAccessManager sessionAccessManager,
            MonitoringOperations monitoringOperations,
            SessionNotificationSender sessionNotificationSender,
            Stats stats) {
 
-       this.internalSessionCache = internalSessionCache;
+       this.sessionAccessManager = sessionAccessManager;
        this.monitoringOperations = monitoringOperations;
        this.sessionNotificationSender = sessionNotificationSender;
        this.stats = stats;
@@ -70,9 +77,10 @@ public class SessionMaxStats implements StatsListener {
      *
      */
    public void printStats() {
-       if (!internalSessionCache.isEmpty()) {
+       int internalSessionCount = sessionAccessManager.getInternalSessionLimit();
+       if (0 != internalSessionCount) {
            
-           int maxSessions = internalSessionCache.size();
+           int maxSessions = internalSessionCount;
            int maxActiveSessions = monitoringOperations.getActiveSessions();
            int notificationQueue = sessionNotificationSender.getNotificationQueueSize();
            

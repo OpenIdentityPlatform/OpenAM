@@ -75,6 +75,7 @@ import org.forgerock.openam.authentication.service.activators.ForceAuthSessionAc
 import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.utils.ClientUtils;
@@ -149,7 +150,7 @@ public class LoginState {
     private static final Set<String> USER_ATTRIBUTES;
     private static final long AGENT_SESSION_IDLE_TIME;
     private static final SecureRandom SECURE_RANDOM;
-    private static final Debug DEBUG = AuthD.debug;
+    private static final Debug DEBUG = Debug.getInstance(ISAuthConstants.AUTH_BUNDLE_NAME);
     private static final List<String> SHARED_STATE_ATTRIBUTES = 
             Arrays.asList(ISAuthConstants.SHARED_STATE_PASSWORD, ISAuthConstants.SHARED_STATE_USERNAME);
     private static volatile List<SessionUpgradeHandler> sessionUpgradeHandlers = null;
@@ -217,7 +218,7 @@ public class LoginState {
     private Callback[] prevCallback;
     private Callback[] submittedCallbackInfo;
     private final Map<String, Callback[]> callbacksPerState = new HashMap<String, Callback[]>();
-    private InternalSession session = null;
+    private SessionID sessionReference = null;
     private HttpServletRequest servletRequest;
     private HttpServletResponse servletResponse;
     private String orgName;
@@ -244,7 +245,10 @@ public class LoginState {
     private String authMethName = "";
     private String pAuthMethName = null;
     private String queryOrg = null;
-    private SessionID sid;
+
+    private SessionID finalSessionId;
+    private String activatedSessionTrackingId;
+
     private boolean cookieSupported = true;
     private boolean cookieSet = false;
     private boolean userEnabled = true;
@@ -334,7 +338,7 @@ public class LoginState {
      */
     private String defaultAuthLevel = "0";
     private ZeroPageLoginConfig zeroPageLoginConfig;
-    private InternalSession oldSession = null;
+    private SessionID oldSessionReference = null;
     private StatelessSession oldStatelessSession = null;
     private SSOToken oldSSOToken = null;
     private boolean forceAuth;
@@ -360,6 +364,9 @@ public class LoginState {
 
     private final StatelessAdminRestriction restriction =
             InjectorHolder.getInstance(StatelessAdminRestriction.class);
+
+    private final SessionAccessManager sessionAccessManager =
+            InjectorHolder.getInstance(SessionAccessManager.class);
 
     /**
      * Attempts to load the configured session property upgrader class.
@@ -427,11 +434,19 @@ public class LoginState {
      * @return session;
      */
     public InternalSession getSession() {
+        if (null == sessionReference) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message(
+                        "Session is null :" + sessionReference);
+            }
+            return null;
+        }
+        InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
         if (session == null || session.getState() == INACTIVE ||
                 session.getState() == DESTROYED) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message(
-                        "Session is null OR INACTIVE OR DESTROYED :" + session);
+                        "Session is INACTIVE OR DESTROYED :" + session);
             }
             return null;
         }
@@ -444,11 +459,12 @@ public class LoginState {
      * @param sess Internal session for the request.
      */
     public void setSession(InternalSession sess) {
-        this.session = sess;
         if (sess != null) {
-            this.sid = sess.getID();
+            this.sessionReference = sess.getSessionID();
+            this.finalSessionId = sess.getID();
         } else {
-            this.sid = null;
+            this.sessionReference = null;
+            this.finalSessionId = null;
         }
     }
 
@@ -459,7 +475,7 @@ public class LoginState {
      * @param sid the new session id to set.
      */
     void setSessionID(SessionID sid) {
-        this.sid = sid;
+        this.finalSessionId = sid;
     }
 
     /**
@@ -623,6 +639,14 @@ public class LoginState {
      */
     public boolean isDynamicProfileCreationEnabled() {
         return dynamicProfileCreation;
+    }
+
+    /**
+     * Gets the external ID of the activated session.  See {@link com.sun.identity.shared.Constants#AM_CTX_ID}
+     * @return the external session ID string.
+     */
+    public String getActivatedSessionTrackingId() {
+        return activatedSessionTrackingId;
     }
 
     /**
@@ -1104,8 +1128,12 @@ public class LoginState {
                 setSuccessLoginURL(AuthContext.IndexType.SERVICE, getAuthConfigName(indexType, indexName));
             }
 
+            InternalSession internalSession = sessionAccessManager.getInternalSession(sessionReference);
             final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
-                    session, subject, loginContext);
+                    internalSession, subject, loginContext);
+            if (isSessionActivated) {
+                this.activatedSessionTrackingId = internalSession.getProperty(Constants.AM_CTX_ID);
+            }
             if (sessionUpgrade && !forceAuth && isSessionActivated && oldStatelessSession == null) {
                 invokeSessionUpgradeHandlers();
             }
@@ -1172,6 +1200,7 @@ public class LoginState {
         String oldUserDN = null;
         String oldAuthenticationModuleInstanceName = null;
         AMIdentity oldAMIdentity = null;
+        InternalSession oldSession = getReferencedOldSession();
         if (oldSession != null || oldStatelessSession != null) {
             if (oldSession != null) {
                 oldUserDN = oldSession.getProperty(ISAuthConstants.PRINCIPAL);
@@ -1593,11 +1622,11 @@ public class LoginState {
 
     /* destroy session */
     void destroySession() {
-        if (session != null) {
-            AuthUtils.removeAuthContext(sid);
-            LazyConfig.AUTHD.destroySession(sid);
-            sid = null;
-            session = null;
+        if (sessionReference != null) {
+            AuthUtils.removeAuthContext(finalSessionId);
+            LazyConfig.AUTHD.destroySession(finalSessionId);
+            finalSessionId = null;
+            sessionReference = null;
         }
     }
 
@@ -1607,7 +1636,7 @@ public class LoginState {
      * @return Session ID.
      */
     public SessionID getSid() {
-        return sid;
+        return finalSessionId;
     }
 
     public boolean getForceFlag() {
@@ -1737,7 +1766,7 @@ public class LoginState {
         servletResponse = response;
         setParamHash(requestHash);
         client = getClient();
-        this.sid = sid;
+        this.finalSessionId = sid;
         if (DEBUG.messageEnabled()) {
             DEBUG.message("requestType : " + newRequest);
             DEBUG.message("client : " + client);
@@ -1776,14 +1805,15 @@ public class LoginState {
             AuthContextLocal authContext
     ) throws AuthException {
         DEBUG.message("LoginState: createSession: Creating new session: ");
-        session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
+        InternalSession session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
         DEBUG.message("Save authContext in InternalSession");
-        sid = session.getID();
+        finalSessionId = session.getID();
+        sessionReference = session.getSessionID();
         session.setAuthContext(authContext);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message(
-                    "LoginState:createSession: New session/sid=" + sid);
+                    "LoginState:createSession: New session/sid=" + finalSessionId);
             DEBUG.message("LoginState:New session: ac=" + authContext);
         }
     }
@@ -1795,13 +1825,17 @@ public class LoginState {
      * @throws SSOException
      */
     public SSOToken getSSOToken() throws SSOException {
-        if (isNoSession() || (!stateless && (session == null || session.getState() == INACTIVE))) {
+        if (null == sessionReference || isNoSession()) {
+            return null;
+        }
+        InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
+        if (!stateless && (session == null || session.getState() == INACTIVE)) {
             return null;
         }
 
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = ssoManager.createSSOToken(sid.toString());
+            SSOToken ssoToken = ssoManager.createSSOToken(finalSessionId.toString());
             return ssoToken;
         } catch (SSOException ex) {
             DEBUG.message("Error retrieving SSOToken :", ex);
@@ -1828,9 +1862,7 @@ public class LoginState {
      *
      * @return the encoded URL
      */
-    public String encodeURL(
-            String url,
-            boolean useAMCookie) {
+    public String encodeURL(final String url, final boolean useAMCookie) {
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("in encodeURL");
@@ -1848,7 +1880,8 @@ public class LoginState {
             return url;
         }
 
-        if (session == null) {
+        InternalSession session = getReferencedSession();
+        if (null == session) {
             return url;
         }
 
@@ -1871,6 +1904,20 @@ public class LoginState {
                     ", Rewritten URL=" + encodedURL);
         }
         return (encodedURL);
+    }
+
+    private InternalSession getReferencedSession() {
+        if (null == sessionReference) {
+            return null;
+        }
+        return sessionAccessManager.getInternalSession(sessionReference);
+    }
+
+    private InternalSession getReferencedOldSession() {
+        if (null == oldSessionReference) {
+            return null;
+        }
+        return sessionAccessManager.getInternalSession(oldSessionReference);
     }
 
     /**
@@ -3139,6 +3186,7 @@ public class LoginState {
         //check from postAuthModule URL is set
         //if not try to retrieve it from session property
         //Success URL from Post Auth takes precedence
+        InternalSession session = getReferencedSession();
         if ((postProcessGoto == null) && (session != null))
             postProcessGoto =
                     session.getProperty(ISAuthConstants.POST_PROCESS_SUCCESS_URL);
@@ -4037,7 +4085,7 @@ public class LoginState {
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         newRequest = true;
-        this.sid = sid;
+        this.finalSessionId = sid;
         if (DEBUG.messageEnabled()) {
             DEBUG.message("requestType : " + newRequest);
             DEBUG.message("sid : " + sid);
@@ -4212,8 +4260,9 @@ public class LoginState {
             if (authMethName != null) {
                 props.put(LogConstants.MODULE_NAME, authMethName);
             }
+            InternalSession session = getReferencedSession();
             if (session != null) {
-                props.put(LogConstants.LOGIN_ID_SID, sid.toString());
+                props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
@@ -4254,8 +4303,9 @@ public class LoginState {
             if (authMethName != null) {
                 props.put(LogConstants.MODULE_NAME, authMethName);
             }
+            InternalSession session = getReferencedSession();
             if (session != null) {
-                props.put(LogConstants.LOGIN_ID_SID, sid.toString());
+                props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }
 
             LazyConfig.AUTHD.logIt(data, AuthD.LOG_ACCESS, logId, props);
@@ -4360,8 +4410,9 @@ public class LoginState {
                     (failureModuleList.length() > 0)) {
                 props.put(LogConstants.MODULE_NAME, failureModuleList);
             }
+            InternalSession session = getReferencedSession();
             if (session != null) {
-                props.put(LogConstants.LOGIN_ID_SID, sid.toString());
+                props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
@@ -4411,8 +4462,9 @@ public class LoginState {
             if (authMethName != null) {
                 props.put(LogConstants.MODULE_NAME, authMethName);
             }
+            InternalSession session = getReferencedSession();
             if (session != null) {
-                props.put(LogConstants.LOGIN_ID_SID, sid.toString());
+                props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
@@ -4484,7 +4536,7 @@ public class LoginState {
      * @return old Session
      */
     public InternalSession getOldSession() {
-        return oldSession;
+        return getReferencedOldSession();
     }
 
     /**
@@ -4493,7 +4545,11 @@ public class LoginState {
      * @param oldSession Old InternalSession Object
      */
     public void setOldSession(InternalSession oldSession) {
-        this.oldSession = oldSession;
+        if (null == oldSession) {
+            this.oldSessionReference = null;
+            return;
+        }
+        this.oldSessionReference = oldSession.getSessionID();
     }
 
     /**
@@ -4516,6 +4572,7 @@ public class LoginState {
 
     private void sessionUpgrade() throws AuthException {
         // set the larger authlevel
+        InternalSession oldSession = getReferencedOldSession();
         if (oldSession == null && oldStatelessSession == null) {
             return;
         }
@@ -4643,6 +4700,7 @@ public class LoginState {
         updateSessionProperty("AuthType", upgradeModuleList);
         updateSessionProperty("Service", upgradeServiceName);
         updateSessionProperty("Role", upgradeRoleName);
+        InternalSession session = getReferencedSession();
         session.setIsSessionUpgrade(true);
     }
 
@@ -4650,14 +4708,20 @@ public class LoginState {
      * will be concatenated , seperated by |
      */
 
-    private void updateSessionProperty(String property, String value) {
+    private void updateSessionProperty(final String property, final String value) {
         if (value == null) {
             return;
         }
+        InternalSession session = null;
+
         if (!forceAuth) {
-            session.putProperty(property, value);
+            session = getReferencedSession();
         } else {
-            oldSession.putProperty(property, value);
+            session = getReferencedOldSession();
+        }
+
+        if (null != session) {
+            session.putProperty(property, value);
         }
     }
 
@@ -4724,6 +4788,7 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
+        InternalSession session = getReferencedSession();
         LazyConfig.SESSION_PROPERTY_UPGRADER.populateProperties(oldSession, session, forceAuth);
     }
 
@@ -4732,6 +4797,7 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
+        InternalSession session = getReferencedSession();
         LazyConfig.SESSION_PROPERTY_UPGRADER.populatePropertiesFromStateless(oldSession, session);
     }
 
@@ -4740,6 +4806,8 @@ public class LoginState {
             loadSessionUpgradeHandlers();
         }
         for (SessionUpgradeHandler sessionUpgradeHandler : sessionUpgradeHandlers) {
+            InternalSession session = getReferencedSession();
+            InternalSession oldSession = getReferencedOldSession();
             sessionUpgradeHandler.handleSessionUpgrade(oldSession, session);
         }
     }
@@ -4802,6 +4870,7 @@ public class LoginState {
                         + "Setting post process class in session "
                         + postLoginInstanceSet);
             }
+            InternalSession session = getReferencedSession();
             session.setPostAuthProcesses(postLoginInstanceSet);
         }
         if ((postLoginInstanceSet != null) &&
@@ -4961,6 +5030,7 @@ public class LoginState {
                     sb.append(postLoginClassName);
                 }
             }
+            InternalSession session = getReferencedSession();
             session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
         }
         return postLoginInstanceSet;
@@ -5236,15 +5306,16 @@ public class LoginState {
         setFailureTokenId(userID);
     }
 
-    /* update the httpsession with internalsession if
-     * failover is enabled
+    /*
+     * If the session should be persisted to the CTS, do so.
      */
-    void updateSessionForFailover() {
+    void persistSession() {
         if (stateless || isNoSession()) {
             return;
         }
-
-        getSession().save();
+        InternalSession session = getSession();
+        session.setStored(true);
+        AuthD.getSessionService().update(session);
     }
 
     /**
@@ -5482,6 +5553,7 @@ public class LoginState {
      * @return <code>true</code> if session state is invalid.
      */
     boolean isSessionInvalid() {
+        InternalSession session = getReferencedSession();
         return (session == null || session.getState() == INVALID ||
                 session.getState() == DESTROYED);
     }
@@ -5910,6 +5982,7 @@ public class LoginState {
 
     boolean isAuthValidForInternalUser() {
         boolean authValid = true;
+        InternalSession session = getReferencedSession();
         if (session == null) {
             DEBUG.warning(
                     "LoginState.isValidAuthForInternalUser():session is null");
@@ -5972,6 +6045,7 @@ public class LoginState {
      * to restore the original session object. If no old session exists then this method does nothing.
      */
     public void restoreOldSession() {
+        InternalSession oldSession = getReferencedOldSession();
         if (oldSession != null) {
             DEBUG.message("Restoring old session");
             setSession(oldSession);

@@ -18,115 +18,94 @@ package com.iplanet.dpro.session.operations;
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.MonitoredOperations;
 import com.iplanet.dpro.session.monitoring.SessionMonitorType;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
-import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
 
 public class ServerSessionOperationStrategyTest {
 
     private ServerSessionOperationStrategy strategy;
-    private SessionService mockSessionService;
     private LocalOperations mockLocal;
-    private RemoteOperations mockRemote;
     private StatelessOperations mockStateless;
-    private CTSOperations mockCTS;
-    private WebtopNamingQuery mockNamingQuery;
-    private Session mockSession;
+    private SessionID mockSessionID;
     private SessionMonitoringStore mockStore;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        // Required dependencies
-        mockSessionService = mock(SessionService.class);
-        mockNamingQuery = mock(WebtopNamingQuery.class);
-
         // Strategies
         mockLocal = mock(LocalOperations.class);
-        mockRemote = mock(RemoteOperations.class);
         mockStateless = mock(StatelessOperations.class);
-        mockCTS = mock(CTSOperations.class);
         mockStore = mock(SessionMonitoringStore.class);
 
         strategy = new ServerSessionOperationStrategy(
-                mockSessionService,
                 mockStore,
                 mockLocal,
-                mockCTS,
-                mockRemote,
                 mockStateless,
-                mockNamingQuery,
                 mock(StatelessSessionManager.class),
                 mock(Debug.class));
 
         // test instances
-        mockSession = mock(Session.class);
+        mockSessionID = mock(SessionID.class);
         SessionID mockSessionId = mock(SessionID.class);
-        given(mockSession.getID()).willReturn(mockSessionId);
         given(mockSessionId.getSessionServerID()).willReturn("TEST");
     }
 
     @Test
     public void shouldUseLocalForLocalSessions() throws SessionException {
         // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(true);
+        given(mockLocal.checkSessionLocal(any(SessionID.class))).willReturn(true);
 
         // When
-        SessionOperations operation = strategy.getOperation(mockSession);
+        SessionOperations operation = strategy.getOperation(mockSessionID);
 
         // Then
         assertThat(operation).isEqualTo(new MonitoredOperations(mockLocal, SessionMonitorType.LOCAL, mockStore));
     }
 
-    @Test
-    public void shouldUseCTSWhenRemoteIsDown() throws SessionException {
-        // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-
-        // Cross-talk is enabled
-        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(false);
-
-        // The Session is a Site
-        given(mockNamingQuery.isSite(anyString())).willReturn(true);
-
-        // The Site is down.
-        given(mockSessionService.isSiteUp(anyString())).willReturn(false);
-
-        // When
-        SessionOperations operation = strategy.getOperation(mockSession);
-
-        // Then
-        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
-    }
-
-    @Test
-    public void shouldUseCTSWhenCrossTalkDisabledCTSContainsSession() throws SessionException {
-        // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-
-        // Cross talk is disabled.
-        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(true);
-
-        // When
-        SessionOperations operation = strategy.getOperation(mockSession);
-
-        // Then
-        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
-    }
+//    @Test
+//    public void shouldUseCTSWhenRemoteIsDown() throws SessionException {
+//        // Given
+//        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
+//
+//        // Cross-talk is enabled
+//        given(mockSessionServiceConfig.isReducedCrossTalkEnabled()).willReturn(false);
+//
+//        // The Session is a Site
+//        given(mockNamingQuery.isSite(anyString())).willReturn(true);
+//
+//        // The Site is down.
+//        given(mockSessionService.isSiteUp(anyString())).willReturn(false);
+//
+//        // When
+//        SessionOperations operation = strategy.getOperation(mockSessionID);
+//
+//        // Then
+//        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
+//    }
+//
+//    @Test
+//    public void shouldUseCTSWhenCrossTalkDisabledCTSContainsSession() throws SessionException {
+//        // Given
+//        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
+//
+//        // Cross talk is disabled.
+//        given(mockSessionServiceConfig.isReducedCrossTalkEnabled()).willReturn(true);
+//
+//        // When
+//        SessionOperations operation = strategy.getOperation(mockSessionID);
+//
+//        // Then
+//        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
+//    }
 }

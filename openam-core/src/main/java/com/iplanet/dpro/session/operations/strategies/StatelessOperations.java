@@ -26,18 +26,17 @@ import javax.inject.Inject;
 
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.*;
 import com.iplanet.dpro.session.operations.SessionOperations;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.sso.SSOToken;
 
 /**
  * Handles client-side sessions.
@@ -45,23 +44,27 @@ import com.iplanet.dpro.session.share.SessionInfo;
  * @since 13.0.0
  */
 public class StatelessOperations implements SessionOperations {
-    private final SessionService sessionService;
+
+    private final SessionOperations localOperations;
     private final StatelessSessionManager statelessSessionManager;
     private final Blacklist<Session> sessionBlacklist;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
+    private final SessionChangeAuthorizer sessionChangeAuthorizer;
 
     @Inject
-    public StatelessOperations(final SessionService sessionService,
+    public StatelessOperations(final LocalOperations localOperations,
                                final StatelessSessionManager statelessSessionManager,
                                final Blacklist<Session> sessionBlacklist,
                                final SessionLogging sessionLogging,
-                               final SessionAuditor sessionAuditor) {
-        this.sessionService = sessionService;
+                               final SessionAuditor sessionAuditor,
+                               final SessionChangeAuthorizer sessionChangeAuthorizer) {
+        this.localOperations = localOperations;
         this.statelessSessionManager = statelessSessionManager;
         this.sessionBlacklist = sessionBlacklist;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
+        this.sessionChangeAuthorizer = sessionChangeAuthorizer;
     }
 
     @Override
@@ -92,8 +95,14 @@ public class StatelessOperations implements SessionOperations {
     }
 
     @Override
+    public Session resolveSession(SessionID sessionID) throws SessionException {
+        return statelessSessionManager.generate(sessionID);
+    }
+
+    @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
-        sessionService.checkPermissionToDestroySession(requester, session.getID());
+        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
+
         if (session instanceof StatelessSession) {
             SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
             sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
@@ -112,7 +121,42 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public void setProperty(final Session session, final String name, final String value) throws SessionException {
-        // Nothing to do
+        localOperations.setProperty(session, name, value);
+    }
+
+    @Override
+    public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
+        return statelessSessionManager.getSessionInfo(sid);
+    }
+
+    @Override
+    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
+        return false;
+    }
+
+    @Override
+    public String getRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String deferenceRestrictedID(Session session, SessionID restrictedID) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
+        localOperations.setExternalProperty(clientToken, sessionId, name, value);
+    }
+
+    @Override
+    public void update(InternalSession session) {
+        throw new UnsupportedOperationException();
     }
 
 }

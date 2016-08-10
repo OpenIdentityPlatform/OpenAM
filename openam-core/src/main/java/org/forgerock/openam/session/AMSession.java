@@ -11,25 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
-package com.iplanet.dpro.session.operations;
+
+package org.forgerock.openam.session;
 
 import com.iplanet.dpro.session.SessionID;
 
 /**
- * Responsible for providing an appropriate implementation of the SessionOperationStrategy
- * based on system dependent factors.
- *
- * Use Case: The ClientSDK shares code with Session, therefore it is inappropriate to
- * try and make one implementation of this strategy work in multiple cases.
+ * This Interface defines the functionality of a session in openam.
  */
-public interface SessionOperationStrategy {
+// More functionality is expected to be defined in here to help capture and encapsulate a session definition
+public interface AMSession {
+
     /**
-     * Based on the Session, determine the appropriate SessionOperations strategy to select.
-     *
-     * @param sessionID Non null Session ID to use.
-     * @return A non null SessionOperations implementation to use.
+     * Get the Id of the session.
+     * @return the SessionID of this session object
      */
-    SessionOperations getOperation(SessionID sessionID);
+    SessionID getID();
 }

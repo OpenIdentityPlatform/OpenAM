@@ -39,6 +39,8 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.WebtopNaming;
@@ -140,8 +142,8 @@ public class SessionCookies {
         }
 
         if (SystemProperties.isServerMode()) {
-            SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-            if (!sessionService.isSiteEnabled()) {
+            SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+            if (!sessionServerConfig.isSiteEnabled()) {
                 cookieValue = WebtopNaming.getLBCookieValue(sid.getSessionServerID());
                 return lbCookieName + "=" + cookieValue;
             }
@@ -149,9 +151,10 @@ public class SessionCookies {
 
         if (RESET_LB_COOKIE_NAME) {
             if (SystemProperties.isServerMode()) {
-                SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-                if (sessionService.isLocalSite(sid)) {
-                    cookieValue = WebtopNaming.getLBCookieValue(sessionService.getCurrentHostServer(sid));
+                SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+                ForeignSessionHandler foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
+                if (sessionServerConfig.isLocalSite(sid)) {
+                    cookieValue = WebtopNaming.getLBCookieValue(foreignSessionHandler.getCurrentHostServer(sid));
                 }
             } else {
                 Session sess = sessionCache.readSession(sid);

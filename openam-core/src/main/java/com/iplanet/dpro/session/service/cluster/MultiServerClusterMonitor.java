@@ -40,9 +40,9 @@ import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.PermutationGenerator;
 import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.sun.identity.shared.debug.Debug;
 
@@ -58,7 +58,7 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class MultiServerClusterMonitor implements ClusterMonitor {
 
-    private final SessionService sessionService;
+    private final ForeignSessionHandler foreignSessionHandler;
     private final Debug sessionDebug;
     private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
@@ -68,19 +68,19 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
 
     /**
      *
-     * @param sessionService
-     * @param sessionDebug
-     * @param serviceConfig
-     * @param serverConfig
+     * @param foreignSessionHandler The handler for sessions loaded from other servers.
+     * @param sessionDebug The session debug instance.
+     * @param serviceConfig The configuration for the session service.
+     * @param serverConfig The configuration for the session server.
      * @throws Exception
      */
     public MultiServerClusterMonitor(
-            SessionService sessionService,
+            ForeignSessionHandler foreignSessionHandler,
             Debug sessionDebug,
             SessionServiceConfig serviceConfig,
             SessionServerConfig serverConfig) throws Exception {
 
-        this(sessionService, sessionDebug, serviceConfig, serverConfig, new ClusterStateServiceFactory());
+        this(foreignSessionHandler, sessionDebug, serviceConfig, serverConfig, new ClusterStateServiceFactory());
     }
 
     /**
@@ -88,13 +88,13 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      */
     @VisibleForTesting
     MultiServerClusterMonitor(
-            SessionService sessionService,
+            ForeignSessionHandler foreignSessionHandler,
             Debug sessionDebug,
             SessionServiceConfig serviceConfig,
             SessionServerConfig serverConfig,
             ClusterStateServiceFactory clusterStateServiceFactory) throws Exception {
 
-        this.sessionService = sessionService;
+        this.foreignSessionHandler = foreignSessionHandler;
         this.sessionDebug = sessionDebug;
         this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
@@ -156,7 +156,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
         Map<String, String> siteMemberMap = getSiteMemberMap();
 
         // Instantiate the State Service.
-        clusterStateService = clusterStateServiceFactory.createClusterStateService(sessionService, serverConfig,
+        clusterStateService = clusterStateServiceFactory.createClusterStateService(foreignSessionHandler, serverConfig,
                 serviceConfig, CollectionUtils.invertMap(clusterMemberMap), siteMemberMap);
 
         // Show our State Server Info Map
@@ -289,14 +289,14 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
     static class ClusterStateServiceFactory {
 
         public ClusterStateService createClusterStateService(
-                SessionService sessionService,
+                ForeignSessionHandler foreignSessionHandler,
                 SessionServerConfig sessionServerConfig,
                 SessionServiceConfig sessionServiceConfig,
                 Map<String, String> serverMembers,
                 Map<String, String> siteMembers) throws Exception {
 
             return new ClusterStateService(
-                    sessionService,
+                    foreignSessionHandler,
                     sessionServerConfig.getLocalServerID(),
                     sessionServiceConfig.getSessionFailoverClusterStateCheckTimeout(),
                     sessionServiceConfig.getSessionFailoverClusterStateCheckPeriod(),

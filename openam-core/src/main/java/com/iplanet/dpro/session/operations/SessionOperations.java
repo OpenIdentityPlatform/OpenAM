@@ -17,7 +17,11 @@ package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.sso.SSOToken;
 
 /**
  * Describes the ability to perform an operation on a Session.
@@ -51,16 +55,6 @@ public interface SessionOperations {
     SessionInfo refresh(Session session, boolean reset) throws SessionException;
 
     /**
-     * Performs the logout operation on the Session.
-     *
-     * This operation is intended to destroy the Session and perform any appropriate
-     * Session related logic.
-     *
-     * @param session SessionID to logout.
-     */
-    void logout(Session session) throws SessionException;
-
-    /**
      * Destroys the Session by removing it and moving it to the DESTROY state.
      *
      * This operation is similar to the logout and uses similar behaviour.
@@ -82,4 +76,84 @@ public interface SessionOperations {
      * communication with session service, or if the property name or value was null.
      */
     void setProperty(Session session, String name, String value) throws SessionException;
+
+    /**
+     * Get the Session Info Object from the Session ID.
+     * @param sessionId the Session Id of the required Session Info.
+     * @param reset if true will cause the last access time on the session to be updated.
+     * @return a Session Info object for the required session.
+     * @throws SessionException if the session could not be accessed.
+     */
+    SessionInfo getSessionInfo(SessionID sessionId, boolean reset) throws SessionException;
+
+    /**
+     * Add a session listener notification url.  The url will receive a notification when session change events occur.
+     * @param sessionId the session id to listen to.
+     * @param url the listener notifcation url
+     * @throws SessionException if the session could not be accessed.
+     */
+    void addSessionListener(SessionID sessionId, String url) throws SessionException;
+
+    /**
+     * Check that a session is a local session.
+     * @param sessionId the session ID to check.
+     * @return returns true if the session is local
+     * @throws SessionException if the session could not be accessed.
+     */
+    boolean checkSessionLocal(SessionID sessionId) throws SessionException;
+
+    /**
+     * Gets the restricted token ID for a session.
+     * @param masterSessionId the master session id to get the restricted token id for
+     * @param restriction the Token Restriction type to use
+     * @return a Restricted token ID as a String
+     * @throws SessionException if the session could not be accessed.
+     */
+    String getRestrictedTokenId(SessionID masterSessionId, TokenRestriction restriction) throws SessionException;
+
+    /**
+     * Given a restricted token, returns the SSOTokenID of the master token
+     * can only be used if the requester is an app token
+     *
+     * @param session Must be an app token
+     * @param restrictedID The SSOTokenID of the restricted token
+     * @return The SSOTokenID string of the master token
+     * @throws SessionException If the master token cannot be de-referenced
+     */
+    String deferenceRestrictedID(Session session, SessionID restrictedID) throws SessionException;
+
+    /**
+     * Sets an external property in the session.  If the property is protected then it will throw a SessionException.
+     *
+     * @param clientToken SSO Token of the client setting external property.
+     * @param sessionId The Id of the session to set the property on
+     * @param name the name of the property
+     * @param value the new value of the property
+     * @throws SessionException If the Session could not be accessed or the property is protected.
+     */
+    void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException;
+
+    /**
+     * Performs the logout operation on the Session.
+     *
+     * This operation is intended to destroy the Session and perform any appropriate
+     * Session related logic.
+     *
+     * @param session Session to logout.
+     */
+    void logout(final Session session) throws SessionException;
+
+    /**
+     * Retrieves the Session from the Session ID.
+     * @param sessionID the ID of the session to resolve
+     * @return the Session Object
+     * @throws SessionException if the session could not be accessed.
+     */
+    Session resolveSession(SessionID sessionID) throws SessionException;
+
+    /**
+     * Called to notify the relevant code that an InternalSession has been updated.
+     * @param session The session that was updated.
+     */
+    void update(InternalSession session);
 }

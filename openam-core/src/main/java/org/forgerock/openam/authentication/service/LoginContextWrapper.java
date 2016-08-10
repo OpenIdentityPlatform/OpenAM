@@ -22,8 +22,9 @@ import javax.security.auth.login.LoginException;
 /**
  * Wrapper class for the javax implementation of LoginContext.
  */
-public class LoginContextWrapper implements LoginContext{
-    javax.security.auth.login.LoginContext javaxContext;
+public class LoginContextWrapper implements LoginContext {
+
+    private final javax.security.auth.login.LoginContext javaxContext;
 
     /**
      * Create an instance of the wrapper based on an existing LoginContext.
@@ -32,7 +33,6 @@ public class LoginContextWrapper implements LoginContext{
     public LoginContextWrapper(javax.security.auth.login.LoginContext javaxContext) {
         this.javaxContext = javaxContext;
     }
-
 
     @Override
     public void login() throws LoginException {

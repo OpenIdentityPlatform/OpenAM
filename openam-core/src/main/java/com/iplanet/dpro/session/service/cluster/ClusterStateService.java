@@ -35,16 +35,6 @@ package com.iplanet.dpro.session.service.cluster;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -60,7 +50,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.forgerock.openam.utils.IOUtils;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimer;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * The <code>ClusterStateService</code> monitors the state of Server instances
@@ -170,7 +172,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private static String localServerId = null;
 
     // SessionService
-    private static volatile SessionService sessionService = null;
+    private static volatile ForeignSessionHandler foreignSessionHandler;
 
     static {
         sessionDebug = Debug.getInstance("amSession");
@@ -226,15 +228,15 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Constructs an instance for the cluster service
-     * @param localServerId id of the server instance in which this
-     *                      ClusterStateService instance is running
+     * @param foreignSessionHandler The handler for sessions from other servers.
+     * @param localServerId id of the server instance in which this ClusterStateService instance is running
      * @param timeout timeout for waiting on an individual server (millisec)
      * @param period checking cycle period (millisecs)
      * @param serverMembers map of Server ID to URL for all cluster Server members.
      * @param siteMembers Mapping of Site ID to URL for all Sites.
      * @throws Exception If there was an unexpected error initialising the ClusterStateService.
      */
-    protected ClusterStateService(SessionService sessionService, String localServerId,
+    protected ClusterStateService(ForeignSessionHandler foreignSessionHandler, String localServerId,
                                   int timeout, long period, Map<String, String> serverMembers,
                                   Map<String, String> siteMembers) throws Exception {
         if ( (localServerId == null)||(localServerId.isEmpty()) )
@@ -245,7 +247,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
         // Ensure we Synchronize this Instantiation.
         synchronized (this) {
-            this.sessionService = sessionService;
+            this.foreignSessionHandler = foreignSessionHandler;
             this.localServerId = localServerId;
             this.timeout = timeout;
             this.period = period;
@@ -443,7 +445,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             boolean cleanRemoteSessions = false;
             synchronized (this) {
 
-                Collection<StateInfo> infos = new ArrayList<StateInfo>();
+                Collection<StateInfo> infos = new ArrayList<>();
                 infos.addAll(servers.values());
                 infos.addAll(sites.values());
 
@@ -461,7 +463,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
             }
             if (cleanRemoteSessions) {
-                sessionService.cleanUpRemoteSessions();
+                foreignSessionHandler.cleanUpRemoteSessions();
             }
         } catch (Exception ex) {
             sessionDebug.error("cleanRemoteSessions Background thread has encountered an Exception: " + ex.getMessage(), ex);

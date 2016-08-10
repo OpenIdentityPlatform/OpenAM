@@ -11,15 +11,20 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package com.iplanet.dpro.session.monitoring;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import com.iplanet.sso.SSOToken;
 
 /**
  * Wraps a provided {@link SessionOperations} instance with timing meta information, and
@@ -74,6 +79,11 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
+    public Session resolveSession(SessionID sessionID) throws SessionException {
+        return sessionOperations.resolveSession(sessionID); // Not monitored at present
+    }
+
+    @Override
     public void destroy(Session requester, Session session) throws SessionException {
         final long start = System.nanoTime();
         sessionOperations.destroy(requester, session);
@@ -90,6 +100,41 @@ public class MonitoredOperations implements SessionOperations {
         sessionOperations.setProperty(session, name, value);
 
         sessionMonitoringStore.storeSetPropertyTime(System.nanoTime() - start, monitorType);
+    }
+
+    @Override
+    public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
+        return sessionOperations.getSessionInfo(sid, reset); // Not monitored at present
+    }
+
+    @Override
+    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
+        sessionOperations.addSessionListener(sessionId, url); // Not monitored at present
+    }
+
+    @Override
+    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
+        return sessionOperations.checkSessionLocal(sessionId); // Not monitored at present
+    }
+
+    @Override
+    public String getRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
+        return sessionOperations.getRestrictedTokenId(masterSid, restriction); // Not monitored at present
+    }
+
+    @Override
+    public String deferenceRestrictedID(Session session, SessionID restrictedID) throws SessionException {
+        return sessionOperations.deferenceRestrictedID(session, restrictedID); // Not monitored at present
+    }
+
+    @Override
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
+        sessionOperations.setExternalProperty(clientToken,sessionId, name, value); // Not monitored at present
+    }
+
+    @Override
+    public void update(InternalSession session) {
+        sessionOperations.update(session);
     }
 
     @Override

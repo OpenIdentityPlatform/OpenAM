@@ -135,7 +135,7 @@ public class ResourceOwnerAuthenticator {
                     String universalId = loginState.getUserUniversalId(loginState.getUserDN());
                     SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
                     final AMIdentity id = IdUtils.getIdentity(adminToken, universalId);
-                    req.getAttributes().put(AM_CTX_ID, loginState.getSession().getProperty(AM_CTX_ID));
+                    req.getAttributes().put(AM_CTX_ID, loginState.getActivatedSessionTrackingId());
                     ret = new ResourceOwner(id.getName(), id, currentTimeMillis());
                 } catch (Exception e) {
                     logger.error("Unable to get SSOToken", e);

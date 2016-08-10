@@ -22,8 +22,9 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
 
 import com.sun.identity.authentication.service.AMLoginContext;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.DSAMECallbackHandler;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This Factory makes Login Context objects based on whether authentication is happening in pure JAAS modules and
@@ -31,6 +32,7 @@ import com.sun.identity.authentication.service.DSAMECallbackHandler;
  */
 public class LoginContextFactory {
 
+    private static final Debug DEBUG = Debug.getInstance(ISAuthConstants.AUTH_BUNDLE_NAME);
     private static LoginContextFactory instance = new LoginContextFactory();
 
     private LoginContextFactory() {}
@@ -70,7 +72,7 @@ public class LoginContextFactory {
                         new javax.security.auth.login.LoginContext(configName, dsameCallbackHandler));
             }
         } else {
-            AuthD.debug.message("Using non pure jaas mode.");
+            DEBUG.message("Using non pure jaas mode.");
             AppConfigurationEntry[] entries = configuration.getAppConfigurationEntry(configName);
             if (subject != null)  {
                 return new com.sun.identity.authentication.jaas.LoginContext(

@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.blacklist.Blacklistable;
+import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
@@ -106,7 +107,7 @@ import com.sun.identity.shared.debug.Debug;
  * @see com.iplanet.dpro.session.SessionListener
  */
 
-public class Session implements Blacklistable {
+public class Session implements Blacklistable, AMSession{
 
     public static final String CACHED_BASE_POLLING_PROPERTY = "com.iplanet.am.session.client.polling.cacheBased";
 
@@ -259,13 +260,14 @@ public class Session implements Blacklistable {
             sessionCache = SessionCache.getInstance();
             sessionCookies = SessionCookies.getInstance();
             sessionServiceURLService = SessionServiceURLService.getInstance();
-            requests = new Requests(sessionService, new SessionPLLSender(sessionCookies));
-            sessionOperationStrategy = new RemoteSessionOperationStrategy(new RemoteOperations(sessionDebug, requests));
+            requests = new Requests(null, null, new SessionPLLSender(sessionCookies));
+            sessionOperationStrategy = new RemoteSessionOperationStrategy(
+                    new RemoteOperations(sessionDebug, requests, null, sessionServiceURLService, null, null));
         }
     }
 
-    private Session(SessionID sid, boolean sessionIsLocal) {
-        this(sid);
+    private Session(SessionID sessionId, boolean sessionIsLocal) {
+        this(sessionId);
         this.sessionIsLocal = sessionIsLocal;
     }
 
@@ -561,7 +563,7 @@ public class Session implements Blacklistable {
             throw new SessionException("Session property name/value cannot be null");
         }
         try {
-            SessionOperations operation = sessionOperationStrategy.getOperation(this);
+            SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
             operation.setProperty(this, name, value);
             sessionProperties.put(name, value);
         } catch (Exception e) {
@@ -609,7 +611,7 @@ public class Session implements Blacklistable {
      */
     public void destroySession(Session session) throws SessionException {
         try {
-            SessionOperations operation = sessionOperationStrategy.getOperation(session);
+            SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
             operation.destroy(this, session);
         } catch (Exception e) {
             throw new SessionException(e);
@@ -628,7 +630,7 @@ public class Session implements Blacklistable {
      */
     public void logout() throws SessionException {
         try {
-            SessionOperations operation = sessionOperationStrategy.getOperation(this);
+            SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
             operation.logout(this);
             sessionCache.removeSID(sessionID);
 
@@ -816,7 +818,7 @@ public class Session implements Blacklistable {
         boolean flag = reset || needToReset;
         needToReset = false;
 
-       SessionOperations operation = sessionOperationStrategy.getOperation(this);
+       SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
        SessionInfo info = operation.refresh(this, flag);
 
         long oldMaxCachingTime = maxCachingTime;

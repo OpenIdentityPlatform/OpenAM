@@ -28,81 +28,41 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.InterruptedIOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.collections.Predicate;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.TokenRestrictionFactory;
-import com.iplanet.dpro.session.service.cluster.ClusterMonitor;
-import com.iplanet.dpro.session.service.cluster.MultiServerClusterMonitor;
-import com.iplanet.dpro.session.service.cluster.SingleServerClusterMonitor;
+import com.iplanet.dpro.session.*;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.dpro.session.utils.SessionInfoFactory;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.SearchResults;
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
-import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
@@ -118,15 +78,7 @@ public class SessionService {
      */
     public static final String SESSION_SERVICE = "session";
 
-    /**
-      * Constants for delegated permissions.
-      */
-    private static final String PERMISSION_READ = "READ";
-    private static final String PERMISSION_MODIFY = "MODIFY";
-    private static final String PERMISSION_DELEGATE = "DELEGATE";
-
     private final Debug sessionDebug;
-    private final Stats stats;
     private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
     private final SSOTokenManager ssoTokenManager;
@@ -135,39 +87,17 @@ public class SessionService {
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
     private final InternalSessionFactory internalSessionFactory;
-    private final HttpConnectionFactory httpConnectionFactory;
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionMaxStats maxSessionStats; // TODO: Inject from Guice
     private final ExecutorService executorService = Executors.newCachedThreadPool(); // TODO: Inject from Guice
-    private final Set remoteSessionSet;
-    /**
-     * AM Session Repository for Session Persistence.
-     */
-    private volatile CTSPersistentStore coreTokenService = null; // TODO: Inject from Guice
 
-    /**
-     * The following InternalSession is for the Authentication Service to use
-     * It is only accessed by AuthD.initAuthSessions
-     */
-    private InternalSession authSession = null;
-    private final TokenIdFactory tokenIdFactory;
-    private final SessionAdapter tokenAdapter;
-    private final SessionInfoFactory sessionInfoFactory;
-    private final InternalSessionCache cache;
+    private final SessionOperationStrategy sessionOperationStrategy;
 
-    private final SessionServiceURLService sessionServiceURLService;
-    private final SessionCache sessionCache;
-    private final SessionCookies sessionCookies;
-    private final SessionPollerPool sessionPollerPool;
-    private final StatelessSessionManager statelessSessionManager;
+    private final SessionAccessManager sessionAccessManager;
+    private final ForeignSessionHandler foreignSessionHandler;
+    private final SessionChangeAuthorizer sessionChangeAuthorizer;
 
-    /**
-     * Reference to the ClusterMonitor instance. When server configuration changes which requires
-     * a different instance (e.g. SFO changing state) then this AtomicReference will ensure
-     * thread safety around the access to the ClusterMonitor instance.
-     */
-    private AtomicReference<ClusterMonitor> clusterMonitor = new AtomicReference<>();
-
+    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
 
     /**
      * Private Singleton Session Service.
@@ -181,57 +111,40 @@ public class SessionService {
             final SessionServerConfig serverConfig,
             final SessionServiceConfig serviceConfig,
             final MonitoringOperations monitoringOperations,
-            final TokenIdFactory tokenIdFactory,
-            final SessionAdapter tokenAdapter,
-            final SessionInfoFactory sessionInfoFactory,
             final SessionLogging sessionLogging,
             final SessionAuditor sessionAuditor,
-            final HttpConnectionFactory httpConnectionFactory,
-            final InternalSessionCache internalSessionCache,
             final InternalSessionFactory internalSessionFactory,
             final SessionNotificationSender sessionNotificationSender,
-            final SessionServiceURLService sessionServiceURLService,
-            final SessionCache sessionCache,
-            final SessionCookies sessionCookies,
-            final SessionPollerPool sessionPollerPool,
-            final StatelessSessionManager statelessSessionManager) {
+            final SessionAccessManager sessionAccessManager,
+            final SessionOperationStrategy sessionOperationStrategy,
+            final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
+            final ForeignSessionHandler foreignSessionHandler,
+            final SessionChangeAuthorizer sessionChangeAuthorizer) {
 
         this.sessionDebug = sessionDebug;
-        this.stats = stats;
         this.ssoTokenManager = ssoTokenManager;
         this.dsameAdminTokenProvider = dsameAdminTokenProvider;
         this.serverConfig = serverConfig;
         this.serviceConfig = serviceConfig;
         this.monitoringOperations = monitoringOperations;
-        this.tokenIdFactory = tokenIdFactory;
-        this.tokenAdapter = tokenAdapter;
-        this.sessionInfoFactory = sessionInfoFactory;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
-        this.httpConnectionFactory = httpConnectionFactory;
-        this.cache = internalSessionCache;
         this.internalSessionFactory = internalSessionFactory;
-        this.statelessSessionManager = statelessSessionManager;
-        this.remoteSessionSet = Collections.synchronizedSet(new HashSet());
+        this.sessionOperationStrategy = sessionOperationStrategy;
+        this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
         this.sessionNotificationSender = sessionNotificationSender;
-        this.sessionServiceURLService = sessionServiceURLService;
-        this.sessionCache = sessionCache;
-        this.sessionCookies = sessionCookies;
-        this.sessionPollerPool = sessionPollerPool;
+        this.sessionAccessManager = sessionAccessManager;
+        this.foreignSessionHandler = foreignSessionHandler;
+        this.sessionChangeAuthorizer = sessionChangeAuthorizer;
 
         try {
 
             if (stats.isEnabled()) {
-                maxSessionStats = new SessionMaxStats(cache, monitoringOperations, sessionNotificationSender, stats);
+                maxSessionStats = new SessionMaxStats(
+                        sessionAccessManager, monitoringOperations, sessionNotificationSender, stats);
                 stats.addStatsListener(maxSessionStats);
             } else {
                 maxSessionStats = null;
-            }
-
-            if (coreTokenService == null) {
-                coreTokenService = getRepository();
-                sessionDebug.message("amTokenRepository Implementation: " +
-                        ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
             }
 
         } catch (Exception ex) {
@@ -239,137 +152,6 @@ public class SessionService {
             sessionDebug.error("SessionService initialization failed.", ex);
             throw new IllegalStateException("SessionService initialization failed.", ex);
 
-        }
-    }
-
-    /**
-     * The ClusterMonitor state depends on whether the system is configured for
-     * SFO or not. As such, this method is aware of the change in SFO state
-     * and triggers a re-initialisation of the ClusterMonitor as required.
-     *
-     * Note, this method also acts as the lazy initialiser for the ClusterMonitor.
-     *
-     * Thread Safety: Uses atomic reference to ensure only one thread can modify
-     * the reference at any one time.
-     *
-     * @return A non null instance of the current ClusterMonitor.
-     * @throws SessionException If there was an error initialising the ClusterMonitor.
-     */
-    private ClusterMonitor getClusterMonitor() throws SessionException {
-        if (!isClusterMonitorValid()) {
-            try {
-                ClusterMonitor previous = clusterMonitor.getAndSet(resolveClusterMonitor());
-                if (previous != null) {
-                    sessionDebug.message("Previous ClusterMonitor shutdown: {}", previous.getClass().getSimpleName());
-                    previous.shutdown();
-                }
-                sessionDebug.message("ClusterMonitor initialised: {}", clusterMonitor.get().getClass().getSimpleName());
-            } catch (Exception e) {
-                sessionDebug.error("Failed to initialise ClusterMonitor", e);
-            }
-        }
-
-
-        ClusterMonitor monitor = clusterMonitor.get();
-        if (monitor == null) {
-            throw new SessionException("Failed to initialise ClusterMonitor");
-        }
-        return monitor;
-    }
-
-    /**
-     * @return True if the ClusterMonitor is valid for the current SessionServiceConfiguration.
-     */
-    private boolean isClusterMonitorValid() {
-        // Handles lazy init case
-        if (clusterMonitor.get() == null) {
-            return false;
-        }
-
-        Class<? extends ClusterMonitor> monitorClass = clusterMonitor.get().getClass();
-        if (isPartOfCluster()) {
-            return monitorClass.isAssignableFrom(MultiServerClusterMonitor.class);
-        } else {
-            return monitorClass.isAssignableFrom(SingleServerClusterMonitor.class);
-        }
-    }
-
-
-    /**
-     * Resolves the appropriate instance of ClusterMonitor to initialise.
-     *
-     * @return A non null ClusterMonitor based on service configuration.
-     * @throws Exception If there was an unexpected error in initialising the MultiClusterMonitor.
-     */
-    private ClusterMonitor resolveClusterMonitor() throws Exception {
-        if (isPartOfCluster()) {
-        return new MultiServerClusterMonitor(this, sessionDebug, serviceConfig, serverConfig);
-        } else {
-            return new SingleServerClusterMonitor();
-        }
-    }
-
-    private boolean isPartOfCluster() {
-        WebtopNamingQuery query = new WebtopNamingQuery();
-        try {
-            String serverId =  query.getAMServerID();
-            String siteId = query.getSiteID(serverId);
-            return siteId != null;
-        } catch (ServerEntryNotFoundException e) {
-            return false;
-        }
-
-    }
-
-    /**
-     * Returns the Internal Session used by the Auth Services.
-     *
-     * @param domain      Authentication Domain
-     */
-    // TODO: Pull out into  new AuthSessionFactory class? This method is only called by AuthD.initAuthSessions
-    //       and AuthD then keeps a local copy of the returned Session. The authSession reference may
-    //       be getting stored as a field on this object to avoid it being garbage collected? Since
-    //       we're not using authSession anywhere else in this class and it isn't referenced by the returned
-    //       Session, it probably wouldn't matter if it was garbage collected.
-    public Session getAuthenticationSession(String domain) {
-        try {
-            if (authSession == null) {
-                // Create a special InternalSession for Authentication Service
-                authSession = getServiceSession(domain);
-            }
-            return authSession != null ? sessionCache.getSession(authSession.getID()) : null;
-        } catch (Exception e) {
-            sessionDebug.error("Error creating service session", e);
-            return null;
-        }
-    }
-
-    /**
-     * Returns the Internal Session which can be used by services
-     *
-     * @param domain      Authentication Domain
-     */
-    // TODO: Also pull this method out into new AuthSessionFactory class
-    private InternalSession getServiceSession(String domain) {
-        try {
-            // Create a special InternalSession which can be used as
-            // service token
-            // note that this session does not need failover protection
-            // as its scope is only this same instance
-            // more over creating an HTTP session by making a self-request
-            // results in dead-lock if called from within synchronized
-            // section in getSessionService()
-            InternalSession session = internalSessionFactory.newInternalSession(domain, false);
-            session.setType(APPLICATION_SESSION);
-            session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
-            session.setClientDomain(domain);
-            session.setNonExpiring();
-            session.setState(VALID);
-            incrementActiveSessions();
-            return session;
-        } catch (Exception e) {
-            sessionDebug.error("Error creating service session", e);
-            return null;
         }
     }
 
@@ -383,59 +165,8 @@ public class SessionService {
      */
 
     public String getRestrictedTokenId(String masterSid, TokenRestriction restriction) throws SessionException {
-        SessionID sid = new SessionID(masterSid);
-
-        // first try
-        String hostServerID = getCurrentHostServer(sid);
-
-        if (!serverConfig.isLocalServer(hostServerID)) {
-            if (!checkServerUp(hostServerID)) {
-                hostServerID = getCurrentHostServer(sid);
-            }
-            if (!serverConfig.isLocalServer(hostServerID)) {
-                String token = getRestrictedTokenIdRemotely(
-                        sessionServiceURLService.getSessionServiceURL(hostServerID), sid, restriction);
-                if (token == null) {
-                    // TODO consider one retry attempt
-                    throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSid);
-                } else {
-                    return token;
-                }
-            }
-        }
-        return doGetRestrictedTokenId(sid, restriction);
-    }
-
-    /**
-     * This method is expected to only be called for local sessions
-     */
-    String doGetRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
-        if (statelessSessionManager.containsJwt(masterSid)) {
-            // Stateless sessions do not (yet) support restricted tokens
-            throw new UnsupportedOperationException(StatelessSession.RESTRICTED_TOKENS_UNSUPPORTED);
-        }
-
-        // locate master session
-        InternalSession session = cache.getBySessionID(masterSid);
-        if (session == null) {
-            session = recoverSession(masterSid);
-            if (session == null) {
-                throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSid);
-            }
-        }
-        sessionInfoFactory.validateSession(session, masterSid);
-        // attempt to reuse the token if restriction is the same
-        SessionID restrictedSid = session.getRestrictedTokenForRestriction(restriction);
-        if (restrictedSid == null) {
-            restrictedSid = session.getID().generateRelatedSessionID(serverConfig);
-            SessionID previousValue = session.addRestrictedToken(restrictedSid, restriction);
-            if (previousValue == null) {
-                cache.put(session);
-            } else {
-                restrictedSid = previousValue;
-            }
-        }
-        return restrictedSid.toString();
+        SessionID sessionID = new SessionID(masterSid);
+        return sessionOperationStrategy.getOperation(sessionID).getRestrictedTokenId(sessionID, restriction);
     }
 
     public InternalSession newInternalSession(String domain, boolean stateless) {
@@ -447,31 +178,36 @@ public class SessionService {
      *
      * @param sessionId Session ID
      */
+    // this method is duplicated in LocalOperations.  It is needed here to handle authentication sessions.
     InternalSession removeCachedInternalSession(final SessionID sessionId) {
         if (null == sessionId) {
             return null;
         }
-        InternalSession session = cache.remove(sessionId);
+
+        InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
         return removeInternalSession(session);
     }
 
+    // this method is duplicated in LocalOperations.  It is needed here to handle authentication sessions.
     private InternalSession removeInternalSession(final InternalSession session) {
+        return sessionAccessManager.removeInternalSession(session.getSessionID());
+    }
 
-        if (null == session) {
-            return null;
-        }
-
-        remoteSessionSet.remove(session.getID());
-        session.cancel();
-        // Session Constraint
-        if (session.getState() == VALID) {
-            decrementActiveSessions();
-        }
-
-        if (session.isStored()) {
-            session.delete();
-        }
-        return session;
+    /**
+     * Understands how to resolve a Token based on its SessionID.
+     *
+     * Stateless Sessions by their very nature do not need to be stored in memory, and so
+     * can be resolved in a different way to Stateful Sessions.
+     *
+     * @param sessionID Non null Session ID.
+     *
+     * @return Null if no matching Session could be found, otherwise a non null
+     * Session instance.
+     *
+     * @throws SessionException If there was an error resolving the Session.
+     */
+    private Session resolveSession(SessionID sessionID) throws SessionException {
+        return sessionOperationStrategy.getOperation(sessionID).resolveSession(sessionID);
     }
 
     /**
@@ -479,25 +215,15 @@ public class SessionService {
      * Performs no action if the sessionID cannot be matched.
      *
      * @param requester The requesting Session.
-     * @param sessionID The session to destroy.
+     * @param sessionToDestroy The session to destroy.
      * @throws SessionException If the user has insufficient permissions.
      */
-    public void destroySession(final Session requester, final SessionID sessionID) throws SessionException {
-        if (sessionID == null) {
+    public void destroySession(Session requester, SessionID sessionToDestroy) throws SessionException {
+        if (sessionToDestroy == null) {
             return;
         }
 
-        InternalSession session = getInternalSession(sessionID);
-
-        if (session == null) {
-            // let us check if the argument is a session handle
-            session = getInternalSessionByHandle(sessionID.toString());
-        }
-
-        if (session != null) {
-            checkPermissionToDestroySession(requester, session.getID());
-            destroyInternalSession(session.getID());
-        }
+        sessionOperationStrategy.getOperation(sessionToDestroy).destroy(requester, resolveSession(sessionToDestroy));
     }
 
     /**
@@ -505,37 +231,36 @@ public class SessionService {
      *
      * @param sessionID The id of the session to destroy.
      */
-    public void destroyInternalSession(SessionID sessionID) {
-        InternalSession session = removeCachedInternalSession(sessionID);
-        if (session != null && session.getState() != INVALID) {
-            signalRemove(session, SessionEvent.DESTROY);
-            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_DESTROYED);
+    void destroyInternalSession(SessionID sessionID) {
+        InternalSession internalSession = removeCachedInternalSession(sessionID);
+        if (internalSession != null && internalSession.getState() != INVALID) {
+            signalRemove(internalSession, SessionEvent.DESTROY);
+            sessionAuditor.auditActivity(internalSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
-        sessionCache.removeSID(sessionID);
-    }
-
-    void deleteFromRepository(InternalSession session) {
-        try {
-            String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
-            getRepository().delete(tokenId);
-        } catch (Exception e) {
-            sessionDebug.error("SessionService : failed deleting session ",
-                    e);
-        }
+        sessionAccessManager.removeSessionId(sessionID);
     }
 
     /**
-     * This method checks if Internal session is already present locally
+     * Destroy a Internal Session, whose session id has been specified.
      *
-     * @param sid
-     * @return a boolean
+     * @param sessionID
      */
-    public boolean isSessionPresent(SessionID sid) {
-        boolean isPresent = cache.getBySessionID(sid) != null
-                || cache.getByRestrictedID(sid) != null
-                || cache.getByHandle(sid.toString()) != null;
+    public void destroyAuthenticationSession(final SessionID sessionID) {
+        InternalSession authenticationSession = removeCachedInternalSession(sessionID);
+        if (authenticationSession != null && authenticationSession.getState() != INVALID) {
+            signalRemove(authenticationSession, SessionEvent.DESTROY);
+            sessionAuditor.auditActivity(authenticationSession.toSessionInfo(), AM_SESSION_DESTROYED);
+        }
+        sessionAccessManager.removeSessionId(sessionID);
+    }
 
-        return isPresent;
+    /**
+     * Updates the session in the underlying storage mechanism based on local changes to the session.
+     * @param session the locally updated session object.
+     */
+    public void update(InternalSession session) {
+        sessionOperationStrategy.getOperation(session.getSessionID()).update(session);
+
     }
 
     /**
@@ -546,107 +271,25 @@ public class SessionService {
      *
      * @return a boolean
      */
-    public boolean checkSessionLocal(SessionID sid) throws SessionException {
-        if (statelessSessionManager.containsJwt(sid)) {
-            // Stateless sessions are not stored in memory and so are not local to any server.
-            return false;
-        } else if (isSessionPresent(sid)) {
-            return true;
-        } else {
-            String hostServerID = getCurrentHostServer(sid);
-            if (serverConfig.isLocalServer(hostServerID)) {
-                if (recoverSession(sid) == null) {
-                    throw new SessionException(SessionBundle.getString("sessionNotObtained"));
-                }
-                return true;
-            }
-        }
-        return false;
+    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
+        return sessionOperationStrategy.getOperation(sessionId).checkSessionLocal(sessionId);
     }
 
     /**
      * Returns the Internal Session corresponding to a Session ID.
      *
-     * @param sid Session Id
+     * @param sessionId Session Id
      */
-    public InternalSession getInternalSession(SessionID sid) {
+    public InternalSession getInternalSession(SessionID sessionId) { // TODO Used to recover authentication session by AuthD
 
-        if (sid == null) {
+        if (sessionId == null) {
             return null;
         }
         // check if sid is actually a handle return null (in order to prevent from assuming recovery case)
-        if (sid.isSessionHandle()) {
+        if (sessionId.isSessionHandle()) {
             return null;
         }
-        return cache.getBySessionID(sid);
-    }
-
-    /**
-     * Quick access to the total size of the remoteSessionSet.
-     *
-     * @return the size of the sessionTable
-     */
-    public int getRemoteSessionCount() {
-        return remoteSessionSet.size();
-    }
-
-    /**
-     * Quick access to the total size of the sessionTable (internal sessions), including
-     * both invalid and valid tokens in the count, as well as 'hidden' sessions used by OpenAM itself.
-     *
-     * @return the size of the sessionTable
-     */
-    public int getInternalSessionCount() {
-        return cache.size();
-    }
-
-    /**
-     * Returns the Internal Session corresponding to a session handle.
-     *
-     * @param shandle Session Id
-     * @return Internal Session corresponding to a session handle
-     */
-    public InternalSession getInternalSessionByHandle(String shandle) {
-        return cache.getByHandle(shandle);
-    }
-
-    /**
-     * As opposed to locateSession() this one accepts normal or restricted token
-     * This is expected to be only called once the session is detected as local
-     *
-     * @param token
-     * @return
-     */
-    private InternalSession resolveToken(SessionID token) throws SessionException {
-        InternalSession sess = cache.getBySessionID(token);
-        if (sess == null) {
-            sess = resolveRestrictedToken(token, true);
-        }
-        if (sess == null) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + token.toString());
-        }
-        return sess;
-    }
-
-    private InternalSession resolveRestrictedToken(SessionID token,
-                                                   boolean checkRestriction) throws SessionException {
-        InternalSession session = cache.getByRestrictedID(token);
-        if (session == null) {
-            return null;
-        }
-        if (checkRestriction) {
-            try {
-                TokenRestriction restriction = session.getRestrictionForToken(token);
-                if (restriction != null && !restriction.isSatisfied(RestrictedTokenContext.getCurrent())) {
-                    throw new SessionException(SessionBundle.rbName, "restrictionViolation", null);
-                }
-            } catch (SessionException se) {
-                throw se;
-            } catch (Exception e) {
-                throw new SessionException(e);
-            }
-        }
-        return session;
+        return sessionAccessManager.getInternalSession(sessionId);
     }
 
     /**
@@ -654,21 +297,14 @@ public class SessionService {
      */
     private List<InternalSession> getValidInternalSessions() {
 
-        synchronized (cache) {
-            List<InternalSession> sessions = new ArrayList<InternalSession>(cache.getAllSessions());
-            org.apache.commons.collections.CollectionUtils.filter(sessions, new Predicate() {
-                @Override
-                public boolean evaluate(Object o) {
-                    InternalSession s = (InternalSession) o; // Apache Commons is old.
-                    if (s.getState() != VALID) {
-                        return false;
-                    }
-                    if (s.isAppSession() && !serviceConfig.isReturnAppSessionEnabled()) {
-                        return false;
-                    }
-                    return true;
+        synchronized (sessionAccessManager) {
+            List<InternalSession> sessions = new ArrayList<>();
+            for (InternalSession session : sessionAccessManager.getAllInternalSessions()) {
+                if (session.getState() == VALID
+                        && (!session.isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
+                    sessions.add(session);
                 }
-            });
+            }
             return sessions;
         }
     }
@@ -817,19 +453,8 @@ public class SessionService {
      * @param reset
      * @throws SessionException
      */
-    public SessionInfo getSessionInfo(SessionID sid, boolean reset)
-            throws SessionException {
-
-        if (statelessSessionManager.containsJwt(sid)) {
-            return statelessSessionManager.getSessionInfo(sid);
-        }
-        // Session is not stateless, continue through the code...
-
-        InternalSession sess = resolveToken(sid);
-        if (reset) {
-            sess.setLatestAccessTime();
-        }
-        return sessionInfoFactory.getSessionInfo(sess, sid);
+    public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
+        return sessionOperationStrategy.getOperation(sid).getSessionInfo(sid, reset);
     }
 
     /**
@@ -847,26 +472,26 @@ public class SessionService {
         }
 
         try {
-            AMIdentity user = getUser(s);
-            Set orgList = user.getAttribute("iplanet-am-session-get-valid-sessions");
-            if (orgList == null) {
-                orgList = Collections.EMPTY_SET;
-            }
 
             SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
-            Set<SessionInfo> infos = new HashSet<>(sessions.getSearchResults().size());
-
-            // top level admin gets all sessions
-            boolean isTopLevelAdmin = hasTopLevelAdminRole(s);
-
-            for (InternalSession sess : sessions.getSearchResults()) {
-                if (isTopLevelAdmin || orgList.contains(sess.getClientDomain())) {
-                    SessionInfo info = sess.toSessionInfo();
-                    // replace session id with session handle to prevent impersonation
-                    info.setSessionID(sess.getSessionHandle());
-                    infos.add(info);
-                }
+            Set<SessionID> sessionIdList = new HashSet<>();
+            for (InternalSession session : sessions.getSearchResults()) {
+                sessionIdList.add(session.getSessionID());
             }
+
+            Collection<InternalSession> sessionsWithPermission = sessionChangeAuthorizer.filterPermissionToAccess(
+                    s.getSessionID(), sessions.getSearchResults());
+
+
+            Set<SessionInfo> infos = new HashSet<>(sessionsWithPermission.size());
+
+            for (InternalSession session : sessionsWithPermission) {
+                SessionInfo info = session.toSessionInfo();
+                // replace session id with session handle to prevent impersonation
+                info.setSessionID(session.getSessionHandle());
+                infos.add(info);
+            }
+
             return new SearchResults<>(sessions.getTotalResultCount(), infos, sessions.getErrorCode());
         } catch (Exception e) {
             throw new SessionException(e);
@@ -874,208 +499,55 @@ public class SessionService {
     }
 
     /**
-     * Checks if the requester has the necessary permission to destroy the provided session. The user has the necessary
-     * privileges if one of these conditions is fulfilled:
-     * <ul>
-     *  <li>The requester attempts to destroy its own session.</li>
-     *  <li>The requester has top level admin role (having read/write access to any service configuration in the top
-     *  level realm).</li>
-     *  <li>The session's client domain is listed in the requester's profile under the
-     *  <code>iplanet-am-session-destroy-sessions service</code> service attribute.</li>
-     * </ul>
-     *
-     * @param requester The requester's session.
-     * @param sid The session to destroy.
-     * @throws SessionException If none of the conditions above is fulfilled, i.e. when the requester does not have the
-     * necessary permissions to destroy the session.
-     */
-    public void checkPermissionToDestroySession(Session requester, SessionID sid) throws SessionException {
-        if (requester.getState(false) != VALID) {
-            throw new SessionException(SessionBundle.getString("invalidSessionState") + sid.toString());
-        }
-        try {
-            // a session can destroy itself or super admin can destroy anyone including another super admin
-            if (requester.getID().equals(sid) || hasTopLevelAdminRole(requester)) {
-                return;
-            }
-
-            AMIdentity user = getUser(requester);
-            Set<String> orgList = user.getAttribute("iplanet-am-session-destroy-sessions");
-            if (!orgList.contains(requester.getClientDomain())) {
-                throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
-            }
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
-    }
-
-    /**
      * Logout the user.
      *
-     * @param session the session to log out
+     * @param session
      * @throws SessionException
      */
-    public void logout(final InternalSession session) throws SessionException {
-        logoutInternalSession(session.getID());
-    }
-
-    /**
-     * Logout the user.
-     *
-     * @param sessionId
-     * @throws SessionException
-     */
-    public void logout(final SessionID sessionId) throws SessionException {
-        if (sessionId == null || sessionId.isSessionHandle()) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + sessionId);
-        }
-        //if the provided sid was a restricted token, resolveToken will always validate the restriction, so there is no
-        //need to check restrictions here.
-        InternalSession session = resolveToken(sessionId);
-        logoutInternalSession(session.getID());
-    }
-
-    private void logoutInternalSession(final SessionID sessionId) {
-        InternalSession session = removeCachedInternalSession(sessionId);
-        if (session != null) {
-            session.delete();
-        }
-        if (session != null && session.getState() != INVALID) {
-            signalRemove(session, SessionEvent.LOGOUT);
-            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);
-        }
+    public void logout(final Session session) throws SessionException {
+        sessionOperationStrategy.getOperation(session.getSessionID()).logout(session);
     }
 
     /**
      * Adds listener to a Internal Sessions.
      *
-     * @param sid Session ID
+     * @param sessionId Session ID
      * @param url
      * @throws SessionException Session is null OR the Session is invalid
      */
-    public void addSessionListener(SessionID sid, String url) throws SessionException {
-        // We do not support session listeners for stateless sessions.
-        if (statelessSessionManager.containsJwt(sid)) {
-            return;
-        }
-
-        InternalSession session = resolveToken(sid);
-        if (session.getState() == INVALID) {
-            throw new SessionException(SessionBundle.getString("invalidSessionState") + sid.toString());
-        }
-        if (!sid.equals(session.getID()) && session.getRestrictionForToken(sid) == null) {
-            throw new IllegalArgumentException("Session id mismatch");
-        }
-        session.addSessionEventURL(url, sid);
+    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
+        sessionOperationStrategy.getOperation(sessionId).addSessionListener(sessionId, url);
     }
 
+    /**
+     * Returns current Notification queue size.
+     */
     public int getNotificationQueueSize() {
         return sessionNotificationSender.getNotificationQueueSize();
     }
 
+    /**
+     * Sends the Internal Session event to the SessionNotificationSender.
+     *
+     * @param internalSession Internal Session.
+     * @param eventType Event Type.
+     */
     public void sendEvent(InternalSession internalSession, int eventType) {
         sessionNotificationSender.sendEvent(internalSession, eventType);
-    }
-
-    /**
-     * Sets internal property to the Internal Session.
-     *
-     * @param sid
-     * @param name
-     * @param value
-     * @throws SessionException
-     */
-    public void setProperty(SessionID sid, String name, String value)
-            throws SessionException {
-        resolveToken(sid).putProperty(name, value);
     }
 
     /**
      * Given a restricted token, returns the SSOTokenID of the master token
      * can only be used if the requester is an app token
      *
-     * @param s            Must be an app token
+     * @param session Must be an app token
      * @param restrictedID The SSOTokenID of the restricted token
      * @return The SSOTokenID string of the master token
      * @throws SSOException If the master token cannot be dereferenced
      */
-    public String deferenceRestrictedID(Session s, String restrictedID)
-            throws SessionException {
-        SessionID rid = new SessionID(restrictedID);
-
-        //first try
-        String hostServerID = getCurrentHostServer(rid);
-
-        if (!serverConfig.isLocalServer(hostServerID)) {
-            if (!checkServerUp(hostServerID)) {
-                hostServerID = getCurrentHostServer(rid);
-            }
-
-            if (!serverConfig.isLocalServer(hostServerID)) {
-                String masterID = deferenceRestrictedIDRemotely(
-                        s, sessionServiceURLService.getSessionServiceURL(hostServerID), rid);
-
-                if (masterID == null) {
-                    //TODO consider one retry attempt
-                    throw new SessionException("unable to get master id remotely " + rid);
-                } else {
-                    return masterID;
-                }
-            }
-        }
-
-        return resolveRestrictedToken(rid, false).getID().toString();
-    }
-
-    // sjf bug 6797573
-    public String deferenceRestrictedIDRemotely(Session s, URL hostServerID, SessionID sessionID) {
-        DataInputStream in = null;
-        DataOutputStream out = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.DEREFERENCE_RESTRICTED_TOKEN_ID;
-
-            URL url = serverConfig.createServerURL(hostServerID, "GetHttpSession" + query);
-
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, s.getID(), null);
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/octet-stream");
-
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bs);
-
-            ds.writeUTF(sessionID.toString());
-            ds.flush();
-            ds.close();
-
-            byte[] getRemotePropertyString = bs.toByteArray();
-
-            conn.setRequestProperty("Content-Length",
-                    Integer.toString(getRemotePropertyString.length));
-
-            out = new DataOutputStream(conn.getOutputStream());
-
-            out.write(getRemotePropertyString);
-            out.close();
-            out = null;
-
-            in = new DataInputStream(conn.getInputStream());
-
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            return in.readUTF();
-
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to dereference the master token remotely", ex);
-        } finally {
-            IOUtils.closeIfNotNull(in);
-            IOUtils.closeIfNotNull(out);
-        }
-
-        return null;
+    public String deferenceRestrictedID(Session session, String restrictedID) throws SessionException {
+        SessionID sessionId = new SessionID(restrictedID);
+        return sessionOperationStrategy.getOperation(session.getSessionID()).deferenceRestrictedID(session, sessionId);
     }
 
     /**
@@ -1083,28 +555,15 @@ public class SessionService {
      * protected
      *
      * @param clientToken - Token of the client setting external property.
-     * @param sid
+     * @param sessionId
      * @param name
      * @param value
      * @throws SessionException
      */
-    public void setExternalProperty(SSOToken clientToken, SessionID sid,
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId,
                                     String name, String value)
             throws SessionException {
-        resolveToken(sid).putExternalProperty(clientToken, name, value);
-    }
-
-    /**
-     * Utility helper method to obtain session repository reference
-     *
-     * @return reference to session repository
-     */
-    // TODO: Use coreTokenService field directly since it should be set in constructor?
-    protected CTSPersistentStore getRepository() {
-        if (coreTokenService == null) {
-            coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
-        }
-        return coreTokenService;
+        sessionOperationStrategy.getOperation(sessionId).setExternalProperty(clientToken, sessionId, name, value);
     }
 
     /**
@@ -1114,21 +573,13 @@ public class SessionService {
      * releasing a session which no longer "belongs locally" (e.g., due to
      * primary server instance restart)
      *
-     * @param sid session id
+     * @param sessionId session id
      * @return server id for the server instance determined to be the current
      *         host
      * @throws SessionException
      */
-    public String getCurrentHostServer(SessionID sid) throws SessionException {
-
-        String serverId = getClusterMonitor().getCurrentHostServer(sid);
-
-        // if we have a local session replica, discard it as hosting server instance is not supposed to be local
-        if (!serverConfig.isLocalServer(serverId)) {
-            // actively clean up duplicates
-            handleReleaseSession(sid);
-        }
-        return serverId;
+    public String getCurrentHostServer(SessionID sessionId) throws SessionException {
+        return foreignSessionHandler.getCurrentHostServer(sessionId);
     }
 
     /**
@@ -1138,12 +589,7 @@ public class SessionService {
      * @return true if server is up, false otherwise
      */
     public boolean checkServerUp(String serverID) {
-        try {
-            return getClusterMonitor().checkServerUp(serverID);
-        } catch (SessionException e) {
-            sessionDebug.error("Failed to check Server Up for {0}", serverID, e);
-            return false;
-        }
+        return servicesClusterMonitorHandler.checkServerUp(serverID);
     }
 
     /**
@@ -1153,17 +599,12 @@ public class SessionService {
      * @return True if the Site is up, False if it failed to respond to a query.
      */
     public boolean isSiteUp(String siteId) {
-        try {
-            return getClusterMonitor().isSiteUp(siteId);
-        } catch (SessionException e) {
-            sessionDebug.error("Failed to check isSiteUp for {0}", siteId, e);
-            return false;
-        }
+        return servicesClusterMonitorHandler.isSiteUp(siteId);
     }
 
     /**
      * This method will execute all the globally set session timeout handlers
-     * with the corresponding timeout event simultaniously.
+     * with the corresponding timeout event simultaneously.
      *
      * @param sessionId  The timed out sessions ID
      * @param changeType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
@@ -1175,7 +616,7 @@ public class SessionService {
         if (!handlers.isEmpty()) {
             try {
                 final SSOToken token = ssoTokenManager.createSSOToken(sessionId.toString());
-                final List<Future<?>> futures = new ArrayList<Future<?>>();
+                final List<Future<?>> futures = new ArrayList<>();
                 final CountDownLatch latch = new CountDownLatch(handlers.size());
 
                 for (final String clazz : handlers) {
@@ -1231,60 +672,6 @@ public class SessionService {
     }
 
     /**
-     * Returns the User of the Session
-     *
-     * @param session Session
-     * @throws SessionException
-     * @throws SSOException
-     */
-    private AMIdentity getUser(Session session) throws SessionException, SSOException {
-        SSOToken ssoSession = ssoTokenManager.createSSOToken(session.getID().toString());
-        AMIdentity user = null;
-        try {
-            user = IdUtils.getIdentity(ssoSession);
-        } catch (IdRepoException e) {
-            sessionDebug.error("SessionService: failed to get the user's identity object", e);
-        }
-        return user;
-    }
-
-    /**
-     * Returns true if the user has top level admin role
-     *
-     * @param session Session.
-     * @throws SessionException
-     * @throws SSOException
-     */
-    private boolean hasTopLevelAdminRole(Session session) throws SessionException, SSOException {
-        SSOToken ssoSession = ssoTokenManager.createSSOToken(session.getID().toString());
-        return hasTopLevelAdminRole(ssoSession, session.getClientID());
-    }
-
-    /**
-     * Returns true if the user has top level admin role
-     *
-     * @param tokenUsedForSearch Single Sign on token used to do the search.
-     * @param clientID           Client ID of the login user.
-     * @throws SessionException
-     * @throws SSOException
-     */
-    private boolean hasTopLevelAdminRole(SSOToken tokenUsedForSearch, String clientID)
-            throws SessionException, SSOException {
-
-        boolean topLevelAdmin = false;
-        Set actions = CollectionUtils.asSet(PERMISSION_READ, PERMISSION_MODIFY, PERMISSION_DELEGATE);
-        try {
-            DelegationPermission perm = new DelegationPermission(
-                    "/", "*", "*", "*", "*", actions, Collections.EMPTY_MAP);
-            DelegationEvaluator evaluator = new DelegationEvaluatorImpl();
-            topLevelAdmin = evaluator.isAllowed(tokenUsedForSearch, perm, Collections.EMPTY_MAP);
-        } catch (DelegationException de) {
-            sessionDebug.error("SessionService.hasTopLevelAdminRole: failed to check the delegation permission.", de);
-        }
-        return topLevelAdmin;
-    }
-
-    /**
      * Returns true if the user is super user
      *
      * @param uuid the uuid of the login user
@@ -1318,192 +705,6 @@ public class SessionService {
     }
 
     /**
-     * Removes InternalSession from the session table so that another server
-     * instance can be an owner This is the server side of distributed
-     * invocation initiated by calling releaseSession()
-     *
-     * @param sid session id of the session migrated
-     */
-    int handleReleaseSession(SessionID sid) {
-        // switch to non-local mode for cached client side session image
-        if (sessionCache.hasSession(sid)) {
-            sessionCache.readSession(sid).setSessionIsLocal(false);
-        }
-
-        InternalSession is = cache.remove(sid);
-        if (is != null) {
-            is.cancel();
-        } else {
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("releaseSession: session not found " + sid);
-            }
-        }
-        return HttpURLConnection.HTTP_OK;
-    }
-
-    /**
-     * This will recover the specified session from the repository, and add it to the cache.
-     * Returns null if no session was recovered.
-     * @param sid Session ID
-     */
-    InternalSession recoverSession(SessionID sid) {
-
-        InternalSession sess = null;
-
-        try {
-            String tokenId = tokenIdFactory.toSessionTokenId(sid);
-            Token token = getRepository().read(tokenId);
-            if (token == null) {
-                return null;
-            }
-            /**
-             * As a side effect of deserialising an InternalSession, we must trigger
-             * the InternalSession to reschedule its timing task to ensure it
-             * maintains the session expiry function.
-             */
-            sess = tokenAdapter.fromToken(token);
-            sess.setSessionServiceDependencies(
-                    this, serviceConfig, sessionLogging, sessionAuditor, sessionDebug);
-            sess.scheduleExpiry();
-            updateSessionMaps(sess);
-
-        } catch (CoreTokenException e) {
-            sessionDebug.error("Failed to retrieve new session", e);
-        }
-        return sess;
-    }
-
-    /**
-     * Utility used to updated various cross-reference mapping data structures
-     * associated with sessions up-to-date when sessions are being recovered
-     * after server instance failure
-     *
-     * @param sess session object
-     */
-    private void updateSessionMaps(InternalSession sess) {
-        if (null == sess) {
-            return;
-        }
-        if (destroySessionIfNecessary(sess)) {
-            return;
-        }
-
-        sess.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
-        SessionID sid = sess.getID();
-        String primaryID = sid.getExtension().getPrimaryID();
-        if (!serverConfig.isLocalServer(primaryID)) {
-            remoteSessionSet.add(sid);
-        }
-        cache.put(sess);
-    }
-
-    /**
-     * function to remove remote sessions when primary server is up
-     */
-    public void cleanUpRemoteSessions() {
-        synchronized (remoteSessionSet) {
-            for (Iterator iter = remoteSessionSet.iterator(); iter.hasNext(); ) {
-                SessionID sid = (SessionID) iter.next();
-                // getCurrentHostServer automatically releases local
-                // session replica if it does not belong locally
-                String hostServer = null;
-                try {
-                    hostServer = getCurrentHostServer(sid);
-                } catch (Exception ex) {
-                }
-                // if session does not belong locally remove it
-                if (!serverConfig.isLocalServer(hostServer)) {
-                    iter.remove();
-                }
-            }
-        }
-    }
-
-    /**
-     * Utility method to check if session has to be destroyed and to remove it
-     * if so.
-     *
-     * @param sess session object
-     * @return true if session should (and has !) been destroyed
-     */
-    boolean destroySessionIfNecessary(InternalSession sess) {
-        boolean wasDestroyed = false;
-        try {
-            wasDestroyed = sess.destroyIfNecessary();
-        } catch (Exception ex) {
-            sessionDebug.error("Exception in session destroyIfNecessary() : ", ex);
-            wasDestroyed = true;
-        }
-
-        if (wasDestroyed) {
-            try {
-                removeCachedInternalSession(sess.getID());
-            } catch (Exception ex) {
-                sessionDebug.error("Exception while removing session : ", ex);
-            }
-        }
-        return wasDestroyed;
-    }
-
-    /**
-     * This method is used to create restricted token
-     *
-     * @param owner       server instance URL
-     * @param masterSid   SessionID
-     * @param restriction restriction
-     */
-    private String getRestrictedTokenIdRemotely(URL owner, SessionID masterSid, TokenRestriction restriction) {
-
-        DataInputStream in = null;
-        DataOutputStream out = null;
-
-        try {
-            String query = "?" + GetHttpSession.OP + "=" + GetHttpSession.GET_RESTRICTED_TOKEN_OP;
-
-            URL url = serverConfig.createServerURL(owner, "GetHttpSession" + query);
-
-            HttpURLConnection conn = httpConnectionFactory.createSessionAwareConnection(url, masterSid, null);
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/octet-stream");
-
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            DataOutputStream ds = new DataOutputStream(bs);
-
-            ds.writeUTF(TokenRestrictionFactory.marshal(restriction));
-            ds.flush();
-            ds.close();
-
-            byte[] marshalledRestriction = bs.toByteArray();
-
-            conn.setRequestProperty("Content-Length", Integer.toString(marshalledRestriction.length));
-
-            out = new DataOutputStream(conn.getOutputStream());
-
-            out.write(marshalledRestriction);
-            out.close();
-            out = null;
-
-            in = new DataInputStream(conn.getInputStream());
-
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            return in.readUTF();
-
-        } catch (Exception ex) {
-            sessionDebug
-                    .error("Failed to create restricted token remotely", ex);
-        } finally {
-            IOUtils.closeIfNotNull(in);
-            IOUtils.closeIfNotNull(out);
-        }
-
-        return null;
-    }
-
-    /**
      * This method is the "server side" of the getRestrictedTokenIdRemotely()
      *
      * @param masterSid   SessionID
@@ -1512,7 +713,7 @@ public class SessionService {
     String handleGetRestrictedTokenIdRemotely(SessionID masterSid,
                                               TokenRestriction restriction) {
         try {
-            return doGetRestrictedTokenId(masterSid, restriction);
+            return sessionOperationStrategy.getOperation(masterSid).getRestrictedTokenId(masterSid, restriction);
         } catch (Exception ex) {
             sessionDebug.error("Failed to create restricted token remotely", ex);
         }
@@ -1520,54 +721,32 @@ public class SessionService {
     }
 
     /**
-     * Writes the current state of the token down to the repository.
+     * Returns true if the URL is the URL of the local session service.
      *
-     * @param session Session Object
+     * @param svcurl the url to check
+     * @return true if the url represents the local session service.
      */
-    void save(InternalSession session) {
-        // do not save sessions which never expire
-        if (!session.willExpire()) {
-            return;
-        }
-        try {
-            getRepository().update(tokenAdapter.toToken(session));
-        } catch (Exception e) {
-            sessionDebug.error("SessionService.save: " + "exception encountered", e);
-        }
-    }
-
-    public boolean isSiteEnabled() {
-        return serverConfig.isSiteEnabled();
-    }
-
-    public boolean isReducedCrossTalkEnabled() {
-        return serviceConfig.isReducedCrossTalkEnabled();
-    }
-
-    public boolean isLocalSite(SessionID id) {
-        return serverConfig.isLocalSite(id);
-    }
-
     public boolean isLocalSessionService(URL svcurl) {
         return serverConfig.isLocalSessionService(svcurl);
     }
 
-    public long getReducedCrosstalkPurgeDelay() {
-        return serviceConfig.getReducedCrosstalkPurgeDelay();
-    }
-
+    /**
+     * Determines if the Maximum  umber of active sessions has been reached.
+     * @return true if the maximum number of sessions has ben reached.
+     */
     public boolean hasExceededMaxSessions() {
         return monitoringOperations.getActiveSessions() >= serviceConfig.getMaxSessions();
     }
+
+    /**
+     * Gets the AM Server ID.
+     * @return the AM Server Id or null if WebtopNaming was unable to detmin the ID of this server.
+     */
     public static String getAMServerID() {
-        String serverid;
-
         try {
-            serverid = WebtopNaming.getAMServerID();
+            return WebtopNaming.getAMServerID();
         } catch (Exception le) {
-            serverid = null;
+            return null;
         }
-
-        return serverid;
     }
 }

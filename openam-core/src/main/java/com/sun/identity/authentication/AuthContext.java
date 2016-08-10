@@ -2379,7 +2379,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 ssoTokenID = ssoToken.getTokenID().toString();
                 
             } else {
-                InjectorHolder.getInstance(SessionService.class).destroyInternalSession(oldSess.getID());
+                InjectorHolder.getInstance(SessionService.class).destroyAuthenticationSession(oldSess.getID());
             }
         }
         localSessionChecked = true;

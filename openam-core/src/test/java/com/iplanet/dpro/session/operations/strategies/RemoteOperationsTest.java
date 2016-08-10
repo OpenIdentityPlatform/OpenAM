@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -19,10 +19,17 @@ import com.iplanet.dpro.session.Requests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.HttpConnectionFactory;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,31 +45,41 @@ import static org.mockito.Mockito.verify;
 
 public class RemoteOperationsTest {
 
-    private Requests mockRequests;
     private RemoteOperations remoteOperations;
+
+    @Mock
+    private Requests mockRequests;
+    @Mock
     private Session mockRequester;
+    @Mock
     private Session mockSession;
+    @Mock
     private SessionID mockRequesterId;
+    @Mock
     private SessionID mockSessionId;
+    @Mock
     private SessionResponse mockResponse;
+    @Mock
+    private ServicesClusterMonitorHandler mockServicesClusterMonitorHandler;
+    @Mock
+    private SessionServiceURLService mockSessionServiceURLService;
+    @Mock
+    private SessionServerConfig mockServerConfig;
+    @Mock
+    private HttpConnectionFactory mockHttpConnectionFactor;
 
     @BeforeMethod
     public void setup() throws SessionException {
-        mockRequester = mock(Session.class);
-        mockRequesterId = mock(SessionID.class);
+        MockitoAnnotations.initMocks(this);
         given(mockRequester.getID()).willReturn(mockRequesterId);
-        mockSession = mock(Session.class);
-        mockSessionId = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionId);
-
-        mockRequests = mock(Requests.class);
-        mockResponse = mock(SessionResponse.class);
         given(mockRequests.sendRequestWithRetry(
                 any(URL.class),
                 any(SessionRequest.class),
                 any(Session.class))).willReturn(mockResponse);
 
-        remoteOperations = new RemoteOperations(mock(Debug.class), mockRequests);
+        remoteOperations = new RemoteOperations(mock(Debug.class), mockRequests, mockServicesClusterMonitorHandler,
+                mockSessionServiceURLService, mockServerConfig, mockHttpConnectionFactor);
     }
 
     @Test

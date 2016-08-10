@@ -39,6 +39,8 @@ import org.forgerock.guice.core.InjectorHolder;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNaming;
 
@@ -134,9 +136,10 @@ public class SessionServiceURLService {
              */
             sid.validate();
 
-            SessionService ss = InjectorHolder.getInstance(SessionService.class);
-            if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
-                return getSessionServiceURL(ss.getCurrentHostServer(sid));
+            SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+            ForeignSessionHandler foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
+            if (sessionServerConfig.isSiteEnabled() && sessionServerConfig.isLocalSite(sid)) {
+                return getSessionServiceURL(foreignSessionHandler.getCurrentHostServer(sid));
             }
         } else {
             primaryId = sid.getExtension().getPrimaryID();

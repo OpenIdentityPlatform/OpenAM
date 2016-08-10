@@ -199,6 +199,9 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * @supported.api
  */
 public abstract class AMLoginModule implements LoginModule {
+
+    private final SessionCount sessionCount;
+
     // list which holds both presentation and credential callbacks
     List internal = null;
     // list which holds only credential callbacks
@@ -280,6 +283,7 @@ public abstract class AMLoginModule implements LoginModule {
     public AMLoginModule() {
         auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
         ad = AuthD.getAuth();
+        sessionCount = InjectorHolder.getInstance(SessionCount.class);
     }
     
     /**
@@ -2674,7 +2678,7 @@ public abstract class AMLoginModule implements LoginModule {
 
             if (univId != null) {
                 sessionQuota = getSessionQuota(amIdUser);
-                sessionCount = SessionCount.getAllSessionsByUUID(univId).size();
+                sessionCount = this.sessionCount.getAllSessionsByUUID(univId).size();
 
                 if (debug.messageEnabled()) {
                     debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
@@ -2743,7 +2747,7 @@ public abstract class AMLoginModule implements LoginModule {
             String univId = IdUtils.getUniversalId(amIdUser);
 
             if (univId != null) {
-                Map<String, String> currentSessions = SessionCount.getAllSessionsByUUID(univId);
+                Map<String, Long> currentSessions = sessionCount.getAllSessionsByUUID(univId);
                 SSOTokenManager manager = SSOTokenManager.getInstance();
 
                 for (String tokenID : currentSessions.keySet()) {

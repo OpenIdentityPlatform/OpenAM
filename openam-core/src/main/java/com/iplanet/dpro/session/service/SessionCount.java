@@ -41,7 +41,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.guice.core.InjectorHolder;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
@@ -51,14 +53,11 @@ import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.TimeUtils;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-
 
 /**
   * <code>SessionCount</code> represents the session count for a given user.
@@ -66,19 +65,20 @@ import com.sun.identity.shared.debug.Debug;
   */
 public class SessionCount {
 
-    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+    private final Debug debug;
+    private final boolean caseSensitiveUUID = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
+    private final CTSPersistentStore persistentStore;
 
-    private static boolean caseSensitiveUUID =
-        SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
+    @Inject
+    private SessionCount(@Named(SESSION_DEBUG) final Debug debugLogger,
+                         final CTSPersistentStore persistentStore) {
+        this.debug = debugLogger;
+        this.persistentStore = persistentStore;
 
-    private static final SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-
-    static {
         try {
             SSOTokenManager.getInstance();
         } catch (Exception ssoe) {
-            debug.error("SessionConstraint: Failied to get the "
-                    + "SSOTokenManager instance.");
+            debug.error("SessionConstraint: Failed to get the SSOTokenManager instance.");
         }
     }
 
@@ -93,7 +93,7 @@ public class SessionCount {
      *             if there is any problem with accessing the session
      *             repository.
      */
-    public static Map getAllSessionsByUUID(String uuid) throws SessionException {
+    public Map<String, Long> getAllSessionsByUUID(String uuid) throws SessionException {
         if (!caseSensitiveUUID) {
             uuid = uuid.toLowerCase();
         }
@@ -114,9 +114,8 @@ public class SessionCount {
         return sessions;
     }
 
-    private static Map<String, Long> getSessionsFromRepository(String uuid) throws CoreTokenException {
+    private Map<String, Long> getSessionsFromRepository(String uuid) throws CoreTokenException {
 
-        CTSPersistentStore repo = sessionService.getRepository();
         try {
             // Filter and Query the CTS
             TokenFilter filter = new TokenFilterBuilder()
@@ -125,7 +124,7 @@ public class SessionCount {
                     .and()
                     .withAttribute(CoreTokenField.USER_ID, uuid)
                     .build();
-            Collection<PartialToken> partialTokens = repo.attributeQuery(filter);
+            Collection<PartialToken> partialTokens = persistentStore.attributeQuery(filter);
 
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(

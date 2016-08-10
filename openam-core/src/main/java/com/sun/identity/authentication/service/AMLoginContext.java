@@ -631,7 +631,7 @@ public class AMLoginContext {
                                         authContext.getLoginState().getUserDN()), true);
                             }
                             loginStatus.setStatus(LoginStatus.AUTH_SUCCESS);
-                            authContext.getLoginState().updateSessionForFailover();
+                            authContext.getLoginState().persistSession();
                             debug.message("login success");
                         } else {
                             logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED,

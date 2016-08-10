@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,7 @@
  */
 package com.iplanet.dpro.session.operations;
 
-import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 
 /**
@@ -39,7 +39,7 @@ public class RemoteSessionOperationStrategy implements SessionOperationStrategy 
      * {@inheritDoc}
      */
     @Override
-    public SessionOperations getOperation(Session session) {
+    public SessionOperations getOperation(SessionID sessionID) {
         return remoteOperations;
     }
 }

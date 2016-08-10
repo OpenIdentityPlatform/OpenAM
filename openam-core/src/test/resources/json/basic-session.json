@@ -4,6 +4,7 @@
     "cookieMode": null,
     "cookieStr": null,
     "creationTime": 0,
+    "isSessionUpgrade": false,
     "latestAccessTime": 0,
     "maxCachingTime": 0,
     "maxIdleTime": 0,

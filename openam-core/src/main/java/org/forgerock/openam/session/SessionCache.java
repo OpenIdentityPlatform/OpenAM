@@ -46,7 +46,7 @@ import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.session.util.RestrictedTokenContext;
@@ -365,9 +365,9 @@ public class SessionCache {
      */
     private long getPurgeDelayForReducedCrosstalk() {
         if (SystemProperties.isServerMode()) {
-            SessionService ss = InjectorHolder.getInstance(SessionService.class);
-            if (ss.isReducedCrossTalkEnabled()) {
-                return ss.getReducedCrosstalkPurgeDelay();
+            SessionServiceConfig sessionServiceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
+            if (sessionServiceConfig.isReducedCrossTalkEnabled()) {
+                return sessionServiceConfig.getReducedCrosstalkPurgeDelay();
             }
         }
         return 0;

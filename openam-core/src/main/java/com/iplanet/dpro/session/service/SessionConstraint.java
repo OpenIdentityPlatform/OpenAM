@@ -139,8 +139,7 @@ public class SessionConstraint {
 	// AM servers and/or session repository
 	Map sessions = null;
 	try {
-	    sessions  =
-		SessionCount.getAllSessionsByUUID(is.getUUID());
+	    sessions = InjectorHolder.getInstance(SessionCount.class).getAllSessionsByUUID(is.getUUID());
 	} catch (Exception e) {
 	    if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
 		if (debug.messageEnabled()) {
@@ -240,9 +239,9 @@ public class SessionConstraint {
     }
 
     /*
-    * Gets the admin token for checking the session constraints for the users
-    * @return admin <code>SSOToken</code>
-    */
+     * Gets the admin token for checking the session constraints for the users
+     * @return admin <code>SSOToken</code>
+     */
     private static SSOToken getAdminToken() {
         if (adminToken == null) {
             try {

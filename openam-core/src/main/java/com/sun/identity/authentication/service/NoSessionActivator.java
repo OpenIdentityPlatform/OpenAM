@@ -42,7 +42,7 @@ enum NoSessionActivator implements SessionActivator {
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
                                    final InternalSession authSession, final Subject subject,
                                    final LoginContext loginContext) {
-        sessionService.destroyInternalSession(authSession.getID());
+        sessionService.destroyAuthenticationSession(authSession.getID());
         return true;
     }
 }

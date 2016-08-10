@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.authentication.service.LoginContext;
+import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionMeta;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -113,9 +114,10 @@ import com.sun.identity.shared.debug.Debug;
  * </pre>
  *
  */
-public class InternalSession implements Serializable {
+public class InternalSession implements Serializable, AMSession {
+
     /*
-     *Logging message
+     * Logging message
      */
     private static final String LOG_MSG_SESSION_MAX_LIMIT_REACHED = "SESSION_MAX_LIMIT_REACHED";
 
@@ -168,7 +170,7 @@ public class InternalSession implements Serializable {
     private String clientDomain;
     private Properties sessionProperties; // e.g. LoginURL, Timeout, Host, etc
     private boolean willExpireFlag;
-    private transient boolean isSessionUpgrade = false;
+    private boolean isSessionUpgrade = false;
     private Boolean cookieMode = null;
     private String cookieStr;
     private transient AuthContextLocal authContext;
@@ -330,7 +332,7 @@ public class InternalSession implements Serializable {
      */
     public void setType(int type) {
         sessionType = type;
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -349,7 +351,7 @@ public class InternalSession implements Serializable {
      */
     public void setClientID(String id) {
         clientID = id;
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -369,7 +371,7 @@ public class InternalSession implements Serializable {
      */
     public void setClientDomain(String domain) {
         clientDomain = domain;
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -395,7 +397,7 @@ public class InternalSession implements Serializable {
         if (taskRunnable.isScheduled() && mayReschedule) {
             reschedule();
         }
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -422,7 +424,7 @@ public class InternalSession implements Serializable {
         if (taskRunnable.isScheduled() && (mayReschedule || reschedulePossible)) {
             reschedule();
         }
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -442,7 +444,7 @@ public class InternalSession implements Serializable {
      */
     public void setMaxCachingTime(long t) {
         maxCachingTimeInMinutes = t;
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -542,7 +544,7 @@ public class InternalSession implements Serializable {
     public boolean hasAuthenticationContext() {
         return null != authContext;
     }
-    
+
     /**
      * Sets the authentication context.
      *
@@ -726,7 +728,7 @@ public class InternalSession implements Serializable {
      * @exception SessionException is thrown if the key is protected property.
      *
      */
-    void putExternalProperty(SSOToken clientToken, String key, String value)
+    public void putExternalProperty(SSOToken clientToken, String key, String value)
         throws SessionException {
 		try {
         	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
@@ -804,7 +806,7 @@ public class InternalSession implements Serializable {
             sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
             sessionAuditor.auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED);
         }
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -816,6 +818,7 @@ public class InternalSession implements Serializable {
     */
     public void setIsSessionUpgrade(boolean value) {
         isSessionUpgrade = value;
+        sessionService.update(this);
     }
 
     /**
@@ -829,19 +832,11 @@ public class InternalSession implements Serializable {
     }
 
     /**
-     * Save this InternalSession to the repository. Also sets it up to save all future changes to the repository.
+     * Set whether this InternalSession is persisted.
+     * @param isStored True if the session is persisted, false otherwise.
      */
-    public void save() {
-        sessionService.save(this);
-        isISStored = true;
-    }
-
-    /**
-     * Delete this InternalSession from the repository. Changes will no longer trigger updates to the repository.
-     */
-    public void delete() {
-        sessionService.deleteFromRepository(this);
-        isISStored = false;
+    public void setStored(boolean isStored) {
+        isISStored = isStored;
     }
 
     /**
@@ -971,48 +966,35 @@ public class InternalSession implements Serializable {
     }
 
     /**
-     * Checks whether the session should be destroyed or not, and if so performs the operation.
+     * Checks whether the session should change state and returns the state that the session should be in.
      */
-    boolean destroyIfNecessary() {
+    public StateTransition checkSessionUpdate() {
         if (!willExpireFlag) {
-            return false;
+            return StateTransition.NO_CHANGE;
         }
-        SessionInfo sessionInfo = toSessionInfo();
-
         if (!isTimedOut()) {
             if (isInvalid()) {
                 if (checkInvalidSessionDefaultIdleTime()) {
-                    setState(DESTROYED);
-                    sessionService.sendEvent(this, SessionEvent.DESTROY);
-                    return true;
+                    return StateTransition.DESTROY;
                 } else {
-                    return false;
+                    return StateTransition.NO_CHANGE;
                 }
             }
 
             if (getTimeLeft() == 0) {
-                changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_MAX_TIMED_OUT);
-                return false;
+                return StateTransition.MAX_TIMEOUT;
             }
 
             if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes) && sessionState != INACTIVE) {
-                changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_IDLE_TIMED_OUT);
-                return false;
+                return StateTransition.IDLE_TIMEOUT;
             }
-            return false;
+            return StateTransition.NO_CHANGE;
         } else {
             // do something special for the timed out sessions
             if (getTimeLeftBeforePurge() <= 0) {
-                // destroy the session
-                sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-                setState(DESTROYED);
-                sessionService.sendEvent(this, SessionEvent.DESTROY);
-                return true;
+                return StateTransition.PURGE;
             } else {
-                return false;
+                return StateTransition.NO_CHANGE;
             }
         }
     }
@@ -1020,8 +1002,11 @@ public class InternalSession implements Serializable {
     /**
      * Changes the state of the session and sends Session Notification when
      * session times out.
+     *
+     * TODO: This logic should be moved into LocalOperations once InternalSessionTaskRunnable is removed.
+     *
      */
-    private void changeStateAndNotify(int eventType) {
+    public void changeStateAndNotify(int eventType) {
         sessionLogging.logEvent(toSessionInfo(), eventType);
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
         putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds));
@@ -1038,6 +1023,13 @@ public class InternalSession implements Serializable {
             trimSession();
         }
         sessionService.sendEvent(this, eventType);
+    }
+
+    /**
+     * Changes the state of the session. Does not notify SessionService, or anything else using Session Notification.
+     */
+    public void changeStateWithoutNotify(int state) {
+        this.sessionState = state;
     }
 
     public SessionInfo toSessionInfo() {
@@ -1099,11 +1091,11 @@ public class InternalSession implements Serializable {
      *
      * Once updated the Session will be persisted.
      */
-    void setLatestAccessTime() {
+    public void setLatestAccessTime() {
         long oldLatestAccessTime = latestAccessTimeInSeconds;
         latestAccessTimeInSeconds = currentTimeMillis() / 1000;
         if ((latestAccessTimeInSeconds - oldLatestAccessTime) > interval) {
-            update();
+            sessionService.update(this);
         }
     }
 
@@ -1112,9 +1104,9 @@ public class InternalSession implements Serializable {
      *
      * @param state
      */
-    void setState(int state) {
+    public void setState(int state) {
         sessionState = state;
-        update();
+        sessionService.update(this);
     }
 
     /**
@@ -1165,7 +1157,7 @@ public class InternalSession implements Serializable {
      * @param url The listening URL.
      * @param sid The associated SessionID.
      */
-    void addSessionEventURL(String url, SessionID sid) {
+    public void addSessionEventURL(String url, SessionID sid) {
 
         Set<SessionID> sids = sessionEventURLs.get(url);
         if (sids == null) {
@@ -1177,7 +1169,7 @@ public class InternalSession implements Serializable {
         }
 
         if (sids.add(sid))  {
-            update();
+            sessionService.update(this);
         }
     }
 
@@ -1215,7 +1207,7 @@ public class InternalSession implements Serializable {
      * Returns the value of willExpireFlag.
      *
      */
-    boolean willExpire() {
+    public boolean willExpire() {
         return willExpireFlag;
     }
 
@@ -1244,11 +1236,11 @@ public class InternalSession implements Serializable {
      * @return The existing session ID instance if this TokenRestriction was already mapped to a session ID,
      * <code>null</code> otherwise.
      */
-    SessionID addRestrictedToken(SessionID sid, TokenRestriction restriction) {
+    public SessionID addRestrictedToken(SessionID sid, TokenRestriction restriction) {
         SessionID previousValue = restrictedTokensByRestriction.putIfAbsent(restriction, sid);
         if (previousValue == null) {
             restrictedTokensBySid.put(sid, restriction);
-            update();
+            sessionService.update(this);
             return null;
         }
         return previousValue;
@@ -1264,7 +1256,7 @@ public class InternalSession implements Serializable {
         return restrictedTokensBySid.get(sid);
     }
 
-    SessionID getRestrictedTokenForRestriction(TokenRestriction restriction) {
+    public SessionID getRestrictedTokenForRestriction(TokenRestriction restriction) {
         return restrictedTokensByRestriction.get(restriction);
     }
 
@@ -1291,21 +1283,7 @@ public class InternalSession implements Serializable {
     }
 
     /**
-     * Update
-     */
-    private void update() {
-        if (isISStored) {
-            if (sessionState != VALID) {
-                delete();
-            } else if (!isTimedOut() || purgeDelayInSeconds > 0) {
-                // Only save if we are not about to delete the session anyway.
-                save();
-            }
-        }
-    }
-
-    /**
-     * Incase of session timeout the session is trimmed to reduce the memory
+     * In case of session timeout the session is trimmed to reduce the memory
      * overhead. Even if the session lives in the server for the extra time out
      * period, the memory is not abused. Instance variables preserved are, 1)
      * sessionID 2) timedOutAt 3) clientID 4) purgeDelayInSeconds 5)
@@ -1634,5 +1612,16 @@ public class InternalSession implements Serializable {
         private void setNonExpiring() {
             timerPool = null;
         }
+    }
+
+    /**
+     * Simple enumeration to report how the session is changing in state
+     */
+    public enum StateTransition {
+        DESTROY,
+        MAX_TIMEOUT,
+        IDLE_TIMEOUT,
+        NO_CHANGE,
+        PURGE
     }
 }

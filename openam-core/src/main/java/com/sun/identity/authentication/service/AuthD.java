@@ -49,6 +49,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.authentication.service.AuthSessionFactory;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -170,15 +171,6 @@ public class AuthD implements ConfigurationListener {
      */  
     static final int LOG_ERROR  = 1;
 
-    /**
-     * Configured directory server host name for auth
-     */
-    public static final String directoryHostName = SystemProperties.get(Constants.AM_DIRECTORY_HOST);
-    /**
-     * Configured directory server port number for auth
-     */
-    public static final int directoryPort = SystemProperties.getAsInt(Constants.AM_DIRECTORY_PORT, 0);
-
     private static final boolean logStatus = "ACTIVE".equalsIgnoreCase(SystemProperties.get(Constants.AM_LOGSTATUS,
             "INACTIVE"));
     /**
@@ -227,12 +219,7 @@ public class AuthD implements ConfigurationListener {
 
     private final String rootSuffix;
 
-    static {
-        if (debug.messageEnabled()) {
-            debug.message("Directory Host: "+ directoryHostName +
-            "\nDirectory PORT : "+ directoryPort);
-        }
-    }
+    private static AuthSessionFactory authSessionFactory = InjectorHolder.getInstance(AuthSessionFactory.class);
     
 
     private AuthD() {
@@ -536,7 +523,7 @@ public class AuthD implements ConfigurationListener {
      * @param sid <code>SessionID</code> to be destroyed
      */
     public void destroySession(SessionID sid) {
-        getSessionService().destroyInternalSession(sid);
+        getSessionService().destroyAuthenticationSession(sid);
     }
     
     /**
@@ -810,7 +797,7 @@ public class AuthD implements ConfigurationListener {
     }
 
     private Session initAuthSession() throws SSOException, SessionException {
-        final Session authSession = getSessionService().getAuthenticationSession(defaultOrg);
+        final Session authSession = authSessionFactory.getAuthenticationSession(defaultOrg);
         if (authSession == null) {
             debug.error("AuthD failed to get auth session");
             throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
@@ -819,8 +806,7 @@ public class AuthD implements ConfigurationListener {
         String clientID = authSession.getClientID();
         authSession.setProperty("Principal", clientID);
         authSession.setProperty("Organization", defaultOrg);
-        authSession.setProperty("Host",
-                authSession.getID().getSessionServer());
+        authSession.setProperty("Host", authSession.getID().getSessionServer());
 
         if (LDAPUtils.isDN(clientID)) {
             String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
