@@ -14,14 +14,19 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-import { combineReducers } from "redux";
+import {
+    SERVER_ADD_REALM
+} from "../actions/types";
 
-import server from "./server";
-import session from "./session";
+const initialState = {
+    realm: undefined
+};
 
-const rootReducer = combineReducers({
-    server,
-    session
-});
+const server = function (state = initialState, action) {
+    switch (action.type) {
+        case SERVER_ADD_REALM: return { realm: action.absolutePath };
+        default: return state;
+    }
+};
 
-export default rootReducer;
+export default server;

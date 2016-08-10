@@ -20,8 +20,10 @@ define([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/services/ServerService",
     "org/forgerock/openam/ui/common/util/RealmHelper",
+    "store/actions/creators",
+    "store/index",
     "UserProfileView"
-], function ($, Configuration, Constants, ServerService, RealmHelper, UserProfileView) {
+], function ($, Configuration, Constants, ServerService, RealmHelper, creators, store, UserProfileView) {
     var obj = {},
         lastKnownSubRealm,
         lastKnownOverrideRealm,
@@ -55,7 +57,9 @@ define([
             }
         }
 
-        ServerService.getConfiguration({ suppressEvents: true }).then(function (response) {
+        ServerService.getConfiguration({ suppressEvents: true }).then((response) => {
+            store.default.dispatch(creators.serverAddRealm(response.realm));
+
             setRequireMapConfig(response);
             successCallback(response);
         }, errorCallback);

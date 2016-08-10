@@ -16,3 +16,5 @@
 
 export const SESSION_ADD_REALM = "session/ADD_REALM";
 export const SESSION_REMOVE_REALM = "session/REMOVE_REALM";
+
+export const SERVER_ADD_REALM = "server/ADD_REALM";
