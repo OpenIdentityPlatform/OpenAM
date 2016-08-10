@@ -29,6 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.AssertJUnit.*;
 import com.sun.identity.shared.encode.Base64;
+
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -558,5 +560,10 @@ public class ScriptResourceTest {
         scriptResource.actionCollection(context, request).getOrThrowUninterruptibly();
 
         // then - exception
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ScriptResource.class).hasValidAnnotations();
     }
 }

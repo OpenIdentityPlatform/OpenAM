@@ -3,33 +3,38 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>openam-examples</artifactId>
+        <artifactId>openam</artifactId>
         <groupId>org.forgerock.openam</groupId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>openam-example-api-descriptor</artifactId>
+    <name>OpenAM Test Utils</name>
+    <description>OpenAM test utilities</description>
+    <artifactId>openam-test-utils</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-i18n</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-resource</artifactId>
+            <artifactId>forgerock-util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>api-descriptor</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-test-utils</artifactId>
-            <scope>test</scope>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
-
 
 </project>

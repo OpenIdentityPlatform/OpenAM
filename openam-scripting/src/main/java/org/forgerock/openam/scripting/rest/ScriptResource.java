@@ -146,7 +146,7 @@ public class ScriptResource extends RealmAwareResource {
                                     description = SCRIPT_RESOURCE + "error.script.decode"),
                             @ApiError(code = 400,
                                     description = SCRIPT_RESOURCE + "error.script.language.not.supported")},
-                    description = SCRIPT_RESOURCE + "validate.action" + DESCRIPTION),
+                    description = SCRIPT_RESOURCE + "validate.action." + DESCRIPTION),
             request = @Schema(schemaResource = "ScriptResource.action.validate.request.schema.json"),
             response = @Schema(schemaResource = "ScriptResource.action.validate.response.schema.json"))
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {

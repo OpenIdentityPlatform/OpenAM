@@ -465,6 +465,7 @@
 
         <module>openam-time-travel</module>
         <module>openam-i18n</module>
+        <module>openam-test-utils</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -2009,6 +2010,12 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-client</artifactId>
                 <version>${activemq.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-test-utils</artifactId>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

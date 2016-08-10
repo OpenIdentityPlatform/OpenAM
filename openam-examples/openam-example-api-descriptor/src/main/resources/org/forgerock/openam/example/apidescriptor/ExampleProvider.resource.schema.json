@@ -1,11 +1,11 @@
 {
   "type": "object",
-  "description": "i18n:ExampleProvider#resource.description",
+  "description": "i18n:api-descriptor/ExampleProvider#resource.description",
   "properties": {
     "exampleProp": {
       "type": "string",
-      "title": "i18n:ExampleProvider#resource.description.exampleProp.title",
-      "description": "i18n:ExampleProvider#resource.description.exampleProp.description"
+      "title": "i18n:api-descriptor/ExampleProvider#resource.description.exampleProp.title",
+      "description": "i18n:api-descriptor/ExampleProvider#resource.description.exampleProp.description"
     }
   }
 }
