@@ -28,17 +28,31 @@ import org.forgerock.services.context.Context;
 public class RealmContext extends AbstractContext {
 
     private final Realm realm;
+    private final boolean viaDns;
 
     /**
-     * Constructs a new RealmContext.
+     * Constructs a new RealmContext for a realm determined from the request URI.
      *
      * @param parent The parent context.
      * @param realm The realm.
      * @since 14.0.0
      */
     public RealmContext(Context parent, Realm realm) {
+        this(parent, realm, false);
+    }
+
+    /**
+     * Constructs a new RealmContext.
+     *
+     * @param parent The parent context.
+     * @param realm The realm.
+     * @param viaDns {@code true} if the realm was determined from the DNS.
+     * @since 14.0.0
+     */
+    RealmContext(Context parent, Realm realm, boolean viaDns) {
         super(parent, "realm");
         this.realm = realm;
+        this.viaDns = viaDns;
     }
 
     /**
@@ -48,6 +62,15 @@ public class RealmContext extends AbstractContext {
      */
     public boolean isRootRealm() {
         return realm.equals(Realm.root());
+    }
+
+    /**
+     * Returns {@code true} if the realm was determined from the DNS.
+     *
+     * @return {@code true} if the realm was determined from the DNS.
+     */
+    boolean isViaDns() {
+        return viaDns;
     }
 
     /**

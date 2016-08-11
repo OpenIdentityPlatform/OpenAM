@@ -121,7 +121,7 @@ public class RealmRoutingFactory {
         @Override
         public Promise<Response, NeverThrowsException> filter(Context context, Request request, Handler handler) {
             try {
-                return handler.handle(new RealmContext(context, Realm.of(request.getUri().getHost())), request);
+                return handler.handle(new RealmContext(context, Realm.of(request.getUri().getHost()), true), request);
             } catch (RealmLookupException e) {
                 return Promises.newResultPromise(new Response(Status.BAD_REQUEST)
                         .setEntity(new BadRequestException("Realm \"" + e.getRealm() + "\" not found", e)
@@ -294,8 +294,15 @@ public class RealmRoutingFactory {
         if ("root".equalsIgnoreCase(realmPathElement)) {
             return Realm.root();
         } else if (context.containsContext(RealmContext.class)) {
-            Realm currentRealm = context.asContext(RealmContext.class).getRealm();
-            return Realm.of(currentRealm, realmPathElement);
+            RealmContext realmContext = context.asContext(RealmContext.class);
+            if (realmContext.isViaDns()) {
+                //If latest RealmContext is via DNS then we haven't seen the 'root' realm yet so treat as realm alias
+                return Realm.of(realmPathElement);
+            } else {
+                //Have seen the 'root' realm so treat as sub realm from previous realm
+                Realm currentRealm = realmContext.getRealm();
+                return Realm.of(currentRealm, realmPathElement);
+            }
         } else {
             throw new NoRealmFoundException(realmPathElement);
         }
