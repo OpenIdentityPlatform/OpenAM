@@ -19,7 +19,9 @@ import {
 } from "../actions/types";
 
 const initialState = {
-    info: undefined
+    info: {
+        realm: undefined
+    }
 };
 
 const server = function (state = initialState, action) {
