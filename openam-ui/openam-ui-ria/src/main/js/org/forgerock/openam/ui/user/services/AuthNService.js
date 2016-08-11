@@ -74,7 +74,7 @@ define([
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
         const urlAndParams = addQueryStringToUrl(
-            fetchUrl.default("/authenticate", { realm: store.default.getState().server.info.realm }),
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
             urlParamsFromObject(getURLParameters()
         ));
         const serviceCall = {
@@ -149,7 +149,7 @@ define([
             }
         };
         const urlAndParams = addQueryStringToUrl(
-            fetchUrl.default("/authenticate", { realm: store.default.getState().server.info.realm }),
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
             urlParamsFromObject(getURLParameters()
         ));
         const serviceCall = {

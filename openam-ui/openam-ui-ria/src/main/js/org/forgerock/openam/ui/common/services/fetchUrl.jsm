@@ -21,16 +21,12 @@ import store from "store/index";
 
 const ROOT_REALM_IDENTIFIER = "/root"; // TODO "root" is a placeholder. Identifier for a root realm yet undecided.
 const hasLeadingSlash = (value) => value[0] === "/";
-const throwIfNotAbsoluteRealm = (realm) => {
-    if (!hasLeadingSlash(realm)) {
-        throw new Error(`[fetchUrl] Realm must be absolute (start with forward slash). "${realm}"`);
-    }
-};
 const throwIfPathHasNoLeadingSlash = (path) => {
     if (!hasLeadingSlash(path)) {
         throw new Error(`[fetchUrl] Path must start with forward slash. "${path}"`);
     }
 };
+const normaliseRealmAliasResourcePath = (alias) => `/realms/${alias}`;
 const normaliseRealmResourcePath = (realm) => realm.replace(/\//g, "/realms/");
 const redesignateRootRealm = (realm, rootIdentifier) => {
     const isRootRealm = realm === "/";
@@ -42,11 +38,10 @@ const redesignateRootRealm = (realm, rootIdentifier) => {
  *
  * @param {string} path Path to the resource. Must start with a forward slash.
  * @param {Object} [options] Options to pass to this function.
- * @param {string} [options.realm=store.getState().session.realm] The realm to use when constructing the URL. Must be absolute.
+ * @param {string} [options.realm=store.getState().session.realm] The realm to use when constructing the URL. Maybe an absolute realm or alias.
  * @returns {string} URL string to be appended after the <code>.../json</code> path.
  *
  * @throws {Error} If path does not start with a forward slash.
- * @throws {Error} If realm is not absolute (does not start with a forward slash).
  *
  * @example // With session on the root realm
  * fetchUrl("/authentication") => "/realms/root/authentication"
@@ -56,14 +51,19 @@ const redesignateRootRealm = (realm, rootIdentifier) => {
  * fetchUrl("/authentication", { realm: "/myRealm" }) => "/realms/root/realms/myRealm/authentication"
  * @example // Forcing no realm
  * fetchUrl("/authentication", { realm: false }) => "/authentication"
+ * @example // With realm alias
+ * fetchUrl("/authentication", { realm: "myAlias" }) => "/realms/myAlias/authentication"
  */
 const fetchUrl = (path, { realm = store.getState().session.realm } = {}) => {
     throwIfPathHasNoLeadingSlash(path);
     if (!realm) { return path; }
 
-    throwIfNotAbsoluteRealm(realm);
-    realm = redesignateRootRealm(realm, ROOT_REALM_IDENTIFIER);
-    realm = normaliseRealmResourcePath(realm);
+    if (hasLeadingSlash(realm)) {
+        realm = redesignateRootRealm(realm, ROOT_REALM_IDENTIFIER);
+        realm = normaliseRealmResourcePath(realm);
+    } else {
+        realm = normaliseRealmAliasResourcePath(realm);
+    }
 
     return realm + path;
 };

@@ -15,18 +15,16 @@
  */
 
 import {
-    SERVER_ADD_INFO
+    SERVER_ADD_REALM
 } from "../actions/types";
 
 const initialState = {
-    info: {
-        realm: undefined
-    }
+    realm: undefined
 };
 
 const server = function (state = initialState, action) {
     switch (action.type) {
-        case SERVER_ADD_INFO: return { info: action.info };
+        case SERVER_ADD_REALM: return { realm: action.realm };
         default: return state;
     }
 };

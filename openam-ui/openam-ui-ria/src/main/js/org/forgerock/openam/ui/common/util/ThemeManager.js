@@ -163,7 +163,7 @@ define([
         getTheme () {
             validateConfig();
 
-            const realm = store.default.getState().server.info.realm || Configuration.globalData.realm;
+            const realm = store.default.getState().server.realm || Configuration.globalData.realm;
             var themeName = findMatchingTheme(realm, getAuthenticationChainName()),
                 isAdminTheme = Router.currentRoute.navGroup === "admin",
                 hasThemeNameChanged = themeName !== Configuration.globalData.themeName,

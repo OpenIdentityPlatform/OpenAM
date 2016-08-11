@@ -19,7 +19,7 @@
  */
 import { t } from "i18next";
 import _ from "lodash";
-import { serverAddInfo } from "store/actions/creators";
+import { serverAddRealm } from "store/actions/creators";
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import fetchUrl from "./fetchUrl";
@@ -47,8 +47,12 @@ export function getConfiguration (callParams) {
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
         url: fetchUrl("/serverinfo/*", { realm: getRealmParameter() })
     }, callParams)).then((response) => {
-        store.dispatch(serverAddInfo(response));
+        store.dispatch(serverAddRealm(response.realm));
 
         return response;
+    }, (reason) => {
+        store.dispatch(serverAddRealm(getRealmParameter()));
+
+        return reason;
     });
 }

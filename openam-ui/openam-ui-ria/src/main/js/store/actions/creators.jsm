@@ -15,7 +15,7 @@
  */
 
 import {
-    SERVER_ADD_INFO,
+    SERVER_ADD_REALM,
     SESSION_ADD_REALM,
     SESSION_REMOVE_REALM
 } from "./types";
@@ -29,7 +29,7 @@ export const sessionRemoveRealm = () => ({
     type: SESSION_REMOVE_REALM
 });
 
-export const serverAddInfo = (info) => ({
-    type: SERVER_ADD_INFO,
-    info
+export const serverAddRealm = (realm) => ({
+    type: SERVER_ADD_REALM,
+    realm
 });
