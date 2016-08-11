@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -149,7 +149,7 @@ public final class JsonPolicyParser implements PolicyParser {
             return privilege;
         } catch (UnrecognizedPropertyException ex) {
             throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                    new Object[] { ex.getUnrecognizedPropertyName() });
+                    new Object[] { ex.getPropertyName() });
         } catch (JsonMappingException ex) {
             throw new EntitlementException(EntitlementException.INVALID_JSON, ex, ex.getMessage());
         } catch (IOException e) {

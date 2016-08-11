@@ -16,6 +16,28 @@
 
 package org.forgerock.openam.utils;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.security.keystore.KeyStoreBuilder;
+import org.forgerock.security.keystore.KeyStoreManager;
+import org.forgerock.security.keystore.KeyStoreType;
+import org.forgerock.security.keystore.KeystoreManagerException;
+
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -28,22 +50,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.JwsAlgorithmType;
-import org.forgerock.json.jose.utils.KeystoreManager;
-import org.forgerock.openam.oauth2.OAuth2Constants;
-
-import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.AccessController;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides access to any OpenAM settings.
@@ -196,9 +202,17 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
             logger.error("key password is null");
         }
 
-        final KeystoreManager keystoreManager = new KeystoreManager(
-                SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS"),
-                SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP), keystorePass);
+        String keyStoreType = SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS");
+        String keyStoreFile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP);
+        final KeyStoreManager keystoreManager;
+        try {
+            keystoreManager = new KeyStoreManager(new KeyStoreBuilder()
+                    .withKeyStoreType(KeyStoreType.valueOf(keyStoreType))
+                    .withKeyStoreFile(keyStoreFile)
+                    .withPassword(keystorePass).build());
+        } catch (FileNotFoundException e) {
+            throw new KeystoreManagerException("Could not load keystore file", e);
+        }
 
         final PrivateKey privateKey = keystoreManager.getPrivateKey(alias, keypass);
         final PublicKey publicKey = keystoreManager.getPublicKey(alias);

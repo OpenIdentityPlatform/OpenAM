@@ -11,15 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -27,12 +36,18 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import org.forgerock.caf.authentication.framework.AuthenticationFramework;
+import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
+import org.forgerock.jaspi.modules.session.jwt.ServletJwtSessionModule;
+import org.forgerock.json.jose.jwt.Jwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.authentication.modules.common.AMLoginModuleBinder;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.AMKeyProvider;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,21 +56,6 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.caf.authentication.framework.AuthenticationFramework;
-import org.forgerock.caf.http.Cookie;
-import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
-import org.forgerock.jaspi.modules.session.jwt.ServletJwtSessionModule;
-import org.forgerock.json.jose.builders.JwtBuilderFactory;
-import org.forgerock.json.jose.jwt.Jwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.json.jose.utils.KeystoreManager;
-import org.forgerock.openam.authentication.modules.common.AMLoginModuleBinder;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.utils.AMKeyProvider;
-import org.mockito.Matchers;
-import org.mockito.MockSettings;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class PersistentCookieAuthModuleTest {
 
