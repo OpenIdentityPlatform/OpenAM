@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.record;
 
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -101,5 +102,10 @@ public class RecordResourceTest extends DebugTestTemplate {
         RecordProperties recordPropertiesOutput = RecordProperties.fromJson(promise.get().getJsonContent().get("record"));
 
         assertThat(recordPropertiesInput).isEqualTo(recordPropertiesOutput);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(RecordResource.class).hasValidAnnotations();
     }
 }

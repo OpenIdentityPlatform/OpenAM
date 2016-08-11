@@ -74,6 +74,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-i18n</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

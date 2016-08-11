@@ -26,6 +26,8 @@ import java.util.Collections;
 
 import com.google.inject.Provider;
 import com.sun.identity.common.LocaleContext;
+
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -206,6 +208,11 @@ public class UmaLabelResourceTest {
         //Then
         verifyZeroInteractions(umaLabelsStore);
         assertThat(promise).failedWithException().isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(UmaLabelResource.class).hasValidAnnotations();
     }
 
 }

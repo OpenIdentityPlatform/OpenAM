@@ -73,7 +73,7 @@ final class ApiAssertions {
             try {
                 properties.load(annotatedClass.getResourceAsStream(resourceBundleName));
                 resourceBundleCache.put(resourceBundleName, properties);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 fail("No resource bundle found at " + resourceBundleName, e);
             }
         }

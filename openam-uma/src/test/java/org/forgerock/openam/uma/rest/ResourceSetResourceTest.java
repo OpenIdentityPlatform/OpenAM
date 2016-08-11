@@ -50,6 +50,7 @@ import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -233,5 +234,10 @@ public class ResourceSetResourceTest {
 
         //Then
         assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ResourceSetResource.class).hasValidAnnotations();
     }
 }
