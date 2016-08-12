@@ -15,25 +15,28 @@
  */
 
 define([
-    "store/actions/types"
-], (types) => {
-    describe("store/actions/types", () => {
-        describe(".SESSION_ADD_REALM", () => {
-            const expected = "session/ADD_REALM";
-            it(`is "${expected}"`, () => {
-                expect(types.SESSION_ADD_REALM).equal(expected);
+    "store/actions/types",
+    "store/reducers/server"
+], (types, reducer) => {
+    reducer = reducer.default;
+
+    describe("store/reducers/server", () => {
+        it("returns the initial state", () => {
+            expect(
+                reducer(undefined, {})
+            ).eql({
+                realm: undefined
             });
         });
-        describe(".SESSION_REMOVE_REALM", () => {
-            const expected = "session/REMOVE_REALM";
-            it(`is "${expected}"`, () => {
-                expect(types.SESSION_REMOVE_REALM).equal(expected);
-            });
-        });
-        describe(".SERVER_ADD_REALM", () => {
-            const expected = "server/ADD_REALM";
-            it(`is "${expected}"`, () => {
-                expect(types.SERVER_ADD_REALM).equal(expected);
+
+        it(`handles ${types.SERVER_ADD_REALM}`, () => {
+            expect(
+                reducer({}, {
+                    type: types.SERVER_ADD_REALM,
+                    realm: "/realmA"
+                })
+            ).eql({
+                realm: "/realmA"
             });
         });
     });

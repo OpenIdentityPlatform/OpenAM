@@ -36,5 +36,15 @@ define([
                 });
             });
         });
+        describe("#serverAddRealm", () => {
+            it("creates an action to add realm to server.session", () => {
+                const realm = "/realmA";
+
+                expect(creators.serverAddRealm(realm)).eql({
+                    type: types.SERVER_ADD_REALM,
+                    realm: realm.toLowerCase()
+                });
+            });
+        });
     });
 });
