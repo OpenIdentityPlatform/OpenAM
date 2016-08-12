@@ -134,7 +134,6 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
      */
     @Override
     protected Map<String, Object> initialize(Subject subject, Map sharedState, Map options) {
-
         String idleTimeString = CollectionHelper.getMapAttr(options, COOKIE_IDLE_TIMEOUT_SETTING_KEY);
         String maxLifeString = CollectionHelper.getMapAttr(options, COOKIE_MAX_LIFE_SETTING_KEY);
         if (StringUtils.isEmpty(idleTimeString)) {
@@ -168,6 +167,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
         }
+
     }
 
     /**
@@ -236,6 +236,9 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             final Subject clientSubject = new Subject();
             MessageInfo messageInfo = prepareMessageInfo(getHttpServletRequest(), getHttpServletResponse());
             if (process(messageInfo, clientSubject, callbacks)) {
+                if (principal != null) {
+                    setAuthenticatingUserName(principal.getName());
+                }
                 return ISAuthConstants.LOGIN_SUCCEED;
             }
             throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);

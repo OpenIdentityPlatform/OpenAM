@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.common;
 
-import com.sun.identity.authentication.spi.AuthLoginException;
+import java.security.Principal;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -24,8 +25,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
-import java.util.Map;
+
+import com.sun.identity.authentication.spi.AuthLoginException;
 
 /**
  * Sub types of this class represent the actual Authentication Logic for the Authentication Module.
@@ -34,8 +35,6 @@ import java.util.Map;
  *
  * Add any required methods from the AMLoginModule that sub types of this class required to here and the
  * AMLoginModuleBinder interface.
- *
- * @author Phill Cunnington phill.cunnington@forgerock.com
  */
 public abstract class AuthLoginModule {
 
@@ -135,5 +134,19 @@ public abstract class AuthLoginModule {
      */
     public void setUserSessionProperty(String name, String value) throws AuthLoginException {
         amLoginModuleBinder.setUserSessionProperty(name, value);
+    }
+
+    /**
+     * See {@link AMLoginModuleBinder#setAuthenticatingUserName(String)}.
+     */
+    public void setAuthenticatingUserName(String userName) {
+        amLoginModuleBinder.setAuthenticatingUserName(userName);
+    }
+
+    /**
+     * See {@link AMLoginModuleBinder#getAuthenticatingUserName()}.
+     */
+    public String getAuthenticatingUserName() {
+        return amLoginModuleBinder.getAuthenticatingUserName();
     }
 }

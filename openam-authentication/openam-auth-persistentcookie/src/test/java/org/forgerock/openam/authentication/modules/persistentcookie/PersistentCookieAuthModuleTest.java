@@ -19,9 +19,7 @@ package org.forgerock.openam.authentication.modules.persistentcookie;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -323,6 +321,12 @@ public class PersistentCookieAuthModuleTest {
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         verify(amLoginModuleBinder).setUserSessionProperty("jwtValidated", "true");
         assertEquals(returnedState, ISAuthConstants.LOGIN_SUCCEED);
+    }
+
+    @Test
+    public void shouldSetUsernameInSharedState() throws Exception {
+        shouldProcessCallbacksWhenJwtValid();
+        verify(amLoginModuleBinder).setAuthenticatingUserName("USER");
     }
 
     @Test
