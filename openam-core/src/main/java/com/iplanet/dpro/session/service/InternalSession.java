@@ -54,6 +54,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.authentication.service.LoginContext;
+import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -69,6 +72,8 @@ import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TaskRunnable;
@@ -108,7 +113,6 @@ import com.sun.identity.shared.debug.Debug;
  * </pre>
  *
  */
-
 public class InternalSession implements Serializable {
     /*
      *Logging message
@@ -165,6 +169,9 @@ public class InternalSession implements Serializable {
     private transient boolean isSessionUpgrade = false;
     private Boolean cookieMode = null;
     private String cookieStr;
+    private transient AuthContextLocal authContext;
+    private transient LoginContext loginContext;
+    private transient Set<AMPostAuthProcessInterface> postAuthProcesses;
 
     @JsonProperty("creationTime")
     private long creationTimeInSeconds;
@@ -195,19 +202,6 @@ public class InternalSession implements Serializable {
      * the restricted token ids associated with the master) that will be used in notification
      */
     private final ConcurrentMap<String, Set<SessionID>> sessionEventURLs = new ConcurrentHashMap<>();
-
-    /*
-     * The following object map is meant to be used to store the transient
-     * objects such as Auth related user properties (e.g. AuthContext and
-     * LoginState) within the InternalSession object. There are a few
-     * characteristics for this type of objects:
-     *  - These objects and the corresponding interfaces are for internal use
-     * only. - These objects are "transient" objects which don't require
-     * persisency. In other words, they won't be saved into the session
-     * repository. - These object are not session properties
-     * since they are not meant to exposed to any client.
-     */
-    private transient final Map<String, Object>  internalObjects = new HashMap<>();
 
     @JsonIgnore private boolean isISStored = false;
     private volatile boolean reschedulePossible;
@@ -529,41 +523,75 @@ public class InternalSession implements Serializable {
 
     /**
      * Returns the state of the Internal Session
-     * @return the session state can be VALID,INVALID,INACTIVE,DESTORYED
+     * @return the session state can be VALID, INVALID, INACTIVE or DESTROYED
      */
     public int getState() {
         return sessionState;
     }
 
     /**
-     * Returns the value of the specified key from the internal object map.
+     * Get the authentication context associated with this session.
      *
-     * @param key
-     *            the key whose associated value is to be returned
-     * @return internal object
+     * @return the AuthContextLocal associated with this session
      */
-    public Object getObject(String key) {
-        return internalObjects.get(key);
+    public AuthContextLocal getAuthContext() {
+        return authContext;
     }
 
     /**
-     * Removes the mapping for this key from the internal object map if present.
-     *
-     * @param key
-     *            key whose mapping is to be removed from the map
+     * Gets whether this session has an associated authenticationContext.
+     * @return true if this session has an authentication context.
      */
-    public void removeObject(String key) {
-        internalObjects.remove(key);
+    public boolean hasAuthenticationContext() {
+        return null != authContext;
+    }
+    
+    /**
+     * Sets the authentication context.
+     *
+     * @param authContext the authentication context
+     */
+    public void setAuthContext(AuthContextLocal authContext) {
+        this.authContext = authContext;
     }
 
     /**
-     * Sets the key-value pair in the internal object map.
-     *
-     * @param key with which the specified value is to be associated
-     * @param value to be associated with the specified key
+     * Clears the authentication context from this session.
      */
-    public void setObject(String key, Object value) {
-        internalObjects.put(key, value);
+    public void clearAuthContext() {
+        this.authContext = null;
+    }
+
+    /**
+     * Gets the login context from this session.
+     * @return the login context
+     */
+    public LoginContext getLoginContext() {
+        return loginContext;
+    }
+
+    /**
+     * Sets the login context associated with this session.
+     * @param loginContext a LoginContext to associate with this session.
+     */
+    public void setLoginContext(LoginContext loginContext) {
+        this.loginContext = loginContext;
+    }
+
+    /**
+     * Sets the list of post authentication process to associate with this Session.
+     * @return
+     */
+    public Set<AMPostAuthProcessInterface> getPostAuthProcesses() {
+        return postAuthProcesses;
+    }
+
+    /**
+     * Sets the list of post authentication processes to associate with this Sessio n.
+     * @param postAuthProcesses a set of post authentication processes.
+     */
+    public void setPostAuthProcesses(Set<AMPostAuthProcessInterface> postAuthProcesses) {
+        this.postAuthProcesses = postAuthProcesses;
     }
 
     /**
@@ -1411,7 +1439,7 @@ public class InternalSession implements Serializable {
         sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
         setState(DESTROYED);
-        sessionService.removeInternalSession(sessionID);
+        sessionService.removeCachedInternalSession(sessionID);
         sessionService.sendEvent(this, SessionEvent.DESTROY);
     }
 
@@ -1536,41 +1564,37 @@ public class InternalSession implements Serializable {
 
         @Override
         public void run() {
-            if (!isTimedOut()) {
-                if (isInvalid()) {
-                    removeSession();
+
+            if (isTimedOut() || isInvalid()) {
+                removeSession();
+                return;
+            }
+
+            long timeLeftInSeconds = getTimeLeft();
+            if (timeLeftInSeconds == 0) {
+                timeoutSessionAndSchedulePurge(SessionEvent.MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
+            } else {
+                long idleTimeLeftInSeconds = (maxIdleTimeInMinutes * 60) - getIdleTime();
+                if (idleTimeLeftInSeconds <= 0 && sessionState != INACTIVE) {
+                    timeoutSessionAndSchedulePurge(SessionEvent.IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
                 } else {
-                    long timeLeft = getTimeLeft();
-                    if (timeLeft == 0) {
-                        changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                        sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
-                        if (timerPool != null) {
-                            if (purgeDelay > 0) {
-                                timerPool.schedule(this, new Date((timedOutTimeInSeconds + (purgeDelay * 60)) * 1000));
-                            }
-                        }
-                    } else {
-                        long idleTimeLeft = (maxIdleTimeInMinutes * 60) - getIdleTime();
-                        if (idleTimeLeft <= 0 && sessionState != INACTIVE) {
-                            changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                            sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
-                            if (timerPool != null) {
-                                if (purgeDelay > 0) {
-                                    timerPool.schedule(this, new Date((timedOutTimeInSeconds + (purgeDelay * 60)) * 1000));
-                                }
-                            }
-                        } else {
-                            long timeToWait = Math.min(timeLeft, idleTimeLeft);
-                            if (timerPool != null) {
-                                timerPool.schedule(this, new Date(((
-                                        currentTimeMillis() / 1000) +
-                                        timeToWait) * 1000));
-                            }
-                        }
+                    long timeToWaitInSeconds = Math.min(timeLeftInSeconds, idleTimeLeftInSeconds);
+                    if (timerPool != null) {
+                        timerPool.schedule(this, new Date(currentTimeMillis() + timeToWaitInSeconds * 1000));
                     }
                 }
-            } else {
-                removeSession();
+            }
+
+        }
+
+        private void timeoutSessionAndSchedulePurge(int event, AuditConstants.EventName eventName) {
+            Reject.ifFalse(event == SessionEvent.MAX_TIMEOUT || event == SessionEvent.IDLE_TIMEOUT);
+            changeStateAndNotify(event);
+            sessionAuditor.auditActivity(toSessionInfo(), eventName);
+            if (timerPool != null) {
+                if (purgeDelay > 0) {
+                    timerPool.schedule(this, new Date((timedOutTimeInSeconds + (purgeDelay * 60)) * 1000));
+                }
             }
         }
 

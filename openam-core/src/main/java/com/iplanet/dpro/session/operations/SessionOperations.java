@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -48,7 +48,7 @@ public interface SessionOperations {
      * @param session Reference to the Session.
      * @return Null if there was an error locating the Session, otherwise non null.
      */
-    public SessionInfo refresh(Session session, boolean reset) throws SessionException;
+    SessionInfo refresh(Session session, boolean reset) throws SessionException;
 
     /**
      * Performs the logout operation on the Session.
@@ -58,7 +58,7 @@ public interface SessionOperations {
      *
      * @param session SessionID to logout.
      */
-    public void logout(Session session) throws SessionException;
+    void logout(Session session) throws SessionException;
 
     /**
      * Destroys the Session by removing it and moving it to the DESTROY state.
@@ -69,7 +69,7 @@ public interface SessionOperations {
      * @param session The non null session to destroy.
      * @throws SessionException If there was an error while deleting the token.
      */
-    public void destroy(Session requester, Session session) throws SessionException;
+    void destroy(Session requester, Session session) throws SessionException;
 
     /**
      * Assigns the property to the Session.
@@ -81,5 +81,5 @@ public interface SessionOperations {
      * session time, or the session was destroyed, or there was an error during
      * communication with session service, or if the property name or value was null.
      */
-    public void setProperty(Session session, String name, String value) throws SessionException;
+    void setProperty(Session session, String name, String value) throws SessionException;
 }

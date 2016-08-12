@@ -24,10 +24,22 @@
  *
  * $Id: AuthContextLocal.java,v 1.12 2009/05/21 21:57:34 qcheng Exp $
  *
- * Portions Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyright 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.server;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpSession;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
@@ -39,20 +51,9 @@ import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.util.PolicyDecisionUtils;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.Locale;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpSession;
 
 /**
  * The <code>AuthContextLocal</code> provides the implementation for
@@ -375,15 +376,6 @@ public final class AuthContextLocal extends Object
         Principal principal, char[] password, Subject subject, Map envMap, String locale)
         throws AuthLoginException {
         try {
-            /*if (!getStatus().equals(AuthContext.Status.NOT_STARTED)) {
-                if (authDebug.messageEnabled()) {
-                    authDebug.message("AuthContextLocal::login called " +
-                    "when the current login status is : " + getStatus());
-                }
-                throw new AuthLoginException(amAuthContextLocal, 
-                    "invalidMethod", new Object[]{getStatus()});
-            }*/
-
             // switch the login status
             loginStatus = AuthContext.Status.IN_PROGRESS;
 
@@ -441,25 +433,9 @@ public final class AuthContextLocal extends Object
                 }
 
             }
-            HashMap loginParamsMap = new HashMap();
-
-            loginParamsMap.put(INDEX_TYPE, type);
-            loginParamsMap.put(INDEX_NAME, indexName);
-            loginParamsMap.put(PRINCIPAL, principal);
-            loginParamsMap.put(PASSWORD, password);
-            loginParamsMap.put(SUBJECT, subject);
-            loginParamsMap.put(LOCALE, locale);
-            if (redirectUrl != null) {
-                loginParamsMap.put(REDIRECT_URL, redirectUrl);
-            }
-
-            if (authDebug.messageEnabled()) {
-                authDebug.message(
-                    "loginParamsMap : " + loginParamsMap.toString());
-            }
 
             authDebug.message("calling AMLoginContext::exceuteLogin : ");
-            amlc.executeLogin(loginParamsMap);
+            amlc.executeLogin(subject, indexType, indexName, locale, redirectUrl);
             authDebug.message("after AMLoginContext::exceuteLogin : ");
             if (amlc.getStatus() == LoginStatus.AUTH_SUCCESS) {
                 loginStatus = AuthContext.Status.SUCCESS;
@@ -507,7 +483,7 @@ public final class AuthContextLocal extends Object
         if (subject == null) {
             subject = amlc.getSubject();
         }
-        return (subject);
+        return subject;
     }
 
     /**

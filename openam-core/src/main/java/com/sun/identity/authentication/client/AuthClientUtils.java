@@ -346,9 +346,9 @@ public class AuthClientUtils {
     	return (decodeHash(request));
     }
 
-    private static Hashtable decodeHash(HttpServletRequest request) {
+    private static Hashtable<String, String> decodeHash(HttpServletRequest request) {
 
-        Hashtable data = new Hashtable();
+        Hashtable<String, String> data = new Hashtable<>();
         String clientEncoding = request.getCharacterEncoding();
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
         if (utilDebug.messageEnabled()) {
@@ -1473,7 +1473,7 @@ public class AuthClientUtils {
      */
     public static String getDomainNameByRequest(
         HttpServletRequest request,
-        Hashtable requestHash) {
+        Map<String, String> requestHash) {
 
         boolean noQueryParam=false;
         String realm = getRealmFromPolicyAdvice(requestHash);
@@ -1517,7 +1517,7 @@ public class AuthClientUtils {
      * @param requestHash Hashtable containing the query parameters
      * @return organization name.
      */
-    public static String getOrgParam(Hashtable<String, String> requestHash) {
+    public static String getOrgParam(Map<String, String> requestHash) {
         String orgParam = null;
         if (requestHash != null && !requestHash.isEmpty()) {
             orgParam = requestHash.get(ISAuthConstants.DOMAIN_PARAM);
@@ -2277,9 +2277,9 @@ public class AuthClientUtils {
 
     /**
      * @deprecated use {@link #getDomainNameByRequest(
-     * javax.servlet.http.HttpServletRequest, java.util.Hashtable)} instead.
+     * javax.servlet.http.HttpServletRequest, java.util.Map<String, String>)} instead.
      */
-    public static String getDomainNameByRequest(Hashtable requestHash) {
+    public static String getDomainNameByRequest(Map<String, String> requestHash) {
         String realm = getRealmFromPolicyAdvice(requestHash);
         String orgParam = getOrgParam(requestHash);
         if (realm != null) {
@@ -2312,7 +2312,7 @@ public class AuthClientUtils {
      * the advice
      * @see com.sun.identity.authentication.util.AMAuthUtils
      */
-    private static String getRealmFromPolicyAdvice(Hashtable<String, String> requestHash) {
+    private static String getRealmFromPolicyAdvice(Map<String, String> requestHash) {
         String advice = requestHash.get(COMPOSITE_ADVICE);
         if (advice == null) {
             return null;

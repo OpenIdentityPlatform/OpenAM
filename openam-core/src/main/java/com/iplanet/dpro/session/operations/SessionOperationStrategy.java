@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations;
 
@@ -31,5 +31,5 @@ public interface SessionOperationStrategy {
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
      */
-    public SessionOperations getOperation(Session session);
+    SessionOperations getOperation(Session session);
 }

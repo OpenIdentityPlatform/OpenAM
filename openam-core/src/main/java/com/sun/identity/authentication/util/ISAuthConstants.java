@@ -632,9 +632,6 @@ public interface ISAuthConstants {
     // AMConfiguration
     public static final String MODULE_INSTANCE_NAME = "moduleInstanceName";
 
-    // AuthContextLocal object index name in the transient HttpSession
-    public static final String AUTH_CONTEXT_OBJ = "authContextObject";
-
     // Attribute to enable or disable module based auth
     public static final String MODULE_BASED_AUTH = "sunEnableModuleBasedAuth";
 
@@ -671,10 +668,6 @@ public interface ISAuthConstants {
     public static final String POSTPROCESS_INSTANCE_SET = 
         "sunAMAuthPostProcessInstanceSet";
 
-    // Property name for Login Context in Session
-    public static final String LOGIN_CONTEXT = 
-        "sunAMAuthLoginContext";
-    
     // Property name for user password attribute
     public static final String ATTR_USER_PASSWORD = "userpassword";
 

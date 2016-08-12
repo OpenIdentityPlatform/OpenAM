@@ -37,11 +37,12 @@ import java.util.Enumeration;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.authentication.service.LoginContext;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -59,7 +60,8 @@ public class DefaultSessionActivator implements SessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject, final Object loginContext)
+                                   final InternalSession authSession, final Subject subject,
+                                   final LoginContext loginContext)
             throws AuthException {
 
         //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
@@ -75,12 +77,12 @@ public class DefaultSessionActivator implements SessionActivator {
      */
     protected boolean updateSessions(InternalSession newSession, LoginState loginState,
                                      InternalSession sessionToActivate, InternalSession authSession,
-                                     SessionService sessionService, Subject subject, Object loginContext)
+                                     SessionService sessionService, Subject subject, LoginContext loginContext)
             throws AuthException {
 
         final SessionID authSessionId = authSession.getID();
 
-        newSession.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+        newSession.clearAuthContext();
 
         //session upgrade and anonymous conditions are handled in here
         loginState.setSessionProperties(newSession);
@@ -100,7 +102,7 @@ public class DefaultSessionActivator implements SessionActivator {
 
         //set the login context for this session
         if (loginState.isModulesInSessionEnabled() && loginContext != null) {
-            newSession.setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
+            newSession.setLoginContext(loginContext);
         }
 
         try {

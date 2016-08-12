@@ -445,29 +445,73 @@ public class SessionService {
     /**
      * Removes the Internal Session from the Internal Session table.
      *
-     * @param sid Session ID
+     * @param sessionId Session ID
      */
-    InternalSession removeInternalSession(SessionID sid) {
-        if (sid == null)
+    InternalSession removeCachedInternalSession(final SessionID sessionId) {
+        if (null == sessionId) {
             return null;
-        InternalSession session = cache.remove(sid);
+        }
+        InternalSession session = cache.remove(sessionId);
+        return removeInternalSession(session);
+    }
 
-        if (session != null) {
-            remoteSessionSet.remove(sid);
-            session.cancel();
-            // Session Constraint
-            if (session.getState() == VALID) {
-                decrementActiveSessions();
-            }
+    private InternalSession removeInternalSession(final InternalSession session) {
 
-            if (session.isStored()) {
-                session.delete();
-            }
-
-            session.delete();
+        if (null == session) {
+            return null;
         }
 
+        remoteSessionSet.remove(session.getID());
+        session.cancel();
+        // Session Constraint
+        if (session.getState() == VALID) {
+            decrementActiveSessions();
+        }
+
+        if (session.isStored()) {
+            session.delete();
+        }
         return session;
+    }
+
+    /**
+     * Destroy a Internal Session, depending on the value of the user's permissions.
+     * Performs no action if the sessionID cannot be matched.
+     *
+     * @param requester The requesting Session.
+     * @param sessionID The session to destroy.
+     * @throws SessionException If the user has insufficient permissions.
+     */
+    public void destroySession(final Session requester, final SessionID sessionID) throws SessionException {
+        if (sessionID == null) {
+            return;
+        }
+
+        InternalSession session = getInternalSession(sessionID);
+
+        if (session == null) {
+            // let us check if the argument is a session handle
+            session = getInternalSessionByHandle(sessionID.toString());
+        }
+
+        if (session != null) {
+            checkPermissionToDestroySession(requester, session.getID());
+            destroyInternalSession(session.getID());
+        }
+    }
+
+    /**
+     * Destroy a Internal Session, whose session id has been specified.
+     *
+     * @param sessionID The id of the session to destroy.
+     */
+    public void destroyInternalSession(SessionID sessionID) {
+        InternalSession session = removeCachedInternalSession(sessionID);
+        if (session != null && session.getState() != INVALID) {
+            signalRemove(session, SessionEvent.DESTROY);
+            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_DESTROYED);
+        }
+        sessionCache.removeSID(sessionID);
     }
 
     void deleteFromRepository(InternalSession session) {
@@ -738,36 +782,6 @@ public class SessionService {
     }
 
     /**
-     * Destroy a Internal Session, whose session id has been specified.
-     *
-     * @param sid
-     */
-    public void destroyInternalSession(SessionID sid) {
-        InternalSession sess = removeInternalSession(sid);
-        if (sess != null && sess.getState() != INVALID) {
-            signalRemove(sess, SessionEvent.DESTROY);
-            sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
-        }
-        sessionCache.removeSID(sid);
-    }
-
-    /**
-     * Logout a Internal Session, whose session id has been specified.
-     *
-     * @param sid
-     */
-    public void logoutInternalSession(SessionID sid) {
-        InternalSession sess = removeInternalSession(sid);
-        if (sess != null) {
-            sess.delete();
-        }
-        if (sess != null && sess.getState() != INVALID) {
-            signalRemove(sess, SessionEvent.LOGOUT);
-            sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_LOGGED_OUT);
-        }
-    }
-
-    /**
      * Simplifies the signalling that a Session has been removed.
      * @param session Non null InternalSession.
      * @param event An integrate from the SessionEvent class.
@@ -860,33 +874,6 @@ public class SessionService {
     }
 
     /**
-     * Destroy a Internal Session, depending on the value of the user's
-     * preferences.
-     *
-     * @param requester
-     * @param sid
-     * @throws SessionException
-     */
-    public void destroySession(Session requester, SessionID sid) throws SessionException {
-        if (sid == null) {
-            return;
-        }
-
-        InternalSession sess = getInternalSession(sid);
-
-        if (sess == null) {
-            // let us check if the argument is a session handle
-            sess = getInternalSessionByHandle(sid.toString());
-        }
-
-        if (sess != null) {
-            sid = sess.getID();
-            checkPermissionToDestroySession(requester, sid);
-            destroyInternalSession(sid);
-        }
-    }
-
-    /**
      * Checks if the requester has the necessary permission to destroy the provided session. The user has the necessary
      * privileges if one of these conditions is fulfilled:
      * <ul>
@@ -925,17 +912,38 @@ public class SessionService {
     /**
      * Logout the user.
      *
-     * @param sid
+     * @param session the session to log out
      * @throws SessionException
      */
-    public void logout(SessionID sid) throws SessionException {
-        if (sid == null || sid.isSessionHandle()) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + sid);
+    public void logout(final InternalSession session) throws SessionException {
+        logoutInternalSession(session.getID());
+    }
+
+    /**
+     * Logout the user.
+     *
+     * @param sessionId
+     * @throws SessionException
+     */
+    public void logout(final SessionID sessionId) throws SessionException {
+        if (sessionId == null || sessionId.isSessionHandle()) {
+            throw new SessionException(SessionBundle.getString("invalidSessionID") + sessionId);
         }
         //if the provided sid was a restricted token, resolveToken will always validate the restriction, so there is no
         //need to check restrictions here.
-        InternalSession session = resolveToken(sid);
+        InternalSession session = resolveToken(sessionId);
         logoutInternalSession(session.getID());
+    }
+
+    private void logoutInternalSession(final SessionID sessionId) {
+        InternalSession session = removeCachedInternalSession(sessionId);
+        if (session != null) {
+            session.delete();
+        }
+        if (session != null && session.getState() != INVALID) {
+            signalRemove(session, SessionEvent.LOGOUT);
+            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);
+        }
     }
 
     /**
@@ -1373,11 +1381,12 @@ public class SessionService {
      * @param sess session object
      */
     private void updateSessionMaps(InternalSession sess) {
-        if (sess == null)
+        if (null == sess) {
             return;
-
-        if (destroySessionIfNecessary(sess))
+        }
+        if (destroySessionIfNecessary(sess)) {
             return;
+        }
 
         sess.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
         SessionID sid = sess.getID();
@@ -1428,7 +1437,7 @@ public class SessionService {
 
         if (wasDestroyed) {
             try {
-                removeInternalSession(sess.getID());
+                removeCachedInternalSession(sess.getID());
             } catch (Exception ex) {
                 sessionDebug.error("Exception while removing session : ", ex);
             }

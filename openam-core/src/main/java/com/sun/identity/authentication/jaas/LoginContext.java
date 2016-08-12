@@ -24,17 +24,13 @@
  *
  * $Id: LoginContext.java,v 1.6 2008/09/22 23:19:42 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.jaas;
 
-import static com.sun.identity.authentication.config.AMAuthConfigUtils.getControlFlagAsString;
-import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
-
-import com.sun.identity.authentication.spi.InvalidPasswordException;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.audit.context.AuditRequestContext;
+import static com.sun.identity.authentication.config.AMAuthConfigUtils.*;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -43,11 +39,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import javax.security.auth.login.*;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.*;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
+import javax.security.auth.login.LoginException;
+
+import org.forgerock.openam.audit.context.AuditRequestContext;
+
+import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is pulled out from JDK1.4.
@@ -55,7 +57,7 @@ import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
  * Error and Runtime exceptions can be passed back to the caller. Otherwise
  * any exception is converted to <code>LoginException</code>.
  */
-public class LoginContext {
+public class LoginContext implements org.forgerock.openam.authentication.service.LoginContext {
 
     private static final String INIT_METHOD = "initialize";
     private static final String LOGIN_METHOD = "login";

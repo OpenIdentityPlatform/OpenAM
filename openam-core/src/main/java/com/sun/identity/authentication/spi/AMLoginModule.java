@@ -24,17 +24,47 @@
  *
  * $Id: AMLoginModule.java,v 1.22 2009/11/21 01:11:56 222713 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.spi;
 
+import static com.sun.identity.authentication.util.ISAuthConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
 import static org.forgerock.openam.utils.StringUtils.*;
-import static com.sun.identity.authentication.util.ISAuthConstants.*;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextInputCallback;
+import javax.security.auth.callback.TextOutputCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
@@ -73,37 +103,6 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
-import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
-import org.forgerock.openam.ldap.LDAPUtils;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextInputCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -247,7 +246,7 @@ public abstract class AMLoginModule implements LoginModule {
     private String moduleName = null;
     private String moduleClass = null;
     private static final String bundleName = "amAuth";
-    private static AuthD ad = AuthD.getAuth();
+    private final AuthD ad;
     private Principal principal = null;
     // the authentication status
     private boolean succeeded = false;
@@ -278,6 +277,7 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public AMLoginModule() {
         auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
+        ad = AuthD.getAuth();
     }
     
     /**

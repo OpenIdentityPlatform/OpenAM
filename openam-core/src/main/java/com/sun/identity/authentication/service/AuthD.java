@@ -126,9 +126,7 @@ public class AuthD implements ConfigurationListener {
                 ConfigurationObserver.getInstance().addListener(INSTANCE);
 
             }
-
             return INSTANCE;
-
         }
     }
 
@@ -172,7 +170,6 @@ public class AuthD implements ConfigurationListener {
      */  
     static final int LOG_ERROR  = 1;
 
-    private static final boolean enforceJAASThread = SystemProperties.getAsBoolean(Constants.ENFORCE_JAAS_THREAD);
     /**
      * Configured directory server host name for auth
      */
@@ -548,9 +545,7 @@ public class AuthD implements ConfigurationListener {
      * @param domain Domain Name.
      * @return new <code>InternalSession</code>
      */
-    public static InternalSession newSession(
-        String domain,
-        boolean stateless) {
+    public static InternalSession newSession(final String domain, final boolean stateless) {
         return getSessionService().newInternalSession(domain, stateless);
     }
     
@@ -561,16 +556,16 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(String sessId) {
-        if (debug.messageEnabled()) {
-            debug.message("getSession for " + sessId);
-        }
-        InternalSession is = null;
-        if (sessId != null) {
-            SessionID sid = new SessionID(sessId);
-            is = getSession(sid);
-        }
-        if (is == null) {
+        debug.message("getSession for %s", sessId);
+
+        if (null == sessId) {
             debug.message("getSession returned null");
+            return null;
+        }
+        InternalSession is = getSession(new SessionID(sessId));
+        if (null == is) {
+            debug.message("getSession returned null");
+            return null;
         }
         return is;
     }
@@ -578,15 +573,18 @@ public class AuthD implements ConfigurationListener {
     /**
      * Returns the session associated with a session ID.
      *
-     * @param sid Session ID.
+     * @param sessionId Session ID.
      * @return the <code>InternalSession</code> associated with a session ID.
      */
-    public static InternalSession getSession(SessionID sid) {
-        InternalSession is = null;
-        if (sid != null) {
-            is = getSessionService().getInternalSession(sid);
-        } 
-        return is;
+    public static InternalSession getSession(SessionID sessionId) {
+        if (null == sessionId){
+            return null;
+        }
+        SessionService sessionService = getSessionService();
+        if (null == sessionService){
+            return null;
+        }
+        return sessionService.getInternalSession(sessionId);
     }
         
         
@@ -594,7 +592,7 @@ public class AuthD implements ConfigurationListener {
      * Returns the session associated with an HTTP Servlet Request.
      *
      * @param req HTTP Servlet Request.
-     * @return the <code>InternalSession</code> associated with 
+     * @return the <code>InternalSession</code> associated with
      *   anHTTP Servlet Request.
      */
     public InternalSession getSession(HttpServletRequest req) {
@@ -1352,14 +1350,5 @@ public class AuthD implements ConfigurationListener {
      */
     Set getDefaultServiceFailureURLSet() {
         return defaultServiceFailureURLSet;
-    }
-
-
-    /**
-     * Flag to force to use JAAS thread.
-     * Default is false.
-     */
-    static boolean isEnforceJAASThread() {
-        return enforceJAASThread;
     }
 }

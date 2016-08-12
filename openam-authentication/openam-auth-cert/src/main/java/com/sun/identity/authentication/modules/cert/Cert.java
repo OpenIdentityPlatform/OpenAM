@@ -29,6 +29,29 @@
 
 package com.sun.identity.authentication.modules.cert;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.x500.X500Principal;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.LDAPUrl;
+
 import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -40,6 +63,7 @@ import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
+
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.CertificateExtensions;
@@ -51,29 +75,6 @@ import sun.security.x509.RFC822Name;
 import sun.security.x509.SubjectAlternativeNameExtension;
 import sun.security.x509.X509CertImpl;
 import sun.security.x509.X509CertInfo;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.x500.X500Principal;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.LDAPUrl;
 
 public class Cert extends AMLoginModule {
 
@@ -771,8 +772,7 @@ public class Cert extends AMLoginModule {
            }
        } else {
            debug.message("getPortalStyleCert: checking cert in userCert param");
-           Hashtable requestHash = 
-               getLoginState("getPortalStyleCert()").getRequestParamHash(); 
+           Map<String, String> requestHash = getLoginState("getPortalStyleCert()").getRequestParamHash();
            if (requestHash != null) {
                certParam = (String) requestHash.get("IDToken0"); 
                if (certParam == null) {

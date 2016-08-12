@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -69,6 +68,7 @@ import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.guava.common.collect.ImmutableList;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
@@ -223,7 +223,7 @@ public class LoginState {
     private String userOrg;
     private String orgDN = null;
     private int loginStatus = LoginStatus.AUTH_IN_PROGRESS;
-    private Hashtable requestHash;
+    private Map<String, String> requestHash;
     private boolean newRequest;  // new or existing request
     private Set<String> aliasAttrNames = null;
     private String userContainerDN = null;
@@ -585,21 +585,15 @@ public class LoginState {
 
     /**
      * Sets the request parameters hash.
+     * Side Effect: Also updates the requestMap at the same time.
      *
      * @param requestHash Request parameters hash.
      */
-    public void setParamHash(Hashtable requestHash) {
+    public void setParamHash(Map<String, String> requestHash) {
         this.requestHash = requestHash;
 
         /* copy these parameters to HashMap */
-        if (requestHash != null) {
-            Enumeration hashKeys = requestHash.keys();
-            while (hashKeys.hasMoreElements()) {
-                String key = (String) hashKeys.nextElement();
-                String value = (String) requestHash.get(key);
-                this.requestMap.put(key, value);
-            }
-        }
+        this.requestMap.putAll(requestHash);
     }
 
     /**
@@ -1096,7 +1090,7 @@ public class LoginState {
      * @return <code>true</code> if user session is activated successfully, <code>false if failed to activated</code>
      * or <code>true</code> if the noSession parameter is set to true.
      */
-    public boolean activateSession(Subject subject, AuthContextLocal ac, Object loginContext) throws AuthException {
+    public boolean activateSession(Subject subject, AuthContextLocal ac, LoginContext loginContext) throws AuthException {
         try {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("activateSession - Token is : " + token);
@@ -1681,7 +1675,7 @@ public class LoginState {
     private String getUserDomain(
             HttpServletRequest request,
             SessionID sid,
-            Hashtable requestHash) {
+            Map<String, String> requestHash) {
         String userOrg;
         if (AuthUtils.newSessionArgExists(requestHash, sid) && sid.toString().length() > 0) {
             userOrg = sid.getSessionDomain();
@@ -1705,7 +1699,7 @@ public class LoginState {
             HttpServletRequest request,
             HttpServletResponse response,
             SessionID sid,
-            Hashtable requestHash
+            Map<String, String> requestHash
     ) throws AuthException {
         // Get / Construct the Original Login URL
         this.loginURL = AuthUtils.constructLoginURL(request);
@@ -1783,10 +1777,9 @@ public class LoginState {
         DEBUG.message("LoginState: createSession: Creating new session: ");
         session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
         DEBUG.message("Save authContext in InternalSession");
-        SessionID sid = session.getID();
-        session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);
+        sid = session.getID();
+        session.setAuthContext(authContext);
 
-        this.sid = sid;
         if (DEBUG.messageEnabled()) {
             DEBUG.message(
                     "LoginState:createSession: New session/sid=" + sid);
@@ -2940,7 +2933,7 @@ public class LoginState {
      *
      * @return saved request parameters in <code>Hashtable</code>
      */
-    public Hashtable getRequestParamHash() {
+    public Map<String, String> getRequestParamHash() {
         return requestHash;
     }
 
@@ -4808,8 +4801,7 @@ public class LoginState {
                         + "Setting post process class in session "
                         + postLoginInstanceSet);
             }
-            session.setObject(ISAuthConstants.POSTPROCESS_INSTANCE_SET,
-                    postLoginInstanceSet);
+            session.setPostAuthProcesses(postLoginInstanceSet);
         }
         if ((postLoginInstanceSet != null) &&
                 (!postLoginInstanceSet.isEmpty())) {

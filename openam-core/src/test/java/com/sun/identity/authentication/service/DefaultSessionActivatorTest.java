@@ -18,6 +18,7 @@ package com.sun.identity.authentication.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.authentication.service.LoginContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,7 +40,6 @@ import org.testng.annotations.Test;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.authentication.util.ISAuthConstants;
 
 public class DefaultSessionActivatorTest {
     private static final String ORGDN = "testdn";
@@ -87,7 +88,7 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
 
         // Then
-        verify(mockNewSession).removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+        verify(mockNewSession).clearAuthContext();
     }
 
     @Test
@@ -166,7 +167,7 @@ public class DefaultSessionActivatorTest {
     @Test
     public void shouldStoreLoginContextInSessionIfEnabled() throws Exception {
         // Given
-        Object loginContext = "some login context";
+        LoginContext loginContext = mock(LoginContext.class);
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
         given(mockState.isModulesInSessionEnabled()).willReturn(true);
 
@@ -174,13 +175,13 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
 
         // Then
-        verify(mockNewSession).setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
+        verify(mockNewSession).setLoginContext(loginContext);
     }
 
     @Test
     public void shouldNotStoreLoginContextInSessionIfDisabled() throws Exception {
         // Given
-        Object loginContext = "some login context";
+        LoginContext loginContext = mock(LoginContext.class);
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
         given(mockState.isModulesInSessionEnabled()).willReturn(false);
 
@@ -188,7 +189,7 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
 
         // Then
-        verify(mockNewSession, never()).setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
+        verify(mockNewSession, never()).setLoginContext(loginContext);
 
     }
 }

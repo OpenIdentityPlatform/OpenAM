@@ -54,6 +54,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
 
     static Debug debug = Debug.getInstance("amCallback");
     AMLoginContext am;
+    private boolean isPureJAAS;
     LoginState loginState;
 
     // this will be sent by AuthContext for module to read.
@@ -68,8 +69,9 @@ public class DSAMECallbackHandler implements CallbackHandler {
      * login thread and login state with callback hndler 
      * @param am <code>AMLoginContext</code> for this callback
      */
-    public DSAMECallbackHandler(AMLoginContext am) {
+    public DSAMECallbackHandler(AMLoginContext am, boolean isPureJAAS) {
         this.am = am;
+        this.isPureJAAS = isPureJAAS;
         this.authThreadManager= am.authThread;
         this.loginState = am.getLoginState();
     }
@@ -109,7 +111,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
             debug.message("LoginState Callbacks");
             ((LoginStateCallback) callbacks[0]).setLoginState(loginState);
         } else {
-            if (am.isPureJAAS()) {
+            if (isPureJAAS) {
                 setPageTimeout(callbacks);
                 loginState.setSubmittedCallback(null,am) ;
                     loginState.setReceivedCallback(callbacks,am) ;
@@ -149,7 +151,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
             if (debug.messageEnabled()) {
                 debug.message("DSAMECAllbackhandler..."+ callbacks);
             }
-            if (am.isPureJAAS()) {
+            if (isPureJAAS) {
                 loginState.setReceivedCallback(null,am) ;
             }
         }

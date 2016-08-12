@@ -11,15 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
 
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.authentication.service.LoginContext;
+
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-
-import javax.security.auth.Subject;
 
 /**
  * Encapsulates logic for activating a session after successful authentication. Implements a strategy design pattern
@@ -38,6 +40,6 @@ public interface SessionActivator {
      * @return whether activation was successful.
      * @throws AuthException if an error occurs that prevents session activation.
      */
-    boolean activateSession(LoginState loginState, SessionService sessionService,
-                            InternalSession authSession, Subject subject, Object loginContext) throws AuthException;
+    boolean activateSession(LoginState loginState, SessionService sessionService, InternalSession authSession,
+                            Subject subject, LoginContext loginContext) throws AuthException;
 }
