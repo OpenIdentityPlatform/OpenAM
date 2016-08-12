@@ -14,12 +14,12 @@
  * Copyright 2014-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.dashboard;
+package org.forgerock.openam.core.rest.devices.deviceprint;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Resources.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.newDate;
 import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.anyString;
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.DeleteRequest;
@@ -39,10 +40,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.realms.Realm;
-import org.forgerock.openam.core.realms.RealmTest;
 import org.forgerock.openam.core.realms.RealmTestHelper;
-import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesDao;
-import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;

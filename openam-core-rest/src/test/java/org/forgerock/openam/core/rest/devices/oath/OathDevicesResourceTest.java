@@ -14,32 +14,25 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.core.rest.dashboard;
+package org.forgerock.openam.core.rest.devices.oath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
-import static org.forgerock.openam.utils.Time.*;
-import static org.mockito.BDDMockito.*;
+import static org.forgerock.openam.utils.Time.newDate;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -53,13 +46,12 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
-import org.forgerock.openam.core.rest.devices.oath.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
@@ -70,6 +62,12 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
 
 public class OathDevicesResourceTest {
 
@@ -236,6 +234,11 @@ public class OathDevicesResourceTest {
 
         // then
         assertThat(promise).failedWithResourceException().withCode(ResourceException.NOT_SUPPORTED);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(OathDevicesResource.class).hasValidAnnotations();
     }
 
     private static class OathDevicesResourceTestClass extends OathDevicesResource {

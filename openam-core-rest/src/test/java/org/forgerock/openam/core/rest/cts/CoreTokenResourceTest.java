@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.cts;
 
@@ -37,12 +37,16 @@ import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.util.promise.Promise;
 import org.mockito.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+/**
+ * Unit test for {@link CoreTokenResource}.
+ */
 public class CoreTokenResourceTest {
 
     private Debug mockDebug;
@@ -161,5 +165,10 @@ public class CoreTokenResourceTest {
 
         // Then
         verify(mockStore).updateAsync(any(Token.class));
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(CoreTokenResource.class).hasValidAnnotations();
     }
 }

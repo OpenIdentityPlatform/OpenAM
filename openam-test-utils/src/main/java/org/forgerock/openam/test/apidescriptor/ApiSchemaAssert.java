@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,24 +47,20 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
 
     private final TitleAssertor titleAssertor = new TitleAssertor();
     private final DescriptionAssertor descriptionAssertor = new DescriptionAssertor();
-    private final List<Annotation> fieldAnnotations;
+    private final List<Annotation> schemaAnnotations;
     private final List<String> schemaResources;
     private final Class<?> annotatedClass;
 
     ApiSchemaAssert(Class<?> annotatedClass, List<Schema> actual) {
         super(actual, ApiSchemaAssert.class);
         this.annotatedClass = annotatedClass;
-        fieldAnnotations = new ArrayList<>();
+        schemaAnnotations = new ArrayList<>();
         schemaResources = new ArrayList<>();
 
         for (Schema schema : actual) {
-            Class<?> resourceType = schema.fromType();
-            if (!resourceType.isAssignableFrom(Void.class)) {
-                Field[] fields = resourceType.getDeclaredFields();
-                for (Field field : fields) {
-                    Annotation[] annotations = field.getAnnotations();
-                    fieldAnnotations.addAll(Arrays.asList(annotations));
-                }
+            Class<?> resourceClass = schema.fromType();
+            if (!resourceClass.isAssignableFrom(Void.class)) {
+                schemaAnnotations.addAll(getSchemaAnnotations(resourceClass));
             }
             String schemaResource = schema.schemaResource();
             if (!schemaResource.isEmpty()) {
@@ -78,7 +75,7 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
      * @return An instance of {@link ApiSchemaAssert}.
      */
     public ApiSchemaAssert hasI18nTitles() {
-        for (Annotation annotation : fieldAnnotations) {
+        for (Annotation annotation : schemaAnnotations) {
             if (annotation instanceof Title) {
                 assertI18nTitle(((Title) annotation).value(), annotatedClass);
             }
@@ -95,7 +92,7 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
      * @return An instance of {@link ApiSchemaAssert}.
      */
     public ApiSchemaAssert hasI18nDescriptions() {
-        for (Annotation annotation : fieldAnnotations) {
+        for (Annotation annotation : schemaAnnotations) {
             if (annotation instanceof Description) {
                 assertI18nDescription(((Description) annotation).value(), annotatedClass);
             }
@@ -124,6 +121,25 @@ public final class ApiSchemaAssert extends AbstractListAssert<ApiSchemaAssert, L
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not read declared resource " + schemaResource, e);
         }
+    }
+
+    private List<Annotation> getSchemaAnnotations(Class<?> resourceClass) {
+        List<Annotation> schemaAnnotations = new ArrayList<>();
+        Annotation[] annotations = resourceClass.getAnnotations();
+        schemaAnnotations.addAll(Arrays.asList(annotations));
+
+        Field[] fields = resourceClass.getDeclaredFields();
+        for (Field field : fields) {
+            annotations = field.getAnnotations();
+            schemaAnnotations.addAll(Arrays.asList(annotations));
+        }
+
+        Method[] methods = resourceClass.getMethods();
+        for (Method method : methods) {
+            annotations = method.getAnnotations();
+            schemaAnnotations.addAll(Arrays.asList(annotations));
+        }
+        return schemaAnnotations;
     }
 
     private abstract class SchemaResourceAssertor implements Function<JsonValue, JsonValue, NeverThrowsException> {

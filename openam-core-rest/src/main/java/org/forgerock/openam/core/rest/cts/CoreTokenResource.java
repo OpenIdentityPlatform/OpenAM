@@ -120,7 +120,7 @@ public class CoreTokenResource {
                 description = CORE_TOKEN_RESOURCE + "error.unexpected.bad.request." + DESCRIPTION),
             @ApiError(
                 code = 500,
-                description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+                description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
         description = CORE_TOKEN_RESOURCE + CREATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
@@ -160,7 +160,7 @@ public class CoreTokenResource {
         errors = {
                 @ApiError(
                         code = 500,
-                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
         description = CORE_TOKEN_RESOURCE + DELETE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String tokenId,
             DeleteRequest deleteRequest) {
@@ -199,7 +199,7 @@ public class CoreTokenResource {
         errors = {
                 @ApiError(
                         code = 500,
-                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+                        description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
             description = CORE_TOKEN_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String tokenId,
             ReadRequest readRequest) {
@@ -238,7 +238,7 @@ public class CoreTokenResource {
             errors = {
                     @ApiError(
                             code = 500,
-                            description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error.." + DESCRIPTION)},
+                            description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
             description = CORE_TOKEN_RESOURCE + UPDATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String tokenId,
             UpdateRequest updateRequest) {
