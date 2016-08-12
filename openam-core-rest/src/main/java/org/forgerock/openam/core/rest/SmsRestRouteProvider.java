@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.openam.audit.AuditConstants.Component.CONFIG;
+import static org.forgerock.openam.audit.AuditConstants.Component.REALMS;
 
 import javax.inject.Inject;
 
@@ -41,6 +42,11 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
     @Override
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
 
+        realmRouter.route("realms")
+                .auditAs(REALMS)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
+                .toCollection(RealmResource.class);
+        
         realmRouter.route("realm-config")
                 .auditAs(CONFIG)
                 .authorizeWith(CrestPrivilegeAuthzModule.class)
