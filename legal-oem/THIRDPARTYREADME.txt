@@ -229,34 +229,34 @@ Copyright: Copyright 2005-2015 The Apache Software Foundation
 Version: httpcore-nio-4.4.1.jar
 Copyright: 2005-2015 The Apache Software Foundation
 
-Version: jackson-annotations-2.6.7.jar
+Version: jackson-annotations-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-core-2.6.7.jar
+Version: jackson-core-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-core-asl-1.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-databind-2.6.7.jar
+Version: jackson-databind-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-dataformat-csv-2.6.7.jar
+Version: jackson-dataformat-csv-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-dataformat-smile-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-xml-2.6.7.jar
+Version: jackson-dataformat-xml-2.8.1.jar
 Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-yaml-2.6.7.jar
+Version: jackson-dataformat-yaml-2.8.1.jar
 Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jaxb-annotations-2.6.7.jar
+Version: jackson-module-jaxb-annotations-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-module-jsonSchema-2.6.7.jar
+Version: jackson-module-jsonSchema-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: java-ipv6-0.14.jar
@@ -386,6 +386,9 @@ Version: woodstox-core-asl-4.3.0.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: woodstox-core-asl-4.4.1.jar
+Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
+
+Version: woodstox-core-5.0.2.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: wss4j-1.6.19.jar
