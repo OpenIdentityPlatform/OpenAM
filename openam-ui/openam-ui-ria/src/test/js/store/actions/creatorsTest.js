@@ -25,7 +25,7 @@ define([
 
                 expect(creators.sessionAddRealm(absolutePath)).eql({
                     type: types.SESSION_ADD_REALM,
-                    absolutePath
+                    absolutePath: absolutePath.toLowerCase()
                 });
             });
         });

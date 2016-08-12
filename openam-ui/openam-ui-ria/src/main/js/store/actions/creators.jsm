@@ -22,7 +22,7 @@ import {
 
 export const sessionAddRealm = (absolutePath) => ({
     type: SESSION_ADD_REALM,
-    absolutePath
+    absolutePath: absolutePath.toLowerCase()
 });
 
 export const sessionRemoveRealm = () => ({
@@ -31,5 +31,5 @@ export const sessionRemoveRealm = () => ({
 
 export const serverAddRealm = (realm) => ({
     type: SERVER_ADD_REALM,
-    realm
+    realm: realm.toLowerCase()
 });
