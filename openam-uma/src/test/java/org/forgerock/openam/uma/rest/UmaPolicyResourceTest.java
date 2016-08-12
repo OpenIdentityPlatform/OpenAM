@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -242,51 +243,6 @@ public class UmaPolicyResourceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForPatchInstance() {
-
-        //Given
-        Context context = mock(Context.class);
-        PatchRequest request = Requests.newPatchRequest("/policies");
-
-        //When
-        Promise<ResourceResponse, ResourceException> result = policyResource.patchInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(result).failedWithResourceException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForActionCollection() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-
-        //When
-        Promise<ActionResponse, ResourceException> result = policyResource.actionCollection(context, request);
-
-        //Then
-        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForActionInstance() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-
-        //When
-        Promise<ActionResponse, ResourceException> result = policyResource.actionInstance(context, "RESOURCE_SET_ID", request);
-
-        //Then
-        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
     public void shouldSuccessfullyQueryPolicies() {
 
         //Given
@@ -331,4 +287,10 @@ public class UmaPolicyResourceTest {
         //Then
         assertThat(result).failedWithException().isEqualTo(resourceException);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(UmaPolicyResource.class).hasValidAnnotations();
+    }
 }
+

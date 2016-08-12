@@ -17,6 +17,7 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
@@ -41,6 +44,8 @@ import org.forgerock.openam.oauth2.ResourceSetDescription;
  *
  * @since 13.0.0
  */
+@Title(UMA_POLICY_RESOURCE + "umaPolicyResource." + TITLE)
+@Description(UMA_POLICY_RESOURCE + "umaPolicyResource." + DESCRIPTION)
 public class UmaPolicy {
 
     /**
@@ -154,6 +159,8 @@ public class UmaPolicy {
     }
 
     private final ResourceSetDescription resourceSet;
+    @Title(UMA_POLICY_RESOURCE + "umaPolicyResource.policy." + TITLE)
+    @Description(UMA_POLICY_RESOURCE + "umaPolicyResource.policy." + DESCRIPTION)
     private final JsonValue policy;
     private final Collection<String> underlyingPolicyIds;
     private Set<String> scopes;

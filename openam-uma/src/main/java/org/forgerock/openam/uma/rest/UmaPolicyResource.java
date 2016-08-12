@@ -11,39 +11,47 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.forgerock.services.context.Context;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CollectionResourceProvider;
+import javax.inject.Inject;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
@@ -53,7 +61,12 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-public class UmaPolicyResource implements CollectionResourceProvider {
+@CollectionProvider(details = @Handler(
+        mvccSupported = true,
+        title = UMA_POLICY_RESOURCE + TITLE,
+        description =  UMA_POLICY_RESOURCE + DESCRIPTION,
+        resourceSchema = @Schema(fromType = UmaPolicy.class)))
+public class UmaPolicyResource {
 
     private final UmaPolicyService umaPolicyService;
 
@@ -68,9 +81,37 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link RequestHandler#handleCreate(Context, CreateRequest)
+     * Adds} a new resource instance to the collection.
+     * <p>
+     * Create requests are targeted at the collection itself and may include a
+     * user-provided resource ID for the new resource as part of the request
+     * itself. The user-provider resource ID may be accessed using the method
+     * {@link CreateRequest#getNewResourceId()}.
+     *
+     * @param context
+     *            The request server context.
+     * @param request
+     *            The create request.
+     * @return A {@code Promise} containing the result of the operation.
+     * @see RequestHandler#handleCreate(Context, CreateRequest)
+     * @see CreateRequest#getNewResourceId()
      */
-    @Override
+    @Create(operationDescription = @Operation(
+            description = UMA_POLICY_RESOURCE + CREATE_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = BAD_REQUEST,
+                            description = UMA_POLICY_RESOURCE + CREATE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = FORBIDDEN,
+                            description = UMA_POLICY_RESOURCE + CREATE + ERROR_403_DESCRIPTION),
+                    @ApiError(
+                            code = CONFLICT,
+                            description = UMA_POLICY_RESOURCE + CREATE + ERROR_409_DESCRIPTION),
+                    @ApiError(
+                            code = INTERNAL_ERROR,
+                            description = UMA_POLICY_RESOURCE + CREATE + ERROR_500_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return umaPolicyService.createPolicy(context, request.getContent())
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
@@ -82,9 +123,21 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link RequestHandler#handleRead(Context, ReadRequest)
+     * Reads} an existing resource within the collection.
+     *
+     * @param context
+     *            The request server context.
+     * @param resourceId
+     *            The ID of the targeted resource within the collection.
+     * @param request
+     *            The read request.
+     * @return A {@code Promise} containing the result of the operation.
+     * @see RequestHandler#handleRead(Context, ReadRequest)
      */
-    @Override
+    @Read(operationDescription = @Operation(
+            description = UMA_POLICY_RESOURCE + READ_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, final String resourceId,
             ReadRequest request) {
         return umaPolicyService.readPolicy(context, resourceId)
@@ -97,9 +150,30 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link RequestHandler#handleUpdate(Context, UpdateRequest)
+     * Updates} an existing resource within the collection.
+     *
+     * @param context
+     *            The request server context.
+     * @param resourceId
+     *            The ID of the targeted resource within the collection.
+     * @param request
+     *            The update request.
+     * @return A {@code Promise} containing the result of the operation.
+     * @see RequestHandler#handleUpdate(Context, UpdateRequest)
      */
-    @Override
+    @Update(operationDescription = @Operation(
+            description = UMA_POLICY_RESOURCE + UPDATE_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = BAD_REQUEST,
+                            description = UMA_POLICY_RESOURCE + UPDATE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = FORBIDDEN,
+                            description = UMA_POLICY_RESOURCE + UPDATE + ERROR_403_DESCRIPTION),
+                    @ApiError(
+                            code = INTERNAL_ERROR,
+                            description = UMA_POLICY_RESOURCE + UPDATE + ERROR_500_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return umaPolicyService.updatePolicy(context, resourceId, request.getContent())
@@ -112,9 +186,30 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link RequestHandler#handleDelete(Context, DeleteRequest)
+     * Removes} a resource instance from the collection.
+     *
+     * @param context
+     *            The request server context.
+     * @param resourceId
+     *            The ID of the targeted resource within the collection.
+     * @param request
+     *            The delete request.
+     * @return A {@code Promise} containing the result of the operation.
+     * @see RequestHandler#handleDelete(Context, DeleteRequest)
      */
-    @Override
+    @Delete(operationDescription = @Operation(
+            description = UMA_POLICY_RESOURCE + DELETE_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = BAD_REQUEST,
+                            description = UMA_POLICY_RESOURCE + DELETE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = NOT_FOUND,
+                            description = UMA_POLICY_RESOURCE + DELETE + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = INTERNAL_ERROR,
+                            description = UMA_POLICY_RESOURCE + DELETE + ERROR_500_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
             DeleteRequest request) {
         return umaPolicyService.deletePolicy(context, resourceId)
@@ -127,36 +222,32 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link RequestHandler#handleQuery(Context, QueryRequest, QueryResourceHandler)
+     * Searches} the collection for all resources which match the query request
+     * criteria.
+     * <p>
+     * Implementations must invoke
+     * {@link QueryResourceHandler#handleResource(ResourceResponse)} for each resource
+     * which matches the query criteria. Once all matching resources have been
+     * returned implementations are required to return either a
+     * {@link QueryResponse} if the query has completed successfully, or
+     * {@link ResourceException} if the query did not complete successfully
+     * (even if some matching resources were returned).
+     *
+     * @param context
+     *            The request server context.
+     * @param request
+     *            The query request.
+     * @param handler
+     *            The query resource handler to be notified for each matching
+     *            resource.
+     * @return A {@code Promise} containing the result of the operation.
+     * @see RequestHandler#handleQuery(Context, QueryRequest, QueryResourceHandler)
      */
-    //No patch support on PolicyResource so we will patch our policy representation and then do an update
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    @Query(operationDescription = @Operation(
+            description = UMA_POLICY_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, final QueryRequest request,
             final QueryResourceHandler handler) {
         return umaPolicyService.queryPolicies(context, request)
