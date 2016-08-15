@@ -57,13 +57,13 @@ public class CollectionHelper {
     private static final String SEPARATOR = "|";
 
     /**
-     * Returns String from a map of string of set of string.
+     * Returns String from a map of string to set of string.
      *
-     * @param map Map of string of set of string.
+     * @param map Map of string to set of string.
      * @param name Key of the map entry.
-     * @return String from a map of string of set of string
+     * @return String from a map of string to set of string
      */
-    public static String getMapAttr(Map map, String name) {
+    public static String getMapAttr(Map<?, ?> map, String name) {
         Set s = (Set) map.get(name);
         String retVal = ((s == null) || s.isEmpty()) ? null : ((String) s.iterator().next());
         return (retVal != null) ? retVal.trim() : null;

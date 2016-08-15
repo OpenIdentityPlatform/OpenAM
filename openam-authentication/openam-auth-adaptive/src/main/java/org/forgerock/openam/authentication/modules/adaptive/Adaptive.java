@@ -28,38 +28,6 @@ package org.forgerock.openam.authentication.modules.adaptive;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6AddressRange;
-import com.googlecode.ipv6.IPv6Network;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.maxmind.geoip2.DatabaseReader;
-import com.maxmind.geoip2.exception.GeoIp2Exception;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.authentication.spi.AMLoginModule;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.AuthenticationException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchOpModifier;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.security.EncodeAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.shared.encode.Hash;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -75,7 +43,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -86,14 +53,40 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IPRange;
 import org.forgerock.openam.utils.ValidateIPaddress;
 
-public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterface {
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6AddressRange;
+import com.googlecode.ipv6.IPv6Network;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.sun.identity.authentication.spi.AMLoginModule;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.Hash;
+
+public class Adaptive extends AMLoginModule {
 
     private static final String ADAPTIVE = "amAuthAdaptive";
     private static final String AUTHLEVEL = "openam-auth-adaptive-auth-level";
@@ -1009,88 +1002,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         return theID;
     }
 
-    public void onLoginSuccess(Map requestParamsMap, HttpServletRequest request,
-                               HttpServletResponse response, SSOToken token)
-            throws AuthenticationException {
-        Map<String, String> m = new HashMap<String, String>();
-        Map<String, Set> attrMap = new HashMap<String, Set>();
-
-        if (debug.messageEnabled()) {
-            debug.message("{} executing PostProcessClass", ADAPTIVE);
-        }
-
-        try {
-            String s = token.getProperty("ADAPTIVE");
-            if (s != null && !s.isEmpty()) {
-                stringToMap(s, m);
-                token.setProperty("ADAPTIVE", "");
-            }
-            if (m.containsKey("IPSAVE")) {
-                String value = m.get("IPSAVE");
-                String name = m.get("IPAttr");
-                Set<String> vals = new HashSet<String>();
-                vals.add(value);
-
-                attrMap.put(name, vals);
-            }
-
-            // Now we save the attribs,  since we can do it in one shot
-            if (!attrMap.isEmpty()) {
-                try {
-                    AMIdentity id = IdUtils.getIdentity(
-                            AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                            token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
-                    id.setAttributes(attrMap);
-                    id.store();
-                } catch (Exception e) {
-                    debug.error("{}.getIdentity : Unable to save Attribute : {}", ADAPTIVE, attrMap, e);
-                }
-
-            }
-            int autoLoginExpire = (60 * 60 * 24) * 365; // 1 year, configurable?
-
-            final Set<String> cookieDomains = AuthUtils.getCookieDomainsForRequest(request);
-            if (m.containsKey("LOGINNAME")) {
-                String value = m.get("LOGINVALUE");
-                String name = m.get("LOGINNAME");
-
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
-            }
-            if (m.containsKey("COOKIENAME")) {
-                String name = m.get("COOKIENAME");
-                String value = m.get("COOKIEVALUE");
-
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
-            }
-            if (m.containsKey("DEVICENAME")) {
-                String name = m.get("DEVICENAME");
-                String value = m.get("DEVICEVALUE");
-
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
-            }
-        } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("{}.getIdentity : Unable to Retrieve PostAuthN Params", ADAPTIVE, e);
-            }
-        }
-    }
-
-    private void addCookieToResponse(HttpServletResponse response, Set<String> cookieDomains, String name,
-            String value, int expire) {
-        for (String domain : cookieDomains) {
-            CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(name, value, expire, "/", domain));
-        }
-    }
-
-    public void onLoginFailure(Map requestParamsMap, HttpServletRequest request,
-                               HttpServletResponse response) throws AuthenticationException {
-    }
-
-    public void onLogout(HttpServletRequest request,
-                         HttpServletResponse response, SSOToken token)
-            throws AuthenticationException {
-    }
-
     /**
      * This builds a map, of the data needed by the PostAuth Class, serializes it,  and then adds it to the Session
      */
@@ -1360,17 +1271,19 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         return stringBuilder.toString();
     }
 
-    public static void stringToMap(String input, Map<String, String> map) {
+    public static Map<String, String> stringToMap(String input) {
+        Map<String, String> result = new HashMap<>();
         String[] nameValuePairs = input.split("&");
         for (String nameValuePair : nameValuePairs) {
             String[] nameValue = nameValuePair.split("=");
             try {
-                map.put(URLDecoder.decode(nameValue[0], "UTF-8"), nameValue.length > 1 ? URLDecoder.decode(
+                result.put(URLDecoder.decode(nameValue[0], "UTF-8"), nameValue.length > 1 ? URLDecoder.decode(
                         nameValue[1], "UTF-8") : "");
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("This method requires UTF-8 encoding support", e);
             }
         }
+        return result;
     }
 
     private static synchronized DatabaseReader getLookupService(String dbLocation) {
