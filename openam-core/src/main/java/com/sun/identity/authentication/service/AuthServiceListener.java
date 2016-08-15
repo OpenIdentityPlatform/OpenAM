@@ -24,7 +24,7 @@
  *
  * $Id: AuthServiceListener.java,v 1.4 2008/11/10 22:56:55 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
@@ -32,6 +32,7 @@ package com.sun.identity.authentication.service;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -47,7 +48,7 @@ import com.sun.identity.sm.ServiceListener;
  */
 public class AuthServiceListener implements ServiceListener{
     private static final String AUTHCONFIG_SERVICE = "iPlanetAMAuthConfiguration";
-    private static Map<String, Map> serviceAttributeCache = new HashMap<>();
+    private static Map<String, Map<String, Set<String>>> serviceAttributeCache = new HashMap<>();
     private static Debug debug = Debug.getInstance("amAuth");
     private static AuthServiceListener serviceListener = new AuthServiceListener();
 
@@ -77,8 +78,8 @@ public class AuthServiceListener implements ServiceListener{
      *            auth configuration service name.
      * @return service attributes.
      */
-    public static Map getServiceAttributeCache(String orgDN, String serviceName) {
-        Map retVal = serviceAttributeCache.get(key(serviceName, orgDN));
+    public static Map<String, Set<String>> getServiceAttributeCache(String orgDN, String serviceName) {
+        Map<String, Set<String>> retVal = serviceAttributeCache.get(key(serviceName, orgDN));
         debug.message("AuthServiceListener.getServiceAttributeCache(): Returning from cache={}, orgDN={}", retVal,
                 orgDN);
         return retVal;
@@ -98,7 +99,7 @@ public class AuthServiceListener implements ServiceListener{
      * @param serviceAttributes
      *            auth service attributes.
      */
-    public static void setServiceAttributeCache(String orgDN, String serviceName, Map serviceAttributes) {
+    public static void setServiceAttributeCache(String orgDN, String serviceName, Map<String, Set<String>> serviceAttributes) {
         serviceAttributeCache.put(key(serviceName, orgDN), serviceAttributes);
         debug.message("AuthServiceListener.setServiceAttributeCache(): Cache after add={}, orgDN={}",
                 serviceAttributeCache, orgDN);

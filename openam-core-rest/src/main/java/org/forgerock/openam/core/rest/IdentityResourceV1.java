@@ -31,7 +31,6 @@ import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +135,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     private ServiceConfigManager mailmgr;
     private ServiceConfig mailscm;
-    private Map<String, HashSet<String>> mailattrs;
+    private Map<String, Set<String>> mailattrs;
 
     final static String MAIL_IMPL_CLASS = "forgerockMailServerImplClassName";
     final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";

@@ -35,6 +35,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
+
 import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMCrypt;
 import com.iplanet.am.sdk.AMHashMap;
@@ -52,11 +57,6 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import org.forgerock.i18n.LocalizedIllegalArgumentException;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.RDN;
 
 /**
  * This class represents an Identity which needs to be managed by Access
@@ -321,8 +321,7 @@ public class AMIdentity {
     public Map getAttributes() throws IdRepoException, SSOException {
 
         IdServices idServices = IdServicesFactory.getDataStoreServices();
-        Map attrs = idServices
-                .getAttributes(token, type, name, orgName, univDN);
+        Map attrs = idServices.getAttributes(token, type, name, orgName, univDN);
         if (debug.messageEnabled()) {
             debug.message("AMIdentity.getAttributes all: attrs=" +
                 IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrs, null));
@@ -801,7 +800,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Map getServiceAttributes(String serviceName)
+    public Map<String, Set<String>> getServiceAttributes(String serviceName)
         throws IdRepoException, SSOException {
         Set attrNames = getServiceAttributesName(serviceName);
 
@@ -811,8 +810,7 @@ public class AMIdentity {
             debug.message("AMIdentity.getServiceAttributes: attrNames="
                 + attrNames + ";  orgName=" + orgName + ";  univDN=" + univDN);
        }
-        return idServices.getServiceAttributes(token, type, name, serviceName,
-            attrNames, orgName, univDN);
+        return idServices.getServiceAttributes(token, type, name, serviceName, attrNames, orgName, univDN);
     }
 
 

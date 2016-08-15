@@ -29,6 +29,26 @@
  */
 package com.sun.identity.authentication.UI;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -67,24 +87,6 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.sm.DNMapper;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * This class is a default implementation of <code>LoginViewBean</code> 
@@ -147,16 +149,16 @@ public class LoginViewBean extends AuthViewBeanBase {
             return new StaticTextField(this, name, TextHeaderVal);
         } else if (name.equals(REDIRECT_URL)) { // Redirect URL for wireless
             String redirect = redirect_url;
-            redirect_url = AuthUtils.encodeURL(redirect, ac, response);
+            redirect_url = AuthUtils.encodeURL(redirect, ac);
             return new StaticTextField(this, name, redirect_url);
         } else if (name.equals(DEFAULT_LOGIN_URL)) {
-            String default_login_url = AuthUtils.encodeURL(LOGINURL, ac, response);
+            String default_login_url = AuthUtils.encodeURL(LOGINURL, ac);
             return new StaticTextField(this, name, default_login_url);
         } else if (name.equals(LOGIN_URL)) { // non-cookie support
             if ((loginURL==null)||(loginURL.length() == 0)) {
                 loginURL = LOGINURL;
             }
-            loginURL = AuthUtils.encodeURL(loginURL, ac, response);
+            loginURL = AuthUtils.encodeURL(loginURL, ac);
             return new StaticTextField(this, name, loginURL);
         } else if (name.equals(PAGE_STATE)) {
             return new StaticTextField(this, name, pageState);
@@ -737,7 +739,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
         }
         
-        return AuthUtils.encodeURL(jsp_page,ac,response);
+        return AuthUtils.encodeURL(jsp_page,ac);
     }
     
     

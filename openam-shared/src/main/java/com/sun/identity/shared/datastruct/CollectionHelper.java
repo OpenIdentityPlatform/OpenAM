@@ -369,7 +369,7 @@ public class CollectionHelper {
      * @param attrName Key of the map entry of interest.
      * @return attributes based on the prioritization.
      */
-    public static Set<String> getServerMapAttrs(Map<String, Set<?>> map, String attrName) {
+    public static Set<String> getServerMapAttrs(Map<String, Set<String>> map, String attrName) {
         Set<String> ret = new LinkedHashSet<String>();
         Set<String> attrValues = (Set<String>) map.get(attrName);
         Set<String> currentServerDefined = new LinkedHashSet<String>();

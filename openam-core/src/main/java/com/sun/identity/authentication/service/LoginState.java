@@ -211,7 +211,6 @@ public class LoginState {
     private String loginLockoutAttrValue = null;
     private String invalidAttemptsDataAttrName = null;
     private int loginLockoutUserWarning = 3;
-    private int userWarningCount = 0;
     private String failureTokenId = null;
     private Callback[] receivedCallbackInfo;
     private Callback[] prevCallback;
@@ -249,7 +248,6 @@ public class LoginState {
     private boolean cookieSet = false;
     private boolean userEnabled = true;
     private AMIdentity amIdentityRole = null;
-    private Set<String> tokenSet;
     private AuthContext.IndexType indexType;
     private String indexName = null;
     private AuthContext.IndexType prevIndexType = null;
@@ -263,7 +261,7 @@ public class LoginState {
     private String defaultOrgSuccessLoginURL = null;
     private String clientOrgFailureLoginURL = null;
     private String defaultOrgFailureLoginURL = null;
-    private final Map<String, String> requestMap = new HashMap<String, String>();
+    private final Map<String, String> requestMap = new HashMap<>();
     private Set<String> domainAuthenticators = null;
     private Set<String> moduleInstances = null;
     private boolean sessionUpgrade = false;
@@ -293,11 +291,10 @@ public class LoginState {
     private String orgAuthConfig = null;
     private String orgAdminAuthConfig = null;
     private String roleAuthConfig = null;
-    private Set orgPostLoginClassSet = Collections.EMPTY_SET;
-    private Map serviceAttributesMap = new HashMap();
+    private Set<String> orgPostLoginClassSet = Collections.emptySet();
+    private Map<String, Set<String>> serviceAttributesMap = new HashMap<>();
     private String moduleErrorMessage = null;
     private String tempDefaultURL = null;
-    private Set<AMPostAuthProcessInterface> postLoginInstanceSet = null;
     private boolean isLocaleSet = false;
     private boolean cookieDetect = false;
     private Map<String, Object> userCreationAttributes = null;
@@ -307,7 +304,7 @@ public class LoginState {
     private String failureModuleList = ISAuthConstants.EMPTY_STRING;
     private String fqdnFailureLoginURL = null;
     private Map<String, String> moduleMap = null;
-    private Map roleAttributeMap = null;
+    private Map<String, Set<String>> roleAttributeMap = null;
     private Set<String> identityTypes = Collections.emptySet();
     private Set<String> userSessionMapping = Collections.emptySet();
     private AMIdentityRepository amIdRepo = null;
@@ -470,7 +467,7 @@ public class LoginState {
      * @param callback
      * @param amLoginContext
      */
-    public void setReceivedCallback(
+    void setReceivedCallback(
             Callback[] callback,
             AMLoginContext amLoginContext) {
         synchronized (amLoginContext) {
@@ -487,7 +484,7 @@ public class LoginState {
      *
      * @param callback
      */
-    public void setReceivedCallback_NoThread(Callback[] callback) {
+    void setReceivedCallback_NoThread(Callback[] callback) {
         submittedCallbackInfo = null;
         receivedCallbackInfo = callback;
         prevCallback = callback;
@@ -499,7 +496,7 @@ public class LoginState {
      * @param callback
      * @param amLoginContext
      */
-    public void setSubmittedCallback(
+     void setSubmittedCallback(
             Callback[] callback,
             AMLoginContext amLoginContext) {
         synchronized (amLoginContext) {
@@ -516,7 +513,7 @@ public class LoginState {
      *
      * @param callback
      */
-    public void setSubmittedCallback_NoThread(Callback[] callback) {
+    void setSubmittedCallback_NoThread(Callback[] callback) {
         prevCallback = receivedCallbackInfo;
         receivedCallbackInfo = null;
         submittedCallbackInfo = callback;
@@ -536,7 +533,7 @@ public class LoginState {
      *
      * @return callbacks submitted by client.
      */
-    public Callback[] getSubmittedInfo() {
+     Callback[] getSubmittedInfo() {
         return submittedCallbackInfo;
     }
 
@@ -611,7 +608,7 @@ public class LoginState {
      * @param newRequest <code>true</code> for new request type;
      *                    <code>false</code> for existing request type.
      */
-    public void setNewRequest(boolean newRequest) {
+    void setNewRequest(boolean newRequest) {
         this.newRequest = newRequest;
     }
 
@@ -620,7 +617,7 @@ public class LoginState {
      *
      * @return the request type.
      */
-    public boolean isNewRequest() {
+    boolean isNewRequest() {
         return newRequest;
     }
 
@@ -638,7 +635,7 @@ public class LoginState {
      *
      * @throws AuthException
      */
-    public void populateOrgProfile() throws AuthException {
+    private void populateOrgProfile() throws AuthException {
         try {
             // get inetdomainstatus for the org
             // check if org is active
@@ -668,9 +665,8 @@ public class LoginState {
                 identityTypes = attrs.get(ISAuthConstants.
                         AUTH_ID_TYPE_ATTR);
             } else {
-                identityTypes = new HashSet<String>();
-                Set containerDNs = (Set) attrs.get(
-                        ISAuthConstants.AUTH_USER_CONTAINER);
+                identityTypes = new HashSet<>();
+                Set<String> containerDNs = attrs.get(ISAuthConstants.AUTH_USER_CONTAINER);
                 getContainerDN(containerDNs);
             }
             userSessionMapping = attrs.get(ISAuthConstants.
@@ -696,8 +692,7 @@ public class LoginState {
             tmp = CollectionHelper.getMapAttr(attrs, Constants.ZERO_PAGE_LOGIN_ENABLED);
             boolean zplEnabled = Boolean.valueOf(tmp);
 
-            @SuppressWarnings("unchecked")
-            Set<String> zplWhitelist = (Set<String>) attrs.get(Constants.ZERO_PAGE_LOGIN_WHITELIST);
+            Set<String> zplWhitelist = attrs.get(Constants.ZERO_PAGE_LOGIN_WHITELIST);
             if (zplWhitelist == null) {
                 zplWhitelist = Collections.emptySet();
             }
@@ -720,34 +715,30 @@ public class LoginState {
 
             localeContext.setOrgLocale(getOrgDN());
 
-            Set orgSuccessLoginURLSet = (Set) attrs.get(ISAuthConstants.LOGIN_SUCCESS_URL);
+            Set<String> orgSuccessLoginURLSet = attrs.get(ISAuthConstants.LOGIN_SUCCESS_URL);
 
             if (orgSuccessLoginURLSet == null) {
-                orgSuccessLoginURLSet = Collections.EMPTY_SET;
+                orgSuccessLoginURLSet = Collections.emptySet();
             }
 
             clientOrgSuccessLoginURL = getRedirectUrl(orgSuccessLoginURLSet);
             defaultOrgSuccessLoginURL = tempDefaultURL;
 
-            Set orgFailureLoginURLSet = (Set) attrs.get(ISAuthConstants.LOGIN_FAILURE_URL);
+            Set<String> orgFailureLoginURLSet = attrs.get(ISAuthConstants.LOGIN_FAILURE_URL);
             if (orgFailureLoginURLSet == null) {
-                orgFailureLoginURLSet = Collections.EMPTY_SET;
+                orgFailureLoginURLSet = Collections.emptySet();
             }
 
             clientOrgFailureLoginURL = getRedirectUrl(orgFailureLoginURLSet);
             defaultOrgFailureLoginURL = tempDefaultURL;
-            orgAuthConfig = CollectionHelper.getMapAttr(attrs,
-                    ISAuthConstants.AUTHCONFIG_ORG);
-            orgAdminAuthConfig = CollectionHelper.getMapAttr(attrs,
-                    ISAuthConstants.AUTHCONFIG_ADMIN);
-            orgPostLoginClassSet =
-                    (Set) attrs.get(ISAuthConstants.POST_LOGIN_PROCESS);
+            orgAuthConfig = CollectionHelper.getMapAttr(attrs, ISAuthConstants.AUTHCONFIG_ORG);
+            orgAdminAuthConfig = CollectionHelper.getMapAttr(attrs, ISAuthConstants.AUTHCONFIG_ADMIN);
+            orgPostLoginClassSet = attrs.get(ISAuthConstants.POST_LOGIN_PROCESS);
             if (orgPostLoginClassSet == null) {
-                orgPostLoginClassSet = Collections.EMPTY_SET;
+                orgPostLoginClassSet = Collections.emptySet();
             }
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.MODULE_BASED_AUTH);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.MODULE_BASED_AUTH);
             if (tmp != null) {
                 if (tmp.equalsIgnoreCase("false")) {
                     enableModuleBasedAuth = false;
@@ -756,22 +747,19 @@ public class LoginState {
 
 
             // retrieve account locking specific attributes
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOGIN_FAILURE_LOCKOUT);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOGIN_FAILURE_LOCKOUT);
             if (tmp != null) {
                 if (tmp.equalsIgnoreCase("true")) {
                     setLoginFailureLockoutMode(true);
                 }
             }
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOGIN_FAILURE_STORE_IN_DS);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOGIN_FAILURE_STORE_IN_DS);
             if (tmp != null) {
                 if (tmp.equalsIgnoreCase("false")) {
                     setLoginFailureLockoutStoreInDS(false);
                 }
             }
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOCKOUT_DURATION);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOCKOUT_DURATION);
             if (tmp != null) {
                 try {
                     setLoginFailureLockoutDuration(Long.parseLong(tmp));
@@ -790,8 +778,7 @@ public class LoginState {
                 }
             }
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOGIN_FAILURE_COUNT);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOGIN_FAILURE_COUNT);
             if (tmp != null) {
                 try {
                     setLoginFailureLockoutCount(Integer.parseInt(tmp));
@@ -800,8 +787,7 @@ public class LoginState {
                 }
             }
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOGIN_FAILURE_DURATION);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOGIN_FAILURE_DURATION);
             if (tmp != null) {
                 try {
                     setLoginFailureLockoutTime(Long.parseLong(tmp));
@@ -811,8 +797,7 @@ public class LoginState {
                 setLoginFailureLockoutTime(getLoginFailureLockoutTime() * 60 * 1000);
             }
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOCKOUT_WARN_USER);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOCKOUT_WARN_USER);
             if (tmp != null) {
                 try {
                     setLoginLockoutUserWarning(Integer.parseInt(tmp));
@@ -821,11 +806,9 @@ public class LoginState {
                 }
             }
 
-            setLoginLockoutNotification(CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOCKOUT_EMAIL));
+            setLoginLockoutNotification(CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOCKOUT_EMAIL));
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.USERNAME_GENERATOR);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.USERNAME_GENERATOR);
             if (tmp != null) {
                 setUserIDGeneratorEnabled(Boolean.valueOf(tmp));
             }
@@ -835,14 +818,11 @@ public class LoginState {
                 setMandatory2FAValue(tmp);
             }
 
-            setUserIDGeneratorClassName(CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.USERNAME_GENERATOR_CLASS));
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOCKOUT_ATTR_NAME);
+            setUserIDGeneratorClassName(CollectionHelper.getMapAttr(attrs, ISAuthConstants.USERNAME_GENERATOR_CLASS));
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOCKOUT_ATTR_NAME);
             setLoginLockoutAttrName(tmp);
 
-            tmp = CollectionHelper.getMapAttr(
-                    attrs, ISAuthConstants.LOCKOUT_ATTR_VALUE);
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.LOCKOUT_ATTR_VALUE);
             setLoginLockoutAttrValue(tmp);
 
             setInvalidAttemptsDataAttrName(CollectionHelper.getMapAttr(
@@ -890,17 +870,14 @@ public class LoginState {
      *
      * @throws AuthException
      */
-    public void populateGlobalProfile() throws AuthException {
+    private void populateGlobalProfile() throws AuthException {
         Map attrs = AuthUtils.getGlobalAttributes("iPlanetAMAuthService");
-        String tmpPostProcess = Misc.getMapAttr(attrs,
-                ISAuthConstants.KEEP_POSTPROCESS_IN_SESSION);
+        String tmpPostProcess = Misc.getMapAttr(attrs, ISAuthConstants.KEEP_POSTPROCESS_IN_SESSION);
         postProcessInSession = Boolean.parseBoolean(tmpPostProcess);
-        String tmpModules = Misc.getMapAttr(attrs,
-                ISAuthConstants.KEEP_MODULES_IN_SESSION);
+        String tmpModules = Misc.getMapAttr(attrs, ISAuthConstants.KEEP_MODULES_IN_SESSION);
         modulesInSession = Boolean.parseBoolean(tmpModules);
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.populateGlobalProfile: "
-                    + "Getting Global Profile: " +
+            DEBUG.message("LoginState.populateGlobalProfile: Getting Global Profile: " +
                     "\npostProcessInSession ->" + postProcessInSession +
                     "\nmodulesInSession ->" + modulesInSession);
         }
@@ -1056,7 +1033,7 @@ public class LoginState {
      * @param token0 <code>SSOToken</code> ID has user principal
      * @return DN for user principal
      */
-    public String tokenToDN(String token0) {
+    private String tokenToDN(String token0) {
         try {
             String token = token0.toLowerCase();
             int pipe = token.indexOf("|");
@@ -1105,18 +1082,6 @@ public class LoginState {
     public String getClientType() {
         return (servletRequest != null) ?
                 AuthUtils.getClientType(servletRequest) : AuthUtils.getDefaultClientType();
-    }
-
-    /**
-     * Activates session on successful authenticaton.
-     *
-     * @param subject
-     * @param ac
-     * @return true if user session is activated successfully
-     */
-    public boolean activateSession(Subject subject, AuthContextLocal ac)
-            throws AuthException {
-        return activateSession(subject, ac, null);
     }
 
     /**
@@ -1181,7 +1146,7 @@ public class LoginState {
         return DefaultSessionActivator.INSTANCE;
     }
 
-    public void setOldStatelessSession(StatelessSession session) {
+    void setOldStatelessSession(StatelessSession session) {
         this.oldStatelessSession = session;
     }
 
@@ -1191,7 +1156,7 @@ public class LoginState {
      * @param session
      * @throws AuthException
      */
-    public void setSessionProperties(InternalSession session) throws AuthException {
+    void setSessionProperties(InternalSession session) throws AuthException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState getSession = " +
                     session + " \nrequest token = " + token);
@@ -1378,7 +1343,7 @@ public class LoginState {
         }
 
         String sessionSuccessURL = LazyConfig.AUTHD.processURL(successLoginURL, servletRequest);
-        sessionSuccessURL = encodeURL(sessionSuccessURL, servletResponse, true);
+        sessionSuccessURL = encodeURL(sessionSuccessURL, true);
         if (sessionSuccessURL != null) {
             session.putProperty(ISAuthConstants.SUCCESS_URL, sessionSuccessURL);
         }
@@ -1562,17 +1527,14 @@ public class LoginState {
                     AuthenticationPrincipalDataRetrieverFactory.
                             getPrincipalDataRetriever();
             if (principalDataRetriever != null) {
-                Map<String, String> attrMap =
-                        principalDataRetriever.getAttrMapForAuthenticationModule(
-                                subject);
+                Map<String, String> attrMap = principalDataRetriever.getAttrMapForAuthenticationModule(subject);
                 if (attrMap != null && !attrMap.isEmpty()) {
                     for (Map.Entry<String, String> entry : attrMap.entrySet()) {
                         String attrName = entry.getKey();
                         String attrValue = entry.getValue();
                         session.putProperty(attrName, attrValue);
                         if (DEBUG.messageEnabled()) {
-                            DEBUG.message("AttrMap for SAML : " +
-                                    attrName + " , " + attrValue);
+                            DEBUG.message("AttrMap for SAML : " + attrName + " , " + attrValue);
                         }
                     }
                 }
@@ -1598,7 +1560,7 @@ public class LoginState {
      *
      * @return Query Organization.
      */
-    public String getQueryOrg() {
+    String getQueryOrg() {
         return queryOrg;
     }
 
@@ -1607,7 +1569,7 @@ public class LoginState {
      *
      * @param queryOrg Query organization.
      */
-    public void setQueryOrg(String queryOrg) {
+    void setQueryOrg(String queryOrg) {
         this.queryOrg = queryOrg;
     }
 
@@ -1670,8 +1632,7 @@ public class LoginState {
     public void enableCookieTimeToLive(boolean flag) {
         cookieTimeToLiveEnabledFlag = flag;
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.enableCookieTimeToLive():"
-                    + "enable=" + cookieTimeToLiveEnabledFlag);
+            DEBUG.message("LoginState.enableCookieTimeToLive(): enable=" + cookieTimeToLiveEnabledFlag);
         }
     }
 
@@ -1683,8 +1644,7 @@ public class LoginState {
      */
     public boolean isCookieTimeToLiveEnabled() {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.isCookieTimeToLiveEnabled():"
-                    + "enabled=" + cookieTimeToLiveEnabledFlag);
+            DEBUG.message("LoginState.isCookieTimeToLiveEnabled(): enabled=" + cookieTimeToLiveEnabledFlag);
         }
         return cookieTimeToLiveEnabledFlag;
     }
@@ -1696,8 +1656,7 @@ public class LoginState {
      */
     public int getCookieTimeToLive() {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.getCookieTimeToLive():"
-                    + "cookieTimeToLive=" + cookieTimeToLive);
+            DEBUG.message("LoginState.getCookieTimeToLive(): cookieTimeToLive=" + cookieTimeToLive);
         }
         return cookieTimeToLive;
     }
@@ -1710,8 +1669,7 @@ public class LoginState {
     public void setCookieTimeToLive(int timeToLive) {
         cookieTimeToLive = timeToLive;
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.setCookieTimeToLive():"
-                    + "cookieTimeToLive=" + cookieTimeToLive);
+            DEBUG.message("LoginState.setCookieTimeToLive(): cookieTimeToLive=" + cookieTimeToLive);
         }
     }
 
@@ -1720,21 +1678,15 @@ public class LoginState {
      *
      * @return user domain.
      */
-    public String getUserDomain(
+    private String getUserDomain(
             HttpServletRequest request,
             SessionID sid,
             Hashtable requestHash) {
-        String userOrg = null;
-
-        String username = null;
-
-        if (userOrg == null) {
-            if (AuthUtils.newSessionArgExists(requestHash, sid) &&
-                    sid.toString().length() > 0) {
-                userOrg = sid.getSessionDomain();
-            } else {
-                userOrg = AuthUtils.getDomainNameByRequest(request, requestHash);
-            }
+        String userOrg;
+        if (AuthUtils.newSessionArgExists(requestHash, sid) && sid.toString().length() > 0) {
+            userOrg = sid.getSessionDomain();
+        } else {
+            userOrg = AuthUtils.getDomainNameByRequest(request, requestHash);
         }
 
         if (DEBUG.messageEnabled()) {
@@ -1749,7 +1701,7 @@ public class LoginState {
      * @return Authentication context for new request.
      * @throws AuthException if it fails to instantiate <code>AuthContext</code>
      */
-    public AuthContextLocal createAuthContext(
+    AuthContextLocal createAuthContext(
             HttpServletRequest request,
             HttpServletResponse response,
             SessionID sid,
@@ -1775,15 +1727,14 @@ public class LoginState {
         }
 
         if ((this.userOrg == null) || this.userOrg.length() == 0) {
-            DEBUG.message("domain is null, error condtion");
+            DEBUG.message("domain is null, error condition");
             logFailed(LazyConfig.AUTHD.bundle.getString("invalidDomain"), "INVALIDDOMAIN");
             auditor.auditLoginFailure(this, INVALID_REALM);
             throw new AuthException(AMAuthErrorCode.AUTH_INVALID_DOMAIN, null);
         }
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("AuthUtil:getAuthContext:" +
-                    "Creating new AuthContextLocal & LoginState");
+            DEBUG.message("AuthUtil:getAuthContext: Creating new AuthContextLocal & LoginState");
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         newRequest = true;
@@ -1825,17 +1776,14 @@ public class LoginState {
     }
 
     /* create new session */
-    void createSession(
+    private void createSession(
             HttpServletRequest req,
             AuthContextLocal authContext
     ) throws AuthException {
         DEBUG.message("LoginState: createSession: Creating new session: ");
-        SessionID sid = null;
-
-        DEBUG.message("Save authContext in InternalSession");
         session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
-        //save the AuthContext object in Session
-        sid = session.getID();
+        DEBUG.message("Save authContext in InternalSession");
+        SessionID sid = session.getID();
         session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);
 
         this.sid = sid;
@@ -1872,11 +1820,10 @@ public class LoginState {
      * Returns URL with the cookie value in the URL.
      *
      * @param url      URL.
-     * @param response HTTP Servlet Response.
      * @return Encoded URL.
      */
-    public String encodeURL(String url, HttpServletResponse response) {
-        return encodeURL(url, response, false);
+    public String encodeURL(String url) {
+        return encodeURL(url, false);
     }
 
     /**
@@ -1885,12 +1832,10 @@ public class LoginState {
      * the AM cookie if session is active/inactive and
      * auth cookie if cookie is invalid
      *
-     * @param response    HTTP Servlet Response.
      * @return the encoded URL
      */
     public String encodeURL(
             String url,
-            HttpServletResponse response,
             boolean useAMCookie) {
 
         if (DEBUG.messageEnabled()) {
@@ -2021,7 +1966,7 @@ public class LoginState {
      *
      * @return <code>true</code> if profile is successfully created.
      */
-    public boolean createUserProfile(String token, Set aliasList) {
+    private boolean createUserProfile(String token, Set aliasList) {
         try {
             if (!dynamicProfileCreation) {
                 DEBUG.message("Error this user requires a profile to login");
@@ -2072,16 +2017,16 @@ public class LoginState {
 
             userDN = getUserDN(amIdentityUser);
 
-            Map p = amIdentityUser.getAttributes();
+            Map userAttributes = amIdentityUser.getAttributes();
             if (amIdentityRole != null) {
                 // retrieve the session attributes for the default role
                 Map sattrs = amIdentityRole.getServiceAttributes(
                         ISAuthConstants.SESSION_SERVICE_NAME);
                 if (sattrs != null && !sattrs.isEmpty()) {
-                    p.putAll(sattrs);
+                    userAttributes.putAll(sattrs);
                 }
             }
-            populateUserAttributes(p, true, null);
+            populateUserAttributes(userAttributes, true, null);
             return true;
         } catch (Exception ex) {
             DEBUG.error("Cannot create user profile for: " + token);
@@ -2104,11 +2049,8 @@ public class LoginState {
                         LazyConfig.AUTHD.getDefaultMaxCachingTime(), DEBUG) };
     }
 
-    void populateUserAttributes(
-            Map p,
-            boolean loginStatus,
-            AMIdentity amIdentity
-    ) throws AMException {
+    private void populateUserAttributes(Map<String, Set<String>> userAttributes, boolean loginStatus,
+                                        AMIdentity amIdentity) throws AMException {
         int[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
 
         if (DEBUG.messageEnabled()) {
@@ -2119,30 +2061,29 @@ public class LoginState {
 
         try {
             userAuthConfig = CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.AUTHCONFIG_USER, null);
+                    userAttributes, ISAuthConstants.AUTHCONFIG_USER, null);
             if (!loginStatus) {
-                Set userFailureURLSet = (Set) p.get(
-                        ISAuthConstants.USER_FAILURE_URL);
+                Set<String> userFailureURLSet = userAttributes.get(ISAuthConstants.USER_FAILURE_URL);
                 clientUserFailureURL = getRedirectUrl(userFailureURLSet);
                 defaultUserFailureURL = tempDefaultURL;
-                Set failureRoleURLSet = (Set) p.get(ISAuthConstants.LOGIN_FAILURE_URL);
+                Set<String> failureRoleURLSet = userAttributes.get(ISAuthConstants.LOGIN_FAILURE_URL);
                 clientFailureRoleURL = getRedirectUrl(failureRoleURLSet);
                 defaultFailureRoleURL = tempDefaultURL;
                 return;
             }
 
             maxSession = CollectionHelper.getIntMapAttr(
-                    p, ISAuthConstants.MAX_SESSION_TIME,
+                    userAttributes, ISAuthConstants.MAX_SESSION_TIME,
                     sessionAttrs[0], DEBUG);
             idleTime = CollectionHelper.getIntMapAttr(
-                    p, ISAuthConstants.SESS_MAX_IDLE_TIME, sessionAttrs[1], DEBUG);
+                    userAttributes, ISAuthConstants.SESS_MAX_IDLE_TIME, sessionAttrs[1], DEBUG);
             cacheTime = CollectionHelper.getIntMapAttr(
-                    p, ISAuthConstants.SESS_MAX_CACHING_TIME, sessionAttrs[2],
+                    userAttributes, ISAuthConstants.SESS_MAX_CACHING_TIME, sessionAttrs[2],
                     DEBUG);
 
             // Status determination
             String tmp = CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.INETUSER_STATUS, "active");
+                    userAttributes, ISAuthConstants.INETUSER_STATUS, "active");
 
             // OPEN ISSUE- amIdentity.isActive return true even if
             // user status is set to inactive.
@@ -2150,9 +2091,9 @@ public class LoginState {
                 tmp = amIdentity.isActive() ? "active" : "inactive";
             }
             String tmp1 = CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.LOGIN_STATUS, "active");
+                    userAttributes, ISAuthConstants.LOGIN_STATUS, "active");
             String tmp2 = CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.NSACCOUNT_LOCK, ISAuthConstants.FALSE_VALUE);
+                    userAttributes, ISAuthConstants.NSACCOUNT_LOCK, ISAuthConstants.FALSE_VALUE);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("entity status is : " + tmp);
                 DEBUG.message("user-login-status is : " + tmp1);
@@ -2165,16 +2106,16 @@ public class LoginState {
             }
 
             String ulocale = CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.PREFERRED_LOCALE, null);
+                    userAttributes, ISAuthConstants.PREFERRED_LOCALE, null);
             localeContext.setUserLocale(ulocale);
 
-            userAliasList = (Set) p.get(ISAuthConstants.USER_ALIAS_ATTR);
+            userAliasList = (Set) userAttributes.get(ISAuthConstants.USER_ALIAS_ATTR);
             // add value from attributes in iplanet-am-auth-alias-attr-name
             if (aliasAttrNames != null && !aliasAttrNames.isEmpty()) {
                 Iterator<String> it = aliasAttrNames.iterator();
                 while (it.hasNext()) {
                     String attrName = it.next();
-                    Set attrVals = (Set) p.get(attrName);
+                    Set attrVals = (Set) userAttributes.get(attrName);
                     if (attrVals != null) {
                         if (userAliasList == null) {
                             userAliasList = new HashSet<String>();
@@ -2184,15 +2125,15 @@ public class LoginState {
                 }
             }
             setAccountLife(CollectionHelper.getMapAttr(
-                    p, ISAuthConstants.ACCOUNT_LIFE));
+                    userAttributes, ISAuthConstants.ACCOUNT_LIFE));
 
             // retrieve the user default success url
             // at user's role level
-            Set userSuccessURLSet = (Set) p.get(ISAuthConstants.USER_SUCCESS_URL);
+            Set<String> userSuccessURLSet = userAttributes.get(ISAuthConstants.USER_SUCCESS_URL);
             clientUserSuccessURL = getRedirectUrl(userSuccessURLSet);
             defaultUserSuccessURL = tempDefaultURL;
 
-            Set successRoleURLSet = (Set) p.get(ISAuthConstants.LOGIN_SUCCESS_URL);
+            Set<String> successRoleURLSet = userAttributes.get(ISAuthConstants.LOGIN_SUCCESS_URL);
             clientSuccessRoleURL = getRedirectUrl(successRoleURLSet);
             defaultSuccessRoleURL = tempDefaultURL;
 
@@ -2233,7 +2174,7 @@ public class LoginState {
      * @return <code>true</code> if user profile found.
      * @throws AuthException if multiple user match found in search
      */
-    public boolean getUserProfile(String token, boolean populate)
+    boolean getUserProfile(String token, boolean populate)
             throws AuthException {
         try {
             return getUserProfile(token, populate, true);
@@ -2254,7 +2195,7 @@ public class LoginState {
      * @return <code>true</code> if user profile found.
      * @throws AuthException if multiple user match found in search
      */
-    public boolean getUserProfile(
+    private boolean getUserProfile(
             String user,
             boolean populate,
             boolean loginStatus
@@ -2296,7 +2237,7 @@ public class LoginState {
                             LazyConfig.AUTHD.getSSOAuthSession(), user, getOrgDN());
                     if (amIdentity != null &&
                             amIdentity.getAttributes() != null) {
-                        amIdentitySet = new HashSet<AMIdentity>();
+                        amIdentitySet = new HashSet<>();
                         amIdentitySet.add(amIdentity);
                         idt = amIdentity.getType();
                         if (DEBUG.messageEnabled()) {
@@ -2372,7 +2313,7 @@ public class LoginState {
                         "organization, and contact your admin to fix the problem");
                 throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
             }
-            amIdentityUser = (AMIdentity) amIdentitySet.iterator().next();
+            amIdentityUser = amIdentitySet.iterator().next();
             userDN = getUserDN(amIdentityUser);
             idt = amIdentityUser.getType();
             if (DEBUG.messageEnabled()) {
@@ -2384,8 +2325,7 @@ public class LoginState {
                 Map basicAttrs = null;
                 Map serviceAttrs = null;
                 if (searchResults != null) {
-                    basicAttrs = (Map) searchResults.getResultAttributes().get(
-                            amIdentityUser);
+                    basicAttrs = (Map) searchResults.getResultAttributes().get(amIdentityUser);
                 } else {
                     basicAttrs = amIdentityUser.getAttributes();
                 }
@@ -2441,7 +2381,7 @@ public class LoginState {
      *
      * @throws AMException if it fails to populate default user attributes
      */
-    public void populateDefaultUserAttributes() throws AMException {
+    private void populateDefaultUserAttributes() throws AMException {
         int[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
         maxSession = sessionAttrs[0];
         idleTime = sessionAttrs[1];
@@ -2495,12 +2435,12 @@ public class LoginState {
      * @return <code>true</code> if it found user profile
      * @throws AuthException
      */
-    public boolean searchUserProfile(
+    boolean searchUserProfile(
             Subject subject,
             AuthContext.IndexType indexType,
             String indexName
     ) throws AuthException {
-        tokenSet = getTokenFromPrincipal(subject);
+        Set<String> tokenSet = getTokenFromPrincipal(subject);
         // check for all users user authenticated as
         if (DEBUG.messageEnabled()) {
             DEBUG.message("in searchUserProfile");
@@ -2575,7 +2515,7 @@ public class LoginState {
                     if (gotUserProfile) {
                         if (indexType == AuthContext.IndexType.ROLE) {
                             boolean userRoleFound = getUserForRole(
-                                    getIdentityRole(indexName, getOrgDN()));
+                                    getIdentityRole(indexName));
                             if (DEBUG.messageEnabled()) {
                                 DEBUG.message("userRoleFound: "
                                         + userRoleFound);
@@ -2623,7 +2563,7 @@ public class LoginState {
 
                             if (indexType == AuthContext.IndexType.ROLE) {
                                 userRoleFound = getUserForRole(
-                                        getIdentityRole(indexName, getOrgDN()));
+                                        getIdentityRole(indexName));
                                 userRoleFoundMap.put(token, userRoleFound);
                             }
                             foundAliasMap = searchUserAliases(token, tokenSet);
@@ -2694,9 +2634,7 @@ public class LoginState {
                         }
                     }
                     if (createWithAlias && !gotUserProfile) {
-                        gotUserProfile =
-                                createUserProfileForTokens(tokenSet,
-                                        gotUserProfileMap);
+                        gotUserProfile = createUserProfileForTokens(tokenSet);
                     }
                 }
             }
@@ -2720,7 +2658,7 @@ public class LoginState {
      * @return <code>true</code> if created user profile successfully
      * @throws AuthException if fails create user profile
      */
-    boolean getCreateUserProfile(boolean populate)
+    private boolean getCreateUserProfile(boolean populate)
             throws AuthException {
         boolean gotProfile = false;
         if (userDN != null) {
@@ -2746,7 +2684,7 @@ public class LoginState {
      * then read that and whichever module is PRIMARY , create profile
      * for that user and add the other user to the aliasList.
      */
-    boolean createUserProfileForTokens(Set<String> tokenSet, Map<String, Boolean> gotUserProfileMap) {
+    private boolean createUserProfileForTokens(Set<String> tokenSet) {
 
         // retrieve the first token
         // put the other tokens in a list
@@ -2787,7 +2725,7 @@ public class LoginState {
     }
 
     /* search the user-alias-list for token names */
-    Map<String, Boolean> searchUserAliases(String userToken, Set<String> tokenSet) {
+    private Map<String, Boolean> searchUserAliases(String userToken, Set<String> tokenSet) {
         Map<String, Boolean> foundUserAliasMap = new HashMap<String, Boolean>();
 
         if (DEBUG.messageEnabled()) {
@@ -2843,7 +2781,7 @@ public class LoginState {
      *                <code>SSOToken</code>
      * @return set of  <code>SSOToken</code> associated with subject
      */
-    Set<String> getTokenFromPrincipal(Subject subject) {
+    private Set<String> getTokenFromPrincipal(Subject subject) {
         Set<String> tokenSet = new HashSet<>();
         List<String> principalNames = new ArrayList<>(subject.getPrincipals().size());
 
@@ -2882,7 +2820,7 @@ public class LoginState {
      *
      * @return <code>true</code> if user is active.
      */
-    public boolean isUserEnabled() {
+    boolean isUserEnabled() {
         return userEnabled;
     }
 
@@ -2890,12 +2828,11 @@ public class LoginState {
      * Returns the DN for role.
      *
      * @param roleName Name of role.
-     * @param orgDN    Organization DN.
      * @return the DN for role.
      */
-    public AMIdentity getIdentityRole(String roleName, String orgDN) {
+    private AMIdentity getIdentityRole(String roleName) {
         if (amIdentityRole == null) {
-            amIdentityRole = searchIdentityRole(roleName, orgDN);
+            amIdentityRole = searchIdentityRole(roleName);
         }
         return amIdentityRole;
     }
@@ -2904,10 +2841,9 @@ public class LoginState {
      * Returns Identity Role.
      *
      * @param role  Name of role.
-     * @param orgDN Organization DN.
      * @return Identity Role.
      */
-    AMIdentity searchIdentityRole(String role, String orgDN) {
+    private AMIdentity searchIdentityRole(String role) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("rolename : " + role);
         }
@@ -2932,7 +2868,7 @@ public class LoginState {
      *
      * @param authMethName Module Name.
      */
-    public void setAuthModuleName(String authMethName) {
+    void setAuthModuleName(String authMethName) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("authethName" + authMethName);
             DEBUG.message("pAuthMethName " + pAuthMethName);
@@ -2971,7 +2907,7 @@ public class LoginState {
      * @param amIdentityRole Role object.
      * @return <code>true</code> if the user belongs to role.
      */
-    public boolean getUserForRole(AMIdentity amIdentityRole) {
+    private boolean getUserForRole(AMIdentity amIdentityRole) {
 
         boolean foundUser = false;
         try {
@@ -3009,14 +2945,14 @@ public class LoginState {
     }
 
     /* check if the user list has inactive user */
-    boolean getUserEnabled(Map<String, Boolean> userEnabledMap) {
+    private boolean getUserEnabled(Map<String, Boolean> userEnabledMap) {
         userEnabled = !userEnabledMap.containsValue(Boolean.FALSE);
 
         return userEnabled;
     }
 
     /* check if the users belong to role */
-    boolean getUserRoleFound(Map<String, Boolean> userRoleFoundMap) {
+    private boolean getUserRoleFound(Map<String, Boolean> userRoleFoundMap) {
         boolean userRoleFound = true;
         if (userRoleFoundMap.containsValue(Boolean.FALSE)) {
             userRoleFound = false;
@@ -3025,7 +2961,7 @@ public class LoginState {
     }
 
     /* check if the users map to the same user */
-    boolean getFoundUserAlias(Map<String, Boolean> foundAliasMap) {
+    private boolean getFoundUserAlias(Map<String, Boolean> foundAliasMap) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("foundAliasMap :" + foundAliasMap);
         }
@@ -3042,7 +2978,7 @@ public class LoginState {
     }
 
     /* check if profile for the user was retrieve */
-    boolean getGotUserProfile(Map<String, Boolean> gotUserProfileMap) {
+    private boolean getGotUserProfile(Map<String, Boolean> gotUserProfileMap) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("GotUserProfileMAP is: " + gotUserProfileMap);
         }
@@ -3059,7 +2995,7 @@ public class LoginState {
     /* add token to iplanet-am-user-alias-list of the token which has
      * a profile
      */
-    void addAliasToUserProfile(String token, Map<String, Boolean> foundUserAliasMap)
+    private void addAliasToUserProfile(String token, Map<String, Boolean> foundUserAliasMap)
             throws AuthException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Token : " + token);
@@ -3073,7 +3009,7 @@ public class LoginState {
     /* add token to iplanet-am-user-alias-list of the identity which has
      * a profile
      */
-    void addAliasToUserProfile(AMIdentity amIdentity, Map<String, Boolean> foundUserAliasMap) {
+    private void addAliasToUserProfile(AMIdentity amIdentity, Map<String, Boolean> foundUserAliasMap) {
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("foundUserAliasMap : " + foundUserAliasMap);
@@ -3109,7 +3045,7 @@ public class LoginState {
     /* check alias list for tokens , if superAdmin token
      * exists then amAdmin need not exist in the user-alias-list
      */
-    boolean checkAliasList(Map<String, Boolean> userAliasList) {
+    private boolean checkAliasList(Map<String, Boolean> userAliasList) {
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("UserAliasList is.. : " + userAliasList);
@@ -3138,17 +3074,15 @@ public class LoginState {
      * set Load Balance Cookie
      *
      * @param cookieDomain name of cookie domain for persistent cookie
-     * @param persist      indicates if cookie is persistent
      * @return persistent cookie in request
      * @throws SSOException
      * @throws AMException
      */
-    public Cookie setlbCookie(String cookieDomain, boolean persist)
+    Cookie setlbCookie(String cookieDomain)
             throws SSOException, AMException {
         String cookieName = AuthUtils.getlbCookieName();
         String cookieValue = AuthUtils.getlbCookieValue();
-        Cookie lbCookie = AuthUtils.createCookie(
-                cookieName, cookieValue, -1, cookieDomain);
+        Cookie lbCookie = AuthUtils.createCookie(cookieName, cookieValue, -1, cookieDomain);
         return lbCookie;
     }
 
@@ -3177,7 +3111,7 @@ public class LoginState {
      * @return the previous index type in authentication level after module
      * selection.
      */
-    public AuthContext.IndexType getPreviousIndexType() {
+    AuthContext.IndexType getPreviousIndexType() {
         return prevIndexType;
     }
 
@@ -3193,7 +3127,7 @@ public class LoginState {
     /**
      * Sets gotoOnFail URL.
      */
-    void setDecodedGoToOnFailURL() {
+    private void setDecodedGoToOnFailURL() {
         String arg = (String) requestHash.get("gotoOnFail");
         if (arg != null && arg.length() != 0) {
             gotoOnFailURL = arg;
@@ -3205,7 +3139,7 @@ public class LoginState {
      *
      * @return success login URL.
      */
-    public String getSuccessLoginURL() {
+    String getSuccessLoginURL() {
         String postProcessGoto = AuthUtils.getPostProcessURL(servletRequest,
                 AMPostAuthProcessInterface.POST_PROCESS_LOGIN_SUCCESS_URL);
         //check from postAuthModule URL is set
@@ -3248,7 +3182,7 @@ public class LoginState {
             fqdnURL = LazyConfig.AUTHD.processURL(successLoginURL, servletRequest);
         }
 
-        String encodedSuccessURL = encodeURL(fqdnURL, servletResponse, true);
+        String encodedSuccessURL = encodeURL(fqdnURL, true);
         if (DEBUG.messageEnabled()) {
             DEBUG.message("get fqdnURL : " + fqdnURL);
             DEBUG.message("get successLoginURL : "
@@ -3272,7 +3206,7 @@ public class LoginState {
         moduleSuccessLoginURL = url;
     }
 
-    String getSuccessURLForRole() {
+    private String getSuccessURLForRole() {
         String roleURL = null;
         try {
             Map roleAttrMap = getRoleServiceAttributes();
@@ -3287,7 +3221,7 @@ public class LoginState {
         return roleURL;
     }
 
-    String getFailureURLForRole() {
+    private String getFailureURLForRole() {
 
         String roleFailureURL = null;
         try {
@@ -3309,13 +3243,12 @@ public class LoginState {
      * @return the AMTemplate for role.
      * @throws Exception if fails to get role attribute
      */
-    Map getRoleServiceAttributes() throws Exception {
+    private Map<String, Set<String>> getRoleServiceAttributes() throws Exception {
         try {
             if (roleAttributeMap == null) {
                 if (LazyConfig.AUTHD.revisionNumber <
                         ISAuthConstants.AUTHSERVICE_REVISION7_0) {
-                    roleAttributeMap = amIdentityRole.getServiceAttributes(
-                            ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
+                    roleAttributeMap = amIdentityRole.getServiceAttributes(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
                 } else {
                     Map roleServiceAttrMap = amIdentityRole.
                             getServiceAttributes(
@@ -3330,7 +3263,7 @@ public class LoginState {
                 }
             }
             if (roleAttributeMap == null) {
-                roleAttributeMap = Collections.EMPTY_MAP;
+                roleAttributeMap = Collections.emptyMap();
             }
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Returning Service Attributes: " +
@@ -3351,7 +3284,7 @@ public class LoginState {
      * @param indexName name of auth index
      * @return success url for a service.
      */
-    String getSuccessURLForService(String indexName) {
+    private String getSuccessURLForService(String indexName) {
 
         String successServiceURL = null;
 
@@ -3387,7 +3320,7 @@ public class LoginState {
      * @param indexName name of auth index
      * @return the service login failure URL.
      */
-    String getFailureURLForService(String indexName) {
+    private String getFailureURLForService(String indexName) {
         String serviceFailureURL = null;
         try {
             if (serviceAttributesMap.isEmpty()) {
@@ -3416,21 +3349,17 @@ public class LoginState {
      * @return service login url attributes.
      * @throws Exception if fails to get service attribute
      */
-    Map getServiceAttributes(String indexName) throws Exception {
+    private Map<String, Set<String>> getServiceAttributes(String indexName) throws Exception {
 
         try {
             String orgDN = getOrgDN();
-            Map attributeDataMap;
-            attributeDataMap = AuthServiceListener.getServiceAttributeCache(
-                    orgDN, indexName);
+            Map<String, Set<String>> attributeDataMap;
+            attributeDataMap = AuthServiceListener.getServiceAttributeCache(orgDN, indexName);
             if (attributeDataMap != null) {
                 return attributeDataMap;
             }
-            attributeDataMap =
-                    AMAuthConfigUtils.getNamedConfig(indexName, orgDN,
-                            LazyConfig.AUTHD.getSSOAuthSession());
-            AuthServiceListener.setServiceAttributeCache(orgDN, indexName,
-                    attributeDataMap);
+            attributeDataMap = AMAuthConfigUtils.getNamedConfig(indexName, orgDN, LazyConfig.AUTHD.getSSOAuthSession());
+            AuthServiceListener.setServiceAttributeCache(orgDN, indexName, attributeDataMap);
             return attributeDataMap;
         } catch (Exception e) {
             if (DEBUG.messageEnabled()) {
@@ -3442,7 +3371,7 @@ public class LoginState {
     }
 
     /* create an instance of PostLoginProcessInterface Class */
-    AMPostAuthProcessInterface getPostLoginProcessInstance(String className) {
+    private AMPostAuthProcessInterface getPostLoginProcessInstance(String className) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("postLoginProcess Class Name is : " + className);
         }
@@ -3534,7 +3463,7 @@ public class LoginState {
      * @param indexType
      * @param indexName
      */
-    public void setSuccessLoginURL(
+    private void setSuccessLoginURL(
             AuthContext.IndexType indexType,
             String indexName) {
         /* if module sets  the url then return the URL module set */
@@ -3635,8 +3564,6 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("SUCCESS Login url : " + successLoginURL);
         }
-
-        return;
     }
 
     /**
@@ -3645,7 +3572,7 @@ public class LoginState {
      * @param indexType
      * @param indexName
      */
-    public void setFailureLoginURL(
+    void setFailureLoginURL(
             AuthContext.IndexType indexType,
             String indexName) {
         /*
@@ -3759,7 +3686,7 @@ public class LoginState {
      *
      * @return failure login URL.
      */
-    public String getFailureLoginURL() {
+    String getFailureLoginURL() {
         String postProcessURL = AuthUtils.getPostProcessURL(servletRequest,
                 AMPostAuthProcessInterface.POST_PROCESS_LOGIN_FAILURE_URL);
         if (postProcessURL != null) {
@@ -3792,7 +3719,7 @@ public class LoginState {
         moduleFailureLoginURL = url;
     }
 
-    public String getLogoutURL() {
+    String getLogoutURL() {
 
         return AuthUtils.getPostProcessURL(servletRequest, AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
     }
@@ -3804,7 +3731,7 @@ public class LoginState {
      * @param attrName    attribute name for login url
      * @return the role login url attribute value.
      */
-    String getRoleURLFromAttribute(Map roleAttrMap, String attrName) {
+    private String getRoleURLFromAttribute(Map roleAttrMap, String attrName) {
         try {
             Set roleURLSet = (Set) roleAttrMap.get(attrName);
             return getRedirectUrl(roleURLSet);
@@ -3823,7 +3750,7 @@ public class LoginState {
      * @param attrName     attribute name for service url
      * @return service url from attribute value.
      */
-    String getServiceURLFromAttribute(Map attributeMap, String attrName) {
+    private String getServiceURLFromAttribute(Map attributeMap, String attrName) {
         Set serviceURLSet =
                 (Set) attributeMap.get(attrName);
 
@@ -3858,7 +3785,7 @@ public class LoginState {
      *
      * @return previously received callback
      */
-    public Callback[] getRecdCallback() {
+    Callback[] getRecdCallback() {
         return prevCallback;
     }
 
@@ -3867,14 +3794,14 @@ public class LoginState {
      *
      * @param prevCallback previously received callback
      */
-    public synchronized void setPrevCallback(Callback[] prevCallback) {
+    synchronized void setPrevCallback(Callback[] prevCallback) {
         this.prevCallback = prevCallback;
     }
 
     /**
      * @return <code>true</code> if noSession mode was enabled in the request.
      */
-    public boolean isNoSession() {
+    boolean isNoSession() {
         return Boolean.parseBoolean(requestMap.get(NO_SESSION_QUERY_PARAM))
                 || (servletRequest != null && Boolean.parseBoolean(
                 (String) servletRequest.getAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR)));
@@ -3883,7 +3810,7 @@ public class LoginState {
     /**
      * Indicates loginFailureLockoutStoreInDS mode is enabled.
      */
-    protected String getAccountLife() {
+    String getAccountLife() {
         return accountLife;
     }
 
@@ -3891,7 +3818,7 @@ public class LoginState {
         return token;
     }
 
-    protected boolean getEnableModuleBasedAuth() {
+    boolean getEnableModuleBasedAuth() {
         return enableModuleBasedAuth;
     }
 
@@ -4016,7 +3943,7 @@ public class LoginState {
      *
      * @return Error template set by module.
      */
-    public String getModuleErrorTemplate() {
+    String getModuleErrorTemplate() {
         return moduleErrorTemplate;
     }
 
@@ -4043,7 +3970,7 @@ public class LoginState {
      *
      * @param timedOut <code>true</code> to set timed out.
      */
-    public void setTimedOut(boolean timedOut) {
+    void setTimedOut(boolean timedOut) {
         this.timedOut = timedOut;
     }
 
@@ -4092,7 +4019,7 @@ public class LoginState {
      * @return the created <code>AuthContextLocal</code>
      * @throws AuthException if fails to create <code>AuthContextLocal</code>
      */
-    public AuthContextLocal createAuthContext(
+    AuthContextLocal createAuthContext(
             SessionID sid,
             String orgName,
             HttpServletRequest req
@@ -4175,7 +4102,7 @@ public class LoginState {
      *                <code>orgDN</code> is to be determined.
      * @return a String which is the orgDN of the request
      */
-    public String getDomainNameByOrg(String orgName) {
+    String getDomainNameByOrg(String orgName) {
         String orgDN = null;
         try {
             orgDN = AuthUtils.getOrganizationDN(orgName, false, null);
@@ -4193,7 +4120,7 @@ public class LoginState {
      *
      * @return the module instances for a organization.
      */
-    public Set<String> getModuleInstances() {
+    Set<String> getModuleInstances() {
         try {
 
             if ((moduleInstances != null) && (!moduleInstances.isEmpty())) {
@@ -4223,7 +4150,7 @@ public class LoginState {
      *
      * @return the allowed authentication modules for organization
      */
-    public Set<String> getDomainAuthenticators() {
+    Set<String> getDomainAuthenticators() {
         return domainAuthenticators;
     }
 
@@ -4252,7 +4179,7 @@ public class LoginState {
     /**
      * TODO-JAVADOC
      */
-    public void logSuccess() {
+    void logSuccess() {
         try {
             String logSuccess = LazyConfig.AUTHD.bundle.getString("loginSuccess");
             ArrayList<String> dataList = new ArrayList<String>();
@@ -4348,7 +4275,7 @@ public class LoginState {
      *
      * @param str message for login failed
      */
-    public void logFailed(String str) {
+    void logFailed(String str) {
         logFailed(str, "LOGIN_FAILED", true, null);
     }
 
@@ -4358,7 +4285,7 @@ public class LoginState {
      * @param str   message for login failed
      * @param error error message for login failed
      */
-    public void logFailed(String str, String error) {
+    void logFailed(String str, String error) {
         logFailed(str, "LOGIN_FAILED", true, error);
     }
 
@@ -4455,7 +4382,7 @@ public class LoginState {
     /**
      * Log Logout status
      */
-    public void logLogout() {
+    void logLogout() {
         try {
             String logLogout = LazyConfig.AUTHD.bundle.getString("logout");
             List<String> dataList = new ArrayList<String>();
@@ -4589,11 +4516,11 @@ public class LoginState {
      *
      * @param sessionUpgrade <code>true</code> if session upgrade.
      */
-    public void setSessionUpgrade(boolean sessionUpgrade) {
+    void setSessionUpgrade(boolean sessionUpgrade) {
         this.sessionUpgrade = sessionUpgrade;
     }
 
-    void sessionUpgrade() throws AuthException {
+    private void sessionUpgrade() throws AuthException {
         // set the larger authlevel
         if (oldSession == null && oldStatelessSession == null) {
             return;
@@ -4729,7 +4656,7 @@ public class LoginState {
      * will be concatenated , seperated by |
      */
 
-    void updateSessionProperty(String property, String value) {
+    private void updateSessionProperty(String property, String value) {
         if (value == null) {
             return;
         }
@@ -4743,7 +4670,7 @@ public class LoginState {
     /* update session with the property and value */
 
     /* Get realm qualified modules list */
-    String getRealmQualifiedModulesList(String realm, String oldModulesList) {
+    private String getRealmQualifiedModulesList(String realm, String oldModulesList) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("getRealmQualifiedModulesList:realm : "
                     + realm);
@@ -4774,7 +4701,7 @@ public class LoginState {
     }
 
     /* compare old session property and new session property */
-    String parsePropertyList(String oldProperty, String newProperty) {
+    private String parsePropertyList(String oldProperty, String newProperty) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("oldProperty : " + oldProperty);
             DEBUG.message("newProperty : " + newProperty);
@@ -4799,7 +4726,7 @@ public class LoginState {
     }
 
     // Upgrade all Properties from the existing (old) session to new session
-    void upgradeAllProperties(InternalSession oldSession) {
+    private void upgradeAllProperties(InternalSession oldSession) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
@@ -4807,7 +4734,7 @@ public class LoginState {
     }
 
     // Upgrade all Properties from the existing (old) session to new session
-    void upgradeAllPropertiesFromStateless(StatelessSession oldSession) throws SessionException {
+    private void upgradeAllPropertiesFromStateless(StatelessSession oldSession) throws SessionException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
@@ -4873,7 +4800,7 @@ public class LoginState {
      * @param type indicates success, failure or logout
      */
     void postProcess(AuthContext.IndexType indexType, String indexName, PostProcessEvent type) {
-        setPostLoginInstances(indexType, indexName);
+        Set<AMPostAuthProcessInterface> postLoginInstanceSet = getPostLoginInstances(getPostLoginClassSet(indexType, indexName));
         if ((postProcessInSession) && ((postLoginInstanceSet != null) &&
                 (!postLoginInstanceSet.isEmpty()))) {
             if (DEBUG.messageEnabled()) {
@@ -4900,7 +4827,7 @@ public class LoginState {
      *                            object to be processes in post login
      * @param type                indicates success, failure or logout
      */
-    void executePostProcessSPI(AMPostAuthProcessInterface postProcessInstance,
+    private void executePostProcessSPI(AMPostAuthProcessInterface postProcessInstance,
                                PostProcessEvent type) {
         /* Reset Post Process URLs in servletRequest so
         * that plugin can set new values (just a safety measure) */
@@ -4949,12 +4876,8 @@ public class LoginState {
      * @param indexType Index type for post login process
      * @param indexName Index name for post login process
      */
-    void setPostLoginInstances(
-            AuthContext.IndexType indexType,
-            String indexName) {
-        AMPostAuthProcessInterface postProcessInstance = null;
-        String postLoginClassName = null;
-        Set postLoginClassSet = Collections.EMPTY_SET;
+    private Set<String> getPostLoginClassSet(AuthContext.IndexType indexType, String indexName) {
+        Set<String> postLoginClassSet = Collections.emptySet();
         if (indexType == AuthContext.IndexType.ROLE) {
 
         /* If role based auth then get post process classes from
@@ -4988,8 +4911,7 @@ public class LoginState {
 
             if (((userAuthConfig != null) && (!userAuthConfig.equals(
                     ISAuthConstants.BLANK)))) {
-                postLoginClassSet = getServicePostLoginClassSet(
-                        userAuthConfig);
+                postLoginClassSet = getServicePostLoginClassSet(userAuthConfig);
             }
         }
 
@@ -5016,12 +4938,17 @@ public class LoginState {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("postLoginClassSet = " + postLoginClassSet);
         }
+        return postLoginClassSet;
+    }
 
+    /**
+     * Note that as a side effect, this sets the post auth process instance property on the session.
+     */
+    private Set<AMPostAuthProcessInterface> getPostLoginInstances(Set<String> postLoginClassSet) {
+        Set<AMPostAuthProcessInterface> postLoginInstanceSet = new HashSet<>();
         if ((postLoginClassSet != null) && (!postLoginClassSet.isEmpty())) {
-            postLoginInstanceSet = new HashSet<AMPostAuthProcessInterface>();
             StringBuilder sb = new StringBuilder();
-            for (Object aPostLoginClassSet : postLoginClassSet) {
-                postLoginClassName = (String) aPostLoginClassSet;
+            for (String postLoginClassName : postLoginClassSet) {
                 if (sb.length() > 0) {
                     sb.append("|");
                 }
@@ -5031,16 +4958,15 @@ public class LoginState {
                     DEBUG.message("setPostLoginInstances : "
                             + postLoginClassSet.size());
                 }
-                postProcessInstance
-                        = getPostLoginProcessInstance(postLoginClassName);
+                AMPostAuthProcessInterface postProcessInstance = getPostLoginProcessInstance(postLoginClassName);
                 if (postProcessInstance != null) {
                     postLoginInstanceSet.add(postProcessInstance);
                     sb.append(postLoginClassName);
                 }
             }
-            session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE,
-                    sb.toString());
+            session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
         }
+        return postLoginInstanceSet;
     }
 
     /**
@@ -5048,15 +4974,14 @@ public class LoginState {
      *
      * @return role post login class set
      */
-    Set getRolePostLoginClassSet() {
+    private Set<String> getRolePostLoginClassSet() {
 
-        Set postLoginClassSet = null;
+        Set<String> postLoginClassSet = null;
         try {
-            Map roleAttrMap = getRoleServiceAttributes();
-            postLoginClassSet = (Set) roleAttrMap.get(
-                    ISAuthConstants.POST_LOGIN_PROCESS);
+            Map<String, Set<String>> roleAttrMap = getRoleServiceAttributes();
+            postLoginClassSet = roleAttrMap.get(ISAuthConstants.POST_LOGIN_PROCESS);
             if (postLoginClassSet == null) {
-                postLoginClassSet = Collections.EMPTY_SET;
+                postLoginClassSet = Collections.emptySet();
             }
 
             if (DEBUG.messageEnabled()) {
@@ -5078,9 +5003,9 @@ public class LoginState {
      * @param indexName Index name for post login
      * @return the service post login process class set
      */
-    Set getServicePostLoginClassSet(String indexName) {
+    private Set<String> getServicePostLoginClassSet(String indexName) {
 
-        Set postLoginClassSet = null;
+        Set<String> postLoginClassSet = null;
         try {
             if ((serviceAttributesMap != null)
                     && (serviceAttributesMap.isEmpty())) {
@@ -5092,10 +5017,9 @@ public class LoginState {
                         serviceAttributesMap);
             }
 
-            postLoginClassSet =
-                    (Set) serviceAttributesMap.get(ISAuthConstants.POST_LOGIN_PROCESS);
+            postLoginClassSet = serviceAttributesMap.get(ISAuthConstants.POST_LOGIN_PROCESS);
             if (postLoginClassSet == null) {
-                postLoginClassSet = Collections.EMPTY_SET;
+                postLoginClassSet = Collections.emptySet();
             }
 
             if (DEBUG.messageEnabled()) {
@@ -5116,7 +5040,7 @@ public class LoginState {
      *
      * @return the error message set by module.
      */
-    public String getModuleErrorMessage() {
+    String getModuleErrorMessage() {
         return moduleErrorMessage;
     }
 
@@ -5139,7 +5063,7 @@ public class LoginState {
      *
      * @return the boolean flag.
      */
-    public boolean isForwardSuccess() {
+    boolean isForwardSuccess() {
         return forwardSuccess;
     }
 
@@ -5148,7 +5072,7 @@ public class LoginState {
      *
      * @return Page timeout.
      */
-    public long getPageTimeOut() {
+    long getPageTimeOut() {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Returning page timeout :" + pageTimeOut);
         }
@@ -5160,7 +5084,7 @@ public class LoginState {
      *
      * @param pageTimeOut Page timeout.
      */
-    public synchronized void setPageTimeOut(long pageTimeOut) {
+    synchronized void setPageTimeOut(long pageTimeOut) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Setting page timeout :" + pageTimeOut);
         }
@@ -5172,7 +5096,7 @@ public class LoginState {
      *
      * @return Last callback sent.
      */
-    public long getLastCallbackSent() {
+    long getLastCallbackSent() {
         if (DEBUG.messageEnabled()) {
             DEBUG.message(
                     "Returning Last Callback Sent :" + lastCallbackSent);
@@ -5185,7 +5109,7 @@ public class LoginState {
      *
      * @param lastCallbackSent Last callback sent.
      */
-    public void setLastCallbackSent(long lastCallbackSent) {
+    void setLastCallbackSent(long lastCallbackSent) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("setting Last Callback Sent :" + lastCallbackSent);
         }
@@ -5203,15 +5127,14 @@ public class LoginState {
      * @param urls set of urls with client type.
      * @return redirect url from a set of urls for client type
      */
-    private String getRedirectUrl(Set urls) {
+    private String getRedirectUrl(Set<String> urls) {
 
         //If the urls set is null, return the default url
         String clientURL = null;
         tempDefaultURL = null;
         if ((urls != null) && (!urls.isEmpty())) {
             String defaultURL = null;
-            for (final Object url1 : urls) {
-                String url = (String) url1;
+            for (final String url : urls) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("URL is : " + url);
                 }
@@ -5247,7 +5170,7 @@ public class LoginState {
      *
      * @return ignoreUserProfile
      */
-    public boolean ignoreProfile() {
+    boolean ignoreProfile() {
         return ignoreUserProfile;
     }
 
@@ -5341,7 +5264,7 @@ public class LoginState {
      *
      * @return Callbacks per Page state.
      */
-    public Callback[] getCallbacksPerState(String pageState) {
+    Callback[] getCallbacksPerState(String pageState) {
         Callback[] rtnCallbacks = null;
         rtnCallbacks = callbacksPerState.get(pageState);
         return rtnCallbacks;
@@ -5350,7 +5273,7 @@ public class LoginState {
     /**
      * Sets Callbacks per Page state.
      */
-    public void setCallbacksPerState(String pageState, Callback[] callbacks) {
+    void setCallbacksPerState(String pageState, Callback[] callbacks) {
         this.callbacksPerState.put(pageState, callbacks);
     }
 
@@ -5392,8 +5315,7 @@ public class LoginState {
             if (attributeValuePairs.containsKey(
                     ISAuthConstants.USER_ALIAS_ATTR)
                     ) {
-                externalAliasList = (HashSet) attributeValuePairs.get(
-                        ISAuthConstants.USER_ALIAS_ATTR);
+                externalAliasList = (HashSet) attributeValuePairs.get(ISAuthConstants.USER_ALIAS_ATTR);
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("externalAliasList:" + externalAliasList);
                 }
@@ -5426,7 +5348,7 @@ public class LoginState {
      * @return a Set which contains the modules names which user
      * successfully authenticated.
      */
-    protected Set<String> getSuccessModuleSet() {
+    Set<String> getSuccessModuleSet() {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("getSuccessModuleSet : " + successModuleSet);
         }
@@ -5469,7 +5391,7 @@ public class LoginState {
      *
      * @return Failure module list.
      */
-    public Set<String> getFailureModuleSet() {
+    Set<String> getFailureModuleSet() {
         return failureModuleSet;
     }
 
@@ -5478,7 +5400,7 @@ public class LoginState {
      *
      * @param failureModuleList which is the list of failed modules.
      */
-    public void setFailureModuleList(String failureModuleList) {
+    void setFailureModuleList(String failureModuleList) {
         this.failureModuleList = failureModuleList;
         if (DEBUG.messageEnabled()) {
             DEBUG.message("failureModulelist :" + failureModuleList);
@@ -5500,7 +5422,7 @@ public class LoginState {
      * @param amIdentityUser OpenSSO Identity user.
      * @return <code>true</code> if the logged in user is 'Agent'.
      */
-    public boolean isAgent(AMIdentity amIdentityUser) {
+    private boolean isAgent(AMIdentity amIdentityUser) {
         boolean isAgent = false;
         try {
             if (amIdentityUser != null &&
@@ -5523,7 +5445,7 @@ public class LoginState {
      * @param moduleMap module containing map of module localized name
      *                  and module name.
      */
-    protected void setModuleMap(Map moduleMap) {
+    void setModuleMap(Map<String, String> moduleMap) {
         this.moduleMap = moduleMap;
     }
 
@@ -5542,7 +5464,7 @@ public class LoginState {
      *
      * @param request HTTP Servlet Request.
      */
-    public void setRequestLocale(HttpServletRequest request) {
+    void setRequestLocale(HttpServletRequest request) {
         localeContext.setLocale(request);
         isLocaleSet = true;
     }
@@ -5562,7 +5484,7 @@ public class LoginState {
      *
      * @return <code>true</code> if session state is invalid.
      */
-    public boolean isSessionInvalid() {
+    boolean isSessionInvalid() {
         return (session == null || session.getState() == INVALID ||
                 session.getState() == DESTROYED);
     }
@@ -5594,7 +5516,7 @@ public class LoginState {
      * @param roleName Role Name.
      * @return universal identifier of role name.
      */
-    public String getRoleUniversalId(String roleName) {
+    String getRoleUniversalId(String roleName) {
         String roleUnivId = null;
         try {
             AMIdentity amIdentity = getRole(roleName);
@@ -5649,7 +5571,7 @@ public class LoginState {
      * @param containerDNs set of DN for containers
      * @throws AuthException if container name is invalid
      */
-    void getContainerDN(Set containerDNs) throws AuthException {
+    private void getContainerDN(Set<String> containerDNs) throws AuthException {
 
         String userOrgDN = null;
         String agentContainerDN = null;
@@ -5657,9 +5579,7 @@ public class LoginState {
         if ((containerDNs == null) || (containerDNs.isEmpty())) {
             DEBUG.message("Container DNs is null");
         } else {
-            Iterator it = containerDNs.iterator();
-            while (it.hasNext()) {
-                String containerName = (String) it.next();
+            for (String containerName : containerDNs) {
                 try {
                     if (DN.valueOf(containerName).isInScopeOf(getOrgDN(), SearchScope.WHOLE_SUBTREE)) {
                         int containerType =
@@ -5733,7 +5653,7 @@ public class LoginState {
      * @throws IdRepoException if it fails to search user
      * @throws SSOException    if <code>SSOToken</code> is not valid
      */
-    IdSearchResults searchIdentity(IdType idType, String userTokenID, boolean populate)
+    private IdSearchResults searchIdentity(IdType idType, String userTokenID, boolean populate)
             throws IdRepoException, SSOException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("In searchAutehnticatedUser: idType " + idType);
@@ -5904,7 +5824,7 @@ public class LoginState {
      *
      * @return an integer type indicating the type of authentication required.
      */
-    public int getCompositeAdviceType() {
+    int getCompositeAdviceType() {
         return compositeAdviceType;
     }
 
@@ -5913,7 +5833,7 @@ public class LoginState {
      *
      * @param type Type of authentication.
      */
-    public void setCompositeAdviceType(int type) {
+    void setCompositeAdviceType(int type) {
         this.compositeAdviceType = type;
     }
 
@@ -5931,7 +5851,7 @@ public class LoginState {
      *
      * @param compositeAdvice Composite Advice for authentication.
      */
-    public void setCompositeAdvice(String compositeAdvice) {
+    void setCompositeAdvice(String compositeAdvice) {
         this.compositeAdvice = compositeAdvice;
     }
 
@@ -5941,7 +5861,7 @@ public class LoginState {
      *
      * @param qualifiedOrgDN qualifiedOrgDN for Policy conditions.
      */
-    public void setQualifiedOrgDN(String qualifiedOrgDN) {
+    void setQualifiedOrgDN(String qualifiedOrgDN) {
         this.qualifiedOrgDN = qualifiedOrgDN;
     }
 
@@ -5952,7 +5872,7 @@ public class LoginState {
      * @param indexType AuthContext.IndexType
      * @param indexName Index Name for AuthContext.IndexType
      */
-    String getAuthConfigName(AuthContext.IndexType indexType,
+    private String getAuthConfigName(AuthContext.IndexType indexType,
                              String indexName) {
         String finalAuthConfigName = null;
         if (indexType == AuthContext.IndexType.ROLE) {
@@ -6068,7 +5988,7 @@ public class LoginState {
         return userIDGeneratorEnabled;
     }
 
-    public void setUserIDGeneratorEnabled(final boolean userIDGeneratorEnabled) {
+    private void setUserIDGeneratorEnabled(final boolean userIDGeneratorEnabled) {
         this.userIDGeneratorEnabled = userIDGeneratorEnabled;
     }
 
@@ -6079,73 +5999,73 @@ public class LoginState {
         return userIDGeneratorClassName;
     }
 
-    public void setUserIDGeneratorClassName(final String userIDGeneratorClassName) {
+    private void setUserIDGeneratorClassName(final String userIDGeneratorClassName) {
         this.userIDGeneratorClassName = userIDGeneratorClassName;
     }
 
     /**
      * Indicates accountlocking mode is enabled.
      */
-    public boolean isLoginFailureLockoutMode() {
+    private boolean isLoginFailureLockoutMode() {
         return loginFailureLockoutMode;
     }
 
-    public void setLoginFailureLockoutMode(final boolean loginFailureLockoutMode) {
+    private void setLoginFailureLockoutMode(final boolean loginFailureLockoutMode) {
         this.loginFailureLockoutMode = loginFailureLockoutMode;
     }
 
     /**
      * Indicates loginFailureLockoutStoreInDS mode is enabled.
      */
-    public boolean isLoginFailureLockoutStoreInDS() {
+    private boolean isLoginFailureLockoutStoreInDS() {
         return loginFailureLockoutStoreInDS;
     }
 
-    public void setLoginFailureLockoutStoreInDS(final boolean loginFailureLockoutStoreInDS) {
+    private void setLoginFailureLockoutStoreInDS(final boolean loginFailureLockoutStoreInDS) {
         this.loginFailureLockoutStoreInDS = loginFailureLockoutStoreInDS;
     }
 
-    public void setAccountLife(final String accountLife) {
+    private void setAccountLife(final String accountLife) {
         this.accountLife = accountLife;
     }
 
-    public void setLoginFailureLockoutDuration(final long loginFailureLockoutDuration) {
+    private void setLoginFailureLockoutDuration(final long loginFailureLockoutDuration) {
         this.loginFailureLockoutDuration = loginFailureLockoutDuration;
     }
 
-    public void setLoginFailureLockoutMultiplier(final int loginFailureLockoutMultiplier) {
+    private void setLoginFailureLockoutMultiplier(final int loginFailureLockoutMultiplier) {
         this.loginFailureLockoutMultiplier = loginFailureLockoutMultiplier;
     }
 
-    public void setLoginFailureLockoutTime(final long loginFailureLockoutTime) {
+    private void setLoginFailureLockoutTime(final long loginFailureLockoutTime) {
         this.loginFailureLockoutTime = loginFailureLockoutTime;
     }
 
-    public void setLoginFailureLockoutCount(final int loginFailureLockoutCount) {
+    private void setLoginFailureLockoutCount(final int loginFailureLockoutCount) {
         this.loginFailureLockoutCount = loginFailureLockoutCount;
     }
 
-    public void setLoginLockoutNotification(final String loginLockoutNotification) {
+    private void setLoginLockoutNotification(final String loginLockoutNotification) {
         this.loginLockoutNotification = loginLockoutNotification;
     }
 
-    public void setLoginLockoutAttrName(final String loginLockoutAttrName) {
+    private void setLoginLockoutAttrName(final String loginLockoutAttrName) {
         this.loginLockoutAttrName = loginLockoutAttrName;
     }
 
-    public void setMandatory2FAValue(final String mandatory2FAValue) {
+    private void setMandatory2FAValue(final String mandatory2FAValue) {
         this.mandatory2fa = Boolean.parseBoolean(mandatory2FAValue);
     }
 
-    public void setLoginLockoutAttrValue(final String loginLockoutAttrValue) {
+    private void setLoginLockoutAttrValue(final String loginLockoutAttrValue) {
         this.loginLockoutAttrValue = loginLockoutAttrValue;
     }
 
-    public void setInvalidAttemptsDataAttrName(final String invalidAttemptsDataAttrName) {
+    private void setInvalidAttemptsDataAttrName(final String invalidAttemptsDataAttrName) {
         this.invalidAttemptsDataAttrName = invalidAttemptsDataAttrName;
     }
 
-    public void setLoginLockoutUserWarning(final int loginLockoutUserWarning) {
+    private void setLoginLockoutUserWarning(final int loginLockoutUserWarning) {
         this.loginLockoutUserWarning = loginLockoutUserWarning;
     }
 
@@ -6154,7 +6074,7 @@ public class LoginState {
      * useful if the login modules have particular logout callback functionality that must be invoked. See
      * authentication service setting "sunAMAuthKeepAuthModuleIntances". Not supported for stateless sessions.
      */
-    public boolean isModulesInSessionEnabled() {
+    boolean isModulesInSessionEnabled() {
         return modulesInSession;
     }
 
@@ -6165,7 +6085,7 @@ public class LoginState {
         return failureTokenId;
     }
 
-    public void setFailureTokenId(final String failureTokenId) {
+    private void setFailureTokenId(final String failureTokenId) {
         this.failureTokenId = failureTokenId;
     }
 
@@ -6203,7 +6123,7 @@ public class LoginState {
     /**
      * Save the principalList that is generated by successful LoginContext authentication, to the requestMap.
      */
-    public void saveSubjectState() {
+    void saveSubjectState() {
         if (principalList != null) {
             requestMap.put(ISAuthConstants.PRINCIPAL_LIST, principalList);
         }

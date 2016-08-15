@@ -30,6 +30,32 @@ package com.sun.identity.authentication.service;
 
 import static org.forgerock.openam.session.SessionConstants.*;
 
+import java.net.URL;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
+
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
@@ -70,30 +96,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.net.URL;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.Reject;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -633,8 +635,7 @@ public class AuthUtils extends AuthClientUtils {
     }
     
     public static String encodeURL(String url,
-    AuthContextLocal authContext,
-    HttpServletResponse response) {
+    AuthContextLocal authContext) {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("AuthUtils:input url is :"+ url);
         }
@@ -644,7 +645,7 @@ public class AuthUtils extends AuthClientUtils {
         if (loginState==null) {
             encodedURL = url;
         } else {
-            encodedURL = loginState.encodeURL(url,response);
+            encodedURL = loginState.encodeURL(url);
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("AuthUtils:encoded url is :"+encodedURL);
@@ -718,14 +719,14 @@ public class AuthUtils extends AuthClientUtils {
     }    
    
     public static Cookie createlbCookie(AuthContextLocal authContext,
-    String cookieDomain, boolean persist) throws AuthException {
+    String cookieDomain) throws AuthException {
         Cookie lbCookie=null;
         try {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("cookieDomain : " + cookieDomain);
             }
             LoginState loginState = getLoginState(authContext);
-            lbCookie = loginState.setlbCookie(cookieDomain, persist);
+            lbCookie = loginState.setlbCookie(cookieDomain);
             return lbCookie;
         } catch (Exception e) {
             utilDebug.message("Unable to create Load Balance Cookie");
@@ -743,12 +744,12 @@ public class AuthUtils extends AuthClientUtils {
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
-                    Cookie cookie = createlbCookie(authContext, domain, false);
+                    Cookie cookie = createlbCookie(authContext, domain);
                     CookieUtils.addCookieToResponse(response, cookie);
                 }
             } else {
                 CookieUtils.addCookieToResponse(response, 
-                        createlbCookie(authContext, null, false));
+                        createlbCookie(authContext, null));
             }
         }
     }     

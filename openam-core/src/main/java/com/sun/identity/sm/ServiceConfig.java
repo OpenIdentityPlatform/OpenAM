@@ -447,7 +447,7 @@ public class ServiceConfig {
      * @return the <code>Map</code> where key is the attribute name and value
      *         is the <code>Set</code> of attribute values
      */
-    public Map getAttributes() {
+    public Map<String, Set<String>> getAttributes() {
         validate();
         return (sc.getAttributes());
     }

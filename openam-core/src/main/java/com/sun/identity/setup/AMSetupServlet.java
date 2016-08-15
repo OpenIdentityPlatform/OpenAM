@@ -1513,8 +1513,8 @@ public class AMSetupServlet extends HttpServlet {
         if (sc != null) {
             ServiceConfig subConfig = sc.getSubConfig(configName);
             if (subConfig != null) {
-                Map<String, Object> configMap = subConfig.getAttributes();
-                Set<String> vals = (Set<String>) configMap.get("sun-idrepo-ldapv3-config-ldap-server");
+                Map<String, Set<String>> configMap = subConfig.getAttributes();
+                Set<String> vals = configMap.get("sun-idrepo-ldapv3-config-ldap-server");
                 vals.add(entry);
                 HashMap<String, Set<String>> mp = new HashMap<String, Set<String>>(2);
                 mp.put("sun-idrepo-ldapv3-config-ldap-server", vals);

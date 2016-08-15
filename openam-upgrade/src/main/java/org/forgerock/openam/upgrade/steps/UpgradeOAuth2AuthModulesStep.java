@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -74,7 +74,7 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
                 ServiceConfig realmConfig = scm.getOrganizationConfig(realm, null);
                 for (String moduleName : (Set<String>) realmConfig.getSubConfigNames()) {
                     ServiceConfig moduleConfig = realmConfig.getSubConfig(moduleName);
-                    Map<String, Set<?>> attributes = getAttributes(moduleConfig);
+                    Map<String, Set<String>> attributes = getAttributes(moduleConfig);
                     check(attributes, ACCOUNT_MAPPER_PROPERTY, DEFAULT_ACCOUNT_MAPPER, realm, moduleName);
                     check(attributes, ATTRIBUTE_MAPPER_PROPERTY, DEFAULT_ATTRIBUTE_MAPPER, realm, moduleName);
                 }
@@ -88,11 +88,11 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
         }
     }
 
-    private Map<String, Set<?>> getAttributes(ServiceConfig moduleConfig) {
+    private Map<String, Set<String>> getAttributes(ServiceConfig moduleConfig) {
         return moduleConfig.getAttributes();
     }
 
-    private void check(Map<String, Set<?>> attributes, String property, String value, String realm, String moduleName) {
+    private void check(Map<String, Set<String>> attributes, String property, String value, String realm, String moduleName) {
         if (attributes.get(property).contains(value)) {
             flagModule(affectedRealms, realm, moduleName);
         } else {
@@ -121,7 +121,7 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
                 ServiceConfig realmConfig = scm.getOrganizationConfig(realm.getKey(), null);
                 for (String moduleName : realm.getValue()) {
                     ServiceConfig moduleConfig = realmConfig.getSubConfig(moduleName);
-                    Map<String, Set<?>> attributes = getAttributes(moduleConfig);
+                    Map<String, Set<String>> attributes = getAttributes(moduleConfig);
                     if (attributes.get(ACCOUNT_MAPPER_PROPERTY).contains(DEFAULT_ACCOUNT_MAPPER)) {
                         moduleConfig.replaceAttributeValues(ACCOUNT_MAPPER_PROPERTY, asSet(DEFAULT_ACCOUNT_MAPPER),
                                 asSet(JSON_MAPPER));
