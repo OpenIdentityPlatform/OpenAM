@@ -24,10 +24,12 @@
  *
  * $Id: SecureRandomFactoryImpl.java,v 1.2 2008/06/25 05:41:28 qcheng Exp $
  *
+ * Portions Copyright 2016 ForgeRock AS.
  */
 
 package com.iplanet.am.util;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
@@ -39,7 +41,7 @@ public class SecureRandomFactoryImpl implements SecureRandomFactory {
     public SecureRandom getSecureRandomInstance() throws Exception {
         try {
             return SecureRandom.getInstance("SHA1PRNG", "SUN");
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             return SecureRandom.getInstance("SHA1PRNG");
         }
     }

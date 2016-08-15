@@ -24,6 +24,7 @@
  *
  * $Id: RandomString.java,v 1.3 2008/06/25 05:41:42 qcheng Exp $
  *
+ * Portions Copyright 2016 ForgeRock AS.
  */
 
 package com.iplanet.services.util.internal;
@@ -49,7 +50,7 @@ public class RandomString {
         String randomStr = null;
         try {
             byte[] bytes = new byte[24];
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             random.nextBytes(bytes);
             randomStr = Base64.encode(bytes).trim();
         } catch (Exception e) {

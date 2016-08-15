@@ -34,6 +34,7 @@ import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class SessionID implements Serializable {
                     try {
                         try {
                             return SecureRandom.getInstance("SHA1PRNG", "SUN");
-                        } catch (NoSuchProviderException e) {
+                        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
                             return SecureRandom.getInstance("SHA1PRNG");
                         }
                     } catch (Exception e) {
