@@ -28,6 +28,9 @@
  */
 package com.sun.identity.sm;
 
+import static com.iplanet.ums.IUMSConstants.*;
+import static com.sun.identity.idm.IdConstants.*;
+
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +43,7 @@ import java.util.regex.Pattern;
 
 import com.google.inject.assistedinject.Assisted;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.util.SystemProperties;
@@ -286,35 +290,11 @@ public class OrganizationConfigManager {
          * the sub-organization without the attributes ii) for the service names
          * in the Map call setAttributes(...)
          */
-        boolean orgExists = false;
+        validateOrgNameCollision(subOrgName);
+        validateOrgAliasCollision(attributes);
+        SMSEntry.debug.message("OrganizationConfigManager::createSubOrganization() New Realm, creating realm: {}",
+                subOrgName);
         String subOrgDN = normalizeDN(subOrgName, orgDN);
-        try {
-            // Check if realm exists, this throws SMSException
-            // if realm does not exist
-            // This is to avoid duplicate creation of realms.
-            new OrganizationConfigManager(token, subOrgDN);
-            SMSEntry.debug.error("OrganizationConfigManager::"
-                    + "createSubOrganization() " + "Realm Already Exists.. "
-                    + subOrgDN);
-            orgExists = true;
-        } catch (SMSException smse) {
-            try {
-                orgExists = !getRealmByAlias(subOrgName).isEmpty();
-            } catch (SSOException e) {
-                SMSEntry.debug.error("OrganizationConfigManager::" +
-                        "createSubOrganization:", e);
-            }
-
-            if (!orgExists) {
-                SMSEntry.debug.message("OrganizationConfigManager::createSubOrganization() New Realm, creating realm: {} - {}", subOrgName, smse);
-            }
-        }
-        Object args[] = { subOrgName };
-        if (orgExists) {
-            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
-                "sms-organization_already_exists1",
-                    args));
-        }
         StringTokenizer st =
             new StringTokenizer(specialCharsString, SEPERATOR);
         while (st.hasMoreTokens()) {
@@ -326,7 +306,7 @@ public class OrganizationConfigManager {
                 SMSEntry.debug.error("OrganizationConfigManager::"+
                     "createSubOrganization() : Detected invalid chars: "+obj);
                 Object args1[] = {subOrgName};
-                throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                throw (new SMSException(UMS_BUNDLE_NAME,
                     SMSEntry.bundle.getString("sms-invalid-org-name"),args1));
             }
         }
@@ -395,7 +375,7 @@ public class OrganizationConfigManager {
                         ServiceConfig subConfig =
                             s.getSubConfig((String) items.next());
                         if (subConfig.getSchemaID().equalsIgnoreCase(
-                            IdConstants.AMSDK_PLUGIN_NAME)) {
+                            AMSDK_PLUGIN_NAME)) {
                             Map amsdkConfig = new HashMap();
                             Set vals = new HashSet();
                             vals.add(orgNamingAttrInLegacyMode +
@@ -447,11 +427,90 @@ public class OrganizationConfigManager {
         return (ocm);
     }
 
-    private Set getRealmByAlias(String subOrgName) throws SSOException, SMSException {
+    private void validateOrgNameCollision(String subOrgName) throws SMSException {
+        String subOrgDN = normalizeDN(subOrgName, orgDN);
+        boolean orgExists = false;
+        try {
+            // Check if realm exists, this throws SMSException
+            // if realm does not exist
+            // This is to avoid duplicate creation of realms.
+            new OrganizationConfigManager(token, subOrgDN);
+            SMSEntry.debug.error("OrganizationConfigManager::"
+                    + "validateOrgNameCollision() " + "Realm Already Exists.. "
+                    + subOrgDN);
+           orgExists = true;
+        } catch (SMSException smse) {
+           //ignore no org found
+        }
+        if(orgExists) {
+            throw new SMSException(UMS_BUNDLE_NAME,
+                    "sms-organization_already_exists1", new Object[] { subOrgName });
+        }
+        try {
+            //check if any organization exist with the given subOrgName as alias
+            if(CollectionUtils.isNotEmpty(searchOrganizationByAlias(subOrgName))) {
+                throw new SMSException(UMS_BUNDLE_NAME,
+                        "sms-organization_already_exists1", new Object[] { subOrgName });
+            }
+        } catch (SSOException e) {
+            SMSEntry.debug.error("OrganizationConfigManager::" + "validateOrgNameCollision:", e);
+            throw new SMSException(UMS_BUNDLE_NAME, "sms-INVALID_SSO_TOKEN");
+        }
+    }
+
+    private void validateOrgAliasCollision(Map attributes) throws SMSException {
+        if (CollectionUtils.isNotEmpty(attributes)) {
+            try {
+                Map svcAttributes  = (Map) attributes.get(REPO_SERVICE);
+                if(CollectionUtils.isNotEmpty(svcAttributes)) {
+                    Set<String> aliases =  (Set) svcAttributes.get(ORGANIZATION_ALIAS_ATTR);
+                    if(CollectionUtils.isNotEmpty(aliases)) {
+                        OrganizationConfigManager rootOrgConfigManager = new OrganizationConfigManager(token, null);
+                        boolean orgExists = false;
+                        for (String alias: aliases) {
+                            String aliasOrgDN = normalizeDN(alias, rootOrgConfigManager.orgDN);
+                            try {
+                                // Check if realm exists by the alias name, this throws SMSException
+                                // if realm does not exist
+                                // This is to avoid realm and alias name collision
+                                new OrganizationConfigManager(token, aliasOrgDN);
+                                SMSEntry.debug.error("OrganizationConfigManager::"
+                                        + "validateOrgAliasCollision() " + "Realm Already Exists.. "
+                                        + aliasOrgDN);
+                                orgExists = true;
+                            } catch (SMSException smse) {
+                                //ignore no org found
+                            }
+                            if(orgExists) {
+                                throw new SMSException(UMS_BUNDLE_NAME,
+                                        "sms-organization_already_exists1", new Object[] { alias });
+                            }
+                            try {
+                                //check if any organization exist with the given alias
+                                //this is to avoid the creation of duplicate alias
+                                if(CollectionUtils.isNotEmpty(searchOrganizationByAlias(alias))) {
+                                    throw new SMSException(UMS_BUNDLE_NAME,
+                                            "sms-organization_already_exists1", new Object[] { alias });
+                                }
+                            } catch (SSOException e) {
+                                SMSEntry.debug.error("OrganizationConfigManager::validateOrgAliasCollision:", e);
+                                throw new SMSException(UMS_BUNDLE_NAME, "sms-INVALID_SSO_TOKEN");
+                            }
+                        }
+                    }
+                }
+            } catch (ClassCastException e) {
+                SMSEntry.debug.error("OrganizationConfigManager::validateOrgAliasCollision:", e);
+                throw new SMSException(UMS_BUNDLE_NAME, "sms-invalid_attribute_type", new Object[] { REPO_SERVICE });
+            }
+        }
+    }
+
+    private Set searchOrganizationByAlias(String alias) throws SSOException, SMSException {
         ServiceManager serviceManager = new ServiceManager(token);
         return serviceManager.searchOrganizationNames(
-                IdConstants.REPO_SERVICE,
-                IdConstants.ORGANIZATION_ALIAS_ATTR, Collections.singleton(subOrgName));
+                REPO_SERVICE,
+                ORGANIZATION_ALIAS_ATTR, Collections.singleton(alias));
     }
 
     private void validateOrgName(final String subOrgName) throws SMSException {
@@ -464,7 +523,7 @@ public class OrganizationConfigManager {
         if (InvalidRealmNameManager.getInvalidRealmNames().contains(realm)) {
             SMSEntry.debug.error("OrganizationConfigManager::createSubOrganization() : Invalid realm name: " +
                     subOrgName + " - clashes with REST endpoint");
-            throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+            throw new SMSException(UMS_BUNDLE_NAME,
                     SMSEntry.bundle.getString("sms-invalid-org-name"), new Object[]{ subOrgName });
         }
     }
@@ -591,7 +650,7 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error(
                     "OrganizationConfigManager: deleteSubOrganization(" +
                     "Root realm "+orgName + " cannot be deleted. ");
-            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+            throw (new SMSException(UMS_BUNDLE_NAME,
                 "sms-cannot_delete_rootsuffix",parms));
                     
         }
@@ -1453,7 +1512,7 @@ public class OrganizationConfigManager {
             SMSEntry.debug.error(
                     "OrganizationConfigManager.getServiceAttributes() Unable " +
                     "to get service attributes. ");
-            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+            throw (new SMSException(UMS_BUNDLE_NAME,
                     "sms-no-organization-schema",
                     args));
 
@@ -1731,7 +1790,7 @@ public class OrganizationConfigManager {
                         return (false);
                     }
                     if (subConfig.getSchemaID().equalsIgnoreCase(
-                        IdConstants.AMSDK_PLUGIN_NAME)) {
+                        AMSDK_PLUGIN_NAME)) {
                         Map configMap = subConfig.getAttributes();
                         if ((configMap != null) && !configMap.isEmpty()) {
                             // Get the amsdkOrgName from the amSDKRepo to build

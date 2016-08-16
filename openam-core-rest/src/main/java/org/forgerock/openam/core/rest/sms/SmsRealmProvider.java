@@ -19,6 +19,7 @@ import static com.sun.identity.sm.SMSException.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.dpro.session.SessionException;
@@ -28,15 +29,14 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.idm.IdConstants;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -62,7 +62,6 @@ import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -70,8 +69,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,8 +84,8 @@ public class SmsRealmProvider implements RequestHandler {
     private final static String SERVICE_NAMES = "serviceNames";
     private static final String ACTIVE_VALUE = "Active";
     private static final String INACTIVE_VALUE = "Inactive";
-    private static final String ACTIVE_ATTRIBUTE_NAME = "active";
-    private static final String ALIASES_ATTRIBUTE_NAME = "aliases";
+    protected static final String ACTIVE_ATTRIBUTE_NAME = "active";
+    protected static final String ALIASES_ATTRIBUTE_NAME = "aliases";
     protected static final String REALM_NAME_ATTRIBUTE_NAME = "name";
     protected static final String PATH_ATTRIBUTE_NAME = "parentPath";
     private static final String PARENT_I18N_KEY = "a109";
@@ -100,12 +97,14 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String ERR_NO_PARAMETER_PROVIDED = "No %s parameter provided";
     private static final String ERR_WRONG_PARAMETER_TYPE = "Wrong parameter type provided in %s. Expected %s";
     private static final String ERR_REALM_CANNOT_CONTAIN = "Realm names cannot contain: %s";
+    private static final String ERR_ALIAS_CANNOT_CONTAIN = "Realm alias cannot contain: %s";
+    private static final String JSON_NULL_STR = "null";
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private RealmNormaliser realmNormaliser;
 
     // This blacklist also includes characters which upset LDAP.
-    private final static Set<String> BLACKLIST_CHARACTERS = new TreeSet<>(CollectionUtils.asSet(
+    private final static Set<String> BLACKLIST_CHARACTERS = new TreeSet<>(asSet(
             "$", "&", "+", ",", "/", ":", ";", "=", "?", "@", " ", "#", "%", "<", ">", "\"", "\\"));
 
     public SmsRealmProvider(SessionCache sessionCache,
@@ -270,28 +269,50 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     private void jsonContentValidation(JsonValue jsonContent) throws BadRequestException {
+        validateRealmName(jsonContent);
+        validateParentPath(jsonContent);
+        validateActiveFlag(jsonContent);
+        validateRealmAliases(jsonContent);
+    }
 
-        final JsonValue realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME);
-        final JsonValue parentPath = jsonContent.get(PATH_ATTRIBUTE_NAME);
-        final JsonValue active = jsonContent.get(ACTIVE_ATTRIBUTE_NAME);
-        final JsonValue aliases = jsonContent.get(ALIASES_ATTRIBUTE_NAME);
-
-        //realmNameChecks
+    private void validateRealmName(JsonValue jsonContent) throws BadRequestException {
+        JsonValue realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME);
         checkArgument(realmName.isNotNull(), ERR_NO_PARAMETER_PROVIDED, REALM_NAME_ATTRIBUTE_NAME);
         checkArgument(StringUtils.isNotBlank(realmName.asString()), ERR_NO_PARAMETER_PROVIDED, REALM_NAME_ATTRIBUTE_NAME);
         checkArgument(!containsBlacklistedCharacters(realmName.asString()), ERR_REALM_CANNOT_CONTAIN, BLACKLIST_CHARACTERS.toString());
-        //parentPathChecks
+    }
+
+    private void validateParentPath(JsonValue jsonContent) throws BadRequestException {
+        JsonValue parentPath = jsonContent.get(PATH_ATTRIBUTE_NAME);
         checkArgument(parentPath.isNotNull(), ERR_NO_PARAMETER_PROVIDED, PATH_ATTRIBUTE_NAME);
         checkArgument(StringUtils.isNotBlank(parentPath.asString()), ERR_NO_PARAMETER_PROVIDED, PATH_ATTRIBUTE_NAME);
-        //activeChecks
-        checkArgument(active.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
-        checkArgument(!active.toString().equals("null"), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
-        checkArgument(active.isBoolean(), ERR_WRONG_PARAMETER_TYPE , ACTIVE_ATTRIBUTE_NAME, Boolean.TYPE.toString());
-        //aliasesChecks
-        checkArgument(aliases.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
-        checkArgument(!aliases.toString().equals("null"), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
-        checkArgument(aliases.isCollection(), ERR_WRONG_PARAMETER_TYPE , ALIASES_ATTRIBUTE_NAME, "list");
+    }
 
+    private void validateActiveFlag(JsonValue jsonContent) throws BadRequestException {
+        JsonValue active = jsonContent.get(ACTIVE_ATTRIBUTE_NAME);
+        checkArgument(active.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
+        checkArgument(!active.toString().equals(JSON_NULL_STR), ERR_NO_PARAMETER_PROVIDED, ACTIVE_ATTRIBUTE_NAME);
+        checkArgument(active.isBoolean(), ERR_WRONG_PARAMETER_TYPE , ACTIVE_ATTRIBUTE_NAME, Boolean.TYPE.toString());
+    }
+
+    private void validateRealmAliases(JsonValue jsonContent) throws BadRequestException {
+        JsonValue aliasJsonValue = jsonContent.get(ALIASES_ATTRIBUTE_NAME);
+        checkArgument(aliasJsonValue.isNotNull(), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
+        checkArgument(!aliasJsonValue.toString().equals(JSON_NULL_STR), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
+        checkArgument(aliasJsonValue.isCollection(), ERR_WRONG_PARAMETER_TYPE , ALIASES_ATTRIBUTE_NAME, "list");
+
+        try {
+            List<String> aliases = aliasJsonValue.asList(String.class);
+            if (isNotEmpty(aliases)) {
+                for (String alias : aliases) {
+                    checkArgument(StringUtils.isNotBlank(alias), ERR_NO_PARAMETER_PROVIDED, ALIASES_ATTRIBUTE_NAME);
+                    checkArgument(!containsBlacklistedCharacters(alias), ERR_ALIAS_CANNOT_CONTAIN, BLACKLIST_CHARACTERS.toString());
+                }
+            }
+        } catch (JsonValueException e) {
+            //should not come here
+            throw new BadRequestException(e);
+        }
     }
 
     private void checkArgument(boolean expression, String errorMessageTemplate, Object... errorMessageArgs) throws BadRequestException {
@@ -321,8 +342,9 @@ public class SmsRealmProvider implements RequestHandler {
             activeValue = INACTIVE_VALUE;
         }
 
-        attributes.put(IdConstants.ORGANIZATION_STATUS_ATTR, CollectionUtils.asSet(activeValue));
-        attributes.put(IdConstants.ORGANIZATION_ALIAS_ATTR, new HashSet<>(realmDetails.get("aliases").asCollection(String.class)));
+        attributes.put(IdConstants.ORGANIZATION_STATUS_ATTR, asSet(activeValue));
+        attributes.put(IdConstants.ORGANIZATION_ALIAS_ATTR,
+                new HashSet<>(realmDetails.get(ALIASES_ATTRIBUTE_NAME).asCollection(String.class)));
 
         return attributes;
     }
