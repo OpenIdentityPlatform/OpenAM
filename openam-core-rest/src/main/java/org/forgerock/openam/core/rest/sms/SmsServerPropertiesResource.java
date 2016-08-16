@@ -882,7 +882,13 @@ public class SmsServerPropertiesResource {
     }
 
     private Map<String, String> getUriTemplateVariables(Context serverContext) {
-        return serverContext.asContext(UriRouterContext.class).getUriTemplateVariables();
+        Map<String, String> uriVariable = new HashMap<>();
+        for (Context context = serverContext; context != null; context = context.getParent()) {
+            if (context instanceof UriRouterContext) {
+                uriVariable.putAll(((UriRouterContext) context).getUriTemplateVariables());
+            }
+        }
+        return uriVariable;
     }
 
     private String getTabName(Map<String, String> uriVariables) {
