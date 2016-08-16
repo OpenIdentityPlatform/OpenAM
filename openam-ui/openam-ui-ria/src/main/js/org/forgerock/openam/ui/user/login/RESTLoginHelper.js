@@ -27,9 +27,10 @@ define([
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/openam/ui/user/services/SessionService",
-    "org/forgerock/openam/ui/user/UserModel"
+    "org/forgerock/openam/ui/user/UserModel",
+    "org/forgerock/openam/ui/user/login/logout"
 ], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
-    fetchUrl, SessionToken, AuthNService, SessionService, UserModel) => {
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -156,24 +157,9 @@ define([
         return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
-    obj.logout = function (successCallback = function () {}, errorCallback = function () {}) {
-        const sessionToken = SessionToken.get();
-        SessionService.isSessionValid(sessionToken).then((result) => {
-            if (result.valid) {
-                SessionService.logout(sessionToken).then((response) => {
-                    SessionToken.remove();
-                    successCallback(response);
-                    return true;
-                }, () => {
-                    SessionToken.remove();
-                });
-            } else {
-                SessionToken.remove();
-                successCallback();
-            }
-        }, () => {
-            errorCallback();
-        });
+    // called by commons
+    obj.logout = function (successCallback, errorCallback) {
+        logout.default().then(successCallback, errorCallback);
     };
 
     return obj;

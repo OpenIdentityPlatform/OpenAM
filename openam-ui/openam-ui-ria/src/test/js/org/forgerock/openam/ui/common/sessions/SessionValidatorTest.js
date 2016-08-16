@@ -19,7 +19,7 @@ define([
     "squire",
     "sinon"
 ], ($, Squire, sinon) => {
-    let RouteTo;
+    let logout;
     let Strategy;
     let validatePromise;
     let Validator;
@@ -31,12 +31,12 @@ define([
 
             Strategy = sinon.stub().returns(validatePromise);
 
-            RouteTo = {
-                sessionExpired: sinon.stub()
+            logout = {
+                "default": sinon.stub().returns($.Deferred())
             };
 
             injector
-                .mock("org/forgerock/openam/ui/common/RouteTo", RouteTo)
+                .mock("org/forgerock/openam/ui/user/login/logout", logout)
                 .require(["org/forgerock/openam/ui/common/sessions/SessionValidator"], (subject) => {
                     Validator = subject;
                     done();
@@ -63,14 +63,14 @@ define([
             });
 
             context("when strategy rejects", () => {
-                it("invokes RouteTo#sessionExpired", () => {
+                it("invokes #logout", () => {
                     validatePromise.reject();
 
                     Validator.start("token", Strategy);
 
                     clock.tick(1000);
 
-                    expect(RouteTo.sessionExpired).to.be.calledOnce;
+                    expect(logout.default).to.be.calledOnce;
                 });
             });
 

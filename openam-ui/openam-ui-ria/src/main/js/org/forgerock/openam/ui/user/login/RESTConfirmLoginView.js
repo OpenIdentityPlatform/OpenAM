@@ -14,56 +14,33 @@
  * Copyright 2011-2016 ForgeRock AS.
  */
 
+ define([
+     "i18next",
+     "org/forgerock/commons/ui/common/main/AbstractView",
+     "org/forgerock/commons/ui/common/main/EventManager",
+     "org/forgerock/commons/ui/common/main/Configuration",
+     "org/forgerock/openam/ui/common/util/Constants",
+     "org/forgerock/openam/ui/common/util/isRealmChanged",
+     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+     "org/forgerock/openam/ui/user/login/logout"
+ ], (i18next, AbstractView, EventManager, Configuration, Constants, isRealmChanged, RESTLoginHelper, logout) => {
+     isRealmChanged = isRealmChanged.default;
 
-define([
-    "jquery",
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/openam/ui/user/services/SessionService",
-    "org/forgerock/openam/ui/user/login/tokens/SessionToken"
-], function ($, AbstractView, Configuration, restLoginHelper, SessionService, SessionToken) {
+     const ConfirmLoginView = AbstractView.extend({
+         template: "templates/openam/ReturnToLoginTemplate.html",
+         baseTemplate: "templates/common/LoginBaseTemplate.html",
+         data: {},
+         render () {
+             if (isRealmChanged()) {
+                 logout.default().always(() => {
+                     this.data.title = i18next.t("common.user.loginConfirm");
+                     this.parentRender();
+                 });
+             } else {
+                 EventManager.sendEvent(Constants.EVENT_HANDLE_DEFAULT_ROUTE);
+             }
+         }
+     });
 
-    var ConfirmLoginView = AbstractView.extend({
-        template: "templates/openam/RESTConfirmLoginTemplate.html",
-        baseTemplate: "templates/common/LoginBaseTemplate.html",
-
-        data: {},
-        events: {
-            "click button#continueLogin": "continueLogin",
-            "click button#logout": "logout"
-        },
-        render () {
-            this.parentRender(function () {
-                $("#menu").hide();
-                $("#user-nav").hide();
-            });
-        },
-        continueLogin () {
-            var href = "#login/";
-
-            $("#menu").show();
-            $("#user-nav").show();
-
-            if (Configuration.globalData.auth.subRealm) {
-                href += Configuration.globalData.auth.subRealm;
-            }
-            location.href = href;
-            return false;
-        },
-        logout () {
-            SessionService.logout(SessionToken.get()).then(function () {
-                SessionToken.remove();
-                var realm = (Configuration.globalData.auth.passedInRealm != null)
-                                ? Configuration.globalData.auth.passedInRealm
-                                : Configuration.globalData.auth.subRealm;
-                location.href = `#login/${
-                    realm
-                    }${restLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams)}`;
-            });
-            return false;
-        }
-    });
-
-    return new ConfirmLoginView();
-});
+     return new ConfirmLoginView();
+ });

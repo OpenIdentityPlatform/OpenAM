@@ -18,11 +18,13 @@ define([
     "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/services/ServerService",
+    "org/forgerock/openam/ui/common/util/isRealmChanged",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "org/forgerock/openam/ui/user/services/SessionService",
-    "store/index",
     "UserProfileView"
-], ($, Configuration, ServerService, SessionToken, SessionService, store, UserProfileView) => {
+], ($, Configuration, ServerService, isRealmChanged, SessionToken, SessionService, UserProfileView) => {
+    isRealmChanged = isRealmChanged.default;
+
     const obj = {};
     const setRequireMapConfig = function (serverInfo) {
         if (serverInfo.kbaEnabled === "true") {
@@ -54,10 +56,7 @@ define([
 
         if (sessionToken) {
             return SessionService.getSessionInfo(sessionToken).then(() => {
-                const sessionInfoIntendedRealm = store.default.getState().server.realm;
-                const authenticatedRealm = store.default.getState().session.realm;
-
-                if (sessionInfoIntendedRealm !== authenticatedRealm) {
+                if (isRealmChanged()) {
                     location.href = "#confirmLogin/";
                 }
             });

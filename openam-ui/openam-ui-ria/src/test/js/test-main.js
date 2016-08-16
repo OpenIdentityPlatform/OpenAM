@@ -30,6 +30,7 @@
             }
         },
         paths: {
+            backbone: "/base/target/dependencies/libs/backbone-1.1.2-min",
             chai: "/base/node_modules/chai/chai",
             handlebars: "/base/target/dependencies/libs/handlebars-4.0.5",
             jquery: "/base/target/dependencies/libs/jquery-2.1.1-min",

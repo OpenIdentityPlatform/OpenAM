@@ -18,9 +18,12 @@
   * @module org/forgerock/openam/ui/common/sessions/SessionValidator
   */
 define([
-    "org/forgerock/openam/ui/common/RouteTo"
-], function (RouteTo) {
-    var delay, ONE_SECOND_IN_MILLISECONDS = 1000, SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS = 1;
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/user/login/logout"
+], (Router, logout) => {
+    let delay;
+    const ONE_SECOND_IN_MILLISECONDS = 1000;
+    const SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS = 1;
 
     function stop () {
         clearTimeout(delay);
@@ -38,10 +41,13 @@ define([
                 var adjustedSeconds = seconds > 0 ? seconds : SESSION_ALMOST_EXPIRED_BACKOFF_SECONDS;
 
                 validate(strategy, token, adjustedSeconds);
-            }, function () {
+            }, () => {
                 stop();
 
-                RouteTo.sessionExpired();
+                // TODO move the logout logic to the Sesion Expiry view
+                logout.default().then(() => {
+                    Router.routeTo(Router.configuration.routes.sessionExpired, { trigger: true });
+                });
             });
         }, seconds * ONE_SECOND_IN_MILLISECONDS);
     }

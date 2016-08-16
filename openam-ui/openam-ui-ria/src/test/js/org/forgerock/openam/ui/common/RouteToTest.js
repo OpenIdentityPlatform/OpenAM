@@ -162,15 +162,5 @@ define([
                 expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_SHOW_LOGIN_DIALOG);
             });
         });
-
-        describe("#sessionExpired", () => {
-            it("sends EVENT_SHOW_LOGIN_DIALOG event", () => {
-                RouteTo.sessionExpired();
-
-                expect(EventManager.sendEvent).to.be.calledOnce.calledWith(Constants.EVENT_CHANGE_VIEW, {
-                    route: Router.configuration.routes.sessionExpired
-                });
-            });
-        });
     });
 });

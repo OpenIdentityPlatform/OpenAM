@@ -21,7 +21,7 @@ define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, Constants, EventManager, Router, URIUtils) {
+], ($, _, Constants, EventManager, Router, URIUtils) => {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -43,7 +43,6 @@ define([
 
             sessionManager.logout(function (response) {
                 store.default.dispatch(creators.sessionRemoveRealm());
-                conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;
 
@@ -59,7 +58,6 @@ define([
                     });
                 }
             }, function () {
-                conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
                 if (gotoURL) {
@@ -284,16 +282,20 @@ define([
             "LoginDialog",
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/commons/ui/common/util/Queue",
-            "org/forgerock/openam/ui/common/RouteTo"
+            "org/forgerock/openam/ui/user/login/logout"
         ],
-        processDescription (event, LoginDialog, Configuration, Queue, RouteTo) {
+        processDescription (event, LoginDialog, Configuration, Queue, logout) {
             var queueName = "loginDialogAuthCallbacks";
-            if (Configuration.loggedUser.hasRole("ui-self-service-user")) {
+
+            if (Configuration.loggedUser && Configuration.loggedUser.hasRole("ui-self-service-user")) {
                 /**
-                 * User may have sensative information on-screen so we exit them from the system when thier session
+                 * User may have sensetive information on screen so we exit them from the system when their session
                  * has expired with a message telling them as such
                  */
-                return RouteTo.sessionExpired();
+                 // TODO move the logout logic to the Sesion Expiry view
+                return logout.default().then(() => {
+                    Router.routeTo(Router.configuration.routes.sessionExpired, { trigger: true });
+                });
             } else {
                 /**
                  * Admins are more likely to have work in-progress so they are presented with a login dialog to give

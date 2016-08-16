@@ -29,15 +29,17 @@ define([
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/common/util/isRealmChanged",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "store/index"
+    "org/forgerock/openam/ui/user/login/logout"
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
-    Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils, URIUtils,
-    store) => {
+    Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, RealmHelper, Router, SessionManager, UIUtils,
+    URIUtils, logout) => {
+    isRealmChanged = isRealmChanged.default;
 
     function populateTemplate () {
         var self = this,
@@ -129,10 +131,7 @@ define([
 
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
-                const sessionInfoIntendedRealm = store.default.getState().server.realm;
-                const authenticatedRealm = store.default.getState().session.realm;
-
-                if (sessionInfoIntendedRealm === authenticatedRealm) {
+                if (isRealmChanged()) {
                     Configuration.setProperty("loggedUser", user);
 
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
@@ -161,9 +160,7 @@ define([
                     location.href = "#confirmLogin/";
                 }
             }, () => {
-                // There is a tokenId but it is invalid so kill it
-                RESTLoginHelper.logout();
-                Configuration.setProperty("loggedUser", null);
+                logout.default();
             });
         },
 
@@ -263,8 +260,7 @@ define([
 
                 // Clear out existing session if instructed
                 if (reqs.hasOwnProperty("tokenId") && urlParams.arg === "newsession") {
-                    RESTLoginHelper.logout();
-                    Configuration.setProperty("loggedUser", null);
+                    logout.default();
                 }
 
                 // If simply by asking for the requirements, we end up with a token,

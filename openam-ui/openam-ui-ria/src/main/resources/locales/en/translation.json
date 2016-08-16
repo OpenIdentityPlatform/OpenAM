@@ -426,7 +426,7 @@
             "validateCode" : "An email has been sent to the address you entered. Click the link in that email to proceed.",
             "user" : "User",
             "login" : "Log in",
-            "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
+            "loginConfirm" : "You have been logged out after trying to access a different organization.",
             "selfService" : "Self-service",
             "administration": "Administration",
             "basicInfo" : "Basic Info",

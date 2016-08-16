@@ -49,8 +49,7 @@ define([
     obj.getSessionInfo = (token) => {
         return obj.serviceCall({
             url: `/${token}`,
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-            errorsHandlers: { "Unauthorized": { status: 401 } }
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
         }).then((response) => {
             store.default.dispatch(creators.sessionAddRealm(response.realm));
             return response;

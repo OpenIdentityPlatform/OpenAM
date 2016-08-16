@@ -60,11 +60,6 @@ define([
         },
         loginDialog () {
             return EventManager.sendEvent(Constants.EVENT_SHOW_LOGIN_DIALOG);
-        },
-        sessionExpired () {
-            return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                route: Router.configuration.routes.sessionExpired
-            });
         }
     };
 
