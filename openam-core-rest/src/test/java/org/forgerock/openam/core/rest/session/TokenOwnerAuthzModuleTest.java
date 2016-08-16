@@ -15,20 +15,19 @@
 */
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.assertTrue;
-
-import java.security.Principal;
-import java.util.concurrent.ExecutionException;
+import static org.testng.AssertJUnit.*;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
+import java.security.Principal;
+import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -44,7 +43,7 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class TokenOwnerAuthzModuleTest {
@@ -55,7 +54,7 @@ public class TokenOwnerAuthzModuleTest {
     SSOTokenManager mockTokenManager;
     Context mockContext;
 
-    @BeforeMethod
+    @BeforeTest
     public void theSetUp() throws SSOException {
         mockService = mock(SessionService.class);
         mockTokenManager  = mock(SSOTokenManager.class);
@@ -136,7 +135,6 @@ public class TokenOwnerAuthzModuleTest {
         Context otherContext = setupUser("john");
         setupUser("universal_id");
 
-
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(otherContext, request);
 
@@ -183,7 +181,6 @@ public class TokenOwnerAuthzModuleTest {
         Principal mockPrincipal = mock(Principal.class);
 
         SSOTokenContext tc = mock(SSOTokenContext.class);
-
 
         Context mockContext = mock(Context.class);
         given(mockContext.asContext(SSOTokenContext.class)).willReturn(tc);

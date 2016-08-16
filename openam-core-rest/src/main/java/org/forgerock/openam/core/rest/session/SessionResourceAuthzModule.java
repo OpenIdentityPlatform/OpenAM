@@ -16,10 +16,12 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import javax.inject.Inject;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
+import javax.inject.Inject;
+
+import com.sun.identity.shared.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ForbiddenException;
@@ -37,12 +39,15 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
 
     public final static String NAME = "SessionResourceFilter";
 
+    private final SSOTokenManager ssoTokenManager;
+
     @Inject
     public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
         super("tokenId", ssoTokenManager,
                 SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
                 SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
                 SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
+        this.ssoTokenManager = ssoTokenManager;
     }
 
     @Override
@@ -82,4 +87,5 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
                 SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId) ||
                 SessionResourceV2.REFRESH_ACTION_ID.equalsIgnoreCase(actionId);
     }
+
 }

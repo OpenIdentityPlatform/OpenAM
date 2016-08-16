@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_ID_PARAM_NAME;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -28,8 +26,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -65,16 +61,13 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
 
     public final static String NAME = "TokenOwnerAuthzModuleFilter";
 
-    private final static Version VER_1 = Version.version(1,2);
-
     private final SSOTokenManager ssoTokenManager;
     private final Set<String> allowedActions;
     private final String tokenIdParameter;
 
     /**
-     * Creates an authz module that will verify that a tokenId provided by the user
-     * (via, path params or query params) is the same user (via universal identifier)
-     * as the user requesting the action.
+     * Creates an authz module that will verify that a tokenId provided by the user (via query params)
+     * is the same user (via universal identifier) as the user requesting the action.
      *
      * @param tokenIdParameter The tokenId query parameter. May not be null.
      * @param ssoTokenManager An instance of the SSOTokenManager.
@@ -140,39 +133,18 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
         return new ForbiddenException().asPromise();
     }
 
-    boolean isTokenOwner(Context context, Request request) throws ResourceException, SSOException {
+    boolean isTokenOwner(Context context, Request request)
+            throws ResourceException, SSOException {
         String loggedInUserId = getUserId(context);
-        String tokenId = getTokenFromPathParam(context, request);
-        if(StringUtils.isBlank(tokenId)) {
-            tokenId = getTokenIdFromQueryParam(request);
+
+        String tokenId =  request.getResourcePath(); // infer from the token from resource path
+        if (StringUtils.isEmpty(tokenId)) {
+            //if there's no tokenId then is it supplied as additional parameter
+            tokenId = request.getAdditionalParameter(tokenIdParameter);
         }
-        String queryUsername = ssoTokenManager.createSSOToken(tokenId).getProperty(Constants.UNIVERSAL_IDENTIFIER);
+
+        final String queryUsername = ssoTokenManager.createSSOToken(tokenId).getProperty(Constants.UNIVERSAL_IDENTIFIER);
         return queryUsername.equalsIgnoreCase(loggedInUserId);
-    }
-
-    private String getTokenIdFromQueryParam(Request request) {
-        return request.getAdditionalParameter(tokenIdParameter);
-    }
-
-    private String getTokenFromPathParam(Context context, Request request) {
-        String tokenId;
-        if (request.getResourcePathObject().size() == 1) {
-            // infer from the token from resource path
-            tokenId =  request.getResourcePath();
-        } else {
-            // infer from the token from template'd resource path
-            tokenId = findTokenIdFromUri(context);
-        }
-        return tokenId;
-    }
-
-    private String findTokenIdFromUri(Context context) {
-        if(context == null || context.asContext(UriRouterContext.class) == null) {
-            return null;
-        } else if(context.asContext(UriRouterContext.class).getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME) == null) {
-            return findTokenIdFromUri(context.getParent());
-        }
-        return context.asContext(UriRouterContext.class).getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME);
     }
 
     private boolean actionCanBeInvokedBySelf(String actionId) {
