@@ -32,23 +32,24 @@ import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
-import org.forgerock.util.promise.Promise;
 
+import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -62,21 +63,28 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     private final LdapDataLayerConfiguration dataLayerConfiguration;
     private final LdapSearchHandler handler;
     private final Map<Class, EntryConverter> converterMap;
+    private final ConnectionFactory<Connection> connectionFactory;
     protected ByteString pagingCookie;
 
     /**
      * Default constructor ensures the Object Class is defined.
      *
      * @param dataLayerConfiguration Required for data store dataLayerConfiguration.
+     * @param handler The Search handler to use on the LDAP store.
+     * @param debug To debug writer for this class.
+     * @param converterMap The map ldap entry types to Java objects (partials, strings, tokens).
+     * @param connectionFactory A factory to communicate down to the data layer with.
      */
     @Inject
     public LdapQueryBuilder(LdapDataLayerConfiguration dataLayerConfiguration, LdapSearchHandler handler,
-            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
-            Map<Class, EntryConverter> converterMap) {
+                            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
+                            Map<Class, EntryConverter> converterMap,
+                            @DataLayer(ConnectionType.CTS_ASYNC) ConnectionFactory connectionFactory) {
         super(debug);
         this.dataLayerConfiguration = dataLayerConfiguration;
         this.handler = handler;
         this.converterMap = converterMap;
+        this.connectionFactory = connectionFactory;
     }
 
     /**
@@ -100,9 +108,13 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     @Override
     public ContinuousQuery executeContinuousQuery(Connection connection, ContinuousQueryListener listener) {
 
-        CTSDJLDAPv3PersistentSearch pSearch = new CTSDJLDAPv3PersistentSearch(
-                dataLayerConfiguration.getTokenStoreRootSuffix(),
-                getLDAPFilter(), SearchScope.WHOLE_SUBTREE, factoryWrapper(connection));
+        CTSDJLDAPv3PersistentSearchBuilder builder = new CTSDJLDAPv3PersistentSearchBuilder(connectionFactory);
+
+        CTSDJLDAPv3PersistentSearch pSearch = builder
+                .withSearchFilter(getLDAPFilter())
+                .withRetry(EventService.RETRY_INTERVAL)
+                .withSearchBaseDN(dataLayerConfiguration.getTokenStoreRootSuffix())
+                .withSearchScope(SearchScope.WHOLE_SUBTREE).build();
 
         pSearch.addContinuousQueryListener(listener);
         pSearch.startQuery();
@@ -204,28 +216,6 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     /**
-     * Todo : Remove and replace with permanent solution via AME-11120
-     */
-    private ConnectionFactory factoryWrapper(final Connection connection) {
-        return new ConnectionFactory() {
-            @Override
-            public void close() {
-                throw new UnsupportedOperationException("Operation not required.");
-            }
-
-            @Override
-            public Promise<Connection, LdapException> getConnectionAsync() {
-                throw new UnsupportedOperationException("Operation not required.");
-            }
-
-            @Override
-            public Connection getConnection() throws LdapException {
-                return connection;
-            }
-        };
-    }
-
-    /**
      * Generates an empty Paging Cookie.
      *
      * The Paging Cookie is required for paging requests. In order to use the
@@ -264,7 +254,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
                 pagingCookie = getEmptyPagingCookie();
             }
 
-            Collection<Entry> entries = null;
+            final Collection<Entry> entries;
             try {
                 entries = getEntries(connection);
             } catch (CoreTokenException e) {

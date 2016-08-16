@@ -40,6 +40,18 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 import com.iplanet.am.sdk.ldap.ACIEventListener;
 import com.iplanet.am.sdk.ldap.EntryEventListener;
 import com.iplanet.am.util.SystemProperties;
@@ -58,17 +70,6 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ldap.LDAPEventManager;
 
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
-
 /**
  * The EventService is responsible for listening to and dispatching to listening objects
  * messages returning from persistent searches running in an underlying LDAP implementation.
@@ -77,12 +78,15 @@ import org.forgerock.util.thread.listener.ShutdownManager;
  */
 public class EventService {
 
+    private static final String EVENT_CONNECTION_RETRY_INTERVAL =
+            "com.iplanet.am.event.connection.delay.between.retries";
+
+    /** Retry interval for reconnecting to persistent searches. **/
+    public static final int RETRY_INTERVAL = SystemProperties.getAsInt(EVENT_CONNECTION_RETRY_INTERVAL, 3000);
+
     private static Debug logger = Debug.getInstance("amEventService");
     private static I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
     private static DSConfigMgr cm = null;
-    private static final String EVENT_CONNECTION_RETRY_INTERVAL =
-            "com.iplanet.am.event.connection.delay.between.retries";
-    private static final int RETRY_INTERVAL = SystemProperties.getAsInt(EVENT_CONNECTION_RETRY_INTERVAL, 3000);
     private static final String EVENT_LISTENER_DISABLE_LIST = "com.sun.am.event.connection.disable.list";
     private static final Class<? extends IDSEventListener> ACI_EVENT_LISTENER_CLASS_NAME = ACIEventListener.class;
     private static final Class<? extends IDSEventListener> ENTRY_EVENT_LISTENER_CLASS_NAME = EntryEventListener.class;
@@ -304,8 +308,8 @@ public class EventService {
 
     private ConnectionFactory getSmsConnectionFactory() throws LDAPServiceException {
         if (smsConnectionFactory == null) {
-            smsConnectionFactory = DSConfigMgr.getDSConfigMgr()
-                    .getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
+            smsConnectionFactory =
+                    DSConfigMgr.getDSConfigMgr().getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
         }
         return smsConnectionFactory;
     }
@@ -388,8 +392,9 @@ public class EventService {
         private final SearchResultEntryHandler resultEntryHandler = new PSearchResultEntryHandler();
 
         public EventServicePersistentSearch(int retryInterval, DN pSearchBaseDN, Filter pSearchFilter,
-                SearchScope pSearchScope, ConnectionFactory factory, String... attributeNames) {
-            super(retryInterval, pSearchBaseDN, pSearchFilter, pSearchScope, factory, attributeNames);
+                                        SearchScope pSearchScope, ConnectionFactory factory, String... attributeNames) {
+            super(retryInterval, pSearchBaseDN, pSearchFilter, pSearchScope,
+                    LdapConnectionFactoryProvider.wrapExistingConnectionFactory(factory), attributeNames);
         }
 
         @Override

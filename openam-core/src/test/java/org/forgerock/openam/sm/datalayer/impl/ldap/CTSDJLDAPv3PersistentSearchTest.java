@@ -19,8 +19,9 @@ import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
+
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -37,7 +38,7 @@ public class CTSDJLDAPv3PersistentSearchTest {
     public void theSetup() { //you need this
         mockConnectionFactory = mock(ConnectionFactory.class);
 
-        pSearch = new CTSDJLDAPv3PersistentSearch(DN.rootDN(), Filter.alwaysFalse(),
+        pSearch = new CTSDJLDAPv3PersistentSearch(3000, DN.rootDN(), Filter.alwaysFalse(),
                 SearchScope.WHOLE_SUBTREE, mockConnectionFactory);
     }
 

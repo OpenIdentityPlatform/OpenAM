@@ -18,17 +18,17 @@ package org.forgerock.openam.sm.datalayer.impl.ldap;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
-
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.util.annotations.VisibleForTesting;
+
+import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
 
 /**
  * This class will execute persistent search request against the configured datastore. When a result is received, the
@@ -45,13 +45,15 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
      * Generate a new CTSDJLDAPv3PersistentSearch, providing the connection factory to use to produce
      * connections.
      *
-     * TODO: Configure the parameters set appropriate to the configuration of the system itself.
-     *
+     * @param retry The retry time to wait if the search fails for whatever reason.
+     * @param searchBaseDN The DN to use as the start location for the query.
+     * @param searchFilter The filter against which events on LDAP are compared.
+     * @param searchScope The scope from the base DN under which to search.
      * @param factory Used to produce connections down to the CTS.
      */
-    public CTSDJLDAPv3PersistentSearch(DN searchBaseDN, Filter searchFilter,
+    public CTSDJLDAPv3PersistentSearch(int retry, DN searchBaseDN, Filter searchFilter,
                                        SearchScope searchScope, ConnectionFactory factory) {
-        super(3000, searchBaseDN, searchFilter, searchScope, factory);
+        super(retry, searchBaseDN, searchFilter, searchScope, factory);
     }
 
     @Override
@@ -103,7 +105,7 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
         public boolean handle(SearchResultEntry entry, String dn, DN previousDn, PersistentSearchChangeType type) {
             if (type != null) {
                 for (ContinuousQueryListener listener : getListeners().keySet()) {
-                    listener.objectChanged(entry.getName().toString());
+                    listener.objectChanged(dn);
                 }
             }
             return true;

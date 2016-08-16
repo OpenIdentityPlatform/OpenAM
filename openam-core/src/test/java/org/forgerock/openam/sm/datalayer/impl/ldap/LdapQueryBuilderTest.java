@@ -30,7 +30,7 @@ import java.util.Map;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
-import org.forgerock.openam.sm.SMSDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -55,6 +55,7 @@ public class LdapQueryBuilderTest {
     private Connection mockConnection;
     private EntryConverter<PartialToken> partialTokenEntryConverter;
     private EntryConverter<Token> tokenEntryConverter;
+    private ConnectionFactory mockConnectionFactory;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -63,6 +64,7 @@ public class LdapQueryBuilderTest {
         mockConnection = mock(Connection.class);
         partialTokenEntryConverter = mock(EntryConverter.class);
         tokenEntryConverter = mock(EntryConverter.class);
+        mockConnectionFactory = mock(ConnectionFactory.class);
         Map<Class, EntryConverter> converterMap = new HashMap<Class, EntryConverter>();
         converterMap.put(PartialToken.class, partialTokenEntryConverter);
         converterMap.put(Token.class, tokenEntryConverter);
@@ -71,8 +73,8 @@ public class LdapQueryBuilderTest {
                 config,
                 searchHandler,
                 mock(Debug.class),
-                converterMap
-                );
+                converterMap,
+                mockConnectionFactory);
     }
 
     @Test

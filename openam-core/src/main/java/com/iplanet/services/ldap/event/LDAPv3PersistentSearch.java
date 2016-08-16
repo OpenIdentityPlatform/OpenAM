@@ -29,17 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.debug.Debug;
-
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
@@ -60,6 +55,12 @@ import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
 import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimerPool;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * An abstract implementation of LDAPv3 persistent searches.
  *
@@ -75,7 +76,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private static final List<String> AD_DEFAULT_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(
             AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR));
 
-    private final ConnectionFactory factory;
+    private final ConnectionFactory<Connection> factory;
     private final ConcurrentHashMap<T, H> listeners = new ConcurrentHashMap<>(1);
     private final int retryInterval;
     private final DN searchBaseDN;
@@ -165,9 +166,9 @@ public abstract class LDAPv3PersistentSearch<T, H> {
      */
     public void startQuery() {
         try {
-            conn = factory.getConnection();
+            conn = factory.create();
             startSearch(conn);
-        } catch (LdapException ere) {
+        } catch (LdapException | DataLayerException ere) {
             DEBUG.error("An error occurred while trying to initiate persistent search connection", ere);
             DEBUG.message("Restarting persistent search");
             restartSearch();
@@ -377,7 +378,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
 
         public void run() {
             try {
-                conn = factory.getConnection();
+                conn = factory.create();
                 startSearch(conn);
                 //everything seems to work, let's disable retryTask and reset the debug limit
                 runPeriod = -1;

@@ -44,6 +44,7 @@ import org.forgerock.util.Options;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.time.Duration;
 
+import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -121,6 +122,21 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
         if (debug.messageEnabled()) {
             debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
         }
+    }
+
+    /**
+     * Wraps a specific {@link org.forgerock.opendj.ldap.ConnectionFactory} factory in a {@link ConnectionFactory}
+     * object, for similarity between {@link org.forgerock.openam.sm.datalayer.impl.ldap.CTSDJLDAPv3PersistentSearch}
+     * and {@link EventService} LDAP uses.
+     *
+     * The intent is to adapt an LDAP connection factory to the more generic data layer connection factory.
+     *
+     * @param ldapConnectionFactory The factory to wrap.
+     * @return The wrapped factory.
+     */
+    public static ConnectionFactory<Connection> wrapExistingConnectionFactory(
+            org.forgerock.opendj.ldap.ConnectionFactory ldapConnectionFactory) {
+        return new LdapConnectionFactory(ldapConnectionFactory);
     }
 
     private static class LdapConnectionFactory implements ConnectionFactory<Connection> {

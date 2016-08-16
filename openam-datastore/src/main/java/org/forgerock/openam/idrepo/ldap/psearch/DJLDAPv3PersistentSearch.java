@@ -18,22 +18,24 @@ package org.forgerock.openam.idrepo.ldap.psearch;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
 
-import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.forgerock.openam.idrepo.ldap.IdentityMovedOrRenamedListener;
 import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+
+import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class will execute persistent search request against the configured datastore. When a result is received, the
