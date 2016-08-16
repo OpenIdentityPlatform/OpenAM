@@ -262,7 +262,7 @@ public class SessionPropertiesResourceTest {
         given(request.getContent()).willReturn(json(properties));
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        given(whiteList.getAllListedProperties(realmpath)).willReturn(properties.keySet());
+        given(whiteList.isPropertyListed(ssoToken, realmpath, properties.keySet())).willReturn(true);
         given(whiteList.isPropertyMapSettable(ssoToken, properties)).willReturn(true);
 
         //when
