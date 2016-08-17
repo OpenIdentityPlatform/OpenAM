@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -23,26 +23,27 @@ import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
 /**
- * Authorization module specifically designed for the Sessions Resource endpoint. This allows anonymous access
- * to the Sessions Endpoint for the ACTIONS of 'logout' and 'validate'. All other endpoint requests are denied.
+ * Authorization module specifically designed for the Sessions Properties Resource endpoint.
+ * This allows access to the Sessions Endpoint for GET,PATCH and UPDATE.
+ * All other endpoint requests are denied.
  */
-public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
+public class SessionPropertiesResourceAuthzModule extends TokenOwnerAuthzModule {
 
-    public final static String NAME = "SessionResourceFilter";
+    public final static String NAME = "SessionPropertiesResourceFilter";
 
     @Inject
-    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
-        super("tokenId", ssoTokenManager,
-                SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
-                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
-                SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
+    public SessionPropertiesResourceAuthzModule(SSOTokenManager ssoTokenManager) {
+        super("tokenId", ssoTokenManager);
     }
 
     @Override
@@ -50,21 +51,36 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
         return NAME;
     }
 
-    /**
-     * Lets through requests known to {@link SessionResource}.
-     */
+
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(Context context, ActionRequest request) {
-
-        if (actionCanBeInvokedByNonAdmin(request.getAction())) {
-            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
-        }
-
-        return super.authorizeAction(context, request);
+        return new ForbiddenException().asPromise();
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest request) {
+        return authorizeRequest(context, request);
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizePatch(Context context, PatchRequest request) {
+        return authorizeRequest(context, request);
+    }
+
+    @Override
+    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context context, UpdateRequest request) {
+        return authorizeRequest(context, request);
+    }
+
+    /**
+     * Authorizes the incoming request by checking if the
+     * session being accessed belongs to the authenticated user
+     *
+     * @param context The context.
+     * @param request The request.
+     * @return The Authiorization result promise.
+     */
+    private Promise<AuthorizationResult, ResourceException> authorizeRequest(Context context, Request request) {
         try {
             if (isTokenOwner(context, request)) {
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
@@ -75,11 +91,5 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
             return new ForbiddenException().asPromise();
         }
         return new ForbiddenException().asPromise();
-    }
-
-    private boolean actionCanBeInvokedByNonAdmin(String actionId) {
-        return SessionResource.VALIDATE_ACTION_ID.equalsIgnoreCase(actionId) ||
-                SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId) ||
-                SessionResourceV2.REFRESH_ACTION_ID.equalsIgnoreCase(actionId);
     }
 }

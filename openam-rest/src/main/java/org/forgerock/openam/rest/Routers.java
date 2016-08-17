@@ -333,13 +333,32 @@ public class Routers {
         @SafeVarargs
         public final ResourceRoute authorizeWith(Class<? extends CrestAuthorizationModule>... authorizationModules) {
             Reject.ifNull(authorizationModules);
+            for (Class<? extends CrestAuthorizationModule> authorizationModule : authorizationModules) {
+                authorizeWith(Key.get(authorizationModule));
+            }
+            return this;
+        }
+
+        /**
+         * Specifies the authorization modules to use when authorizing requests
+         * to the endpoint.
+         *
+         * <p>Can only be set <strong>once</strong>, attempt to do so twice
+         * will result in an {@code IllegalStateException}.</p>
+         *
+         * @param authorizationModuleKeys The authorization module keys.
+         * @return This route.
+         * @throws IllegalStateException If attempted to be set twice.
+         */
+        public final ResourceRoute authorizeWith(Key<? extends CrestAuthorizationModule>... authorizationModuleKeys) {
+            Reject.ifNull(authorizationModuleKeys);
             if (this.authorizationModules != null) {
                 throw new IllegalStateException("Authorization Filters have already been set!");
             } else {
                 this.authorizationModules = new ArrayList<>();
             }
-            for (Class<? extends CrestAuthorizationModule> authorizationModuleClass : authorizationModules) {
-                CrestAuthorizationModule module = InjectorHolder.getInstance(authorizationModuleClass);
+            for (Key<? extends CrestAuthorizationModule> authorizationModuleKey : authorizationModuleKeys) {
+                CrestAuthorizationModule module = InjectorHolder.getInstance(authorizationModuleKey);
                 this.authorizationModules.add(new LoggingAuthzModule(module, module.getName()));
             }
             return this;

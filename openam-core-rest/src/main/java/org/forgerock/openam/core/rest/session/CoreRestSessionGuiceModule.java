@@ -17,6 +17,7 @@
 package org.forgerock.openam.core.rest.session;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,15 +41,31 @@ public class CoreRestSessionGuiceModule extends AbstractModule {
 
     @Provides
     @Inject
+    @Named("SessionResourceAuthzModule")
     public AnyOfAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
             CrestPrivilegeAuthzModule privilegeAuthzModule,
             AdminOnlyAuthzModule adminOnlyAuthzModule) {
-        SessionResourceAuthzModule sessionResourceAuthzModule = new SessionResourceAuthzModule(ssoTokenManager);
+        List<CrestAuthorizationModule> authzList = initializeAuthzList(privilegeAuthzModule, adminOnlyAuthzModule);
+        authzList.add(new SessionResourceAuthzModule(ssoTokenManager));
+        return new AnyOfAuthzModule(authzList);
+    }
+
+    @Provides
+    @Inject
+    @Named("SessionPropertiesResourceAuthzModule")
+    public AnyOfAuthzModule getSessionPropertiesResourceAuthzModule(SSOTokenManager ssoTokenManager,
+            CrestPrivilegeAuthzModule privilegeAuthzModule,
+            AdminOnlyAuthzModule adminOnlyAuthzModule) {
+        List<CrestAuthorizationModule> authzList = initializeAuthzList(privilegeAuthzModule, adminOnlyAuthzModule);
+        authzList.add(new SessionPropertiesResourceAuthzModule(ssoTokenManager));
+        return new AnyOfAuthzModule(authzList);
+    }
+
+    private List<CrestAuthorizationModule> initializeAuthzList(CrestPrivilegeAuthzModule privilegeAuthzModule,
+            AdminOnlyAuthzModule adminOnlyAuthzModule) {
         List<CrestAuthorizationModule> authzList = new ArrayList<>(3);
         authzList.add(adminOnlyAuthzModule);
         authzList.add(privilegeAuthzModule);
-        authzList.add(sessionResourceAuthzModule);
-        return new AnyOfAuthzModule(authzList);
-
+        return authzList;
     }
 }
