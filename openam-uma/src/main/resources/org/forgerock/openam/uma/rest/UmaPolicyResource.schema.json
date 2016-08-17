@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/UmaPolicyResource#schema.title",
+  "description": "i18n:api-descriptor/UmaPolicyResource#schema.description",
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "title": "i18n:api-descriptor/UmaPolicyResource#schema.policyId.title",
+      "description": "i18n:api-descriptor/UmaPolicyResource#schema.policyId.description"
+    },
+    "permissions": {
+      "type": "array",
+      "title": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.title",
+      "description": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.description",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "title": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.items.subject.title",
+            "description": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.items.subject.description"
+          },
+          "scopes": {
+            "type": "array",
+            "title": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.items.scopes.title",
+            "description": "i18n:api-descriptor/UmaPolicyResource#schema.permissions.items.scopes.description",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

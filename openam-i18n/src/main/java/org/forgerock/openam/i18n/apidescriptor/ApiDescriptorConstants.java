@@ -108,7 +108,10 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String UMA_LABEL_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaLabelResource#";
-    
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String UMA_POLICY_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaPolicyResource#";
+
     /** Constant used as key to API Descriptor translations **/
     public static final String SERVER_VERSION_RESOURCE = TRANSLATION_KEY_PREFIX + "ServerVersionResource#";
 

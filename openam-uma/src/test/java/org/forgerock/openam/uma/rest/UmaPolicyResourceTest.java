@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -19,6 +19,7 @@ package org.forgerock.openam.uma.rest;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -26,15 +27,9 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collection;
 import java.util.HashSet;
-
-import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -43,11 +38,10 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
-
-import org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -242,51 +236,6 @@ public class UmaPolicyResourceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForPatchInstance() {
-
-        //Given
-        Context context = mock(Context.class);
-        PatchRequest request = Requests.newPatchRequest("/policies");
-
-        //When
-        Promise<ResourceResponse, ResourceException> result = policyResource.patchInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(result).failedWithResourceException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForActionCollection() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-
-        //When
-        Promise<ActionResponse, ResourceException> result = policyResource.actionCollection(context, request);
-
-        //Then
-        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldThrowNotSupportedExceptionForActionInstance() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-
-        //When
-        Promise<ActionResponse, ResourceException> result = policyResource.actionInstance(context, "RESOURCE_SET_ID", request);
-
-        //Then
-        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
     public void shouldSuccessfullyQueryPolicies() {
 
         //Given
@@ -331,4 +280,10 @@ public class UmaPolicyResourceTest {
         //Then
         assertThat(result).failedWithException().isEqualTo(resourceException);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(UmaPolicyResource.class).hasValidAnnotations();
+    }
 }
+
