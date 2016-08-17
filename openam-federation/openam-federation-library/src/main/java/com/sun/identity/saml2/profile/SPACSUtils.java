@@ -1756,62 +1756,48 @@ public class SPACSUtils {
     }
 
     /**
-     * Saves response for later retrieval and retrieves local auth url from
-     * <code>SPSSOConfig</code>.
+     * Saves response for later retrieval and retrieves local auth url from <code>SPSSOConfig</code>.
      * If the url does not exist, generate one from request URI.
-     * If still cannot get it, (shouldn't happen), get it from
-     * <code>AMConfig.properties</code>.
+     * If still cannot get it, (shouldn't happen), get it from {@link SystemConfigurationUtil}.
      *
-     * @param orgName realm or organization name the service provider resides in
-     * @param hostEntityId Entity ID of the hosted service provider
-     * @param sm <code>SAML2MetaManager</code> instance to perform meta
-     *                operation.
-     * @param respInfo to be cached <code>ResponseInfo</code>.
-     * @param requestURI http request URI.
-     * @return local login url.
+     * @param realm Realm or organization name the service provider resides in.
+     * @param hostEntityId Entity ID of the hosted service provider.
+     * @param sm <code>SAML2MetaManager</code> instance to perform metadata operations.
+     * @param respInfo The to be cached <code>ResponseInfo</code>.
+     * @param requestURI The HTTP request URI.
+     * @return The local login url.
      */
-    public static String prepareForLocalLogin(
-                                        String orgName,
-                                        String hostEntityId,
-                                        SAML2MetaManager sm,
-                                        ResponseInfo respInfo,
-                                        String requestURI)
-    {
-        String localLoginUrl = getAttributeValueFromSPSSOConfig(
-                orgName, hostEntityId, sm, SAML2Constants.LOCAL_AUTH_URL);
-        if ((localLoginUrl == null) || (localLoginUrl.length() == 0)) {
+    public static String prepareForLocalLogin(String realm, String hostEntityId, SAML2MetaManager sm,
+            ResponseInfo respInfo, String requestURI) {
+        String localLoginUrl = getAttributeValueFromSPSSOConfig(realm, hostEntityId, sm, SAML2Constants.LOCAL_AUTH_URL);
+        if (StringUtils.isEmpty(localLoginUrl)) {
             // get it from request
             try {
                 int index = requestURI.indexOf("Consumer/metaAlias");
                 if (index != -1) {
-                    localLoginUrl = requestURI.substring(0, index)
-                        + "UI/Login?org="
-                        + orgName;
+                    localLoginUrl = requestURI.substring(0, index) + "UI/Login?realm=" + realm;
                 }
             } catch (IndexOutOfBoundsException e) {
                 localLoginUrl = null;
             }
-            if ((localLoginUrl == null) || (localLoginUrl.length() == 0)) {
+            if (StringUtils.isEmpty(localLoginUrl)) {
                 // shouldn't be here, but in case
                 localLoginUrl =
                         SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_PROTOCOL)
                         + "://"
                         + SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_HOST)
                         + SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_PORT)
-                        + "/UI/Login?org="
-                        + orgName;
+                        + "/UI/Login?realm="
+                        + realm;
             }
         }
 
         respInfo.setIsLocalLogin(true);
         synchronized (SPCache.responseHash) {
-           SPCache.responseHash.put(respInfo.getResponse().getID(), 
-               respInfo);
-        }   
-        if (SAML2Utils.debug.messageEnabled()) {
-            SAML2Utils.debug.message("SPACSUtils:prepareForLocalLogin: " +
-                "localLoginUrl = " + localLoginUrl);
+           SPCache.responseHash.put(respInfo.getResponse().getID(), respInfo);
         }
+        SAML2Utils.debug.message("SPACSUtils:prepareForLocalLogin: localLoginUrl = {}", localLoginUrl);
+
         return localLoginUrl;
     }
 
