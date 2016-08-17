@@ -130,9 +130,6 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String RESOURCE_SET_RESOURCE = TRANSLATION_KEY_PREFIX + "ResourceSetResource#";
 
-    /** Constant used as key to {@code KbaResource} resource bundle location **/
-    public static final String KBA_RESOURCE = TRANSLATION_KEY_PREFIX + "KbaResource#";
-
     private ApiDescriptorConstants() {
         // Constants class only
     }
