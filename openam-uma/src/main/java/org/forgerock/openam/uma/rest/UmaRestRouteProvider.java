@@ -37,7 +37,7 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(OAUTH)
                 .authorizeWith(UmaPolicyResourceAuthzFilter.class)
                 .through(UmaEnabledFilter.class)
-                .toAnnotatedCollection(UmaPolicyResource.class);
+                .toCollection(UmaPolicyResource.class);
 
         realmRouter.route("users/{user}/uma/auditHistory")
                 .auditAs(OAUTH)

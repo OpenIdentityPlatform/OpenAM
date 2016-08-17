@@ -107,9 +107,6 @@ public final class ApiDescriptorConstants {
     public static final String SERVER_VERSION_RESOURCE = TRANSLATION_KEY_PREFIX + "ServerVersionResource#";
 
     /** Constant used as key to API Descriptor translations **/
-    public static final String UMA_POLICY_RESOURCE = TRANSLATION_KEY_PREFIX + "UmaPolicyResource#";
-
-    /** Constant used as key to API Descriptor translations **/
     public static final String DASHBOARD_RESOURCE = TRANSLATION_KEY_PREFIX + "DashboardResource#";
 
     /** Constant used as key to API Descriptor translations **/

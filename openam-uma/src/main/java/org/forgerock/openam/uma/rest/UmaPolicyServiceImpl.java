@@ -222,7 +222,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             }
             return requiredScopes.isEmpty();
         } catch (EntitlementException e) {
-            debug.error("Failed to evaluate UMA policies", e);
+            debug.error("Failed to evaluate UAM policies", e);
             return false;
         }
     }
