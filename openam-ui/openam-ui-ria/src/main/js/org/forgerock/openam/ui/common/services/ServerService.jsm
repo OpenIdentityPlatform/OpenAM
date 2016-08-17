@@ -28,15 +28,19 @@ import URIUtils from "org/forgerock/commons/ui/common/util/URIUtils";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
-function getRealmParameter () {
-    const realmParameter = URIUtils.parseQueryString(URIUtils.getCurrentQueryString()).realm;
-    return realmParameter ? realmParameter : false;
+function getRealmUrlParameter () {
+    return URIUtils.parseQueryString(URIUtils.getCurrentQueryString()).realm;
+}
+
+function getUrl (path) {
+    const realmParameter = getRealmUrlParameter();
+    return fetchUrl(path, { realm: realmParameter ? realmParameter : false });
 }
 
 export function getVersion () {
     return obj.serviceCall({
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
-        url: fetchUrl("/serverinfo/version", { realm: getRealmParameter() })
+        url: getUrl("/serverinfo/version")
     }).then((data) => {
         return `OpenAM ${data.version} ${t("common.form.build")} ${data.revision} (${data.date})`;
     });
@@ -45,13 +49,13 @@ export function getVersion () {
 export function getConfiguration (callParams) {
     return obj.serviceCall(_.extend({
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-        url: fetchUrl("/serverinfo/*", { realm: getRealmParameter() })
+        url: getUrl("/serverinfo/*")
     }, callParams)).then((response) => {
         store.dispatch(serverAddRealm(response.realm));
 
         return response;
     }, (reason) => {
-        store.dispatch(serverAddRealm(getRealmParameter()));
+        store.dispatch(serverAddRealm(getRealmUrlParameter()));
 
         return reason;
     });
