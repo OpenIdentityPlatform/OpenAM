@@ -24,15 +24,26 @@
  *
  * $Id: SMSGateway.java,v 1.2 2009/06/03 20:46:51 veiming Exp $
  *
- */
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.modules.hotp;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import java.util.Map;
 
+/**
+ * Defines the ability to send SMS (Short Message Service) and e-mail via a gateway implementation.
+ * The implementation is responsible for resolving its own configuration details. Each message provided will contain
+ * information about where it is to be sent to. The messages are expected to be delivered within the limits of the
+ * current authentication session and/or module state's timeout timeframe. The implementation is expected to operate in
+ * either a synchronous or asynchronous fashion, with no requirements on when the message should be delivered to the
+ * recipient.
+ * <br>
+ * Thread Safety: The implementation does not have to be implemented in a thread-safe manner, each OTP code will be sent
+ * using a new instance of the gateway implementation.
+ *
+ * @supported.all.api
+ */
 public interface SMSGateway {
 
     /**
