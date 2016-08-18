@@ -32,26 +32,24 @@ define([
         }, options));
     }
 
-    obj.getMaxIdle = function (token) {
-        return performServiceCall({
-            url: `?_action=getMaxIdle&tokenId=${token}`,
-            suppressSpinner: true
-        });
-    };
-
-    obj.getTimeLeft = function (token) {
-        return performServiceCall({
-            url: `?_action=getTimeLeft&tokenId=${token}`,
-            suppressSpinner: true
-        });
-    };
-
-    obj.getSessionInfo = (token) => {
-        return obj.serviceCall({
+    function getSessionInfo (token, options) {
+        return obj.serviceCall(_.merge({
             url: `/${token}`,
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
-        }).then((response) => {
-            store.default.dispatch(creators.sessionAddRealm(response.realm));
+        }, options));
+    }
+
+    obj.getTimeLeft = function (token) {
+        return getSessionInfo(token, { suppressSpinner: true })
+            .then((sessionInfo) => { return sessionInfo.maxtime; });
+    };
+
+    obj.updateSessionInfo = (token) => {
+        return getSessionInfo(token).then((response) => {
+            store.default.dispatch(creators.sessionAddInfo({
+                maxidletime: response.maxidletime,
+                realm: response.realm
+            }));
             return response;
         });
     };

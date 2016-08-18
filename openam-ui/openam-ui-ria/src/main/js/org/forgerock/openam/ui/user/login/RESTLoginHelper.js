@@ -104,7 +104,7 @@ define([
         });
 
         if (sessionToken) {
-            return SessionService.getSessionInfo(sessionToken).then((data) => {
+            return SessionService.updateSessionInfo(sessionToken).then((data) => {
                 return UserModel.fetchById(data.uid).then(successCallback);
             }, noSessionHandler);
         } else {

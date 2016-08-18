@@ -55,7 +55,7 @@ define([
         const sessionToken = SessionToken.get();
 
         if (sessionToken) {
-            return SessionService.getSessionInfo(sessionToken).then(() => {
+            return SessionService.updateSessionInfo(sessionToken).then(() => {
                 if (isRealmChanged()) {
                     location.href = "#confirmLogin/";
                 }

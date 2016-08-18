@@ -18,16 +18,16 @@ define([
     "store/actions/types"
 ], (types) => {
     describe("store/actions/types", () => {
-        describe(".SESSION_ADD_REALM", () => {
-            const expected = "session/ADD_REALM";
+        describe(".SESSION_ADD_INFO", () => {
+            const expected = "session/ADD_INFO";
             it(`is "${expected}"`, () => {
-                expect(types.SESSION_ADD_REALM).equal(expected);
+                expect(types.SESSION_ADD_INFO).equal(expected);
             });
         });
-        describe(".SESSION_REMOVE_REALM", () => {
-            const expected = "session/REMOVE_REALM";
+        describe(".SESSION_REMOVE_INFO", () => {
+            const expected = "session/REMOVE_INFO";
             it(`is "${expected}"`, () => {
-                expect(types.SESSION_REMOVE_REALM).equal(expected);
+                expect(types.SESSION_REMOVE_INFO).equal(expected);
             });
         });
         describe(".SERVER_ADD_REALM", () => {

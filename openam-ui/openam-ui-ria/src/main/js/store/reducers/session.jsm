@@ -15,18 +15,30 @@
  */
 
 import {
-    SESSION_ADD_REALM,
-    SESSION_REMOVE_REALM
+    SESSION_ADD_INFO,
+    SESSION_REMOVE_INFO
 } from "../actions/types";
 
+import _ from "lodash";
+
 const initialState = {
-    realm: undefined
+    realm: undefined,
+    maxidletime: undefined
 };
 
 const session = function (state = initialState, action) {
     switch (action.type) {
-        case SESSION_ADD_REALM: return { realm: action.absolutePath };
-        case SESSION_REMOVE_REALM: return { realm: undefined };
+        case SESSION_ADD_INFO: {
+            const sessionInfo = {};
+            const secondsInMinute = 60;
+
+            if (action.info.maxidletime) { sessionInfo.maxidletime = action.info.maxidletime * secondsInMinute; }
+            if (action.info.realm) { sessionInfo.realm = action.info.realm.toLowerCase(); }
+
+            return _.merge({}, state, sessionInfo);
+        }
+
+        case SESSION_REMOVE_INFO: return {};
         default: return state;
     }
 };

@@ -25,29 +25,32 @@ define([
             expect(
                 reducer(undefined, {})
             ).eql({
-                realm: undefined
+                realm: undefined,
+                maxidletime: undefined
             });
         });
 
-        it(`handles ${types.SESSION_ADD_REALM}`, () => {
+        it(`handles ${types.SESSION_ADD_INFO}`, () => {
+            const realm = "/realmA";
+            const minutes = 10;
+
             expect(
                 reducer({}, {
-                    type: types.SESSION_ADD_REALM,
-                    absolutePath: "/realmA"
+                    type: types.SESSION_ADD_INFO,
+                    info: { realm, maxidletime: minutes }
                 })
             ).eql({
-                realm: "/realmA"
+                realm: realm.toLowerCase(),
+                maxidletime: minutes * 60
             });
         });
 
-        it(`handles ${types.SESSION_REMOVE_REALM}`, () => {
+        it(`handles ${types.SESSION_REMOVE_INFO}`, () => {
             expect(
                 reducer({}, {
-                    type: types.SESSION_REMOVE_REALM
+                    type: types.SESSION_REMOVE_INFO
                 })
-            ).eql({
-                realm: undefined
-            });
+            ).eql({});
         });
     });
 });

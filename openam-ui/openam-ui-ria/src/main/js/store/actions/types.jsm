@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-export const SESSION_ADD_REALM = "session/ADD_REALM";
-export const SESSION_REMOVE_REALM = "session/REMOVE_REALM";
+export const SESSION_ADD_INFO = "session/ADD_INFO";
+export const SESSION_REMOVE_INFO = "session/REMOVE_INFO";
 
 export const SERVER_ADD_REALM = "server/ADD_REALM";

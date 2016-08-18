@@ -19,20 +19,20 @@ define([
     "store/actions/types"
 ], (creators, types) => {
     describe("store/actions/creators", () => {
-        describe("#sessionAddRealm", () => {
-            it("creates an action to add realm to store.session", () => {
-                const absolutePath = "/realmA";
+        describe("#sessionAddInfo", () => {
+            it("creates an action to add session info to store.session", () => {
+                const info = { realm: "/realmA", maxidletime: 5 };
 
-                expect(creators.sessionAddRealm(absolutePath)).eql({
-                    type: types.SESSION_ADD_REALM,
-                    absolutePath: absolutePath.toLowerCase()
+                expect(creators.sessionAddInfo(info)).eql({
+                    type: types.SESSION_ADD_INFO,
+                    info
                 });
             });
         });
-        describe("#sessionRemoveRealm", () => {
-            it("creates an action to remove realm from store.session", () => {
-                expect(creators.sessionRemoveRealm()).eql({
-                    type: types.SESSION_REMOVE_REALM
+        describe("#sessionRemoveInfo", () => {
+            it("creates an action to remove session info from store.session", () => {
+                expect(creators.sessionRemoveInfo()).eql({
+                    type: types.SESSION_REMOVE_INFO
                 });
             });
         });
@@ -42,7 +42,7 @@ define([
 
                 expect(creators.serverAddRealm(realm)).eql({
                     type: types.SERVER_ADD_REALM,
-                    realm: realm.toLowerCase()
+                    realm
                 });
             });
         });

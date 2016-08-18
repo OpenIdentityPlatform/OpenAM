@@ -30,13 +30,14 @@ define([
         });
 
         it(`handles ${types.SERVER_ADD_REALM}`, () => {
+            const realm = "/realmA";
             expect(
                 reducer({}, {
                     type: types.SERVER_ADD_REALM,
-                    realm: "/realmA"
+                    realm
                 })
             ).eql({
-                realm: "/realmA"
+                realm: realm.toLowerCase()
             });
         });
     });

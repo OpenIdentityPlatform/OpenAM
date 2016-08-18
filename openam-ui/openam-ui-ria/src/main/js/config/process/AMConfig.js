@@ -42,7 +42,7 @@ define([
             SessionValidator.stop();
 
             sessionManager.logout(function (response) {
-                store.default.dispatch(creators.sessionRemoveRealm());
+                store.default.dispatch(creators.sessionRemoveInfo());
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
                 delete conf.gotoURL;
 

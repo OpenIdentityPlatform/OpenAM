@@ -68,7 +68,7 @@ define([
     }
 
     function addRealmToStore (realm) {
-        store.default.dispatch(creators.sessionAddRealm(realm));
+        store.default.dispatch(creators.sessionAddInfo({ realm }));
     }
 
     obj.begin = function (options) {

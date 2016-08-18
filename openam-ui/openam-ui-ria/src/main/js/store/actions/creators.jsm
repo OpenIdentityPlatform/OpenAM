@@ -16,20 +16,20 @@
 
 import {
     SERVER_ADD_REALM,
-    SESSION_ADD_REALM,
-    SESSION_REMOVE_REALM
+    SESSION_ADD_INFO,
+    SESSION_REMOVE_INFO
 } from "./types";
 
-export const sessionAddRealm = (absolutePath) => ({
-    type: SESSION_ADD_REALM,
-    absolutePath: absolutePath.toLowerCase()
+export const sessionAddInfo = (info) => ({
+    type: SESSION_ADD_INFO,
+    info
 });
 
-export const sessionRemoveRealm = () => ({
-    type: SESSION_REMOVE_REALM
+export const sessionRemoveInfo = () => ({
+    type: SESSION_REMOVE_INFO
 });
 
 export const serverAddRealm = (realm) => ({
     type: SERVER_ADD_REALM,
-    realm: realm.toLowerCase()
+    realm
 });

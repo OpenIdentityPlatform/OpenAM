@@ -24,7 +24,7 @@ const initialState = {
 
 const server = function (state = initialState, action) {
     switch (action.type) {
-        case SERVER_ADD_REALM: return { realm: action.realm };
+        case SERVER_ADD_REALM: return { realm: action.realm.toLowerCase() };
         default: return state;
     }
 };
