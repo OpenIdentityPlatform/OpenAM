@@ -70,6 +70,10 @@ import com.sun.identity.shared.debug.Debug;
  *
  */
 @CollectionProvider(
+        pathParam = @Parameter(
+                name = "tokenId",
+                type = "string",
+                description = CORE_TOKEN_RESOURCE + "pathParam." + DESCRIPTION),
         details = @Handler(
                 title = CORE_TOKEN_RESOURCE + TITLE,
                 description = CORE_TOKEN_RESOURCE + DESCRIPTION,

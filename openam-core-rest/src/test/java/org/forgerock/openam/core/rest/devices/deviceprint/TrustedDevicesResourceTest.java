@@ -44,6 +44,7 @@ import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.mockito.ArgumentCaptor;
@@ -144,4 +145,10 @@ public class TrustedDevicesResourceTest {
         //Then
         //Expected NotFoundException
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(TrustedDevicesResource.class).hasValidAnnotations();
+    }
+
 }
