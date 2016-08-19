@@ -131,7 +131,7 @@ define([
 
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
-                if (isRealmChanged()) {
+                if (!isRealmChanged()) {
                     Configuration.setProperty("loggedUser", user);
 
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {

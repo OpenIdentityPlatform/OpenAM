@@ -248,16 +248,8 @@ public class OAuth extends AMLoginModule {
 
             case GET_OAUTH_TOKEN_STATE: {
 
-                final String csrfState;
-
-                if (request.getParameter("jsonContent") != null) {
-                    final JsonValue jval = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent"));
-                    csrfState = jval.get("state").asString();
-                    code =jval.get(PARAM_CODE).asString();
-                } else {
-                    csrfState = request.getParameter("state");
-                    code = request.getParameter(PARAM_CODE);
-                }
+                final String csrfState = request.getParameter("state");
+                code = request.getParameter(PARAM_CODE);
 
                 if (csrfState == null) {
                     OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
