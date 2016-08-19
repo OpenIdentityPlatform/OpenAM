@@ -33,7 +33,8 @@
          render () {
              if (isRealmChanged()) {
                  logout.default().always(() => {
-                     this.data.title = i18next.t("common.user.loginConfirm");
+                     this.data.title = i18next.t("common.user.loggedOutOfPreviousSite");
+                     this.data.linkTitle = i18next.t("common.user.logInToNewSite");
                      this.parentRender();
                  });
              } else {

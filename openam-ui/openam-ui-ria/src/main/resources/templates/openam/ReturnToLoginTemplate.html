@@ -2,5 +2,6 @@
     <div class="page-header">
         <h1>{{title}}</h1>
     </div>
-    <a data-return-to-login-page title='{{t "common.user.returnToLoginPage"}}' href="{{ routeTo 'login' }}{{params}}">{{t "common.user.returnToLoginPage"}}</a>
+    <a data-return-to-login-page title='{{ternary linkTitle linkTitle (t "common.user.returnToLoginPage")}}'
+        href="{{ routeTo 'login' }}{{params}}">{{ternary linkTitle linkTitle (t "common.user.returnToLoginPage")}}</a>
 </div>

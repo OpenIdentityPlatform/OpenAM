@@ -64,4 +64,8 @@ define([
 
         return $.t(translationKey, parameters);
     });
+
+    Handlebars.registerHelper("ternary", (testExpression, yes, no) => {
+        return testExpression ? yes : no;
+    });
 });
