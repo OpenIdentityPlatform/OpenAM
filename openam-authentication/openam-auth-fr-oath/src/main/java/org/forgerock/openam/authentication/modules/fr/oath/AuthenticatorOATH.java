@@ -40,6 +40,9 @@ import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.utils.Alphabet;
+import org.forgerock.openam.utils.CodeException;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.GenerationUtils;
@@ -151,6 +154,8 @@ public class AuthenticatorOATH extends AMLoginModule {
             InjectorHolder.getInstance(Key.get(
                     new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorOathService>>(){},
                     Names.named(AuthenticatorOathServiceFactory.FACTORY_NAME)));
+
+    private final RecoveryCodeGenerator recoveryCodeGenerator = InjectorHolder.getInstance(RecoveryCodeGenerator.class);
 
     private OathDeviceSettings newDevice = null;
     
@@ -453,7 +458,12 @@ public class AuthenticatorOATH extends AMLoginModule {
 
         OathDeviceSettings settings = oathDevices.createDeviceProfile(minSecretKeyLength);
         settings.setChecksumDigit(checksum);
-        settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
+
+        try {
+            settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.Alphanumeric, false));
+        } catch (CodeException e) {
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
 
         return settings;
     }

@@ -76,25 +76,4 @@ public abstract class DeviceSettings {
         return recoveryCodes;
     }
 
-    /**
-     * Generates numCodes of recovery codes, utilising java.util.UUID.randomUUID() to create random
-     * String characters.
-     *
-     * @param numCodes Number of recovery codes to generate. Must be > 0.
-     * @return a String array of randomly generated recovery codes, of size numSize.
-     */
-    public static String[] generateRecoveryCodes(int numCodes) {
-        Reject.ifTrue(numCodes < 1, "numCodes must be greater than or equal to 1.");
-
-        String[] recoveryCodes = new String[numCodes];
-
-        for ( int i = 0; i < numCodes; i++) {
-            String temp = UUID.randomUUID().toString();
-            temp = temp.replace("-", "").substring(0, 10);
-            recoveryCodes[i] = temp;
-        }
-
-        return recoveryCodes;
-    }
-
 }

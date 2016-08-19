@@ -15,15 +15,12 @@
  */
 package org.forgerock.openam.oauth2.guice;
 
-import static com.google.inject.name.Names.named;
+import static com.google.inject.name.Names.*;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
-import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
+import static org.forgerock.oauth2.core.TokenStore.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
-import static org.forgerock.openam.rest.service.RestletUtils.wrap;
+import static org.forgerock.openam.rest.service.RestletUtils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +30,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.iplanet.services.naming.WebtopNamingQuery;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
@@ -95,7 +86,6 @@ import org.forgerock.openam.blacklist.BloomFilterBlacklist;
 import org.forgerock.openam.blacklist.CTSBlacklist;
 import org.forgerock.openam.blacklist.CachingBlacklist;
 import org.forgerock.openam.blacklist.NoOpBlacklist;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
@@ -126,6 +116,7 @@ import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -138,6 +129,17 @@ import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.SubjectTypeValidator;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.restlet.Restlet;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.iplanet.services.naming.WebtopNamingQuery;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
@@ -321,10 +323,10 @@ public class OAuth2GuiceModule extends AbstractModule {
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
             ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder,
             Blacklist<Blacklistable> tokenBlacklist, CTSPersistentStore cts,
-            TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
+            TokenAdapter<StatelessTokenMetadata> tokenAdapter, RecoveryCodeGenerator recoveryCodeGenerator) {
         StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
                 providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+                cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
         StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
                 realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
                 realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter);
@@ -381,9 +383,10 @@ public class OAuth2GuiceModule extends AbstractModule {
                 OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory oauth2UrisFactory,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-                Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory) {
+                Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory,
+                RecoveryCodeGenerator recoveryCodeGenerator) {
             super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser,
-                    ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory);
+                    ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
         }
 
         @Override

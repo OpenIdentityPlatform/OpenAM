@@ -18,7 +18,6 @@ package org.forgerock.openam.authentication.modules.push;
 import static org.forgerock.openam.authentication.modules.push.Constants.*;
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.concurrent.ExecutionException;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -57,14 +56,17 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 
+import com.amazonaws.services.sns.model.InvalidParameterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -233,7 +235,7 @@ public class AuthenticatorPush extends AbstractPushModule {
             coreTokenService.deleteAsync(messageId);
 
             if (deny != null && deny) { //denied
-                throw failedAsLoginException();
+                throw failedAsPasswordException();
             } else {
                 storeUsername(username);
                 return ISAuthConstants.LOGIN_SUCCEED;
@@ -258,7 +260,7 @@ public class AuthenticatorPush extends AbstractPushModule {
                     storeUsername(username);
                     return ISAuthConstants.LOGIN_SUCCEED;
                 } else { //denied
-                    throw failedAsLoginException();
+                    throw failedAsPasswordException();
                 }
             }
         } catch (CoreTokenException e) {
@@ -371,6 +373,11 @@ public class AuthenticatorPush extends AbstractPushModule {
     @Override
     public Principal getPrincipal() {
         return principal;
+    }
+
+    private InvalidPasswordException failedAsPasswordException() throws InvalidParameterException {
+        setFailureID(username);
+        return new InvalidPasswordException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
     }
 
     private AuthLoginException failedAsLoginException() throws AuthLoginException {

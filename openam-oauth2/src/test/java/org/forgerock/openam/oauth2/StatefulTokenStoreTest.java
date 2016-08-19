@@ -16,13 +16,17 @@
 
 package org.forgerock.openam.oauth2;
 
-import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.Collections.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.data.Offset.offset;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.Time.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -30,9 +34,6 @@ import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.DeviceCode;
@@ -49,12 +50,18 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.forgerock.openam.utils.Alphabet;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.query.QueryFilter;
 import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 
 public class StatefulTokenStoreTest {
 
@@ -72,6 +79,7 @@ public class StatefulTokenStoreTest {
     private Debug debug;
     private ClientAuthenticationFailureFactory failureFactory;
     private OAuth2RequestFactory oAuth2RequestFactory;
+    private RecoveryCodeGenerator recoveryCodeGenerator;
 
     @BeforeMethod
     public void setUp() {
@@ -87,6 +95,7 @@ public class StatefulTokenStoreTest {
         auditLogger = mock(OAuth2AuditLogger.class);
         debug = mock(Debug.class);
         failureFactory = mock(ClientAuthenticationFailureFactory.class);
+        recoveryCodeGenerator = mock(RecoveryCodeGenerator.class);
 
         oAuth2RequestFactory = new OAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()));
 
@@ -99,7 +108,7 @@ public class StatefulTokenStoreTest {
 
         openAMtokenStore = new StatefulTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
                 clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
-                new SecureRandom(), failureFactory);
+                new SecureRandom(), failureFactory, recoveryCodeGenerator);
     }
 
     @Test
@@ -192,7 +201,7 @@ public class StatefulTokenStoreTest {
         //Given
         StatefulTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticStatefulTokenStore(tokenStore,
                 providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory);
+                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator);
         JsonValue token = json(object(
                 field("tokenName", Collections.singleton("access_token")),
                 field("realm", Collections.singleton("/otherrealm"))));
@@ -223,6 +232,7 @@ public class StatefulTokenStoreTest {
         given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
+        given(recoveryCodeGenerator.generateCode(eq(Alphabet.Small_screen_alphanumeric), anyInt())).willReturn("234567AB");
 
         // When
         DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), resourceOwner, "CLIENT ID", "NONCE",
