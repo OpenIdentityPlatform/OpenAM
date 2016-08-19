@@ -296,7 +296,7 @@ public class SessionRequestHandler implements RequestHandler {
             case SessionRequest.AddSessionListener:
             case SessionRequest.SetProperty:
             case SessionRequest.DestroySession:
-                verifyTargetSessionIsLocal(req, targetSid);
+                verifyTargetSessionIsLocalOrStateless(req, targetSid);
                 break;
             default:
                 throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
@@ -307,8 +307,12 @@ public class SessionRequestHandler implements RequestHandler {
      *  Verify that this server is the correct host for the session and the session can be found(or recovered) locally.
      *  This function will become much simpler with removal of home servers, or possibly no longer be required.
      */
-    private void verifyTargetSessionIsLocal(SessionRequest req, SessionID sid) throws SessionException,
+    private void verifyTargetSessionIsLocalOrStateless(SessionRequest req, SessionID sid) throws SessionException,
             SessionRequestException, ForwardSessionRequestException {
+        if (statelessSessionFactory.containsJwt(sid)) {
+            return;
+        }
+
         String hostServerID = sessionService.getCurrentHostServer(sid);
 
         if (!serverConfig.isLocalServer(hostServerID)) {
