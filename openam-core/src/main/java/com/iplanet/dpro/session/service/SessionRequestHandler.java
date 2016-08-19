@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
@@ -396,10 +397,9 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetSessionCount:
                 String uuid = req.getUUID();
-                Object sessions = SessionCount.getSessionsFromLocalServer(uuid);
-
+                Map sessions =  SessionCount.getAllSessionsByUUID(uuid);
                 if (sessions != null) {
-                    res.setSessionsForGivenUUID((Map) sessions);
+                    res.setSessionsForGivenUUID(sessions);
                 }
 
                 break;

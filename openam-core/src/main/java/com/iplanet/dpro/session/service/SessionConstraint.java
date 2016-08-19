@@ -32,6 +32,7 @@ package com.iplanet.dpro.session.service;
 
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 
+import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -41,10 +42,12 @@ import org.forgerock.openam.session.service.DestroyOldestAction;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
@@ -89,6 +92,8 @@ public class SessionConstraint {
     private static final Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
 
     private static QuotaExhaustionAction quotaExhaustionAction = null;
+
+    private static SSOToken adminToken = null;
 
     private static QuotaExhaustionAction getQuotaExhaustionAction() {
         String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
@@ -191,9 +196,9 @@ public class SessionConstraint {
         AMIdentity identity = null;
         try {
             if (ISAuthConstants.IGNORE.equals(profile)) {
-                identity = new AMIdentityRepository(is.getClientDomain(), SessionCount.getAdminToken()).getRealmIdentity();
+                identity = new AMIdentityRepository(is.getClientDomain(), getAdminToken()).getRealmIdentity();
             } else {
-                identity = IdUtils.getIdentity(SessionCount.getAdminToken(), is.getUUID());
+                identity = IdUtils.getIdentity(getAdminToken(), is.getUUID());
             }
             Map serviceAttrs = identity.getServiceAttributesAscending(AM_SESSION_SERVICE);
             Set s = (Set) serviceAttrs.get(SESSION_QUOTA_ATTR_NAME);
@@ -220,7 +225,7 @@ public class SessionConstraint {
         int quota = DEFAULT_QUOTA;
         try {
             ServiceSchemaManager ssm = new ServiceSchemaManager(
-                    AM_SESSION_SERVICE, SessionCount.getAdminToken());
+                    AM_SESSION_SERVICE, getAdminToken());
             ServiceSchema schema = ssm.getDynamicSchema();
             Map attrs = schema.getAttributeDefaults();
             quota = CollectionHelper.getIntMapAttr(attrs, SESSION_QUOTA_ATTR_NAME, DEFAULT_QUOTA, debug);
@@ -232,5 +237,20 @@ public class SessionConstraint {
             }
         }
         return quota;
+    }
+
+    /*
+    * Gets the admin token for checking the session constraints for the users
+    * @return admin <code>SSOToken</code>
+    */
+    private static SSOToken getAdminToken() {
+        if (adminToken == null) {
+            try {
+                adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            } catch (Exception e) {
+                debug.error("Failed to get the admin token for Session constraint checking.", e);
+            }
+        }
+        return adminToken;
     }
 }

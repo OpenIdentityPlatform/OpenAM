@@ -1202,13 +1202,6 @@ public interface Constants {
             "openam.auth.soap.rest.generic.authentication.exception";
 
     /**
-     * Switch to allow using local sessions to track session counts when running
-     * in SessionCount.MULTI_SERVER_MODE.
-     */
-    static final String USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE =
-            "openam.session.useLocalSessionsInMultiServerMode";
-
-    /**
      * Default Domain Attribute
      */
     static final String DEFAULT_ROOT_NAMING_ATTRIBUTE = "dc";
