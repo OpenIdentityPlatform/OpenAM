@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.dashboard;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DASHBOARD_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -58,10 +59,10 @@ import com.sun.identity.shared.debug.Debug;
                 title = DASHBOARD_RESOURCE + TITLE,
                 description = DASHBOARD_RESOURCE + DESCRIPTION,
                 resourceSchema = @Schema(
-                        schemaResource = "/org/forgerock/openam/core/rest/dashboard/Dashboard.resource.schema.json"),
+                        schemaResource = "Dashboard.resource.schema.json"),
                 mvccSupported = false),
         pathParam = @Parameter(name = "resourceId", type = "string", description = DASHBOARD_RESOURCE +
-                "pathParam." + DESCRIPTION))
+                PATH_PARAM + DESCRIPTION))
 public final class DashboardResource {
 
     private final Debug debug;

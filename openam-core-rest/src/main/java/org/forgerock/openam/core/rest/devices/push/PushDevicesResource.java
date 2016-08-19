@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.devices.push;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PUSH_DEVICES_RESOURCE;
@@ -82,7 +83,7 @@ import org.forgerock.util.promise.Promise;
         pathParam = @Parameter(
                 name = "uuid",
                 type = "string",
-                description = PUSH_DEVICES_RESOURCE + "pathParam." + DESCRIPTION))
+                description = PUSH_DEVICES_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class PushDevicesResource extends TwoFADevicesResource<PushDevicesDao> {
 
     private final AuthenticatorDeviceServiceFactory<AuthenticatorPushService> pushServiceFactory;

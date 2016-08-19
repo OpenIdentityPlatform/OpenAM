@@ -44,14 +44,12 @@ import java.util.regex.Pattern;
  * @since 13.0.0
  */
 @SingletonProvider(
-    value = @Handler(
-        title = SERVER_VERSION_RESOURCE + TITLE,
-        description = SERVER_VERSION_RESOURCE + DESCRIPTION,
-        resourceSchema = @Schema(schemaResource = "ServerVersionResource.schema.json"),
-        mvccSupported = false
-    )
-)
-public class ServerVersionResource implements SingletonResourceProvider {
+        value = @Handler(
+                title = SERVER_VERSION_RESOURCE + TITLE,
+                description = SERVER_VERSION_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "ServerVersionResource.schema.json"),
+                mvccSupported = false))
+public class ServerVersionResource {
 
     private final static String SERVER_VERSION = "version";
 
@@ -78,31 +76,12 @@ public class ServerVersionResource implements SingletonResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, ActionRequest actionRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest patchRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Read(
-        operationDescription = @Operation(
+    @Read(operationDescription = @Operation(
             description = SERVER_VERSION_RESOURCE + READ_DESCRIPTION,
             errors = {
-                @ApiError(
-                    code = 403,
-                    description = SERVER_VERSION_RESOURCE + ERROR_403_DESCRIPTION
-                )
-            }
-        )
-    )
+                    @ApiError(
+                            code = 403,
+                            description = SERVER_VERSION_RESOURCE + ERROR_403_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
         JsonValue result = json(object(
                 field("version", getVersion()),
@@ -113,10 +92,4 @@ public class ServerVersionResource implements SingletonResourceProvider {
         return newResourceResponse(SERVER_VERSION, Integer.toString(result.asMap().hashCode()), result).asPromise();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest updateRequest) {
-        return new NotSupportedException().asPromise();
-    }
 }

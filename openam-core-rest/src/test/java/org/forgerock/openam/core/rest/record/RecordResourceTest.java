@@ -65,14 +65,10 @@ public class RecordResourceTest extends DebugTestTemplate {
         JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
                 IOUtils.getFileContentFromClassPath(RecordResourceTest.class,
                         RECORD_DIRECTORY + "startSimpleRecord.json"));
-        given(request.getAction()).willReturn("start");
         given(request.getContent()).willReturn(jsonRecordProperties);
 
         // When...
-        Promise<ActionResponse, ResourceException> promise = recordResource.actionCollection(serverContext, request);
-
-        // Then...
-        verify(request).getAction();
+        Promise<ActionResponse, ResourceException> promise = recordResource.actionStart(serverContext, request);
 
         RecordProperties recordPropertiesInput = RecordProperties.fromJson(jsonRecordProperties);
         RecordProperties recordPropertiesOutput = RecordProperties.fromJson(promise.get().getJsonContent().get("record"));
@@ -89,14 +85,8 @@ public class RecordResourceTest extends DebugTestTemplate {
                         RECORD_DIRECTORY + "startSimpleRecord.json"));
         debugRecorder.startRecording(jsonRecordProperties);
 
-        // Given...
-        given(request.getAction()).willReturn("stop");
-
         // When...
-        Promise<ActionResponse, ResourceException> promise = recordResource.actionCollection(serverContext, request);
-
-        // Then...
-        verify(request).getAction();
+        Promise<ActionResponse, ResourceException> promise = recordResource.actionStop(serverContext, request);
 
         RecordProperties recordPropertiesInput = RecordProperties.fromJson(jsonRecordProperties);
         RecordProperties recordPropertiesOutput = RecordProperties.fromJson(promise.get().getJsonContent().get("record"));

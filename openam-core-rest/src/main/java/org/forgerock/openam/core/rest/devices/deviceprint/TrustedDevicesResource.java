@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.devices.deviceprint;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TRUSTED_DEVICES_RESOURCE;
@@ -70,7 +71,7 @@ import org.forgerock.util.promise.Promise;
         pathParam = @Parameter(
                 name = "uuid",
                 type = "string",
-                description = TRUSTED_DEVICES_RESOURCE + "pathParam." + DESCRIPTION))
+                description = TRUSTED_DEVICES_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class TrustedDevicesResource extends UserDevicesResource<TrustedDevicesDao> {
 
     private static final DateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

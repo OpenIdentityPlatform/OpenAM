@@ -36,7 +36,7 @@ public class ScriptingRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("scripts")
                 .auditAs(SCRIPT)
                 .authorizeWith(CrestPrivilegeAuthzModule.class)
-                .toCollection(ScriptResource.class);
+                .toAnnotatedCollection(ScriptResource.class);
 
     }
 }

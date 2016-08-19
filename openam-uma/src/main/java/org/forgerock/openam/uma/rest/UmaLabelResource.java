@@ -64,11 +64,21 @@ import org.forgerock.util.promise.Promise;
  * A collection provider for UMA Labels.
  * @Since 13.0.0
  */
-@CollectionProvider(details = @Handler(
-        mvccSupported = true,
-        title = UMA_LABEL_RESOURCE + TITLE,
-        description =  UMA_LABEL_RESOURCE + DESCRIPTION,
-        resourceSchema = @Schema(fromType = ResourceSetLabel.class)))
+@CollectionProvider(
+        details = @Handler(
+                mvccSupported = true,
+                title = UMA_LABEL_RESOURCE + TITLE,
+                description =  UMA_LABEL_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(fromType = ResourceSetLabel.class),
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = UMA_LABEL_RESOURCE + "pathparams.user")}),
+        pathParam = @Parameter(
+                name = "umaLabelId",
+                type = "string",
+                description = UMA_LABEL_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class UmaLabelResource {
     private static final Debug debug = Debug.getInstance("umaLabel");
     private static final String TYPE_LABEL = "type";

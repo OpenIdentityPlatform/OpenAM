@@ -23,6 +23,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PENDING_REQUEST_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
@@ -86,7 +87,7 @@ import org.forgerock.util.promise.Promises;
         pathParam = @Parameter(
                 name = "pendingRequestId",
                 type = "string",
-                description = PENDING_REQUEST_RESOURCE + "pathParam." + DESCRIPTION))
+                description = PENDING_REQUEST_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class PendingRequestResource {
 
     private static final String APPROVE_ACTION_ID = "approve";

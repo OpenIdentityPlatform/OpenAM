@@ -20,6 +20,7 @@ import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory.*;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.util.promise.Promises.*;
@@ -85,7 +86,7 @@ import org.forgerock.util.promise.Promise;
         pathParam = @Parameter(
                 name = "uuid",
                 type = "string",
-                description = OATH_DEVICES_RESOURCE + "pathParam." + DESCRIPTION))
+                description = OATH_DEVICES_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
     private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory;

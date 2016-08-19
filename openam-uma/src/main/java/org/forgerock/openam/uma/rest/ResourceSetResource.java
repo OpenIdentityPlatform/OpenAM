@@ -23,6 +23,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_405_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
@@ -112,7 +113,7 @@ import org.forgerock.util.query.QueryFilterVisitor;
         pathParam = @Parameter(
                 name = "resourceSetId",
                 type = "string",
-                description = RESOURCE_SET_RESOURCE + "pathParam." + DESCRIPTION))
+                description = RESOURCE_SET_RESOURCE + PATH_PARAM + DESCRIPTION))
     public class ResourceSetResource {
 
     private static final String ID = "_id";

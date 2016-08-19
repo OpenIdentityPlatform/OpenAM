@@ -24,6 +24,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SCRIPT_RESOURCE;
@@ -109,9 +110,9 @@ import com.sun.identity.shared.encode.Base64;
                 mvccSupported = false,
                 resourceSchema = @Schema(schemaResource = "ScriptResource.schema.json")),
         pathParam = @Parameter(
-                name = "_id",
+                name = "scriptId",
                 type = "string",
-                description = SCRIPT_RESOURCE + "pathParam." + DESCRIPTION))
+                description = SCRIPT_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class ScriptResource extends RealmAwareResource {
 
     private final Logger logger;

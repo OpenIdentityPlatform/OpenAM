@@ -20,6 +20,7 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.COR
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
@@ -70,20 +71,15 @@ import com.sun.identity.shared.debug.Debug;
  *
  */
 @CollectionProvider(
-        pathParam = @Parameter(
-                name = "tokenId",
-                type = "string",
-                description = CORE_TOKEN_RESOURCE + "pathParam." + DESCRIPTION),
         details = @Handler(
                 title = CORE_TOKEN_RESOURCE + TITLE,
                 description = CORE_TOKEN_RESOURCE + DESCRIPTION,
                 resourceSchema = @Schema(fromType = Token.class),
-                mvccSupported = false,
-                parameters = {
-                        @Parameter(
-                                name = "tokenId",
-                                type = "string",
-                                description = CORE_TOKEN_RESOURCE + "pathParam." + DESCRIPTION)}))
+                mvccSupported = false),
+        pathParam = @Parameter(
+                name = "tokenId",
+                type = "string",
+                description = CORE_TOKEN_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class CoreTokenResource {
     public static final String DEBUG_HEADER = "CoreTokenResource :: ";
     // Injected

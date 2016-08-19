@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
@@ -93,9 +94,9 @@ import com.sun.identity.sm.ServiceConfigManager;
         description = SERVER_INFO_RESOURCE + DESCRIPTION,
         resourceSchema = @Schema(fromType = ServerInfo.class)),
         pathParam = @Parameter(
-                name = "id", type = "string",
+                name = "resourceId", type = "string",
                 enumTitles = {"All data", "Cookie Domains"}, enumValues = {"*", "cookieDomains"},
-                description = SERVER_INFO_RESOURCE + "pathParam.description"))
+                description = SERVER_INFO_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
@@ -338,7 +339,14 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    @Read(operationDescription = @Operation(description = SERVER_INFO_RESOURCE + "operation.read.description"))
+    @Read(operationDescription = @Operation(
+            description = SERVER_INFO_RESOURCE + READ_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = 403,
+                            description = SERVER_INFO_RESOURCE + ERROR_400_DESCRIPTION)
+            }
+    ))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 

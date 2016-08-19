@@ -57,7 +57,7 @@ import com.sun.identity.shared.debug.Debug;
  */
 @CollectionProvider(details = @Handler(mvccSupported = false, title = RECORD_RESOURCE + TITLE,
         description = RECORD_RESOURCE + DESCRIPTION))
-public class RecordResource implements CollectionResourceProvider {
+public class RecordResource {
 
     // Json label for the recording status
     private static final String STATUS_LABEL = "recording";
@@ -73,53 +73,26 @@ public class RecordResource implements CollectionResourceProvider {
         this.debugRecorder = debugRecorder;
     }
 
-    @Override
-    @Actions({
-        @Action(name = "start",
-                operationDescription = @Operation(
-                        errors = {
-                                @ApiError(
-                                        code = 400,
-                                        description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
-                        description = RECORD_RESOURCE + "operation.start.description"),
-                request = @Schema(schemaResource = "RecordPropertiesRequest.schema.json"),
-                response = @Schema(schemaResource = "RecordStatus.schema.json")),
-        @Action(name = "status",
-                operationDescription = @Operation(
-                        description = RECORD_RESOURCE + "operation.status.description"),
-                response = @Schema(schemaResource = "RecordStatus.schema.json")),
-        @Action(name = "stop",
-                operationDescription = @Operation(
-                        errors = {
-                                @ApiError(
-                                        code = 400,
-                                        description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
-                        description = RECORD_RESOURCE + "operation.stop.description"),
-                response = @Schema(schemaResource = "RecordStatus.schema.json"))})
-    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
-            ActionRequest actionRequest) {
-        switch (actionRequest.getAction()) {
-            case RecordConstants.START_ACTION:
-                return actionStart(actionRequest.getContent());
-            case RecordConstants.STATUS_ACTION:
-                return actionStatus();
-            case RecordConstants.STOP_ACTION:
-                return actionStop();
-            default:
-                return RestUtils.generateUnsupportedOperation();
-        }
-    }
-
     /**
      * Start action
      *
-     * @param jsonValue
      * @return
      */
-    private Promise<ActionResponse, ResourceException> actionStart(JsonValue jsonValue) {
+    @Action(name = "start",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
+                    description = RECORD_RESOURCE + "operation.start.description"),
+            request = @Schema(schemaResource = "RecordPropertiesRequest.schema.json"),
+            response = @Schema(schemaResource = "RecordStatus.schema.json"))
+    public Promise<ActionResponse, ResourceException> actionStart(Context serverContext,
+                                                                   ActionRequest actionRequest) {
+        JsonValue jsonValue = actionRequest.getContent();
         try {
             debugRecorder.startRecording(jsonValue);
-            return actionStatus();
+            return actionStatus(serverContext, actionRequest);
         } catch (JsonValueException e) {
             debug.message("Record json '{}' can't be parsed", jsonValue, e);
             return new BadRequestException("Record json '" + jsonValue + "' can't be parsed", e).asPromise();
@@ -134,7 +107,12 @@ public class RecordResource implements CollectionResourceProvider {
      *
      * @return
      */
-    private Promise<ActionResponse, ResourceException> actionStatus() {
+    @Action(name = "status",
+            operationDescription = @Operation(
+                    description = RECORD_RESOURCE + "operation.status.description"),
+            response = @Schema(schemaResource = "RecordStatus.schema.json"))
+    public Promise<ActionResponse, ResourceException> actionStatus(Context serverContext,
+                                                                    ActionRequest actionRequest) {
 
         Record currentRecord = debugRecorder.getCurrentRecord();
         JsonObject jsonValue = JsonValueBuilder.jsonValue();
@@ -152,7 +130,16 @@ public class RecordResource implements CollectionResourceProvider {
      *
      * @return
      */
-    private Promise<ActionResponse, ResourceException> actionStop() {
+    @Action(name = "stop",
+            operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = RECORD_RESOURCE + ERROR_400_DESCRIPTION)},
+                    description = RECORD_RESOURCE + "operation.stop.description"),
+            response = @Schema(schemaResource = "RecordStatus.schema.json"))
+    public Promise<ActionResponse, ResourceException> actionStop(Context serverContext,
+                                                                  ActionRequest actionRequest) {
         try {
             Record record = debugRecorder.stopRecording();
             if (record == null) {
@@ -167,47 +154,5 @@ public class RecordResource implements CollectionResourceProvider {
             debug.message("Record can't be stopped.", e);
             return new BadRequestException("Record can't be stopped.", e).asPromise();
         }
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
-            ActionRequest actionRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
-            CreateRequest createRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String s,
-            DeleteRequest deleteRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
-            PatchRequest patchRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext, QueryRequest queryRequest,
-            QueryResourceHandler queryResultHandler) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
-            ReadRequest readRequest) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
-            UpdateRequest updateRequest) {
-        return RestUtils.generateUnsupportedOperation();
     }
 }

@@ -70,7 +70,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
                 .forVersion(1, 1)
-                .toCollection(ServerInfoResource.class);
+                .toAnnotatedCollection(ServerInfoResource.class);
 
         realmRouter.route("serverinfo/version")
                 .authenticateWith(ssoToken().exceptRead())
@@ -110,17 +110,17 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("users/{user}/devices/trusted")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
-                .toCollection(TrustedDevicesResource.class);
+                .toAnnotatedCollection(TrustedDevicesResource.class);
 
         realmRouter.route("users/{user}/devices/2fa/oath")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
-                .toCollection(OathDevicesResource.class);
+                .toAnnotatedCollection(OathDevicesResource.class);
 
         realmRouter.route("users/{user}/devices/push")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
-                .toCollection(PushDevicesResource.class);
+                .toAnnotatedCollection(PushDevicesResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))
@@ -147,7 +147,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route(RecordConstants.RECORD_REST_ENDPOINT)
                 .auditAs(RECORD)
                 .authorizeWith(AdminOnlyAuthzModule.class)
-                .toCollection(RecordResource.class);
+                .toAnnotatedCollection(RecordResource.class);
     }
 
     @Override
