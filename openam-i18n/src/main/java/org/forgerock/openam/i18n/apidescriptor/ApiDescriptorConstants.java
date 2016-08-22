@@ -148,6 +148,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String SNS_MESSAGE_RESOURCE = TRANSLATION_KEY_PREFIX + "SnsMessageResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String AUDIT_HISTORY_RESOURCE = TRANSLATION_KEY_PREFIX + "AuditUserHistoryResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

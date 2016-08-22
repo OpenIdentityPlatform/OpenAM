@@ -43,7 +43,7 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(AuditHistory.class);
+                .toAnnotatedCollection(AuditHistory.class);
 
         realmRouter.route("users/{user}/uma/pendingrequests")
                 .auditAs(OAUTH)
