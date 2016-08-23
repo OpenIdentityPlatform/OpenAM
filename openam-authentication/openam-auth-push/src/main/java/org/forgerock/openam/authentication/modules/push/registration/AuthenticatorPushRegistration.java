@@ -350,7 +350,7 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
 
         try {
             newDeviceRegistrationProfile.setRecoveryCodes(
-                    recoveryCodeGenerator.generateCodes(NUM_RECOVERY_CODES, Alphabet.Alphanumeric, false));
+                    recoveryCodeGenerator.generateCodes(NUM_RECOVERY_CODES, Alphabet.ALPHANUMERIC, false));
         } catch (CodeException e) {
             DEBUG.error("Insufficient recovery code generation occurred.");
             throw failedAsLoginException();

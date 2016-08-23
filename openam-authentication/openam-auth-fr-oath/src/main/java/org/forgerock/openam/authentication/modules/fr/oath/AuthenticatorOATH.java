@@ -460,7 +460,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         settings.setChecksumDigit(checksum);
 
         try {
-            settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.Alphanumeric, false));
+            settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.ALPHANUMERIC, false));
         } catch (CodeException e) {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
