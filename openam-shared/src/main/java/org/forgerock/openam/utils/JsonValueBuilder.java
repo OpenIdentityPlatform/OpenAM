@@ -11,17 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
-import org.forgerock.json.JsonException;
-import org.forgerock.json.JsonValue;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+import org.forgerock.api.jackson.JacksonUtils;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +78,23 @@ public final class JsonValueBuilder {
         } catch (IOException e) {
             throw new JsonException("Failed to parse json", e);
         }
+    }
+
+    /**
+     * Construct a {@code JsonValue} from a classpath resource.
+     * @param relativeType The type to resolve the resource from.
+     * @param resource The resource path.
+     * @return The JsonValue.
+     */
+    public static JsonValue fromResource(Class<?> relativeType, String resource) {
+        InputStream resource1 = relativeType.getResourceAsStream(resource);
+
+        try {
+            return JsonValue.json(JacksonUtils.OBJECT_MAPPER.readValue(resource1, Object.class));
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not read declared resource " + resource, e);
+        }
+
     }
 
     /**

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "per-builder-i18n;submit.request.title",
+  "description": "per-builder-i18n;submit.request.description",
+  "properties": {
+    "token": {
+      "type": "string",
+      "title": "per-builder-i18n;req.token.title",
+      "description": "per-builder-i18n;req.token.description"
+    },
+    "input": {
+      "type": "object",
+      "title": "per-builder-i18n;input.title",
+      "description": "per-builder-i18n;input.description",
+      "patternProperties": {
+        ".*": {
+          "type": "any",
+          "title": "per-builder-i18n;input.property.title",
+          "description": "per-builder-i18n;input.property.description"
+        }
+      }
+    }
+  },
+  "required": ["input"]
+}
