@@ -896,7 +896,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         int i;
         for (i = 0; i < NUM_RETRIES; i++) {
 
-            String result = recoveryCodeGenerator.generateCode(Alphabet.Small_screen_alphanumeric, CODE_LENGTH);
+            String result = recoveryCodeGenerator.generateCode(Alphabet.BASE58, CODE_LENGTH);
 
             try {
                 readDeviceCode(result, request);

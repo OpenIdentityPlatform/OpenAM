@@ -232,7 +232,7 @@ public class StatefulTokenStoreTest {
         given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
-        given(recoveryCodeGenerator.generateCode(eq(Alphabet.Small_screen_alphanumeric), anyInt())).willReturn("234567AB");
+        given(recoveryCodeGenerator.generateCode(eq(Alphabet.BASE58), anyInt())).willReturn("234567AB");
 
         // When
         DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), resourceOwner, "CLIENT ID", "NONCE",
