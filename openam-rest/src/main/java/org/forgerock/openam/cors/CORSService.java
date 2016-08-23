@@ -43,15 +43,13 @@ import com.sun.identity.shared.debug.Debug;
  * <li>Alters the responses such that they are valid for CORS.
  * </ul>
  *
- * When comparing Strings HTTP methods and Origin headers are case-sensitive.
- *
  */
 public class CORSService {
 
     private static final Debug DEBUG = Debug.getInstance("frRest");
 
     private static final Set<String> simpleHeaders = Collections.unmodifiableSet(new HashSet<>(
-            Arrays.asList("Cache-Control", "Content-Language", "Expires", "Last-Modified", "Pragma")));
+            Arrays.asList("cache-control", "content-language", "expires", "last-modified", "pragma")));
 
     private final CSVHelper csvHelper = new CSVHelper();
 
@@ -187,7 +185,7 @@ public class CORSService {
         if (req.getHeaderNames() != null) {
             while (req.getHeaderNames().hasMoreElements()) {
                 String header = req.getHeaderNames().nextElement();
-                if (!acceptedHeaders.contains(header) && !simpleHeaders.contains(header)) {
+                if (!acceptedHeaders.contains(header.toLowerCase()) && !simpleHeaders.contains(header.toLowerCase())) {
                     DEBUG.warning("CORS Fail - Headers do not match allowed headers.");
                     return false;
                 }
@@ -262,7 +260,7 @@ public class CORSService {
             List<String> headerList = csvHelper.csvStringToList(headerCSVList, true);
 
             for (String header : headerList) {
-                if (!acceptedHeaders.contains(header) && !simpleHeaders.contains(header)) {
+                if (!acceptedHeaders.contains(header.toLowerCase()) && !simpleHeaders.contains(header.toLowerCase())) {
                     DEBUG.warning("CORS Fail - Preflight request contained the "
                             + CORSConstants.AC_REQUEST_HEADERS + " headers with an invalid value.");
                     return false;
