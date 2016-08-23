@@ -201,7 +201,7 @@ public class AuthenticatorPush extends AbstractPushModule {
             return STATE_EMERGENCY_USED;
         }
 
-        throw new AuthLoginException(AM_AUTH_AUTHENTICATOR_PUSH, "authFailed", null);
+        throw failedAsPasswordException();
     }
 
     private int pollForResponse() throws AuthLoginException {
