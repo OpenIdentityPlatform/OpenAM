@@ -175,6 +175,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String SELF_SERVICE_REQUEST_HANDLER = TRANSLATION_KEY_PREFIX + "SelfServiceRequestHandler_";
 
+    /** Constant used as key to {@code AuditService} resource bundle location **/
+    public static final String AUDIT_SERVICE = TRANSLATION_KEY_PREFIX + "AuditService#";
+
     /** Constant used as key to API Descriptor translations **/
     public static final String SESSION_RESOURCE = TRANSLATION_KEY_PREFIX + "SessionResource#";
 

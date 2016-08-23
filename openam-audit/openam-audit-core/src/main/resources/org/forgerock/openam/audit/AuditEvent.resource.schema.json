@@ -1,0 +1,305 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "i18n:api-descriptor/AuditService#schema.title",
+  "description": "i18n:api-descriptor/AuditService#schema.description",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.id.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.id.description",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.timestamp.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.timestamp.description",
+      "type": "string"
+    },
+    "eventName": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.eventName.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.eventName.description",
+      "type": "string"
+    },
+    "transactionId": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.transactionId.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.transactionId.description",
+      "type": "string"
+    },
+    "userId": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.userId.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.userId.description",
+      "type": "string"
+    },
+    "trackingIds": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.trackingIds.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.trackingIds.description",
+      "type": "array",
+      "items": {
+        "id": "0",
+        "type": "string"
+      }
+    },
+    "component": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.component.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.component.description",
+      "type": "string"
+    },
+    "realm": {
+      "title": "i18n:api-descriptor/AuditService#schema.common.realm.title",
+      "description": "i18n:api-descriptor/AuditService#schema.common.realm.description",
+      "type": "string"
+    },
+    "server": {
+      "title": "i18n:api-descriptor/AuditService#schema.access.server.title",
+      "description": "i18n:api-descriptor/AuditService#schema.access.server.description",
+      "type": "object",
+      "properties": {
+        "ip": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.server.ip.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.server.ip.description",
+          "type": "string"
+        },
+        "port": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.server.port.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.server.port.description",
+          "type": "integer"
+        }
+      }
+    },
+    "client": {
+      "title": "i18n:api-descriptor/AuditService#schema.access.client.title",
+      "description": "i18n:api-descriptor/AuditService#schema.access.client.description",
+      "type": "object",
+      "properties": {
+        "ip": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.client.ip.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.client.ip.description",
+          "type": "string"
+        },
+        "port": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.client.port.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.client.port.description",
+          "type": "integer"
+        }
+      }
+    },
+    "request": {
+      "title": "i18n:api-descriptor/AuditService#schema.access.request.title",
+      "description": "i18n:api-descriptor/AuditService#schema.access.request.description",
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.request.protocol.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.request.protocol.description",
+          "type": "string"
+        },
+        "operation": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.request.operation.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.request.operation.description",
+          "type": "string"
+        },
+        "detail": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.request.detail.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.request.detail.description",
+          "type": "object"
+        }
+      }
+    },
+    "http": {
+      "title": "i18n:api-descriptor/AuditService#schema.access.http.title",
+      "description": "i18n:api-descriptor/AuditService#schema.access.http.description",
+      "type": "object",
+      "properties": {
+        "request": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.http.request.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.http.request.description",
+          "type": "object",
+          "properties": {
+            "secure": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.secure.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.secure.description",
+              "type": "boolean"
+            },
+            "method": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.method.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.method.description",
+              "type": "string"
+            },
+            "path": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.path.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.path.description",
+              "type": "string"
+            },
+            "queryParameters": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.queryParameters.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.queryParameters.description",
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "headers": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.headers.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.headers.description",
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "cookies": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.cookies.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.cookies.description",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "response": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.http.response.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.http.response.description",
+          "type": "object",
+          "properties": {
+            "headers": {
+              "title": "i18n:api-descriptor/AuditService#schema.access.http.request.headers.title",
+              "description": "i18n:api-descriptor/AuditService#schema.access.http.request.headers.description",
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "response": {
+      "title": "i18n:api-descriptor/AuditService#schema.access.response.title",
+      "description": "i18n:api-descriptor/AuditService#schema.access.response.description",
+      "type": "object",
+      "properties": {
+        "status": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.response.status.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.response.status.description",
+          "type": "string"
+        },
+        "statusCode": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.response.statusCode.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.response.statusCode.description",
+          "type": "string"
+        },
+        "detail": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.response.detail.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.response.detail.description",
+          "type": "object"
+        },
+        "elapsedTime": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.response.elapsedTime.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.response.elapsedTime.description",
+          "type": "integer"
+        },
+        "elapsedTimeUnits": {
+          "title": "i18n:api-descriptor/AuditService#schema.access.response.elapsedTimeUnits.title",
+          "description": "i18n:api-descriptor/AuditService#schema.access.response.elapsedTimeUnits.description",
+          "type": "string"
+        }
+      }
+    },
+    "runAs": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.runAs.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.runAs.description",
+      "type": "string"
+    },
+    "objectId": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.objectId.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.objectId.description",
+      "type": "string"
+    },
+    "operation": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.operation.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.operation.description",
+      "type": "string"
+    },
+    "before": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.before.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.before.description",
+      "type": "object"
+    },
+    "after": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.after.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.after.description",
+      "type": "object"
+    },
+    "changedFields": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.changedFields.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.changedFields.description",
+      "type": "array",
+      "items": {
+        "id": "1",
+        "type": "string"
+      }
+    },
+    "revision": {
+      "title": "i18n:api-descriptor/AuditService#schema.activity-and-config.revision.title",
+      "description": "i18n:api-descriptor/AuditService#schema.activity-and-config.revision.description",
+      "type": "string"
+    },
+    "result": {
+      "title": "i18n:api-descriptor/AuditService#schema.authentication.result.title",
+      "description": "i18n:api-descriptor/AuditService#schema.authentication.result.description",
+      "type": "string"
+    },
+    "principal": {
+      "title": "i18n:api-descriptor/AuditService#schema.authentication.principal.title",
+      "description": "i18n:api-descriptor/AuditService#schema.authentication.principal.description",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "context": {
+      "title": "i18n:api-descriptor/AuditService#schema.authentication.context.title",
+      "description": "i18n:api-descriptor/AuditService#schema.authentication.context.description",
+      "type": "object",
+      "properties": {}
+    },
+    "entries": {
+      "title": "i18n:api-descriptor/AuditService#schema.authentication.entries.title",
+      "description": "i18n:api-descriptor/AuditService#schema.authentication.entries.description",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "title": "i18n:api-descriptor/AuditService#schema.authentication.entries.moduleId.title",
+            "description": "i18n:api-descriptor/AuditService#schema.authentication.entries.moduleId.description",
+            "type": "string"
+          },
+          "result": {
+            "title": "i18n:api-descriptor/AuditService#schema.authentication.entries.result.title",
+            "description": "i18n:api-descriptor/AuditService#schema.authentication.entries.result.description",
+            "type": "string"
+          },
+          "info": {
+            "title": "i18n:api-descriptor/AuditService#schema.authentication.entries.info.title",
+            "description": "i18n:api-descriptor/AuditService#schema.authentication.entries.info.description",
+            "type": "object",
+            "properties": {}
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "transactionId",
+    "timestamp"
+  ]
+}

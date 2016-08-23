@@ -36,6 +36,10 @@
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-i18n</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-audit-core</artifactId>
         </dependency>
@@ -47,6 +51,11 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-test-utils</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
