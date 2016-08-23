@@ -15,13 +15,20 @@
 */
 package org.forgerock.openam.cors;
 
-import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.openam.cors.utils.CSVHelper;
 import org.forgerock.util.Reject;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * See <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a> for further information.
@@ -42,6 +49,9 @@ import org.forgerock.util.Reject;
 public class CORSService {
 
     private static final Debug DEBUG = Debug.getInstance("frRest");
+
+    private static final Set<String> simpleHeaders = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList("Cache-Control", "Content-Language", "Expires", "Last-Modified", "Pragma")));
 
     private final CSVHelper csvHelper = new CSVHelper();
 
@@ -80,11 +90,11 @@ public class CORSService {
         }
 
         if (acceptedHeaders == null) {
-            acceptedHeaders = new ArrayList<String>();
+            acceptedHeaders = new ArrayList<>();
         }
 
         if (exposedHeaders == null) {
-            exposedHeaders = new ArrayList<String>();
+            exposedHeaders = new ArrayList<>();
         }
 
         this.acceptedOrigins = acceptedOrigins;
@@ -118,8 +128,7 @@ public class CORSService {
             handlePreflightFlow(req, res);
             return false;
         } else {
-            handleActualRequestFlow(req, res);
-            return true;
+            return handleActualRequestFlow(req, res);
         }
 
     }
@@ -173,7 +182,17 @@ public class CORSService {
      * @param req The request
      * @param res The response
      */
-    private void handleActualRequestFlow(final HttpServletRequest req, final HttpServletResponse res) {
+    private boolean handleActualRequestFlow(final HttpServletRequest req, final HttpServletResponse res) {
+
+        if (req.getHeaderNames() != null) {
+            while (req.getHeaderNames().hasMoreElements()) {
+                String header = req.getHeaderNames().nextElement();
+                if (!acceptedHeaders.contains(header) && !simpleHeaders.contains(header)) {
+                    DEBUG.warning("CORS Fail - Headers do not match allowed headers.");
+                    return false;
+                }
+            }
+        }
 
         final String originHeader = req.getHeader(CORSConstants.ORIGIN);
 
@@ -182,6 +201,7 @@ public class CORSService {
         }
 
         addOriginAndCredsHeaders(res, originHeader);
+        return true;
     }
 
     /**
@@ -241,10 +261,12 @@ public class CORSService {
             String headerCSVList = req.getHeader(CORSConstants.AC_REQUEST_HEADERS);
             List<String> headerList = csvHelper.csvStringToList(headerCSVList, true);
 
-            if (!acceptedHeaders.containsAll(headerList)) {
-                DEBUG.warning("CORS Fail - Preflight request contained the "
-                        + CORSConstants.AC_REQUEST_HEADERS + " headers with an invalid value.");
-                return false;
+            for (String header : headerList) {
+                if (!acceptedHeaders.contains(header) && !simpleHeaders.contains(header)) {
+                    DEBUG.warning("CORS Fail - Preflight request contained the "
+                            + CORSConstants.AC_REQUEST_HEADERS + " headers with an invalid value.");
+                    return false;
+                }
             }
         }
 
