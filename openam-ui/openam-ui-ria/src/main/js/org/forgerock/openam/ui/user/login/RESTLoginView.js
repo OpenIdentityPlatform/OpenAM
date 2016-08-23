@@ -131,9 +131,10 @@ define([
 
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
-                if (!isRealmChanged()) {
+                if (isRealmChanged()) {
+                    location.href = "#confirmLogin/";
+                } else {
                     Configuration.setProperty("loggedUser", user);
-
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
 
                         if (auth.urlParams && auth.urlParams.goto) {
@@ -156,8 +157,6 @@ define([
                             Router.navigate("", { trigger: true });
                         }
                     });
-                } else {
-                    location.href = "#confirmLogin/";
                 }
             }, () => {
                 logout.default();

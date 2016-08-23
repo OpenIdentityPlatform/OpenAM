@@ -214,37 +214,36 @@ define([
         description: "",
         dependencies: [
             "org/forgerock/commons/ui/common/main/Configuration",
-            "org/forgerock/commons/ui/common/util/CookieHelper",
             "org/forgerock/openam/ui/admin/services/global/RealmsService",
             "org/forgerock/openam/ui/common/sessions/SessionValidator",
             "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
-            "org/forgerock/openam/ui/common/util/NavigationHelper"
+            "org/forgerock/openam/ui/common/util/NavigationHelper",
+            "org/forgerock/openam/ui/user/login/tokens/SessionToken"
         ],
         processDescription (
             event,
             Configuration,
-            CookieHelper,
             RealmsService,
             SessionValidator,
             MaxIdleTimeLeftStrategy,
-            NavigationHelper) {
+            NavigationHelper,
+            SessionToken) {
             var queueName = "loginDialogAuthCallbacks",
                 authenticatedCallback,
-                token;
+                sessionToken;
 
             if (Configuration.globalData[queueName]) {
                 authenticatedCallback = Configuration.globalData[queueName].remove();
             }
 
-            if (Configuration.loggedUser.hasRole("ui-realm-admin")) {
+            if (Configuration.loggedUser && Configuration.loggedUser.hasRole("ui-realm-admin")) {
                 RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
             }
 
-            if (Configuration.globalData.xuiUserSessionValidationEnabled &&
+            if (Configuration.loggedUser && Configuration.globalData.xuiUserSessionValidationEnabled &&
                 !Configuration.loggedUser.hasRole(["ui-realm-admin", "ui-global-admin"])) {
-                token = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-
-                SessionValidator.start(token, MaxIdleTimeLeftStrategy);
+                sessionToken = SessionToken.get();
+                SessionValidator.start(sessionToken, MaxIdleTimeLeftStrategy);
             }
 
             while (authenticatedCallback) {
@@ -261,9 +260,7 @@ define([
             "org/forgerock/openam/ui/common/RouteTo"
         ],
         processDescription (event, Configuration, RouteTo) {
-            var loggedIn = Configuration.loggedUser;
-
-            if (!loggedIn) {
+            if (!Configuration.loggedUser) {
                 // 401 no session
                 return RouteTo.logout();
             } else if (_.get(event, "fromRouter")) {
