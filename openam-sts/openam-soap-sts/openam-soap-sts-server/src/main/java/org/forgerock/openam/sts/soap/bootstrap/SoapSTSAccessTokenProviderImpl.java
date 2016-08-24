@@ -56,6 +56,9 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
     private final String amSessionCookieName;
     private final URL authenticateUrl;
     private final URL logoutUrl;
+    private final int retryNumber;
+    private final int retryInterval;
+    private final double retryMultiplier;
     private final String authNServiceVersion;
     private final String sessionServiceVersion;
     private final SoapSTSAgentCredentialsAccess credentialsAccess;
@@ -68,6 +71,9 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
                                           AMTokenParser amTokenParser,
                                           @Named(SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY) String amSessionCookieName,
                                           @Named(SoapSTSModule.OPENAM_HOME_SERVER_PROPERTY_KEY) String openamUrl,
+                                          @Named(SoapSTSModule.SOAP_STS_AGENT_RETRY_NUMBER_PROPERTY_KEY) String retryNumber,
+                                          @Named(SoapSTSModule.SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_PROPERTY_KEY) String retryInterval,
+                                          @Named(SoapSTSModule.SOAP_STS_AGENT_RETRY_MULTIPLIER_PROPERTY_KEY) String retryMultiplier,
                                           UrlConstituentCatenator urlConstituentCatenator,
                                           @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRoot,
                                           @Named(AMSTSConstants.REST_AUTHN_URI_ELEMENT) String authNUriElement,
@@ -85,6 +91,9 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
         this.credentialsAccess = credentialsAccess;
         this.authenticateUrl = constituteLoginUrl(urlConstituentCatenator, openamUrl, jsonRoot, agentRealm, authNUriElement);
         this.logoutUrl = constituteLogoutUrl(urlConstituentCatenator, openamUrl, jsonRoot, agentRealm, restLogoutUriElement);
+        this.retryNumber = StringUtils.isEmpty(retryNumber) ? 3 : Integer.parseInt(retryNumber);
+        this.retryInterval = StringUtils.isEmpty(retryInterval) ? 500 : Integer.parseInt(retryInterval);
+        this.retryMultiplier = StringUtils.isEmpty(retryMultiplier) ? 1.5 : Double.parseDouble(retryMultiplier);
         this.logger = logger;
     }
 
@@ -170,5 +179,29 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
         } finally {
             accessTokenRef.set(null);
         }
+    }
+
+    @Override
+    public String getAccessTokenWithRetry() throws ResourceException {
+        String accessToken;
+        int currentRetryIntervalMillis = retryInterval;
+        for (int i = 0; i < retryNumber; i++) {
+            try {
+                return getAccessToken();
+            } catch (ResourceException e) {
+                logger.debug("Failed to retrieve soap-sts-agent token. Retry in " + currentRetryIntervalMillis + " milliseconds.");
+                try {
+                 Thread.sleep(currentRetryIntervalMillis);
+                 currentRetryIntervalMillis *= retryMultiplier;
+                } catch (InterruptedException ignored) {}
+            }
+        }
+
+        if (StringUtils.isEmpty(accessTokenRef.get())) {
+            throw new InternalServerErrorException(
+                    "Unable to obtain soap-sts-agent token after " + retryNumber + " retries.");
+        }
+
+        return null;
     }
 }

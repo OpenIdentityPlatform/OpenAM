@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.soap.token.provider;
@@ -51,7 +51,7 @@ public abstract class SoapTokenProviderBase implements TokenProvider {
 
     protected String getTokenGenerationServiceConsumptionToken() throws TokenCreationException {
         try {
-            return soapSTSAccessTokenProvider.getAccessToken();
+            return soapSTSAccessTokenProvider.getAccessTokenWithRetry();
         } catch (ResourceException e) {
             throw new TokenCreationException(e.getCode(), e.getMessage(), e);
         }

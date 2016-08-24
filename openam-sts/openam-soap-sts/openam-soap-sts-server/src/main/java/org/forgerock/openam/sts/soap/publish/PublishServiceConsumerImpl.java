@@ -92,7 +92,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         String sessionId = null;
         HttpURLConnectionWrapper.ConnectionResult connectionResult;
         try {
-            sessionId = soapSTSAccessTokenProvider.getAccessToken();
+            sessionId = soapSTSAccessTokenProvider.getAccessTokenWithRetry();
             Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, soapSTSPublishServiceVersion);

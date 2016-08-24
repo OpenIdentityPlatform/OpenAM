@@ -11,7 +11,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015 ForgeRock AS.
+  ~ Copyright 2015-2016 ForgeRock AS.
   -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -52,6 +52,27 @@
                    labelFor="tfSoapAgentPassword_confirm" />
             <cc name="tfSoapAgentPassword_confirm" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
             </cc>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentRetryNumber" defaultValue="create.soap.sts.deployment.label.soap.agent.retry.number"
+                   labelFor="tfSoapAgentRetryNumber" />
+            <cc name="tfSoapAgentRetryNumber" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapAgentRetryNumber" defaultValue="create.soap.sts.deployment.soap.agent.retry.number.help"/>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentRetryInitialInterval" defaultValue="create.soap.sts.deployment.label.soap.agent.retry.initial.interval"
+                   labelFor="tfSoapAgentRetryInitialInterval" />
+            <cc name="tfSoapAgentRetryInitialInterval" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapAgentRetryInitialInterval" defaultValue="create.soap.sts.deployment.soap.agent.retry.initial.interval.help"/>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentRetryMultiplier" defaultValue="create.soap.sts.deployment.label.soap.agent.retry.multiplier"
+                   labelFor="tfSoapAgentRetryMultiplier" />
+            <cc name="tfSoapAgentRetryMultiplier" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapAgentRetryMultiplier" defaultValue="create.soap.sts.deployment.soap.agent.retry.multiplier.help"/>
         </property>
         <property required="false">
             <label name="lblCustomWsdlFileNames" defaultValue="create.soap.sts.deployment.label.custom.wsdl.file.names"
