@@ -241,26 +241,24 @@ java.io.PrintWriter
             data[2] = saml2Resp.toXMLString(true, true);
         }
         LogUtil.error(Level.INFO, LogUtil.SP_SSO_FAILED, data, null);
-        if (se instanceof InvalidStatusCodeSaml2Exception) {
-            if (isProxyOn) {
-                SAML2Utils.debug.error("spAssertionConsumer.jsp: Non-Success status code in response");
-                String firstlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getFirstlevelStatuscode();
-                String secondlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getSecondlevelStatuscode();
-                try {
-                    IDPProxyUtil.sendResponseWithStatus(request, response, new PrintWriter(out, true),
-                            requestID, metaAlias, hostEntityId, realm, firstlevelStatusCodeValue,
-                            secondlevelStatusCodeValue);
-                } catch (SAML2Exception samle) {
-                    SAML2Utils.debug.error("Failed to send response with status ", samle);
-                }
-                return;
+        SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
+        if (se.isRedirectionDone()) {
+            //The redirection has already happened successfully and logging auditsuccess.
+            saml2Auditor.auditAccessSuccess();
+            return;
+        } else if (se instanceof InvalidStatusCodeSaml2Exception && isProxyOn) {
+            SAML2Utils.debug.error("spAssertionConsumer.jsp: Non-Success status code in response");
+            String firstlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getFirstlevelStatuscode();
+            String secondlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getSecondlevelStatuscode();
+            try {
+                IDPProxyUtil.sendResponseWithStatus(request, response, new PrintWriter(out, true),
+                        requestID, metaAlias, hostEntityId, realm, firstlevelStatusCodeValue,
+                        secondlevelStatusCodeValue);
+            } catch (SAML2Exception samle) {
+                SAML2Utils.debug.error("Failed to send response with status ", samle);
             }
+            return;
         } else {
-            SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
-            if (se.isRedirectionDone()) {
-                saml2Auditor.auditAccessSuccess();
-                return;
-            }
             if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
