@@ -24,7 +24,7 @@
  *
  * $Id: AuthContext.java,v 1.25 2009/11/21 01:12:59 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication;
 
@@ -621,7 +621,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         if (authURL != null) {
             authServiceURL = getAuthServiceURL(authURL.getProtocol(),
                 authURL.getHost(), Integer.toString(authURL.getPort()),
-                authURL.getPath());
+                SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR));
         }
         
         AuthLoginException authException = null;
