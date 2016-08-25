@@ -84,6 +84,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String QUERY_DESCRIPTION = QUERY + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String PATCH_DESCRIPTION = PATCH + DESCRIPTION;
     
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_400_DESCRIPTION = ERROR + "400." + DESCRIPTION;
@@ -180,6 +183,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String SESSION_RESOURCE = TRANSLATION_KEY_PREFIX + "SessionResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SESSION_PROPERTIES_RESOURCE = TRANSLATION_KEY_PREFIX + "SessionPropertiesResource#";
 
     private ApiDescriptorConstants() {
         // Constants class only

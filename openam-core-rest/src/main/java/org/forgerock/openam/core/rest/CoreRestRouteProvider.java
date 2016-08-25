@@ -137,7 +137,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(SESSION)
                 .authorizeWith(Key.get(AnyOfAuthzModule.class, Names.named("SessionPropertiesResourceAuthzModule")))
                 .forVersion(2)
-                .toSingleton(SessionPropertiesResource.class);
+                .toAnnotatedSingleton(SessionPropertiesResource.class);
 
         rootRouter.route("tokens")
                 .auditAs(CTS)

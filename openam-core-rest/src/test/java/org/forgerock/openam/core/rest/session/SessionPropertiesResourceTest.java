@@ -48,6 +48,7 @@ import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -272,5 +273,10 @@ public class SessionPropertiesResourceTest {
         verify(ssoToken).setProperty("foo", "baar");
         verify(ssoToken).setProperty("ping", "poong");
         verify(ssoToken).setProperty("woo", "hoo");
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(SessionPropertiesResource.class).hasValidAnnotations();
     }
 }

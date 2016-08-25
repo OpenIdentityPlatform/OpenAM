@@ -18,26 +18,37 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.forgerock.json.resource.PatchOperation.OPERATION_REMOVE;
 import static org.forgerock.json.resource.PatchOperation.OPERATION_REPLACE;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PARAMETER_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATCH_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SERVER_INFO_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_PROPERTIES_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
+import javax.inject.Inject;
+
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Patch;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.SingletonProvider;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
@@ -53,13 +64,19 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * EndPoint for querying the updating the session properties via a Rest interface
@@ -87,6 +104,17 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 14.0.0
  */
+@SingletonProvider(value = @Handler(
+        title = SESSION_PROPERTIES_RESOURCE + TITLE,
+        description = SESSION_PROPERTIES_RESOURCE + DESCRIPTION,
+        mvccSupported = false,
+        resourceSchema = @Schema(schemaResource = "SessionPropertiesResource.schema.json"),
+        parameters = @Parameter(
+                name = SessionPropertiesResource.TOKEN_ID_PARAM_NAME,
+                type = "string",
+                description = SESSION_PROPERTIES_RESOURCE + SessionPropertiesResource.TOKEN_ID_PARAM_NAME + "." + PARAMETER_DESCRIPTION
+        )
+    ))
 public class SessionPropertiesResource implements SingletonResourceProvider {
 
     private static final Debug LOGGER = Debug.getInstance(SessionConstants.SESSION_DEBUG);
@@ -140,6 +168,7 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
      * @return The response indicating the success or failure of the patch operation
      */
     @Override
+    @Patch(operationDescription = @Operation(description = SESSION_PROPERTIES_RESOURCE + PATCH_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest request) {
 
         List<PatchOperation> operations = request.getPatchOperations();
@@ -178,6 +207,7 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
      * @return The name value pairs of the session properties.
      */
     @Override
+    @Read(operationDescription = @Operation(description = SESSION_PROPERTIES_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
         String tokenId = findTokenIdFromUri(context);
         JsonValue result;
@@ -200,6 +230,7 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
      * @return The response indicating the success or failure of the update operation
      */
     @Override
+    @Update(operationDescription = @Operation(description = SESSION_PROPERTIES_RESOURCE + UPDATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest request) {
         String tokenId;
         JsonValue result;

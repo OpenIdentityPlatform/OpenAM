@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "patternProperties": {
+    ".+": {
+      "type" : "string",
+      "description": "i18n:api-descriptor/SessionPropertiesResource#schema.entry.description"
+    }
+  }
+}
