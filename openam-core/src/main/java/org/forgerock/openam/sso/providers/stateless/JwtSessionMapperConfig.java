@@ -45,6 +45,8 @@ public class JwtSessionMapperConfig {
     private static final String ENCRYPTION_RSA_KEY_ALIAS = "openam-session-stateless-encryption-rsa-certificate-alias";
     private static final String ENCRYPTION_AES_KEY = "openam-session-stateless-encryption-aes-key";
 
+    private static final String NONE = "NONE";
+
     private final JwtSessionMapper jwtSessionMapper;
 
     /**
@@ -62,7 +64,7 @@ public class JwtSessionMapperConfig {
         // Configure encryption algorithm and parameters
 
         String encryptionAlgorithm = CollectionHelper.getMapAttr(attrs, ENCRYPTION_ALGORITHM);
-        final boolean encryptionEnabled = !StringUtils.isEqualTo("NONE", encryptionAlgorithm);
+        final boolean encryptionEnabled = !StringUtils.isEqualTo(NONE, encryptionAlgorithm);
 
         if (encryptionEnabled) {
             JweAlgorithmType jweAlgorithmType = JweAlgorithmType.valueOf(encryptionAlgorithm);
@@ -81,7 +83,7 @@ public class JwtSessionMapperConfig {
 
         // Configure compression
         CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.parseAlgorithm(
-                CollectionHelper.getMapAttr(attrs, COMPRESSION_TYPE));
+                CollectionHelper.getMapAttr(attrs, COMPRESSION_TYPE, NONE));
         builder.compressedUsing(compressionAlgorithm);
 
         // Configure signing algorithm and parameters

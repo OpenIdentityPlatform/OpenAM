@@ -69,6 +69,13 @@ public class JwtSessionMapperConfigTest {
     }
 
     @Test
+    public void shouldDefaultToNoCompression() {
+        JwtSessionMapper result = newConfig(mapOf(ENCRYPTION_ALGORITHM, "NONE", SIGNING_ALGORITHM, "HS256",
+                SIGNING_HMAC_SHARED_SECRET, "test")).getJwtSessionMapper();
+        assertThat(result.compressionAlgorithm).isEqualTo(CompressionAlgorithm.NONE);
+    }
+
+    @Test
     public void shouldSupportRSAEncryption() {
         JwtSessionMapper result = newConfig(mapOf(COMPRESSION_TYPE, "NONE", ENCRYPTION_ALGORITHM, "RSA",
                 SIGNING_ALGORITHM, "HS256", SIGNING_HMAC_SHARED_SECRET, "test")).getJwtSessionMapper();
