@@ -18,9 +18,16 @@ package com.iplanet.dpro.session.operations.strategies;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -31,12 +38,6 @@ import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BlacklistException;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-
-import javax.inject.Inject;
 
 /**
  * Handles client-side sessions.
@@ -44,23 +45,20 @@ import javax.inject.Inject;
  * @since 13.0.0
  */
 public class StatelessOperations implements SessionOperations {
-    private final SessionOperations localOperations;
     private final SessionService sessionService;
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
     private final Blacklist<Session> sessionBlacklist;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
 
     @Inject
-    public StatelessOperations(final LocalOperations localOperations,
-                               final SessionService sessionService,
-                               final StatelessSessionFactory statelessSessionFactory,
+    public StatelessOperations(final SessionService sessionService,
+                               final StatelessSessionManager statelessSessionManager,
                                final Blacklist<Session> sessionBlacklist,
                                final SessionLogging sessionLogging,
                                final SessionAuditor sessionAuditor) {
-        this.localOperations = localOperations;
         this.sessionService = sessionService;
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.statelessSessionManager = statelessSessionManager;
         this.sessionBlacklist = sessionBlacklist;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
@@ -68,7 +66,7 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
-        final SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+        final SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
         if (sessionInfo.getExpiryTime(TimeUnit.MILLISECONDS) < currentTimeMillis()) {
             throw new SessionTimedOutException("Stateless session corresponding to client "
                     + sessionInfo.getClientID() + " timed out.");
@@ -79,7 +77,7 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public void logout(final Session session) throws SessionException {
         if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+            SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
             sessionLogging.logEvent(sessionInfo, SessionEvent.LOGOUT);
             // Required since not possible to mock SessionAuditor in test case
             if (sessionAuditor != null) {
@@ -97,7 +95,7 @@ public class StatelessOperations implements SessionOperations {
     public void destroy(final Session requester, final Session session) throws SessionException {
         sessionService.checkPermissionToDestroySession(requester, session.getID());
         if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
+            SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
             sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
             // Required since not possible to mock SessionAuditor in test case
             if (sessionAuditor != null) {
@@ -114,7 +112,7 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public void setProperty(final Session session, final String name, final String value) throws SessionException {
-        localOperations.setProperty(session, name, value);
+        // Nothing to do
     }
 
 }

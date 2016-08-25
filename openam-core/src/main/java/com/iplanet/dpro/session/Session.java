@@ -467,6 +467,15 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     }
 
     /**
+     * Updates the ID of the session. Used when updating a stateless session.
+     *
+     * @param sessionID the new session ID for the session.
+     */
+    protected void setID(SessionID sessionID) {
+        this.sessionID = sessionID;
+    }
+
+    /**
      * Returns the session type.
      *
      * @return The session type.

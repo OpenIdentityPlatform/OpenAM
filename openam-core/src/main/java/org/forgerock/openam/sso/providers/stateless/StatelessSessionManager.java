@@ -40,7 +40,7 @@ import com.sun.identity.shared.debug.Debug;
  *
  * @since 13.0.0
  */
-public class StatelessSessionFactory {
+public class StatelessSessionManager {
 
     private static final Debug debug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
@@ -56,7 +56,7 @@ public class StatelessSessionFactory {
      * @param sessionServiceConfig Non null.
      */
     @Inject
-    public StatelessSessionFactory(StatelessJWTCache cache,
+    public StatelessSessionManager(StatelessJWTCache cache,
                                    SessionServerConfig sessionServerConfig,
                                    SessionServiceConfig sessionServiceConfig) {
         this.cache = cache;
@@ -161,7 +161,22 @@ public class StatelessSessionFactory {
         SessionID sessionID = SessionID.generateStatelessSessionID(sessionServerConfig, info.getClientDomain(), jwt);
         cache.cache(info, jwt);
 
-        return new StatelessSession(sessionID, info);
+        return new StatelessSession(sessionID, info, this);
+    }
+
+    /**
+     * Updates a stateless SessionID to reflect the new state of the session and removes the previous SessionID from
+     * the cache.
+     *
+     * @param previousId the previous session id to remove from the cache.
+     * @param newSessionInfo the new session state to reflect in the updated session ID.
+     * @return the updated session ID.
+     * @throws SessionException if there was an unexpected error.
+     */
+    SessionID updateSessionID(SessionID previousId, SessionInfo newSessionInfo) throws SessionException {
+        cache.remove(getJWTFromSessionID(previousId, true));
+        String jwt = getJwtSessionMapper().asJwt(newSessionInfo);
+        return SessionID.generateStatelessSessionID(sessionServerConfig, newSessionInfo.getClientDomain(), jwt);
     }
 
     /**
@@ -182,7 +197,7 @@ public class StatelessSessionFactory {
      */
     public StatelessSession generate(SessionID sessionID) throws SessionException {
         SessionInfo sessionInfo = getSessionInfo(sessionID);
-        return new StatelessSession(sessionID, sessionInfo);
+        return new StatelessSession(sessionID, sessionInfo, this);
     }
 
     /**

@@ -29,9 +29,9 @@ import static org.mockito.BDDMockito.mock;
 /**
  * Limited amount of testing present here due to static code usage.
  */
-public class StatelessSessionFactoryTest {
+public class StatelessSessionManagerTest {
 
-    private StatelessSessionFactory factory;
+    private StatelessSessionManager factory;
     private StatelessJWTCache mockCache;
 
     @BeforeMethod
@@ -39,7 +39,7 @@ public class StatelessSessionFactoryTest {
         mockCache = mock(StatelessJWTCache.class);
         SessionServerConfig mockServerConfig = mock(SessionServerConfig.class);
         SessionServiceConfig mockServiceConfig = mock(SessionServiceConfig.class);
-        factory = new StatelessSessionFactory(mockCache, mockServerConfig, mockServiceConfig);
+        factory = new StatelessSessionManager(mockCache, mockServerConfig, mockServiceConfig);
     }
 
     @Test
@@ -54,19 +54,19 @@ public class StatelessSessionFactoryTest {
         SessionID id = mock(SessionID.class);
         given(id.getTail()).willReturn("badger=");
         given(id.isC66Encoded()).willReturn(true);
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(id, true)).isEqualTo("badger.");
+        assertThat(StatelessSessionManager.getJWTFromSessionID(id, true)).isEqualTo("badger.");
     }
 
     @Test
     public void shouldReturnNullIfNoJWTInSessionID() {
         SessionID id = mock(SessionID.class);
         given(id.getTail()).willReturn(null);
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(id, true)).isNull();
+        assertThat(StatelessSessionManager.getJWTFromSessionID(id, true)).isNull();
     }
 
     @Test
     public void shouldReturnNullIfNoSessionIDProvided() {
-        assertThat(StatelessSessionFactory.getJWTFromSessionID(null, true)).isNull();
+        assertThat(StatelessSessionManager.getJWTFromSessionID(null, true)).isNull();
     }
 
     /**
@@ -84,7 +84,7 @@ public class StatelessSessionFactoryTest {
         final SessionID sessionID = new SessionID("*@" + fullJwtAlphabet);
 
         // When
-        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, true);
+        final String result = StatelessSessionManager.getJWTFromSessionID(sessionID, true);
 
         // Then
         assertThat(result).isEqualTo(fullJwtAlphabet);
@@ -98,7 +98,7 @@ public class StatelessSessionFactoryTest {
         final SessionID sessionID = new SessionID("*@" + fullJwtAlphabet);
 
         // When
-        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, false);
+        final String result = StatelessSessionManager.getJWTFromSessionID(sessionID, false);
 
         // Then
         assertThat(result).isEqualTo(sessionID.getTail());
@@ -111,7 +111,7 @@ public class StatelessSessionFactoryTest {
         final SessionID sessionID = new SessionID("notencoded@" + fullJwtAlphabet);
 
         // When
-        final String result = StatelessSessionFactory.getJWTFromSessionID(sessionID, true);
+        final String result = StatelessSessionManager.getJWTFromSessionID(sessionID, true);
 
         // Then
         assertThat(result).isEqualTo(fullJwtAlphabet);

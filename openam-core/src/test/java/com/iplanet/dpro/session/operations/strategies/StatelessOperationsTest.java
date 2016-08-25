@@ -37,7 +37,7 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -52,7 +52,7 @@ public class StatelessOperationsTest {
     private SessionService mockSessionService;
 
     @Mock
-    private StatelessSessionFactory mockSessionFactory;
+    private StatelessSessionManager mockSessionFactory;
 
     @Mock
     private Blacklist<Session> mockSessionBlacklist;
@@ -73,7 +73,7 @@ public class StatelessOperationsTest {
         sid = new SessionID("test");
         given(mockSession.getID()).willReturn(sid);
         statelessOperations = new StatelessOperations(
-                null, mockSessionService, mockSessionFactory, mockSessionBlacklist, mockSessionLogging, null);
+                mockSessionService, mockSessionFactory, mockSessionBlacklist, mockSessionLogging, null);
     }
 
     @Test

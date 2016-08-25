@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
@@ -117,7 +117,7 @@ public class SSOTokenManager {
 
     // Guice provided, lazy initialised, Server Mode only, for Stateless Sessions.
     private static SSOProvider statelessProvider;
-    private static StatelessSessionFactory statelessFactory;
+    private static StatelessSessionManager statelessSessionManager;
 
     /**
      * Returns the singleton instance of
@@ -186,14 +186,14 @@ public class SSOTokenManager {
      * to smooth over this issue.
      * @return Null if client mode, otherwise non null Guice initialised.
      */
-    private StatelessSessionFactory getStatelessFactory() {
+    private StatelessSessionManager getStatelessSessionManager() {
         if (!SystemProperties.isServerMode()) {
             return null;
         }
-        if (statelessFactory == null) {
-            statelessFactory = InjectorHolder.getInstance(StatelessSessionFactory.class);
+        if (statelessSessionManager == null) {
+            statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
         }
-        return statelessFactory;
+        return statelessSessionManager;
     }
 
     /**
@@ -588,11 +588,11 @@ public class SSOTokenManager {
 
         try {
             if (object instanceof HttpServletRequest) {
-                return getStatelessFactory().containsJwt((HttpServletRequest) object);
+                return getStatelessSessionManager().containsJwt((HttpServletRequest) object);
             } else if (object instanceof SessionID) {
-                return getStatelessFactory().containsJwt((SessionID) object);
+                return getStatelessSessionManager().containsJwt((SessionID) object);
             }
-            return getStatelessFactory().containsJwt(object.toString());
+            return getStatelessSessionManager().containsJwt(object.toString());
         } catch (SessionException | IllegalArgumentException e) {
             debug.message("Error whilst inspecting JWT:\nClass: {0}\n{1}",
                     object.getClass(), object, e);

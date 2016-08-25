@@ -55,7 +55,7 @@ import com.sun.identity.sm.ServiceListener;
  */
 public class StatelessSSOProvider implements SSOProvider, ServiceListener {
 
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
     private final Blacklist<Session> sessionBlacklist;
     private final StatelessAdminRestriction restriction;
     private final Debug debug;
@@ -65,11 +65,11 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
      * Default constructor is required by interface.
      */
     @Inject
-    public StatelessSSOProvider(StatelessSessionFactory statelessSessionFactory,
+    public StatelessSSOProvider(StatelessSessionManager statelessSessionManager,
                                 Blacklist<Session> sessionBlacklist,
                                 StatelessAdminRestriction restriction,
                                 @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.statelessSessionManager = statelessSessionManager;
         this.sessionBlacklist = sessionBlacklist;
         this.restriction = restriction;
         this.debug = debug;
@@ -86,7 +86,7 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
         StatelessSession session;
 
         try {
-            session = statelessSessionFactory.generate(sessionId);
+            session = statelessSessionManager.generate(sessionId);
         } catch (SessionException e) {
             throw new SSOException(e);
         }

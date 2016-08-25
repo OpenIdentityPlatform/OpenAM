@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -66,7 +66,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
     private final WebtopNamingQuery queryUtils;
     private final Debug debug;
     private final SessionMonitoringStore store;
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
 
     /**
      * Guice initialised constructor.
@@ -77,7 +77,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * @param cts Required strategy.
      * @param store The store for session monitoring information.
      * @param queryUtils Required for Server availability decisions.
-     * @param statelessSessionFactory Required for JWT checks.
+     * @param statelessSessionManager Required for JWT checks.
      * @param debug Required for logging.
      */
     @Inject
@@ -88,7 +88,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
             RemoteOperations remote,
             StatelessOperations clientSide,
             WebtopNamingQuery queryUtils,
-            StatelessSessionFactory statelessSessionFactory,
+            StatelessSessionManager statelessSessionManager,
             @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
 
         this.service = service;
@@ -98,7 +98,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
         this.cts = cts;
         this.clientSide = clientSide;
         this.queryUtils = queryUtils;
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.statelessSessionManager = statelessSessionManager;
         this.debug = debug;
     }
 
@@ -183,7 +183,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
     }
 
     private boolean isClientSide(Session session) {
-        return statelessSessionFactory.containsJwt(session.getID());
+        return statelessSessionManager.containsJwt(session.getID());
     }
 
     /**

@@ -69,7 +69,7 @@ import org.forgerock.openam.session.SessionPollerPool;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
 
@@ -159,7 +159,7 @@ public class SessionService {
     private final SessionCache sessionCache;
     private final SessionCookies sessionCookies;
     private final SessionPollerPool sessionPollerPool;
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
 
     /**
      * Reference to the ClusterMonitor instance. When server configuration changes which requires
@@ -194,7 +194,7 @@ public class SessionService {
             final SessionCache sessionCache,
             final SessionCookies sessionCookies,
             final SessionPollerPool sessionPollerPool,
-            final StatelessSessionFactory statelessSessionFactory) {
+            final StatelessSessionManager statelessSessionManager) {
 
         this.sessionDebug = sessionDebug;
         this.stats = stats;
@@ -211,7 +211,7 @@ public class SessionService {
         this.httpConnectionFactory = httpConnectionFactory;
         this.cache = internalSessionCache;
         this.internalSessionFactory = internalSessionFactory;
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.statelessSessionManager = statelessSessionManager;
         this.remoteSessionSet = Collections.synchronizedSet(new HashSet());
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionServiceURLService = sessionServiceURLService;
@@ -410,7 +410,7 @@ public class SessionService {
      * This method is expected to only be called for local sessions
      */
     String doGetRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
-        if (statelessSessionFactory.containsJwt(masterSid)) {
+        if (statelessSessionManager.containsJwt(masterSid)) {
             // Stateless sessions do not (yet) support restricted tokens
             throw new UnsupportedOperationException(StatelessSession.RESTRICTED_TOKENS_UNSUPPORTED);
         }
@@ -503,7 +503,7 @@ public class SessionService {
      * @return a boolean
      */
     public boolean checkSessionLocal(SessionID sid) throws SessionException {
-        if (statelessSessionFactory.containsJwt(sid)) {
+        if (statelessSessionManager.containsJwt(sid)) {
             // Stateless sessions are not stored in memory and so are not local to any server.
             return false;
         } else if (isSessionPresent(sid)) {
@@ -806,8 +806,8 @@ public class SessionService {
     public SessionInfo getSessionInfo(SessionID sid, boolean reset)
             throws SessionException {
 
-        if (statelessSessionFactory.containsJwt(sid)) {
-            return statelessSessionFactory.getSessionInfo(sid);
+        if (statelessSessionManager.containsJwt(sid)) {
+            return statelessSessionManager.getSessionInfo(sid);
         }
         // Session is not stateless, continue through the code...
 
@@ -947,7 +947,7 @@ public class SessionService {
      */
     public void addSessionListener(SessionID sid, String url) throws SessionException {
         // We do not support session listeners for stateless sessions.
-        if (statelessSessionFactory.containsJwt(sid)) {
+        if (statelessSessionManager.containsJwt(sid)) {
             return;
         }
 

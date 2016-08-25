@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -42,7 +42,7 @@ public class StatelessSessionActivatorTest {
     private LoginState mockLoginState;
 
     @Mock
-    private StatelessSessionFactory mockSessionFactory;
+    private StatelessSessionManager mockSessionFactory;
     
     @BeforeMethod
     public void setup() {

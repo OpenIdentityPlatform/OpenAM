@@ -41,11 +41,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -101,7 +100,7 @@ public class SessionRequestHandler implements RequestHandler {
     private final SessionService sessionService;
     private final Debug sessionDebug;
     private final SessionServerConfig serverConfig;
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
 
     private SSOToken clientToken = null;
 
@@ -113,7 +112,7 @@ public class SessionRequestHandler implements RequestHandler {
         sessionService = InjectorHolder.getInstance(SessionService.class);
         sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
         serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
-        statelessSessionFactory = InjectorHolder.getInstance(StatelessSessionFactory.class);
+        statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
     }
 
     /**
@@ -130,8 +129,8 @@ public class SessionRequestHandler implements RequestHandler {
      * @throws SessionException If there was an error resolving the Session.
      */
     private Session resolveSession(SessionID sessionID) throws SessionException {
-        if (statelessSessionFactory.containsJwt(sessionID)) {
-            return statelessSessionFactory.generate(sessionID);
+        if (statelessSessionManager.containsJwt(sessionID)) {
+            return statelessSessionManager.generate(sessionID);
         }
         return sessionCache.getSession(sessionID);
     }
@@ -309,7 +308,7 @@ public class SessionRequestHandler implements RequestHandler {
      */
     private void verifyTargetSessionIsLocalOrStateless(SessionRequest req, SessionID sid) throws SessionException,
             SessionRequestException, ForwardSessionRequestException {
-        if (statelessSessionFactory.containsJwt(sid)) {
+        if (statelessSessionManager.containsJwt(sid)) {
             return;
         }
 
@@ -358,7 +357,7 @@ public class SessionRequestHandler implements RequestHandler {
         switch (req.getMethodID()) {
             case SessionRequest.GetSession:
                 try {
-                    if (statelessSessionFactory.containsJwt(requesterSession.getSessionID())) {
+                    if (statelessSessionManager.containsJwt(requesterSession.getSessionID())) {
                         // We need to validate the session before creating the sessioninfo to ensure that the
                         // stateless session hasn't timed out yet, and hasn't  been blacklisted either.
                         SSOTokenManager tokenManager = SSOTokenManager.getInstance();

@@ -4844,7 +4844,11 @@ public class LoginState {
         try {
             switch (type) {
                 case SUCCESS:
-                    postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, getSSOToken());
+                    final SSOToken ssoToken = getSSOToken();
+                    postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, ssoToken);
+                    // Regenerate the session ID based on the sso token in case this is a stateless session that
+                    // has been updated.
+                    setSessionID(new SessionID(ssoToken.getTokenID().toString()));
                     break;
                 case FAILURE:
                     postProcessInstance.onLoginFailure(requestMap, servletRequest, servletResponse);

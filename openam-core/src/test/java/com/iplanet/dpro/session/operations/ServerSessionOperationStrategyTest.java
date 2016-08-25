@@ -21,7 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -72,7 +72,7 @@ public class ServerSessionOperationStrategyTest {
                 mockRemote,
                 mockStateless,
                 mockNamingQuery,
-                mock(StatelessSessionFactory.class),
+                mock(StatelessSessionManager.class),
                 mock(Debug.class));
 
         // test instances
