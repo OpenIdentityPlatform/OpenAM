@@ -818,7 +818,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     continue;
                 }
                 result.put(attribute.getAttributeDescriptionAsString(), function.apply(attribute));
-                if (attrName.equalsIgnoreCase(userStatusAttr) && attrs.contains(DEFAULT_USER_STATUS_ATTR)) {
+                if (attrName.equalsIgnoreCase(userStatusAttr)) {
+                    // Always include the DEFAULT_USER_STATUS_ATTR to cover any mapped isActive logic in envs like AD.
                     String converted = helper.convertToInetUserStatus(attribute.firstValueAsString(), activeValue);
                     result.put(DEFAULT_USER_STATUS_ATTR,
                             function.apply(new LinkedAttribute(DEFAULT_USER_STATUS_ATTR, converted)));
@@ -2248,7 +2249,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         Map filteredMap = new CaseInsensitiveHashMap(attributes);
         for (String key : (Set<String>) attributes.keySet()) {
-            if (!predefinedAttrs.contains(key)) {
+            // Always allow the DEFAULT_USER_STATUS_ATTR to cover any mapped isActive logic in envs like AD.
+            if (!predefinedAttrs.contains(key) && !DEFAULT_USER_STATUS_ATTR.equalsIgnoreCase(key)) {
                 filteredMap.remove(key);
             }
         }
