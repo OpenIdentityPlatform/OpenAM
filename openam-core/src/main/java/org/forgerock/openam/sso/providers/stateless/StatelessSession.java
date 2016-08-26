@@ -19,7 +19,7 @@
 */
 package org.forgerock.openam.sso.providers.stateless;
 
-import static org.forgerock.util.Reject.checkNotNull;
+import static org.forgerock.util.Reject.*;
 
 import java.util.Set;
 
@@ -65,11 +65,6 @@ public class StatelessSession extends Session {
         Reject.ifNull(sessionInfo.getSecret());
         this.stableId = sessionInfo.getSecret();
         this.statelessSessionManager = checkNotNull(statelessSessionManager);
-    }
-
-    @Override
-    public void scheduleToTimerPool() {
-        // Ignore
     }
 
     @Override

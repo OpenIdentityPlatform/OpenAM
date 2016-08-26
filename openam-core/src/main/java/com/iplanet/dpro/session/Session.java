@@ -34,11 +34,8 @@ import static org.forgerock.openam.utils.Time.*;
 
 import java.net.URL;
 import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,18 +43,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.blacklist.Blacklistable;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionMeta;
 import org.forgerock.openam.session.SessionPLLSender;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionPollerSender;
 import org.forgerock.openam.session.SessionServiceURLService;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
@@ -72,9 +64,7 @@ import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SearchResults;
-import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
@@ -116,7 +106,9 @@ import com.sun.identity.shared.debug.Debug;
  * @see com.iplanet.dpro.session.SessionListener
  */
 
-public class Session extends GeneralTaskRunnable implements Blacklistable {
+public class Session implements Blacklistable {
+
+    public static final String CACHED_BASE_POLLING_PROPERTY = "com.iplanet.am.session.client.polling.cacheBased";
 
     /**
      * Defines the type of Session that has been created. Where 0 for User
@@ -183,17 +175,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     protected int sessionState;
 
     /**
-     * This is the time value (computed as System.currentTimeMillis()) when a DESTROYED
-     * session should be removed from the {@link SessionCache#sessionTable}.
-     *
-     * It will be set to {@link com.iplanet.dpro.session.service.SessionService#getReducedCrosstalkPurgeDelay() }
-     * minutes after the time {@link org.forgerock.openam.session.SessionCache#removeRemoteSID } is called.
-     *
-     * Value zero means the session has not been destroyed or cross-talk is not being reduced.
-     */
-    private volatile long purgeAt = 0;
-
-    /**
      * If this is a Remote session that has been destroyed but not yet removed from the
      * sessionTable, this flag is used to avoid repeated notification of the DESTROY event
      * to session listeners.
@@ -209,13 +190,9 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
 
     /**
      * URL of the Session Server, where this session resides.
+     * Note: This field only exists to optimise client mode.
      */
     private URL sessionServiceURL;
-
-    /**
-     * Type of the Event
-     */
-    private int eventType = -1;
 
     /**
      * Last time the client sent a request associated with this session, as the
@@ -226,7 +203,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     /**
      * Indicates whether the latest access time need to be reset on the session.
      */
-    volatile boolean needToReset = false;
+    private volatile boolean needToReset = false;
 
     /**
      * Indicates whether to use local or remote calls to Session Service
@@ -236,7 +213,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
 
     private String cookieStr;
 
-    Boolean cookieMode = null;
+    private Boolean cookieMode = null;
 
     private TokenRestriction restriction = null;
 
@@ -250,20 +227,10 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      */
     private Set<SessionListener> localSessionEventListeners = new HashSet<SessionListener>();
 
-    /**
-     * This is used only in polling mode to find the polling state of this
-     * session.
-     */
-    private volatile boolean isPolling = false;
-
-    private SessionPollerSender sender = null;
-
     private Requests requests;
 
     private final SessionCookies sessionCookies;
-    private final SessionPollerPool sessionPollerPool;
     private final SessionCache sessionCache;
-    private final SessionPLLSender sessionPLLSender;
     private final SessionServiceURLService sessionServiceURLService;
     private final SessionOperationStrategy sessionOperationStrategy;
     private final SessionService sessionService;
@@ -282,21 +249,17 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         if (SystemProperties.isServerMode()) {
             // Had to choose, final or @Inject approach. Went final.
             sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
-            sessionPollerPool = InjectorHolder.getInstance(SessionPollerPool.class);
             sessionCache = InjectorHolder.getInstance(SessionCache.class);
-            sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
             sessionServiceURLService = InjectorHolder.getInstance(SessionServiceURLService.class);
             sessionService = InjectorHolder.getInstance(SessionService.class);
             sessionOperationStrategy = InjectorHolder.getInstance(ServerSessionOperationStrategy.class);
             requests = InjectorHolder.getInstance(Requests.class);
         } else {
             sessionService = null; // Intentionally null in client mode.
-            sessionPollerPool = SessionPollerPool.getInstance();
             sessionCache = SessionCache.getInstance();
             sessionCookies = SessionCookies.getInstance();
-            sessionPLLSender = new SessionPLLSender(sessionCookies);
             sessionServiceURLService = SessionServiceURLService.getInstance();
-            requests = new Requests(sessionService, sessionPLLSender);
+            requests = new Requests(sessionService, new SessionPLLSender(sessionCookies));
             sessionOperationStrategy = new RemoteSessionOperationStrategy(new RemoteOperations(sessionDebug, requests));
         }
     }
@@ -304,15 +267,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     private Session(SessionID sid, boolean sessionIsLocal) {
         this(sid);
         this.sessionIsLocal = sessionIsLocal;
-    }
-
-
-    public long getPurgeAt() {
-        return purgeAt;
-    }
-
-    public void setPurgeAt(long purgeAt) {
-        this.purgeAt = purgeAt;
     }
 
     public void setSessionIsLocal(boolean sessionIsLocal) {
@@ -338,124 +292,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     //todo: Object...
     public void setContext(Object context) {
         this.context = context;
-    }
-
-    /**
-     * Enables the Session Polling
-     * @param b if <code>true</code> polling is enabled, disabled otherwise
-     */
-    public void setIsPolling(boolean b) {
-        isPolling = b;
-    }
-
-    /**
-     * Checks if Polling is enabled
-     * @return <code> true if polling is enabled , <code>false<code> otherwise
-     */
-    protected boolean getIsPolling() {
-        return isPolling;
-    }
-
-    public boolean addElement(Object obj) {
-        return false;
-    }
-
-    public boolean removeElement(Object obj) {
-        return false;
-    }
-
-    public boolean isEmpty() {
-        return true;
-    }
-
-    public long getRunPeriod() {
-        return -1;
-    }
-
-    public void run() {
-        if (sessionPollerPool.isPollingEnabled()) {
-            try {
-                if (!getIsPolling()) {
-                    long expectedTime;
-                    if (willExpire(maxIdleTime)) {
-                        expectedTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
-                        if (sessionPollerPool.getCacheBasedPolling()) {
-                            expectedTime = Math.min(expectedTime, (latestRefreshTime + (maxCachingTime * 60)) * 1000);
-                        }
-                    } else {
-                        expectedTime = (latestRefreshTime + (SessionMeta.getAppSSOTokenRefreshTime() * 60)) * 1000;
-                    }
-                    if (expectedTime > scheduledExecutionTime()) {
-                        // Get an instance as required otherwise it causes issues on container restart.
-                        SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
-                        return;
-                    }
-                    if (sender == null) {
-                        sender = new SessionPollerSender(this);
-                    }
-                    RestrictedTokenContext.doUsing(getContext(),
-                        new RestrictedTokenAction() {
-                            public Object run() throws Exception {
-                                try {
-                                    setIsPolling(true);
-                                    sessionPollerPool.getThreadPool().run(sender);
-                                } catch (ThreadPoolException e) {
-                                    setIsPolling(false);
-                                    sessionDebug.error("Send Polling Error: ", e);
-                                }
-                                return null;
-                            }
-                    });
-                }
-            } catch (SessionException se) {
-                sessionCache.removeSID(sessionID);
-                sessionDebug.message("session is not in timeout state so clean it", se);
-            } catch (Exception ex) {
-                sessionDebug.error("Exception encountered while polling", ex);
-            }
-        } else {
-
-            String sessionRemovalDebugMessage;
-            if (purgeAt > 0) {
-                /**
-                 * Reduced crosstalk protection.
-                 *
-                 * In order to prevent sessions from being (re)created from CTS on remote servers before
-                 * the destroyed state has been propagated, remote sessions are kept in memory for a configurable
-                 * amount of time {@link CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY }.
-                 *
-                 * This delay introduced to cover the CTS replication lag is only required when running as an
-                 * OpenAM server with a 'remote' copy of a session; therefore, this feature is not required
-                 * when polling is enabled - since polling is only ever used by non-OpenAM clients.
-                 */
-                // destroyed session scheduled for purge
-                if (purgeAt > scheduledExecutionTime()) {
-                    SystemTimerPool.getTimerPool().schedule(this, new Date(purgeAt));
-                    return;
-                }
-                sessionRemovalDebugMessage = "Session Removed, Reduced Crosstalk Purge Time complete";
-            } else {
-                // schedule at the max session time
-                long expectedTime = -1;
-                if (willExpire(maxSessionTime)) {
-                    expectedTime = (latestRefreshTime + (maxSessionTime * 60)) * 1000;
-                }
-                if (expectedTime > scheduledExecutionTime()) {
-                    SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
-                    return;
-                }
-                sessionRemovalDebugMessage = "Session Destroyed, Caching time exceeded the Max Session Time";
-            }
-
-            try {
-                sessionCache.removeSID(sessionID);
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message(sessionRemovalDebugMessage);
-                }
-            } catch (Exception ex) {
-                sessionDebug.error("Exception occured while cleaning up Session Cache", ex);
-            }
-        }
     }
 
     /**
@@ -534,40 +370,15 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         if (timedOutAt > 0) {
             return true;
         }
-        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()){
+        if (!usingCachedBasedPolling() && maxCachingTimeReached()){
             try {
                 refresh(false);
             } catch (SessionTimedOutException e) {
                 latestRefreshTime = currentTimeMillis() / 1000;
-                timedOutAt = latestRefreshTime; //
+                timedOutAt = latestRefreshTime;
             }
         }
         return timedOutAt > 0;
-    }
-
-    /**
-     * Returns the extra time left(in seconds) for the client Session after the
-     * session timed out. If extra time left is zero, it means the session is
-     * ready to be removed permanently. If it returns -1 it means the session
-     * did not even reached the time out state.
-     * @return <code>Session</code> Purge time left
-     * @exception <code>SessionException</code>
-     */
-    public long getTimeLeftBeforePurge() throws SessionException {
-        /**
-         * Return -1 if the session has not timed out due to idle/max timeout
-         * period.
-         */
-        if (!isTimedOut()) {
-            return -1;
-        }
-        /**
-         * Return the extra time left, if the session has timed out due to
-         * idle/max time out period
-         */
-        long now = currentTimeMillis() / 1000;
-        long left = (timedOutAt + SessionMeta.getPurgeDelay() * 60 - now);
-        return (left > 0) ? left : 0;
     }
 
     /**
@@ -607,7 +418,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     }
 
     private void refreshSessionIfStale() throws SessionException {
-        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
+        if (!usingCachedBasedPolling() && maxCachingTimeReached()) {
             refresh(false);
         }
     }
@@ -630,6 +441,14 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     }
 
     /**
+     * Gets the time at which the Session was last refreshed from the master copy (in millis).
+     * @return The latest time at which the session was refreshed.
+     */
+    public long getLatestRefreshTime() {
+        return latestRefreshTime;
+    }
+
+    /**
      * Returns the state of the session.
      *
      * @param reset
@@ -643,7 +462,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      *            service.
      */
     public int getState(boolean reset) throws SessionException {
-        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
+        if (!usingCachedBasedPolling() && maxCachingTimeReached()) {
             refresh(reset);
         } else {
             if (reset) {
@@ -658,18 +477,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
     }
 
     /**
-     * Returns the type of the event which caused the state change of this
-     * session.
-     *
-     * @return The type of the event. The event types are defined in class
-     *         SessionEvent as static integers : SESSION_CREATION, IDLE_TIMEOUT,
-     *         MAX_TIMEOUT, LOGOUT, ACTIVATION, REACTIVATION, and DESTROY.
-     */
-    public int getEventType() {
-        return eventType;
-    }
-
-    /**
      * Gets the property stored in this session.
      *
      * @param name The property name.
@@ -681,7 +488,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      */
     public String getProperty(String name) throws SessionException {
         if (name == null ? sessionCookies.getLBCookieName() != null : !name.equals(sessionCookies.getLBCookieName())) {
-            if ((!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) ||
+            if ((!usingCachedBasedPolling() && maxCachingTimeReached()) ||
                 !sessionProperties.containsKey(name)) {
                 refresh(false);
             }
@@ -722,7 +529,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
      *              restricted
      */
     public boolean isRestricted() throws SessionException {
-        return (this.getRestriction() != null ? true : false);
+        return restriction != null;
     }
 
     /**
@@ -853,40 +660,6 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
             throw new SessionException(SessionBundle.rbName, "invalidSessionState", null);
         }
         localSessionEventListeners.add(listener);
-    }
-
-
-    public void scheduleToTimerPool() {
-        if (sessionPollerPool.isPollingEnabled()) {
-            long timeoutTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
-            if (sessionPollerPool.getCacheBasedPolling()) {
-                timeoutTime = Math.min((latestRefreshTime + (maxCachingTime * 60)) * 1000, timeoutTime);
-            }
-            if (scheduledExecutionTime() > timeoutTime) {
-                cancel();
-            }
-            if (!isScheduled()) {
-                SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
-            }
-        } else {
-            if ((sessionPollerPool.isSessionCleanupEnabled()) && willExpire(maxSessionTime)) {
-                long timeoutTime = (latestRefreshTime + (maxSessionTime * 60)) * 1000;
-
-                if (scheduledExecutionTime() > timeoutTime) {
-                    cancel();
-                }
-                if (!isScheduled()) {
-                    SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns true if the provided time is less than Long.MAX_VALUE seconds.
-     */
-    private boolean willExpire(long minutes) {
-        return minutes < Long.MAX_VALUE / 60;
     }
 
     /**
@@ -1050,10 +823,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         long oldMaxIdleTime = maxIdleTime;
         long oldMaxSessionTime = maxSessionTime;
         update(info);
-        if ((!isScheduled()) || (oldMaxCachingTime > maxCachingTime) ||
-                (oldMaxIdleTime > maxIdleTime) || (oldMaxSessionTime > maxSessionTime)) {
-            scheduleToTimerPool();
-        }
+        sessionCache.notifySessionRefresh(this, oldMaxCachingTime, oldMaxIdleTime, oldMaxSessionTime);
     }
 
     /**
@@ -1337,4 +1107,7 @@ public class Session extends GeneralTaskRunnable implements Blacklistable {
         return sessionID.getExtension().getStorageKey();
     }
 
+    private boolean usingCachedBasedPolling() {
+        return SystemProperties.getAsBoolean(CACHED_BASE_POLLING_PROPERTY, false);
+    }
 }

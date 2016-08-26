@@ -16,6 +16,18 @@
 
 package org.forgerock.openam.session;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.inject.Singleton;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
+
 import com.google.inject.name.Named;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
@@ -26,19 +38,8 @@ import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.util.Reject;
-
-import javax.inject.Singleton;
-import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import static org.forgerock.openam.session.SessionConstants.DESTROYED;
-import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Responsible for providing a single point of contact for all Sessions stored in memory.
@@ -50,6 +51,8 @@ public class SessionCache {
      * Maps stateful sessions, allowing their sessionId to be used as a lookup to the Session object.
      */
     private final ConcurrentMap<SessionID, Session> sessionTable = new ConcurrentHashMap<SessionID, Session>();
+
+    private final ConcurrentMap<SessionID, SessionCuller> sessionCullerTable = new ConcurrentHashMap<>();
 
     private final SessionPollerPool sessionPollerPool;
 
@@ -97,13 +100,25 @@ public class SessionCache {
     }
 
     /**
+     * Retrieve the culler for the provided session.
+     * @param sessionID Non null sessionID of the Session to lookup.
+     * @return Null indicates no Session present, otherwise non null.
+     */
+    private SessionCuller getSessionCuller(SessionID sessionID) {
+        Reject.ifNull(sessionID);
+        return sessionCullerTable.get(sessionID);
+    }
+
+    /**
      * Store a Session in the table.
      *
      * @param session The Session to store. Non null.
      */
-    public void writeSession(Session session) {
+    @VisibleForTesting
+    void writeSession(Session session) {
         Reject.ifNull(session);
         Reject.ifNull(session.getID());
+        sessionCullerTable.put(session.getID(), new SessionCuller(session));
         sessionTable.put(session.getID(), session);
     }
 
@@ -112,8 +127,13 @@ public class SessionCache {
      * @param sessionID The SessionID of the Session to delete. Non null.
      * @return A possibly null Session if none was matched, otherwise non null.
      */
-    public Session deleteSession(SessionID sessionID) {
+    private Session deleteSession(SessionID sessionID) {
         Reject.ifNull(sessionID);
+
+        SessionCuller sessionCuller = sessionCullerTable.remove(sessionID);
+        if (sessionCuller != null) {
+            sessionCuller.cancel();
+        }
         return sessionTable.remove(sessionID);
     }
 
@@ -132,9 +152,10 @@ public class SessionCache {
             long eventTime = currentTimeMillis();
 
             // remove from sessionTable if there is no purge delay or it has elapsed
-            if (session.getPurgeAt() <= eventTime) {
+            SessionCuller sessionCuller = getSessionCuller(sid);
+            Reject.ifNull(sessionCuller);
+            if (sessionCuller.getPurgeAt() <= eventTime) {
                 deleteSession(sid);
-                session.cancel();
             }
 
             // ensure session has destroyed state and observers are notified (exactly once)
@@ -190,14 +211,10 @@ public class SessionCache {
                 }
             }
 
-            session.setPurgeAt(currentTimeMillis() + (purgeDelay * 60 * 1000));
-            session.cancel();
-            if (!session.isScheduled()) {
-                SystemTimerPool.getTimerPool().schedule(session, new Date(session.getPurgeAt()));
-            } else {
-                debug.error("Unable to schedule destroyed session for purging");
+            SessionCuller sessionCuller = getSessionCuller(sessionID);
+            if (sessionCuller != null) {
+                sessionCuller.rescheduleForPurge(currentTimeMillis() + (purgeDelay * 60 * 1000));
             }
-
         }
 
         removeSID(sessionID);
@@ -310,6 +327,24 @@ public class SessionCache {
             session.addInternalSessionListener();
         }
         return session;
+    }
+
+    /**
+     * Used to notify the cache that a session has been updated, and that it should reschedule the culler if necessary.
+     * @param session The session that was refreshed.
+     * @param oldMaxCachingTime The previous maxCachingTime.
+     * @param oldMaxIdleTime The previous maxIdleTime.
+     * @param oldMaxSessionTime The previous maxSessionTime.
+     */
+    public void notifySessionRefresh(Session session, long oldMaxCachingTime, long oldMaxIdleTime,
+                                     long oldMaxSessionTime) {
+        SessionCuller sessionCuller = getSessionCuller(session.getID());
+        if (sessionCuller != null) {
+            if ((!sessionCuller.isScheduled()) || (oldMaxCachingTime > session.getMaxCachingTime()) ||
+                    (oldMaxIdleTime > session.getMaxIdleTime()) || (oldMaxSessionTime > session.getMaxSessionTime())) {
+                sessionCuller.scheduleToTimerPool();
+            }
+        }
     }
 
     /**

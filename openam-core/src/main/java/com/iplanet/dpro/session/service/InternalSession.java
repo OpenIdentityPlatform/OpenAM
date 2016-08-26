@@ -74,9 +74,8 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
-import com.sun.identity.common.HeadTaskRunnable;
+import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.common.TaskRunnable;
 import com.sun.identity.common.TimerPool;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
@@ -389,7 +388,7 @@ public class InternalSession implements Serializable {
             mayReschedule = true;
         }
         maxSessionTimeInMinutes = t;
-        if ((taskRunnable.scheduledExecutionTime() != -1) && mayReschedule) {
+        if (taskRunnable.isScheduled() && mayReschedule) {
             reschedule();
         }
         update();
@@ -416,7 +415,7 @@ public class InternalSession implements Serializable {
         maxIdleTimeInMinutes = t;
         reschedulePossible = (maxDefaultIdleTime > maxIdleTimeInMinutes)
                 || (maxDefaultIdleTime > maxSessionTimeInMinutes);
-        if ((taskRunnable.scheduledExecutionTime() != -1) && (mayReschedule || reschedulePossible)) {
+        if (taskRunnable.isScheduled() && (mayReschedule || reschedulePossible)) {
             reschedule();
         }
         update();
@@ -1459,55 +1458,11 @@ public class InternalSession implements Serializable {
         this.timedOutTimeInSeconds = timedOutAt;
     }
 
-    private class InternalSessionTaskRunnable implements TaskRunnable {
-        private transient volatile TaskRunnable nextTask = null;
-        private transient volatile TaskRunnable previousTask = null;
-        private transient volatile HeadTaskRunnable headTask = null;
+    private class InternalSessionTaskRunnable extends GeneralTaskRunnable {
         private transient TimerPool timerPool = null;
 
         public InternalSessionTaskRunnable() {
             timerPool = SystemTimerPool.getTimerPool();
-        }
-
-        @Override
-        public void setHeadTask(HeadTaskRunnable headTask) {
-            this.headTask = headTask;
-        }
-
-        @Override
-        public long scheduledExecutionTime() {
-            synchronized (this) {
-                if (headTask != null) {
-                    return headTask.scheduledExecutionTime();
-                }
-            }
-            return -1;
-        }
-
-        @Override
-        public HeadTaskRunnable getHeadTask() {
-            // no need to synchronize for single operation
-            return headTask;
-        }
-
-        @Override
-        public TaskRunnable previous() {
-            return previousTask;
-        }
-
-        @Override
-        public TaskRunnable next() {
-            return nextTask;
-        }
-
-        @Override
-        public void setPrevious(TaskRunnable task) {
-            previousTask = task;
-        }
-
-        @Override
-        public void setNext(TaskRunnable task) {
-            nextTask = task;
         }
 
         @Override
@@ -1531,35 +1486,6 @@ public class InternalSession implements Serializable {
         @Override
         public long getRunPeriod() {
             return -1;
-        }
-
-        @Override
-        public void cancel() {
-            HeadTaskRunnable oldHeadTask = null;
-            do {
-                oldHeadTask = headTask;
-                if (oldHeadTask != null) {
-                    if (oldHeadTask.acquireValidLock()) {
-                        try {
-                            if (oldHeadTask == headTask) {
-                                if (!oldHeadTask.isTimedOut()) {
-                                    previousTask.setNext(nextTask);
-                                    if (nextTask != null) {
-                                        nextTask.setPrevious(previousTask);
-                                        nextTask = null;
-                                    } else {
-                                        oldHeadTask.setTail(previousTask);
-                                    }
-                                }
-                                break;
-                            }
-                        } finally {
-                            oldHeadTask.releaseLockAndNotify();
-                        }
-                    }
-                }
-            } while (oldHeadTask != headTask);
-            headTask = null;
         }
 
         @Override

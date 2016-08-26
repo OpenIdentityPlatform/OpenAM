@@ -11,20 +11,22 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.session;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.am.util.ThreadPool;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
+import static org.forgerock.openam.session.SessionConstants.*;
 
 import javax.inject.Singleton;
 
-import static org.forgerock.openam.session.SessionConstants.*;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.am.util.ThreadPool;
+import com.iplanet.dpro.session.Session;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Singleton holding the threadpool running the amSessionPoller.
@@ -35,7 +37,7 @@ public class SessionPollerPool {
     private ThreadPool threadPool = null; //configured on first-use by #initPollerPool()
 
     private boolean cacheBasedPolling =
-            SystemProperties.getAsBoolean("com.iplanet.am.session.client.polling.cacheBased", false);
+            SystemProperties.getAsBoolean(Session.CACHED_BASE_POLLING_PROPERTY, false);
 
     private static Debug debug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 

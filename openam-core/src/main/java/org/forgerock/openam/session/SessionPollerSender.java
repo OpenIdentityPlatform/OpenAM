@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session;
+
+import java.util.List;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -24,15 +26,17 @@ import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.sun.identity.shared.debug.Debug;
 
-import java.util.List;
-
 /**
  * Ex-Sun class, pulled out from Session.java.
+ *
+ * Used to poll a SessionService periodically. The information recovered is used to update a Session object, and if
+ * necessary will result in it being removed from the local cache.
  *
  * todo: attribution
  */
 public class SessionPollerSender implements Runnable {
 
+    private final SessionCuller sessionCuller;
     private SessionInfo info = null;
     private final Session session;
     private final SessionID sid;
@@ -40,8 +44,14 @@ public class SessionPollerSender implements Runnable {
     private final SessionCache sessionCache = SessionCache.getInstance();
     private final SessionPLLSender pllSender = new SessionPLLSender(SessionCookies.getInstance());
 
-    public SessionPollerSender(Session sess) {
-        this.session = sess;
+    /**
+     * Creates a new SessionPollerSender.
+     * @param session The session to create the sender for.
+     * @param sessionCuller The associated session culler.
+     */
+    public SessionPollerSender(Session session, SessionCuller sessionCuller) {
+        this.sessionCuller = sessionCuller;
+        this.session = session;
         this.sid = session.getID();
     }
 
@@ -79,11 +89,11 @@ public class SessionPollerSender implements Runnable {
                     long oldMaxIdleTime = session.getMaxIdleTime();
                     long oldMaxSessionTime = session.getMaxSessionTime();
                     session.update(info);
-                    if ((!session.isScheduled()) ||
+                    if ((!sessionCuller.isScheduled()) ||
                             (oldMaxCachingTime > session.getMaxCachingTime()) ||
                             (oldMaxIdleTime > session.getMaxIdleTime()) ||
                             (oldMaxSessionTime > session.getMaxSessionTime())) {
-                        session.scheduleToTimerPool();
+                        sessionCuller.scheduleToTimerPool();
                     }
                 }
             } catch (SessionException se) {
@@ -94,6 +104,6 @@ public class SessionPollerSender implements Runnable {
         } else {
             sessionCache.removeSID(sid);
         }
-        session.setIsPolling(false);
+        sessionCuller.setIsPolling(false);
     }
 }
