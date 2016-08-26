@@ -31,8 +31,26 @@ import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.READONLY;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.STRING_TYPE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_401_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_404_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SITES_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -40,13 +58,19 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.Actions;
 import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.api.enums.CountPolicy;
 import org.forgerock.api.enums.PagingMode;
 import org.forgerock.api.enums.QueryType;
@@ -55,14 +79,11 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
@@ -72,7 +93,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.core.rest.sms.models.Site;
+import org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
@@ -89,16 +110,17 @@ import com.sun.identity.sm.SMSException;
 /**
  * A CREST collection resource provider that presents the global sites config in a coherent way.
  */
-@CollectionProvider(details = @Handler(
-        id = "sites:1.0",
-        title = "Sites",
-        description = "This version 1.0 sites service represents a Sites resource with CQ operations "
-                + "on the users collection and CRUDPA operations available for the site item. "
-                + "Items can have server version 1.0 subresources. ",
-        resourceSchema = @Schema(fromType = Site.class),
-        mvccSupported = false),
-        pathParam = @Parameter(name = "_id", type = "string", description = "The site name from the path"))
-public class SitesResourceProvider implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = SITES_RESOURCE + ApiDescriptorConstants.TITLE,
+                description = SITES_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "SitesResourceProvider.schema.json"),
+                mvccSupported = false),
+        pathParam = @Parameter(
+                name = "sitesId",
+                type = "string",
+                description = SITES_RESOURCE + PATH_PARAM + DESCRIPTION))
+public class SitesResourceProvider {
 
     private static final String SITE_NAME = "_id";
     private static final String SITE_ID = "id";
@@ -118,7 +140,15 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         this.debug = debug;
     }
 
-    @Override
+    @Actions({
+            @Action(name = RestConstants.TEMPLATE,
+                    operationDescription = @Operation(
+                            description = SITES_RESOURCE + ACTION + "template." + DESCRIPTION),
+                    response = @Schema(schemaResource = "SitesResourceProvider.action.template.response.schema.json")),
+            @Action(name = RestConstants.SCHEMA,
+                    operationDescription = @Operation(
+                            description = SITES_RESOURCE + ACTION + "schema." + DESCRIPTION),
+                    response = @Schema(schemaResource = "SitesResourceProvider.action.schema.response.schema.json"))})
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         switch (request.getAction()) {
             case RestConstants.TEMPLATE:
@@ -161,7 +191,13 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         }
     }
 
-    @Override
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = SITES_RESOURCE + CREATE + ERROR_500_DESCRIPTION)},
+            description = SITES_RESOURCE + CREATE_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         String id = request.getNewResourceId();
@@ -208,7 +244,13 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         return id;
     }
 
-    @Override
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = SITES_RESOURCE + DELETE + ERROR_500_DESCRIPTION)},
+            description = SITES_RESOURCE + DELETE_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String id,
             DeleteRequest request) {
         ResourceResponse site;
@@ -238,21 +280,16 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         }
     }
 
-    @Override
     @Query(operationDescription =
     @Operation(
-            description = "The query operation",
-            locales = {"en-GB", "en-US"},
+            description = SITES_RESOURCE + QUERY_DESCRIPTION,
             errors = {
                     @ApiError(
-                            id = "badRequest",
                             code = 400,
-                            description = "Indicates that the request could not be understood by "
-                                    + "the resource due to malformed syntax."),
+                            description = SITES_RESOURCE + QUERY + ERROR_400_DESCRIPTION),
                     @ApiError(
-                            id = "unauthorized",
-                            code = 401,
-                            description = "Unauthorized - Missing or bad authentication")}),
+                            code = 500,
+                            description = SITES_RESOURCE + QUERY + ERROR_500_DESCRIPTION)}),
             type = QueryType.FILTER,
             countPolicies = {CountPolicy.NONE},
             pagingModes = {PagingMode.COOKIE, PagingMode.OFFSET},
@@ -302,7 +339,19 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         return newResourceResponse(siteName, String.valueOf(site.getObject().hashCode()), site);
     }
 
-    @Override
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 401,
+                            description = SITES_RESOURCE + READ + ERROR_401_DESCRIPTION),
+                    @ApiError(
+                            code = 404,
+                            description = SITES_RESOURCE + READ + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = SITES_RESOURCE + READ + ERROR_500_DESCRIPTION)},
+            description = SITES_RESOURCE + READ_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String id,
             ReadRequest request) {
         try {
@@ -322,7 +371,13 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         }
     }
 
-    @Override
+    @Update(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = SITES_RESOURCE + UPDATE + ERROR_500_DESCRIPTION)},
+            description = SITES_RESOURCE + UPDATE_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String id,
             UpdateRequest request) {
         JsonValue content = request.getContent();
@@ -356,17 +411,5 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         } catch (NotFoundException e) {
             return new InternalServerErrorException("Could not read site after just updating it", e).asPromise();
         }
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String id,
-            PatchRequest request) {
-        return new NotSupportedException().asPromise();
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String id,
-            ActionRequest request) {
-        return new NotSupportedException("Action not supported on instance").asPromise();
     }
 }
