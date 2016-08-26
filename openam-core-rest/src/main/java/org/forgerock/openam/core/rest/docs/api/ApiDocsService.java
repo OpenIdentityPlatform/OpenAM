@@ -18,6 +18,14 @@ package org.forgerock.openam.core.rest.docs.api;
 import static org.forgerock.json.resource.Requests.newApiRequest;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -28,6 +36,7 @@ import org.asciidoctor.Placement;
 import org.asciidoctor.SafeMode;
 import org.forgerock.api.markup.ApiDocGenerator;
 import org.forgerock.api.models.ApiDescription;
+import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -51,7 +60,7 @@ public class ApiDocsService {
     private static final int SECTION_NUMBERING_DEPTH = 5;
     private static final int TOC_LEVELS = 5;
 
-    private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
+    private final Asciidoctor asciidoctor;
     private final Router realmRouter;
 
     /**
@@ -61,7 +70,57 @@ public class ApiDocsService {
      */
     @Inject
     public ApiDocsService(@Named("RealmResourceRouter") ResourceRouter realmResourceRouter) {
+        asciidoctor = initializeAsciidoctor();
         this.realmRouter = realmResourceRouter.getRouter();
+    }
+
+    /**
+     * Creates the {@link Asciidoctor} instance for later use.
+     * Depending on the container used to host OpenAM, Asciidoctor may struggle to find the asciidoctor.rb source file
+     * on the classpath.
+     * Under normal circumstances Asciidoctor finds all JAR files on the classpath that has a {@literal specifications}
+     * folder in it, then parses all the .gemspec files in that folder to figure out the exact locations of the (J)Ruby
+     * gems. Example resource URL: {@code file:/path/to/asciidoctor.jar!specifications/}.
+     * When using WildFly (or JBoss EAP) containers, this gets a little bit more tricky, because the resource URLs
+     * returned will always have vfs protocol. As both Asciidoctor and JRuby are unaware of the internals of such
+     * URLs, they will handle the returned URL just as if it was a file path. Example resource URL: {@code
+     * vfs:/path/to/asciidoctor.jar/specifications}.
+     * Since in the vfs case the URL points to a non-existent folder, JRuby will then fail to find the gemspec files,
+     * and hence it will also fail to find the asciidoctor gem. To overcome this problem we are using a different
+     * factory method that takes GEM_PATH as parameter. The GEM_PATH parameter needs to point to the parent directory of
+     * the {@literal gems} and the {@literal specifications} folders, so OpenAM just looks for those folders on the
+     * classpath and figures out the url to the parent directory (which will be the path to the JAR file essentially
+     * since both folders are at the root of the JAR files).
+     * To minimize the impact, in case VFS is not in use, we just fallback to the default factory method.
+     *
+     * @return An {@link Asciidoctor} instance.
+     * @see <a href="http://schneems.com/2014/04/15/gem-path.html">GEM_PATH variable</a>
+     */
+    private Asciidoctor initializeAsciidoctor() {
+        List<String> gemPaths = new ArrayList<>();
+        try {
+            for (URL url : Collections.list(Thread.currentThread().getContextClassLoader().getResources("gems"))) {
+                if ("vfs".equals(url.getProtocol())) {
+                    String path;
+                    try {
+                        URI uri = url.toURI();
+                        uri = uri.getPath().endsWith("/") ? uri.resolve("..") : uri.resolve(".");
+                        path = uri.getSchemeSpecificPart();
+                    } catch (URISyntaxException urise) {
+                        path = url.getPath();
+                    }
+                    gemPaths.add(path.endsWith("/") ? path.substring(0, path.length() - 1) : path);
+                } else {
+                    break;
+                }
+            }
+        } catch (IOException ignored) {
+        }
+        if (gemPaths.isEmpty()) {
+            return Asciidoctor.Factory.create();
+        } else {
+            return Asciidoctor.Factory.create(Joiner.on(":").join(gemPaths));
+        }
     }
 
     /**
