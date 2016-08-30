@@ -30,8 +30,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.api.models.ApiDescription;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
@@ -58,6 +60,7 @@ import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
@@ -68,7 +71,7 @@ import org.forgerock.util.query.QueryFilter;
  *
  * @since 13.0.0
  */
-public class SmsRouteTree implements RequestHandler {
+public class SmsRouteTree implements RequestHandler, Describable<ApiDescription, Request> {
 
     private static final QueryFilter<JsonPointer> ALWAYS_TRUE = QueryFilter.alwaysTrue();
     private static final String SCRIPTING_SERVICE_NAME = "scripting";
@@ -345,6 +348,26 @@ public class SmsRouteTree implements RequestHandler {
         }
         ResourcePath childPath = resourcePath(child);
         return parent.concat(childPath);
+    }
+
+    @Override
+    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+        return router.api(apiProducer);
+    }
+
+    @Override
+    public ApiDescription handleApiRequest(Context context, Request request) {
+        return router.handleApiRequest(context, request);
+    }
+
+    @Override
+    public void addDescriptorListener(Listener listener) {
+        router.addDescriptorListener(listener);
+    }
+
+    @Override
+    public void removeDescriptorListener(Listener listener) {
+        router.removeDescriptorListener(listener);
     }
 
     private static class ChildQueryResourceHandler implements QueryResourceHandler {

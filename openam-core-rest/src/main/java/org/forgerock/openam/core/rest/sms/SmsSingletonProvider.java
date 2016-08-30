@@ -41,10 +41,14 @@ import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.guava.common.base.Optional;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -290,7 +294,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     }
 
     @Override
-    protected void addDynamicSchema(Context context, JsonValue result) {
+    protected void addDynamicSchema(Optional<Context> context, JsonValue result) {
         if (dynamicSchema != null) {
             addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
         }
@@ -397,4 +401,24 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         return subSchemaPath.isEmpty() ? null : lastSchemaNodeName();
     }
 
+    @Override
+    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+        // TODO AME-11777 and AME-11778
+        return null;
+    }
+
+    @Override
+    public ApiDescription handleApiRequest(Context context, Request request) {
+        return null;
+    }
+
+    @Override
+    public void addDescriptorListener(Listener listener) {
+
+    }
+
+    @Override
+    public void removeDescriptorListener(Listener listener) {
+
+    }
 }
