@@ -383,7 +383,7 @@ public class ResourceOwnerSessionValidator {
 
     private URI buildDefaultLoginUrl(OAuth2Request request, String gotoUrl, String acrValues, String realm,
             String moduleName, String serviceName, String locale) throws URISyntaxException, ServerException,
-            NotFoundException, UnsupportedEncodingException {
+            NotFoundException {
 
         final Request req = request.getRequest();
         final String authURL = getAuthURL(getHttpServletRequest(req));
@@ -412,7 +412,7 @@ public class ResourceOwnerSessionValidator {
             loginRef.addQueryParameter(SERVICE, serviceName);
         }
 
-        loginRef.addQueryParameter(GOTO, URLEncoder.encode(gotoUrl, "UTF-8"));
+        loginRef.addQueryParameter(GOTO, gotoUrl);
 
         return loginRef.toUri();
     }
