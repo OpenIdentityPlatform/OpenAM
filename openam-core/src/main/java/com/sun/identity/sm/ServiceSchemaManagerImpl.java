@@ -24,17 +24,10 @@
  *
  * $Id: ServiceSchemaManagerImpl.java,v 1.8 2008/08/28 18:36:30 arviranga Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import com.iplanet.services.util.AMEncryption;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
@@ -45,9 +38,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.iplanet.services.util.AMEncryption;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 
 
 /**
@@ -58,7 +60,7 @@ import org.w3c.dom.Node;
  * version. This class implements all the "read" methods and would receive
  * notification when schema changes.
  */
-public class ServiceSchemaManagerImpl implements SMSObjectListener {
+public class ServiceSchemaManagerImpl implements SMSObjectListener, CachedSMSEntry.SMSEntryUpdateListener {
     // Instance variables
     private String serviceName;
 
@@ -453,7 +455,7 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
     // and called via CachedSMSEntry's refresh when cache gets dirty.
     // Method is synchronized since calls from CachedSMSEntry.refresh
     // can happen at the same time.
-    synchronized void update() {
+    public synchronized void update() {
         if (!smsEntry.isValid()) {
             // Clear the references and return
             clear();

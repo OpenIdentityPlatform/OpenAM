@@ -24,31 +24,30 @@
  *
  * $Id: PluginSchemaImpl.java,v 1.5 2008/07/11 01:46:20 arviranga Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.xml.XMLUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * The class <code>PluginSchemaImpl</code> provides the interfaces to obtain
  * the schema information of a plugin that is configured for a service.
  */
-class PluginSchemaImpl extends ServiceSchemaImpl {
+class PluginSchemaImpl extends ServiceSchemaImpl implements CachedSMSEntry.SMSEntryUpdateListener {
 
     protected String interfaceName;
 
@@ -164,7 +163,7 @@ class PluginSchemaImpl extends ServiceSchemaImpl {
 
     // Gets calls by local changes and also by notifications threads
     // Hence synchronized to avoid data corruption
-    synchronized void update() {
+    public synchronized void update() {
         Node pluginNode = null;
         String[] schemaAttrs = smsEntry.getSMSEntry().getAttributeValues(
                 SMSEntry.ATTR_PLUGIN_SCHEMA);

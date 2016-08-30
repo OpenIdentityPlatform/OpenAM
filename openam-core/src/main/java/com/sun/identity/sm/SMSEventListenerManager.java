@@ -24,24 +24,21 @@
  *
  * $Id: SMSEventListenerManager.java,v 1.12 2009/01/28 05:35:03 ww203982 Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.SearchScope;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Receives notifications for all SMS object changes from
@@ -52,22 +49,22 @@ import org.forgerock.opendj.ldap.SearchScope;
 class SMSEventListenerManager implements SMSObjectListener {
 
     // All Notification Objects list
-    protected static Map<String, NotificationObject> notificationObjects =
+    private static final Map<String, NotificationObject> notificationObjects =
         Collections.synchronizedMap(new HashMap<String, NotificationObject>());
     
     // CachedSMSEntry objects
-    protected static Map<String, Set<?>> nodeChanges =
-        Collections.synchronizedMap(new HashMap());
+    private static final Map<String, Set<NotificationObject>> nodeChanges =
+            Collections.synchronizedMap(new HashMap<String, Set<NotificationObject>>());
     
     // CachedSubEntries objects
-    protected static Map<String, Set<?>> subNodeChanges =
-        Collections.synchronizedMap(new HashMap());
-    
+    private static final Map<String, Set<NotificationObject>> subNodeChanges =
+            Collections.synchronizedMap(new HashMap<String, Set<NotificationObject>>());
+
     // Static Initialization variables
     private static Debug debug = SMSEntry.eventDebug; 
     protected static boolean initialized;
 
-    static void initialize(SSOToken token) {
+    static void initialize() {
         if (!initialized) {
             try {
                 if (SMSNotificationManager.isCacheEnabled()) {
@@ -85,11 +82,12 @@ class SMSEventListenerManager implements SMSObjectListener {
         }
     }
 
-    SMSEventListenerManager() {
+    private SMSEventListenerManager() {
         // do nothing
     }
 
     // Processes object changed notifications
+    @Override
     public void objectChanged(String odn, int event) {
         objectChanged(odn, event, false);
     }
@@ -116,11 +114,9 @@ class SMSEventListenerManager implements SMSObjectListener {
             // from nodeChanges. All "subNodeChanges" entries would
             // have an entry in "nodeChanges", hence donot have to
             // iterate throught it
-            Set childDNs = new HashSet();
+            Set<String> childDNs = new HashSet<>();
             synchronized (nodeChanges) {
-                Iterator keyitems = nodeChanges.keySet().iterator();
-                while (keyitems.hasNext()) {
-                    String cdn = (String) keyitems.next();
+                for (String cdn : nodeChanges.keySet()) {
                     if (DN.valueOf(cdn).isInScopeOf(sdn, SearchScope.SUBORDINATES)) {
                         childDNs.add(cdn);
                     }
@@ -131,20 +127,19 @@ class SMSEventListenerManager implements SMSObjectListener {
                 debug.message("SMSEventListener::objectChanged: Sending " +
                     "delete event of: " + dn + " to child nodes: " + childDNs);
             }
-            for (Iterator items = childDNs.iterator(); items.hasNext();) {
-                String item = (String) items.next();
+            for (String item : childDNs) {
                 objectChanged(item, event, true);
                 // Send notifications to external listeners also if
                 // data store notification is not enabled
                 if (!SMSNotificationManager.isDataStoreNotificationEnabled()) {
                     SMSNotificationManager.getInstance().sendNotifications(
-                        item, event, true);
+                            item, event, true);
                 }
             }
         }
 
         // Send notifications to CachedSMSEntries
-        sendNotifications((Set) nodeChanges.get(dn), odn, event);
+        sendNotifications(nodeChanges.get(dn), odn, event);
         
         // Process sub-entry changed events, not interested in attribute mods
         if ((event == SMSObjectListener.ADD) ||
@@ -154,10 +149,11 @@ class SMSEventListenerManager implements SMSObjectListener {
                 debug.message("SMSEventListener::entry changed for: " + dn +
                     " sending notifications to its parents");
             }
-            sendNotifications((Set) subNodeChanges.get(DN.valueOf(dn).parent().toString().toLowerCase()), odn, event);
+            sendNotifications(subNodeChanges.get(DN.valueOf(dn).parent().toString().toLowerCase()), odn, event);
         }
     }
 
+    @Override
     public void allObjectsChanged() {
         if (debug.messageEnabled()) {
             debug.message("SMSEventListenerManager::allObjectsChanged called");
@@ -178,27 +174,25 @@ class SMSEventListenerManager implements SMSObjectListener {
     /**
      * Registers notification for changes to nodes
      */
-    protected static String notifyChangesToNode(SSOToken token, String dn,
-        Method method, Object object, Object[] args) {
-        initialize(token);
+    static String registerForNotifyChangesToNode(String dn, SMSEventListener eventListener) {
+        initialize();
         String ndn = DN.valueOf(dn).toString().toLowerCase();
-        return (addNotificationObject(nodeChanges, ndn, method, object, args));
+        return (addNotificationObject(nodeChanges, ndn, eventListener));
     }
 
     /**
      * Registers notification for changes to its sub-nodes
      */
-    protected static String notifyChangesToSubNodes(SSOToken token, String dn,
-        Object o) {
-        initialize(token);
+    static String registerForNotifyChangesToSubNodes(String dn, SMSEventListener eventListener) {
+        initialize();
         String ndn = DN.valueOf(dn).toString().toLowerCase();
-        return (addNotificationObject(subNodeChanges, ndn, null, o, null));
+        return (addNotificationObject(subNodeChanges, ndn, eventListener));
     }
 
     /**
      * Removes notification objects
      */
-    protected static void removeNotification(String notificationID) {
+    static void removeNotification(String notificationID) {
         NotificationObject no = notificationObjects.get(notificationID);
         if (no != null) {
             no.set.remove(no);
@@ -209,18 +203,17 @@ class SMSEventListenerManager implements SMSObjectListener {
     /**
      * Adds notification method to the map
      */
-    private static String addNotificationObject(Map<String, Set<?>> nChangesMap, String dn,
-        Method method, Object object, Object[] args) {
-        Set nObjects = null;
+    private static String addNotificationObject(Map<String, Set<NotificationObject>> nChangesMap, String dn,
+                                                SMSEventListener eventListener) {
+        Set<NotificationObject> nObjects;
         synchronized (nChangesMap) {
-            nObjects = (Set) nChangesMap.get(dn);
+            nObjects = nChangesMap.get(dn);
             if (nObjects == null) {
-                nObjects = Collections.synchronizedSet(new HashSet());
+                nObjects = Collections.synchronizedSet(new HashSet<NotificationObject>());
                 nChangesMap.put(dn, nObjects);
             }
         }
-        NotificationObject no = new NotificationObject(method, object, args,
-            nObjects);
+        NotificationObject no = new NotificationObject(eventListener, nObjects);
         nObjects.add(no);
         notificationObjects.put(no.getID(), no);
         return (no.getID());
@@ -229,36 +222,20 @@ class SMSEventListenerManager implements SMSObjectListener {
     /**
      * Sends notification to methods and objects within the set
      */
-    private static void sendNotifications(Set nObjects, String dn, int event) {
+    private static void sendNotifications(Set<NotificationObject> nObjects, String dn, int event) {
         if ((nObjects == null) || (nObjects.isEmpty())) {
             return;
         }
-        HashSet nobjs = new HashSet(2);
+        Set<NotificationObject> nobjs = new HashSet<>(2);
         synchronized (nObjects) {
             nobjs.addAll(nObjects);
         }
-        Iterator items = nobjs.iterator();
 
-        while (items.hasNext()) {
+        for (NotificationObject no : nobjs) {
             try {
-                NotificationObject no = (NotificationObject) items.next();
-                if ((dn != null) && (no.object instanceof CachedSubEntries)) {
-                    CachedSubEntries cse = (CachedSubEntries) no.object;
-                    // We do not cache Realm names.
-                    // We cache only service names and policy names.
-                    if (!dn.startsWith(SMSEntry.ORG_PLACEHOLDER_RDN)) {
-                        if (event == SMSObjectListener.ADD) {
-                            cse.add(LDAPUtils.rdnValueFromDn(dn));
-                        } else {
-                            cse.remove(LDAPUtils.rdnValueFromDn(dn));
-                        }
-                    }
-                } else {
-                    no.method.invoke(no.object, no.args);
-                }
+                no.notifyEvent(dn, event);
             } catch (Exception e) {
-                debug.error("SMSEvent notification: " +
-                    "Unable to send notification: ", e);
+                debug.error("SMSEvent notification: Unable to send notification: ", e);
             }
         }
     }
@@ -266,36 +243,37 @@ class SMSEventListenerManager implements SMSObjectListener {
     private static class NotificationObject {
 
         String id;
-        Method method;
-        Object object;
-        Object[] args;
-        Set set;
+        SMSEventListener eventListener;
+        Set<NotificationObject> set;
 
-        NotificationObject(Method m, Object o, Object[] a, Set s) {
-            id = SMSUtils.getUniqueID();
-            method = m;
-            object = o;
-            args = a;
-            set = s;
+        NotificationObject(SMSEventListener eventListener, Set<NotificationObject> s) {
+            this.id = SMSUtils.getUniqueID();
+            this.eventListener = eventListener;
+            this.set = s;
         }
 
         String getID() {
             return (id);
         }
 
-        // @Override
+        @Override
         public int hashCode() {
             int hash = 3;
             hash = 13 * hash + (id != null ? id.hashCode() : 0);
             return hash;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof NotificationObject) {
                 NotificationObject no = (NotificationObject) o;
                 return (id.equals(no.id));
             }
             return (false);
+        }
+
+        private void notifyEvent(String dn, int event) {
+            eventListener.notifySMSEvent(dn, event);
         }
     }
 }

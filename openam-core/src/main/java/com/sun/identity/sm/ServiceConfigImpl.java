@@ -51,7 +51,7 @@ import java.util.concurrent.locks.Lock;
  * configuration information of a service configuration. It provides methods to
  * get configuration parameters for this service configuration.
  */
-class ServiceConfigImpl implements ServiceListener {
+class ServiceConfigImpl implements ServiceListener, CachedSMSEntry.SMSEntryUpdateListener {
 
     // Static variables
     private static ConcurrentMap<String, ServiceConfigImpl> configImpls = new ConcurrentHashMap<>();
@@ -395,7 +395,7 @@ class ServiceConfigImpl implements ServiceListener {
     // Method gets called by local changes and also by changes from
     // notification thread. Hence it synchornized to avoid data being
     // corrupted
-    synchronized void update() {
+    public synchronized void update() {
         // Check if entry is still valid
         if (!smsEntry.isValid()) {
             // Entry has to be removed from cache and cleared
@@ -613,7 +613,7 @@ class ServiceConfigImpl implements ServiceListener {
     }
 
     // This function is executed after obtaining "configMutex" lock
-    static ServiceConfigImpl getFromCache(String cn, SSOToken t)
+    private static ServiceConfigImpl getFromCache(String cn, SSOToken t)
         throws SMSException, SSOException {
         ServiceConfigImpl answer = configImpls.get(cn);
         if (answer != null) {
@@ -637,7 +637,7 @@ class ServiceConfigImpl implements ServiceListener {
         return (answer);        
     }
 
-    static CachedSMSEntry checkAndUpdatePermission(
+    private static CachedSMSEntry checkAndUpdatePermission(
         String cacheName, String dn, SSOToken t)
         throws SMSException, SSOException {
         CachedSMSEntry answer = CachedSMSEntry.getInstance(t, dn);
@@ -662,7 +662,7 @@ class ServiceConfigImpl implements ServiceListener {
         userPrincipals.clear();
     }
 
-    static String getCacheName(String sName, String version, String oName,
+    private static String getCacheName(String sName, String version, String oName,
             String gName, String cName, boolean global) {
         StringBuilder sb = new StringBuilder(100);
         sb.append(sName).append(version).append(oName).append(gName).append(
