@@ -16,15 +16,19 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
 
 import org.assertj.core.api.Assertions;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.forgerock.openam.core.realms.Realm;
@@ -32,6 +36,9 @@ import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
+import org.forgerock.util.i18n.LocalizableString;
+import org.forgerock.util.i18n.PreferredLocales;
 import org.forgerock.util.test.assertj.Conditions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -116,7 +123,7 @@ public class SmsResourceProviderTest {
         SmsResourceProvider resourceProvider = new MySmsResourceProvider(serviceSchema, schemaType, subSchemaPath,
                 uriPath, true, jsonConverter, debug);
 
-        Assertions.assertThat(resourceProvider).isNotNull();
+        assertThat(resourceProvider).isNotNull();
     }
 
     @Test
@@ -130,7 +137,7 @@ public class SmsResourceProviderTest {
         String returnedRealm = resourceProvider.realmFor(mockContext);
 
         // Then
-        Assertions.assertThat(returnedRealm).isEqualTo("/" + RESOLVED_REALM);
+        assertThat(returnedRealm).isEqualTo("/" + RESOLVED_REALM);
     }
 
     @Test
@@ -152,8 +159,10 @@ public class SmsResourceProviderTest {
         AssertJJsonValueAssert.assertThat(returnedJV)
                 .isObject()
                 .stringIs("_id", Conditions.equalTo("one"))
-                .stringIs("name", Conditions.equalTo("Sub Schema One"))
                 .booleanAt("collection").isFalse();
+        Object name = returnedJV.get("name").getObject();
+        assertThat(name).isInstanceOf(LocalizableString.class);
+        assertThat(((LocalizableString) name).toTranslatedString(new PreferredLocales())).isEqualTo("Sub Schema One");
     }
 
     @Test
@@ -167,7 +176,7 @@ public class SmsResourceProviderTest {
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
         when(mockServiceConfig.exists()).thenReturn(true);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager)).isEqualTo(mockServiceConfig);
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager)).isEqualTo(mockServiceConfig);
     }
 
     @Test(expectedExceptions = NotFoundException.class)
@@ -204,7 +213,7 @@ public class SmsResourceProviderTest {
         when(mockServiceConfig.getSubConfig("resourceName")).thenReturn(mockServiceSubConfig);
         when(mockServiceSubConfig.exists()).thenReturn(true);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
                 .isEqualTo(mockServiceSubConfig);
     }
 
@@ -252,7 +261,7 @@ public class SmsResourceProviderTest {
         when(mockServiceConfig.getSubConfig("schemaName")).thenReturn(mockServiceSubConfig);
         when(mockServiceSubConfig.exists()).thenReturn(true);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
                 .isEqualTo(mockServiceSubConfig);
     }
 
@@ -278,7 +287,7 @@ public class SmsResourceProviderTest {
         when(mockServiceConfig.getSubConfig("schemaName")).thenReturn(mockServiceSubConfig);
         when(mockServiceSubConfig.exists()).thenReturn(false);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
                 .isEqualTo(mockServiceSubConfig);
     }
 
@@ -305,7 +314,7 @@ public class SmsResourceProviderTest {
         when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
         when(mockServiceSubConfig.exists()).thenReturn(true);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
                 .isEqualTo(mockServiceSubConfig);
     }
 
@@ -360,7 +369,7 @@ public class SmsResourceProviderTest {
         when(mockServiceConfig.getSubConfig("subConfigName")).thenReturn(mockServiceSubConfig);
         when(mockServiceSubConfig.exists()).thenReturn(true);
 
-        Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
+        assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager))
                 .isEqualTo(mockServiceSubConfig);
     }
 
@@ -401,6 +410,26 @@ public class SmsResourceProviderTest {
                               boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug) {
             super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug,
                     AMResourceBundleCache.getInstance(), Locale.UK);
+        }
+
+        @Override
+        public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+            return null;
+        }
+
+        @Override
+        public ApiDescription handleApiRequest(Context context, Request request) {
+            return null;
+        }
+
+        @Override
+        public void addDescriptorListener(Listener listener) {
+
+        }
+
+        @Override
+        public void removeDescriptorListener(Listener listener) {
+
         }
     }
 }

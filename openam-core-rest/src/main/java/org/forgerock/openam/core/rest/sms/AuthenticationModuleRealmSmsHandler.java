@@ -62,7 +62,7 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
 public class AuthenticationModuleRealmSmsHandler {
 
     private final SSOToken adminToken;

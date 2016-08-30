@@ -83,7 +83,7 @@ import com.sun.identity.sm.SMSException;
  *
  * Since 14.0.0
  */
-@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
+@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
 public final class ServersResourceProvider {
 
     private final Debug debug;

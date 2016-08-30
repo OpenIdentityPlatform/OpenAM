@@ -23,6 +23,7 @@ import static com.sun.identity.sm.AttributeSchema.Syntax.DECIMAL_RANGE;
 import static com.sun.identity.sm.AttributeSchema.Syntax.NUMBER;
 import static com.sun.identity.sm.AttributeSchema.Syntax.NUMBER_RANGE;
 import static com.sun.identity.sm.AttributeSchema.Syntax.PERCENT;
+import static java.util.Arrays.asList;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -46,6 +47,7 @@ import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
 import static org.forgerock.openam.rest.RestConstants.COLLECTION;
 import static org.forgerock.openam.rest.RestConstants.NAME;
+import static org.forgerock.util.i18n.LocalizableString.TRANSLATION_KEY_PREFIX;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,6 +66,8 @@ import java.util.ResourceBundle;
 
 import org.forgerock.api.annotations.Action;
 import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.guava.common.base.Optional;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
@@ -72,6 +76,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
@@ -79,6 +84,9 @@ import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
+import org.forgerock.util.i18n.LocalizableString;
+import org.forgerock.util.i18n.PreferredLocales;
 import org.forgerock.util.promise.Promise;
 
 import com.iplanet.sso.SSOException;
@@ -101,7 +109,9 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * creatable types, while allowing all of those mechanisms to be overridden by more specific subclasses.
  * @since 13.0.0
  */
-public abstract class SmsResourceProvider {
+abstract class SmsResourceProvider implements Describable<ApiDescription, Request> {
+
+    protected static final ClassLoader CLASS_LOADER = SmsResourceProvider.class.getClassLoader();
 
     /**
      * Contains the mapping of auto created authentication modules and their type so that
@@ -120,7 +130,7 @@ public abstract class SmsResourceProvider {
         AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
     }
 
-    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
+    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -141,7 +151,7 @@ public abstract class SmsResourceProvider {
         this.serviceVersion = schema.getVersion();
         this.type = type;
         this.subSchemaPath = subSchemaPath;
-        this.uriPath = uriPath == null ? Collections.<String>emptyList() : Arrays.asList(uriPath.split("/"));
+        this.uriPath = uriPath == null ? Collections.<String>emptyList() : asList(uriPath.split("/"));
         this.hasInstanceName = serviceHasInstanceName;
         this.converter = converter;
         this.debug = debug;
@@ -270,7 +280,7 @@ public abstract class SmsResourceProvider {
 
     @Action(operationDescription = @Operation)
     public Promise<ActionResponse, ResourceException> schema(Context context) {
-        return newActionResponse(createSchema(context)).asPromise();
+        return newActionResponse(createSchema(Optional.of(context))).asPromise();
     }
 
     @Action(operationDescription = @Operation)
@@ -316,20 +326,28 @@ public abstract class SmsResourceProvider {
                 field(COLLECTION, schema.supportsMultipleConfigurations())));
     }
 
-    private String getI18NName() {
+    LocalizableString getI18NName() {
         String i18nKey = schema.getI18NKey();
         String i18nName = schema.getName();
         if (StringUtils.isEmpty(i18nName)) {
             i18nName = schema.getServiceName();
         }
-        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), defaultLocale);
-        if (rb != null && StringUtils.isNotEmpty(i18nKey)) {
-            i18nName = com.sun.identity.shared.locale.Locale.getString(rb, i18nKey, debug);
+        if (StringUtils.isNotEmpty(i18nKey)) {
+            return getSchemaI18N(i18nKey, new LocalizableString(i18nName));
         }
-        return i18nName;
+        return new LocalizableString(i18nName);
     }
 
-    private JsonValue createSchema(Context context) {
+    private LocalizableString getSchemaI18N(String i18nKey, LocalizableString defaultValue) {
+        String i18NFileName = schema.getI18NFileName();
+        return new LocalizableString(TRANSLATION_KEY_PREFIX + i18NFileName + "#"+ i18nKey, CLASS_LOADER, defaultValue);
+    }
+
+    private LocalizableString getConsoleI18N(String i18nKey, LocalizableString defaultValue) {
+        return new LocalizableString(TRANSLATION_KEY_PREFIX + "amConsole" + "#"+ i18nKey, CLASS_LOADER, defaultValue);
+    }
+
+    JsonValue createSchema(Optional<Context> context) {
         JsonValue result = json(object(field("type", "object")));
         addGlobalSchema(context, result);
         addOrganisationSchema(context, result);
@@ -339,11 +357,10 @@ public abstract class SmsResourceProvider {
 
     /**
      * Add the global attribute schema to the given {@link JsonValue} result.
-     *
-     * @param context The request context.
+     *  @param context The request context.
      * @param result The response body {@link JsonValue}.
      */
-    protected void addGlobalSchema(Context context, JsonValue result) {
+    protected void addGlobalSchema(Optional<Context> context, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.GLOBAL)) {
             addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
         }
@@ -353,11 +370,10 @@ public abstract class SmsResourceProvider {
      * Add the organisation attribute schema to the given {@link JsonValue} result. The organisation attribute schema
      * will be added at the root of the JSON response if the request is for realm based schema, but should be added
      * under "defaults" when the request is for global schema, see {@link SmsGlobalSingletonProvider}.
-     *
-     * @param context The request context.
+     *  @param context The request context.
      * @param result The response body {@link JsonValue}.
      */
-    protected void addOrganisationSchema(Context context, JsonValue result) {
+    protected void addOrganisationSchema(Optional<Context> context, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.ORGANIZATION)) {
             addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
         }
@@ -365,11 +381,10 @@ public abstract class SmsResourceProvider {
 
     /**
      * Add the dynamic attribute schema to the given {@link JsonValue} result.
-     *
-     * @param context The request context.
+     *  @param context The request context.
      * @param result The response body {@link JsonValue}.
      */
-    protected void addDynamicSchema(Context context, JsonValue result) {
+    protected void addDynamicSchema(Optional<Context> context, JsonValue result) {
         // Dynamic schema will be added in SmsSingletonProvider
     }
 
@@ -451,13 +466,10 @@ public abstract class SmsResourceProvider {
         return !schema.getServiceType().equals(SchemaType.DYNAMIC);
     }
 
-    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
+    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Optional<Context> context) {
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
-        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
         String serviceType = schemas.getServiceType().getType();
-        List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
-
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), getLocale(context));
+        List<String> sections = getSections(attributeSectionMap, serviceType);
 
         for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
@@ -470,40 +482,37 @@ public abstract class SmsResourceProvider {
                         attributePath = section + "/" + PROPERTIES + "/" + attributePath;
                         result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
                         result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                                getTitle(consoleI18n, schemaI18n, sectionLabel));
-                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER), sections.indexOf(section));
+                                getTitle(sectionLabel));
+                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
+                                sections.indexOf(section));
                     }
                 }
 
-                Object propertyOrder = (attribute.getOrder() == null) ? i18NKey : attribute.getOrder();
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString
-                        (i18NKey));
+                Integer propertyOrder = attribute.getOrder();
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), getSchemaI18N(i18NKey, null));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
-                        getSchemaDescription(schemaI18n, i18NKey));
+                        getSchemaDescription(i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), propertyOrder);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
-                addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, context);
+                addType(result, path + attributePath, attribute, context);
                 addExampleValue(result, path, attribute, attributePath);
             }
         }
     }
 
-    private String getTitle(ResourceBundle consoleI18n, ResourceBundle schemaI18n, String title) {
-        String result = getConsoleString(consoleI18n, title);
-        if (result.equals("")) {
-            result = getConsoleString(schemaI18n, title);
-        }
-
-        return result;
+    private LocalizableString getTitle(String title) {
+        return getConsoleI18N(title, getSchemaI18N(title, null));
     }
 
-    private List<String> getSections(Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
+    private List<String> getSections(Map<String, String> attributeSectionMap, String serviceType) {
 
         List<String> sections = new ArrayList<>();
-        String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
 
-        if (StringUtils.isNotEmpty(sectionOrder)) {
-            sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
+        try {
+            ResourceBundle console = ResourceBundle.getBundle("amConsole");
+            sections.addAll(asList(console.getString("sections." + serviceName + "." + serviceType).split("\\s+")));
+        } catch (MissingResourceException e) {
+            // ignore - no sections
         }
 
         if (sections.isEmpty()) {
@@ -525,30 +534,29 @@ public abstract class SmsResourceProvider {
         result.addPermissive(new JsonPointer(path + attributePath + "/" + EXAMPLE_VALUE), exampleValue);
     }
 
-    static String getSchemaDescription(ResourceBundle i18n, String i18NKey) {
-        StringBuilder description = new StringBuilder();
-        if (i18n.containsKey(i18NKey + ".help")) {
-            description.append(i18n.getString(i18NKey + ".help"));
-        }
-        if (i18n.containsKey(i18NKey + ".help.txt")) {
-            if (description.length() > 0) {
-                description.append("<br><br>");
+    private LocalizableString getSchemaDescription(String i18NKey) {
+        final LocalizableString help = getSchemaI18N(i18NKey + ".help", new LocalizableString(""));
+        final LocalizableString helpTxt = getSchemaI18N(i18NKey + ".help.txt", new LocalizableString(""));
+        return getSchemaDescription(help, helpTxt);
+    }
+
+    static LocalizableString getSchemaDescription(final LocalizableString help, final LocalizableString helpTxt) {
+        return new LocalizableString("help description") {
+            @Override
+            public String toTranslatedString(PreferredLocales locales) {
+                String helpValue = help.toTranslatedString(locales);
+                String helpTxtValue = helpTxt.toTranslatedString(locales);
+                if (helpValue.isEmpty()) {
+                    return helpTxtValue;
+                } else if (helpTxtValue.isEmpty()) {
+                    return helpValue;
+                }
+                return helpValue + "<br><br>" + helpTxtValue;
             }
-            description.append(i18n.getString(i18NKey + ".help.txt"));
-        }
-        return description.toString();
+        };
     }
 
-    protected String getConsoleString(ResourceBundle console, String key) {
-        try {
-            return console.getString(key);
-        } catch (MissingResourceException e) {
-            return "";
-        }
-    }
-
-    private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle schemaI18n,
-                         ResourceBundle consoleI18n, Context context) {
+    private void addType(JsonValue result, String pointer, AttributeSchema attribute, Optional<Context> context) {
         String type = null;
         AttributeSchema.Type attributeType = attribute.getType();
         AttributeSchema.Syntax syntax = attribute.getSyntax();
@@ -558,7 +566,7 @@ public abstract class SmsResourceProvider {
             type = OBJECT_TYPE;
             JsonValue fieldType = json(object());
             if (attribute.hasChoiceValues()) {
-                addEnumChoices(fieldType, attribute, schemaI18n, consoleI18n, context);
+                addEnumChoices(fieldType, attribute, context);
             } else {
                 fieldType.add(TYPE, STRING_TYPE);
             }
@@ -569,51 +577,47 @@ public abstract class SmsResourceProvider {
             result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
                     object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
             if (attribute.hasChoiceValues()) {
-                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
-                        context);
+                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, context);
             }
         } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
             type = ARRAY_TYPE;
             result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
                     object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
-            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
-                    context);
+            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, context);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
-            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, schemaI18n, consoleI18n, context);
+            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, context);
+            type = getTypeFromSyntax(syntax);
         } else {
             type = getTypeFromSyntax(syntax);
         }
         if (type != null) {
             result.addPermissive(new JsonPointer(pointer + "/" + TYPE), type);
+        } else {
+            debug.warning("Could not find type for attribute {}", attribute);
         }
         if (AttributeSchema.Syntax.PASSWORD.equals(syntax)) {
             result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PASSWORD_TYPE);
         }
     }
 
-    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle schemaI18n,
-                                ResourceBundle consoleI18n, Context context) {
-        List<String> values = new ArrayList<String>();
-        List<String> descriptions = new ArrayList<String>();
-        Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :
-                Collections.singletonMap(Constants.ORGANIZATION_NAME, realmFor(context));
-        Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
-        for (Map.Entry<String, String> value : valuesMap.entrySet()) {
-            values.add(value.getKey());
-            if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())) {
-                if (value.getValue() != null && consoleI18n.containsKey(value.getValue())) {
-                    descriptions.add(consoleI18n.getString(value.getValue()));
+    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, Optional<Context> context) {
+        if (context.isPresent()) {
+            List<String> values = new ArrayList<String>();
+            List<LocalizableString> descriptions = new ArrayList<>();
+            Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :
+                    Collections.singletonMap(Constants.ORGANIZATION_NAME, realmFor(context.get()));
+            Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
+            for (Map.Entry<String, String> value : valuesMap.entrySet()) {
+                values.add(value.getKey());
+                if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())) {
+                    descriptions.add(getConsoleI18N(value.getValue(), null));
                 } else {
-                    descriptions.add(value.getValue());
+                    descriptions.add(getConsoleI18N(value.getValue(), new LocalizableString(value.getKey())));
                 }
-            } else if (value.getValue() != null && schemaI18n.containsKey(value.getValue())) {
-                descriptions.add(schemaI18n.getString(value.getValue()));
-            } else {
-                descriptions.add(value.getKey());
             }
+            jsonValue.add(ENUM, values);
+            jsonValue.putPermissive(new JsonPointer("options/enum_titles"), descriptions);
         }
-        jsonValue.add(ENUM, values);
-        jsonValue.putPermissive(new JsonPointer("options/enum_titles"), descriptions);
     }
 
     private String getTypeFromSyntax(AttributeSchema.Syntax syntax) {
