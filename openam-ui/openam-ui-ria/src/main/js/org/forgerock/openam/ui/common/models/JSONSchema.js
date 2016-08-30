@@ -43,9 +43,8 @@ define([
     "lodash",
     "org/forgerock/openam/ui/common/models/schemaTransforms/transformBooleanTypeToCheckboxFormat",
     "org/forgerock/openam/ui/common/models/schemaTransforms/transformEnumTypeToString",
-    "org/forgerock/openam/ui/common/models/schemaTransforms/transformPropertyOrderAttributeToInt",
     "org/forgerock/openam/ui/common/models/schemaTransforms/warnOnInferredPasswordWithoutFormat"
-], (i18next, _, transformBooleanTypeToCheckboxFormat, transformEnumTypeToString, transformPropertyOrderAttributeToInt,
+], (i18next, _, transformBooleanTypeToCheckboxFormat, transformEnumTypeToString,
     warnOnInferredPasswordWithoutFormat) => {
     function groupTopLevelProperties (raw) {
         if (_.isEmpty(_.omit(raw.properties, "defaults", "dynamic"))) {
@@ -121,8 +120,7 @@ define([
      * @returns {Object} the transformed schema
      */
     function cleanJSONSchema (schema) {
-        eachProperty(schema, [transformPropertyOrderAttributeToInt,
-                              transformBooleanTypeToCheckboxFormat,
+        eachProperty(schema, [transformBooleanTypeToCheckboxFormat,
                               transformEnumTypeToString,
                               warnOnInferredPasswordWithoutFormat]);
 
