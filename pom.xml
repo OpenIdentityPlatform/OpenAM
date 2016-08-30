@@ -57,7 +57,7 @@
     <name>OpenAM Project</name>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>12.0.0-3</version>
+    <version>12.0.0-4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -102,8 +102,8 @@
         <!-- **************************************************************** -->
 
         <!-- Java Properties -->
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
 
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms256m -Xmx256m -XX:MaxPermSize=96m</java.surefire.options>
@@ -482,7 +482,7 @@
         <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam-sustaining.git</connection>
         <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam-sustaining.git</developerConnection>
         <url>https://stash.forgerock.org/projects/OPENAM/repos/openam-sustaining/browse</url>
-    <tag>12.0.0-3</tag>
+    <tag>12.0.0-4</tag>
   </scm>
 
     <!-- Dependency Management -->

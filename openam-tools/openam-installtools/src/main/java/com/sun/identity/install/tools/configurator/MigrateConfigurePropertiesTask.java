@@ -46,50 +46,50 @@ import com.sun.identity.install.tools.util.FileUtils;
  * to merge previous product's config file with the one newly generated.
  */
 public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
-    
-	// parameters not to be migrated from previous product
+
+	// parameter not to be migrated from previous product
 	private static HashSet nonMigratedParameters = new HashSet();
 	static {
 		nonMigratedParameters.add("com.iplanet.services.debug.directory");
 		nonMigratedParameters.add("com.sun.identity.agents.config.local.logfile");
 	}
-	
-    public boolean execute(String name, IStateAccess stateAccess, 
+
+    public boolean execute(String name, IStateAccess stateAccess,
             Map properties)
     throws InstallException {
-        
+
         boolean status = false;
         status = super.execute(name, stateAccess, properties);
-        
+
         if (status) {
             status = false;
             String instanceConfigFileMigrate = (String) stateAccess
                     .get(STR_CONFIG_DIR_PREFIX_MIGRATE_TAG);
-            
+
             Debug.log("MigrateConfigurePropertiesTask.execute() - " +
-                    "instance config file name to migrate from: " + 
+                    "instance config file name to migrate from: " +
                     instanceConfigFileMigrate);
-            
+
             String instanceConfigFile = (String) stateAccess
                     .get(STR_CONFIG_AGENT_CONFIG_FILE_PATH_TAG);
-            
+
             Debug.log("MigrateConfigurePropertiesTask.execute() - " +
                     "instance config file name: " + instanceConfigFile);
-            
+
             String configFile = (String) stateAccess
             .get(STR_CONFIG_FILE_PATH_TAG);
-    
+
             Debug.log("MigrateConfigurePropertiesTask.execute() - " +
             "config file name: " + instanceConfigFile);
-    
-            
+
+
             try {
                 mergeConfigFiles(instanceConfigFileMigrate, instanceConfigFile);
                 status = true;
-                
+
                 mergeConfigFiles(instanceConfigFileMigrate, configFile);
                 status = true;
-                
+
             } catch (Exception e) {
                 Debug.log(
                         "MigrateConfigurePropertiesTask.execute() - Exception "
@@ -98,7 +98,7 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
         }
         return status;
     }
-    
+
     /**
      * merge previous product's config file with the one newly generated.
      *
@@ -108,50 +108,50 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
      */
     private void mergeConfigFiles(String instanceConfigFileMigrate,
             String instanceConfigFile ) throws Exception {
-        
+
         BufferedReader br = null;
         PrintWriter pw = null;
-        
+
         Debug.log(
                 "MigrateConfigurePropertiesTask.mergeConfigFiles() - " +
                 "config file to migrate from: " + instanceConfigFileMigrate +
                 " config file to migrate to: " + instanceConfigFile);
-        
+
         try {
             FileReader fr = new FileReader(instanceConfigFile);
             br = new BufferedReader(fr);
-            
+
             String tmpFileName = instanceConfigFile + ".tmp";
             pw = new PrintWriter(new FileWriter(tmpFileName));
-            
+
             String lineData = null;
             KeyValue keyValue = null;
             ArrayList migrateLines = null;
-            
+
             while ((lineData = br.readLine()) != null) {
                 lineData = lineData.trim();
-                
+
                 if (lineData.startsWith(FileUtils.HASH) ||
                         lineData.length() == 0) {
                     // write back comment statement and empty line.
                     pw.println(lineData);
                 } else {
-                    
+
                     keyValue = new KeyValue(lineData);
-                    
+
                     if (nonMigratedParameters.contains(keyValue.getKey())) {
                     	pw.println(lineData);
                     	continue;
                     }
-                    
+
                     migrateLines = getMigrateLines(keyValue.getParameter(),
                             instanceConfigFileMigrate);
-                    
+
                     Debug.log(
                         "MigrateConfigurePropertiesTask.mergeConfigFiles() - " +
                         "parameter: " + keyValue.getParameter() +
-                        " matched migration parameters: " + migrateLines);
-                    
+                        " matched migration parameter: " + migrateLines);
+
                     if (migrateLines.size() > 0) {
                         for (int i=0; i<migrateLines.size(); i++) {
                             pw.println(migrateLines.get(i));
@@ -162,15 +162,15 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
                     }
                 } // end of if (lineData..
             } // end of while
-            
+
             br.close();
             pw.flush();
             pw.close();
-            
+
             FileUtils.copyFile(tmpFileName, instanceConfigFile);
             File tmpFile = new File(tmpFileName);
             tmpFile.delete();
-            
+
         } catch (Exception ex) {
             if (br != null) {
                 try {
@@ -184,9 +184,9 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
             }
         }
     }
-    
+
     /**
-     * read the lines of parameters within previous product's config file
+     * read the lines of parameter within previous product's config file
      * for each parameter.
      *
      * @param parameter
@@ -196,17 +196,17 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
      */
     private ArrayList getMigrateLines(String parameter,
             String instanceConfigFileMigrate) throws IOException {
-        
+
         ArrayList migrateLines = new ArrayList();
-        
+
         FileReader fr = null;
         BufferedReader br = null;
         try {
             fr = new FileReader(instanceConfigFileMigrate);
             br = new BufferedReader(fr);
-            
+
             String lineData = null;
-            
+
             while ((lineData = br.readLine()) != null) {
                 if (!lineData.startsWith(FileUtils.HASH) &&
                         lineData.indexOf(parameter) >= 0) {
@@ -225,17 +225,17 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
             }
         }
         return migrateLines;
-        
+
     }
-    
+
         /*
-         * inner class to parse&wrap config parameters.
+         * inner class to parse&wrap config parameter.
          */
     class KeyValue {
         String key = null;
         String parameter = null;
         String value = null;
-        
+
         public KeyValue(String lineData) {
             int index = 0;
             if (lineData != null && lineData.length() != 0) {
@@ -247,34 +247,34 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
                 }
             }
         }
-        
+
         public String getKey() {
             return key;
         }
-        
+
         public void setKey(String key) {
             this.key = key;
         }
-        
+
         public String getParameter() {
             return parameter;
         }
-        
+
         public void setParameter(String parameter) {
             this.parameter = parameter;
         }
-        
+
         public String getValue() {
             return value;
         }
-        
+
         public void setValue(String value) {
             this.value = value;
         }
-        
+
         private void getParameterName() {
             parameter = key;
-            
+
             if (key != null && key.length() > 0) {
                 if (key.endsWith(FileUtils.SQRBRACKET_CLOSE)) {
                     int index = key.lastIndexOf(FileUtils.SQRBRACKET_OPEN);
@@ -284,7 +284,7 @@ public class MigrateConfigurePropertiesTask extends ConfigurePropertiesTask {
                 }
             }
         } // end of getParameterName
-        
+
     }
-    
+
 }

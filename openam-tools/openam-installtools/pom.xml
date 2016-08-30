@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-tools</artifactId>
-        <version>12.0.0-3</version>
+        <version>12.0.0-4-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -100,6 +100,7 @@
                                     <include>org.forgerock.commons:forgerock-guice-core</include>
                                     <include>org.forgerock.commons:forgerock-util</include>
                                     <include>org.forgerock.openam:openam-shared</include>
+                                    <include>org.forgerock.commons:forgerock-util</include>
                                     <include>com.google.inject:guice:no_aop</include>
                                     <include>javax.inject:javax.inject</include>
                                     <include>org.slf4j:slf4j-api</include>
@@ -117,6 +118,10 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-installtools-launcher</artifactId>
         </dependency>
@@ -128,6 +133,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

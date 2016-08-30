@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -52,7 +52,11 @@ public class ServerGroupConfiguration implements ConnectionConfig {
      * @return The password to use for connections to the Server Group.
      */
     public char[] getBindPassword() {
-        return instance.getPasswd().toCharArray();
+        String password = instance.getPasswd();
+        if (password == null) {
+            return null;
+        }
+        return password.toCharArray();
     }
 
     /**
