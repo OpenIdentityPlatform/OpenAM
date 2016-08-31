@@ -30,15 +30,17 @@ define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/common/util/isRealmChanged",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/user/login/logout"
+    "org/forgerock/openam/ui/user/login/logout",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/gotoUrl",
+    "store/index"
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
-    Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, RealmHelper, Router, SessionManager, UIUtils,
-    URIUtils, logout) => {
+    Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, Router, SessionManager, UIUtils,
+    URIUtils, logout, query, gotoUrl, store) => {
     isRealmChanged = isRealmChanged.default;
 
     function populateTemplate () {
@@ -79,21 +81,14 @@ define([
         }
     }
 
-    function routeToLoginUnavailable (urlParams) {
-
-        // FIXME: If there has been a previous successful login, the global configuration and login defaults are
-        // populated with the realm and subrealm. These are not being removed when the session ends, and so cause
-        // problems during the next failed login request because the Router.configuration.routes.login.defaults[0] is
-        // already populated with the previous subrealm.
-        // This quick solution just over-rides this property with the subrealm in the current request.
-        Router.configuration.routes.login.defaults[0] = `/${RealmHelper.getSubRealm()}`;
+    function routeToLoginUnavailable (fragmentParams) {
 
         // We cannot use the Router.getLink() method here and simply apply the subrealm to the route because
         // Router.getLink() does more than its title suggests. It also applies the default properties to the route and
         // these are not always correct if there has been a previous successful login request.
         // FIXME: Remove any session specific properties from the UI upon session end.
         Router.routeTo(Router.configuration.routes.loginFailure, {
-            args: [urlParams],
+            args: [fragmentParams],
             trigger: true
         });
     }
@@ -127,8 +122,6 @@ define([
         },
 
         handleExistingSession (requirements) {
-            const auth = Configuration.globalData.auth;
-
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
                 if (isRealmChanged()) {
@@ -137,8 +130,8 @@ define([
                     Configuration.setProperty("loggedUser", user);
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
 
-                        if (auth.urlParams && auth.urlParams.goto) {
-                            window.location.href = auth.urlParams.goto;
+                        if (gotoUrl.exists()) {
+                            window.location.href = gotoUrl.toHref();
                             $("body").empty();
                             return false;
                         }
@@ -224,33 +217,30 @@ define([
                     // enabled the login button if login failure
                     $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
-                    var urlParams;
                     if (Configuration.globalData.auth.currentStage > 1) {
-                        urlParams = URIUtils.getCurrentFragmentQueryString();
-                        if (urlParams) {
-                            urlParams = `&${urlParams}`;
+                        let fragmentParams = URIUtils.getCurrentFragmentQueryString();
+                        if (fragmentParams) {
+                            fragmentParams = `&${fragmentParams}`;
                         }
-                        // Go to the Login Unavailable view with all the original url params.
-                        routeToLoginUnavailable(urlParams);
+                        // Go to the Login Unavailable view with all the original fragment parameters.
+                        routeToLoginUnavailable(fragmentParams);
                     }
                 }
             });
         },
 
         render (args) {
-            let urlParams = {}; // Deserialized querystring params
+            const addtionalArguments = args ? args[1] : undefined;
+            let params = {};
             const auth = Configuration.globalData.auth;
 
-            if (args && args.length) {
-                auth.additional = args[1]; // May be "undefined"
-                auth.urlParams = urlParams;
-
-                if (args[1]) {
-                    urlParams = this.handleUrlParams();
-                }
+            if (args) {
+                auth.additional = addtionalArguments;
+                auth.urlParams = {};
+                params = this.handleParams();
 
                 // If there are IDTokens try to login with the provided credentials
-                if (urlParams.IDToken1 && this.isZeroPageLoginAllowed() && !auth.autoLoginAttempts) {
+                if (params.IDToken1 && this.isZeroPageLoginAllowed() && !auth.autoLoginAttempts) {
                     this.autoLogin();
                 }
             }
@@ -258,7 +248,7 @@ define([
             AuthNService.getRequirements().then(_.bind(function (reqs) {
 
                 // Clear out existing session if instructed
-                if (reqs.hasOwnProperty("tokenId") && urlParams.arg === "newsession") {
+                if (reqs.hasOwnProperty("tokenId") && params.arg === "newsession") {
                     logout.default();
                 }
 
@@ -267,7 +257,7 @@ define([
                 if (reqs.hasOwnProperty("tokenId")) {
                     this.handleExistingSession(reqs);
                 } else { // We aren't logged in yet, so render a form...
-                    this.renderForm(reqs, urlParams);
+                    this.renderForm(reqs, params);
 
                     if (CookieHelper.getCookie("invalidRealm")) {
                         CookieHelper.deleteCookie("invalidRealm");
@@ -290,13 +280,9 @@ define([
                  * would normally only be applied when the user has logged in, so they should not contain invalid values
                  */
 
-                routeToLoginUnavailable(
-                    RESTLoginHelper.filterUrlParams (
-                        URIUtils.parseQueryString (
-                            URIUtils.getCurrentCompositeQueryString()
-                        )
-                    )
-                );
+                const paramString = URIUtils.getCurrentFragmentQueryString();
+                routeToLoginUnavailable(RESTLoginHelper.filterUrlParams(query.parseParameters(paramString)));
+
             }, this));
         },
 
@@ -409,33 +395,34 @@ define([
             }
         },
 
-        handleUrlParams () {
-            var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
-
+        handleParams () {
+            // TODO: Remove support for fragment params and change to URIUtils.getCurrentQueryString()
+            // as currently we are checking both the framgent and query with framgent over-riding.
+            const paramString = URIUtils.getCurrentCompositeQueryString();
+            const params = query.parseParameters(paramString);
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params
             // but if composite_advice set that must be adhered to
-            if (!urlParams.authIndexType || urlParams.authIndexType !== "composite_advice") {
+            if (!params.authIndexType || params.authIndexType !== "composite_advice") {
                 _.each(["authlevel", "module", "service", "user", "resource"], function (param) {
-                    if (urlParams[param]) {
-                        urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
-                        urlParams.authIndexValue = urlParams[param];
+                    if (params[param]) {
+                        params.authIndexType = ((param === "authlevel") ? "level" : param);
+                        params.authIndexValue = params[param];
                         //*** Note special case for authLevel
                         Configuration.globalData.auth.additional += `&authIndexType=${
                             ((param === "authlevel") ? "level" : param)
-                            }&authIndexValue=${urlParams[param]}`;
+                        }&authIndexValue=${params[param]}`;
                     }
                 });
             }
-
             // Special case for SSORedirect
-            if (urlParams.goto && urlParams.goto.indexOf("/SSORedirect") === 0) {
-                urlParams.goto = `/${Constants.context}${urlParams.goto}`;
+            if (params.goto && params.goto.indexOf("/SSORedirect") === 0) {
+                params.goto = `/${Constants.context}${params.goto}`;
                 Configuration.globalData.auth.additional.replace("&goto=", `&goto=/${Constants.context}`);
             }
 
-            Configuration.globalData.auth.urlParams = urlParams;
-            return urlParams;
+            Configuration.globalData.auth.urlParams = params;
+            return params;
         }
     });
 
@@ -528,18 +515,13 @@ define([
         return new Handlebars.SafeString(result);
     });
 
-    Handlebars.registerHelper("decorateWithRealm", function (uri) {
-        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
-        if (uri.slice(-1) !== "/") {
-            uri += "/";
-        }
-        return uri + RealmHelper.getSubRealm();
+    Handlebars.registerHelper("intendedRealmParameter", () => {
+        const sessionInfoIntendedRealm = store.default.getState().server.realm;
+        return sessionInfoIntendedRealm ? `&realm=${sessionInfoIntendedRealm}` : "";
     });
 
-    Handlebars.registerHelper("gotoParameter", function () {
-        return _.has(Configuration, "globalData.auth.urlParams.goto")
-            ? `&goto=${encodeURIComponent(Configuration.globalData.auth.urlParams.goto)}`
-            : "";
+    Handlebars.registerHelper("gotoParameter", () => {
+        return gotoUrl.exists() ? `&goto=${gotoUrl.get()}` : "";
     });
 
     return new LoginView();

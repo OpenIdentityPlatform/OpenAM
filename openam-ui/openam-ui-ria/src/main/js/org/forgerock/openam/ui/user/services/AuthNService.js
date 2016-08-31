@@ -26,38 +26,31 @@ define([
     "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "store/actions/creators",
-    "store/index"
+    "store/index",
+    "org/forgerock/openam/ui/common/util/uri/query"
+
 ], ($, _, Messages, AbstractDelegate, Configuration, EventManager, URIUtils, fetchUrl, Constants, AuthenticationToken,
-    SessionToken, creators, store) => {
+    SessionToken, creators, store, query) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
     let knownAuth = {};
-    function getURLParameters () {
-        const query = URIUtils.getCurrentCompositeQueryString();
-        const urlParams = _.isEmpty(query) ? {} : _.object(_.map(query.split("&"), (pair) => pair.split("=", 2)));
+
+    function handleFragmentParameters (params) {
 
         if (Configuration.globalData.auth.urlParams) {
-            _.extend(urlParams, Configuration.globalData.auth.urlParams);
+            _.extend(params, Configuration.globalData.auth.urlParams);
         }
-
-        // Call to getCurrentCompositeQueryString may have picked up a realm param, explicitly remove
-        delete urlParams.realm;
 
         // In case user has logged in already update session
         const sessionToken = SessionToken.get();
         if (sessionToken) {
-            urlParams.sessionUpgradeSSOTokenId = sessionToken;
+            params.sessionUpgradeSSOTokenId = sessionToken;
         }
 
-        return urlParams;
+        return params;
     }
-    function urlParamsFromObject (params) {
-        if (_.isEmpty(params)) {
-            return "";
-        }
-        return _.map(params, (value, key) => `${key}=${value}`).join("&");
-    }
+
     function addQueryStringToUrl (url, queryString) {
         if (_.isEmpty(queryString)) {
             return url;
@@ -73,10 +66,11 @@ define([
 
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
+        const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
             fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
-            urlParamsFromObject(getURLParameters()
-        ));
+            query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
+        );
         const serviceCall = {
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
@@ -148,10 +142,11 @@ define([
                 window.location.href = errorBody.detail.failureUrl;
             }
         };
+        const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
             fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
-            urlParamsFromObject(getURLParameters()
-        ));
+            query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
+        );
         const serviceCall = {
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
@@ -255,11 +250,12 @@ define([
             return $.Deferred().resolve(requirementList[requirementList.length - 1]);
         }
     };
-    obj.setGoToUrl = function (tokenId, urlGoTo) {
+    obj.validateGotoUrl = function (goto) {
+        goto = decodeURIComponent(goto);
         return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-            data: JSON.stringify({ "goto": urlGoTo }),
+            data: JSON.stringify({ goto }),
             url: "",
             serviceUrl: `${Constants.host}/${Constants.context}/json/users?_action=validateGoto`,
             errorsHandlers: { "Bad Request": { status: "400" } }

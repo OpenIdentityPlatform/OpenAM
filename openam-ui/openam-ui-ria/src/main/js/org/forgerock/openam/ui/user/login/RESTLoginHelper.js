@@ -28,9 +28,11 @@ define([
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/openam/ui/user/login/logout"
+    "org/forgerock/openam/ui/user/login/logout",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/gotoUrl"
 ], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
-    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout) => {
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -113,27 +115,27 @@ define([
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
-        // The successfulLoginURL is populated by the server (not from window.location of the browser), upon successful
-        // authentication.
-        var successfulLoginURL = Configuration.globalData.auth.fullLoginURL,
-            successfulLoginURLParams = successfulLoginURL
-                ? successfulLoginURL.substring(successfulLoginURL.indexOf("?") + 1) : "";
-
-        return URIUtils.parseQueryString(successfulLoginURLParams);
+        // The successfulLoginURL is populated by the server upon successful authentication,
+        // not from window.location of the browser.
+        const fullLoginURL = Configuration.globalData.auth.fullLoginURL;
+        const paramString = fullLoginURL ? fullLoginURL.substring(fullLoginURL.indexOf("?") + 1) : "";
+        return query.parseParameters(paramString);
     };
+
 
     obj.setSuccessURL = function (tokenId, successUrl) {
         const promise = $.Deferred();
-        const urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
         let context = "";
 
-        if (urlParams && urlParams.goto) {
-            AuthNService.setGoToUrl(tokenId, urlParams.goto).then((data) => {
+        const goto = query.parseParameters().goto;
+
+        if (goto) {
+            AuthNService.validateGotoUrl(goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf(`/${Constants.context}`) !== 0) {
                     context = `/${Constants.context}`;
                 }
-                Configuration.globalData.auth.urlParams.goto = context + data.successURL;
+                gotoUrl.set(encodeURIComponent(context + data.successURL));
                 promise.resolve();
             }, () => {
                 promise.reject();
@@ -143,8 +145,9 @@ define([
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
-                if (!Configuration.globalData.auth.urlParams.goto) {
-                    Configuration.globalData.auth.urlParams.goto = successUrl;
+
+                if (!gotoUrl.exists()) {
+                    gotoUrl.set(successUrl);
                 }
             }
             promise.resolve();
