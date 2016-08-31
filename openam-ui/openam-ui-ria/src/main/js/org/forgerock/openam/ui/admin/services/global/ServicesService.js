@@ -35,7 +35,6 @@ define([
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
         }).then((response) => {
-            delete response.properties.defaults; // TODO remove when OPENAM-8824 is fixed
             return new JSONSchema(response);
         });
     };
