@@ -174,8 +174,8 @@ public class CreateProfileTask implements ITask, InstallConstants {
                 .parameter("_action", RESTEndpoint.CREATE_PROFILE_URI_ACTION_VALUE)
                 .addModuleParameters()
                 .postData(jsonPayload.toString())
-                .headers("Content-Type", "application/json")
-                .headers(cookieName, ssoToken)
+                .header("Content-Type", "application/json")
+                .header(cookieName, ssoToken)
                 .apiVersion(RESTEndpoint.CREATE_PROFILE_URI_API_VERSION)
                 .build();
 
@@ -199,9 +199,9 @@ public class CreateProfileTask implements ITask, InstallConstants {
                 .path(authURL)
                 .post()
                 .addModuleParameters()
-                .headers("Content-Type", "application/json")
-                .headers("X-OpenAM-Username", userName)
-                .headers("X-OpenAM-Password", password)
+                .header("Content-Type", "application/json")
+                .header("X-OpenAM-Username", userName)
+                .header("X-OpenAM-Password", password)
                 .apiVersion(RESTEndpoint.AUTHENTICATION_URI_API_VERSION)
                 .build();
 
@@ -239,7 +239,7 @@ public class CreateProfileTask implements ITask, InstallConstants {
                 .path(serviceURL)
                 .path(RESTEndpoint.SERVER_INFO_URI)
                 .get()
-                .headers("Content-Type", "application/json")
+                .header("Content-Type", "application/json")
                 .apiVersion(RESTEndpoint.SERVER_INFO_URI_API_VERSION)
                 .build();
 

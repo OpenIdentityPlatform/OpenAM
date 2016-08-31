@@ -17,6 +17,7 @@
  */
 package com.sun.identity.install.tools.util;
 
+import org.forgerock.openam.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -38,10 +39,10 @@ import java.util.Map;
  */
 public final class RESTEndpoint {
 
-    public static final String AUTHENTICATION_URI = "/json/authenticate";
+    public static final String AUTHENTICATION_URI = "/json/{REALM}authenticate";
     public static final String AUTHENTICATION_URI_API_VERSION = "1.0";
 
-    public static final String CREATE_PROFILE_URI = "/json/agents";
+    public static final String CREATE_PROFILE_URI = "/json/{REALM}agents";
     public static final String CREATE_PROFILE_URI_ACTION_VALUE = "create";
     public static final String CREATE_PROFILE_URI_API_VERSION = "1.0";
 
@@ -223,6 +224,7 @@ public final class RESTEndpoint {
     public static class RESTEndpointBuilder {
         private StringBuilder path;
         private Map<String, String> parameters;
+        private String realm;
         private String postData;
         private HTTPMethod httpMethod;
         private Map<String, String> headers;
@@ -231,38 +233,89 @@ public final class RESTEndpoint {
             path = new StringBuilder();
             parameters = new LinkedHashMap<>();
             headers = new LinkedHashMap<>();
+            realm = null;
             httpMethod = HTTPMethod.POST;
             postData = "";
         }
 
         /**
-         * @return a representation of the path for debugging (logging) purposes.
+         * This is where we assemble the path (straightforward in itself) but substitute the realm.  For a number of
+         * URLs we use, the realm is not involved (none of the OIDC calls use it) but for others (like the identity
+         * endpoint) it is very important.  Unfortunately substituting it is painful as we can accidentally change
+         * <p/>
+         * path1/{REALM}/path2
+         * <p/>
+         * to
+         * <p/>
+         * path1//path2
+         * <p/>
+         * when the realm is undefined (i.e. it is the root realm), or even worse:
+         * <p/>
+         * path1///path2
+         * <p/>
+         * when the realm is set to "/".
+         *
+         * @return the carefully assembled path
          */
         public String getPath() {
-            return path.toString();
+            String result = path.toString();
+
+            // Trim the realm.  Note that in this way if the caller set the realm to "/" (root realm), we trim it
+            // such that it becomes zero length.
+            //
+            if (realm != null) {
+                if (realm.startsWith("/")) {
+                    realm = realm.substring(1);
+                }
+                if (realm.endsWith("/")) {
+                    realm = realm.substring(0, realm.length() - 1);
+                }
+            }
+
+            if (result.contains("{REALM}/")) {
+                result = result.replace("{REALM}/", "{REALM}");
+            }
+            if (result.contains("{REALM}")) {
+                if (StringUtils.isBlank(realm)) {
+                    result = result.replace("{REALM}", "");
+                } else {
+                    result = result.replace("{REALM}", realm + "/");
+                }
+            }
+            return result;
         }
 
         /**
          * Add the specified value to the path carefully.  We must never end up gluing together two "/" characters
          * (one from the end of the previous path and another from the start of the next path).
-         * @param s the value to append to the path.
+         * @param incoming the value to append to the path.
          * @return the rest call builder object for fluency.
          */
-        public RESTEndpointBuilder path(String s) {
-            if (s == null) {
+        public RESTEndpointBuilder path(String incoming) {
+            if (StringUtils.isBlank(incoming)) {
                 return this;
             }
-            if (s.startsWith("/")) {
-                s = s.substring(1);
+            if (incoming.startsWith("/")) {
+                incoming = incoming.substring(1);
             }
-            if (s.endsWith("/")) {
-                s = s.substring(0, s.length() - 1);
+            if (incoming.endsWith("/")) {
+                incoming = incoming.substring(0, incoming.length() - 1);
             }
             if (this.path.length() > 0) {
                 this.path.append("/");
             }
-            this.path.append(s);
+            this.path.append(incoming);
 
+            return this;
+        }
+
+        /**
+         * Add the specified realm.
+         * @param s The realm.
+         * @return the rest call builder object for fluency.
+         */
+        public RESTEndpointBuilder realm(String s) {
+            realm = s;
             return this;
         }
 
@@ -326,7 +379,7 @@ public final class RESTEndpoint {
          * @param value The header value
          * @return the current rest call builder object
          */
-        public RESTEndpointBuilder headers(String header, String value) {
+        public RESTEndpointBuilder header(String header, String value) {
             headers.put(header, value);
             return this;
         }

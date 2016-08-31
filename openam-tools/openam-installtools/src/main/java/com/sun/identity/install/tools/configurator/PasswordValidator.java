@@ -164,9 +164,9 @@ public class PasswordValidator extends ValidatorBase {
                 .post()
                 .parameter("noSession", "true")
                 .addModuleParameters()
-                .headers("Content-Type", "application/json")
-                .headers("X-OpenAM-Username", agentUserName)
-                .headers("X-OpenAM-Password", agentUserPasswd)
+                .header("Content-Type", "application/json")
+                .header("X-OpenAM-Username", agentUserName)
+                .header("X-OpenAM-Password", agentUserPasswd)
                 .apiVersion(RESTEndpoint.AUTHENTICATION_URI_API_VERSION)
                 .build();
 
@@ -255,9 +255,9 @@ public class PasswordValidator extends ValidatorBase {
                 .post()
                 .parameter("noSession", "true")
                 .addModuleParameters()
-                .headers("Content-Type", "application/json")
-                .headers("X-OpenAM-Username", agentAdminUserName)
-                .headers("X-OpenAM-Password", agentAdminUserPasswd)
+                .header("Content-Type", "application/json")
+                .header("X-OpenAM-Username", agentAdminUserName)
+                .header("X-OpenAM-Password", agentAdminUserPasswd)
                 .apiVersion(RESTEndpoint.AUTHENTICATION_URI_API_VERSION)
                 .build();
 

@@ -89,6 +89,130 @@ public class RESTEndpointTest {
     }
 
     @Test
+    public void shouldCorrectlySubstituteEmptyRealm() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path + "/")
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<append>");
+    }
+
+    @Test
+    public void shouldCorrectlySubstituteEmptyRealmAlt() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path)
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<append>");
+    }
+
+    @Test
+    public void shouldCorrectlySubstituteNonEmptyRealm() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path + "/")
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .realm("<realm>")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<realm>/<append>");
+    }
+
+    @Test
+    public void shouldCorrectlySubstituteNonEmptyRealmAlt() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path)
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .realm("<realm>")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<realm>/<append>");
+    }
+
+    @Test
+    public void shouldCorrectlySubstituteDeliberatelySpecifiedRootRealm() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path + "/")
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .realm("/")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<append>");
+    }
+
+    @Test
+    public void shouldCorrectlySubstituteDeliberatelySpecifiedRootRealmAlt() {
+        final String path = "<path>/{REALM}";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path)
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .realm("/")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).contains("<path>/<append>");
+    }
+
+    @Test
+    public void shouldNotContainRealmEvenThoughSpecified() {
+        final String path = "<path>/";
+        final String append = "<append>";
+
+        RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
+                .path(path)
+                .path("/" + append + "/")
+                .path("/" + append + "/")
+                .realm("<wibble>")
+                .build();
+
+        String toPathValue = endpoint.getPath();
+
+        assertThat(toPathValue).doesNotContain("//");
+        assertThat(toPathValue).doesNotContain("<wibble>");
+    }
+
+    @Test
     public void shouldHandleMultipleParametersInCorrectOrder() {
         final String param1name = "param1";
         final String param1value = "value1";
@@ -188,8 +312,8 @@ public class RESTEndpointTest {
         final String name2 = "<header-name2>";
         final String value2 = "<header-value2>";
         RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
-                .headers(name1, value1)
-                .headers(name2, value2)
+                .header(name1, value1)
+                .header(name2, value2)
                 .build();
 
         String toStringValue = endpoint.toString();
@@ -223,8 +347,8 @@ public class RESTEndpointTest {
         final String name2 = "<userPasswordValue>";
         final String value2 = "should-not-appear";
         RESTEndpoint endpoint = new RESTEndpoint.RESTEndpointBuilder()
-                .headers(name1, value1)
-                .headers(name2, value2)
+                .header(name1, value1)
+                .header(name2, value2)
                 .build();
 
         String toStringValue = endpoint.toString();
