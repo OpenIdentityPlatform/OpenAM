@@ -92,7 +92,7 @@ define([
                 url: fetchUrl.default(`/global-config/services/${type}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
-                data: JSON.stringify(data)
+                data: new JSONValues(data).toJSON()
             }).then((response) => new JSONValues(response));
         },
         create (type, data) {
