@@ -32,7 +32,6 @@ define([
             role: "ui-global-admin",
             navGroup: "admin"
         },
-        /* TODO: AME-9967
         listGlobalServices: {
             view: "org/forgerock/openam/ui/admin/views/configuration/global/ListGlobalServicesView",
             url: /configure\/global-services$/,
@@ -62,7 +61,7 @@ define([
             role: "ui-realm-admin",
             navGroup: "admin",
             forceUpdate: true
-        },*/
+        },
         listSites: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
             url: /deployment\/sites$/,
