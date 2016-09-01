@@ -19,6 +19,7 @@ package org.forgerock.openam.upgrade.steps;
 import static org.forgerock.openam.entitlement.EntitlementRegistry.getSubjectTypeName;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import java.security.PrivilegedAction;
@@ -51,6 +52,7 @@ import com.sun.identity.entitlement.JwtClaimSubject;
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeEntitlementsStep")
 public class UmaApplicationSubjectsStep extends AbstractUpgradeStep {
 
+    private final static int AM_13 = 1300;
     private static final Set<String> SUBJECT_TYPES = asSet(getSubjectTypeName(JwtClaimSubject.class));
     private final Map<String, Set<Application>> needUpgrade = new HashMap<>();
     private final ApplicationServiceFactory applicationServiceFactory;
@@ -68,26 +70,28 @@ public class UmaApplicationSubjectsStep extends AbstractUpgradeStep {
 
     @Override
     public void initialize() throws UpgradeException {
-        ApplicationType type = applicationTypeManagerWrapper.getApplicationType(getAdminSubject(),
-                UmaConstants.UMA_POLICY_APPLICATION_TYPE);
-        try {
-            for (String realm : getRealmNames()) {
-                ApplicationService appService = applicationServiceFactory.create(getAdminSubject(), realm);
-                Set<Application> affected = new HashSet<>();
-                for (Application application : appService.getApplications()) {
-                    if (application.getApplicationType().equals(type)
-                            && !application.getSubjects().containsAll(SUBJECT_TYPES)) {
-                        affected.add(application);
-                        applicationCount++;
+        if (!isCurrentVersionLessThan(AM_13, true)) {
+            ApplicationType type = applicationTypeManagerWrapper
+                    .getApplicationType(getAdminSubject(), UmaConstants.UMA_POLICY_APPLICATION_TYPE);
+            try {
+                for (String realm : getRealmNames()) {
+                    ApplicationService appService = applicationServiceFactory.create(getAdminSubject(), realm);
+                    Set<Application> affected = new HashSet<>();
+                    for (Application application : appService.getApplications()) {
+                        if (application.getApplicationType().equals(type) && !application.getSubjects()
+                                .containsAll(SUBJECT_TYPES)) {
+                            affected.add(application);
+                            applicationCount++;
+                        }
+                    }
+                    if (!affected.isEmpty()) {
+                        needUpgrade.put(realm, affected);
                     }
                 }
-                if (!affected.isEmpty()) {
-                    needUpgrade.put(realm, affected);
-                }
+            } catch (Exception ex) {
+                DEBUG.error("An error occurred while trying to look for upgradable UMA policy applications", ex);
+                throw new UpgradeException("Unable to retrieve UMA policy applications", ex);
             }
-        } catch (Exception ex) {
-            DEBUG.error("An error occurred while trying to look for upgradable UMA policy applications", ex);
-            throw new UpgradeException("Unable to retrieve UMA policy applications", ex);
         }
     }
 
