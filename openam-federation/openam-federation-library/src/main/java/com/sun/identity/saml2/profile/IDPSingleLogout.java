@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: IDPSingleLogout.java,v 1.28 2009/11/25 01:20:47 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -72,6 +72,7 @@ import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
 
@@ -546,9 +547,8 @@ public class IDPSingleLogout {
             }
         }
 
-        LogoutResponse logoutRes = processLogoutRequest(
-            logoutReq, request, response, binding, relayState,
-            idpEntityID, realm, true);
+        LogoutResponse logoutRes = processLogoutRequest(logoutReq, request, response, out, binding, relayState,
+                idpEntityID, realm, true);
         if (logoutRes == null) {
             // this is the case where there is more SP session participant
             // and processLogoutRequest() sends LogoutRequest to one of them
@@ -687,6 +687,7 @@ public class IDPSingleLogout {
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out the print writer for writing out presentation
      * @param samlResponse <code>LogoutResponse</code> in the
      *          XML string format.
      * @param relayState the target URL on successful
@@ -697,11 +698,8 @@ public class IDPSingleLogout {
      * @throws SessionException if error processing
      *          <code>LogoutResponse</code>.
      */
-    public static boolean processLogoutResponse(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        String samlResponse,
-        String relayState) throws SAML2Exception, SessionException {
+    public static boolean processLogoutResponse(HttpServletRequest request, HttpServletResponse response,
+            PrintWriter out, String samlResponse, String relayState) throws SAML2Exception, SessionException {
         String method = "processLogoutResponse : ";
         if (debug.messageEnabled()) {
             debug.message(method + "samlResponse : " + samlResponse);
@@ -802,9 +800,8 @@ public class IDPSingleLogout {
             }
         }
 
-        boolean doRelayState = processLogoutResponse(request, response,
-            logoutRes, relayState, metaAlias, idpEntityID, spEntityID, realm,
-            binding);
+        boolean doRelayState = processLogoutResponse(request, response, out, logoutRes, relayState, metaAlias,
+                idpEntityID, spEntityID, realm, binding);
 
         // IDPProxy
         Map logoutResponseMap = (Map)IDPCache.logoutResponseCache.get(
@@ -827,11 +824,9 @@ public class IDPSingleLogout {
         return doRelayState;
     }
 
-    static boolean processLogoutResponse(HttpServletRequest request,
-        HttpServletResponse response, LogoutResponse logoutRes,
-        String relayState, String metaAlias, String idpEntityID,
-        String spEntityID, String realm, String binding)
-        throws SAML2Exception, SessionException {
+    static boolean processLogoutResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
+            LogoutResponse logoutRes, String relayState, String metaAlias, String idpEntityID, String spEntityID,
+            String realm, String binding) throws SAML2Exception, SessionException {
 
         // use the cache to figure out which session index is in question
         // and then use the cache to see if any more SPs to send logout request
@@ -883,7 +878,7 @@ public class IDPSingleLogout {
         debug.message("idpSession.getNameIDandSPpairs()=" + list);
 
         if (list.isEmpty()) {
-            return sendLastResponse(idpSession, logoutRes, request, response, idpSessionIndex, session, realm,
+            return sendLastResponse(idpSession, logoutRes, request, response, out, idpSessionIndex, session, realm,
                     idpEntityID, relayState);
         } else {
             // send Next Requests
@@ -926,7 +921,7 @@ public class IDPSingleLogout {
             }
             //seems like there were only SOAP endpoints left for SPs, so now we should just send back the logout
             //response.
-            return sendLastResponse(idpSession, logoutRes, request, response, idpSessionIndex, session, realm,
+            return sendLastResponse(idpSession, logoutRes, request, response, out, idpSessionIndex, session, realm,
                     idpEntityID, relayState);
         }
     }
@@ -938,6 +933,7 @@ public class IDPSingleLogout {
      * @param logoutReq <code>LogoutRequest</code> from SP
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out the print writer for writing out presentation
      * @param binding name of binding will be used for request processing.
      * @param relayState the relay state.
      * @param idpEntityID name of host entity ID.
@@ -948,15 +944,9 @@ public class IDPSingleLogout {
      * @throws SAML2Exception if error processing
      *          <code>LogoutRequest</code>.
      */
-    public static LogoutResponse processLogoutRequest(
-        LogoutRequest logoutReq,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        String binding,
-        String relayState,
-        String idpEntityID,
-        String realm, boolean isVerified) throws SAML2Exception {
-
+    public static LogoutResponse processLogoutRequest(LogoutRequest logoutReq, HttpServletRequest request,
+            HttpServletResponse response, PrintWriter out, String binding, String relayState, String idpEntityID,
+            String realm, boolean isVerified) throws SAML2Exception {
         Status status = null;
         String spEntity = logoutReq.getIssuer().getValue();
         Object session = null;
@@ -1134,7 +1124,10 @@ public class IDPSingleLogout {
                 }
                 List partners = idpSession.getSessionPartners();
                 boolean cleanUp = true;
-                if (partners != null && !partners.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(partners)) {
+                    //IdP Proxy case: store the original LogoutRequest from the remote SP, so that once the proxy had
+                    //its SLO round-trip with the remote IdP we can send back a LogoutResponse as a reply.
+                    IDPCache.logoutRequestById.put(logoutReq.getID(), logoutReq);
                     cleanUp = false;
                 }
 
@@ -1234,7 +1227,7 @@ public class IDPSingleLogout {
                 }
                 spEntity = idpSession.getOriginatingLogoutSPEntityID();
                 if (binding.equals(SAML2Constants.HTTP_REDIRECT) || binding.equals(SAML2Constants.HTTP_POST)) {
-                    sendLastResponse(idpSession, null, request, response, sessionIndex, session, realm, idpEntityID,
+                    sendLastResponse(idpSession, null, request, response, out, sessionIndex, session, realm, idpEntityID,
                             relayState);
                     return null;
                 } else {
@@ -1607,13 +1600,19 @@ public class IDPSingleLogout {
     }
 
     private static boolean sendLastResponse(IDPSession idpSession, LogoutResponse logoutRes, HttpServletRequest request,
-            HttpServletResponse response, String idpSessionIndex, Object session, String realm, String idpEntityID,
-            String relayState) throws SAML2Exception, SessionException, SAML2MetaException {
-        String binding;
+            HttpServletResponse response, PrintWriter out, String idpSessionIndex, Object session, String realm,
+            String idpEntityID, String relayState) throws SAML2Exception, SessionException {
         //resetting the binding to the original value so the response is sent back with the correct binding
-        binding = idpSession.getOriginatingLogoutRequestBinding();
+        String binding = idpSession.getOriginatingLogoutRequestBinding();
         String originatingRequestID = idpSession.getOriginatingLogoutRequestID();
         String originatingLogoutSPEntityID = idpSession.getOriginatingLogoutSPEntityID();
+
+        List partners = IDPProxyUtil.getSessionPartners(request);
+        if (CollectionUtils.isNotEmpty(partners)) {
+            LogoutRequest origLogoutRequest = (LogoutRequest) IDPCache.logoutRequestById.remove(originatingRequestID);
+            IDPProxyUtil.sendProxyLogoutRequest(request, response, out, origLogoutRequest, partners, binding, relayState);
+            return false;
+        }
         if (originatingRequestID == null) {
             // this is IDP initiated SLO
             if (idpSession.getLogoutAll()) {

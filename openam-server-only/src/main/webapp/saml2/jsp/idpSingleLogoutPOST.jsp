@@ -24,7 +24,7 @@
 
    $Id: idpSingleLogoutPOST.jsp,v 1.5 2009/06/24 23:05:30 mrudulahg Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2016 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
@@ -90,7 +90,7 @@
          *          <code>LogoutResponse</code>.
          */
             doRelayState = IDPSingleLogout.processLogoutResponse(
-                request, response,samlResponse, relayState);
+                request, response, new PrintWriter(out, true), samlResponse, relayState);
         } catch (SAML2Exception sse) {
             SAML2Utils.debug.error("Error processing LogoutResponse :",
                 sse);

@@ -1515,8 +1515,17 @@ public class SPACSUtils {
         }
         String tokenID = sessionProvider.getSessionID(session);
         if (!SPCache.isFedlet) {
-            List fedSessions = (List)
-                SPCache.fedSessionListsByNameIDInfoKey.get(infoKeyString);
+            List fedSessions = (List) SPCache.fedSessionListsByNameIDInfoKey.get(infoKeyString);
+            if (isIDPProxy) {
+                IDPSession idpSess = IDPCache.idpSessionsBySessionID.get(tokenID);
+                if (idpSess == null) {
+                    idpSess = new IDPSession(session);
+                    IDPCache.idpSessionsBySessionID.put(tokenID, idpSess);
+                }
+                SAML2Utils.debug.message("Add Session Partner: {}", info.getRemoteEntityID());
+                idpSess.addSessionPartner(new SAML2SessionPartner(info.getRemoteEntityID(), true));
+            }
+
             if (fedSessions == null) {
                 synchronized (SPCache.fedSessionListsByNameIDInfoKey) {
                     fedSessions = (List)
@@ -1534,25 +1543,6 @@ public class SPACSUtils {
                 if ((agent != null) && agent.isRunning() && (saml2Svc != null)){
                     saml2Svc.setFedSessionCount(
 		        (long)SPCache.fedSessionListsByNameIDInfoKey.size());
-                }
-
-                if (isIDPProxy) {
-                    //IDP Proxy 
-                    IDPSession idpSess = (IDPSession)
-                        IDPCache.idpSessionsBySessionID.get(
-                        tokenID);
-                    if (idpSess == null) {
-                        idpSess = new IDPSession(session);
-                        IDPCache.idpSessionsBySessionID.put(
-                            tokenID, idpSess);
-                    }
-                    if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message("Add Session Partner: " +
-                            info.getRemoteEntityID());
-                    } 
-                    idpSess.addSessionPartner(new SAML2SessionPartner(
-                        info.getRemoteEntityID(), true));
-                    // end of IDP Proxy        
                 }
             } else {
                 synchronized (fedSessions) {

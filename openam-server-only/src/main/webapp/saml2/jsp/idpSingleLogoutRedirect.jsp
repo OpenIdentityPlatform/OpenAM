@@ -24,7 +24,7 @@
 
    $Id: idpSingleLogoutRedirect.jsp,v 1.9 2009/06/12 22:21:42 mallas Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2016 ForgeRock AS.
 --%>
 
 
@@ -96,8 +96,8 @@
          * @throws SAML2Exception if error processing
          *          <code>LogoutResponse</code>.
          */
-            doRelayState = IDPSingleLogout.processLogoutResponse(
-                request, response,samlResponse, relayState);
+            doRelayState = IDPSingleLogout.processLogoutResponse(request, response, new PrintWriter(out), samlResponse,
+                    relayState);
         } catch (SAML2Exception sse) {
             SAML2Utils.debug.error("Error processing LogoutResponse :",
                 sse);

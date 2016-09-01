@@ -225,8 +225,16 @@ public class IDPCache {
       */
     public static PeriodicCleanUpMap proxySPLogoutReqCache =
         new PeriodicCleanUpMap(
-        SPCache.interval * 1000, SPCache.interval * 1000); 
-    
+        SPCache.interval * 1000, SPCache.interval * 1000);
+
+    /**
+     * Cache to save LogoutRequests by their ID for later retrieval.
+     * key: ID attribute value of the LogoutRequest as String.
+     * value: LogoutRequest
+     */
+    public static PeriodicCleanUpMap logoutRequestById = new PeriodicCleanUpMap(SPCache.interval * 1000,
+            SPCache.interval * 1000);
+
     /** 
       * Cache saves the SOAPMessage created by proxy IDP to the original SP
       * key   : requestID (String) 
@@ -235,7 +243,7 @@ public class IDPCache {
     public static PeriodicCleanUpMap SOAPMessageByLogoutRequestID =
          new PeriodicCleanUpMap(
          SPCache.interval * 1000, SPCache.interval * 1000); 
-    
+
     /**
       * Cache saves the SAML2 Session Partner's providerID 
       * key   : sessionId (String)
