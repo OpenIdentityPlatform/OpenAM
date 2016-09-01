@@ -49,7 +49,7 @@ public enum OAuthTokenField {
     SESSION_ID(OAuth2Constants.Custom.SSO_TOKEN_ID, CoreTokenField.STRING_THIRTEEN),
     DEVICE_USER_CODE(OAuth2Constants.DeviceCode.USER_CODE, CoreTokenField.STRING_FOURTEEN),
     AUTH_GRANT_ID(OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID, CoreTokenField.STRING_FIFTEEN),
-    AUTH_TIME(OAuth2Constants.CoreTokenParams.AUTH_TIME, CoreTokenField.DATE_ONE);
+    AUTH_TIME(OAuth2Constants.CoreTokenParams.AUTH_TIME, CoreTokenField.DATE_TWO);
 
     private final String oAuthField;
     private final CoreTokenField coreTokenField;
