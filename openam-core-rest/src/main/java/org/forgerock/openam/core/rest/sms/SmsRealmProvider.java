@@ -66,7 +66,6 @@ import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 
 import java.security.AccessController;
@@ -188,27 +187,16 @@ public class SmsRealmProvider implements RequestHandler {
                         field("type", "array"),
                         field("items", object(field("type", "string"))),
                         field("title", idRepoI18N.getString(PARENT_I18N_KEY)),
-                        field("description", getSchemaDescription(PARENT_I18N_KEY)),
+                        field("description", SmsResourceProvider.getSchemaDescription(idRepoI18N, PARENT_I18N_KEY)),
                         field("required", true)
                 )),
                 field(ACTIVE_ATTRIBUTE_NAME, object(
                         field("type", "boolean"),
                         field("title", idRepoI18N.getString(ACTIVE_I18N_KEY)),
-                        field("description", getSchemaDescription(ACTIVE_I18N_KEY)),
+                        field("description", SmsResourceProvider.getSchemaDescription(idRepoI18N, ACTIVE_I18N_KEY)),
                         field("required", true)
                 ))
         ))));
-    }
-
-    private LocalizableString getSchemaDescription(String i18NKey) {
-        final LocalizableString help = getSchemaI18N(i18NKey + ".help", new LocalizableString(""));
-        final LocalizableString helpTxt = getSchemaI18N(i18NKey + ".help.txt", new LocalizableString(""));
-        return SmsResourceProvider.getSchemaDescription(help, helpTxt);
-    }
-
-    private LocalizableString getSchemaI18N(String key, LocalizableString defaultValue) {
-        return new LocalizableString(LocalizableString.TRANSLATION_KEY_PREFIX + "amIdRepoService#" + key,
-                getClass().getClassLoader(), defaultValue);
     }
 
     private boolean containsBlacklistedCharacters(String realmName) {
