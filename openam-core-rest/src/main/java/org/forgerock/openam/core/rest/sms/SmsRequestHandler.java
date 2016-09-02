@@ -29,7 +29,6 @@ import javax.inject.Named;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,8 +97,8 @@ import org.forgerock.util.promise.Promise;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener {
 
-    private static final List<Pattern> DEFAULT_IGNORED_ROUTES =
-            Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
+    private static final Pattern DEFAULT_IGNORED_ROUTES =
+            Pattern.compile("services/platform/(\\{sites\\}|sites|servers|secondary-urls)(/.*)?$");
     private static final String DEFAULT_VERSION = "1.0";
     static final String USE_PARENT_PATH = "USE-PARENT";
     private static final String EMPTY_PATH = "EMPTY";
@@ -447,7 +446,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      */
     private void addGlobalPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema globalSchema,
             ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree,
-            Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
+            Set<RouteMatcher<Request>>> serviceRoutes, Pattern ignoredRoutes, SmsRouteTree routeTree)
             throws SMSException {
         String schemaName = globalSchema.getResourceName();
         String path = updatePaths(parentPath, schemaName, schemaPath, globalSchema);
@@ -496,7 +495,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      */
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
             ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
-            List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
+            Pattern ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
         String schemaName = schema.getResourceName();
         String path = updatePaths(parentPath, schemaName, schemaPath, schema);
         SmsRouteTree subtree = routeTree;
@@ -522,7 +521,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     }
 
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes,
+            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, Pattern ignoredRoutes,
             SmsRouteTree routeTree)
             throws SMSException {
         for (String subSchema : schema.getSubSchemaNames()) {
@@ -552,12 +551,11 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     }
 
     private SmsRouteTree addRoute(ServiceSchema schema, RoutingMode mode, String path,
-            RequestHandler handler, List<Pattern> ignoredRoutes, SmsRouteTree routeTree,
+            RequestHandler handler, Pattern ignoredRoutes, SmsRouteTree routeTree,
             Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes) {
-        for (Pattern ignored : ignoredRoutes) {
-            if (ignored.matcher(path).matches()) {
-                return routeTree;
-            }
+        String parentPath = routeTree == null ? "" : routeTree.getPath() + (path.startsWith("/") ? "" : "/");
+        if (ignoredRoutes.matcher(parentPath + path).matches()) {
+            return routeTree;
         }
         SmsRouteTree tree = routeTree == null ? this.routeTree.handles(schema.getServiceName()) : routeTree;
         SmsRouteTree.Route route = tree.addRoute(mode, path, handler, schema.isHiddenInConfigUI());

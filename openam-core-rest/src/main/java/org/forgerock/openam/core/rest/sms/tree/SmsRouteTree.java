@@ -355,6 +355,15 @@ public class SmsRouteTree implements RequestHandler {
     }
 
     /**
+     * Returns the resource path of this SMS RouteTree
+     *
+     * @return The resource path
+     */
+    public ResourcePath getPath() {
+        return  path;
+    }
+
+    /**
      * A matching pair for an {@code SmsRouteTree} route that consists of the tree routed to, and the route matcher
      * that leads there.
      */
