@@ -22,9 +22,11 @@
                                     title="{{t 'common.form.edit'}}">
                                     <i class="fa fa-pencil"/>
                                 </a>
+                                {{#if ../showDeleteButton}}
                                 <button type="button" data-subschema-delete class="btn btn-link" title="{{t 'common.form.delete'}}">
                                     <i class="fa fa-close"/>
                                 </button>
+                                {{/if}}
                             </div>
                         </td>
                     </tr>

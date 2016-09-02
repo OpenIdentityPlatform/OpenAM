@@ -50,7 +50,9 @@ define("org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent
         Promise.all([this.getSubSchemaInstances(), this.getSubSchemaCreatableTypes()]).then((response) => {
             UIUtils.fillTemplateWithData(this.subSchemaTemplate, _.assign(this.data, {
                 instances: response[0],
-                creatables: response[1]
+                creatables: response[1],
+                // scripting sub configuration (default types) can't be deleted
+                showDeleteButton: this.data.type !== "scripting"
             }), (html) => {
                 this.$el.html(html);
             });

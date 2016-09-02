@@ -24,14 +24,17 @@ define([
     const EditGlobalServiceSubSchemaView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
         render ([serviceType, subSchemaType, subSchemaInstanceId]) {
+            // global script types can not be deleted
+            const showDeleteButton = () => serviceType !== "scripting";
+
             const editComponent = new EditSchemaComponent({
                 data: {
                     serviceType,
                     subSchemaType,
                     subSchemaInstanceId,
-                    headerActions: [
+                    headerActions: showDeleteButton() ? [
                         { actionPartial: "form/_Button", data: "delete", title: "common.form.delete", icon:"fa-times" }
-                    ]
+                    ] : []
                 },
                 listRoute: Router.configuration.routes.editGlobalService,
                 listRouteArgs: [encodeURIComponent(serviceType)],
