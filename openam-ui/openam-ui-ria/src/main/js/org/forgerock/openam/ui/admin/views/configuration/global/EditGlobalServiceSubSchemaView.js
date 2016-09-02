@@ -23,12 +23,12 @@ define([
 ], (AbstractView, Router, ServicesService, Backlink, EditSchemaComponent) => {
     const EditGlobalServiceSubSchemaView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
-        render ([serviceType, subSchemaType, id]) {
+        render ([serviceType, subSchemaType, subSchemaInstanceId]) {
             const editComponent = new EditSchemaComponent({
                 data: {
                     serviceType,
                     subSchemaType,
-                    id,
+                    subSchemaInstanceId,
                     headerActions: [
                         { actionPartial: "form/_Button", data: "delete", title: "common.form.delete", icon:"fa-times" }
                     ]
@@ -37,11 +37,21 @@ define([
                 listRouteArgs: [encodeURIComponent(serviceType)],
 
                 template: "templates/admin/views/common/schema/EditServiceSubSchemaTemplate.html",
+                subSchemaTemplate: "templates/admin/views/configuration/global/SubSubSchemaListTemplate.html",
 
-                getInstance: () => ServicesService.type.subSchema.instance.get(serviceType, subSchemaType, id),
-                updateInstance:
-                    (values) => ServicesService.type.subSchema.instance.update(serviceType, subSchemaType, id, values),
-                deleteInstance: () => ServicesService.type.subSchema.instance.remove(serviceType, subSchemaType, id)
+                getInstance: () => ServicesService.type.subSchema.instance.get(
+                    serviceType, subSchemaType, subSchemaInstanceId),
+                updateInstance: (values) => ServicesService.type.subSchema.instance.update(
+                    serviceType, subSchemaType, subSchemaInstanceId, values),
+                deleteInstance: () => ServicesService.type.subSchema.instance.remove(
+                    serviceType, subSchemaType, subSchemaInstanceId),
+
+                getSubSchemaTypes: () => ServicesService.type.subSchema.type.subSchema.type.getAll(
+                    serviceType, subSchemaType),
+                getSubSchemaCreatableTypes: () => ServicesService.type.subSchema.type.subSchema.type.getCreatables(
+                    serviceType, subSchemaType),
+                getSubSchemaInstances: () => ServicesService.type.subSchema.type.subSchema.instance.getAll(
+                    serviceType, subSchemaType)
             });
 
             this.parentRender(() => {

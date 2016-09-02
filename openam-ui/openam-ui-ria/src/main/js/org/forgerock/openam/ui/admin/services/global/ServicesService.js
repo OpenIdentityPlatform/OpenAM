@@ -18,6 +18,7 @@
  * @module org/forgerock/openam/ui/admin/services/global/ServicesService
  */
 define([
+    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -26,7 +27,7 @@ define([
     "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], (_, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
+], ($, _, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     const getServiceSchema = function (type) {
@@ -129,6 +130,47 @@ define([
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "name"));
+                },
+                // TODO 'subSchema' block below contains mock data, update it as part of 2 following issues:
+                // AME-11854 [REST SMS] make sure that calls to sub-sub configuration return correct data
+                // AME-11868 Update sub-sub schema view with correct server calls
+                subSchema: {
+                    type: {
+                        getAll (serviceType) {
+                            const response = { result: [] };
+                            if (serviceType === "scripting") {
+                                response.result = [{ "_id": "mock", "name": "mock", "collection": true }];
+                            }
+                            return $.Deferred().resolve(response).then((response) => response.result);
+                        },
+                        getCreatables () {
+                            return $.Deferred().resolve({ result: [] }).then((response) => response.result);
+                        }
+                    },
+                    instance: {
+                        getAll (serviceType) {
+                            const response = { result: [] };
+                            if (serviceType === "scripting") {
+                                response.result = [{ "_id": "mockEngineConfig", "_type": { "_id": "mockEngine",
+                                    "name": "Mock Engine Name" } }];
+                            }
+                            return $.Deferred().resolve(response).then((response) => _.sortBy(response.result, "_id"));
+                        },
+                        get () {
+                            return $.Deferred().resolve({
+                                schema: new JSONSchema({ "properties": { "mockField": { type: "string", title:
+                                    "mock title" } }, type: "object" }),
+                                values: new JSONValues({ "mockField": "mock value" })
+                            });
+                        },
+                        update () {
+                            return $.Deferred().resolve({
+                                schema: new JSONSchema({ "properties": { "mockField": { type: "string", title:
+                                    "mock title" } }, type: "object" }),
+                                values: new JSONValues({ "mockField": "mock value" })
+                            });
+                        }
+                    }
                 }
             },
             instance: {

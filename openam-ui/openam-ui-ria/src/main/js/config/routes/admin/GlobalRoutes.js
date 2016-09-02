@@ -62,6 +62,14 @@ define([
             navGroup: "admin",
             forceUpdate: true
         },
+        globalServiceSubSubSchemaEdit: {
+            view: "org/forgerock/openam/ui/admin/views/configuration/global/EditGlobalServiceSubSubSchemaView",
+            url: /configure\/global-services\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)\/([^\/]+)\/edit\/([^\/]+)/,
+            pattern: "configure/global-services/?/?/edit/?/?/edit/?",
+            role: "ui-realm-admin",
+            navGroup: "admin",
+            forceUpdate: true
+        },
         listSites: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
             url: /deployment\/sites$/,
