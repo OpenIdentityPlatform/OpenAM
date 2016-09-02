@@ -187,6 +187,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String SESSION_PROPERTIES_RESOURCE = TRANSLATION_KEY_PREFIX + "SessionPropertiesResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SMS_RESOURCE_PROVIDER = TRANSLATION_KEY_PREFIX + "SmsResourceProvider#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

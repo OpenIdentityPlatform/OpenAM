@@ -45,6 +45,8 @@ import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.REQUIRED;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.STRING_TYPE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SMS_RESOURCE_PROVIDER;
 import static org.forgerock.openam.rest.RestConstants.COLLECTION;
 import static org.forgerock.openam.rest.RestConstants.NAME;
 import static org.forgerock.util.i18n.LocalizableString.TRANSLATION_KEY_PREFIX;
@@ -80,6 +82,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -112,7 +115,11 @@ import com.sun.identity.sm.ServiceSchemaManager;
  */
 public abstract class SmsResourceProvider implements Describable<ApiDescription, Request> {
 
-    protected static final ClassLoader CLASS_LOADER = SmsResourceProvider.class.getClassLoader();
+    static final LocalizableString SCHEMA_DESCRIPTION =
+            new LocalizableString(SMS_RESOURCE_PROVIDER + ACTION + "schema." + ApiDescriptorConstants.DESCRIPTION);
+    static final LocalizableString TEMPLATE_DESCRIPTION =
+            new LocalizableString(SMS_RESOURCE_PROVIDER + ACTION + "template." + ApiDescriptorConstants.DESCRIPTION);
+    static final ClassLoader CLASS_LOADER = SmsResourceProvider.class.getClassLoader();
 
     /**
      * Contains the mapping of auto created authentication modules and their type so that
@@ -545,7 +552,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
         result.addPermissive(new JsonPointer(path + attributePath + "/" + EXAMPLE_VALUE), exampleValue);
     }
 
-    private LocalizableString getSchemaDescription(String i18NKey) {
+    LocalizableString getSchemaDescription(String i18NKey) {
         final LocalizableString help = getSchemaI18N(i18NKey + ".help", new LocalizableString(""));
         final LocalizableString helpTxt = getSchemaI18N(i18NKey + ".help.txt", new LocalizableString(""));
         return getSchemaDescription(help, helpTxt);
