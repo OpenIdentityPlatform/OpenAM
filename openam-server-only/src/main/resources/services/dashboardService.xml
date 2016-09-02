@@ -54,32 +54,32 @@
                                      type="single"
                                      syntax="string"
                                      resourceName="className"
-                                     i18nKey="Dashboard Class Name"/>
+                                     i18nKey="A101"/>
                     <AttributeSchema name="dashboardName"
                                      type="single"
                                      syntax="string"
                                      resourceName="name"
-                                     i18nKey="Dashboard Name"/>
+                                     i18nKey="A102"/>
                     <AttributeSchema name="dashboardDisplayName"
                                      type="single"
                                      syntax="string"
                                      resourceName="displayName"
-                                     i18nKey="Dashboard Display Name"/>
+                                     i18nKey="A103"/>
                     <AttributeSchema name="dashboardIcon"
                                      type="single"
                                      syntax="string"
                                      resourceName="icon"
-                                     i18nKey="dashboard Icon"/>
+                                     i18nKey="A104"/>
                     <AttributeSchema name="dashboardLogin"
                                      type="single"
                                      syntax="string"
                                      resourceName="login"
-                                     i18nKey="Dashboard Login"/>
+                                     i18nKey="A105"/>
                     <AttributeSchema name="ICFIdentifier"
                                      type="single"
                                      syntax="string"
                                      resourceName="icfIdentifier"
-                                     i18nKey="ICF Identifier"/>
+                                     i18nKey="A106"/>
                 </SubSchema>
             </Global>
             <Organization>
