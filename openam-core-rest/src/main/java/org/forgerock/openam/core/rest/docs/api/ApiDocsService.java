@@ -25,6 +25,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,7 +47,10 @@ import org.asciidoctor.SafeMode;
 import org.forgerock.api.markup.ApiDocGenerator;
 import org.forgerock.api.models.ApiDescription;
 import org.forgerock.guava.common.base.Joiner;
+import org.forgerock.guava.common.io.Files;
 import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.io.FileBranchingStream;
+import org.forgerock.http.io.IO;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
@@ -47,13 +60,16 @@ import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This service provides an HTML representation of the OpenAM REST API.
  *
  * @since 14.0.0
  */
-public class ApiDocsService {
+public class ApiDocsService implements Describable.Listener {
 
     private static final ContentTypeHeader HTML_CONTENT_TYPE = ContentTypeHeader.valueOf("text/html; charset=UTF-8");
     private static final ContentTypeHeader TEXT_CONTENT_TYPE = ContentTypeHeader.valueOf("text/plain; charset=UTF-8");
@@ -62,6 +78,10 @@ public class ApiDocsService {
 
     private final Asciidoctor asciidoctor;
     private final Router realmRouter;
+    private final Debug debug;
+    private volatile ApiDescription description;
+    private volatile File docs;
+    private volatile File asciidoc;
 
     /**
      * Create an instance of the {@link ApiDocsService}.
@@ -69,9 +89,12 @@ public class ApiDocsService {
      * @param realmResourceRouter The {@link ResourceRouter} that can be used to retrieve the CREST API.
      */
     @Inject
-    public ApiDocsService(@Named("RealmResourceRouter") ResourceRouter realmResourceRouter) {
+    public ApiDocsService(@Named("RealmResourceRouter") ResourceRouter realmResourceRouter,
+            @Named("frRest") Debug debug) {
         asciidoctor = initializeAsciidoctor();
         this.realmRouter = realmResourceRouter.getRouter();
+        this.debug = debug;
+        realmRouter.addDescriptorListener(this);
     }
 
     /**
@@ -134,34 +157,72 @@ public class ApiDocsService {
      */
     @Get
     public Response handle(@Contextual Context context, @Contextual Request request) {
-        ApiDescription apiDescription = realmRouter.handleApiRequest(context, newApiRequest(ResourcePath.empty()));
-        String asciiDocMarkup = ApiDocGenerator.execute("OpenAM API", apiDescription, null);
-
-        String query = request.getUri().getQuery();
-        if (isNotEmpty(query) && query.contains("format=asciidoc")) {
-            Response response = new Response(Status.OK);
-            response.getHeaders().add(TEXT_CONTENT_TYPE);
-            response.setEntity(asciiDocMarkup);
-            return response;
-        }
-
-        String html;
-        synchronized (asciidoctor) {
-            html = asciidoctor.render(asciiDocMarkup,
-                    OptionsBuilder.options()
-                            .attributes(AttributesBuilder.attributes()
-                                    .tableOfContents(Placement.LEFT)
-                                    .sectNumLevels(SECTION_NUMBERING_DEPTH)
-                                    .attribute("toclevels", TOC_LEVELS)
-                                    .get())
-                            .safe(SafeMode.SAFE)
-                            .headerFooter(true)
-                            .get());
-        }
-
         Response response = new Response(Status.OK);
-        response.getHeaders().add(HTML_CONTENT_TYPE);
-        response.setEntity(html);
+        File input;
+        try {
+            if ("asciidoc".equals(request.getForm().getFirst("format"))) {
+                response.getHeaders().add(TEXT_CONTENT_TYPE);
+                input = getAsciiDoc(context);
+            } else {
+                response.getHeaders().add(HTML_CONTENT_TYPE);
+                input = getDocs(context);
+            }
+        } catch (IOException | RuntimeException e) {
+            debug.warning("ApiDocsService#handle :: Could not generate API docs", e);
+            return new Response(Status.INTERNAL_SERVER_ERROR).setCause(e);
+        }
+        try {
+            response.setEntity(new FileBranchingStream(input));
+        } catch (IOException e) {
+            debug.error("ApiDocsService#handle :: Could not read API docs", e);
+            return new Response(Status.INTERNAL_SERVER_ERROR).setCause(e);
+        }
         return response;
+    }
+
+    private synchronized File getDocs(Context context) throws IOException {
+        if (docs == null) {
+            docs = File.createTempFile("openam-api.", ".html");
+            docs.deleteOnExit();
+            try (Reader reader = new FileReader(getAsciiDoc(context)); Writer writer = new FileWriter(docs)) {
+                asciidoctor.render(
+                        reader,
+                        writer,
+                        OptionsBuilder.options()
+                                .attributes(AttributesBuilder.attributes()
+                                        .tableOfContents(Placement.LEFT)
+                                        .sectNumLevels(SECTION_NUMBERING_DEPTH)
+                                        .attribute("toclevels", TOC_LEVELS)
+                                        .get())
+                                .safe(SafeMode.SAFE)
+                                .headerFooter(true)
+                                .get());
+            }
+        }
+        return docs;
+    }
+
+    private synchronized File getAsciiDoc(Context context) throws IOException {
+        if (asciidoc == null) {
+            String asciiDocMarkup = ApiDocGenerator.execute("OpenAM API", getDescription(context), null);
+            asciidoc = File.createTempFile("openam-api.", ".asciidoc");
+            asciidoc.deleteOnExit();
+            Files.write(asciiDocMarkup, asciidoc, StandardCharsets.UTF_8);
+        }
+        return asciidoc;
+    }
+
+    private synchronized ApiDescription getDescription(Context context) {
+        if (description == null) {
+            description = realmRouter.handleApiRequest(context, newApiRequest(ResourcePath.empty()));
+        }
+        return description;
+    }
+
+    @Override
+    public synchronized void notifyDescriptorChange() {
+        docs = null;
+        asciidoc = null;
+        description = null;
     }
 }
