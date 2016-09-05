@@ -1112,7 +1112,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     // Process 'RedirectCallback' initiated by Authentication module
     private void processRedirectCallback(RedirectCallback rc) throws Exception {                
         String status = request.getParameter(rc.getStatusParameter()); 
-        clearCookie(rc.getRedirectBackUrlCookieName());
         if (status != null && status.length() != 0) {
             loginDebug.message("Found Status parameter."); 
             rc.setStatus(status);
