@@ -225,7 +225,7 @@ public class AMLoginContext {
      *
      * @throws AuthLoginException if execute login fails
      */
-    public void executeLogin(Subject subject, IndexType indexType, String indexName, String locale, String redirectUrl)
+    public void executeLogin(Subject subject, IndexType loginIndexType, String loginIndexName, String locale, String redirectUrl)
             throws AuthLoginException {
         boolean errorState = false;
         internalAuthError = false;
@@ -274,8 +274,8 @@ public class AMLoginContext {
         /*
          * Initialize instance fields
          */
-        this.indexType = indexType;
-        this.indexName = indexName;
+        this.indexType = loginIndexType;
+        this.indexName = loginIndexName;
         try {
             if (StringUtils.isNotEmpty(locale)) {
                 authContext.getLoginState().setLocale(locale);
