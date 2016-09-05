@@ -112,15 +112,8 @@ public final class AuthContextLocal extends Object
      * Holds the set of module instance names
      */
     protected Set moduleInstanceNames;
-    /**
-     * Holds the index type
-     */
-    protected AuthContext.IndexType indexType;
-    /**
-     * Holds the index name
-     */
-    protected String indexName;
-    /**
+
+    /*
      * Holds the login status
      */
     protected AuthContext.Status loginStatus;
@@ -372,8 +365,8 @@ public final class AuthContextLocal extends Object
      * @param locale locale setting
      * @throws AuthLoginException if error occurs during login
      */
-    protected void login(AuthContext.IndexType type, String indexName, 
-        Principal principal, char[] password, Subject subject, Map envMap, String locale)
+    protected void login(AuthContext.IndexType type, String indexName,
+        Principal principal, char[] password, Subject subject, Map envMap, String locale) // TODO: remove unused args
         throws AuthLoginException {
         try {
             // switch the login status
@@ -435,7 +428,7 @@ public final class AuthContextLocal extends Object
             }
 
             authDebug.message("calling AMLoginContext::exceuteLogin : ");
-            amlc.executeLogin(subject, indexType, indexName, locale, redirectUrl);
+            amlc.executeLogin(subject, type, indexName, locale, redirectUrl);
             authDebug.message("after AMLoginContext::exceuteLogin : ");
             if (amlc.getStatus() == LoginStatus.AUTH_SUCCESS) {
                 loginStatus = AuthContext.Status.SUCCESS;
