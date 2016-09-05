@@ -600,7 +600,8 @@ public abstract class SmsResourceProvider {
         Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
         for (Map.Entry<String, String> value : valuesMap.entrySet()) {
             values.add(value.getKey());
-            if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())) {
+            if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())
+                    || AttributeSchema.UIType.GLOBALSCRIPTSELECT.equals(attribute.getUIType())) {
                 if (value.getValue() != null && consoleI18n.containsKey(value.getValue())) {
                     descriptions.add(consoleI18n.getString(value.getValue()));
                 } else {
