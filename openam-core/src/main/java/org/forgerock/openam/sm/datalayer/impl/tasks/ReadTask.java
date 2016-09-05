@@ -15,18 +15,16 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
-import java.text.MessageFormat;
-
 /**
- * Performs a Read against the LDAP persistence layer.
+ * Performs a Read against the persistence layer.
  */
 public class ReadTask extends AbstractTask {
     private final String tokenId;
@@ -47,13 +45,12 @@ public class ReadTask extends AbstractTask {
      * In the event of a failure, this function will still throw the expected
      * exception, even though the result handler will be notified.
      *
-     * @param connection Non null connection.
      * @param adapter Non null for connection-coupled operations.
      * @throws DataLayerException If there was an error whilst performing the read.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
-        Token token = adapter.read(connection, tokenId);
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+        Token token = adapter.read(tokenId);
         handler.processResults(token);
     }
 

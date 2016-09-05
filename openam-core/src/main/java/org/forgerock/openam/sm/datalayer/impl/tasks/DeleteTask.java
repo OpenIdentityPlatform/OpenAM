@@ -15,12 +15,12 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-
-import java.text.MessageFormat;
 
 /**
  * Deletes a given Token from the persistence layer.
@@ -39,16 +39,15 @@ public class DeleteTask extends AbstractTask {
     }
 
     /**
-     * Performs the delete operation from the persistence store using the LDAP adapter.
+     * Performs the delete operation from the persistence store using the TokenStorageAdapter.
      *
-     * @param connection Non null connection to use for the operation.
      * @param adapter Non null adapter to use for the operation.
      *
      * @throws DataLayerException If there was a problem performing the operation.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.delete(connection, tokenId);
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+        adapter.delete(tokenId);
         handler.processResults(tokenId);
     }
 

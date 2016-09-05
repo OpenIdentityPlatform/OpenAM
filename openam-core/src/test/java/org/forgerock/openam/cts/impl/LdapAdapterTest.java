@@ -76,8 +76,33 @@ public class LdapAdapterTest {
         mockConnectionFactory = mock(ConnectionFactory.class);
 
         given(mockConnectionFactory.create()).willReturn(mockConnection);
+        given(mockConnectionFactory.isValid(mockConnection)).willReturn(false);
 
         adapter = new LdapAdapter(mockConversion, mockQueryVisitor, mockQueryFactory, mockConnectionFactory);
+    }
+
+    @Test
+    public void shouldRenewConnection() throws Exception {
+        //given
+        Token token = new Token("badger", TokenType.SESSION);
+
+        Connection mockConnection2 = mock(Connection.class);
+
+        when(mockConnectionFactory.create()).thenReturn(mockConnection).thenReturn(mockConnection2);
+
+        Result successResult = mockSuccessfulResult();
+        given(mockConnection2.add(any(Entry.class))).willReturn(successResult);
+        given(mockConnection.add(any(Entry.class))).willReturn(successResult);
+        given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
+
+        //when
+        adapter.create(token); // first call creates first connection and uses
+        adapter.create(token); // second call fails validation of first connection, creates second
+
+        //then
+        verify(mockConnection2, times(1)).add(any(Entry.class));
+        verify(mockConnection, times(1)).add(any(Entry.class));
+        verify(mockConnection, times(1)).close();
     }
 
     @Test
@@ -91,7 +116,7 @@ public class LdapAdapterTest {
         given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
 
         // When
-        adapter.create(mockConnection, token);
+        adapter.create(token);
 
         // Then
         verify(mockConnection).add(any(Entry.class));
@@ -106,7 +131,7 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When
-        adapter.read(mockConnection, tokenId);
+        adapter.read(tokenId);
 
         // Then
         ArgumentCaptor<SearchRequest> captor = ArgumentCaptor.forClass(SearchRequest.class);
@@ -127,7 +152,7 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When
-        Token result = adapter.read(mockConnection, tokenId);
+        Token result = adapter.read(tokenId);
 
         // Then
         assertThat(result).isNull();
@@ -145,7 +170,7 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When
-        adapter.delete(mockConnection, tokenId);
+        adapter.delete(tokenId);
 
         // Then
         ArgumentCaptor<DeleteRequest> captor = ArgumentCaptor.forClass(DeleteRequest.class);
@@ -165,7 +190,7 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When / Then
-        adapter.delete(mockConnection, tokenId);
+        adapter.delete(tokenId);
     }
 
     @Test
@@ -181,13 +206,13 @@ public class LdapAdapterTest {
 
         // When / Then
         try {
-            adapter.delete(mockConnection, tokenId);
+            adapter.delete(tokenId);
             fail();
         } catch (LdapOperationFailedException e) {}
     }
 
     @Test
-    public void shouldNoNothingIfNoModificaitonsOnUpdate() throws Exception {
+    public void shouldDoNothingIfNoModificaitonsOnUpdate() throws Exception {
         // Given
         String tokenId = "badger";
         Token first = new Token(tokenId, TokenType.OAUTH);
@@ -202,7 +227,7 @@ public class LdapAdapterTest {
         adapter = new LdapAdapter(conversion, mockQueryVisitor, mockQueryFactory, mockConnectionFactory);
 
         // When
-        adapter.update(mockConnection, first, second);
+        adapter.update(first, second);
 
         // Then
         verify(mockConnection, never()).modify(any(ModifyRequest.class));
@@ -225,7 +250,7 @@ public class LdapAdapterTest {
         LdapAdapter adapter = new LdapAdapter(conversion, null, null, mockConnectionFactory);
 
         // When
-        adapter.update(mockConnection, first, second);
+        adapter.update(first, second);
 
         // Then
         verify(mockConnection).modify(any(ModifyRequest.class));
@@ -250,7 +275,7 @@ public class LdapAdapterTest {
 
         // When
         TokenFilter filter = new TokenFilterBuilder().withQuery(QueryFilter.<CoreTokenField>alwaysTrue()).build();
-        Collection<Token> result = adapter.query(mockConnection, filter);
+        Collection<Token> result = adapter.query(filter);
 
         // Then
         verify(mockBuilder).withFilter(any(Filter.class));
@@ -289,7 +314,7 @@ public class LdapAdapterTest {
                 .withQuery(QueryFilter.<CoreTokenField>alwaysTrue())
                 .returnAttribute(CoreTokenField.STRING_ONE)
                 .build();
-        Collection<PartialToken> result = adapter.partialQuery(mockConnection, filter);
+        Collection<PartialToken> result = adapter.partialQuery(filter);
 
         // Then
         verify(mockBuilder).withFilter(any(Filter.class));

@@ -16,15 +16,10 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.text.MessageFormat;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -34,82 +29,44 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * A simple TaskExecutor that simply obtains a connection and executes the task on it.
- * @param <T> The type of connection being used.
+ * A simple TaskExecutor that simply executes a task.
  */
-public class SimpleTaskExecutor<T> implements TaskExecutor {
+public class SimpleTaskExecutor implements TaskExecutor {
 
-    private final ConnectionFactory<T> connectionFactory;
-    private final TokenStorageAdapter<T> adapter;
+    private final TokenStorageAdapter adapter;
     private final Debug debug;
-    private T connection;
 
     @Inject
-    public SimpleTaskExecutor(ConnectionFactory connectionFactory,
-            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
+    public SimpleTaskExecutor(@Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
             TokenStorageAdapter adapter) {
-        this.connectionFactory = connectionFactory;
         this.adapter = adapter;
         this.debug = debug;
     }
 
     @Override
     public synchronized void start() throws DataLayerException {
-        if (connection == null) {
-            this.connection = connectionFactory.create();
-        }
+       //this section intentionally left blank
     }
 
     @Override
     protected void finalize() throws Throwable {
-        close();
         super.finalize();
     }
 
     /**
-     * The simple executor obtains a connection and executes the task with it.
+     * The simple executor that executes a task.
+     *
+     * TokenId is unused in this implementation.
+     *
      * @param tokenId The token the task is in reference to. May be null in the case of query.
      * @param task The task to be executed.
      */
     @Override
     public void execute(String tokenId, Task task) {
         try {
-            if (!connectionFactory.isValid(connection)) {
-                close();
-                start();
-            }
-        } catch (DataLayerException e) {
-            error("acquiring connection", e);
-            task.processError(e);
-            return;
-        }
-
-        try {
-            task.execute(connection, adapter);
+            task.execute(adapter);
         } catch (DataLayerException e) {
             error("processing task", e);
-        }
-    }
-
-    /**
-     * Close the connection if it was not null.
-     */
-    synchronized void close() {
-        if (connection instanceof Closeable) {
-            debug("Closing connection");
-            try {
-                ((Closeable)connection).close();
-            } catch (IOException e) {
-                debug.message("IOException when closing connection", e);
-            }
-        }
-        connection = null;
-    }
-
-    private void debug(String format, Object... args) {
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_ASYNC_HEADER + "Task Processor: " + format, args));
         }
     }
 

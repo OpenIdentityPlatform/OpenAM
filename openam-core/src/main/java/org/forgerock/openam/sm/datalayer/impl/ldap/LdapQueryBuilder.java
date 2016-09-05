@@ -106,7 +106,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     @Override
-    public ContinuousQuery executeContinuousQuery(Connection connection, ContinuousQueryListener listener) {
+    public ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) {
 
         CTSDJLDAPv3PersistentSearchBuilder builder = new CTSDJLDAPv3PersistentSearchBuilder(connectionFactory);
 
