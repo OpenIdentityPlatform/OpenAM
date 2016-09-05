@@ -26,20 +26,20 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.openam.audit.context.AbstractAuditRequestContextPropagatingDecorator;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.queue.QueueSelector;
 import org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration;
-import org.forgerock.openam.audit.context.AbstractAuditRequestContextPropagatingDecorator;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
-import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueTimeoutException;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
+import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
 /**
  * The SeriesTaskExecutor is an executor that allows parallel processing of tasks, while guaranteeing that tasks on a
@@ -129,7 +129,7 @@ public class SeriesTaskExecutor implements TaskExecutor {
 
         taskQueues = new BlockingQueue[processors];
         for (int ii = 0; ii < processors; ii++) {
-            taskQueues[ii] = new LinkedBlockingQueue<Task>(configuration.getQueueSize());
+            taskQueues[ii] = new LinkedBlockingQueue<>(configuration.getQueueSize());
         }
 
         for (int ii = 0; ii < processors; ii++) {
@@ -211,10 +211,10 @@ public class SeriesTaskExecutor implements TaskExecutor {
         }
 
         @Override
-        public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
+        public void execute(TokenStorageAdapter adapter) throws DataLayerException {
             setContext();
             try {
-                delegate.execute(connection, adapter);
+                delegate.execute(adapter);
             } finally {
                 revertContext();
             }

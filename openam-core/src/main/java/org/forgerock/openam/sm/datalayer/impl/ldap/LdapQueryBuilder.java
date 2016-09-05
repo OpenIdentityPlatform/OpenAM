@@ -33,11 +33,10 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DecodeException;
@@ -73,18 +72,18 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
      * @param handler The Search handler to use on the LDAP store.
      * @param debug To debug writer for this class.
      * @param converterMap The map ldap entry types to Java objects (partials, strings, tokens).
-     * @param connectionFactory A factory to communicate down to the data layer with.
+     * @param connectionFactoryProvider A producer of factories used to communicate down to the data layer with.
      */
     @Inject
     public LdapQueryBuilder(LdapDataLayerConfiguration dataLayerConfiguration, LdapSearchHandler handler,
                             @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
                             Map<Class, EntryConverter> converterMap,
-                            @DataLayer(ConnectionType.CTS_ASYNC) ConnectionFactory connectionFactory) {
+                            LdapConnectionFactoryProvider connectionFactoryProvider) {
         super(debug);
         this.dataLayerConfiguration = dataLayerConfiguration;
         this.handler = handler;
         this.converterMap = converterMap;
-        this.connectionFactory = connectionFactory;
+        this.connectionFactory = connectionFactoryProvider.createFactory();
     }
 
     /**
@@ -106,7 +105,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     @Override
-    public ContinuousQuery executeContinuousQuery(Connection connection, ContinuousQueryListener listener) {
+    public ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) {
 
         CTSDJLDAPv3PersistentSearchBuilder builder = new CTSDJLDAPv3PersistentSearchBuilder(connectionFactory);
 

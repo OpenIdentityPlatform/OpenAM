@@ -24,73 +24,65 @@ import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
- * Adapts the token to some activity against the connection type, T.
- * @param <T> The type of connection that token activity will be recorded using.
+ * Adapts the token to some activity against the connection type.
  */
-public interface TokenStorageAdapter<T> {
+public interface TokenStorageAdapter {
 
     /**
      * Create the Token in the database.
      *
-     * @param connection The non null connection to perform this call against.
      * @param token      Non null Token to create.
      * @throws org.forgerock.openam.sm.datalayer.api.DataLayerException If the operation failed for a known reason.
      */
-    void create(T connection, Token token) throws DataLayerException;
+    void create(Token token) throws DataLayerException;
 
     /**
      * Performs a read against the database connection and converts the result into a Token.
      *
-     * @param connection The non null connection to perform this call against.
      * @param tokenId The id of the Token to read.
      * @return Token if found, otherwise null.
      */
-    Token read(T connection,  String tokenId) throws DataLayerException;
+    Token read(String tokenId) throws DataLayerException;
 
     /**
      * Update the Token based on whether there were any changes between the two.
      *
-     * @param connection The non null connection to perform this call against.
      * @param previous The non null previous Token to check against.
      * @param updated The non null Token to update with.
      * @return True if the token was updated, or false if there were no changes detected.
      * @throws DataLayerException If the operation failed for a known reason.
      */
-    boolean update(T connection, Token previous, Token updated) throws DataLayerException;
+    boolean update(Token previous, Token updated) throws DataLayerException;
 
     /**
      * Performs a delete against the Token ID provided.
      *
-     * @param connection Non null connection to call.
      * @param tokenId The non null Token ID to delete.
      * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
      */
-    void delete(T connection, String tokenId) throws DataLayerException;
+    void delete(String tokenId) throws DataLayerException;
 
     /**
      * Performs a full-token query using the provided filter.
      *
-     * @param connection Non null connection to call.
      * @param query The non null filter specification.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    Collection<Token> query(T connection, TokenFilter query) throws DataLayerException;
+    Collection<Token> query(TokenFilter query) throws DataLayerException;
 
     /**
      * Performs a partial query using the provided filter.
      *
-     * @param connection Non null connection to call.
      * @param query The non null filter specification.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    Collection<PartialToken> partialQuery(T connection, TokenFilter query) throws DataLayerException;
+    Collection<PartialToken> partialQuery(TokenFilter query) throws DataLayerException;
 
     /**
      * Performs a continuous query using the provided filter.
      *
-     * @param connection Non null connection to call.
      * @param filter The non null filter specification.
      */
-    ContinuousQuery startContinuousQuery(T connection, TokenFilter filter, ContinuousQueryListener listener);
+    ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener);
 
 }

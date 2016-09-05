@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
@@ -25,14 +25,12 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.opendj.ldap.Connection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class CreateTaskTest {
 
     private CreateTask task;
-    private Connection mockConnection;
     private LdapAdapter mockAdapter;
     private Token mockToken;
     private ResultHandler<Token, ?> mockHandler;
@@ -41,7 +39,6 @@ public class CreateTaskTest {
     public void setup() {
         mockToken = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
-        mockConnection = mock(Connection.class);
         mockHandler = mock(ResultHandler.class);
 
         task = new CreateTask(mockToken, mockHandler);
@@ -49,21 +46,21 @@ public class CreateTaskTest {
 
     @Test
     public void shouldUseAdapterForCreate() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).create(any(Connection.class), eq(mockToken));
+        task.execute(mockAdapter);
+        verify(mockAdapter).create(eq(mockToken));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).create(any(Connection.class), any(Token.class));
-        task.execute(mockConnection, mockAdapter);
+                .when(mockAdapter).create(any(Token.class));
+        task.execute(mockAdapter);
         verify(mockHandler).processError(any(CoreTokenException.class));
     }
 
     @Test
     public void shouldUpdateHandlerOnSuccess() throws Exception {
-        task.execute(mockConnection, mockAdapter);
+        task.execute(mockAdapter);
         verify(mockHandler).processResults(mockToken);
     }
 }

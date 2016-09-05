@@ -15,16 +15,16 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
-import java.text.MessageFormat;
-
 /**
- * Responsible for creating a Token in LDAP Store.
+ * Responsible for creating a Token in persistence layer.
  */
 public class CreateTask extends AbstractTask {
     private final Token token;
@@ -43,13 +43,12 @@ public class CreateTask extends AbstractTask {
      *
      * Note: If the Token already exists this operation will fail.
      *
-     * @param connection Non null connection to use.
-     * @param adapter Required for LDAP operations.
+     * @param adapter Required for datalayer operations.
      * @throws DataLayerException If there was any problem creating the Token.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.create(connection, token);
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+        adapter.create(token);
         handler.processResults(token);
     }
 

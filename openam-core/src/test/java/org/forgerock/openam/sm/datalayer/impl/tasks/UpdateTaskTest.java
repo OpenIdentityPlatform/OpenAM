@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
@@ -28,13 +28,11 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.opendj.ldap.Connection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class UpdateTaskTest {
     private UpdateTask task;
-    private Connection mockConnection;
     private LdapAdapter mockAdapter;
     private Token mockToken;
     private ResultHandler<Token, ?> mockHandler;
@@ -43,36 +41,35 @@ public class UpdateTaskTest {
     public void setup() throws Exception {
         mockToken = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
-        mockConnection = mock(Connection.class);
         mockHandler = mock(ResultHandler.class);
         task = new UpdateTask(mockToken, mockHandler);
 
-        given(mockAdapter.read(any(Connection.class), anyString())).willReturn(mockToken);
+        given(mockAdapter.read(anyString())).willReturn(mockToken);
     }
 
     @Test
     public void shouldUpdateWhenTokenPresent() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).update(any(Connection.class), any(Token.class), eq(mockToken));
+        task.execute(mockAdapter);
+        verify(mockAdapter).update(any(Token.class), eq(mockToken));
     }
 
     @Test
     public void shouldCreateWhenNotPresent() throws Exception {
-        given(mockAdapter.read(any(Connection.class), anyString())).willReturn(null);
-        task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).create(any(Connection.class), eq(mockToken));
+        given(mockAdapter.read(anyString())).willReturn(null);
+        task.execute(mockAdapter);
+        verify(mockAdapter).create(eq(mockToken));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
-        doThrow(DataLayerException.class).when(mockAdapter).read(any(Connection.class), anyString());
-        task.execute(mockConnection, mockAdapter);
+        doThrow(DataLayerException.class).when(mockAdapter).read(anyString());
+        task.execute(mockAdapter);
         verify(mockHandler).processError(any(CoreTokenException.class));
     }
 
     @Test
     public void shouldCallHandlerOnSuccess() throws Exception {
-        task.execute(mockConnection, mockAdapter);
+        task.execute(mockAdapter);
         verify(mockHandler).processResults(eq(mockToken));
     }
 }

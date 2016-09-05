@@ -70,8 +70,8 @@ public class ContinuousQueryTask implements Task {
     }
 
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) {
-        queryPromise.tryHandleResult(adapter.startContinuousQuery(connection, tokenFilter, listener));
+    public void execute(TokenStorageAdapter adapter) {
+        queryPromise.tryHandleResult(adapter.startContinuousQuery(tokenFilter, listener));
     }
 
     @Override

@@ -20,14 +20,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.sun.identity.shared.debug.Debug;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Fluent class responsible for constructing queries for the data store.
@@ -191,9 +191,8 @@ public abstract class QueryBuilder<C, F> {
      * Attaches a listener to a connection which will continually return its results. The listener will perform
      * appropriate actions in response to the data returned from the connection.
      *
-     * @param connection The connection used to perform the request.
      * @param listener The listening class used to process the returned data.
      */
-    public abstract ContinuousQuery executeContinuousQuery(C connection, ContinuousQueryListener listener);
+    public abstract ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener);
 
 }
