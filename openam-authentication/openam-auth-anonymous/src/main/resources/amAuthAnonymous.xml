@@ -48,6 +48,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a500"
+                    order="400"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -57,12 +58,14 @@
                     type="list"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="validAnonymousUsers">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-anonymous-default-user-name"
                     type="single"
                     syntax="string"
                     i18nKey="a102"
+                    order="200"
                     resourceName="defaultAnonymousUsername">
                     <DefaultValues>
                         <Value>anonymous</Value>
@@ -72,6 +75,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a103"
+                    order="300"
                     resourceName="caseSensitiveUsernameMatchingEnabled">
                     <BooleanValues>
                          <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -86,6 +90,7 @@
                        type="single"
                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                        i18nKey="a500"
+                       order="400"
                        resourceName="authenticationLevel">
                        <DefaultValues>
                            <Value>0</Value>
@@ -95,12 +100,14 @@
                        type="list"
                        syntax="string"
                        i18nKey="a101"
+                       order="100"
                        resourceName="validAnonymousUsers">
                    </AttributeSchema>
                    <AttributeSchema name="iplanet-am-auth-anonymous-default-user-name"
                        type="single"
                        syntax="string"
                        i18nKey="a102"
+                       order="200"
                        resourceName="defaultAnonymousUsername">
                        <DefaultValues>
                            <Value>anonymous</Value>
@@ -110,6 +117,7 @@
                        type="single"
                        syntax="boolean"
                        i18nKey="a103"
+                       order="300"
                        resourceName="caseSensitiveUsernameMatchingEnabled">
                        <BooleanValues>
                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>

@@ -49,7 +49,7 @@
         </AttributeSchema>
 
         <!-- For plug-in - to show in the Edit Page (Required + MAP specific) -->
-        <AttributeSchema name="generalPropertyNames" i18nKey="generalPropertyNames" type="list" syntax="string">
+        <AttributeSchema name="generalPropertyNames" i18nKey="generalPropertyNames" order="8000" type="list" syntax="string">
           <DefaultValues>
             <Value>clientType</Value>
             <Value>parentId</Value>
@@ -66,7 +66,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="hardwarePlatformNames" i18nKey="hardwarePlatformNames" type="list" syntax="string">
+        <AttributeSchema name="hardwarePlatformNames" i18nKey="hardwarePlatformNames" order="8200" type="list" syntax="string">
           <DefaultValues>
             <Value>BluetoothProfile</Value>
             <Value>BitsPerPixel</Value>
@@ -90,7 +90,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="softwarePlatformNames" i18nKey="softwarePlatformNames" type="list" syntax="string">
+        <AttributeSchema name="softwarePlatformNames" i18nKey="softwarePlatformNames" order="8800" type="list" syntax="string">
           <DefaultValues>
             <Value>AcceptDownloadableSoftware</Value>
             <Value>AudioInputEncoder</Value>
@@ -113,7 +113,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="networkCharacteristicsNames" i18nKey="networkCharacteristicsNames" type="list" syntax="string">
+        <AttributeSchema name="networkCharacteristicsNames" i18nKey="networkCharacteristicsNames" order="8500" type="list" syntax="string">
           <DefaultValues>
             <Value>CurrentBearerService</Value>
             <Value>SecuritySupport</Value>
@@ -122,7 +122,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="browserUANames" i18nKey="browserUANames" type="list" syntax="string">
+        <AttributeSchema name="browserUANames" i18nKey="browserUANames" order="7300" type="list" syntax="string">
           <DefaultValues>
             <Value>BrowserName</Value>
             <Value>BrowserVersion</Value>
@@ -139,7 +139,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="wapCharacteristicsNames" i18nKey="wapCharacteristicsNames" type="list" syntax="string">
+        <AttributeSchema name="wapCharacteristicsNames" i18nKey="wapCharacteristicsNames" order="9000" type="list" syntax="string">
           <DefaultValues>
             <Value>SupportedPictogramSet</Value>
             <Value>WapDeviceClass</Value>
@@ -153,7 +153,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="pushCharacteristicsNames" i18nKey="pushCharacteristicsNames" type="list" syntax="string">
+        <AttributeSchema name="pushCharacteristicsNames" i18nKey="pushCharacteristicsNames" order="8700" type="list" syntax="string">
           <DefaultValues>
             <Value>Push-Accept</Value>
             <Value>Push-Accept-Charset</Value>
@@ -165,7 +165,7 @@
           </DefaultValues>
         </AttributeSchema>
 
-        <AttributeSchema name="additionalPropertiesNames" i18nKey="additionalPropertiesNames" type="list" syntax="string">
+        <AttributeSchema name="additionalPropertiesNames" i18nKey="additionalPropertiesNames" order="7200" type="list" syntax="string">
           <DefaultValues>
             <Value>additionalProperties</Value>
           </DefaultValues>
@@ -200,7 +200,7 @@
                 </DefaultValues>
             </AttributeSchema>
 
-            <AttributeSchema name="clientType" i18nKey="clientType"
+            <AttributeSchema name="clientType" i18nKey="clientType" order="7400"
                 any="required|display"
                 validator="RequiredValueValidator"
                 type="single"
@@ -210,7 +210,7 @@
                 </DefaultValues>
             </AttributeSchema>
 
-            <AttributeSchema name="parentId" i18nKey="parentId"
+            <AttributeSchema name="parentId" i18nKey="parentId" order="8600"
                  any="display" type="single_choice" syntax="string">
               <ChoiceValues>
                 <ChoiceValue i18nKey="HTML">HTML</ChoiceValue>
@@ -234,7 +234,7 @@
               </ChoiceValues>
             </AttributeSchema>
 
-            <AttributeSchema name="userAgent" i18nKey="userAgent"
+            <AttributeSchema name="userAgent" i18nKey="userAgent" order="8900"
                 any="required|display"
                 type="single"
                 syntax="string"
@@ -245,13 +245,13 @@
             </AttributeSchema>
 
             <!-- optional properties -->
-            <AttributeSchema name="contentType" i18nKey="contentType"
+            <AttributeSchema name="contentType" i18nKey="contentType" order="7500"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="filePath" i18nKey="filePath"
+            <AttributeSchema name="filePath" i18nKey="filePath" order="7900"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="cookieSupport" i18nKey="cookieSupport"
+            <AttributeSchema name="cookieSupport" i18nKey="cookieSupport" order="7600"
                   any="display" type="single_choice" syntax="string">
               <ChoiceValues>
                 <ChoiceValue i18nKey="cookieDetect">cookieDetect</ChoiceValue>
@@ -259,252 +259,252 @@
                 <ChoiceValue i18nKey="noCookieSupport">false</ChoiceValue>
               </ChoiceValues>
             </AttributeSchema>
-            <AttributeSchema name="counterName" i18nKey="counterName"
+            <AttributeSchema name="counterName" i18nKey="counterName" order="7700"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="encoderClassName" i18nKey="encoderClassName"
+            <AttributeSchema name="encoderClassName" i18nKey="encoderClassName" order="7800"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="genericHTML" i18nKey="genericHTML"
+            <AttributeSchema name="genericHTML" i18nKey="genericHTML" order="8100"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="ignoreHostHeader" i18nKey="ignoreHostHeader"
+            <AttributeSchema name="ignoreHostHeader" i18nKey="ignoreHostHeader" order="8300"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="lineLength" i18nKey="lineLength"
+            <AttributeSchema name="lineLength" i18nKey="lineLength" order="8400"
               any="display" type="single" syntax="number"
             />
 
             <!-- UAProfile HardwarePlatform properties -->
 
-            <AttributeSchema name="BluetoothProfile" i18nKey="BluetoothProfile"
+            <AttributeSchema name="BluetoothProfile" i18nKey="BluetoothProfile" order="400"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="BitsPerPixel" i18nKey="BitsPerPixel"
+            <AttributeSchema name="BitsPerPixel" i18nKey="BitsPerPixel" order="300"
               any="display" type="single" syntax="number"
             />
-            <AttributeSchema name="ColorCapable" i18nKey="ColorCapable"
+            <AttributeSchema name="ColorCapable" i18nKey="ColorCapable" order="1200"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="CPU" i18nKey="CPU"
+            <AttributeSchema name="CPU" i18nKey="CPU" order="700"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="ImageCapable" i18nKey="ImageCapable"
+            <AttributeSchema name="ImageCapable" i18nKey="ImageCapable" order="1800"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="InputCharset" i18nKey="InputCharset"
+            <AttributeSchema name="InputCharset" i18nKey="InputCharset" order="1900"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Keyboard" i18nKey="Keyboard"
+            <AttributeSchema name="Keyboard" i18nKey="Keyboard" order="2600"
                 any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="Model" i18nKey="Model"
+            <AttributeSchema name="Model" i18nKey="Model" order="3000"
                 any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="NumberOfSoftKeys" i18nKey="NumberOfSoftKeys" 
+            <AttributeSchema name="NumberOfSoftKeys" i18nKey="NumberOfSoftKeys" order="3100" 
               any="display" type="single" syntax="number"
             />
-            <AttributeSchema name="OutputCharset" i18nKey="OutputCharset"
+            <AttributeSchema name="OutputCharset" i18nKey="OutputCharset" order="3500"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="PixelAspectRatio" i18nKey="PixelAspectRatio"
+            <AttributeSchema name="PixelAspectRatio" i18nKey="PixelAspectRatio" order="3600"
               any="display"  type="single" syntax="string"
             />
-            <AttributeSchema name="PointingResolution" i18nKey="PointingResolution"
+            <AttributeSchema name="PointingResolution" i18nKey="PointingResolution" order="3700"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="ScreenSize" i18nKey="ScreenSize"
+            <AttributeSchema name="ScreenSize" i18nKey="ScreenSize" order="4700"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="ScreenSizeChar" i18nKey="ScreenSizeChar"
+            <AttributeSchema name="ScreenSizeChar" i18nKey="ScreenSizeChar" order="4800"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="SoundOutputCapable" i18nKey="SoundOutputCapable"
+            <AttributeSchema name="SoundOutputCapable" i18nKey="SoundOutputCapable" order="5100"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="StandardFontProportional" i18nKey="StandardFontProportional"
+            <AttributeSchema name="StandardFontProportional" i18nKey="StandardFontProportional" order="5200"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="TextInputCapable" i18nKey="TextInputCapable"
+            <AttributeSchema name="TextInputCapable" i18nKey="TextInputCapable" order="5700"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="Vendor" i18nKey="Vendor"
+            <AttributeSchema name="Vendor" i18nKey="Vendor" order="5800"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="VoiceInputCapable" i18nKey="VoiceInputCapable"
+            <AttributeSchema name="VoiceInputCapable" i18nKey="VoiceInputCapable" order="6000"
               any="display" type="single" syntax="boolean"
             />
 
             <!-- UAProfile SoftwarePlatform properties -->
 
-            <AttributeSchema name="AcceptDownloadableSoftware" i18nKey="AcceptDownloadableSoftware"
+            <AttributeSchema name="AcceptDownloadableSoftware" i18nKey="AcceptDownloadableSoftware" order="100"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="AudioInputEncoder" i18nKey="AudioInputEncoder"
+            <AttributeSchema name="AudioInputEncoder" i18nKey="AudioInputEncoder" order="200"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="CcppAccept" i18nKey="CcppAccept"
+            <AttributeSchema name="CcppAccept" i18nKey="CcppAccept" order="800"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="CcppAccept-Charset" i18nKey="CcppAccept-Charset"
+            <AttributeSchema name="CcppAccept-Charset" i18nKey="CcppAccept-Charset" order="900"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="CcppAccept-Encoding" i18nKey="CcppAccept-Encoding"
+            <AttributeSchema name="CcppAccept-Encoding" i18nKey="CcppAccept-Encoding" order="1000"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="CcppAccept-Language" i18nKey="CcppAccept-Language"
+            <AttributeSchema name="CcppAccept-Language" i18nKey="CcppAccept-Language" order="1100"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="DownloadableSoftwareSupport" i18nKey="DownloadableSoftwareSupport"
+            <AttributeSchema name="DownloadableSoftwareSupport" i18nKey="DownloadableSoftwareSupport" order="1500"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="JavaEnabled" i18nKey="JavaEnabled"
+            <AttributeSchema name="JavaEnabled" i18nKey="JavaEnabled" order="2200"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="JavaPlatform" i18nKey="JavaPlatform"
+            <AttributeSchema name="JavaPlatform" i18nKey="JavaPlatform" order="2300"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="JVMVersion" i18nKey="JVMVersion"
+            <AttributeSchema name="JVMVersion" i18nKey="JVMVersion" order="2000"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="MexeClassmarks" i18nKey="MexeClassmarks"
+            <AttributeSchema name="MexeClassmarks" i18nKey="MexeClassmarks" order="2700"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="MexeSecureDomains" i18nKey="MexeSecureDomains"
+            <AttributeSchema name="MexeSecureDomains" i18nKey="MexeSecureDomains" order="2800"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="MexeSpec" i18nKey="MexeSpec"
+            <AttributeSchema name="MexeSpec" i18nKey="MexeSpec" order="2900"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="OSName" i18nKey="OSName"
+            <AttributeSchema name="OSName" i18nKey="OSName" order="3200"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="OSVendor" i18nKey="OSVendor"
+            <AttributeSchema name="OSVendor" i18nKey="OSVendor" order="3300"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="OSVersion" i18nKey="OSVersion"
+            <AttributeSchema name="OSVersion" i18nKey="OSVersion" order="3400"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="RecipientAppAgent" i18nKey="RecipientAppAgent"
+            <AttributeSchema name="RecipientAppAgent" i18nKey="RecipientAppAgent" order="4600"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="SoftwareNumber" i18nKey="SoftwareNumber"
+            <AttributeSchema name="SoftwareNumber" i18nKey="SoftwareNumber" order="5000"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="VideoInputEncoder" i18nKey="VideoInputEncoder"
+            <AttributeSchema name="VideoInputEncoder" i18nKey="VideoInputEncoder" order="5900"
               any="display" type="list" syntax="string"
             />
 
             <!-- UAProfile Network Characteristic properties -->
 
-            <AttributeSchema name="CurrentBearerService" i18nKey="CurrentBearerService"
+            <AttributeSchema name="CurrentBearerService" i18nKey="CurrentBearerService" order="1300"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="SecuritySupport" i18nKey="SecuritySupport"
+            <AttributeSchema name="SecuritySupport" i18nKey="SecuritySupport" order="4900"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="SupportedBearers" i18nKey="SupportedBearers"
+            <AttributeSchema name="SupportedBearers" i18nKey="SupportedBearers" order="5300"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="SupportedBluetoothVersion" i18nKey="SupportedBluetoothVersion"
+            <AttributeSchema name="SupportedBluetoothVersion" i18nKey="SupportedBluetoothVersion" order="5400"
               any="display" type="single" syntax="string"
             />
 
             <!-- UAProfile BrowserUA properties -->
 
-            <AttributeSchema name="BrowserName" i18nKey="BrowserName"
+            <AttributeSchema name="BrowserName" i18nKey="BrowserName" order="500"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="BrowserVersion" i18nKey="BrowserVersion"
+            <AttributeSchema name="BrowserVersion" i18nKey="BrowserVersion" order="600"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="DownloadableBrowserApps" i18nKey="DownloadableBrowserApps"
+            <AttributeSchema name="DownloadableBrowserApps" i18nKey="DownloadableBrowserApps" order="1400"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="FramesCapable" i18nKey="FramesCapable"
+            <AttributeSchema name="FramesCapable" i18nKey="FramesCapable" order="1600"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="HtmlVersion" i18nKey="HtmlVersion"
+            <AttributeSchema name="HtmlVersion" i18nKey="HtmlVersion" order="1700"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="JavaAppletEnabled" i18nKey="JavaAppletEnabled"
+            <AttributeSchema name="JavaAppletEnabled" i18nKey="JavaAppletEnabled" order="2100"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="JavaScriptEnabled" i18nKey="JavaScriptEnabled"
+            <AttributeSchema name="JavaScriptEnabled" i18nKey="JavaScriptEnabled" order="2400"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="JavaScriptVersion" i18nKey="JavaScriptVersion"
+            <AttributeSchema name="JavaScriptVersion" i18nKey="JavaScriptVersion" order="2500"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="PreferenceForFrames" i18nKey="PreferenceForFrames"
+            <AttributeSchema name="PreferenceForFrames" i18nKey="PreferenceForFrames" order="3800"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="TablesCapable" i18nKey="TablesCapable"
+            <AttributeSchema name="TablesCapable" i18nKey="TablesCapable" order="5600"
               any="display" type="single" syntax="boolean"
             />
-            <AttributeSchema name="XhtmlModules" i18nKey="XhtmlModules"
+            <AttributeSchema name="XhtmlModules" i18nKey="XhtmlModules" order="6900"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="XhtmlVersion" i18nKey="XhtmlVersion"
+            <AttributeSchema name="XhtmlVersion" i18nKey="XhtmlVersion" order="7000"
               any="display" type="single" syntax="string"
             />
 
             <!-- UAProfile WapCharacteristics properties -->
 
-            <AttributeSchema name="SupportedPictogramSet" i18nKey="SupportedPictogramSet"
+            <AttributeSchema name="SupportedPictogramSet" i18nKey="SupportedPictogramSet" order="5500"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="WapDeviceClass" i18nKey="WapDeviceClass"
+            <AttributeSchema name="WapDeviceClass" i18nKey="WapDeviceClass" order="6100"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="WapVersion" i18nKey="WapVersion"
+            <AttributeSchema name="WapVersion" i18nKey="WapVersion" order="6200"
               any="display" type="single" syntax="string"
             />
-            <AttributeSchema name="WmlDeckSize" i18nKey="WmlDeckSize" 
+            <AttributeSchema name="WmlDeckSize" i18nKey="WmlDeckSize" order="6300" 
               any="display" type="single" syntax="number"
             />
-            <AttributeSchema name="WmlScriptLibraries" i18nKey="WmlScriptLibraries"
+            <AttributeSchema name="WmlScriptLibraries" i18nKey="WmlScriptLibraries" order="6400"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="WmlScriptVersion" i18nKey="WmlScriptVersion"
+            <AttributeSchema name="WmlScriptVersion" i18nKey="WmlScriptVersion" order="6500"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="WmlVersion" i18nKey="WmlVersion"
+            <AttributeSchema name="WmlVersion" i18nKey="WmlVersion" order="6600"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="WtaiLibraries" i18nKey="WtaiLibraries"
+            <AttributeSchema name="WtaiLibraries" i18nKey="WtaiLibraries" order="6800"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="WtaVersion" i18nKey="WtaVersion"
+            <AttributeSchema name="WtaVersion" i18nKey="WtaVersion" order="6700"
               any="display" type="single" syntax="string"
             />
 
             <!-- UAProfile PushCharacteristics properties -->
 
-            <AttributeSchema name="Push-Accept" i18nKey="Push-Accept"
+            <AttributeSchema name="Push-Accept" i18nKey="Push-Accept" order="3900"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Push-Accept-Charset" i18nKey="Push-Accept-Charset"
+            <AttributeSchema name="Push-Accept-Charset" i18nKey="Push-Accept-Charset" order="4100"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Push-Accept-Encoding" i18nKey="Push-Accept-Encoding"
+            <AttributeSchema name="Push-Accept-Encoding" i18nKey="Push-Accept-Encoding" order="4200"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Push-Accept-Language" i18nKey="Push-Accept-Language"
+            <AttributeSchema name="Push-Accept-Language" i18nKey="Push-Accept-Language" order="4300"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Push-Accept-AppID" i18nKey="Push-Accept-AppID"
+            <AttributeSchema name="Push-Accept-AppID" i18nKey="Push-Accept-AppID" order="4000"
               any="display" type="list" syntax="string"
             />
-            <AttributeSchema name="Push-MsgSize" i18nKey="Push-MsgSize"
+            <AttributeSchema name="Push-MsgSize" i18nKey="Push-MsgSize" order="4500"
               any="display" type="single" syntax="number"
             />
-            <AttributeSchema name="Push-MaxPushReq" i18nKey="Push-MaxPushReq" 
+            <AttributeSchema name="Push-MaxPushReq" i18nKey="Push-MaxPushReq" order="4400" 
               any="display" type="single" syntax="number"
             />
 
             <!-- additional properties -->
-            <AttributeSchema name="additionalProperties" i18nKey="additionalProperties"
+            <AttributeSchema name="additionalProperties" i18nKey="additionalProperties" order="7100"
               any="display" type="list" syntax="string"
             />
 

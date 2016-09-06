@@ -44,7 +44,8 @@
                     syntax="password"
                     any="required|display"
 		    validator="RequiredValueValidator"
-                    i18nKey="u102">
+                    i18nKey="u102"
+                    order="100">
 		    <DefaultValues>
 			<Value>&#160;</Value>
 		    </DefaultValues>
@@ -53,20 +54,23 @@
                     type="single"
                     syntax="string"
 		    any="display"
-                    i18nKey="u105">
+                    i18nKey="u105"
+                    order="200">
 		</AttributeSchema>
 	        <AttributeSchema name="sunIdentityServerDeviceKeyValue"
                     type="list"
                     syntax="string"
 		    any="display"
-                    i18nKey="u107">
+                    i18nKey="u107"
+                    order="300">
 		</AttributeSchema>
                 <AttributeSchema name="sunIdentityServerDeviceStatus"
                     type="single_choice"
                     syntax="string"
                     any="required|filter|adminDisplay"
 		    validator="RequiredValueValidator"
-		    i18nKey="u111">
+		    i18nKey="u111"
+		    order="400">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="u200">Active</ChoiceValue>
                         <ChoiceValue i18nKey="u201">Inactive</ChoiceValue>

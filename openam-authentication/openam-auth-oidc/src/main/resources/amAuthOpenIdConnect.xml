@@ -35,7 +35,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-header-name"
-                                 type="single" syntax="string" i18nKey="header_name"
+                                 type="single" syntax="string" i18nKey="header_name" order="400"
                                  validator="RequiredValueValidator"
                                  resourceName="idTokenHeaderName">
                     <DefaultValues>
@@ -43,7 +43,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 type="single" syntax="string" i18nKey="issuer_name" order="500"
                                  validator="RequiredValueValidator"
                                  resourceName="idTokenIssuer">
                     <DefaultValues>
@@ -51,7 +51,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
-                                 type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                 type="single_choice" syntax="string" i18nKey="crypto_context_type" order="200"
                                  validator="RequiredValueValidator"
                                  resourceName="cryptoContextType">
                     <ChoiceValues>
@@ -64,7 +64,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
-                                 type="single" syntax="string" i18nKey="crypto_context_value"
+                                 type="single" syntax="string" i18nKey="crypto_context_value" order="300"
                                  validator="RequiredValueValidator"
                                  resourceName="cryptoContextValue">
                     <DefaultValues>
@@ -72,7 +72,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
-                                 type="single" syntax="string" i18nKey="account_provider_class"
+                                 type="single" syntax="string" i18nKey="account_provider_class" order="100"
                                  validator="RequiredValueValidator"
                                  resourceName="accountProviderClass">
                     <DefaultValues>
@@ -80,7 +80,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
-                                 type="single" syntax="string" i18nKey="principal_mapper_class"
+                                 type="single" syntax="string" i18nKey="principal_mapper_class" order="900"
                                  validator="RequiredValueValidator"
                                  resourceName="principalMapperClass">
                     <DefaultValues>
@@ -93,6 +93,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="jwt_to_local_attr_mappings"
+                                 order="600"
                                  resourceName="jwtToLdapAttributeMappings">
                     <DefaultValues>
                         <Value>sub=uid</Value>
@@ -105,6 +106,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="listed_audience_name"
+                                 order="700"
                                  resourceName="audienceName">
                     <DefaultValues>
                         <Value>example</Value>
@@ -116,6 +118,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="listed_authorized_parties"
+                                 order="800"
                                  resourceName="acceptedAuthorizedParties">
                     <DefaultValues>
                         <Value>AuthorizedPartyExample</Value>
@@ -132,7 +135,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-header-name"
-                                     type="single" syntax="string" i18nKey="header_name"
+                                     type="single" syntax="string" i18nKey="header_name" order="400"
                                      validator="RequiredValueValidator"
                                      resourceName="idTokenHeaderName">
                         <DefaultValues>
@@ -140,7 +143,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     type="single" syntax="string" i18nKey="issuer_name" order="500"
                                      validator="RequiredValueValidator"
                                      resourceName="idTokenIssuer">
                         <DefaultValues>
@@ -148,7 +151,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
-                                     type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                     type="single_choice" syntax="string" i18nKey="crypto_context_type" order="200"
                                      validator="RequiredValueValidator"
                                      resourceName="cryptoContextType">
                         <ChoiceValues>
@@ -161,7 +164,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
-                                     type="single" syntax="string" i18nKey="crypto_context_value"
+                                     type="single" syntax="string" i18nKey="crypto_context_value" order="300"
                                      validator="RequiredValueValidator"
                                      resourceName="cryptoContextValue">
                         <DefaultValues>
@@ -169,7 +172,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
-                                     type="single" syntax="string" i18nKey="account_provider_class"
+                                     type="single" syntax="string" i18nKey="account_provider_class" order="100"
                                      validator="RequiredValueValidator"
                                      resourceName="accountProviderClass">
                         <DefaultValues>
@@ -177,7 +180,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
-                                     type="single" syntax="string" i18nKey="principal_mapper_class"
+                                     type="single" syntax="string" i18nKey="principal_mapper_class" order="900"
                                      validator="RequiredValueValidator"
                                      resourceName="principalMapperClass">
                         <DefaultValues>
@@ -190,6 +193,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="jwt_to_local_attr_mappings"
+                                     order="600"
                                      resourceName="jwtToLdapAttributeMappings">
                         <DefaultValues>
                             <Value>sub=uid</Value>
@@ -202,6 +206,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="listed_audience_name"
+                                     order="700"
                                      resourceName="audienceName">
                         <DefaultValues>
                             <Value>example</Value>
@@ -213,6 +218,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="listed_authorized_parties"
+                                     order="800"
                                      resourceName="acceptedAuthorizedParties">
                         <DefaultValues>
                             <Value>AuthorizedPartyExample</Value>

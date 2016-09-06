@@ -34,6 +34,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a100"
+                                 order="100"
                                  resourceName="pushAttrName">
                     <DefaultValues>
                         <Value>pushDeviceProfiles</Value>
@@ -43,6 +44,7 @@
                 <AttributeSchema name="openam-auth-authenticator-push-device-settings-encryption-scheme"
                                  type="single_choice"
                                  i18nKey="a101"
+                                 order="200"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionScheme">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="RSAES_AES256CBC_HS512">RSAES_AES256CBC_HS512</ChoiceValue>
@@ -58,6 +60,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a102"
+                                 order="300"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystore">
                     <DefaultValues>
                         <Value>@BASE_DIR@/@SERVER_URI@/keystore.jks</Value>
@@ -67,6 +70,7 @@
                 <AttributeSchema name="openam-auth-authenticator-push-device-settings-encryption-keystore-type"
                                  type="single_choice"
                                  i18nKey="a103"
+                                 order="400"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystoreType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="JKS">JKS</ChoiceValue>
@@ -83,6 +87,7 @@
                                  type="single"
                                  syntax="password"
                                  i18nKey="a104"
+                                 order="500"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystorePassword">
                     <DefaultValues>
                         <Value>changeit</Value>
@@ -93,6 +98,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a105"
+                                 order="600"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystoreKeyPairAlias">
                 </AttributeSchema>
 
@@ -100,6 +106,7 @@
                                  type="single"
                                  syntax="password"
                                  i18nKey="a106"
+                                 order="700"
                                  resourceName="authenticatorPushDeviceSettingsEncryptionKeystorePrivateKeyPassword">
                 </AttributeSchema>
 

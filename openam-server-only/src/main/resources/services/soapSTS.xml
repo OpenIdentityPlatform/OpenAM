@@ -28,12 +28,13 @@
 
             <Organization>
                 <AttributeSchema name="persist-issued-tokens-in-cts"
-                                 type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                                 type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts" order="3400">
                 </AttributeSchema>
                 <AttributeSchema name="issued-token-types"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="issued_token_types">
+                                 i18nKey="issued_token_types"
+                                 order="1700">
                     <DefaultValues>
                         <Value>SAML2</Value>
                         <Value>OPENIDCONNECT</Value>
@@ -44,27 +45,28 @@
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="validated_token_config">
+                                 i18nKey="validated_token_config"
+                                 order="6400">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-service-name"
-                                 type="single" syntax="string" i18nKey="deployment_service_name">
+                                 type="single" syntax="string" i18nKey="deployment_service_name" order="1100">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-custom-service-name"
-                                 type="single" syntax="string" i18nKey="deployment_custom_service_name">
+                                 type="single" syntax="string" i18nKey="deployment_custom_service_name" order="600">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-service-port"
-                                 type="single" syntax="string" i18nKey="deployment_service_port">
+                                 type="single" syntax="string" i18nKey="deployment_service_port" order="1200">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-custom-service-port"
-                                 type="single" syntax="string" i18nKey="deployment_custom_service_port">
+                                 type="single" syntax="string" i18nKey="deployment_custom_service_port" order="700">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-wsdl-location"
-                                 type="single_choice" syntax="string" i18nKey="deployment_wsdl_location"
+                                 type="single_choice" syntax="string" i18nKey="deployment_wsdl_location" order="1600"
                                  validator="RequiredValueValidator">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="ut_transport_wsdl">sts_ut_transport.wsdl</ChoiceValue>
@@ -79,51 +81,54 @@
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-custom-wsdl-location"
-                                 type="single" syntax="string" i18nKey="deployment_custom_wsdl_location">
+                                 type="single" syntax="string" i18nKey="deployment_custom_wsdl_location" order="800">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-am-url"
-                                 type="single" syntax="string" i18nKey="deployment_am_url"
+                                 type="single" syntax="string" i18nKey="deployment_am_url" order="400"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-realm"
-                                 type="single" syntax="string" i18nKey="deployment_realm"
+                                 type="single" syntax="string" i18nKey="deployment_realm" order="1000"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="deployment-url-element"
-                                 type="single" syntax="string" i18nKey="deployment_url_element"
+                                 type="single" syntax="string" i18nKey="deployment_url_element" order="1500"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="deployment-auth-target-mappings"
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="deployment_auth_target_mappings">
+                                 i18nKey="deployment_auth_target_mappings"
+                                 order="500">
                     <DefaultValues>
                         <Value>USERNAME|service|ldapService</Value>
                         <Value>X509|module|cert_module|x509_token_auth_target_header_key=client_cert</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"
-                                 type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key">
+                                 type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key" order="900">
                 </AttributeSchema>
                 <AttributeSchema name="deployment-tls-offload-engine-hosts"
-                                 type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
+                                 type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts" order="1400">
                 </AttributeSchema>
 
                 <AttributeSchema name="delegation-relationship-supported"
-                                 type="single" syntax="boolean" i18nKey="delegation_relationship_supported">
+                                 type="single" syntax="boolean" i18nKey="delegation_relationship_supported" order="200">
                 </AttributeSchema>
                 <AttributeSchema name="delegation-validated-token-types"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="delegation_validated_token_types">
+                                 i18nKey="delegation_validated_token_types"
+                                 order="300">
                 </AttributeSchema>
                 <AttributeSchema name="delegation-custom-token-handlers"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="delegation_custom_token_handlers">
+                                 i18nKey="delegation_custom_token_handlers"
+                                 order="100">
                 </AttributeSchema>
 
                 <!--
@@ -137,61 +142,61 @@
                 class, instead of in the top-level STSInstanceConfig class, as in the 12 release.
                 -->
                 <AttributeSchema name="issuer-name"
-                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 type="single" syntax="string" i18nKey="issuer_name" order="1800"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-name-id-format"
-                                 type="single" syntax="string" i18nKey="saml2_name_id_format"
+                                 type="single" syntax="string" i18nKey="saml2_name_id_format" order="5100"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-token-lifetime-seconds"
-                                 type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                                 type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds" order="5700">
                     <DefaultValues>
                         <Value>600</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-conditions-provider-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name" order="4100">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-subject-provider-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name" order="4200">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-authentication-statements-provider-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name" order="3800">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-attribute-statements-provider-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name" order="3700">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-authz-decision-statements-provider-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name" order="4000">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-attribute-mapper-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name" order="3600">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
-                                 type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
+                                 type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name" order="3900">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-sign-assertion"
-                                 type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
+                                 type="single" syntax="boolean" i18nKey="saml2_sign_assertion" order="5200">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-sp-entity-id"
-                                 type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                 type="single" syntax="string" i18nKey="saml2_sp_entity_id" order="5600"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-sp-acs-url"
-                                 type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                                 type="single" syntax="string" i18nKey="saml2_sp_acs_url" order="5500">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encrypt-attributes"
-                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes" order="4400">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encrypt-assertion"
-                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion" order="4300">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encrypt-nameid"
-                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid" order="4500">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encryption-algorithm"
-                                 type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                                 type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm" order="4600">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
                         <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
@@ -202,61 +207,62 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encryption-algorithm-strength"
-                                 type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                                 type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength" order="4700">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-keystore-filename"
-                                 type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                                 type="single" syntax="string" i18nKey="saml2_keystore_filename" order="4900">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-keystore-password"
-                                 type="single" syntax="password" i18nKey="saml2_keystore_password">
+                                 type="single" syntax="password" i18nKey="saml2_keystore_password" order="5000">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-encryption-key-alias"
-                                 type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                                 type="single" syntax="string" i18nKey="saml2_encryption_key_alias" order="4800">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-signature-key-alias"
-                                 type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                 type="single" syntax="string" i18nKey="saml2_signature_key_alias" order="5300"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-signature-key-password"
-                                 type="single" syntax="password" i18nKey="saml2_signature_key_password">
+                                 type="single" syntax="password" i18nKey="saml2_signature_key_password" order="5400">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-attribute-map"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="saml2_attribute_map">
+                                 i18nKey="saml2_attribute_map"
+                                 order="3500">
                 </AttributeSchema>
 
                 <AttributeSchema name="soap-keystore-filename"
-                                 type="single" syntax="string" i18nKey="soap_keystore_filename">
+                                 type="single" syntax="string" i18nKey="soap_keystore_filename" order="6000">
                 </AttributeSchema>
                 <AttributeSchema name="soap-keystore-password"
-                                 type="single" syntax="password" i18nKey="soap_keystore_password">
+                                 type="single" syntax="password" i18nKey="soap_keystore_password" order="6100">
                 </AttributeSchema>
                 <AttributeSchema name="soap-encryption-key-alias"
-                                 type="single" syntax="string" i18nKey="soap_encryption_key_alias">
+                                 type="single" syntax="string" i18nKey="soap_encryption_key_alias" order="5800">
                 </AttributeSchema>
                 <AttributeSchema name="soap-signature-key-alias"
-                                 type="single" syntax="string" i18nKey="soap_signature_key_alias"
+                                 type="single" syntax="string" i18nKey="soap_signature_key_alias" order="6200"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="soap-signature-key-password"
-                                 type="single" syntax="password" i18nKey="soap_signature_key_password">
+                                 type="single" syntax="password" i18nKey="soap_signature_key_password" order="6300">
                 </AttributeSchema>
                 <AttributeSchema name="soap-encryption-key-password"
-                                 type="single" syntax="password" i18nKey="soap_encryption_key_password">
+                                 type="single" syntax="password" i18nKey="soap_encryption_key_password" order="5900">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-issuer"
-                                 type="single" syntax="string" i18nKey="oidc_issuer"
+                                 type="single" syntax="string" i18nKey="oidc_issuer" order="2600"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-token-lifetime-seconds"
-                                 type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds">
+                                 type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds" order="3300">
                     <DefaultValues>
                         <Value>600</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="oidc-signature-algorithm"
-                                 type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm">
+                                 type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm" order="3000">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_256">HS256</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
@@ -268,7 +274,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="oidc-public-key-reference-type"
-                                 type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type">
+                                 type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type" order="2900">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="oidc_signature_verification_reference_type_none">NONE</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_verification_reference_type_jwk">JWK</ChoiceValue>
@@ -278,39 +284,40 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="oidc-keystore-location"
-                                 type="single" syntax="string" i18nKey="oidc_keystore_location">
+                                 type="single" syntax="string" i18nKey="oidc_keystore_location" order="2700">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-keystore-password"
-                                 type="single" syntax="password" i18nKey="oidc_keystore_password">
+                                 type="single" syntax="password" i18nKey="oidc_keystore_password" order="2800">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-signature-key-alias"
-                                 type="single" syntax="string" i18nKey="oidc_signature_key_alias">
+                                 type="single" syntax="string" i18nKey="oidc_signature_key_alias" order="3100">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-signature-key-password"
-                                 type="single" syntax="password" i18nKey="oidc_signature_key_password">
+                                 type="single" syntax="password" i18nKey="oidc_signature_key_password" order="3200">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-client-secret"
-                                 type="single" syntax="password" i18nKey="oidc_client_secret">
+                                 type="single" syntax="password" i18nKey="oidc_client_secret" order="2200">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-audience"
-                                 type="list" syntax="string" i18nKey="oidc_audience">
+                                 type="list" syntax="string" i18nKey="oidc_audience" order="2000">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-authorized-party"
-                                 type="single" syntax="string" i18nKey="oidc_authorized_party">
+                                 type="single" syntax="string" i18nKey="oidc_authorized_party" order="2100">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-claim-map"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="oidc_attribute_map">
+                                 i18nKey="oidc_attribute_map"
+                                 order="1900">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-custom-claim-mapper-class"
-                                 type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class">
+                                 type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class" order="2500">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-custom-authn-context-mapper-class"
-                                 type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class">
+                                 type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class" order="2300">
                 </AttributeSchema>
                 <AttributeSchema name="oidc-custom-authn-method-references-mapper-class"
-                                 type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class">
+                                 type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class" order="2400">
                 </AttributeSchema>
 
                 <!--
@@ -318,12 +325,13 @@
                 -->
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="persist-issued-tokens-in-cts"
-                                     type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                                     type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts" order="3400">
                     </AttributeSchema>
                     <AttributeSchema name="issued-token-types"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="issued_token_types">
+                                     i18nKey="issued_token_types"
+                                     order="1700">
                         <DefaultValues>
                             <Value>SAML2</Value>
                             <Value>OPENIDCONNECT</Value>
@@ -334,27 +342,28 @@
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="validated_token_config">
+                                     i18nKey="validated_token_config"
+                                     order="6400">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-service-name"
-                                     type="single" syntax="string" i18nKey="deployment_service_name">
+                                     type="single" syntax="string" i18nKey="deployment_service_name" order="1100">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-custom-service-name"
-                                     type="single" syntax="string" i18nKey="deployment_custom_service_name">
+                                     type="single" syntax="string" i18nKey="deployment_custom_service_name" order="600">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-service-port"
-                                     type="single" syntax="string" i18nKey="deployment_service_port_alias">
+                                     type="single" syntax="string" i18nKey="deployment_service_port_alias" order="1300">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-custom-service-port"
-                                     type="single" syntax="string" i18nKey="deployment_custom_service_port">
+                                     type="single" syntax="string" i18nKey="deployment_custom_service_port" order="700">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-wsdl-location"
-                                     type="single_choice" syntax="string" i18nKey="deployment_wsdl_location"
+                                     type="single_choice" syntax="string" i18nKey="deployment_wsdl_location" order="1600"
                                      validator="RequiredValueValidator">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="ut_transport_wsdl">sts_ut_transport.wsdl</ChoiceValue>
@@ -369,109 +378,112 @@
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-custom-wsdl-location"
-                                     type="single" syntax="string" i18nKey="deployment_custom_wsdl_location">
+                                     type="single" syntax="string" i18nKey="deployment_custom_wsdl_location" order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-am-url"
-                                     type="single" syntax="string" i18nKey="deployment_am_url"
+                                     type="single" syntax="string" i18nKey="deployment_am_url" order="400"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-realm"
-                                     type="single" syntax="string" i18nKey="deployment_realm"
+                                     type="single" syntax="string" i18nKey="deployment_realm" order="1000"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="deployment-url-element"
-                                     type="single" syntax="string" i18nKey="deployment_url_element"
+                                     type="single" syntax="string" i18nKey="deployment_url_element" order="1500"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="deployment-auth-target-mappings"
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="deployment_auth_target_mappings">
+                                     i18nKey="deployment_auth_target_mappings"
+                                     order="500">
                         <DefaultValues>
                             <Value>USERNAME|service|ldapService</Value>
                             <Value>X509|module|cert_module|x509_token_auth_target_header_key=client_cert</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"
-                                     type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key">
+                                     type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key" order="900">
                     </AttributeSchema>
                     <AttributeSchema name="deployment-tls-offload-engine-hosts"
-                                     type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
+                                     type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts" order="1400">
                     </AttributeSchema>
 
                     <AttributeSchema name="delegation-relationship-supported"
-                                     type="single" syntax="boolean" i18nKey="delegation_relationship_supported">
+                                     type="single" syntax="boolean" i18nKey="delegation_relationship_supported" order="200">
                     </AttributeSchema>
                     <AttributeSchema name="delegation-validated-token-types"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="delegation_validated_token_types">
+                                     i18nKey="delegation_validated_token_types"
+                                     order="300">
                     </AttributeSchema>
                     <AttributeSchema name="delegation-custom-token-handlers"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="delegation_custom_token_handlers">
+                                     i18nKey="delegation_custom_token_handlers"
+                                     order="100">
                     </AttributeSchema>
 
                     <AttributeSchema name="issuer-name"
-                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     type="single" syntax="string" i18nKey="issuer_name" order="1800"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-name-id-format"
-                                     type="single" syntax="string" i18nKey="saml2_name_id_format"
+                                     type="single" syntax="string" i18nKey="saml2_name_id_format" order="5100"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-token-lifetime-seconds"
-                                     type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                                     type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds" order="5700">
                         <DefaultValues>
                             <Value>600</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-conditions-provider-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name" order="4100">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-subject-provider-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name" order="4200">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-authentication-statements-provider-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name" order="3800">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-attribute-statements-provider-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name" order="3700">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-authz-decision-statements-provider-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name" order="4000">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-attribute-mapper-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name" order="3600">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
-                                     type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
+                                     type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name" order="3900">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-sign-assertion"
-                                     type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
+                                     type="single" syntax="boolean" i18nKey="saml2_sign_assertion" order="5200">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-sp-entity-id"
-                                     type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                     type="single" syntax="string" i18nKey="saml2_sp_entity_id" order="5600"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-sp-acs-url"
-                                     type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                                     type="single" syntax="string" i18nKey="saml2_sp_acs_url" order="5500">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encrypt-attributes"
-                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes" order="4400">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encrypt-assertion"
-                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion" order="4300">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encrypt-nameid"
-                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid" order="4500">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encryption-algorithm"
-                                     type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                                     type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm" order="4600">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
                             <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
@@ -482,61 +494,62 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encryption-algorithm-strength"
-                                     type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                                     type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength" order="4700">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-keystore-filename"
-                                     type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                                     type="single" syntax="string" i18nKey="saml2_keystore_filename" order="4900">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-keystore-password"
-                                     type="single" syntax="password" i18nKey="saml2_keystore_password">
+                                     type="single" syntax="password" i18nKey="saml2_keystore_password" order="5000">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-encryption-key-alias"
-                                     type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                                     type="single" syntax="string" i18nKey="saml2_encryption_key_alias" order="4800">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-signature-key-alias"
-                                     type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                     type="single" syntax="string" i18nKey="saml2_signature_key_alias" order="5300"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-signature-key-password"
-                                     type="single" syntax="password" i18nKey="saml2_signature_key_password">
+                                     type="single" syntax="password" i18nKey="saml2_signature_key_password" order="5400">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-attribute-map"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="saml2_attribute_map">
+                                     i18nKey="saml2_attribute_map"
+                                     order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="soap-keystore-filename"
-                                     type="single" syntax="string" i18nKey="soap_keystore_filename">
+                                     type="single" syntax="string" i18nKey="soap_keystore_filename" order="6000">
                     </AttributeSchema>
                     <AttributeSchema name="soap-keystore-password"
-                                     type="single" syntax="password" i18nKey="soap_keystore_password">
+                                     type="single" syntax="password" i18nKey="soap_keystore_password" order="6100">
                     </AttributeSchema>
                     <AttributeSchema name="soap-encryption-key-alias"
-                                     type="single" syntax="string" i18nKey="soap_encryption_key_alias">
+                                     type="single" syntax="string" i18nKey="soap_encryption_key_alias" order="5800">
                     </AttributeSchema>
                     <AttributeSchema name="soap-signature-key-alias"
-                                     type="single" syntax="string" i18nKey="soap_signature_key_alias"
+                                     type="single" syntax="string" i18nKey="soap_signature_key_alias" order="6200"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="soap-signature-key-password"
-                                     type="single" syntax="password" i18nKey="soap_signature_key_password">
+                                     type="single" syntax="password" i18nKey="soap_signature_key_password" order="6300">
                     </AttributeSchema>
                     <AttributeSchema name="soap-encryption-key-password"
-                                     type="single" syntax="password" i18nKey="soap_encryption_key_password">
+                                     type="single" syntax="password" i18nKey="soap_encryption_key_password" order="5900">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-issuer"
-                                     type="single" syntax="string" i18nKey="oidc_issuer"
+                                     type="single" syntax="string" i18nKey="oidc_issuer" order="2600"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-token-lifetime-seconds"
-                                     type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds">
+                                     type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds" order="3300">
                         <DefaultValues>
                             <Value>600</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="oidc-signature-algorithm"
-                                     type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm">
+                                     type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm" order="3000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_256">HS256</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
@@ -548,7 +561,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="oidc-public-key-reference-type"
-                                     type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type">
+                                     type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type" order="2900">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="oidc_signature_verification_reference_type_none">NONE</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_verification_reference_type_jwk">JWK</ChoiceValue>
@@ -558,39 +571,40 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="oidc-keystore-location"
-                                     type="single" syntax="string" i18nKey="oidc_keystore_location">
+                                     type="single" syntax="string" i18nKey="oidc_keystore_location" order="2700">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-keystore-password"
-                                     type="single" syntax="password" i18nKey="oidc_keystore_password">
+                                     type="single" syntax="password" i18nKey="oidc_keystore_password" order="2800">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-signature-key-alias"
-                                     type="single" syntax="string" i18nKey="oidc_signature_key_alias">
+                                     type="single" syntax="string" i18nKey="oidc_signature_key_alias" order="3100">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-signature-key-password"
-                                     type="single" syntax="password" i18nKey="oidc_signature_key_password">
+                                     type="single" syntax="password" i18nKey="oidc_signature_key_password" order="3200">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-client-secret"
-                                     type="single" syntax="password" i18nKey="oidc_client_secret">
+                                     type="single" syntax="password" i18nKey="oidc_client_secret" order="2200">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-audience"
-                                     type="list" syntax="string" i18nKey="oidc_audience">
+                                     type="list" syntax="string" i18nKey="oidc_audience" order="2000">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-authorized-party"
-                                     type="single" syntax="string" i18nKey="oidc_authorized_party">
+                                     type="single" syntax="string" i18nKey="oidc_authorized_party" order="2100">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-claim-map"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="oidc_attribute_map">
+                                     i18nKey="oidc_attribute_map"
+                                     order="1900">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-custom-claim-mapper-class"
-                                     type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class">
+                                     type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class" order="2500">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-custom-authn-context-mapper-class"
-                                     type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class">
+                                     type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class" order="2300">
                     </AttributeSchema>
                     <AttributeSchema name="oidc-custom-authn-method-references-mapper-class"
-                                     type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class">
+                                     type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class" order="2400">
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

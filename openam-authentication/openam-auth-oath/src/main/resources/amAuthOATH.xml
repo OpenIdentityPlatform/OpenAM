@@ -38,6 +38,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a500"
+                                 order="100"
                                  resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -48,6 +49,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a501"
+                                 order="200"
                                  resourceName="passwordLength">
                     <DefaultValues>
                         <Value>6</Value>
@@ -57,6 +59,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a502"
+                                 order="300"
                                  resourceName="minimumSecretKeyLength">
                     <DefaultValues>
                         <Value>32</Value>
@@ -67,6 +70,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a503"
+                                 order="400"
                                  resourceName="secretKeyAttribute">
                 <DefaultValues>
                         <Value></Value>
@@ -76,7 +80,8 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a512">
+                                 i18nKey="a512"
+                                 order="1300">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
                     </DefaultValues>
@@ -84,7 +89,8 @@
                 <AttributeSchema name="forgerock-oath-observed-clock-drift-attribute-name"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a513">
+                                 i18nKey="a513"
+                                 order="1400">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -93,6 +99,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a514"
+                                 order="1500"
                                  rangeStart="0" rangeEnd="2147483648">
                     <DefaultValues>
                         <Value>0</Value>
@@ -103,6 +110,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a504"
+                                 order="500"
                                  resourceName="oathAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
@@ -116,6 +124,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a505"
+                                 order="600"
                                  resourceName="hotpWindowSize">
                 <DefaultValues>
                         <Value>100</Value>
@@ -125,6 +134,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a506"
+                                 order="700"
                                  resourceName="hotpCounterAttribute">
                     <DefaultValues>
                         <Value></Value>
@@ -134,6 +144,7 @@
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a507"
+                                 order="800"
                                  resourceName="addChecksum">
                 <ChoiceValues>
                         <ChoiceValue i18nKey="true">True</ChoiceValue>
@@ -147,6 +158,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a508"
+                                 order="900"
                                  resourceName="truncationOffset">
                 <DefaultValues>
                         <Value>-1</Value>
@@ -156,6 +168,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a509"
+                                 order="1000"
                                  resourceName="timeStepSize">
                 <DefaultValues>
                         <Value>30</Value>
@@ -165,6 +178,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a510"
+                                 order="1100"
                                  resourceName="stepsInWindow">
                 <DefaultValues>
                         <Value>2</Value>
@@ -174,6 +188,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a511"
+                                 order="1200"
                                  resourceName="lastLoginTimeAttribute">
                 <DefaultValues>
                         <Value></Value>
@@ -184,6 +199,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500"
+                                     order="100"
                                      resourceName="authenticationLevel">
                     <DefaultValues>
                             <Value>0</Value>
@@ -193,6 +209,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a501"
+                                     order="200"
                                      resourceName="passwordLength">
                     <DefaultValues>
                             <Value>6</Value>
@@ -202,6 +219,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a502"
+                                     order="300"
                                      resourceName="minimumSecretKeyLength">
                     <DefaultValues>
                             <Value>32</Value>
@@ -211,6 +229,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a503"
+                                     order="400"
                                      resourceName="secretKeyAttribute">
                         <DefaultValues>
                             <Value></Value>
@@ -219,7 +238,8 @@
                     <AttributeSchema name="forgerock-oath-sharedsecret-implementation-class"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a512">
+                                     i18nKey="a512"
+                                     order="1300">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider</Value>
                         </DefaultValues>
@@ -227,7 +247,8 @@
                     <AttributeSchema name="forgerock-oath-observed-clock-drift-attribute-name"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a513">
+                                     i18nKey="a513"
+                                     order="1400">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -236,6 +257,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a514"
+                                     order="1500"
                                      rangeStart="0" rangeEnd="2147483648">
                         <DefaultValues>
                             <Value>0</Value>
@@ -245,6 +267,7 @@
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="a504"
+                                     order="500"
                                      resourceName="oathAlgorithm">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
@@ -258,6 +281,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a505"
+                                     order="600"
                                      resourceName="hotpWindowSize">
                         <DefaultValues>
                             <Value>100</Value>
@@ -267,6 +291,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a506"
+                                     order="700"
                                      resourceName="hotpCounterAttribute">
                         <DefaultValues>
                             <Value></Value>
@@ -276,6 +301,7 @@
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="a507"
+                                     order="800"
                                      resourceName="addChecksum">
                     <ChoiceValues>
                             <ChoiceValue i18nKey="true">True</ChoiceValue>
@@ -289,6 +315,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a508"
+                                     order="900"
                                      resourceName="truncationOffset">
                     <DefaultValues>
                             <Value>-1</Value>
@@ -298,6 +325,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a509"
+                                     order="1000"
                                      resourceName="timeStepSize">
                     <DefaultValues>
                             <Value>30</Value>
@@ -307,6 +335,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a510"
+                                     order="1100"
                                      resourceName="stepsInWindow">
                     <DefaultValues>
                             <Value>2</Value>
@@ -316,6 +345,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a511"
+                                     order="1200"
                                      resourceName="lastLoginTimeAttribute">
                     <DefaultValues>
                             <Value></Value>

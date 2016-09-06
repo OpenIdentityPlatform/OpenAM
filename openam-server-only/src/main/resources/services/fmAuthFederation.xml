@@ -48,6 +48,7 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
                         type="single"
                         syntax="number"
                         i18nKey="a500"
+                        order="100"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -58,6 +59,7 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
                             type="single"
                             syntax="number"
                             i18nKey="a500"
+                            order="100"
                             resourceName="authenticationLevel">
                             <DefaultValues>
                                 <Value>0</Value>

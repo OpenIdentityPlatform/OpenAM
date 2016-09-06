@@ -26,7 +26,7 @@
                 i18nKey="service-description"
                 resourceName="scripting">
             <Global>
-                <AttributeSchema name="defaultScriptContext" i18nKey="g101" type="single_choice"
+                <AttributeSchema name="defaultScriptContext" i18nKey="g101" order="900" type="single_choice"
                                  resourceName="defaultContext">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="script-type-01">POLICY_CONDITION</ChoiceValue>
@@ -40,7 +40,7 @@
                 </AttributeSchema>
                 <SubSchema name="scriptContext" inheritance="multiple" resourceName="contexts">
                     <AttributeSchema name="i18nKey" type="single"/>
-                    <AttributeSchema name="languages" type="multiple_choice" syntax="string" i18nKey="st101">
+                    <AttributeSchema name="languages" type="multiple_choice" syntax="string" i18nKey="st101" order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="language-01">JAVASCRIPT</ChoiceValue>
                             <ChoiceValue i18nKey="language-02">GROOVY</ChoiceValue>
@@ -52,7 +52,8 @@
                     </AttributeSchema>
                     <AttributeSchema name="defaultScript" type="single_choice" uitype="globalScriptSelect"
                                      propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}" syntax="string"
-                                     i18nKey="st103">
+                                     i18nKey="st103"
+                                     order="1200">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
@@ -71,41 +72,41 @@
                         </AttributeSchema>
                         <AttributeSchema name="serverTimeout"
                                          type="single" syntax="number_range" rangeStart="0"
-                                         rangeEnd="2147483647" i18nKey="ec101">
+                                         rangeEnd="2147483647" i18nKey="ec101" order="100">
                             <DefaultValues>
                                 <Value>0</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="coreThreads"
                                          type="single" syntax="number_range" rangeStart="1"
-                                         rangeEnd="2147483647" i18nKey="ec102">
+                                         rangeEnd="2147483647" i18nKey="ec102" order="200">
                             <DefaultValues>
                                 <Value>10</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="maxThreads"
                                          type="single" syntax="number_range" rangeStart="1"
-                                         rangeEnd="2147483647" i18nKey="ec103">
+                                         rangeEnd="2147483647" i18nKey="ec103" order="300">
                             <DefaultValues>
                                 <Value>50</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="queueSize"
                                          type="single" syntax="number_range" rangeStart="-1"
-                                         rangeEnd="2147483647" i18nKey="ec104">
+                                         rangeEnd="2147483647" i18nKey="ec104" order="400">
                             <DefaultValues>
                                 <Value>10</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="idleTimeout"
                                          type="single" syntax="number_range" rangeStart="0"
-                                         rangeEnd="2147483647" i18nKey="ec105">
+                                         rangeEnd="2147483647" i18nKey="ec105" order="500">
                             <DefaultValues>
                                 <Value>60</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="whiteList"
-                                         type="list" syntax="string" i18nKey="ec106">
+                                         type="list" syntax="string" i18nKey="ec106" order="600">
                             <DefaultValues>
                                 <Value>java.lang.Boolean</Value>
                                 <Value>java.lang.Byte</Value>
@@ -150,7 +151,7 @@
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="blackList"
-                                         type="list" syntax="string" i18nKey="ec107">
+                                         type="list" syntax="string" i18nKey="ec107" order="700">
                             <DefaultValues>
                                 <Value>java.security.AccessController</Value>
                                 <Value>java.lang.Class</Value>
@@ -158,7 +159,7 @@
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="useSecurityManager"
-                                         type="single" syntax="boolean" i18nKey="ec108">
+                                         type="single" syntax="boolean" i18nKey="ec108" order="800">
                             <BooleanValues>
                                 <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                                 <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -207,16 +208,16 @@
                 <SubSchema name="scriptConfigurations">
                     <SubSchema name="scriptConfiguration" inheritance="multiple" resourceName="scripts"
                                hideConfigUI="yes">
-                        <AttributeSchema name="name" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="description" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="script" type="single" syntax="script" i18nKey="no-i18n"/>
-                        <AttributeSchema name="language" type="single" syntax="string" i18nKey="no-i18n">
+                        <AttributeSchema name="name" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="description" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="script" type="single" syntax="script" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="language" type="single" syntax="string" i18nKey="no-i18n" order="1000">
                             <ChoiceValues>
                                 <ChoiceValue i18nKey="language-01">JAVASCRIPT</ChoiceValue>
                                 <ChoiceValue i18nKey="language-02">GROOVY</ChoiceValue>
                             </ChoiceValues>
                         </AttributeSchema>
-                        <AttributeSchema name="context" type="single" syntax="string" i18nKey="no-i18n">
+                        <AttributeSchema name="context" type="single" syntax="string" i18nKey="no-i18n" order="1000">
                             <ChoiceValues>
                                 <ChoiceValue i18nKey="script-type-01">POLICY_CONDITION</ChoiceValue>
                                 <ChoiceValue i18nKey="script-type-02">AUTHENTICATION_SERVER_SIDE</ChoiceValue>
@@ -224,10 +225,10 @@
                                 <ChoiceValue i18nKey="script-type-04">OIDC_CLAIMS</ChoiceValue>
                             </ChoiceValues>
                         </AttributeSchema>
-                        <AttributeSchema name="createdBy" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="creationDate" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="lastModifiedBy" type="single" syntax="string" i18nKey="no-i18n"/>
-                        <AttributeSchema name="lastModifiedDate" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="createdBy" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="creationDate" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="lastModifiedBy" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
+                        <AttributeSchema name="lastModifiedDate" type="single" syntax="string" i18nKey="no-i18n" order="1000"/>
                     </SubSchema>
                 </SubSchema>
             </Organization>

@@ -42,25 +42,25 @@
 
                 <!-- https://aws.amazon.com/developers/access-keys/ source of example key values -->
 
-                <AttributeSchema name="accessKey" type="single" i18nKey="a010" validator="RequiredValueValidator">
+                <AttributeSchema name="accessKey" type="single" i18nKey="a010" order="100" validator="RequiredValueValidator">
                     <ExampleValue>
                         <Value>AKIAIOSFODNN7EXAMPLE</Value>
                     </ExampleValue>
                 </AttributeSchema>
 
-                <AttributeSchema name="secret" type="single" i18nKey="a020" validator="RequiredValueValidator">
+                <AttributeSchema name="secret" type="single" i18nKey="a020" order="200" validator="RequiredValueValidator">
                     <ExampleValue>
                         <Value>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</Value>
                     </ExampleValue>
                 </AttributeSchema>
 
-                <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" validator="RequiredValueValidator">
+                <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" order="300" validator="RequiredValueValidator">
                     <ExampleValue>
                         <Value>arn:aws:sns:us-east-1:1234567890:app/APNS/production</Value>
                     </ExampleValue>
                 </AttributeSchema>
 
-                <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" validator="RequiredValueValidator">
+                <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" order="400" validator="RequiredValueValidator">
                     <ExampleValue>
                         <Value>arn:aws:sns:us-east-1:1234567890:app/GCM/production</Value>
                     </ExampleValue>
@@ -69,7 +69,7 @@
                 <!-- http://docs.aws.amazon.com/general/latest/gr/rande.html for region list
                      (or google 'amazon aws regions') -->
 
-                <AttributeSchema name="region" type="single_choice" syntax="string" i18nKey="a045"
+                <AttributeSchema name="region" type="single_choice" syntax="string" i18nKey="a045" order="500"
                                  validator="RequiredValueValidator">
                     <ChoiceValues>
                         <ChoiceValue>us-gov-west-1</ChoiceValue>
@@ -90,7 +90,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="delegateFactory" type="single" syntax="string" i18nKey="a050"
+                <AttributeSchema name="delegateFactory" type="single" syntax="string" i18nKey="a050" order="600"
                                  validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>org.forgerock.openam.services.push.sns.SnsHttpDelegateFactory</Value>
@@ -98,21 +98,21 @@
                 </AttributeSchema>
 
                 <AttributeSchema name="mdDuration" type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a060" validator="RequiredValueValidator">
+                                 rangeEnd="2147483647" i18nKey="a060" order="700" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>120</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="mdConcurrency" type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="16" i18nKey="a070" validator="RequiredValueValidator">
+                                 rangeEnd="16" i18nKey="a070" order="800" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>16</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="mdCacheSize" type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a080" validator="RequiredValueValidator">
+                                 rangeEnd="2147483647" i18nKey="a080" order="900" validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>10000</Value>
                     </DefaultValues>

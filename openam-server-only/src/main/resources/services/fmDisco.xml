@@ -55,6 +55,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="g101"
+                    order="100"
                     resourceName="providerID">
                     <DefaultValues>
                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco</Value>
@@ -64,6 +65,7 @@
                     type="multiple_choice"
                     syntax="string"
                     i18nKey="g102"
+                    order="200"
                     resourceName="supportedAuthnMechs">
                     <ChoiceValues>
                         <ChoiceValue>urn:liberty:security:2003-08:null:null</ChoiceValue>
@@ -116,6 +118,7 @@
                     type="multiple_choice"
                     syntax="string"
                     i18nKey="g103"
+                    order="300"
                     resourceName="supportedDirectives">
                     <ChoiceValues>
                         <ChoiceValue>AuthenticateRequester</ChoiceValue>
@@ -137,6 +140,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g104"
+                    order="400"
                     resourceName="usePolicyForDiscoveryLookup">
                     <DefaultValues>
                         <Value>false</Value>
@@ -147,6 +151,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g105"
+                    order="500"
                     resourceName="usePolicyForDiscoveryUpdate">
                     <DefaultValues>
                         <Value>false</Value>
@@ -157,6 +162,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="g106"
+                    order="600"
                     resourceName="authorizer">
                     <DefaultValues>
                         <Value>@DISCO_AUTHORIZER@</Value>
@@ -166,6 +172,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="g107"
+                    order="700"
                     resourceName="entryHandler">
                     <DefaultValues>
                         <Value>@DISCO_ENTRY_HANDLER@</Value>
@@ -176,6 +183,7 @@
                     syntax="string"
                     uitype="name_value_list"
                     i18nKey="g108"
+                    order="800"
                     resourceName="idMapperClasses">
                     <DefaultValues>
                         <Value>providerid=@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco|idmapper=com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper</Value>
@@ -185,6 +193,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g109"
+                    order="900"
                     resourceName="authenticateResponseMessage">
                     <DefaultValues>
                         <Value>false</Value>
@@ -202,6 +211,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g202"
+                    order="1000"
                     resourceName="bootstrappingSessionContextStatement">
                     <DefaultValues>
                         <Value>false</Value>
@@ -211,6 +221,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g203"
+                    order="1100"
                     resourceName="encryptNameIdentifierInBootstrapping">
                     <DefaultValues>
                         <Value>false</Value>
@@ -220,6 +231,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="g204"
+                    order="1200"
                     resourceName="impliedResource">
                     <DefaultValues>
                         <Value>false</Value>
@@ -229,6 +241,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="g205"
+                    order="1300"
                     resourceName="nameIdentifierMapperClass">
                     <DefaultValues>
                         <Value>com.sun.identity.liberty.ws.disco.plugins.IDFFNameIdentifierMapper</Value>
@@ -238,6 +251,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="g206"
+                    order="1400"
                     resourceName="globalEntryHandlerPluginClass">
                     <DefaultValues>
                         <Value>@DISCO_GLOBAL_ENTRY_HANDLER@</Value>
@@ -256,7 +270,8 @@
                     type="single"
                     syntax="boolean"
                     uitype="radio"
-                    i18nKey="p101">
+                    i18nKey="p101"
+                    order="1500">
                     <IsResourceNameAllowed/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -267,7 +282,8 @@
                     type="single"
                     syntax="boolean"
                     uitype="radio"
-                    i18nKey="p102">
+                    i18nKey="p102"
+                    order="1600">
                     <IsResourceNameAllowed/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -279,7 +295,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoEntries"
                     type="list"
                     syntax="xml"
-                    i18nKey="p103">
+                    i18nKey="p103"
+                    order="1700">
                 </AttributeSchema>
             </User>
         </Schema>

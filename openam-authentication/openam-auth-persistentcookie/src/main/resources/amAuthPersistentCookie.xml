@@ -28,7 +28,8 @@
                 <AttributeSchema
                         name="openam-auth-persistent-cookie-idle-time"
                         type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a001" resourceName="idleTimeout">
+                        i18nKey="a001"
+                        order="100" resourceName="idleTimeout">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -36,7 +37,8 @@
                 <AttributeSchema
                         name="openam-auth-persistent-cookie-max-life"
                         type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a002" resourceName="maxLife">
+                        i18nKey="a002"
+                        order="200" resourceName="maxLife">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -44,7 +46,7 @@
                 <AttributeSchema
                         name="openam-auth-persistent-cookie-enforce-ip"
                         cosQualifier="default" type="single"
-                        syntax="boolean" i18nKey="a003" resourceName="enforceClientIP">
+                        syntax="boolean" i18nKey="a003" order="300" resourceName="enforceClientIP">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -56,7 +58,7 @@
                 <AttributeSchema
                         name="openam-auth-persistent-cookie-secure-cookie"
                         cosQualifier="default" type="single"
-                        syntax="boolean" i18nKey="a004" resourceName="useSecureCookie">
+                        syntax="boolean" i18nKey="a004" order="400" resourceName="useSecureCookie">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -68,7 +70,7 @@
                 <AttributeSchema
                         name="openam-auth-persistent-cookie-http-only-cookie"
                         cosQualifier="default" type="single"
-                        syntax="boolean" i18nKey="a005" resourceName="useHttpOnlyCookie">
+                        syntax="boolean" i18nKey="a005" order="500" resourceName="useHttpOnlyCookie">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -78,7 +80,8 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-persistent-cookie-hmac-key" type="single" syntax="password"
-                    i18nKey="a006" resourceName="hmacKey">
+                    i18nKey="a006"
+                    order="600" resourceName="hmacKey">
                     <DefaultValues>
                         <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
@@ -87,7 +90,8 @@
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
                             type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                            i18nKey="a001" resourceName="idleTimeout">
+                            i18nKey="a001"
+                            order="100" resourceName="idleTimeout">
                         <DefaultValues>
                             <Value>5</Value>
                         </DefaultValues>
@@ -95,7 +99,8 @@
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-max-life"
                             type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                            i18nKey="a002" resourceName="maxLife">
+                            i18nKey="a002"
+                            order="200" resourceName="maxLife">
                         <DefaultValues>
                             <Value>5</Value>
                         </DefaultValues>
@@ -103,7 +108,7 @@
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-enforce-ip"
                             cosQualifier="default" type="single"
-                            syntax="boolean" i18nKey="a003" resourceName="enforceClientIP">
+                            syntax="boolean" i18nKey="a003" order="300" resourceName="enforceClientIP">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -115,7 +120,7 @@
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-secure-cookie"
                             cosQualifier="default" type="single"
-                            syntax="boolean" i18nKey="a004" resourceName="useSecureCookie">
+                            syntax="boolean" i18nKey="a004" order="400" resourceName="useSecureCookie">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -127,7 +132,7 @@
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-http-only-cookie"
                             cosQualifier="default" type="single"
-                            syntax="boolean" i18nKey="a005" resourceName="useHttpOnlyCookie">
+                            syntax="boolean" i18nKey="a005" order="500" resourceName="useHttpOnlyCookie">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -137,7 +142,8 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-persistent-cookie-hmac-key" type="single" syntax="password"
-                        i18nKey="a006" resourceName="hmacKey">
+                        i18nKey="a006"
+                        order="600" resourceName="hmacKey">
                         <DefaultValues>
                             <Value>@256_BIT_RANDOM_SECURE@</Value>
                         </DefaultValues>

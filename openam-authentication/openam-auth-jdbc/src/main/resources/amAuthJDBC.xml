@@ -46,6 +46,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a100"
+                    order="100"
                     resourceName="connectionType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceJNDI">JNDI</ChoiceValue> 
@@ -59,6 +60,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a101"
+                    order="200"
                     resourceName="connectionPoolJndiName">
                     <DefaultValues>
                         <Value>java:comp/env/jdbc/samplePool</Value>
@@ -68,6 +70,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a102"
+                    order="300"
                     resourceName="jdbcDriver">
                     <DefaultValues>
                         <Value>com.mysql.jdbc.Driver</Value>
@@ -77,6 +80,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a103"
+                    order="400"
                     resourceName="jdbcUrl">
                     <DefaultValues>
                         <Value>jdbc:mysql://127.0.0.1:3306/test</Value>
@@ -86,6 +90,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a104"
+                    order="500"
                     resourceName="username">
                     <DefaultValues>
                         <Value>root</Value>
@@ -95,6 +100,7 @@
                     type="single"
                     syntax="password"
                     i18nKey="a105"
+                    order="600"
                     resourceName="password">
                     <DefaultValues>
                         <Value>password</Value>
@@ -104,6 +110,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a106"
+                    order="700"
                     resourceName="passwordColumn">
                     <DefaultValues>
                         <Value>PASSWORD_COLUMN</Value>
@@ -113,6 +120,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a107"
+                    order="800"
                     resourceName="passwordStatement">
                     <DefaultValues>
                         <Value>select PASSWORD_COLUMN from TABLE where USERNAME_COLUMN = ?</Value>
@@ -122,6 +130,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a108"
+                    order="900"
                     resourceName="passwordTransformClass">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.modules.jdbc.ClearTextTransform</Value>
@@ -131,6 +140,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a109"
+                    order="1000"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -149,6 +159,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a100"
+                        order="100"
                         resourceName="connectionType">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceJNDI">JNDI</ChoiceValue> 
@@ -162,6 +173,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a101"
+                        order="200"
                         resourceName="connectionPoolJndiName">
                         <DefaultValues>
                             <Value>java:comp/env/jdbc/samplePool</Value>
@@ -171,6 +183,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a102"
+                        order="300"
                         resourceName="jdbcDriver">
                         <DefaultValues>
                             <Value>com.mysql.jdbc.Driver</Value>
@@ -180,6 +193,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a103"
+                        order="400"
                         resourceName="jdbcUrl">
                         <DefaultValues>
                             <Value>jdbc:mysql://127.0.0.1:3306/test</Value>
@@ -189,6 +203,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a104"
+                        order="500"
                         resourceName="username">
                         <DefaultValues>
                             <Value>root</Value>
@@ -198,6 +213,7 @@
                         type="single"
                         syntax="password"
                         i18nKey="a105"
+                        order="600"
                         resourceName="password">
                         <DefaultValues>
                             <Value>password</Value>
@@ -207,6 +223,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a106"
+                        order="700"
                         resourceName="passwordColumn">
                         <DefaultValues>
                             <Value>PASSWORD_COLUMN</Value>
@@ -216,6 +233,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a107"
+                        order="800"
                         resourceName="passwordStatement">
                         <DefaultValues>
                             <Value>select PASSWORD_COLUMN from TABLE where USERNAME_COLUMN = ?</Value>
@@ -225,6 +243,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a108"
+                        order="900"
                         resourceName="passwordTransformClass">
                         <DefaultValues>
                             <Value>com.sun.identity.authentication.modules.jdbc.ClearTextTransform</Value>
@@ -234,6 +253,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a109"
+                        order="1000"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>

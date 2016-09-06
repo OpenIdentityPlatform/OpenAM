@@ -41,7 +41,8 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  resourceName="selfServiceEnabled"
-                                 i18nKey="a100">
+                                 i18nKey="a100"
+                                 order="100">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -55,7 +56,8 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  resourceName="selfRegistrationEnabled"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 order="200">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -69,7 +71,8 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  resourceName="selfRegistrationTokenLifetime"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="300">
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
@@ -78,7 +81,8 @@
                                  type="single"
                                  syntax="url"
                                  resourceName="selfRegistrationConfirmationUrl"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 order="400">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
                     </DefaultValues>
@@ -88,7 +92,8 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  resourceName="forgotPasswordEnabled"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 order="500">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -102,7 +107,8 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  resourceName="forgotPasswordTokenLifetime"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 order="600">
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
@@ -111,7 +117,8 @@
                                  type="single"
                                  syntax="url"
                                  resourceName="forgotPasswordConfirmationUrl"
-                                 i18nKey="a106">
+                                 i18nKey="a106"
+                                 order="700">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
                     </DefaultValues>
@@ -120,7 +127,8 @@
                                  type="single_choice"
                                  syntax="string"
                                  resourceName="userRegisteredDestination"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 order="800">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a107a">default</ChoiceValue>
                         <ChoiceValue i18nKey="a107b">login</ChoiceValue>
@@ -134,7 +142,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="protectedUserAttributes"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 order="900">
                 </AttributeSchema> 
             </Organization>
         </Schema>

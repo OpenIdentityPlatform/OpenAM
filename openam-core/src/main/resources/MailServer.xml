@@ -40,7 +40,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="emailImplClassName"
-                                 i18nKey="a100">
+                                 i18nKey="a100"
+                                 order="100">
                     <DefaultValues>
                         <Value>org.forgerock.openam.services.email.MailServerImpl</Value>
                     </DefaultValues>
@@ -49,7 +50,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="hostname"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 order="200">
                     <ExampleValue>
                         <Value>smtp.example.com</Value>
                     </ExampleValue>
@@ -58,7 +60,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="65535"
                                  resourceName="port"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="300">
                     <DefaultValues>
                         <Value>465</Value>
                     </DefaultValues>
@@ -67,7 +70,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="username"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 order="400">
                     <ExampleValue>
                         <Value>username</Value>
                     </ExampleValue>
@@ -76,13 +80,15 @@
                                  type="single"
                                  syntax="password"
                                  resourceName="password"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 order="500">
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
                                  type="single_choice"
                                  syntax="string"
                                  resourceName="sslState"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 order="600">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
                         <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
@@ -95,7 +101,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="from"
-                                 i18nKey="a106">
+                                 i18nKey="a106"
+                                 order="700">
                     <ExampleValue>
                         <Value>no-reply@example.com</Value>
                     </ExampleValue>
@@ -104,7 +111,8 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="emailAddressAttribute"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 order="800">
                     <DefaultValues>
                         <Value>mail</Value>
                     </DefaultValues>
@@ -113,14 +121,16 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="subject"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 order="900">
                     <IsOptional/>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPMessage"
                                  type="single"
                                  syntax="string"
                                  resourceName="message"
-                                 i18nKey="a109">
+                                 i18nKey="a109"
+                                 order="1000">
                     <IsOptional/>
                 </AttributeSchema>
             </Organization>

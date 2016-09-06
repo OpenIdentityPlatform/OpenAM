@@ -65,7 +65,8 @@
                     syntax="string"
                     any="display"
                     resourceName="preferredTimezone"
-                    i18nKey="d102">
+                    i18nKey="d102"
+                    order="100">
 		</AttributeSchema>
 	        <AttributeSchema name="preferredlocale"
                     type="single_choice"
@@ -82,6 +83,7 @@
                     syntax="dn"
                     any="display"
                     i18nKey="d104"
+                    order="200"
                     resourceName="adminDNStartingView">
 				<IsOptional/>
 		</AttributeSchema>
@@ -90,6 +92,7 @@
                     syntax="string"
                     any="display"
                     i18nKey="d105"
+                    order="300"
                     resourceName="defaultUserStatus">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="u200">Active</ChoiceValue>
@@ -107,7 +110,8 @@
                     syntax="string"
                     any="required|filter"
 		    validator="RequiredValueValidator"
-                    i18nKey="u101">
+                    i18nKey="u101"
+                    order="400">
 		    <DefaultValues>
 			<Value>&#x00A0;</Value>
 		    </DefaultValues>
@@ -116,14 +120,16 @@
                     type="single"
                     syntax="string"
                     any="optional|filter|display"
-                    i18nKey="u102">
+                    i18nKey="u102"
+                    order="500">
 		</AttributeSchema>
 	        <AttributeSchema name="sn"
                     type="single"
                     syntax="string"
                     any="required|filter|display"
 		    validator="RequiredValueValidator"
-                    i18nKey="u103">
+                    i18nKey="u103"
+                    order="600">
 		    <DefaultValues>
 			<Value>&#x00A0;</Value>
 		    </DefaultValues>
@@ -133,7 +139,8 @@
                     any="required|filter|display"
 		    validator="RequiredValueValidator"
                     syntax="string"
-                    i18nKey="u104">
+                    i18nKey="u104"
+                    order="700">
 		    <DefaultValues>
 			<Value>&#x00A0;</Value>
 		    </DefaultValues>
@@ -143,7 +150,8 @@
                     syntax="password"
                     any="required"
 		    validator="RequiredValueValidator"
-                    i18nKey="u105">
+                    i18nKey="u105"
+                    order="800">
 		    <DefaultValues>
 			<Value>&#x00A0;</Value>
 		    </DefaultValues>
@@ -154,43 +162,50 @@
                     any="display" 
                     uitype="link"
                     propertiesViewBeanURL="../user/UMChangeUserPassword"
-                    i18nKey="u1051">
+                    i18nKey="u1051"
+                    order="900">
                 </AttributeSchema>  
 	        <AttributeSchema name="mail"
                     type="single"
                     syntax="email"
 		    any="display"
-                    i18nKey="u106">
+                    i18nKey="u106"
+                    order="1000">
 		</AttributeSchema>
 	        <AttributeSchema name="employeenumber"
                     type="single"
                     syntax="number"
 		    any="adminDisplay"
-                    i18nKey="u107">
+                    i18nKey="u107"
+                    order="1100">
 		</AttributeSchema>
                 <AttributeSchema name="telephonenumber"
                     type="single"
                     syntax="string"
                     any="display"
-                    i18nKey="u108">
+                    i18nKey="u108"
+                    order="1200">
 		</AttributeSchema>
 	        <AttributeSchema name="manager"
                     type="single"
                     syntax="string"
-                    i18nKey="u109">
+                    i18nKey="u109"
+                    order="1300">
 		</AttributeSchema>
                 <AttributeSchema name="postaladdress"
                     type="single"
                     syntax="string"
                     any="display"
-                    i18nKey="u110">
+                    i18nKey="u110"
+                    order="1400">
 		</AttributeSchema>
                 <AttributeSchema name="inetuserstatus"
                     type="single_choice"
                     syntax="string"
                     any="required|filter|adminDisplay"
 		    validator="RequiredValueValidator"
-		    i18nKey="u111">
+		    i18nKey="u111"
+		    order="1500">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="u200">Active</ChoiceValue>
                         <ChoiceValue i18nKey="u201">Inactive</ChoiceValue>
@@ -203,13 +218,15 @@
                     type="single"
                     syntax="date"
                     any="adminDisplay"
-                    i18nKey="u112">
+                    i18nKey="u112"
+                    order="1600">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-user-auth-config"
                     type="single_choice"
                     syntax="string"
                     any="adminDisplay"
-                    i18nKey="u113">
+                    i18nKey="u113"
+                    order="1700">
 	     	    <ChoiceValues>
 			<ChoiceValuesClassName
                             className= "com.sun.identity.authentication.service.ConfiguredAuthServices" />
@@ -222,7 +239,8 @@
                     type="list"
                     syntax="string"
                     any="adminDisplay"
-                    i18nKey="u114">
+                    i18nKey="u114"
+                    order="1800">
                     <DefaultValues>
                         <Value/>
                     </DefaultValues>
@@ -241,13 +259,15 @@
                     type="list"
                     syntax="string"
                     any="adminDisplay"
-                    i18nKey="u116">
+                    i18nKey="u116"
+                    order="1900">
                 </AttributeSchema>
 		<AttributeSchema name="iplanet-am-user-failure-url"
                     type="list"
                     syntax="string"
                     any="adminDisplay"
-                    i18nKey="u117">
+                    i18nKey="u117"
+                    order="2000">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-user-password-reset-options"
                     type="single"
@@ -255,7 +275,8 @@
                     propertiesViewBeanURL="../user/UMUserPasswordResetOptions"
                     uitype="link"
                     any="display"
-                    i18nKey="u120">
+                    i18nKey="u120"
+                    order="2100">
                     <DefaultValues>
                         <Value/>
                     </DefaultValues>
@@ -279,7 +300,8 @@
 		    type="list"
 		    syntax="string"
 		    any="adminDisplay"
-		    i18nKey="u122">
+		    i18nKey="u122"
+		    order="2200">
 		</AttributeSchema>
                 <AttributeSchema name="RequiredValueValidator"
                     type="validator"

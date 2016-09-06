@@ -44,7 +44,8 @@
                 <AttributeSchema name="searchableAttributes"
                     type="list"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    order="100">
                     <DefaultValues>
                         <Value>oauth.cons_name</Value>
                         <Value>oauth.cons_key</Value>
@@ -55,7 +56,8 @@
                 <AttributeSchema name="tokenCleanupInterval"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    order="200">
                     <DefaultValues>
                         <Value>180</Value>
                     </DefaultValues>
@@ -63,7 +65,8 @@
                 <AttributeSchema name="tokenTypesWithoutEtagEnforcement"
                     type="list"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    order="300">
                 </AttributeSchema>
                 <AttributeSchema name="tokenStoreImplClass"
                     type="single"

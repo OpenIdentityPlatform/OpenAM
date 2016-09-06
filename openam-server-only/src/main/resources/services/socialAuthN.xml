@@ -41,14 +41,16 @@
                                  uitype="maplist"
                                  validator="MapValueValidator"
                                  resourceName="displayNames"
-                                 i18nKey="a101"/>
+                                 i18nKey="a101"
+                                 order="100"/>
                 <AttributeSchema name="socialAuthNAuthChain"
                                  type="list"
                                  syntax="string"
                                  uitype="maplist"
                                  resourceName="authenticationChains"
                                  validator="MapValueValidator"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="200">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                                 className="com.sun.identity.authentication.service.ConfiguredSocialAuthServices"/>
@@ -60,12 +62,14 @@
                                  uitype="maplist"
                                  resourceName="icons"
                                  validator="MapValueValidator"
-                                 i18nKey="a103"/>
+                                 i18nKey="a103"
+                                 order="300"/>
                 <AttributeSchema name="socialAuthNEnabled"
                                  type="list"
                                  syntax="string"
                                  resourceName="enabledKeys"
-                                 i18nKey="a104"/>
+                                 i18nKey="a104"
+                                 order="400"/>
             </Organization>
         </Schema>
     </Service>

@@ -47,7 +47,8 @@
                     syntax="string"
                     any="required|adminDisplay"
                     validator="RequiredValueValidator"
-                    i18nKey="fr1">
+                    i18nKey="fr1"
+                    order="100">
 		    <DefaultValues>
                         <Value>(objectclass=@USER_OBJECT_CLASS@)</Value>
 		    </DefaultValues>

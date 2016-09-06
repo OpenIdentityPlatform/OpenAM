@@ -31,49 +31,49 @@
                 </AttributeSchema>
             </Global>
             <Policy>
-                <AttributeSchema name="CREATE" type="single" syntax="boolean" uitype="radio" i18nKey="CREATE">
+                <AttributeSchema name="CREATE" type="single" syntax="boolean" uitype="radio" i18nKey="CREATE" order="200">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="READ" type="single" syntax="boolean" uitype="radio" i18nKey="READ">
+                <AttributeSchema name="READ" type="single" syntax="boolean" uitype="radio" i18nKey="READ" order="600">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="UPDATE" type="single" syntax="boolean" uitype="radio" i18nKey="UPDATE">
+                <AttributeSchema name="UPDATE" type="single" syntax="boolean" uitype="radio" i18nKey="UPDATE" order="700">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="DELETE" type="single" syntax="boolean" uitype="radio" i18nKey="DELETE">
+                <AttributeSchema name="DELETE" type="single" syntax="boolean" uitype="radio" i18nKey="DELETE" order="300">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="PATCH" type="single" syntax="boolean" uitype="radio" i18nKey="PATCH">
+                <AttributeSchema name="PATCH" type="single" syntax="boolean" uitype="radio" i18nKey="PATCH" order="400">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="ACTION" type="single" syntax="boolean" uitype="radio" i18nKey="ACTION">
+                <AttributeSchema name="ACTION" type="single" syntax="boolean" uitype="radio" i18nKey="ACTION" order="100">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
-                <AttributeSchema name="QUERY" type="single" syntax="boolean" uitype="radio" i18nKey="QUERY">
+                <AttributeSchema name="QUERY" type="single" syntax="boolean" uitype="radio" i18nKey="QUERY" order="500">
                     <IsResourceNameAllowed />
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>

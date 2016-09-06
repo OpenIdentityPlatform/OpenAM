@@ -45,7 +45,8 @@
                     type="list" 
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    order="100">
                     <DefaultValues> 
                         <Value>key=disco|class=com.sun.identity.liberty.ws.disco.DiscoveryService</Value> 
                         <Value>key=idpp|class=com.sun.identity.liberty.ws.idpp.PPRequestHandler</Value>
@@ -55,7 +56,8 @@
                 <AttributeSchema name="WebServiceAuthenticator" 
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    order="200">
                     <DefaultValues> 
             <Value>@WEB_SERVICE_AUTHENTICATOR@</Value>
                     </DefaultValues> 
@@ -63,7 +65,8 @@
                 <AttributeSchema name="SupportedAuthenticationMechanisms" 
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    order="300">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a10501">urn:liberty:security:2003-08:null:null</ChoiceValue>
                         <ChoiceValue i18nKey="a10502">urn:liberty:security:2003-08:null:X509</ChoiceValue>
@@ -114,7 +117,8 @@
                 <AttributeSchema name="EnforceOnlyKnownProvider"
                   type="single"
                   syntax="boolean"
-                  i18nKey="a106">
+                  i18nKey="a106"
+                  order="400">
                   <DefaultValues>
                     <Value>true</Value>
                   </DefaultValues>
@@ -122,12 +126,14 @@
                 <AttributeSchema name="CertAliasForSSLClientAuth"
                   type="single"
                   syntax="string"
-                  i18nKey="a107">
+                  i18nKey="a107"
+                  order="500">
                 </AttributeSchema>
                 <AttributeSchema name="StaleTimeLimit"
                   type="single"
                   syntax="number"
-                  i18nKey="a108">
+                  i18nKey="a108"
+                  order="600">
                   <DefaultValues>
                     <Value>300000</Value>
                   </DefaultValues>
@@ -135,7 +141,8 @@
                 <AttributeSchema name="MessageIDCacheCleanupInterval"
                   type="single"
                   syntax="number"
-                  i18nKey="a109">
+                  i18nKey="a109"
+                  order="700">
                   <DefaultValues>
                     <Value>60000</Value>
                   </DefaultValues>
@@ -143,7 +150,8 @@
                 <AttributeSchema name="SupportedActors"
                   type="single"
                   syntax="string"
-                  i18nKey="a110">
+                  i18nKey="a110"
+                  order="800">
                   <DefaultValues>
                     <Value>http://schemas.xmlsoap.org/soap/actor/next</Value>
                   </DefaultValues>
@@ -151,7 +159,8 @@
                 <AttributeSchema name="NamespacePrefixMappingList"
                   type="single"
                   syntax="string"
-                  i18nKey="a111">
+                  i18nKey="a111"
+                  order="900">
                   <DefaultValues>
                     <Value>S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/liberty/pp|is=urn:liberty:is:2003-08</Value>
                   </DefaultValues>
@@ -159,12 +168,14 @@
                 <AttributeSchema name="JAXBPackageList"
                   type="single"
                   syntax="string"
-                  i18nKey="a112">
+                  i18nKey="a112"
+                  order="1000">
                 </AttributeSchema>
                 <AttributeSchema name="WSFVersion"
                   type="single_choice"
                   syntax="string"
-                  i18nKey="a113">
+                  i18nKey="a113"
+                  order="1100">
                       <ChoiceValues>
                         <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
                         <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>

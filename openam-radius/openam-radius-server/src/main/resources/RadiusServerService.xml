@@ -46,7 +46,8 @@
                 <AttributeSchema name="radiusListenerEnabled"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a-radius-listener-enabled-label">
+                                 i18nKey="a-radius-listener-enabled-label"
+                                 order="200">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
                         <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
@@ -59,6 +60,7 @@
                 <AttributeSchema name="radiusServerPort"
                                  cosQualifier="default"
                                  i18nKey="b-radius-port"
+                                 order="400"
                                  isSearchable="no"
                                  syntax="number_range"
                                  rangeStart="1025"
@@ -72,6 +74,7 @@
                 <AttributeSchema name="radiusThreadPoolCoreSize"
                                  cosQualifier="default"
                                  i18nKey="c-radius-thread-pool-core-size"
+                                 order="600"
                                  isSearchable="no"
                                  syntax="number_range"
                                  rangeStart="1"
@@ -85,6 +88,7 @@
                 <AttributeSchema name="radiusThreadPoolMaxSize"
                                  cosQualifier="default"
                                  i18nKey="d-radius-thread-pool-max-size"
+                                 order="800"
                                  isSearchable="no"
                                  syntax="number_range"
                                  rangeStart="1"
@@ -98,6 +102,7 @@
                 <AttributeSchema name="radiusThreadPoolKeepaliveSeconds"
                                  cosQualifier="default"
                                  i18nKey="e-radius-thread-pool-keepalive-seconds"
+                                 order="1000"
                                  isSearchable="no"
                                  syntax="number_range"
                                  rangeStart="1"
@@ -111,6 +116,7 @@
                 <AttributeSchema name="radiusThreadPoolQueueSize"
                                  cosQualifier="default"
                                  i18nKey="f-radius-thread-pool-queue-size"
+                                 order="1100"
                                  isSearchable="no"
                                  syntax="number_range"
                                  rangeStart="1"
@@ -129,6 +135,7 @@
                            i18nKey="client-config-instance">
                     <AttributeSchema name="clientIpAddress"
                                      i18nKey="a-client-ip-address-label"
+                                     order="100"
                                      isSearchable="no"
                                      syntax="string"
                                      type="single" >
@@ -139,6 +146,7 @@
                         
                     <AttributeSchema name="clientSecret"
                                      i18nKey="b-client-secret-label"
+                                     order="300"
                                      isSearchable="no"
                                      syntax="string"
                                      type="single" >
@@ -152,7 +160,8 @@
                     <AttributeSchema name="clientPacketsLogged"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="c-client-log-packets">
+                                     i18nKey="c-client-log-packets"
+                                     order="500">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
                             <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
@@ -164,6 +173,7 @@
 
                     <AttributeSchema name="handlerClass"
                                      i18nKey="d-handler-class"
+                                     order="700"
                                      isSearchable="no"
                                      syntax="string"
                                      type="single" >
@@ -174,6 +184,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="handlerConfig"
                                      i18nKey="e-handler-config-params"
+                                     order="900"
                                      isSearchable="no"
                                      syntax="string"
                                      type="list" >

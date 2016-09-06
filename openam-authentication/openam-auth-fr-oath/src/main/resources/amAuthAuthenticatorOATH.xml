@@ -60,6 +60,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a500"
+                                 order="100"
                                  resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -71,6 +72,7 @@
                                  syntax="string"
                                  validator="CodeLengthValidator"
                                  i18nKey="a501"
+                                 order="200"
                                  resourceName="passwordLength">
                     <DefaultValues>
                         <Value>6</Value>
@@ -81,6 +83,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="16" rangeEnd="2147483647"
                                  i18nKey="a502"
+                                 order="300"
                                  resourceName="minimumSecretKeyLength">
                     <DefaultValues>
                         <Value>32</Value>
@@ -91,6 +94,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a504"
+                                 order="400"
                                  resourceName="oathAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
@@ -104,6 +108,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                  i18nKey="a505"
+                                 order="500"
                                  resourceName="hotpWindowSize">
                     <DefaultValues>
                         <Value>100</Value>
@@ -114,6 +119,7 @@
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a507"
+                                 order="600"
                                  resourceName="addChecksumToOtpEnabled">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="true">True</ChoiceValue>
@@ -127,6 +133,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a508"
+                                 order="700"
                                  resourceName="truncationOffset">
                     <DefaultValues>
                         <Value>-1</Value>
@@ -136,6 +143,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                  i18nKey="a509"
+                                 order="800"
                                  resourceName="totpTimeStepInterval">
                     <DefaultValues>
                         <Value>30</Value>
@@ -145,6 +153,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a510"
+                                 order="900"
                                  resourceName="totpTimeStepsInWindow">
                     <DefaultValues>
                         <Value>2</Value>
@@ -154,6 +163,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  i18nKey="a514"
+                                 order="1000"
                                  resourceName="totpMaximumClockDrift">
                     <DefaultValues>
                         <Value>5</Value>
@@ -163,6 +173,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a515"
+                                 order="1100"
                                  validator="RequiredValueValidator"
                                  resourceName="oathIssuerName">
                     <ExampleValue>
@@ -188,6 +199,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500"
+                                     order="100"
                                      resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -198,6 +210,7 @@
                                      syntax="string"
                                      validator="CodeLengthValidator"
                                      i18nKey="a501"
+                                     order="200"
                                      resourceName="passwordLength">
                         <DefaultValues>
                             <Value>6</Value>
@@ -207,6 +220,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="16" rangeEnd="2147483647"
                                      i18nKey="a502"
+                                     order="300"
                                      resourceName="minimumSecretKeyLength">
                         <DefaultValues>
                             <Value>32</Value>
@@ -216,6 +230,7 @@
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="a504"
+                                     order="400"
                                      resourceName="oathAlgorithm">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
@@ -229,6 +244,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                      i18nKey="a505"
+                                     order="500"
                                      resourceName="hotpWindowSize">
                         <DefaultValues>
                             <Value>100</Value>
@@ -239,6 +255,7 @@
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="a507"
+                                     order="600"
                                      resourceName="addChecksumToOtpEnabled">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="true">True</ChoiceValue>
@@ -252,6 +269,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a508"
+                                     order="700"
                                      resourceName="truncationOffset">
                         <DefaultValues>
                             <Value>-1</Value>
@@ -261,6 +279,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                                      i18nKey="a509"
+                                     order="800"
                                      resourceName="totpTimeStepInterval">
                         <DefaultValues>
                             <Value>30</Value>
@@ -270,6 +289,7 @@
                                      type="single"
                                      syntax="number"
                                      i18nKey="a510"
+                                     order="900"
                                      resourceName="totpTimeStepsInWindow">
                         <DefaultValues>
                             <Value>2</Value>
@@ -279,6 +299,7 @@
                                     type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                     i18nKey="a514"
+                                    order="1000"
                                     resourceName="totpMaximumClockDrift">
                         <DefaultValues>
                             <Value>5</Value>
@@ -288,6 +309,7 @@
                                      type="single"
                                      syntax="string"
                                      i18nKey="a515"
+                                     order="1100"
                                      validator="RequiredValueValidator"
                                      resourceName="oathIssuerName">
                         <ExampleValue>

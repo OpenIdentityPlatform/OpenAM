@@ -45,6 +45,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a101"
+                                 order="100"
                                  resourceName="clientScriptEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -60,6 +61,7 @@
                                  propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                  syntax="string"
                                  i18nKey="a102"
+                                 order="200"
                                  resourceName="clientScript">
                     <ChoiceValues>
                         <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
@@ -79,6 +81,7 @@
                                  propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                  syntax="string"
                                  i18nKey="a104"
+                                 order="300"
                                  resourceName="serverScript">
                     <ChoiceValues>
                         <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
@@ -96,6 +99,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  i18nKey="a500"
+                                 order="400"
                                  resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -107,6 +111,7 @@
                                      type="single"
                                      syntax="boolean"
                                      i18nKey="a101"
+                                     order="100"
                                      resourceName="clientScriptEnabled">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -122,6 +127,7 @@
                                      propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                      syntax="string"
                                      i18nKey="a102"
+                                     order="200"
                                      resourceName="clientScript">
                         <ChoiceValues>
                             <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
@@ -141,6 +147,7 @@
                                      propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                      syntax="string"
                                      i18nKey="a104"
+                                     order="300"
                                      resourceName="serverScript">
                         <ChoiceValues>
                             <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
@@ -158,6 +165,7 @@
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500"
+                                     order="400"
                                      resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>

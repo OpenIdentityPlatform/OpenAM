@@ -49,6 +49,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a101"
+                    order="100"
                     resourceName="datastoreClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.datastore.impl.IdRepoDataStoreProvider</Value>
@@ -58,6 +59,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a102"
+                    order="200"
                     resourceName="configurationClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.configuration.impl.ConfigurationInstanceImpl</Value>
@@ -67,6 +69,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a103"
+                    order="300"
                     resourceName="loggerClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.log.impl.LogProvider</Value>
@@ -76,6 +79,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a104"
+                    order="400"
                     resourceName="sessionProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.session.impl.FMSessionProvider</Value>
@@ -85,6 +89,7 @@
                     type="single" 
                     syntax="number" 
                     i18nKey="a105"
+                    order="500"
                     resourceName="maxContentLength">
                     <DefaultValues>
                         <Value>20480</Value>
@@ -94,6 +99,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a110"
+                    order="600"
                     resourceName="passwordDecoderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.FMPasswordDecoder</Value>
@@ -103,6 +109,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a111"
+                    order="700"
                     resourceName="signatureProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.AMSignatureProvider</Value>
@@ -112,6 +119,7 @@
                     type="single" 
                     syntax="string" 
                     i18nKey="a112"
+                    order="800"
                     resourceName="keyProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.JKSKeyProvider</Value>
@@ -121,6 +129,7 @@
                     type="single_choice" 
                     syntax="string" 
                     i18nKey="a113"
+                    order="900"
                     resourceName="certificateChecking">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="off">off</ChoiceValue>
@@ -134,6 +143,7 @@
                     type="single_choice" 
                     syntax="string" 
                     i18nKey="a114"
+                    order="1000"
                     resourceName="canonicalizationAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
@@ -149,6 +159,7 @@
                     type="single_choice" 
                     syntax="string" 
                     i18nKey="a115"
+                    order="1100"
                     resourceName="signatureAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#rsa-sha1">http://www.w3.org/2000/09/xmldsig#rsa-sha1</ChoiceValue>
@@ -172,7 +183,8 @@
                 <AttributeSchema name="DigestAlgorithm"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1150">
+                    i18nKey="a1150"
+                    order="1200">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#sha1">http://www.w3.org/2000/09/xmldsig#sha1</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmlenc#sha256">http://www.w3.org/2001/04/xmlenc#sha256</ChoiceValue>
@@ -186,7 +198,8 @@
                 <AttributeSchema name="QuerySignatureAlgorithmRSA"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a1151">
+                                 i18nKey="a1151"
+                                 order="1300">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#rsa-sha1">http://www.w3.org/2000/09/xmldsig#rsa-sha1</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256">http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</ChoiceValue>
@@ -200,7 +213,8 @@
                 <AttributeSchema name="QuerySignatureAlgorithmDSA"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a1152">
+                                 i18nKey="a1152"
+                                 order="1400">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#dsa-sha1">http://www.w3.org/2000/09/xmldsig#dsa-sha1</ChoiceValue>
                     </ChoiceValues>
@@ -211,7 +225,8 @@
                 <AttributeSchema name="QuerySignatureAlgorithmEC"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a1153">
+                                 i18nKey="a1153"
+                                 order="1500">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1">http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256">http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256</ChoiceValue>
@@ -226,6 +241,7 @@
                     type="single_choice" 
                     syntax="string" 
                     i18nKey="a116"
+                    order="1600"
                     resourceName="transformationAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
@@ -249,6 +265,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a117"
+                    order="1700"
                     resourceName="samlErrorPageUrl">
                     <DefaultValues>
                         <Value>/saml2/jsp/saml2error.jsp</Value>
@@ -258,6 +275,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a118"
+                    order="1800"
                     resourceName="samlErrorPageHttpBinding">
                     <DefaultValues>
                         <Value>HTTP-POST</Value>
@@ -267,6 +285,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a119"
+                    order="1900"
                     resourceName="monitoringAgentClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.AgentProvider</Value>
@@ -276,6 +295,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a120"
+                    order="2000"
                     resourceName="monitoringSaml1Class">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML1SvcProvider</Value>
@@ -285,6 +305,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a121"
+                    order="2100"
                     resourceName="monitoringSaml2Class">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML2SvcProvider</Value>
@@ -294,6 +315,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a122"
+                    order="2200"
                     resourceName="monitoringIdffClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonIDFFSvcProvider</Value>

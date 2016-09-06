@@ -52,6 +52,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a650"
+                                 order="100"
                                  resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -62,6 +63,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a651"
+                                 order="200"
                                  resourceName="issuer">
                     <DefaultValues>
                         <Value>ForgeRock</Value>
@@ -72,6 +74,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a652"
+                                 order="300"
                                  resourceName="timeoutInMilliSecconds">
                     <DefaultValues>
                         <Value>120000</Value>
@@ -82,6 +85,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator"
                                  i18nKey="a653"
+                                 order="400"
                                  resourceName="bgcolour">
                     <DefaultValues>
                         <Value>#519387</Value>
@@ -92,6 +96,7 @@
                                  syntax="string"
                                  validator="UrlValidator"
                                  i18nKey="a654"
+                                 order="500"
                                  resourceName="imgUrl">
                     <ExampleValue>
                         <Value>http://example.com/image.png</Value>
@@ -102,6 +107,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator UrlValidator"
                                  i18nKey="a655"
+                                 order="600"
                                  resourceName="appleLink">
                     <DefaultValues>
                         <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
@@ -112,6 +118,7 @@
                                  syntax="string"
                                  validator="RequiredValueValidator UrlValidator"
                                  i18nKey="a656"
+                                 order="700"
                                  resourceName="googleLink">
                     <DefaultValues>
                         <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>
@@ -136,6 +143,7 @@
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      validator="RequiredValueValidator"
                                      i18nKey="a650"
+                                     order="100"
                                      resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -146,6 +154,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="a651"
+                                     order="200"
                                      resourceName="issuer">
                         <DefaultValues>
                             <Value>ForgeRock</Value>
@@ -156,6 +165,7 @@
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      validator="RequiredValueValidator"
                                      i18nKey="a652"
+                                     order="300"
                                      resourceName="timeoutInMilliSecconds">
                         <DefaultValues>
                             <Value>120000</Value>
@@ -166,6 +176,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="a653"
+                                     order="400"
                                      resourceName="bgcolour">
                         <DefaultValues>
                             <Value>#519387</Value>
@@ -176,6 +187,7 @@
                                      syntax="string"
                                      validator="UrlValidator"
                                      i18nKey="a654"
+                                     order="500"
                                      resourceName="imgUrl">
                         <ExampleValue>
                             <Value>http://example.com/image.png</Value>
@@ -186,6 +198,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator UrlValidator"
                                      i18nKey="a655"
+                                     order="600"
                                      resourceName="appleLink">
                         <DefaultValues>
                             <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
@@ -196,6 +209,7 @@
                                      syntax="string"
                                      validator="RequiredValueValidator UrlValidator"
                                      i18nKey="a656"
+                                     order="700"
                                      resourceName="googleLink">
                         <DefaultValues>
                             <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>

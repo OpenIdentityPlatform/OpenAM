@@ -52,6 +52,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a101"
+                    order="100"
                     resourceName="rotationEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
@@ -66,6 +67,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a102"
+                    order="200"
                     resourceName="maxFileSize">
                     <DefaultValues>
                         <Value>100000000</Value>
@@ -76,6 +78,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a103"
+                    order="300"
                     resourceName="numberHistoryFiles">
                     <DefaultValues>
                         <Value>1</Value>
@@ -85,6 +88,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a1031"
+                    order="400"
                     resourceName="prefix">
                     <DefaultValues>
                         <Value></Value>
@@ -94,6 +98,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a1032"
+                    order="500"
                     resourceName="suffix">
                     <DefaultValues>
                         <Value>-MM.dd.yy-kk.mm</Value>
@@ -104,6 +109,7 @@
                     syntax="number_range"
                     rangeStart="-1" rangeEnd="2147483647"
                     i18nKey="a1033"
+                    order="600"
                     resourceName="rotationInterval">
                     <DefaultValues>
                         <Value>-1</Value>
@@ -113,6 +119,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a104"
+                    order="700"
                     resourceName="location">
                     <DefaultValues>
                         <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
@@ -122,6 +129,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a1041"
+                    order="800"
                     resourceName="status">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceACTIVE">ACTIVE</ChoiceValue>
@@ -134,7 +142,8 @@
                 <AttributeSchema name="resolveHostName"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a1042">
+                    i18nKey="a1042"
+                    order="900">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
@@ -147,6 +156,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a105"
+                    order="1000"
                     resourceName="type">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceFile">File</ChoiceValue>
@@ -169,6 +179,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a1162"
+                    order="2400"
                     resourceName="certificateStore">
                     <DefaultValues>
                         <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
@@ -178,6 +189,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a107"
+                    order="1100"
                     resourceName="user">
                     <DefaultValues>
                         <Value>dbuser</Value>
@@ -299,12 +311,14 @@
                     type="single"
                     syntax="password"
                     i18nKey="a108"
+                    order="1200"
                     resourceName="password">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-db-driver"
                     type="single"
                     syntax="string"
                     i18nKey="a109"
+                    order="1300"
                     resourceName="driver">
                     <DefaultValues>
                         <Value>oracle.jdbc.driver.OracleDriver</Value>
@@ -338,6 +352,7 @@
                     type="multiple_choice"
                     syntax="string"
                     i18nKey="a111"
+                    order="1900"
                     resourceName="fields">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDOM">Domain</ChoiceValue>
@@ -369,6 +384,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a114"
+                    order="2000"
                     resourceName="verifyPeriod">
                     <DefaultValues>
                         <Value>3600</Value>
@@ -379,6 +395,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a115"
+                    order="2100"
                     resourceName="signaturePeriod">
                     <DefaultValues>
                         <Value>900</Value>
@@ -388,6 +405,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a116"
+                    order="2200"
                     resourceName="security">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
@@ -401,6 +419,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a1161"
+                    order="2300"
                     resourceName="signingAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceMD2withRSA">MD2withRSA</ChoiceValue>
@@ -433,6 +452,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a117"
+                    order="2500"
                     resourceName="maxRecords">
                     <DefaultValues>
                         <Value>500</Value>
@@ -443,6 +463,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a119"
+                    order="2700"
                     resourceName="bufferSize">
                     <DefaultValues>
                         <Value>25</Value>
@@ -453,6 +474,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a1191"
+                    order="2800"
                     resourceName="databaseFailureMemoryBufferSize">
                     <DefaultValues>
                         <Value>2</Value>
@@ -463,6 +485,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a120"
+                    order="2900"
                     resourceName="bufferTime">
                     <DefaultValues>
                         <Value>60</Value>
@@ -472,6 +495,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a121"
+                    order="3000"
                     resourceName="buffering">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
@@ -486,6 +510,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a118"
+                    order="2600"
                     resourceName="filesPerKeystore">
                     <DefaultValues>
                         <Value>5</Value>
@@ -520,6 +545,7 @@
                     listOrder="insertion"
                     syntax="string"
                     i18nKey="a130"
+                    order="3100"
                     resourceName="jdkLoggingLevel">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceLOGOFF">OFF</ChoiceValue>
@@ -571,6 +597,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a1101"
+                    order="1400"
                     resourceName="host">
                     <DefaultValues>
                         <Value>localhost</Value>
@@ -581,6 +608,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="65535"
                     i18nKey="a1102"
+                    order="1500"
                     resourceName="port">
                     <DefaultValues>
                         <Value>514</Value>
@@ -590,6 +618,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a1103"
+                    order="1600"
                     resourceName="protocol">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceUDP">UDP</ChoiceValue>
@@ -603,6 +632,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a1104"
+                    order="1700"
                     resourceName="facility">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choicekern">kern</ChoiceValue>
@@ -635,6 +665,7 @@
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a1105"
+                    order="1800"
                     resourceName="timeout">
                     <DefaultValues>
                         <Value>30</Value>

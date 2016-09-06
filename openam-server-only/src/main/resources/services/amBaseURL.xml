@@ -32,6 +32,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="source">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a101a">FIXED_VALUE</ChoiceValue>
@@ -48,19 +49,22 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="fixedValue"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="200">
                 </AttributeSchema>
                 <AttributeSchema name="base-url-extension-class"
                                  type="single"
                                  syntax="string"
                                  resourceName="extensionClassName"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 order="300">
                 </AttributeSchema>
                 <AttributeSchema name="base-url-context-path"
                                  type="single"
                                  syntax="string"
                                  resourceName="contextPath"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 order="400">
                     <DefaultValues>
                         <Value>/@SERVER_URI@</Value>
                     </DefaultValues>

@@ -48,11 +48,13 @@
                         type="single"
                         syntax="string"
                         i18nKey="a201"
+                        order="100"
                         resourceName="description">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-cot-status"
                         type="single_choice"
                         i18nKey="a205"
+                        order="200"
                         resourceName="status">
                         <ChoiceValues>
                               <ChoiceValue i18nKey="a206">Active</ChoiceValue>
@@ -66,30 +68,35 @@
                         type="single"
                         syntax="url"
                         i18nKey="a211"
+                        order="400"
                         resourceName="saml2WriterServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-saml2-readerservice-url"
                         type="single"
                         syntax="url"
                         i18nKey="a212"
+                        order="500"
                         resourceName="saml2ReaderServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-idff-writerservice-url"
                         type="single"
                         syntax="url"
                         i18nKey="a213"
+                        order="600"
                         resourceName="idffWriterServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-idff-readerservice-url"
                         type="single"
                         syntax="url"
                         i18nKey="a214"
+                        order="700"
                         resourceName="idffReaderServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-trusted-providers"
                         type="list"
                         syntax="string"
                         i18nKey="a210"
+                        order="300"
                         resourceName="trustedProviders">
                     </AttributeSchema>
                 </SubSchema>

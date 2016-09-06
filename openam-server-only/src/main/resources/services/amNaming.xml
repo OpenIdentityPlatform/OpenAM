@@ -55,6 +55,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a101"
+                    order="100"
                     resourceName="profileUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/profileservice</Value>
@@ -64,6 +65,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a102"
+                    order="200"
                     resourceName="sessionUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sessionservice</Value>
@@ -73,6 +75,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a103"
+                    order="300"
                     resourceName="loggingUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/loggingservice</Value>
@@ -82,6 +85,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a105"
+                    order="400"
                     resourceName="policyUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/policyservice</Value>
@@ -91,6 +95,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a106"
+                    order="500"
                     resourceName="authUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/authservice</Value>
@@ -100,6 +105,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a107"
+                    order="600"
                     resourceName="samlAwareServletUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLAwareServlet</Value>
@@ -109,6 +115,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a108"
+                    order="700"
                     resourceName="samlSoapReceiverUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLSOAPReceiver</Value>
@@ -118,6 +125,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a109"
+                    order="800"
                     resourceName="samlPostServletUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLPOSTProfileServlet</Value>
@@ -127,6 +135,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a110"
+                    order="900"
                     resourceName="samlAssertionManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/AssertionManagerServlet/AssertionManagerIF</Value>
@@ -137,6 +146,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a114"
+                    order="1200"
                     resourceName="jaxrpcUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/jaxrpc/</Value>
@@ -147,6 +157,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a115"
+                    order="1300"
                     resourceName="jaxwsUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/identityservices/</Value>
@@ -157,6 +168,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a116"
+                    order="1400"
                     resourceName="idsvcsRestUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/identity/</Value>
@@ -167,6 +179,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a111"
+                    order="1000"
                     resourceName="federationAssertionManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/FSAssertionManagerServlet/FSAssertionManagerIF</Value>
@@ -176,6 +189,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a113"
+                    order="1100"
                     resourceName="securityTokenManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SecurityTokenManagerServlet/SecurityTokenManagerIF</Value>
@@ -185,6 +199,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a117"
+                    order="1500"
                     resourceName="stsUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sts</Value>
@@ -194,6 +209,7 @@
                     type="single"
                     syntax="url"
                     i18nKey="a118"
+                    order="1600"
                     resourceName="stsMexUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sts/mex</Value>

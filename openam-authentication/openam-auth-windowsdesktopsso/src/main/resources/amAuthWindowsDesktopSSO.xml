@@ -47,30 +47,35 @@
                     type="single"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="principalName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-keytab-file"
                     type="single"
                     syntax="string"
                     i18nKey="a102"
+                    order="200"
                     resourceName="keytabFileName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realm"
                     type="single"
                     syntax="string"
                     i18nKey="a103"
+                    order="300"
                     resourceName="kerberosRealm">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kdc"
                     type="single"
                     syntax="string"
                     i18nKey="a104"
+                    order="400"
                     resourceName="kerberosServerName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-returnRealm"
                     type="single"
                     syntax="boolean"
                     i18nKey="a105"
+                    order="500"
                     resourceName="returnPrincipalWithDomainName">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -84,6 +89,7 @@
                         type="single"
                         syntax="boolean"
                         i18nKey="a108"
+                        order="800"
                         resourceName="lookupUserInRealm">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -97,6 +103,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a106"
+                    order="600"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -106,6 +113,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a107"
+                    order="700"
                     resourceName="trustedKerberosRealms">
                     <DefaultValues/>
                 </AttributeSchema>
@@ -114,30 +122,35 @@
                         type="single"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="principalName">
                     </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-keytab-file"
                         type="single"
                         syntax="string"
                         i18nKey="a102"
+                        order="200"
                         resourceName="keytabFileName">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realm"
                         type="single"
                         syntax="string"
                         i18nKey="a103"
+                        order="300"
                         resourceName="kerberosRealm">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kdc"
                         type="single"
                         syntax="string"
                         i18nKey="a104"
+                        order="400"
                         resourceName="kerberosServerName">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-returnRealm"
                         type="single"
                         syntax="boolean"
                         i18nKey="a105"
+                        order="500"
                         resourceName="returnPrincipalWithDomainName">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -151,6 +164,7 @@
                         type="single"
                         syntax="boolean"
                         i18nKey="a108"
+                        order="800"
                         resourceName="lookupUserInRealm">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -164,6 +178,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a106"
+                        order="600"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -173,6 +188,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a107"
+                        order="700"
                         resourceName="trustedKerberosRealms">
                         <DefaultValues/>
                     </AttributeSchema>                    

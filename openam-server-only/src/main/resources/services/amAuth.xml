@@ -46,6 +46,7 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a117"
+                                 order="500"
                                  resourceName="authenticators">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.modules.ldap.LDAP</Value>
@@ -80,12 +81,14 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a140"
+                                 order="2300"
                                  resourceName="ldapConnectionPoolSize">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-default-size"
                                  type="single"
                                  syntax="string"
                                  i18nKey="a141"
+                                 order="2400"
                                  resourceName="ldapConnectionPoolDefaultSize">
                     <DefaultValues>
                         <Value>1:10</Value>
@@ -103,6 +106,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a146"
+                                 order="2900"
                                  resourceName="remoteAuthSecurityEnabled">
                     <DefaultValues>
                         <Value>false</Value>
@@ -112,6 +116,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a148"
+                                 order="3100"
                                  resourceName="keepPostProcessInstances">
                     <DefaultValues>
                         <Value>false</Value>
@@ -121,6 +126,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a149"
+                                 order="3200"
                                  resourceName="keepAuthModuleInstances">
                     <DefaultValues>
                         <Value>false</Value>
@@ -130,6 +136,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a154"
+                                 order="3500"
                                  resourceName="xuiInterfaceEnabled">
                     <DefaultValues>
                         <Value>true</Value>
@@ -146,6 +153,7 @@
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a102"
+                                 order="100"
                                  resourceName="dynamicProfileCreation">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="Create">true</ChoiceValue>
@@ -161,6 +169,7 @@
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a104"
+                                 order="200"
                                  resourceName="adminAuthModule">
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -175,6 +184,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a151"
+                    order="3300"
                     resourceName="keyAlias">
                     <DefaultValues>
                         <Value>test</Value>
@@ -184,6 +194,7 @@
                                  type="single"
                                  syntax="password"
                                  i18nKey="a160"
+                                 order="4000"
                                  validator="RequiredValueValidator"
                                  resourceName="sharedSecret">
                     <DefaultValues>
@@ -194,12 +205,14 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a105"
+                                 order="300"
                                  resourceName="defaultRole">
                 </AttributeSchema>
                 <AttributeSchema name="sunEnableModuleBasedAuth"
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a145"
+                                 order="2800"
                                  resourceName="moduleBasedAuthEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -213,6 +226,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a158"
+                                 order="3800"
                                  resourceName="statelessSessionsEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -226,6 +240,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a152"
+                                 order="3400"
                                  resourceName="zeroPageLoginEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -239,12 +254,14 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a155"
+                                 order="3600"
                                  resourceName="zeroPageLoginReferrerWhiteList">
                 </AttributeSchema>
                 <AttributeSchema name="openam.auth.zero.page.login.allow.null.referer"
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a156"
+                                 order="3700"
                                  resourceName="zeroPageLoginAllowedWithoutReferrer">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -258,6 +275,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a125"
+                                 order="800"
                                  resourceName="loginFailureLockoutMode">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -271,6 +289,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a144"
+                                 order="2700"
                                  resourceName="storeInvalidAttemptsInDataStore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -284,6 +303,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a130"
+                                 order="1300"
                                  resourceName="lockoutDuration">
                     <DefaultValues>
                         <Value>0</Value>
@@ -293,6 +313,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a1301"
+                                 order="1400"
                                  resourceName="lockoutDurationMultiplier">
                     <DefaultValues>
                         <Value>1</Value>
@@ -302,6 +323,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a126"
+                                 order="900"
                                  resourceName="loginFailureCount">
                     <DefaultValues>
                         <Value>5</Value>
@@ -311,6 +333,7 @@
                                  type="single"
                                  syntax="number"
                                  i18nKey="a127"
+                                 order="1000"
                                  resourceName="loginFailureDuration">
                     <DefaultValues>
                         <Value>300</Value>
@@ -321,12 +344,14 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a128"
+                                 order="1100"
                                  resourceName="lockoutEmailAddress">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-lockout-warn-user"
                                  type="single"
                                  syntax="number"
                                  i18nKey="a129"
+                                 order="1200"
                                  resourceName="lockoutWarnUserCount">
                     <DefaultValues>
                         <Value>0</Value>
@@ -336,18 +361,21 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a131"
+                                 order="1500"
                                  resourceName="lockoutAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-lockout-attribute-value"
                                  type="single"
                                  syntax="string"
                                  i18nKey="a132"
+                                 order="1600"
                                  resourceName="lockoutAttributeValue">
                 </AttributeSchema>
                 <AttributeSchema name="sunAMAuthInvalidAttemptsDataAttrName"
                                  type="single"
                                  syntax="string"
                                  i18nKey="a1321"
+                                 order="1700"
                                  resourceName="invalidAttemptsDataAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-user-container"
@@ -362,6 +390,7 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a114"
+                                 order="400"
                                  resourceName="aliasAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-user-naming-attr"
@@ -376,6 +405,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  i18nKey="a500"
+                                 order="4100"
                                  resourceName="defaultAuthLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -385,6 +415,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a120"
+                                 order="600"
                                  resourceName="locale">
                     <DefaultValues>
                         <Value>@PLATFORM_LOCALE@</Value>
@@ -394,6 +425,7 @@
                                  type="single_choice"
                                  syntax="string"
                                  i18nKey="a121"
+                                 order="700"
                                  resourceName="orgConfig">
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -408,6 +440,7 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a133"
+                                 order="1800"
                                  resourceName="loginSuccessUrl">
                     <DefaultValues>
                         <Value>/@SERVER_URI@/console</Value>
@@ -417,6 +450,7 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a134"
+                                 order="1900"
                                  resourceName="loginFailureUrl">
                     <DefaultValues>
                         <Value/>
@@ -426,12 +460,14 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a135"
+                                 order="2000"
                                  resourceName="loginPostProcessClass">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-username-generator-enabled"
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a138"
+                                 order="2100"
                                  resourceName="usernameGeneratorEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -445,6 +481,7 @@
                                  type="single"
                                  syntax="string"
                                  i18nKey="a139"
+                                 order="2200"
                                  resourceName="usernameGeneratorClass">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.spi.DefaultUserIDGenerator</Value>
@@ -454,6 +491,7 @@
                                  type="multiple_choice"
                                  syntax="string"
                                  i18nKey="a142"
+                                 order="2500"
                                  resourceName="identityType">
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -468,12 +506,14 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="a143"
+                                 order="2600"
                                  resourceName="userStatusCallbackPlugins">
                 </AttributeSchema>
                 <AttributeSchema name="sunAMUserAttributesSessionMapping"
                                  type="list"
                                  syntax="string"
                                  i18nKey="a147"
+                                 order="3000"
                                  resourceName="userAttributeSessionMapping">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-valid-goto-domains"
@@ -486,7 +526,8 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  resourceName="twoFactorRequired"
-                                 i18nKey="a159">
+                                 i18nKey="a159"
+                                 order="3900">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

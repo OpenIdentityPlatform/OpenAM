@@ -43,32 +43,37 @@
                     <AttributeSchema name="uniquemember"
                          type="list"
                          syntax="string"
-                         i18nKey="g101">
+                         i18nKey="g101"
+                         order="300">
 		    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-group-subscribable"
                          type="single"
                          syntax="boolean"
-                         i18nKey="g102">
+                         i18nKey="g102"
+                         order="400">
 		    </AttributeSchema>
                 </SubSchema>
                 <SubSchema name="DynamicGroup">
                     <AttributeSchema name="filterinfo"
                          type="single"
                          syntax="string"
-                         i18nKey="dg1">
+                         i18nKey="dg1"
+                         order="100">
 		    </AttributeSchema>
                 </SubSchema>
                 <SubSchema name="Organization">
                     <AttributeSchema name="sunPreferredDomain"
                          type="single"
                          syntax="string"
-                         i18nKey="o101">
+                         i18nKey="o101"
+                         order="500">
                     </AttributeSchema>
                     <AttributeSchema name="inetdomainstatus"
                          type="single_choice"
                          syntax="string"
                          any="optional|filter"
-                         i18nKey="o102">
+                         i18nKey="o102"
+                         order="600">
                          <ChoiceValues>
                              <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
                              <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
@@ -77,24 +82,28 @@
                     <AttributeSchema name="sunOrganizationAlias"
                          type="list"
                          syntax="string"
-                         i18nKey="o1021">
+                         i18nKey="o1021"
+                         order="700">
                     </AttributeSchema>
                     <AttributeSchema name="associatedDomain"
                          type="list"
                          syntax="string"
-                         i18nKey="o103">
+                         i18nKey="o103"
+                         order="800">
                     </AttributeSchema>
                     <AttributeSchema name="sunNameSpaceUniqueAttrs"
                          type="list"
                          syntax="string"
-                         i18nKey="o104">
+                         i18nKey="o104"
+                         order="900">
                     </AttributeSchema>
                 </SubSchema>
                 <SubSchema name="FilteredRole">
                     <AttributeSchema name="filterinfo"
                          type="single"
                          syntax="string"
-                         i18nKey="fr1">
+                         i18nKey="fr1"
+                         order="200">
                     </AttributeSchema>
                 </SubSchema>
 	    </Global>

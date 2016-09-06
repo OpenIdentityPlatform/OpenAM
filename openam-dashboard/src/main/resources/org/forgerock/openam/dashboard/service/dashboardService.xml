@@ -55,39 +55,46 @@
                                      type="single"
                                      syntax="string"
                                      resourceName="className"
-                                     i18nKey="A101"/>
+                                     i18nKey="A101"
+                                     order="100"/>
                     <AttributeSchema name="dashboardName"
                                      type="single"
                                      syntax="string"
                                      resourceName="name"
-                                     i18nKey="A102"/>
+                                     i18nKey="A102"
+                                     order="200"/>
                     <AttributeSchema name="dashboardDisplayName"
                                      type="single"
                                      syntax="string"
                                      resourceName="displayName"
-                                     i18nKey="A103"/>
+                                     i18nKey="A103"
+                                     order="300"/>
                     <AttributeSchema name="dashboardIcon"
                                      type="single"
                                      syntax="string"
                                      resourceName="icon"
-                                     i18nKey="A104"/>
+                                     i18nKey="A104"
+                                     order="400"/>
                     <AttributeSchema name="dashboardLogin"
                                      type="single"
                                      syntax="string"
                                      resourceName="login"
-                                     i18nKey="A105"/>
+                                     i18nKey="A105"
+                                     order="500"/>
                     <AttributeSchema name="ICFIdentifier"
                                      type="single"
                                      syntax="string"
                                      resourceName="icfIdentifier"
-                                     i18nKey="A106"/>
+                                     i18nKey="A106"
+                                     order="600"/>
                 </SubSchema>
             </Global>
             <Organization>
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="A107">
+                                 i18nKey="A107"
+                                 order="700">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -97,7 +104,8 @@
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="A108">
+                                 i18nKey="A108"
+                                 order="800">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>

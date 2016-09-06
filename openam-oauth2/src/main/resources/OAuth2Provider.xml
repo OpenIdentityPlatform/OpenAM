@@ -45,7 +45,8 @@
                                  syntax="number_range"
                                  rangeStart="0"
                                  rangeEnd="2147483647"
-                                 i18nKey="a134">
+                                 i18nKey="a134"
+                                 order="0">
                     <DefaultValues>
                         <Value>10000</Value>
                     </DefaultValues>
@@ -55,7 +56,8 @@
                                  syntax="number_range"
                                  rangeStart="0"
                                  rangeEnd="2147483647"
-                                 i18nKey="a135">
+                                 i18nKey="a135"
+                                 order="1">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
@@ -64,7 +66,8 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a136">
+                                 i18nKey="a136"
+                                 order="2">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -75,7 +78,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a099"
-                                 order="0">
+                                 order="3">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

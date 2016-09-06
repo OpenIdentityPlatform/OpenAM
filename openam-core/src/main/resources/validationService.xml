@@ -28,7 +28,8 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="validGotoDestinations"
-                                 i18nKey="a100">
+                                 i18nKey="a100"
+                                 order="100">
                 </AttributeSchema>
             </Organization>
         </Schema>

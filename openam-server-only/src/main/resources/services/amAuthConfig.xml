@@ -67,11 +67,13 @@
                             propertiesViewBeanURL="@CONSOLE_URI@/auth/ACModuleList" 
                             uitype="link"
                             i18nKey="a101"
+                            order="100"
                             resourceName="authChainConfiguration"/>
                              <AttributeSchema name="iplanet-am-auth-login-success-url"
                             type="list"
                             syntax="string"
                             i18nKey="a102"
+                            order="200"
                             resourceName="loginSuccessUrl">
                             <DefaultValues>
                                   <Value/>
@@ -81,6 +83,7 @@
                             type="list"
                             syntax="string"
                             i18nKey="a103"
+                            order="300"
                             resourceName="loginFailureUrl">
                             <DefaultValues>
                                 <Value/>
@@ -90,6 +93,7 @@
                             type="list"
                             syntax="string"
                             i18nKey="a104"
+                            order="400"
                             resourceName="loginPostProcessClass">
                         </AttributeSchema>
 
@@ -102,6 +106,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="authChainConfiguration">
                     <ChoiceValues>
                         <ChoiceValuesClassName
