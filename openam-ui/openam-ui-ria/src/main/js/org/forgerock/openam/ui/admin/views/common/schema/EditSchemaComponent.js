@@ -24,25 +24,35 @@ define([
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/ReactAdapterView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/common/TabSearch",
     "org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent",
+    "org/forgerock/openam/ui/admin/views/configuration/global/scripting/ScriptsList",
+    "org/forgerock/openam/ui/common/components/PanelComponent",
     "org/forgerock/openam/ui/common/components/PartialBasedView",
     "org/forgerock/openam/ui/common/components/TabComponent",
     "org/forgerock/openam/ui/common/models/JSONSchema",
     "org/forgerock/openam/ui/common/models/JSONValues",
     "org/forgerock/openam/ui/common/util/Promise",
     "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView"
-], ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, UIUtils, FormHelper, TabSearch,
-    SubSchemaListComponent, PartialBasedView, TabComponent, JSONSchema, JSONValues, Promise, FlatJSONSchemaView) => {
+], ($, _, Backbone, Messages, AbstractView, EventManager, ReactAdapterView, Router, Constants, UIUtils, FormHelper,
+    TabSearch, SubSchemaListComponent, ScriptsList, PanelComponent, PartialBasedView, TabComponent, JSONSchema,
+    JSONValues, Promise, FlatJSONSchemaView) => {
+
+    ScriptsList = ScriptsList.default;
 
     const PSEUDO_TAB = { id: _.uniqueId("pseudo_tab_"), title: $.t("console.common.configuration") };
     const SUBSCHEMA_TAB = { id: "subschema", title: $.t("console.common.secondaryConfigurations") };
+    const DEFAULT_SCRIPTS_TAB = { id: "defaultScripts", title: "Default Scripts" };
 
-    const createTabs = (schema, subSchemaTypes) => {
+    const isScriptingSubSchemaView = (subSchemaType, subSubSchemaType) => subSchemaType === "contexts" &&
+        _.isEmpty(subSubSchemaType);
+
+    const createTabs = (schema, subSchemaTypes, isScriptingSubSchemaView) => {
         let tabs = [];
         const hasSubSchema = subSchemaTypes && subSchemaTypes.length > 0;
         const schemaIsCollection = schema.isCollection();
@@ -52,12 +62,15 @@ define([
                 .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
                 .sortBy("order")
                 .value());
+        } else if (hasSubSchema) {
+            tabs.push(PSEUDO_TAB);
+        }
+
+        if (isScriptingSubSchemaView) {
+            tabs.push(DEFAULT_SCRIPTS_TAB);
         }
 
         if (hasSubSchema) {
-            if (!schemaIsCollection) {
-                tabs.push(PSEUDO_TAB);
-            }
             tabs.push(SUBSCHEMA_TAB);
         }
 
@@ -120,6 +133,12 @@ define([
                             schema: this.data.schema,
                             values: this.data.values
                         });
+                    } else if (id === DEFAULT_SCRIPTS_TAB.id) {
+                        return (new ReactAdapterView({
+                            reactView: ScriptsList,
+                            reactProps: { subSchemaType: this.data.subSchemaInstanceId },
+                            needsBaseTemplate: false
+                        }));
                     } else {
                         return new FlatJSONSchemaView({
                             schema: new JSONSchema(this.data.schema.raw.properties[id]),
@@ -128,7 +147,7 @@ define([
                     }
                 },
                 createFooter: (id) => {
-                    if (id !== SUBSCHEMA_TAB.id) {
+                    if (id !== SUBSCHEMA_TAB.id && id !== DEFAULT_SCRIPTS_TAB.id) {
                         return new PartialBasedView({ partial: "form/_JSONSchemaFooter" });
                     }
                 }
@@ -155,7 +174,8 @@ define([
 
                 this.data.name = instance.name;
 
-                const tabs = createTabs(instance.schema, subSchema);
+                const tabs = createTabs(instance.schema, subSchema, isScriptingSubSchemaView(this.data.subSchemaType,
+                    this.data.subSubSchemaType));
                 const hasTabs = !_.isEmpty(tabs);
 
                 this.data.hasTabs = hasTabs;

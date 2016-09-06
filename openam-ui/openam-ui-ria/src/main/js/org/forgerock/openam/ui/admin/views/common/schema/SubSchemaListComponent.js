@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent
                 instances: response[0],
                 creatables: response[1],
                 // scripting sub configuration (default types) can't be deleted
-                showDeleteButton: this.data.type !== "scripting"
+                showDeleteButton: this.data.serviceType !== "scripting"
             }), (html) => {
                 this.$el.html(html);
             });

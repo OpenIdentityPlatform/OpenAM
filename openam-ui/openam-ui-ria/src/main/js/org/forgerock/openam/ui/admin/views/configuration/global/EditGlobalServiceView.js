@@ -26,21 +26,21 @@ define([
 ], (AbstractView, UIUtils, ServicesService, Backlink, EditSchemaComponent) => {
     const EditGlobalServiceView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
-        render ([type]) {
+        render ([serviceType]) {
             const editComponent = new EditSchemaComponent({
-                data: { type },
+                data: { serviceType },
 
                 template: "templates/admin/views/configuration/EditGlobalConfigurationTemplate.html",
                 subSchemaTemplate: "templates/admin/views/configuration/global/SubSchemaListTemplate.html",
 
-                getInstance: () => ServicesService.instance.get(type),
-                updateInstance: (values) => ServicesService.instance.update(type, values),
+                getInstance: () => ServicesService.instance.get(serviceType),
+                updateInstance: (values) => ServicesService.instance.update(serviceType, values),
 
-                getSubSchemaTypes: () => ServicesService.type.subSchema.type.getAll(type),
-                getSubSchemaCreatableTypes: () => ServicesService.type.subSchema.type.getCreatables(type),
-                getSubSchemaInstances: () => ServicesService.type.subSchema.instance.getAll(type),
+                getSubSchemaTypes: () => ServicesService.type.subSchema.type.getAll(serviceType),
+                getSubSchemaCreatableTypes: () => ServicesService.type.subSchema.type.getCreatables(serviceType),
+                getSubSchemaInstances: () => ServicesService.type.subSchema.instance.getAll(serviceType),
                 deleteSubSchemaInstance: (subSchemaType, subSchemaInstance) =>
-                    ServicesService.type.subSchema.instance.remove(type, subSchemaType, subSchemaInstance)
+                    ServicesService.type.subSchema.instance.remove(serviceType, subSchemaType, subSchemaInstance)
             });
 
             this.parentRender(() => {
