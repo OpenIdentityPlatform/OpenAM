@@ -22,6 +22,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -126,15 +130,20 @@ public abstract class PrivilegeAuthzModule {
                     loggedInRealm, REST, VERSION, routerContext.getMatchedUri(),
                     definition.getCommonVerb(), actions, Collections.<String, String>emptyMap());
 
+            // If the subject is an agent, the realm in the context and the realm of the subject do not have to be
+            // either the same, or related by parentage
+            //
+            boolean isRealmValid = isCASPAorJASPA(token) || loggedIntoValidRealm(realm, loggedInRealm);
+
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,
-                    Collections.<String, Set<String>>emptyMap()) && loggedIntoValidRealm(realm, loggedInRealm)) {
+                    Collections.<String, Set<String>>emptyMap()) && isRealmValid) {
                 // Authorisation has been approved.
                 return AuthorizationResult.accessPermitted();
             }
         } catch (DelegationException dE) {
             throw new InternalServerErrorException("Attempt to authorise the user has failed", dE);
         } catch (SSOException e) {
-            //you don't have a user so return access denied
+            // you don't have a user so return access denied
             return AuthorizationResult.accessDenied("No valid user supplied in request.");
         }
 
@@ -149,9 +158,28 @@ public abstract class PrivilegeAuthzModule {
      */
     protected boolean loggedIntoValidRealm(String requestedRealm, String loggedInRealm) {
         return requestedRealm.equalsIgnoreCase(loggedInRealm)
-                || RealmUtils.isParentRealm(loggedInRealm, requestedRealm);
+                    || RealmUtils.isParentRealm(loggedInRealm, requestedRealm);
     }
 
+    /**
+     * @param ssoToken The user's SSO Token
+     * @return True if the user SSO Token corresponds to CASPA (C Application Server Policy Agent) or JASPA (Java
+     * Application Server Policy Agent)
+     * @throws SSOException if the SSO Token's principal cannot be extracted, or there is an IdRepoException.
+     */
+    private boolean isCASPAorJASPA(SSOToken ssoToken) throws SSOException {
+
+        try {
+            if (ssoToken != null) {
+                AMIdentity identity = new AMIdentity(ssoToken);
+                String agentType = AgentConfiguration.getAgentType(identity);
+                return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(agentType)
+                        || AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(agentType);
+            }
+        } catch (IdRepoException ignored) {
+        }
+        return false;
+    }
 
     /**
      * Function converts an action to a string representation.
@@ -162,7 +190,6 @@ public abstract class PrivilegeAuthzModule {
         public String apply(final Action action) {
             return action.toString();
         }
-
     }
 
 }
