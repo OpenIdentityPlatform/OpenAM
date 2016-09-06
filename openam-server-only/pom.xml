@@ -553,55 +553,6 @@
             </build>
         </profile>
         <profile>
-            <id>precommit</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <script language="groovy"><![CDATA[
-                                            File libs = new File(project.getProperty("project.build.directory") +
-                                                    "/generated-sources/license/THIRD-PARTY.txt")
-                                            File thirdParty = new File(project.getProperty("basedir") +
-                                                    "/../legal/THIRDPARTYREADME.txt")
-                                            List published = thirdParty.readLines().findAll { s -> s.startsWith("Version:") }
-                                            List missing = [];
-                                            libs.eachLine { line ->
-                                                (line =~ /\(([^:\(]+):([^:]+):([^ ]+)/).each { match, groupId, artifactId, version ->
-                                                    if (!groupId.startsWith("org.forgerock") &&
-                                                            !published.any { s -> s.contains(artifactId) && s.contains(version) }) {
-                                                        missing.add("$groupId:$artifactId:$version")
-                                                    }
-                                                }
-                                            }
-                                            if (!missing.isEmpty()) {
-                                                throw new Exception("Missing libraries from THIRDPARTYREADME.txt:\n" +
-                                                        missing.join("\n"))
-                                            }
-                                        ]]></script>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.codehaus.groovy</groupId>
-                                <artifactId>groovy-jsr223</artifactId>
-                                <version>2.3.3</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>precompile-jsps</id>
             <build>
                 <plugins>
