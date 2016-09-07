@@ -44,10 +44,22 @@ define([
                     "properties": {
                         "globalProperty": {},
                         "defaults": {
-                            "defaultsProperty": {}
+                            "defaultsCollection": {
+                                "type": "object",
+                                "properties": {
+                                    "defaultsProperty": {}
+                                }
+                            },
+                            "defaultsSimpleProperty": {}
                         },
                         "dynamic": {
-                            "dynamicProperty": {}
+                            "dynamicCollection": {
+                                "type": "object",
+                                "properties": {
+                                    "dynamicProperty": {}
+                                }
+                            },
+                            "dynamicSimpleProperty": {}
                         }
                     },
                     "type": "object"
@@ -68,12 +80,24 @@ define([
                 expect(schema.raw.properties.global.propertyOrder).eq(-10);
             });
 
-            it("flatten properties in \"defaults\" onto the top-level properties", () => {
-                expect(schema.raw.properties).to.contain.keys("defaultsProperty");
+            it("flattens properties in \"defaults\" onto the top-level properties", () => {
+                expect(schema.raw.properties).to.contain.keys("realmDefaults");
+                expect(schema.raw.properties).to.contain.keys("defaultsCollection");
             });
 
-            it("flatten properties in \"dynamic\" onto the top-level properties", () => {
-                expect(schema.raw.properties).to.contain.keys("dynamicProperty");
+            it("groups simple properties in \"defaults\" into a pseudo collection \"realmDefaults\"", () => {
+                expect(schema.raw.properties).to.contain.keys("realmDefaults");
+                expect(schema.raw.properties.realmDefaults.properties).to.contain.keys("defaultsSimpleProperty");
+            });
+
+            it("flattens properties in \"dynamic\" onto the top-level properties", () => {
+                expect(schema.raw.properties).to.contain.keys("dynamicAttributes");
+                expect(schema.raw.properties).to.contain.keys("dynamicCollection");
+            });
+
+            it("groups simple properties in \"dynamic\" into a pseudo collection \"dynamicAttributes\"", () => {
+                expect(schema.raw.properties).to.contain.keys("dynamicAttributes");
+                expect(schema.raw.properties.dynamicAttributes.properties).to.contain.keys("dynamicSimpleProperty");
             });
 
             context("when there is no \"defaults\" or \"dynamic\" properties", () => {

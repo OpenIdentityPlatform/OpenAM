@@ -47,6 +47,15 @@ define([
     "org/forgerock/openam/ui/common/models/schemaTransforms/warnOnInferredPasswordWithoutFormat"
 ], (i18next, _, transformBooleanTypeToCheckboxFormat, transformEnumTypeToString, transformPropertyOrderAttributeToInt,
     warnOnInferredPasswordWithoutFormat) => {
+    /**
+     * Determines whether the specified object is of type <code>object</code>
+     * @param   {Object}  object Object to determine the type of
+     * @returns {Boolean}        Whether the object is of type <code>object</code>
+     */
+    function isObjectType (object) {
+        return object.type === "object";
+    }
+
     function groupTopLevelProperties (raw) {
         if (_.isEmpty(_.omit(raw.properties, "defaults", "dynamic"))) {
             return raw;
@@ -72,28 +81,62 @@ define([
         return schema;
     }
 
+    /**
+     * Groups simple properties together in a pseudo collection. Property is considered simple, if it is not a
+     * collection of properties itself. The new collection will be translated into its own tab on the UI.
+     *
+     * @param   {Object} raw Schema
+     * @param   {string} propertyKey Key of the property value object
+     * @param   {string} pseudoCollectionName Simple properties will be grouped under this name
+     * @param   {string} pseudoCollectionDisplayName Display name of the pseudo tab
+     * @returns {JSONSchema} JSONSchema new JSONSchema object
+     */
+    function groupSimplePropertiesInPseudoCollection (raw, propertyKey, pseudoCollectionName,
+        pseudoCollectionDisplayName) {
+
+        if (_.isEmpty(_.pick(raw.properties, propertyKey))) {
+            return raw;
+        }
+
+        const schema = _.cloneDeep(raw);
+        const simpleProperties = _.pick(schema.properties[propertyKey], (property) => {
+            return !_.has(property, "properties");
+        });
+
+        if (!_.isEmpty(simpleProperties)) {
+            schema.properties[propertyKey][pseudoCollectionName] = {
+                properties: simpleProperties,
+                propertyOrder: -10,
+                title: pseudoCollectionDisplayName,
+                type: "object"
+            };
+
+            schema.properties[propertyKey] = _.omit(schema.properties[propertyKey], _.keys(simpleProperties));
+        }
+
+        return schema;
+    }
+
     function throwOnNoSchemaRootType (schema) {
         if (!schema.type) {
             throw new Error("[JSONSchema] No \"type\" attribute found on schema root object.");
         }
     }
 
+    /**
+    * Ungroups specified property, moving its child properties one level up.
+    *
+    * @param   {Object} raw Schema
+    * @param   {string} propertyKey Key of the property value object
+    * @returns {JSONSchema} JSONSchema new JSONSchema object
+    */
     function ungroupProperty (raw, propertyKey) {
         const schema = _.cloneDeep(raw);
 
-        schema.properties = _.merge(schema.properties, schema.properties[propertyKey]);
+        schema.properties = { ...schema.properties, ...schema.properties[propertyKey] };
         delete schema.properties[propertyKey];
 
         return schema;
-    }
-
-    /**
-     * Determines whether the specified object is of type <code>object</code>
-     * @param   {Object}  object Object to determine the type of
-     * @returns {Boolean}        Whether the object is of type <code>object</code>
-     */
-    function isObjectType (object) {
-        return object.type === "object";
     }
 
     /**
@@ -139,8 +182,16 @@ define([
             if (hasDefaults || hasDynamic) {
                 schema = groupTopLevelProperties(schema);
 
-                if (hasDefaults) { schema = ungroupProperty(schema, "defaults"); }
-                if (hasDynamic) { schema = ungroupProperty(schema, "dynamic"); }
+                if (hasDefaults) {
+                    schema = groupSimplePropertiesInPseudoCollection(schema, "defaults", "realmDefaults",
+                        i18next.t("console.common.realmDefaults"));
+                    schema = ungroupProperty(schema, "defaults");
+                }
+                if (hasDynamic) {
+                    schema = groupSimplePropertiesInPseudoCollection(schema, "dynamic", "dynamicAttributes",
+                        i18next.t("console.common.dynamicAttributes"));
+                    schema = ungroupProperty(schema, "dynamic");
+                }
             }
 
             schema = cleanJSONSchema(schema);

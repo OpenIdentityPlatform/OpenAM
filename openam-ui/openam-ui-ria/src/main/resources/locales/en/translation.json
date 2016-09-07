@@ -745,6 +745,8 @@
             "confirmDeleteSelected": "Are you sure that you want to delete these items?",
             "configuration": "Configuration",
             "secondaryConfigurations": "Secondary Configurations",
+            "realmDefaults": "Realm Defaults",
+            "dynamicAttributes": "Dynamic Attributes",
             "global": "Global"
         },
         "sites" : {

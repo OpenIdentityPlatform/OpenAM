@@ -25,25 +25,51 @@ define([
                 values = new JSONValues({
                     "globalValue": {},
                     "defaults": {
-                        "defaultsValue": {}
+                        "defaultsCollection": {
+                            "collectionItem1": "value1",
+                            "collectionItem2": "value2"
+                        },
+                        "defaultsSimple": "simpleValue"
                     },
                     "dynamic": {
-                        "dynamicValue": {}
+                        "dynamicCollection": {
+                            "collectionItem1": "value1",
+                            "collectionItem2": "value2"
+                        },
+                        "dynamicSimple": "simpleValue"
                     }
                 });
             });
 
             it("groups the top-level values under a \"global\" value", () => {
                 expect(values.raw).to.contain.keys("global");
-                expect(values.raw.global).to.have.keys("globalValue");
+                expect(values.raw.global).to.contain.keys("globalValue");
             });
 
-            it("flatten values in \"defaults\" onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("defaultsValue");
+            it("groups simple values in \"defaults\" into a pseudo collection \"realmDefaults\"", () => {
+                expect(values.raw).to.contain.keys("realmDefaults");
+                expect(values.raw.realmDefaults).to.contain.keys("defaultsSimple");
             });
 
-            it("flatten values in \"dynamic\" onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("dynamicValue");
+            it("flattens values in \"defaults\" onto the top-level values", () => {
+                expect(values.raw).to.contain.keys("defaultsCollection");
+            });
+
+            it("groups simple values in \"dynamic\" into a pseudo collection \"dynamicAttributes\"", () => {
+                expect(values.raw).to.contain.keys("dynamicAttributes");
+                expect(values.raw.dynamicAttributes).to.contain.keys("dynamicSimple");
+            });
+
+            it("flattens values in \"dynamic\" onto the top-level values", () => {
+                expect(values.raw).to.contain.keys("dynamicCollection");
+            });
+
+            it("contains \"_defaultsCollectionProperties\"", () => {
+                expect(values.raw).to.contain.keys("_defaultsCollectionProperties");
+            });
+
+            it("contains \"_dynamicCollectionProperties\"", () => {
+                expect(values.raw).to.contain.keys("_dynamicCollectionProperties");
             });
 
             context("when there is no \"defaults\" or \"dynamic\" properties", () => {
@@ -109,11 +135,20 @@ define([
                     "_id": {},
                     "_type": {},
                     "globalValue": {},
-                    "defaults": {
-                        "defaultsValue": {}
+                    "_defaultsCollectionProperties": ["defaultsCollection"],
+                    "_dynamicCollectionProperties": ["dynamicCollection"],
+                    "defaultsCollection": {
+                        "collectionItem1": "value1",
+                        "collectionItem2": "value2"
                     },
-                    "dynamic": {
-                        "dynamicValue": {}
+                    "realmDefaults": {
+                        "defaultsSimple": "simpleValue"
+                    },
+                    "dynamicCollection": {
+                        "collectionItem": "value"
+                    },
+                    "dynamicAttributes": {
+                        "dynamicSimple": "simpleValue"
                     }
                 }).toJSON();
             });
@@ -129,12 +164,22 @@ define([
 
             it("returns defaults values under a \"defaults\" property", () => {
                 expect(JSON.parse(values)).to.contain.keys("defaults");
-                expect(JSON.parse(values).defaults).to.have.keys("defaultsValue");
+                expect(JSON.parse(values).defaults).to.contain.keys("defaultsCollection");
+                expect(JSON.parse(values).defaults).to.contain.keys("defaultsSimple");
             });
 
             it("returns dynamic values under a \"dynamic\" property", () => {
                 expect(JSON.parse(values)).to.contain.keys("dynamic");
-                expect(JSON.parse(values).dynamic).to.have.keys("dynamicValue");
+                expect(JSON.parse(values).dynamic).to.contain.keys("dynamicCollection");
+                expect(JSON.parse(values).dynamic).to.contain.keys("dynamicSimple");
+            });
+
+            it("does not return \"_defaultsCollectionProperties\"", () => {
+                expect(JSON.parse(values)).to.not.contain.keys("_defaultsCollectionProperties");
+            });
+
+            it("does not return \"_dynamicCollectionProperties\"", () => {
+                expect(JSON.parse(values)).to.not.contain.keys("_dynamicCollectionProperties");
             });
 
             it("returns \"_id\" at the top-level", () => {

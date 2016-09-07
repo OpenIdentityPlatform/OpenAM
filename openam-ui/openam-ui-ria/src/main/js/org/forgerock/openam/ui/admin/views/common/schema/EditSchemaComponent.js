@@ -45,17 +45,19 @@ define([
     const createTabs = (schema, subSchemaTypes) => {
         let tabs = [];
         const hasSubSchema = subSchemaTypes && subSchemaTypes.length > 0;
+        const schemaIsCollection = schema.isCollection();
 
-        if (schema.isCollection()) {
+        if (schemaIsCollection) {
             tabs = tabs.concat(_(schema.raw.properties)
                 .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
                 .sortBy("order")
                 .value());
-        } else {
-            tabs.push(PSEUDO_TAB);
         }
 
         if (hasSubSchema) {
+            if (!schemaIsCollection) {
+                tabs.push(PSEUDO_TAB);
+            }
             tabs.push(SUBSCHEMA_TAB);
         }
 
@@ -154,7 +156,7 @@ define([
                 this.data.name = instance.name;
 
                 const tabs = createTabs(instance.schema, subSchema);
-                const hasTabs = tabs.length > 1;
+                const hasTabs = !_.isEmpty(tabs);
 
                 this.data.hasTabs = hasTabs;
 

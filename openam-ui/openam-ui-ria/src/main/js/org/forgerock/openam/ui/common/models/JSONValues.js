@@ -62,9 +62,44 @@ define([
         return values;
     }
 
-    function ungroupValue (raw, propertyKey) {
-        const values = _.merge(raw, raw[propertyKey]);
-        values[`_${propertyKey}Properties`] = _.keys(raw[propertyKey]);
+    /**
+     * Groups simple properties together in a pseudo collection. Property is considered simple, if it is not a
+     * collection of properties itself. The new collection will be translated into its own tab on the UI.
+     *
+     * @param   {Object} raw Values
+     * @param   {string} propertyKey Key of the property value object
+     * @param   {string} pseudoCollectionName Simple properties will be grouped under this name
+     * @returns {JSONValues} JSONValues object with new value set
+     */
+    function groupSimplePropertiesInPseudoCollection (raw, propertyKey, pseudoCollectionName) {
+        const values = _.cloneDeep(raw);
+        const simpleProperties = _.pick(values[propertyKey], (value) => {
+            return !_.isObject(value) || _.isArray(value);
+        });
+
+        if (!_.isEmpty(simpleProperties)) {
+            values[propertyKey][pseudoCollectionName] = simpleProperties;
+            values[propertyKey] = _.omit(values[propertyKey], _.keys(simpleProperties));
+        }
+
+        return values;
+    }
+
+    /**
+    * Ungroups specified value, moving its child properties one level up.
+    *
+    * @param   {Object} raw Values
+    * @param   {string} propertyKey Key of the property value object
+    * @param   {string} pseudoCollectionName Simple properties are grouped under this name
+    * @returns {JSONValues} JSONValues object with new value set
+    */
+    function ungroupValue (raw, propertyKey, pseudoCollectionName) {
+        const values = { ...raw, ...raw[propertyKey] };
+        const collectionPropertiesKeys = _.without(_.keys(raw[propertyKey]), pseudoCollectionName);
+
+        if (!_.isEmpty(collectionPropertiesKeys)) {
+            values[`_${propertyKey}CollectionProperties`] = collectionPropertiesKeys;
+        }
         delete values[propertyKey];
 
         return values;
@@ -78,8 +113,14 @@ define([
             if (hasDefaults || hasDynamic) {
                 values = groupTopLevelValues(values);
 
-                if (hasDefaults) { values = ungroupValue(values, "defaults"); }
-                if (hasDynamic) { values = ungroupValue(values, "dynamic"); }
+                if (hasDefaults) {
+                    values = groupSimplePropertiesInPseudoCollection(values, "defaults", "realmDefaults");
+                    values = ungroupValue(values, "defaults", "realmDefaults");
+                }
+                if (hasDynamic) {
+                    values = groupSimplePropertiesInPseudoCollection(values, "dynamic", "dynamicAttributes");
+                    values = ungroupValue(values, "dynamic", "dynamicAttributes");
+                }
             }
 
             this.raw = Object.freeze(values);
@@ -139,29 +180,63 @@ define([
             return new JSONValues(_.mapValues(this.raw, "value"));
         }
         toJSON () {
-            let json = _.clone(this.raw);
+            let json = _.cloneDeep(this.raw);
 
-            if (json._defaultsProperties) {
-                json.defaults = {};
+            const unwrapPseudoCollection = (json, propertyKey, pseudoCollectionName) => {
+                const data = _.cloneDeep(json);
 
-                _.each(this.raw._defaultsProperties, (property) => {
-                    json.defaults[property] = json[property];
-                    delete json[property];
-                });
-                delete json._defaultsProperties;
+                data[propertyKey] = data[pseudoCollectionName];
+
+                return data;
+            };
+
+            const wrapCollectionProperties = (json, propertyKey) => {
+                let data = _.cloneDeep(json);
+
+                const collectionPropertiesKeys = data[`_${propertyKey}CollectionProperties`];
+                const collectionProperties = _.pick(data, collectionPropertiesKeys);
+                data[propertyKey] = { ...data[propertyKey], ...collectionProperties };
+                data = _.omit(data, collectionPropertiesKeys);
+
+                return data;
+            };
+
+            const deletePseudoData = (json, propertyKey, pseudoChildrenCollectionName) => {
+                const data = _.cloneDeep(json);
+
+                delete data[`_${propertyKey}CollectionProperties`];
+                delete data[pseudoChildrenCollectionName];
+
+                return data;
+            };
+
+            const pseudoCollectionPresent = (json, collectionName) => json.hasOwnProperty(collectionName);
+
+            const collectionPropertiesPresent = (json, propertyKey) => {
+                const collectionPropertiesKeys = json[`_${propertyKey}CollectionProperties`];
+                return collectionPropertiesKeys && !_.isEmpty(collectionPropertiesKeys);
+            };
+
+            if (pseudoCollectionPresent(json, "realmDefaults")) {
+                json = unwrapPseudoCollection(json, "defaults", "realmDefaults");
             }
 
-            if (json._dynamicProperties) {
-                json.dynamic = {};
-
-                _.each(this.raw._dynamicProperties, (property) => {
-                    json.dynamic[property] = json[property];
-                    delete json[property];
-                });
-                delete json._dynamicProperties;
+            if (collectionPropertiesPresent(json, "defaults")) {
+                json = wrapCollectionProperties(json, "defaults");
             }
 
-            json = _.merge(json, json.global);
+            if (pseudoCollectionPresent(json, "dynamicAttributes")) {
+                json = unwrapPseudoCollection(json, "dynamic", "dynamicAttributes");
+            }
+
+            if (collectionPropertiesPresent(json, "dynamic")) {
+                json = wrapCollectionProperties(json, "dynamic");
+            }
+
+            json = deletePseudoData(json, "defaults", "realmDefaults");
+            json = deletePseudoData(json, "dynamic", "dynamicAttributes");
+
+            json = { ...json, ...json.global };
             delete json.global;
 
             return JSON.stringify(json);
