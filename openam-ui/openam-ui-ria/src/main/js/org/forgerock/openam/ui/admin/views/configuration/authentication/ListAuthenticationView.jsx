@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-import { Clearfix, Grid, ListGroup, ListGroupItem, PageHeader, Panel } from "react-bootstrap";
+import { Grid, ListGroup, ListGroupItem, PageHeader, Panel } from "react-bootstrap";
 import { t } from "i18next";
 import React, { Component } from "react";
 
