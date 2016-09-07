@@ -168,6 +168,7 @@ module.exports = function (grunt) {
                 src: [
                     "." + mavenSrcPath + "/**/*.js",
                     "." + mavenSrcPath + "/**/*.jsm",
+                    "." + mavenSrcPath + "/**/*.jsx",
                     "!." + mavenSrcPath + "/libs/**/*.js",
                     "." + mavenTestPath + "/**/*.js"
                 ],
