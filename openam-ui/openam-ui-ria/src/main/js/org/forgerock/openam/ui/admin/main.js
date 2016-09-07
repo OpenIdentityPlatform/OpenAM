@@ -64,7 +64,6 @@ define([
     "./views/realms/ListRealmsView",
     "./views/realms/RealmTreeNavigationView",
 
-    "./views/configuration/createConfigurationListView",
     "./views/configuration/server/EditServerDefaultsView",
     "./views/configuration/authentication/ListAuthenticationView",
     "./views/configuration/global/ListGlobalServicesView",
