@@ -47,6 +47,7 @@
                     <#if state??>state: "${state?js_string}",</#if>
                     <#if nonce??>nonce: "${nonce?js_string}",</#if>
                     <#if acr??>acr: "${acr?js_string}",</#if>
+                    <#if csrf??>csrf: "${csrf?js_string}",</#if>
                     <#if display_description??>displayDescription: "${display_description?js_string}",</#if>
                     <#if response_type??>responseType: "${response_type?js_string}",</#if>
                     <#if client_id??>clientId: "${client_id?js_string}",</#if>

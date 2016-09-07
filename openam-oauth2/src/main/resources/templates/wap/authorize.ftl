@@ -62,6 +62,9 @@
         <#if acr??>
             <input type="hidden" name="acr" value="${acr?html}"/>
         </#if>
+        <#if csrf??>
+            <input type="hidden" name="csrf" value="${csrf?html}"/>
+        </#if>
             <!-- Required parameters -->
             <input type="hidden" name="response_type" value="${response_type}"/>
             <input type="hidden" name="client_id" value="${client_id}"/>

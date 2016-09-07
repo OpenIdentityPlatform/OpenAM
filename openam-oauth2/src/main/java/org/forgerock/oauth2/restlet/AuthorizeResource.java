@@ -25,6 +25,7 @@ import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.RedirectUriResolver;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.exceptions.CsrfException;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -71,8 +72,8 @@ public class AuthorizeResource extends ConsentRequiredResource {
     public AuthorizeResource(OAuth2RequestFactory requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
             XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory,
-            RedirectUriResolver redirectUriResolver) {
-        super(router, baseURLProviderFactory, xuiState);
+            RedirectUriResolver redirectUriResolver, ResourceOwnerSessionValidator resourceOwnerSessionValidator) {
+        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;

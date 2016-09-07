@@ -108,7 +108,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
             ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
             ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils, CsrfProtection csrfProtection) {
-        super(router, baseURLProviderFactory, xuiState);
+        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator);
         this.representation = representation;
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;
