@@ -20,13 +20,13 @@ import React from "react";
  * A page description.
  * @module components/PageDescription
  * @param {Object} props Properties passed to this component
- * @param {string} props.text Text to display for the page description
+ * @param {ReactNode} props.children Children to add within this component
  * @returns {ReactElement} Renderable React element
  */
-const PageDescription = ({ text }) => <p className="page-description">{text}</p>;
+const PageDescription = ({ children }) => <p className="page-description">{ children }</p>;
 
 PageDescription.propTypes = {
-    text: React.PropTypes.string.isRequired
+    children: React.PropTypes.node
 };
 
 export default PageDescription;

@@ -48,7 +48,7 @@ export default class ListAuthenticationView extends Component {
                     { t("config.AppConfiguration.Navigation.links.configure.authentication") }
                 </PageHeader>
 
-                <PageDescription text={ t("console.configuration.authentication.description") }/>
+                <PageDescription>{ t("console.configuration.authentication.description") }</PageDescription>
 
                 <Panel>
                     <Block header={ t("console.configuration.authentication.core.title") }
