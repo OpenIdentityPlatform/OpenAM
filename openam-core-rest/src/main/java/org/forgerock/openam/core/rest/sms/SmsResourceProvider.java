@@ -54,6 +54,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -185,7 +186,7 @@ public abstract class SmsResourceProvider {
     protected ServiceConfig parentSubConfigFor(Context context, ServiceConfigManager scm)
             throws SMSException, SSOException, NotFoundException {
 
-        Map<String, String> uriTemplateVariables = context.asContext(UriRouterContext.class).getUriTemplateVariables();
+        Map<String, String> uriTemplateVariables = getUriTemplateVariables(context);
 
         ServiceConfig config;
         if (type == SchemaType.GLOBAL) {
@@ -219,6 +220,16 @@ public abstract class SmsResourceProvider {
             }
         }
         return config;
+    }
+
+    private Map<String, String> getUriTemplateVariables(Context context) {
+        Map<String, String> uriTemplateVariables = new HashMap<>();
+        Context c = context;
+        while (c.containsContext(UriRouterContext.class)) {
+            uriTemplateVariables.putAll(c.asContext(UriRouterContext.class).getUriTemplateVariables());
+            c = c.getParent();
+        }
+        return uriTemplateVariables;
     }
 
     /**
