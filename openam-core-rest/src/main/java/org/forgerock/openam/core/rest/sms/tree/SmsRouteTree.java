@@ -205,7 +205,7 @@ public class SmsRouteTree implements RequestHandler {
                 if (!subRoute.getKey().equals("")) {
                     final ResourcePath subPath = resourcePath(subRoute.getKey());
                     try {
-                        readInstances(context, result.get("result"), subPath, subRoute.getValue());
+                        readInstances(context, result.get("result"), subPath, subRoute.getValue(), forUI);
                     } catch (ResourceException e) {
                         return e.asPromise();
                     }
@@ -255,12 +255,14 @@ public class SmsRouteTree implements RequestHandler {
         return newActionResponse(json(object(field("result", result.getObject())))).asPromise();
     }
 
-    private void readInstances(Context context, JsonValue response,
-            ResourcePath subPath, RequestHandler handler) throws ResourceException {
+    private void readInstances(Context context, JsonValue response, ResourcePath subPath, RequestHandler handler,
+            boolean forUI) throws ResourceException {
         try {
-            QueryRequest subRequest = newQueryRequest(empty()).setQueryFilter(ALWAYS_TRUE);
-            handler.handleQuery(context, subRequest, new ChildQueryResourceHandler(subPath, response))
-                    .getOrThrowUninterruptibly();
+            if (!(hiddenFromUI.contains(subPath.toString()) && forUI)) {
+                QueryRequest subRequest = newQueryRequest(empty()).setQueryFilter(ALWAYS_TRUE);
+                handler.handleQuery(context, subRequest, new ChildQueryResourceHandler(subPath, response))
+                        .getOrThrowUninterruptibly();
+            }
         } catch (ResourceException e) {
             if (e.getCode() == NOT_SUPPORTED || e.getCode() == BAD_REQUEST) {
                 getSingletonInstance(context, response, subPath, handler);

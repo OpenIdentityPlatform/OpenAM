@@ -170,7 +170,7 @@
                     </SubSchema>
                 </SubSchema>
                 <SubSchema name="globalScripts" hideConfigUI="yes">
-                    <SubSchema name="globalScript" inheritance="multiple">
+                    <SubSchema name="globalScript" hideConfigUI="yes" inheritance="multiple">
                         <AttributeSchema name="name" type="single" syntax="string"/>
                         <AttributeSchema name="description" type="single" syntax="string"/>
                         <AttributeSchema name="context" type="single" syntax="string"/>

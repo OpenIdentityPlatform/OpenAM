@@ -126,7 +126,8 @@ define([
                 getCreatables (serviceType) {
                     return obj.serviceCall({
                         url: fetchUrl.default(
-                            `/global-config/services/${serviceType}?_action=getCreatableTypes`, { realm: false }),
+                            `/global-config/services/${serviceType}?_action=getCreatableTypes&forUI=true`,
+                            { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "name"));
@@ -177,7 +178,8 @@ define([
                 getAll (serviceType) {
                     return obj.serviceCall({
                         url: fetchUrl.default(
-                            `/global-config/services/${serviceType}?_action=nextdescendents`, { realm: false }),
+                            `/global-config/services/${serviceType}?_action=nextdescendents&forUI=true`,
+                            { realm: false }),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "_id"));
