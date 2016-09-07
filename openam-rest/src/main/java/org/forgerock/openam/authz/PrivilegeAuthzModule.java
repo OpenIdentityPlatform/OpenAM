@@ -55,6 +55,8 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  */
 public abstract class PrivilegeAuthzModule {
 
+    private static final Debug DEBUG = Debug.getInstance("frRest");
+
     public static final String NAME = "DelegationFilter";
     public static final PrivilegeDefinition MODIFY = PrivilegeDefinition.getInstance("modify", Action.MODIFY);
     public static final PrivilegeDefinition READ = PrivilegeDefinition.getInstance("read", Action.READ);
@@ -165,9 +167,8 @@ public abstract class PrivilegeAuthzModule {
      * @param ssoToken The user's SSO Token
      * @return True if the user SSO Token corresponds to CASPA (C Application Server Policy Agent) or JASPA (Java
      * Application Server Policy Agent)
-     * @throws SSOException if the SSO Token's principal cannot be extracted, or there is an IdRepoException.
      */
-    private boolean isCASPAorJASPA(SSOToken ssoToken) throws SSOException {
+    private boolean isCASPAorJASPA(SSOToken ssoToken) {
 
         try {
             if (ssoToken != null) {
