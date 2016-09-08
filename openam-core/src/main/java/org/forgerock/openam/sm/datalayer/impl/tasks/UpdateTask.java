@@ -15,16 +15,18 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
-import java.text.MessageFormat;
-
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
+import java.text.MessageFormat;
+
 /**
- * Responsible for updating the persistence layer with the provided Token.
+ * Responsible for updating the LDAP persistence with the provided Token.
  */
 public class UpdateTask extends AbstractTask {
     private final Token token;
@@ -44,16 +46,17 @@ public class UpdateTask extends AbstractTask {
      * If the Token exists, then an update is performed, otherwise a create is
      * performed.
      *
+     * @param connection Non null Connection.
      * @param adapter Non null for connection-coupled operations.
      * @throws DataLayerException If there was an error of any kind.
      */
     @Override
-    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        Token previous = adapter.read(token.getTokenId());
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+        Token previous = adapter.read(connection, token.getTokenId());
         if (previous == null) {
-            adapter.create(token);
+            adapter.create(connection, token);
         } else {
-            adapter.update(previous, token);
+            adapter.update(connection, previous, token);
         }
         handler.processResults(token);
     }

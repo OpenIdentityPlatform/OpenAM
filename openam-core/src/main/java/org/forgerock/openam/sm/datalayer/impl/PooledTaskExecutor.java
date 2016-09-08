@@ -16,24 +16,22 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import java.text.MessageFormat;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This is a thread-safe, synchronous {@link TaskExecutor} that is implemented as a pool of
@@ -122,10 +120,7 @@ public class PooledTaskExecutor implements TaskExecutor {
 
     private void debug(String message, Object... parameters) {
         if (debug.messageEnabled()) {
-            debug.message(debug.getName() + " "
-                    + Thread.currentThread()
-                    + DEBUG_PREFIX
-                    + MessageFormat.format(message, parameters));
+            debug.message(debug.getName() + " " + Thread.currentThread() + DEBUG_PREFIX + MessageFormat.format(message, parameters));
         }
     }
 }

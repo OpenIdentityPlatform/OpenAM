@@ -50,13 +50,13 @@ public class ContinuousQueryTaskTest {
     @Test
     public void shouldHandleResult() throws DataLayerException, ExecutionException, InterruptedException {
         //given
-        TokenStorageAdapter mockAdapter = mock(TokenStorageAdapter.class);
+        TokenStorageAdapter<Void> mockAdapter = mock(TokenStorageAdapter.class);
         ContinuousQuery mockQuery = mock(ContinuousQuery.class);
 
-        given(mockAdapter.startContinuousQuery(mockFilter, mockListener)).willReturn(mockQuery);
+        given(mockAdapter.startContinuousQuery(null, mockFilter, mockListener)).willReturn(mockQuery);
 
         //when
-        task.execute(mockAdapter);
+        task.execute(null, mockAdapter);
 
         //then
         Promise<ContinuousQuery, NeverThrowsException> promise = task.getQuery();

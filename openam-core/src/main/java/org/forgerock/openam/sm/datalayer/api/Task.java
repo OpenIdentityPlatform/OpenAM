@@ -26,10 +26,11 @@ public interface Task {
     /**
      * Perform the task.
      *
+     * @param connection Connection to use.
      * @param adapter Connection-coupled utility functions to perform the task with.
      * @throws DataLayerException If there was a problem processing the task.
      */
-    void execute(TokenStorageAdapter adapter) throws DataLayerException;
+   <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException;
 
     /**
      * Set the task error. Used for setting the error response without executing the task.

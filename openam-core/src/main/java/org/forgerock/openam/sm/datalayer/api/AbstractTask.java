@@ -40,13 +40,13 @@ public abstract class AbstractTask<T> implements Task {
     }
 
     @Override
-    public void execute(TokenStorageAdapter adapter) throws DataLayerException {
+    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
         if (isError) {
             return;
         }
 
         try {
-            performTask(adapter);
+            performTask(connection, adapter);
         } catch (DataLayerException e) {
             processError(e);
             throw e;
@@ -56,9 +56,10 @@ public abstract class AbstractTask<T> implements Task {
     /**
      * Performs a task.
      *
+     * @param connection Non null connection to use.
      * @param adapter Required for LDAP operations.
      * @throws DataLayerException If there was any problem creating the Token.
      */
-    public abstract void performTask(TokenStorageAdapter adapter) throws DataLayerException;
+    public abstract <T> void performTask(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException;
 
 }

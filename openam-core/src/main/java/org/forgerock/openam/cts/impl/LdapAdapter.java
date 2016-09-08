@@ -20,6 +20,8 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
+
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -27,9 +29,6 @@ import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.ldap.LDAPRequests;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
@@ -37,7 +36,6 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
-import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -48,8 +46,6 @@ import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
-import com.forgerock.opendj.ldap.controls.TransactionIdControl;
-
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
  * values into Tokens. This class will manage the associated conversion tasks
@@ -58,14 +54,11 @@ import com.forgerock.opendj.ldap.controls.TransactionIdControl;
  * It also helps us work around a number of final classes in the SDK which were
  * hindering unit testing.
  */
-public class LdapAdapter implements TokenStorageAdapter {
+public class LdapAdapter implements TokenStorageAdapter<Connection> {
 
     private final LdapTokenAttributeConversion conversion;
     private final LdapQueryFilterVisitor queryConverter;
     private final LdapQueryFactory queryFactory;
-    private final ConnectionFactory<Connection> connectionFactory;
-
-    private Connection connection;
 
     /**
      * Create an instance of this adapter.
@@ -73,28 +66,25 @@ public class LdapAdapter implements TokenStorageAdapter {
      * @param conversion Non null, required for Token conversion.
      * @param queryConverter For converting between CTS and LDAP.
      * @param queryFactory Produces queries.
-     * @param connectionFactory Produces connections to the datastore.
      */
     @Inject
     public LdapAdapter(LdapTokenAttributeConversion conversion, LdapQueryFilterVisitor queryConverter,
-                       LdapQueryFactory queryFactory,
-                       @DataLayer(ConnectionType.CTS_ASYNC) ConnectionFactory connectionFactory) {
+            LdapQueryFactory queryFactory) {
         this.conversion = conversion;
         this.queryConverter = queryConverter;
         this.queryFactory = queryFactory;
-        this.connectionFactory = connectionFactory;
     }
 
     /**
      * Create the Token in LDAP.
      *
+     * @param connection The non null connection to perform this call against.
      * @param token Non null Token to create.
-     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws LdapOperationFailedException If the operation failed for a known reason.
      */
-    public void create(Token token) throws DataLayerException {
+    public void create(Connection connection, Token token) throws LdapOperationFailedException {
         Entry entry = conversion.getEntry(token);
         try {
-            getConnection();
             processResult(connection.add(LDAPRequests.newAddRequest(entry)));
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
@@ -104,15 +94,14 @@ public class LdapAdapter implements TokenStorageAdapter {
     /**
      * Performs a read against the LDAP connection and converts the result into a Token.
      *
+     * @param connection The non null connection to perform this call against.
      * @param tokenId The id of the Token to read.
      * @return Token if found, otherwise null.
-     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws DataLayerException If the operation failed for a known reason.
      */
-    public Token read(String tokenId) throws DataLayerException {
+    public Token read(Connection connection,  String tokenId) throws DataLayerException {
         DN dn = conversion.generateTokenDN(tokenId);
-
         try {
-            getConnection();
             SearchResultEntry resultEntry = connection.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
             return conversion.tokenFromEntry(resultEntry);
         } catch (LdapException e) {
@@ -127,12 +116,13 @@ public class LdapAdapter implements TokenStorageAdapter {
     /**
      * Update the Token based on whether there were any changes between the two.
      *
+     * @param connection The non null connection to perform this call against.
      * @param previous The non null previous Token to check against.
      * @param updated The non null Token to update with.
      * @return True if the token was updated, or false if there were no changes detected.
-     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws LdapOperationFailedException If the operation failed for a known reason.
      */
-    public boolean update(Token previous, Token updated) throws DataLayerException {
+    public boolean update(Connection connection, Token previous, Token updated) throws LdapOperationFailedException {
         Entry currentEntry = conversion.getEntry(updated);
         LdapTokenAttributeConversion.stripObjectClass(currentEntry);
 
@@ -149,25 +139,23 @@ public class LdapAdapter implements TokenStorageAdapter {
         }
 
         try {
-            getConnection();
             processResult(connection.modify(request));
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
-
         return true;
     }
 
     /**
      * Performs a delete against the Token ID provided.
      *
+     * @param connection Non null connection to call.
      * @param tokenId The non null Token ID to delete.
-     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
      */
-    public void delete(String tokenId) throws DataLayerException {
+    public void delete(Connection connection, String tokenId) throws LdapOperationFailedException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
         try {
-            getConnection();
             processResult(connection.delete(LDAPRequests.newDeleteRequest(dn)));
         } catch (LdapException e) {
             Result result = e.getResult();
@@ -179,9 +167,8 @@ public class LdapAdapter implements TokenStorageAdapter {
     }
 
     @Override
-    public Collection<Token> query(TokenFilter query) throws DataLayerException {
+    public Collection<Token> query(Connection connection, TokenFilter query) throws DataLayerException {
         try {
-            getConnection();
             return queryFactory.createInstance()
                     .withFilter(query.getQuery().accept(queryConverter, null))
                     .execute(connection).next();
@@ -191,9 +178,8 @@ public class LdapAdapter implements TokenStorageAdapter {
     }
 
     @Override
-    public Collection<PartialToken> partialQuery(TokenFilter query) throws DataLayerException {
+    public Collection<PartialToken> partialQuery(Connection connection, TokenFilter query) throws DataLayerException {
         try {
-            getConnection();
             return queryFactory.createInstance()
                     .returnTheseAttributes(query.getReturnFields())
                     .withFilter(query.getQuery().accept(queryConverter, null))
@@ -204,10 +190,11 @@ public class LdapAdapter implements TokenStorageAdapter {
     }
 
     @Override
-    public ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener) {
+    public ContinuousQuery startContinuousQuery(Connection connection, TokenFilter filter,
+                                           ContinuousQueryListener listener) {
         return queryFactory.createInstance()
             .withFilter(filter.getQuery().accept(queryConverter, null))
-            .executeContinuousQuery(listener);
+            .executeContinuousQuery(connection, listener);
     }
 
     /**
@@ -222,12 +209,4 @@ public class LdapAdapter implements TokenStorageAdapter {
             throw new LdapOperationFailedException(result);
         }
     }
-
-    private synchronized void getConnection() throws DataLayerException {
-        if (!connectionFactory.isValid(connection)) {
-            IOUtils.closeIfNotNull(connection);
-            connection = connectionFactory.create();
-        }
-    }
-
 }

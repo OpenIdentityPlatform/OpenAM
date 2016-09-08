@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2016 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
@@ -28,13 +28,15 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.opendj.ldap.Connection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class QueryTaskTest {
 
     private QueryTask task;
-    private TokenStorageAdapter mockAdapter;
+    private Connection mockConnection;
+    private TokenStorageAdapter<Connection> mockAdapter;
     private TokenFilter mockTokenFilter;
     private ResultHandler<Collection<Token>, ?> mockResultHandler;
 
@@ -42,6 +44,7 @@ public class QueryTaskTest {
     @BeforeMethod
     public void setup() {
         mockAdapter = mock(LdapAdapter.class);
+        mockConnection = mock(Connection.class);
         mockTokenFilter = mock(TokenFilter.class);
         mockResultHandler = mock(ResultHandler.class);
 
@@ -51,10 +54,10 @@ public class QueryTaskTest {
     @Test
     public void shouldExecuteTokenQuery() throws Exception {
         // given
-        given(mockAdapter.query(mockTokenFilter)).willReturn(new ArrayList<Token>());
+        given(mockAdapter.query(mockConnection, mockTokenFilter)).willReturn(new ArrayList<Token>());
 
         // when
-        task.execute(mockAdapter);
+        task.execute(mockConnection, mockAdapter);
 
         // then
         verify(mockResultHandler).processResults(any(ArrayList.class));
@@ -64,6 +67,6 @@ public class QueryTaskTest {
     public void shouldPreventTokenFilterWithReturnFieldsDefined() throws Exception {
         HashSet<CoreTokenField> returnFields = new HashSet<CoreTokenField>(Arrays.asList(CoreTokenField.TOKEN_ID));
         given(mockTokenFilter.getReturnFields()).willReturn(returnFields);
-        task.execute(mockAdapter);
+        task.execute(mockConnection, mockAdapter);
     }
 }

@@ -22,12 +22,13 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.util.Reject;
 
 /**
- * Performs a partial query against the persistence layer. Partial queries operate like normal queries
+ * Performs a partial query against LDAP. Partial queries operate like normal queries
  * except that the results are not full Token instances. Instead they are a collection
  * of Name/Value pairs which represent a subset of a Token.
  *
@@ -46,17 +47,17 @@ public class PartialQueryTask extends AbstractTask {
     }
 
     /**
-     * Performs the partial query operation from the persistence store using the TokenStorageAdapter.
      *
+     * @param connection Connection to use.
      * @param adapter Utility functions to perform the task with.
      * @throws DataLayerException
      * @throws IllegalArgumentException If the TokenFilter did not define any return fields.
      */
     @Override
-    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
         Reject.ifTrue(tokenFilter.getReturnFields().isEmpty());
 
-        handler.processResults(adapter.partialQuery(tokenFilter));
+        handler.processResults(adapter.partialQuery(connection, tokenFilter));
     }
 
     @Override

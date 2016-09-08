@@ -21,11 +21,6 @@ package org.forgerock.openam.sm.datalayer.impl;
  */
 public interface SimpleTaskExecutorFactory {
 
-    /**
-     * Generate a new SimpleTaskExecutor.
-     *
-     * @return a SimpleTaskExecutor.
-     */
-    SimpleTaskExecutor create();
+    SimpleTaskExecutor<?> create();
 
 }
