@@ -163,13 +163,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 : Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap();
         routeTree = tree(authzModules, privilegeAuthzModule,
                 branch("/authentication", smsServiceHandlerFunction.AUTHENTICATION_HANDLES_FUNCTION,
-                        leaf("/modules", smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION),
+                        leaf("/modules", smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION, true),
                         filter("/chains", smsServiceHandlerFunction.AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
                                 authenticationChainsFilter)),
                 branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                        leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION)),
-                leaf("/agents",smsServiceHandlerFunction.AGENTS_MODULE_HANDLES_FUNCTION),
-                leaf("/services", smsServiceHandlerFunction)
+                        leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION, false)),
+                leaf("/agents",smsServiceHandlerFunction.AGENTS_MODULE_HANDLES_FUNCTION, false),
+                leaf("/services", smsServiceHandlerFunction, true)
         );
 
         this.smsServiceHandlerFunction = smsServiceHandlerFunction;

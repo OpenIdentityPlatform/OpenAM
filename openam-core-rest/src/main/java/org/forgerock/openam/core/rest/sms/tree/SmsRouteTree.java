@@ -16,6 +16,14 @@
 
 package org.forgerock.openam.core.rest.sms.tree;
 
+import static java.util.Arrays.asList;
+import static org.forgerock.api.models.Action.action;
+import static org.forgerock.api.models.ApiDescription.apiDescription;
+import static org.forgerock.api.models.Definitions.definitions;
+import static org.forgerock.api.models.Paths.paths;
+import static org.forgerock.api.models.Resource.resource;
+import static org.forgerock.api.models.VersionedPath.UNVERSIONED;
+import static org.forgerock.api.models.VersionedPath.versionedPath;
 import static org.forgerock.authz.filter.crest.AuthorizationFilters.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Requests.*;
@@ -24,18 +32,28 @@ import static org.forgerock.json.resource.ResourcePath.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.json.resource.Router.*;
 import static org.forgerock.openam.rest.RestConstants.*;
+import static org.forgerock.openam.utils.JsonValueBuilder.fromResource;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.api.models.Action;
 import org.forgerock.api.models.ApiDescription;
+import org.forgerock.api.models.Definitions;
+import org.forgerock.api.models.Paths;
+import org.forgerock.api.models.Resource;
+import org.forgerock.api.models.Schema;
+import org.forgerock.api.models.TranslateJsonSchema;
+import org.forgerock.api.models.VersionedPath;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -44,6 +62,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -62,6 +81,7 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.descriptor.Describable;
 import org.forgerock.services.routing.RouteMatcher;
+import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
@@ -75,6 +95,8 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
 
     private static final QueryFilter<JsonPointer> ALWAYS_TRUE = QueryFilter.alwaysTrue();
     private static final String SCRIPTING_SERVICE_NAME = "scripting";
+    private static final ClassLoader CLASS_LOADER = SmsRouteTree.class.getClassLoader();
+    private static final Schema TYPE_SCHEMA = schemaFromResource("restsms.type");
 
     final Map<MatchingResourcePath, CrestAuthorizationModule> authzModules;
     private final Predicate<String> handlesFunction;
@@ -87,6 +109,26 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
     private final Map<String, RequestHandler> handlers = new LinkedHashMap<>();
     private final String uriTemplate;
     private final Set<String> hiddenFromUI = new HashSet<>();
+    private final boolean supportGeneralActions;
+    private static final List<Action> GENERAL_ACTIONS = asList(
+            action()
+                    .name(NEXT_DESCENDENTS)
+                    .response(schemaFromResource("nextdescendents.response"))
+                    .build(),
+            action()
+                    .name(GET_ALL_TYPES)
+                    .response(schemaFromResource("types.response"))
+                    .build(),
+            action()
+                    .name(GET_CREATABLE_TYPES)
+                    .response(schemaFromResource("types.response"))
+                    .build());
+
+    private static Schema schemaFromResource(String schemaName) {
+        return Schema.newBuilder().schema(
+                fromResource(SmsRouteTree.class, "SmsRouteTree." + schemaName + ".schema.json")
+                        .as(new TranslateJsonSchema(CLASS_LOADER))).build();
+    }
 
     /**
      * Creates a {@code SmsRouteTree} instance.
@@ -96,11 +138,13 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
      * @param router The {@code Router} instance.
      * @param filter The filter to wrap around all routes.
      * @param path The path of this tree element.
-     * @param uriTemplate
+     * @param uriTemplate The tempate for the node.
+     * @param supportGeneralActions Whether to support the general SMS actions of {@code nextdescendents},
+     *                              {@code getAllTypes} and {@code getCreateableTypes}.
      */
     SmsRouteTree(Map<MatchingResourcePath, CrestAuthorizationModule> authzModules,
             CrestAuthorizationModule defaultAuthzModule, boolean isRoot, Router router, Filter filter,
-            ResourcePath path, Predicate<String> handlesFunction, String uriTemplate) {
+            ResourcePath path, Predicate<String> handlesFunction, String uriTemplate, boolean supportGeneralActions) {
         this.authzModules = authzModules;
         this.defaultAuthzModule = defaultAuthzModule;
         this.isRoot = isRoot;
@@ -110,6 +154,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
         this.filter = filter;
         this.handlesFunction = handlesFunction;
         this.uriTemplate = uriTemplate;
+        this.supportGeneralActions = supportGeneralActions;
     }
 
     final void addSubTree(SmsRouteTree subTree) {
@@ -173,7 +218,8 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
         }
 
         if (!uriTemplate.isEmpty()) {
-            SmsRouteTree subtree = new SmsRouteTreeBuilder(uriTemplate).build(this);
+            SmsRouteTree subtree = new SmsRouteTreeBuilder(uriTemplate).supportGeneralActions(supportGeneralActions)
+                    .build(this);
             handlers.put(uriTemplate, subtree);
             if (mode.equals(RoutingMode.STARTS_WITH)) {
                 subtree.router.setDefaultRoute(handler);
@@ -203,7 +249,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
         String action = request.getAction();
         boolean forUI = Boolean.parseBoolean(request.getAdditionalParameter(FOR_UI));
 
-        if (NEXT_DESCENDENTS.equals(action) && remainingUri.isEmpty()) {
+        if (supportGeneralActions && NEXT_DESCENDENTS.equals(action) && remainingUri.isEmpty()) {
             JsonValue result = json(object(field("result", array())));
             for (Map.Entry<String, RequestHandler> subRoute : handlers.entrySet()) {
                 if (!subRoute.getKey().equals("")) {
@@ -216,13 +262,17 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
                 }
             }
             return newActionResponse(result).asPromise();
-        } else if (GET_ALL_TYPES.equals(action) && remainingUri.isEmpty()) {
+        } else if (NEXT_DESCENDENTS.equals(action) && remainingUri.isEmpty()) {
+            return new NotSupportedException().asPromise();
+        } else if (supportGeneralActions && GET_ALL_TYPES.equals(action) && remainingUri.isEmpty()) {
             try {
                 return readTypes(context, ALL_CHILD_TYPES, false);
             } catch (ResourceException e) {
                 return e.asPromise();
             }
-        } else if (GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
+        } else if (GET_ALL_TYPES.equals(action) && remainingUri.isEmpty()) {
+            return new NotSupportedException().asPromise();
+        } else if (supportGeneralActions && GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
             try {
                 if (SCRIPTING_SERVICE_NAME.equals(context.asContext(UriRouterContext.class).getMatchedUri())) {
                     // Default script types cannot be created
@@ -233,6 +283,8 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
             } catch (ResourceException e) {
                 return e.asPromise();
             }
+        } else if (GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
+            return new NotSupportedException().asPromise();
         } else {
             return router.handleAction(context, request);
         }
@@ -352,7 +404,77 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
 
     @Override
     public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
-        return router.api(apiProducer);
+        ApiDescription api = router.api(apiProducer);
+        if (api == null || !supportGeneralActions) {
+            return api;
+        }
+        VersionedPath basePath = api.getPaths().get("");
+        if (basePath != null) {
+            VersionedPath.Builder pathBuilder = versionedPath();
+            for (Version v : basePath.getVersions()) {
+                Resource resource = basePath.get(v);
+                pathBuilder.put(v, resource()
+                        .mvccSupported(resource.isMvccSupported())
+                        .description(resource.getDescription())
+                        .title(resource.getTitle())
+                        .actions(asList(resource.getActions()))
+                        .actions(GENERAL_ACTIONS)
+                        .create(resource.getCreate())
+                        .read(resource.getRead())
+                        .update(resource.getUpdate())
+                        .delete(resource.getDelete())
+                        .patch(resource.getPatch())
+                        .queries(asList(resource.getQueries()))
+                        .items(resource.getItems())
+                        .resourceSchema(resource.getResourceSchema())
+                        .subresources(resource.getSubresources())
+                        .parameters(asList(resource.getParameters()))
+                        .build());
+            }
+            basePath = pathBuilder.build();
+        } else {
+            basePath = versionedPath().put(UNVERSIONED, resource()
+                    .mvccSupported(false)
+                    .title(localizableString(uriTemplate, ".title"))
+                    .description(localizableString(uriTemplate, ".description"))
+                    .actions(GENERAL_ACTIONS).build()).build();
+        }
+        Paths.Builder paths = paths().put("", basePath);
+        for (String path : api.getPaths().getNames()) {
+            if (!path.equals("")) {
+                paths.put(path, api.getPaths().get(path));
+            }
+        }
+        Definitions definitions = api.getDefinitions();
+        if (definitions == null || !definitions.getNames().contains("restsms.type")) {
+            Definitions.Builder builder = definitions().put("restsms.type", TYPE_SCHEMA);
+            if (definitions != null) {
+                for (String name : definitions.getNames()) {
+                    builder.put(name, definitions.get(name));
+                }
+            }
+            definitions = builder.build();
+        }
+        return apiDescription()
+                .definitions(definitions)
+                .description(api.getDescription())
+                .errors(api.getErrors())
+                .id(api.getId())
+                .version(api.getVersion())
+                .services(api.getServices())
+                .paths(paths.build())
+                .build();
+    }
+
+    private LocalizableString localizableString(String uriTemplate, String suffix) {
+        String key = uriTemplate.replace("/", ".").replaceAll("[{}]", "");
+        if (!key.startsWith(".")) {
+            key = "." + key;
+        }
+        if (key.endsWith(".")) {
+            key = key.substring(0, key.length() - 1);
+        }
+        return new LocalizableString("i18n:api-descriptor/SmsRequestHandler#paths" + key + suffix, CLASS_LOADER);
     }
 
     @Override

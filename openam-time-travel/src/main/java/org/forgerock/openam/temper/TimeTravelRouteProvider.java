@@ -31,8 +31,11 @@ import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -40,6 +43,8 @@ import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -59,8 +64,8 @@ public class TimeTravelRouteProvider implements RestRouteProvider {
     /**
      * The actual resource provider.
      */
-    @RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
-    public static class TimeTravelResourceProvider {
+    @RequestHandler(@Handler(mvccSupported = false))
+    public static class TimeTravelResourceProvider implements Describable<ApiDescription, Request> {
         /**
          * The {@code fastforward} action allows the time to be moved forward by a number of milliseconds.
          *
@@ -85,6 +90,26 @@ public class TimeTravelRouteProvider implements RestRouteProvider {
             setOffset(offset);
             String offsetString = valueOf(offset);
             return newResourceResponse(offsetString, offsetString, json(object(field("offset", offset)))).asPromise();
+        }
+
+        @Override
+        public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+            return null;
+        }
+
+        @Override
+        public ApiDescription handleApiRequest(Context context, Request request) {
+            return null;
+        }
+
+        @Override
+        public void addDescriptorListener(Listener listener) {
+
+        }
+
+        @Override
+        public void removeDescriptorListener(Listener listener) {
+
         }
     }
 

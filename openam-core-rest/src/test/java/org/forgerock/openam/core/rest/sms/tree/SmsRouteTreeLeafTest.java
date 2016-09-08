@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.core.rest.sms.tree;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.resource.ResourcePath.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.resource.ResourcePath.resourcePath;
 
 import java.util.Collections;
 
@@ -43,7 +43,7 @@ public class SmsRouteTreeLeafTest {
         };
 
         routeTree = new SmsRouteTree(Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap(), null, false,
-                router, null, resourcePath(""), handlesFunction, null);
+                router, null, resourcePath(""), handlesFunction, null, false);
     }
 
     @DataProvider(name = "handlesFunction")

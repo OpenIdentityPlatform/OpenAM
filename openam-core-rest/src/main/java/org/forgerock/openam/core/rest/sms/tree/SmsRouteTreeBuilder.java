@@ -21,7 +21,6 @@ import static org.forgerock.guava.common.base.Predicates.alwaysFalse;
 import static org.forgerock.json.resource.ResourcePath.empty;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,10 +29,12 @@ import javax.annotation.Nonnull;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guava.common.base.Predicates;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.services.context.Context;
 
 /**
  * A builder for creating {@link SmsRouteTree} trees.
@@ -43,6 +44,7 @@ import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 public class SmsRouteTreeBuilder {
 
     private final String uriTemplate;
+    private boolean supportGeneralActions = false;
     private Set<SmsRouteTreeBuilder> subTreeBuilders = emptySet();
     private Predicate<String> handlesFunction = alwaysFalse();
     private Filter filter;
@@ -66,7 +68,7 @@ public class SmsRouteTreeBuilder {
             SmsRouteTreeBuilder... subTreeBuilders) {
         Router router = new Router();
         SmsRouteTree tree = new SmsRouteTree(authModules, defaultAuthModule, true, router, null, empty(),
-                Predicates.<String>alwaysFalse(), null);
+                Predicates.<String>alwaysFalse(), null, false);
         for (SmsRouteTreeBuilder subTreeBuilder : subTreeBuilders) {
             tree.addSubTree(subTreeBuilder.build(tree));
         }
@@ -104,10 +106,13 @@ public class SmsRouteTreeBuilder {
      * @param uriTemplate The uri template that matches roots from the parent router.
      * @param handlesFunction The function that determines whether this router should handle the
      *                        service being registered.
+     * @param generalActions Whether the tree leaf (and nodes attached to it) will support the general actions in
+     *                       {@link SmsRouteTree#handleAction(Context, ActionRequest)}.
      * @return A {@code SmsRouteTreeBuilder}.
      */
-    public static SmsRouteTreeBuilder leaf(String uriTemplate, Predicate<String> handlesFunction) {
-        return new SmsRouteTreeBuilder(uriTemplate).handles(handlesFunction);
+    public static SmsRouteTreeBuilder leaf(String uriTemplate, Predicate<String> handlesFunction,
+            boolean generalActions) {
+        return new SmsRouteTreeBuilder(uriTemplate).handles(handlesFunction).supportGeneralActions(generalActions);
     }
 
     /**
@@ -154,6 +159,11 @@ public class SmsRouteTreeBuilder {
         return this;
     }
 
+    SmsRouteTreeBuilder supportGeneralActions(boolean supportGeneralActions) {
+        this.supportGeneralActions = supportGeneralActions;
+        return this;
+    }
+
     /**
      * Build the tree from the provided parent.
      * @param parent The parent tree.
@@ -164,7 +174,7 @@ public class SmsRouteTreeBuilder {
 
         ResourcePath path = SmsRouteTree.concat(parent.path, uriTemplate);
         SmsRouteTree tree = new SmsRouteTree(parent.authzModules, parent.defaultAuthzModule, false, router, filter,
-                path, handlesFunction, uriTemplate);
+                path, handlesFunction, uriTemplate, supportGeneralActions);
         for (SmsRouteTreeBuilder subTreeBuilder : subTreeBuilders) {
             tree.addSubTree(subTreeBuilder.build(tree));
         }

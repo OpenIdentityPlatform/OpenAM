@@ -41,6 +41,7 @@ import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
@@ -88,17 +89,23 @@ public class SmsRouteTreeTest {
                 return "NOT_AUTHORIZED".equals(serviceName);
             }
         };
+        Predicate<String> leafFiveFunction = new Predicate<String>() {
+            public boolean apply(String serviceName) {
+                return serviceName.matches("OTHERSERVICE\\d");
+            }
+        };
 
         Map<MatchingResourcePath, CrestAuthorizationModule> authModules = Collections.singletonMap(
                 resourcePath("/not-authorized/service"), authModule
         );
         routeTree = SmsRouteTreeBuilder.tree(authModules, defaultAuthModule,
                 SmsRouteTreeBuilder.branch("branch1",
-                        SmsRouteTreeBuilder.leaf("leaf1", leafOneFunction)),
+                        SmsRouteTreeBuilder.leaf("leaf1", leafOneFunction, false)),
                 SmsRouteTreeBuilder.branch("branch2",
-                        SmsRouteTreeBuilder.leaf("leaf2", leafTwoFunction),
-                        SmsRouteTreeBuilder.leaf("leaf3", leafThreeFunction)),
-                SmsRouteTreeBuilder.leaf("not-authorized", leafFourFunction));
+                        SmsRouteTreeBuilder.leaf("leaf2", leafTwoFunction, false),
+                        SmsRouteTreeBuilder.leaf("leaf3", leafThreeFunction, false)),
+                SmsRouteTreeBuilder.leaf("not-authorized", leafFourFunction, false),
+                SmsRouteTreeBuilder.leaf("otherservices", leafFiveFunction, true));
     }
 
     @DataProvider(name = "handleRoutes")
@@ -179,8 +186,8 @@ public class SmsRouteTreeTest {
         RequestHandler handler2 = createTypeHandler(2, "two", false);
         RequestHandler handler3 = createTypeHandler(3, "three", true);
 
-        Context context = new UriRouterContext(mock(Context.class), "", "", Collections.<String, String>emptyMap());
-        ActionRequest request = Requests.newActionRequest("", "getAllTypes");
+        Context context = new UriRouterContext(mock(Context.class), "", "/otherservices", Collections.<String, String>emptyMap());
+        ActionRequest request = Requests.newActionRequest("/otherservices", "getAllTypes");
 
         Promise<AuthorizationResult, ResourceException> successResult = newResultPromise(accessPermitted());
         given(defaultAuthModule.authorizeAction(any(Context.class), any(ActionRequest.class))).willReturn(successResult);
@@ -212,8 +219,8 @@ public class SmsRouteTreeTest {
         when(handler2.handleRead(any(Context.class), any(ReadRequest.class)))
                 .thenReturn(Responses.newResourceResponse("1", "1", json(object())).asPromise());
 
-        Context context = new UriRouterContext(mock(Context.class), "", "", Collections.<String, String>emptyMap());
-        ActionRequest request = Requests.newActionRequest("", "getCreatableTypes");
+        Context context = new UriRouterContext(mock(Context.class), "", "/otherservices", Collections.<String, String>emptyMap());
+        ActionRequest request = Requests.newActionRequest("/otherservices", "getCreatableTypes");
 
         Promise<AuthorizationResult, ResourceException> successResult = newResultPromise(accessPermitted());
         given(defaultAuthModule.authorizeAction(any(Context.class), any(ActionRequest.class))).willReturn(successResult);
@@ -236,6 +243,25 @@ public class SmsRouteTreeTest {
         );
     }
 
+    @Test
+    public void shouldNotSupportGeneralActionsOnUnsupportedLeaves() throws Exception {
+        RequestHandler handler1 = createTypeHandler(1, "one", false, "SERVICE_ONE");
+
+        Context context = new UriRouterContext(mock(Context.class), "", "/branch1/leaf1", Collections.<String, String>emptyMap());
+        ActionRequest request = Requests.newActionRequest("/branch1/leaf1", "getCreatableTypes");
+
+        Promise<AuthorizationResult, ResourceException> successResult = newResultPromise(accessPermitted());
+        given(defaultAuthModule.authorizeAction(any(Context.class), any(ActionRequest.class))).willReturn(successResult);
+        given(defaultAuthModule.authorizeRead(any(Context.class), any(ReadRequest.class))).willReturn(successResult);
+
+        //When
+        Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
+
+        //Then
+        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
+        verifyNoMoreInteractions(handler1);
+    }
+
     private void verifyGetTypeAction(RequestHandler handler) {
         ArgumentCaptor<ActionRequest> captor = ArgumentCaptor.forClass(ActionRequest.class);
         verify(handler).handleAction(any(Context.class), captor.capture());
@@ -243,6 +269,10 @@ public class SmsRouteTreeTest {
     }
 
     private RequestHandler createTypeHandler(int id, String name, boolean collection) {
+        return createTypeHandler(id, name, collection, "OTHERSERVICE" + id);
+    }
+
+    private RequestHandler createTypeHandler(int id, String name, boolean collection, String serviceName) {
         RequestHandler handler = mock(RequestHandler.class);
         given(handler.handleAction(any(Context.class), any(ActionRequest.class)))
                 .willReturn(
@@ -251,7 +281,7 @@ public class SmsRouteTreeTest {
                                 field("collection", collection),
                                 field("name", name))))
                                 .asPromise());
-        routeTree.handles("OTHERSERVICE" + id).addRoute(RoutingMode.STARTS_WITH, "/service" + id, handler);
+        routeTree.handles(serviceName).addRoute(RoutingMode.STARTS_WITH, "/service" + id, handler);
         return handler;
     }
 }

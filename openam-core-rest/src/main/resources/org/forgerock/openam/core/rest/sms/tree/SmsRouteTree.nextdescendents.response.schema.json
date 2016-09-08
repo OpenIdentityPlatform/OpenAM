@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.title",
+  "description": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.description",
+  "properties": {
+    "result": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.result.item.title",
+        "description": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.result.item.description",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "title": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.id.title",
+            "description": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.id.description"
+          },
+          "_type": {
+            "$ref": "#/definitions/restsms.type"
+          }
+        },
+        "additionalProperties": {
+          "type": "any",
+          "title": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.additional.title",
+          "description": "i18n:api-descriptor/SmsRequestHandler#action.nextdescendents.response.additional.description"
+        }
+      }
+    }
+  }
+}
