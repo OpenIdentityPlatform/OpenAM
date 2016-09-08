@@ -5,7 +5,7 @@
     "abbrev": {
       "version": "1.0.9",
       "from": "abbrev@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/abbrev/-/abbrev-1.0.9.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/abbrev/-/abbrev-1.0.9.tgz"
     },
     "ansi-regex": {
       "version": "2.0.0",
@@ -15,7 +15,7 @@
     "ansi-styles": {
       "version": "2.2.1",
       "from": "ansi-styles@>=2.2.1 <3.0.0",
-      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/ansi-styles/-/ansi-styles-2.2.1.tgz"
     },
     "argparse": {
       "version": "1.0.7",
@@ -35,7 +35,7 @@
     "balanced-match": {
       "version": "0.4.2",
       "from": "balanced-match@>=0.4.1 <0.5.0",
-      "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-0.4.2.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/balanced-match/-/balanced-match-0.4.2.tgz"
     },
     "brace-expansion": {
       "version": "1.1.6",
@@ -60,7 +60,7 @@
     "chalk": {
       "version": "1.1.3",
       "from": "chalk@>=1.1.1 <1.2.0",
-      "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/chalk/-/chalk-1.1.3.tgz"
     },
     "coffee-script": {
       "version": "1.10.0",
@@ -75,7 +75,7 @@
     "concat-map": {
       "version": "0.0.1",
       "from": "concat-map@0.0.1",
-      "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/concat-map/-/concat-map-0.0.1.tgz"
     },
     "currently-unhandled": {
       "version": "0.4.1",
@@ -100,12 +100,12 @@
     "escape-string-regexp": {
       "version": "1.0.5",
       "from": "escape-string-regexp@>=1.0.2 <2.0.0",
-      "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
     },
     "esprima": {
-      "version": "2.7.2",
+      "version": "2.7.3",
       "from": "esprima@>=2.6.0 <3.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/esprima/-/esprima-2.7.2.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/esprima/-/esprima-2.7.3.tgz"
     },
     "eventemitter2": {
       "version": "0.4.14",
@@ -155,14 +155,14 @@
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/getobject/-/getobject-0.1.0.tgz"
     },
     "glob": {
-      "version": "7.0.5",
+      "version": "7.0.6",
       "from": "glob@>=7.0.0 <7.1.0",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-7.0.5.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/glob/-/glob-7.0.6.tgz"
     },
     "graceful-fs": {
-      "version": "4.1.5",
+      "version": "4.1.6",
       "from": "graceful-fs@>=4.1.2 <5.0.0",
-      "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.1.5.tgz"
+      "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.1.6.tgz"
     },
     "grunt": {
       "version": "1.0.1",
@@ -241,12 +241,12 @@
     "inflight": {
       "version": "1.0.5",
       "from": "inflight@>=1.0.4 <2.0.0",
-      "resolved": "https://registry.npmjs.org/inflight/-/inflight-1.0.5.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/inflight/-/inflight-1.0.5.tgz"
     },
     "inherits": {
-      "version": "2.0.1",
+      "version": "2.0.3",
       "from": "inherits@>=2.0.0 <3.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/inherits/-/inherits-2.0.1.tgz"
+      "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz"
     },
     "is-arrayish": {
       "version": "0.2.1",
@@ -306,7 +306,7 @@
     "minimatch": {
       "version": "3.0.3",
       "from": "minimatch@>=3.0.0 <3.1.0",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.3.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/minimatch/-/minimatch-3.0.3.tgz"
     },
     "minimist": {
       "version": "1.2.0",
@@ -316,7 +316,7 @@
     "nopt": {
       "version": "3.0.6",
       "from": "nopt@>=3.0.6 <3.1.0",
-      "resolved": "https://registry.npmjs.org/nopt/-/nopt-3.0.6.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/nopt/-/nopt-3.0.6.tgz"
     },
     "normalize-package-data": {
       "version": "2.3.5",
@@ -334,9 +334,9 @@
       "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz"
     },
     "once": {
-      "version": "1.3.3",
+      "version": "1.4.0",
       "from": "once@>=1.3.0 <2.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/once/-/once-1.3.3.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/once/-/once-1.4.0.tgz"
     },
     "parse-json": {
       "version": "2.2.0",
@@ -351,7 +351,7 @@
     "path-is-absolute": {
       "version": "1.0.0",
       "from": "path-is-absolute@>=1.0.0 <1.1.0",
-      "resolved": "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.0.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/path-is-absolute/-/path-is-absolute-1.0.0.tgz"
     },
     "path-type": {
       "version": "1.1.0",
@@ -418,15 +418,10 @@
       "from": "spdx-correct@>=1.0.0 <1.1.0",
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/spdx-correct/-/spdx-correct-1.0.2.tgz"
     },
-    "spdx-exceptions": {
-      "version": "1.0.5",
-      "from": "spdx-exceptions@>=1.0.4 <2.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/spdx-exceptions/-/spdx-exceptions-1.0.5.tgz"
-    },
     "spdx-expression-parse": {
-      "version": "1.0.2",
+      "version": "1.0.3",
       "from": "spdx-expression-parse@>=1.0.0 <1.1.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/spdx-expression-parse/-/spdx-expression-parse-1.0.2.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/spdx-expression-parse/-/spdx-expression-parse-1.0.3.tgz"
     },
     "spdx-license-ids": {
       "version": "1.2.2",
@@ -441,7 +436,7 @@
     "strip-ansi": {
       "version": "3.0.1",
       "from": "strip-ansi@>=3.0.0 <4.0.0",
-      "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-3.0.1.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/strip-ansi/-/strip-ansi-3.0.1.tgz"
     },
     "strip-bom": {
       "version": "2.0.0",
@@ -459,14 +454,14 @@
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/supports-color/-/supports-color-2.0.0.tgz"
     },
     "swagger-ui": {
-      "version": "2.1.5",
-      "from": "swagger-ui@2.1.5",
-      "resolved": "https://registry.npmjs.org/swagger-ui/-/swagger-ui-2.1.5.tgz"
+      "version": "2.2.3",
+      "from": "swagger-ui@2.2.3",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/swagger-ui/-/swagger-ui-2.2.3.tgz"
     },
     "swagger-ui-themes": {
       "version": "2.0.1",
-      "from": "swagger-ui-themes@>=2.0.1 <3.0.0",
-      "resolved": "https://registry.npmjs.org/swagger-ui-themes/-/swagger-ui-themes-2.0.1.tgz"
+      "from": "swagger-ui-themes@2.0.1",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/swagger-ui-themes/-/swagger-ui-themes-2.0.1.tgz"
     },
     "trim-newlines": {
       "version": "1.0.0",
@@ -484,14 +479,14 @@
       "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/validate-npm-package-license/-/validate-npm-package-license-3.0.1.tgz"
     },
     "which": {
-      "version": "1.2.10",
+      "version": "1.2.11",
       "from": "which@>=1.2.1 <1.3.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/which/-/which-1.2.10.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/which/-/which-1.2.11.tgz"
     },
     "wrappy": {
       "version": "1.0.2",
       "from": "wrappy@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/wrappy/-/wrappy-1.0.2.tgz"
     }
   }
 }
