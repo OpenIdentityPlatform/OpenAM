@@ -244,7 +244,19 @@ define([
                             }
                         }
                     }
-                }
+                },
+                "helpLinks" : [
+                    {
+                        "href" : "#api/explorer",
+                        "icon-class" : "fa-code",
+                        "label" : "config.AppConfiguration.Navigation.helpLinks.apiExplorer"
+                    },
+                    {
+                        "href" : "#api/docs",
+                        "icon-class" : "fa-file-text",
+                        "label" : "config.AppConfiguration.Navigation.helpLinks.apiDocs"
+                    }
+                ]
             }
         }],
         loggerLevel: "debug"

@@ -132,6 +132,10 @@
                 },
                 "username" : {
                     "label" : "Signed in as"
+                },
+                "helpLinks" : {
+                    "apiExplorer" : "API EXPLORER",
+                    "apiDocs" : "API DOCS"
                 }
             }
         }
