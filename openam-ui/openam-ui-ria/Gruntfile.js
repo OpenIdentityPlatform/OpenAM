@@ -88,7 +88,8 @@ module.exports = function (grunt) {
                 ignore: ["libs/"],
                 presets: ["es2015", "react"],
                 plugins: [
-                    ["transform-es2015-classes", { "loose": true }]
+                    ["transform-es2015-classes", { "loose": true }],
+                    "transform-object-rest-spread"
                 ]
             },
             transpileJS: {
