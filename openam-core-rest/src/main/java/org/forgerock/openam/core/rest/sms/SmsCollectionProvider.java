@@ -25,11 +25,14 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
@@ -53,6 +56,7 @@ import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
 import org.forgerock.api.enums.QueryType;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -82,6 +86,11 @@ import org.forgerock.util.promise.ResultHandler;
  */
 @CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
 public class SmsCollectionProvider extends SmsResourceProvider {
+
+    private static final Collection<Pattern> UNCREATABLE_TYPES =
+            Collections.singleton(Pattern.compile("services\\/scripting\\/contexts$"));
+    private static final Collection<Pattern> UNDELETABLE_TYPES =
+            Collections.singleton(Pattern.compile("services\\/scripting\\/contexts\\/[\\w]+$"));
 
     private final boolean autoCreatedAuthModule;
     private final String authModuleResourceName;
@@ -145,6 +154,9 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      */
     @Create(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> create(final Context context, CreateRequest request) {
+        if (matchesPattern(UNCREATABLE_TYPES, context.asContext(UriRouterContext.class).getBaseUri())) {
+            return new NotSupportedException().asPromise();
+        }
         JsonValue content = request.getContent();
         final String realm = realmFor(context);
         try {
@@ -191,6 +203,15 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         }
     }
 
+    private boolean matchesPattern(Collection<Pattern> patterns, String baseUri) {
+        for (Pattern pattern : patterns) {
+            if (pattern.matcher(baseUri).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Deletes a child instance of config. The parent config referenced by the request path is found, and
      * the config is deleted using the resourceId.
@@ -198,6 +219,9 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      */
     @Delete(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId) {
+        if (matchesPattern(UNDELETABLE_TYPES, context.asContext(UriRouterContext.class).getBaseUri())) {
+            return new NotSupportedException().asPromise();
+        }
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
