@@ -33,7 +33,6 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SMS_RESOURCE_PROVIDER;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -85,7 +84,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
-import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
@@ -110,9 +108,6 @@ import com.sun.identity.sm.ServiceSchema;
 @CollectionProvider(details = @Handler(mvccSupported = false))
 public class SmsCollectionProvider extends SmsResourceProvider {
 
-    private static final LocalizableString QUERY_DESCRIPTION =
-            new LocalizableString(SMS_RESOURCE_PROVIDER + "collection.query.description");
-
     private final boolean autoCreatedAuthModule;
     private final String authModuleResourceName;
     private final ApiDescription description;
@@ -134,7 +129,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                 .paths(Paths.paths().put("", VersionedPath.versionedPath()
                         .put(VersionedPath.UNVERSIONED, Resource.resource()
                                 .title(getI18NName())
-                                .description(getSchemaDescription(schema.getI18NKey()))
                                 .mvccSupported(false)
                                 .items(items().pathParameter(parameter().name("id").type("string").source(PATH).build())
                                         .read(read().build())
@@ -143,11 +137,10 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                                         .create(create().mode(ID_FROM_CLIENT).build())
                                         .build())
                                 .resourceSchema(Schema.schema().schema(createSchema(Optional.<Context>absent())).build())
-                                .query(query().type(QueryType.FILTER)
-                                        .description(QUERY_DESCRIPTION).queryableFields().build())
+                                .query(query().type(QueryType.FILTER).queryableFields().build())
                                 .create(create().mode(ID_FROM_CLIENT).build())
-                                .action(action().name("schema").description(SCHEMA_DESCRIPTION).build())
-                                .action(action().name("template").description(TEMPLATE_DESCRIPTION).build())
+                                .action(action().name("schema").build())
+                                .action(action().name("template").build())
                                 .build()).build()
                 ).build()).build();
     }
