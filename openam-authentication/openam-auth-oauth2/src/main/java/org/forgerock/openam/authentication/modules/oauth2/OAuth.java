@@ -26,8 +26,11 @@
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -42,6 +45,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +63,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,11 +71,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
@@ -88,6 +96,7 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
@@ -110,6 +119,10 @@ public class OAuth extends AMLoginModule {
     String userPassword = "";
     String proxyURL = "";
     private final CTSPersistentStore ctsStore;
+
+    /* default idle time for invalid sessions */
+    private static final long maxDefaultIdleTime =
+            SystemProperties.getAsLong("com.iplanet.am.session.invalidsessionmaxtime", 3);
 
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
@@ -197,6 +210,10 @@ public class OAuth extends AMLoginModule {
                 String csrfState = createAuthorizationState();
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
+
+                long expiryTime = currentTimeMillis() + TimeUnit.MINUTES.toMillis(maxDefaultIdleTime);
+                Calendar expiryTimeStamp = TimeUtils.fromUnixTime(expiryTime, TimeUnit.MILLISECONDS);
+                csrfStateToken.setExpiryTimestamp(expiryTimeStamp);
 
                 try {
                     ctsStore.create(csrfStateToken);
