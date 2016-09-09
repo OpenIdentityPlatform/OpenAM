@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -561,12 +562,12 @@ public class WebtopNaming {
      *
      * @throws URLNotFoundException if the Naming Service cannot find a URL for a specified service
      */
-    public static Vector<String> getBaseURLs() throws URLNotFoundException {
+    public static List<String> getBaseURLs() throws URLNotFoundException {
 
         try {
             getNamingProfile(false);
 
-            Vector<String> result = new Vector<>();
+            List<String> result = new ArrayList<>();
             if (monitorThread == null) {
                 result.add(expand("%protocol://%host:%port/%uri", amServerProtocol, amServer,
                             amServerPort, amServerURI, false));
@@ -592,8 +593,7 @@ public class WebtopNaming {
      *
      * @return platform server list
      *
-     * @throws Exception if an error occurs when updating the
-     *     nameing table
+     * @throws Exception if an error occurs when updating the naming table
      */
     public static Set<String> getPlatformServerList() throws Exception {
          return getPlatformServerList(true);

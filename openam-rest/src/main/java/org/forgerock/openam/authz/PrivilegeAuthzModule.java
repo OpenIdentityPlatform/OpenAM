@@ -55,8 +55,6 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  */
 public abstract class PrivilegeAuthzModule {
 
-    private static final Debug DEBUG = Debug.getInstance("frRest");
-
     public static final String NAME = "DelegationFilter";
     public static final PrivilegeDefinition MODIFY = PrivilegeDefinition.getInstance("modify", Action.MODIFY);
     public static final PrivilegeDefinition READ = PrivilegeDefinition.getInstance("read", Action.READ);
@@ -177,7 +175,7 @@ public abstract class PrivilegeAuthzModule {
                 return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(agentType)
                         || AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(agentType);
             }
-        } catch (IdRepoException ignored) {
+        } catch (IdRepoException|SSOException ignored) {
         }
         return false;
     }
