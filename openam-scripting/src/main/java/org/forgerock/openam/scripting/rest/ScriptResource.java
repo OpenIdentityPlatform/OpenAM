@@ -31,20 +31,9 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SCR
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TRANSLATION_KEY_PREFIX;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
-import static org.forgerock.openam.scripting.ScriptConstants.JSON_UUID;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CONTEXT;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CREATED_BY;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_CREATION_DATE;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_DESCRIPTION;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LANGUAGE;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LAST_MODIFIED_BY;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_LAST_MODIFIED_DATE;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_NAME;
-import static org.forgerock.openam.scripting.ScriptConstants.SCRIPT_TEXT;
+import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.MISSING_SCRIPT;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.SCRIPT_DECODING_FAILED;
-import static org.forgerock.openam.scripting.ScriptConstants.getContextFromString;
-import static org.forgerock.openam.scripting.ScriptConstants.getLanguageFromString;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -327,6 +316,7 @@ public class ScriptResource extends RealmAwareResource {
                 field(SCRIPT_NAME, scriptConfig.getName()),
                 field(SCRIPT_DESCRIPTION, scriptConfig.getDescription()),
                 field(SCRIPT_TEXT, Base64.encode(scriptConfig.getScript().getBytes(UTF_8))),
+                field(SCRIPT_IS_DEFAULT, scriptConfig.isDefault()),
                 field(SCRIPT_LANGUAGE, scriptConfig.getLanguage().name()),
                 field(SCRIPT_CONTEXT, scriptConfig.getContext().name()),
                 field(SCRIPT_CREATED_BY, scriptConfig.getCreatedBy()),
