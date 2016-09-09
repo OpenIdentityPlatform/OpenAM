@@ -67,6 +67,17 @@ define([
     }
 
     /**
+     * Transforms propertyOrder attribute to integer
+     * @param {Object} property Property to transform
+     */
+    function transformPropertyOrderAttributeToInt (property) {
+        if (property.hasOwnProperty("propertyOrder") && !_.isNumber(property.propertyOrder)) {
+            const orderWithoutPrefixedCharacter = property.propertyOrder.slice(1);
+            property.propertyOrder = parseInt(orderWithoutPrefixedCharacter, 10);
+        }
+    }
+
+    /**
      * Warns if a property is inferred to be a password and does not have a format of password
      * @param {Object} property Property to transform
      * @param {String} name Raw property name
@@ -84,7 +95,8 @@ define([
         /**
          * Property transforms & warnings
          */
-        eachProperty(schema, [transformBooleanTypeToCheckboxFormat,
+        eachProperty(schema, [transformPropertyOrderAttributeToInt,
+                              transformBooleanTypeToCheckboxFormat,
                               transformEnumTypeToString,
                               warnOnInferredPasswordWithoutFormat]);
 
