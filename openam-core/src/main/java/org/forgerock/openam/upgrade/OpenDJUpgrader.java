@@ -263,7 +263,6 @@ public class OpenDJUpgrader {
     private int callDJUpgradeMechanism() {
 
         final String[] args = {
-                "--configClass", "org.opends.server.extensions.ConfigFileHandler",
                 "--configFile", installRoot + "/config/config.ldif",
                 "--acceptLicense",
                 "--force",
