@@ -28,13 +28,21 @@
  */
 package com.sun.identity.setup;
 
-import static org.forgerock.openam.utils.IOUtils.writeToFile;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.Collection;
+import java.util.Properties;
+
+import org.forgerock.openam.utils.AMKeyProvider;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.DSConfigMgrBase;
 import com.iplanet.services.ldap.IDSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerGroup;
@@ -42,13 +50,8 @@ import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.services.util.XMLException;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.common.configuration.ConfigurationException;
-import com.sun.identity.shared.StringUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSException;
-import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * This class is responsible for creating bootstrap file based on the
@@ -80,126 +83,129 @@ public class BootstrapCreator {
             DSConfigMgrBase dsCfg = new DSConfigMgrBase();
             dsCfg.parseServiceConfigXML();
             instance.update(dsCfg);
-        } catch (XMLException e) {
-            throw new ConfigurationException(e.getMessage());
-        } catch (SMSException e) {
-            throw new ConfigurationException(e.getMessage());
-        } catch (SSOException e) {
-            throw new ConfigurationException(e.getMessage());
-        }
-    }
-    
-    public static void createBootstrap()
-        throws ConfigurationException {
-        try {
-            instance.update(DSConfigMgr.getDSConfigMgr());
-        } catch (LDAPServiceException e) {
+        } catch (XMLException | SMSException | SSOException | IOException e) {
             throw new ConfigurationException(e.getMessage());
         }
     }
 
+    // This is called on every boot
+    // we use this as a hook to migrate the legacy bootstrap to the env var + properties.
     private void update(IDSConfigMgr dsCfg)
-        throws ConfigurationException {
+            throws ConfigurationException, IOException {
         try {
-            String bootstrapString = getBootStrapURL(dsCfg);
             String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
-            String file = baseDir + "/" + BootstrapData.BOOTSTRAP;
-            File f = new File(file);
-            boolean exist = f.exists();
-            boolean writable = exist && f.canWrite();
+            Properties bootProps = getBootstrapPropsFile(dsCfg);
+            // get the password properties
+            String dspw = bootProps.getProperty(BootstrapData.DSAME_PWD_KEY);
+            String configStorepw = bootProps.getProperty(BootstrapData.CONFIG_PWD_KEY);
 
-            // make bootstrap writable if it is not
-            if (exist && !writable) {
-                f.setWritable(true);
-                Thread.sleep(3000);
+            // do migration if the old bootstrap file is there.
+            File f = new File(baseDir + "/" + BootstrapData.BOOTSTRAP);
+
+            if (f.exists()) { // start migration of legacy bootstrap and keystore
+                String installDir = SystemProperties.get(Constants.AM_INSTALL_DIR);
+
+                System.out.println("Migrating keystore");
+
+                // get the old keystore - using decryption for the storepass
+                AMKeyProvider amKeyProvider = new AMKeyProvider(installDir, true);
+                char[] keystorePass = amKeyProvider.getKeystorePass();
+                String keyPassword = amKeyProvider.getPrivateKeyPass();
+
+                // Migrate the keys...
+                // change the path to new top level location
+                amKeyProvider.setKeyStoreFilePath(baseDir + "/keystore.jceks");
+                amKeyProvider.store();
+                // create new .storepass and .keypass files
+                AMSetupServlet.createPasswordFiles(baseDir, new String(keystorePass), keyPassword);
+
+                // now we can remove bootstrap
+                f.delete();
             }
 
-            writeToFile(file, bootstrapString);
+            // add the required boot passwords to the keystore
+            AMKeyProvider amk = new AMKeyProvider(baseDir, false);
+            amk.storeSecret(BootstrapData.DSAME_PWD_KEY, dspw);
+            amk.storeSecret(BootstrapData.CONFIG_PWD_KEY, configStorepw);
+            amk.store();
+            // This writes out the boot.properties file (minus the passwords)
+            updateBootProps(baseDir, bootProps);
 
-            // not exist means that the product is first configured.
-            // set permission to 400
-            if (!exist) {
-                if (isUnix) {
-                    Runtime.getRuntime().exec("/bin/chmod 400 " + file);
-                }
-            } else {
-                // make it not writable if it was previously not writable.
-                if (!writable) {
-                    f.setWritable(false);
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new ConfigurationException(e.getMessage());
-        } catch (IOException e) {
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
             throw new ConfigurationException(e.getMessage());
         }
-    }        
+    }
+
+    // write out the boot properties to boot.properties
+    private void updateBootProps(String baseDir, Properties bootstrapProps) throws IOException {
+        String file = baseDir + "/boot.properties";
+        // we remove the passwords - because they should now be in the keystore
+        // The passwords are in the boot props in order to migrate from the legacy bootstrap file
+        bootstrapProps.remove(BootstrapData.DSAME_PWD_KEY);
+        bootstrapProps.remove(BootstrapData.CONFIG_PWD_KEY);
+
+        OutputStream out = new FileOutputStream(file);
+        bootstrapProps.store(out,"OpenAM bootstrap properties. These values can be overridden with environment variables");
+        out.close();
+    }
 
     /**
-     * Returns the bootstrap url.
+     * Get the properties needed for the new boot.properties file. The properties are derived from
+     * the current running/boostrapped instance.
      *
-     * @param dsCfg instance of the <code>IDSConfigMgr</code> containing
-     *              the connection information to the config store.
-     * @exception ConfigurationException if there is an error and cannot
-     *     obtain the bootstrap URL. This may be due to connection error.
+     * @param dsCfg handle to the dir server config store
+     * @return The bootstrap properties
      */
-    public String getBootStrapURL(IDSConfigMgr dsCfg)
-        throws ConfigurationException {
-        String bootstrapStr = null;
-        try {
-            ServerGroup sg = dsCfg.getServerGroup("sms");
-            ServerGroup defaultGroup = dsCfg.getServerGroup("default") ;
-            ServerInstance svrCfg;
+    private Properties getBootstrapPropsFile(IDSConfigMgr dsCfg) throws ConfigurationException {
+        Properties p = new Properties();
 
-            if (sg == null) {
-                sg = defaultGroup;
-                svrCfg = dsCfg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
-            } else {
-                svrCfg = sg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
-            }
+        ServerGroup sg = dsCfg.getServerGroup("sms");
+        ServerGroup defaultGroup = dsCfg.getServerGroup("default");
+        ServerInstance svrCfg;
 
-            ServerInstance userInstance = defaultGroup.getServerInstance(
-                LDAPUser.Type.AUTH_ADMIN);
-            String dsameUserName = userInstance.getAuthID();
-            String dsameUserPwd = JCECrypt.encode(userInstance.getPasswd());
-
-            String connDN = svrCfg.getAuthID();
-            String connPwd = JCECrypt.encode(svrCfg.getPasswd());
-            String rootSuffix = svrCfg.getBaseDN();
-
-            Collection serverList = sg.getServersList();
-            StringBuilder bootstrap = new StringBuilder();
-
-            for (Iterator i = serverList.iterator(); i.hasNext(); ) {
-                Server serverObj = (Server)i.next();
-                Server.Type connType = serverObj.getConnectionType();
-                String proto = (connType.equals(Server.Type.CONN_SIMPLE)) ?
-                    "ldap" : "ldaps";
-                String url = StringUtils.strReplaceAll(template,
-                    "@DS_PROTO@", proto);
-
-                String host = serverObj.getServerName() + ":" +
-                    serverObj.getPort();
-                url = StringUtils.strReplaceAll(url, "@DS_HOST@", host);
-                url = StringUtils.strReplaceAll(url, "@INSTANCE_NAME@",
-                    URLEncoder.encode(SystemProperties.getServerInstanceName(),
-                    "UTF-8"));
-                url = StringUtils.strReplaceAll(url, "@DSAMEUSER_NAME@",
-                    URLEncoder.encode(dsameUserName, "UTF-8"));
-                url = StringUtils.strReplaceAll(url, "@DSAMEUSER_PWD@",
-                    URLEncoder.encode(dsameUserPwd, "UTF-8"));
-                url = StringUtils.strReplaceAll(url, "@BASE_DN@",
-                    URLEncoder.encode(rootSuffix, "UTF-8"));
-                url = StringUtils.strReplaceAll(url, "@BIND_DN@",
-                    URLEncoder.encode(connDN, "UTF-8"));
-                url = StringUtils.strReplaceAll(url, "@BIND_PWD@",
-                    URLEncoder.encode(connPwd, "UTF-8"));
-                bootstrap.append(url).append("\n");
-            }
-            bootstrapStr = bootstrap.toString();
-        } catch (IOException e) {
-            throw new ConfigurationException(e.getMessage());
+        if (sg == null) {
+            sg = defaultGroup;
+            svrCfg = dsCfg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
+        } else {
+            svrCfg = sg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
         }
-        return bootstrapStr;
-    }        
+
+        ServerInstance userInstance = defaultGroup.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
+        String dsameUserName = userInstance.getAuthID();
+        String dsameUserPwd = userInstance.getPasswd();
+        String connDN = svrCfg.getAuthID();
+        String connPwd = svrCfg.getPasswd();
+        String rootSuffix = svrCfg.getBaseDN();
+
+        Collection serverList = sg.getServersList();
+
+        // we should only have one server...
+        if (serverList.size() <= 0) {
+            throw new ConfigurationException("Server list is empty");
+        }
+
+        // We take the first one.
+        // With AM 14, there should only be one server (could be many instances, but one logical server)
+        Server serverObj = (Server) serverList.iterator().next();
+
+        Server.Type connType = serverObj.getConnectionType();
+        String proto = (connType.equals(Server.Type.CONN_SIMPLE)) ? "ldap" : "ldaps";
+
+        p.setProperty(BootstrapData.ENV_OPENAM_CONFIG_STORE_LDAP_HOST, serverObj.getServerName());
+        p.setProperty(BootstrapData.ENV_OPENAM_CONFIG_STORE_LDAP_PORT, "" + serverObj.getPort());
+        p.setProperty(BootstrapData.ENV_OPENAM_CONFIG_STORE_LDAP_PROTO, proto);
+
+        p.setProperty(BootstrapData.ENV_OPENAM_INSTANCE, SystemProperties.getServerInstanceName());
+        p.setProperty(BootstrapData.ENV_OPENAM_CONFIG_STORE_BASE_DN, rootSuffix);
+
+        p.setProperty(BootstrapData.ENV_OPENAM_DSAME_USER, dsameUserName);
+
+        p.setProperty(BootstrapData.ENV_OPENAM_CONFIG_STORE_DIR_MGR, connDN);
+
+        // include the password props for now. These should not be written out to boot.properties
+        p.setProperty(BootstrapData.DSAME_PWD_KEY, dsameUserPwd);
+        p.setProperty(BootstrapData.CONFIG_PWD_KEY, connPwd);
+
+        return p;
+    }
 }

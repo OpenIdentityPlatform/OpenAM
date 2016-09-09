@@ -36,6 +36,7 @@ import static org.forgerock.openam.utils.IOUtils.*;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +48,13 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.AccessController;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -91,6 +98,7 @@ import org.forgerock.openam.setup.ZipUtils;
 import org.forgerock.openam.upgrade.EmbeddedOpenDJBackupManager;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.config.ConfigurationFramework;
 
@@ -301,15 +309,14 @@ public class AMSetupServlet extends HttpServlet {
         isConfiguredFlag = overrideAMC == null || overrideAMC.equalsIgnoreCase("false");
         
         if (!isConfiguredFlag && servletCtx != null) {
+            // This call has side effect that sets the System base dir property
             String baseDir = getBaseDir();
             try {
-                String bootstrapFile = getBootStrapFile();
-                if (bootstrapFile != null) {
+                if (canBootstrap()) {
                     isConfiguredFlag = Bootstrap.load(new BootstrapData(baseDir), false);
-                } else {                    
-                    if (baseDir != null) {
+                }
+                else if (baseDir != null) {
                         isConfiguredFlag = loadAMConfigProperties(baseDir + "/" + SetupConstants.AMCONFIG_PROPERTIES);
-                    }
                 }
             } catch (ConfiguratorException e) {
                 //ignore, WAR may not be configured yet.
@@ -476,7 +483,6 @@ public class AMSetupServlet extends HttpServlet {
         Map<String, Object> userRepo = (Map<String, Object>) map.remove(SetupConstants.USER_STORE);
 
         try {
-
             // Check for click-through license acceptance before processing the request.
             SetupProgress.reportStart("configurator.progress.license.check", new Object[0]);
             if (!isLicenseAccepted(request)) {
@@ -908,12 +914,10 @@ public class AMSetupServlet extends HttpServlet {
             // postInitialize requires the user repo to be configured
             postInitialize(adminSSOToken);
 
-            /*
-             * Requiring the keystore.jks file in OpenAM workspace.
-             * The createIdentitiesForWSSecurity is for the 
-             * JavaEE/NetBeans integration that we had done.
-             */
-            createPasswordFiles(basedir, deployuri);
+            // create .storepass and .keypass files to unlock the keystore
+            // The template keystore file stores the password protected with "changeit"
+            String storePass = AMSetupUtils.getRandomString();
+            createPasswordFiles(basedir, storePass, "changeit");
             if (!isDITLoaded) {
                 if ((userRepo == null) || userRepo.isEmpty()) {
                     createDemoUser();
@@ -1047,17 +1051,21 @@ public class AMSetupServlet extends HttpServlet {
     /**
      * Returns location of the bootstrap file.
      *
-     * @return Location of the bootstrap file. Returns null if the file
+     *  return the legacy bootstrap file OR boot.properties. If both files exist, the legacy bootstrap is returned
+     *
+     * @return Location of the bootstrap file. Returns null if a bootstrap file
      *         cannot be located 
      * @throws ConfiguratorException if servlet context is null or deployment
      *         application real path cannot be determined.
      */
     static String getBootStrapFile() throws ConfiguratorException {
         String bootstrap = null;
-        
+        String bootProps = null;
+
         String configDir = getPresetConfigDir();
         if (configDir != null && configDir.length() > 0) {
             bootstrap = configDir + "/bootstrap";
+            bootProps = configDir + "/boot.properties";
         } else {
             String locator = getBootstrapLocator();
             FileReader frdr = null;
@@ -1065,7 +1073,9 @@ public class AMSetupServlet extends HttpServlet {
             try {
                 frdr = new FileReader(locator);
                 BufferedReader brdr = new BufferedReader(frdr);
-                bootstrap = brdr.readLine() + "/bootstrap";
+                String basePath = brdr.readLine();
+                bootstrap = basePath + "/bootstrap";
+                bootProps = basePath + "/boot.properties";
             } catch (IOException e) {
                 //ignore
             } finally {
@@ -1078,14 +1088,43 @@ public class AMSetupServlet extends HttpServlet {
                 }
             }
         }
-        
+
         if (bootstrap != null) {
             File test = new File(bootstrap);
             if (!test.exists()) {
                 bootstrap = null;
             }
         }
-        return bootstrap;
+        if (bootProps != null) {
+            File test = new File(bootProps);
+            if (!test.exists()) {
+                bootProps = null;
+            }
+        }
+
+        return bootstrap != null ? bootstrap : bootProps;
+    }
+
+    /**
+     * Determine if we can boot from one of
+     * <ul>
+     *     <li>legacy bootstrap file</li>
+     *     <li>boot.properties</li>
+     *     <li>environment variables</li>
+     * </ul>
+     *
+     * @return true if the system can boot from files or environment variables
+     * @throws ConfiguratorException
+     */
+    static boolean canBootstrap() throws ConfiguratorException {
+        String bsFile = getBootStrapFile();
+        if (bsFile != null) {
+            return true;
+        }
+        // if no boot props found we can still boot from env vars
+        // this is the minimal env var required - the rest can default
+        String env = System.getenv(BootstrapData.ENV_OPENAM_INSTANCE);
+        return env != null;
     }
 
     // this is the file which contains the base dir.
@@ -1464,32 +1503,55 @@ public class AMSetupServlet extends HttpServlet {
      * Create the storepass and keypass files
      *
      * @param basedir the configuration base directory.
-     * @param deployuri the deployment URI. 
+     * @param keystorePwd password for .storepass
+     * @param keyPassword password for the .keypass - usually the same as above
      * @throws IOException if password files cannot be written.
      */
-    private static void createPasswordFiles(String basedir, String deployuri) throws IOException {
-        String pwd = Crypt.encrypt("changeit");
-        String location = basedir + deployuri;
-        writeContent(location + "/.keypass", pwd);
-        writeContent(location + "/.storepass", pwd);
-        copyCtxFile("/WEB-INF/template/keystore", "keystore.jks", location);
-        copyCtxFile("/WEB-INF/template/keystore", "keystore.jceks", location);
+    protected static void createPasswordFiles(String basedir, String keystorePwd, String keyPassword) throws IOException {
+        // We no longer encrypt the password in the keypass /storepass, because
+        // the boot passwords are stored in the keystore, and we need
+        // to be able to open the keystore to boot.
+        // The keystore now moves to the basedir
+        writeContent(basedir + "/.keypass", keyPassword);
+        writeContent(basedir + "/.storepass", keystorePwd);
+        copyCtxFile("/WEB-INF/template/keystore", "keystore.jks", basedir);
+        copyCtxFile("/WEB-INF/template/keystore", "keystore.jceks", basedir);
+        // the sample keystore files are encrypted with the default "changeit". We need to open and then save them
+        // the new password
+        AMKeyProvider jceks = new AMKeyProvider(true, basedir + "/keystore.jceks", "changeit", "JCEKS", "changeit");
+        AMKeyProvider jks = new AMKeyProvider(true, basedir + "/keystore.jks", "changeit", "JKS", "changeit");
+
+        jceks.setKey(keystorePwd, keyPassword);
+        jks.setKey(keystorePwd, keyPassword);
+
+        try {
+            jceks.store();
+            jks.store();
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new IOException("Can't update keystore password", e);
+        }
     }
 
     /**
      * Helper method to create the storepass and keypass files
      *
-     * @param fName is the name of the file to create.
+     * @param fName   is the name of the file to create.
      * @param content is the password to write in the file.
+     * @throws IOException
      */
     private static void writeContent(String fName, String content) throws IOException {
         FileWriter fout = null;
         try {
-            fout = new FileWriter(new File(fName));
-            fout.write(content);
+            File f = new File(fName);
+            BufferedWriter writer = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8);
+            writer.write(content);
+            writer.close();
+
+            chmodFileReadOnly(f);
+
         } catch (IOException ioex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME)
-                    .error("AMSetupServlet.writeContent: Exception in creating password files:" , ioex);
+                    .error("AMSetupServlet.writeContent: Exception in creating password files:", ioex);
             throw ioex;
         } finally {
             if (fout != null) {
@@ -1499,6 +1561,30 @@ public class AMSetupServlet extends HttpServlet {
                     //No handling requried
                 }
             }
+        }
+    }
+
+    /**
+     * Change a file to be read only for owner (eg password file on disk that we want to protect)
+     *
+     * @param f - the File handle to the file
+     * @throws IOException if the file does not exist or permissions can not be changed
+     */
+    private static void chmodFileReadOnly(File f) throws IOException {
+        // Tyy to chmod the file to be owner readable only
+        // this may or may not work on all platforms..
+        // Need to verify this works on Windows
+        f.setReadable(true, true); // force set read only for owner.
+
+
+        // now try to chmod the file read only on Posix systems
+        try {
+            Set perms = new HashSet();
+            perms.add(PosixFilePermission.OWNER_READ);
+            perms.add(PosixFilePermission.OWNER_WRITE);
+            Files.setPosixFilePermissions(f.toPath(), perms);
+        } catch (UnsupportedOperationException e) {
+            /* we know this fails on Windows - so ignore the exception */
         }
     }
 
