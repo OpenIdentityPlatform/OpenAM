@@ -71,6 +71,7 @@ import org.forgerock.util.query.QueryFilter;
 public class SmsRouteTree implements RequestHandler {
 
     private static final QueryFilter<JsonPointer> ALWAYS_TRUE = QueryFilter.alwaysTrue();
+    private static final String SCRIPTING_SERVICE_NAME = "scripting";
 
     final Map<MatchingResourcePath, CrestAuthorizationModule> authzModules;
     private final Predicate<String> handlesFunction;
@@ -220,7 +221,12 @@ public class SmsRouteTree implements RequestHandler {
             }
         } else if (GET_CREATABLE_TYPES.equals(action) && remainingUri.isEmpty()) {
             try {
-                return readTypes(context, NOT_CREATED_SINGLETONS, forUI);
+                if (SCRIPTING_SERVICE_NAME.equals(context.asContext(UriRouterContext.class).getMatchedUri())) {
+                    // Default script types cannot be created
+                    return newActionResponse(json(array())).asPromise();
+                } else {
+                    return readTypes(context, NOT_CREATED_SINGLETONS, forUI);
+                }
             } catch (ResourceException e) {
                 return e.asPromise();
             }

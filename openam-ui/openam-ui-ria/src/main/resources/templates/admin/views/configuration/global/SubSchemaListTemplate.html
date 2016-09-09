@@ -48,7 +48,7 @@
                 {{/each}}
             </ul>
         </div>
-    {{else}}
+    {{else if creatables.length}}
         <a class="btn btn-default pull-right" href="{{routeTo 'globalServiceSubSchemaNew' type creatables.[0]._id}}"
             title="{{t 'common.form.edit'}}">
             <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
@@ -71,7 +71,7 @@
                     {{/each}}
                 </ul>
             </div>
-        {{else}}
+        {{else if creatables.length}}
             <a class="btn btn-primary" href="{{routeTo 'globalServiceSubSchemaNew' type creatables.[0]._id}}"
                 title="{{t 'common.form.edit'}}">
                 <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
