@@ -37,7 +37,7 @@ define([
                 getInstance: () => ServicesService.type.subSchema.type.subSchema.instance.get(
                     serviceType, subSchemaType, subSchemaInstanceId, subSubSchemaType, subSubSchemaInstanceId),
                 updateInstance: (values) => ServicesService.type.subSchema.type.subSchema.instance.update(
-                    serviceType, subSchemaType, subSchemaInstanceId, subSubSchemaType, subSubSchemaInstanceId, values)
+                    serviceType, subSchemaType, subSchemaInstanceId, subSubSchemaType, values)
             });
 
             this.parentRender(() => {

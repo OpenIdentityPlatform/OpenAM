@@ -47,6 +47,16 @@ define([
             type: "POST"
         }).then((response) => new JSONSchema(response));
     };
+    const getServiceSubSubSchema = function (serviceType, subSchemaType, subSchemaInstance, subSubSchemaType) {
+        return obj.serviceCall({
+            url: fetchUrl.default(
+                `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}/${subSubSchemaType}` +
+                "?_action=schema",
+                { realm: false }),
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "POST"
+        }).then((response) => new JSONSchema(response));
+    };
 
     obj.instance = {
         getAll () {  // TODO this is the only difference in GLOBAL and REALM service rest calls
@@ -132,43 +142,66 @@ define([
                         type: "POST"
                     }).then((response) => _.sortBy(response.result, "name"));
                 },
-                // TODO 'subSchema' block below contains mock data, update it as part of 2 following issues:
-                // AME-11854 [REST SMS] make sure that calls to sub-sub configuration return correct data
-                // AME-11868 Update sub-sub schema view with correct server calls
                 subSchema: {
                     type: {
-                        getAll (serviceType) {
-                            const response = { result: [] };
-                            if (serviceType === "scripting") {
-                                response.result = [{ "_id": "mock", "name": "mock", "collection": true }];
-                            }
-                            return $.Deferred().resolve(response).then((response) => response.result);
+                        getAll (serviceType, subSchemaType) {
+                            return obj.serviceCall({
+                                url: fetchUrl.default(
+                                    `/global-config/services/${serviceType}/${subSchemaType}?_action=getAllTypes`,
+                                    { realm: false }),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                                type: "POST"
+                            }).then((response) => response.result);
                         },
-                        getCreatables () {
-                            return $.Deferred().resolve({ result: [] }).then((response) => response.result);
+                        getCreatables (serviceType, subSchemaType, subSchemaInstance) {
+                            return obj.serviceCall({
+                                url: fetchUrl.default(
+                                    `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}` +
+                                    "?_action=getCreatableTypes&forUI=true",
+                                    { realm: false }),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                                type: "POST"
+                            }).then((response) => _.sortBy(response.result, "name"));
                         }
                     },
                     instance: {
-                        getAll (serviceType) {
-                            const response = { result: [] };
-                            if (serviceType === "scripting") {
-                                response.result = [{ "_id": "mockEngineConfig", "_type": { "_id": "mockEngine",
-                                    "name": "Mock Engine Name" } }];
+                        getAll (serviceType, subSchemaType, subSchemaInstance) {
+                            return obj.serviceCall({
+                                url: fetchUrl.default(
+                                    `/global-config/services/${serviceType}/${subSchemaType}/${subSchemaInstance}` +
+                                    "?_action=nextdescendents",
+                                    { realm: false }),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                                type: "POST"
+                            }).then((response) => _.sortBy(response.result, "_id"));
+                        },
+                        get (serviceType, subSchemaType, subSchemaInstance, subSubSchemaType) {
+                            function getInstance () {
+                                return obj.serviceCall({
+                                    url: fetchUrl.default(
+                                        "/global-config/services/" +
+                                        `${serviceType}/${subSchemaType}/${subSchemaInstance}/${subSubSchemaType}`,
+                                        { realm: false }),
+                                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                                }).then((response) => new JSONValues(response));
                             }
-                            return $.Deferred().resolve(response).then((response) => _.sortBy(response.result, "_id"));
+
+                            return Promise.all([getServiceSubSubSchema(serviceType, subSchemaType, subSchemaInstance,
+                                    subSubSchemaType), getInstance()])
+                                .then((response) => ({
+                                    schema: response[0],
+                                    values: response[1]
+                                }));
                         },
-                        get () {
-                            return $.Deferred().resolve({
-                                schema: new JSONSchema({ "properties": { "mockField": { type: "string", title:
-                                    "mock title" } }, type: "object" }),
-                                values: new JSONValues({ "mockField": "mock value" })
-                            });
-                        },
-                        update () {
-                            return $.Deferred().resolve({
-                                schema: new JSONSchema({ "properties": { "mockField": { type: "string", title:
-                                    "mock title" } }, type: "object" }),
-                                values: new JSONValues({ "mockField": "mock value" })
+                        update (serviceType, subSchemaType, subSchemaInstance, subSubSchemaType, data) {
+                            return obj.serviceCall({
+                                url: fetchUrl.default(
+                                    "/global-config/services/" +
+                                    `${serviceType}/${subSchemaType}/${subSchemaInstance}/${subSubSchemaType}`,
+                                    { realm: false }),
+                                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                                type: "PUT",
+                                data: JSON.stringify(data)
                             });
                         }
                     }

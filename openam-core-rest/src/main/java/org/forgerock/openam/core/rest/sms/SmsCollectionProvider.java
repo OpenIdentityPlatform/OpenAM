@@ -18,23 +18,31 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceAlreadyExistsException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
+import com.sun.identity.sm.ServiceSchema;
+import org.forgerock.api.annotations.Action;
 import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Create;
 import org.forgerock.api.annotations.Delete;
@@ -42,11 +50,12 @@ import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Read;
-import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
@@ -66,18 +75,6 @@ import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.ResultHandler;
-
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceAlreadyExistsException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceNotFoundException;
-import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A CREST collection provider for SMS schema config.
@@ -102,6 +99,43 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         autoCreatedAuthModule = subSchemaPath.size() == 1 && getAuthenticationServiceNames().contains(serviceName) &&
                 super.uriPath.size() == 1 && AUTO_CREATED_AUTHENTICATION_MODULES.containsValue(super.uriPath.get(0));
         authModuleResourceName = autoCreatedAuthModule ? super.uriPath.get(0) : null;
+    }
+
+    @Action(operationDescription = @Operation, name = "nextdescendents")
+    public Promise<ActionResponse, ResourceException> nextDescendentsAction(Context context, String resourceId,
+            ActionRequest request) {
+        try {
+            ServiceConfigManager scm = getServiceConfigManager(context);
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            ServiceConfig contextConfig = config.getSubConfig(getUriTemplateVariables(context).get("id"));
+
+            JsonValue result = json(object(field("result", array())));
+            for (String subConfigName : contextConfig.getSubConfigNames("*")) {
+                ServiceConfig subConfig = contextConfig.getSubConfig(subConfigName);
+                ServiceSchema subSchema = schema.getSubSchema(subConfigName);
+                JsonValue value = new SmsCollectionProvider(new SmsJsonConverter(subSchema), subSchema,
+                        subSchema.getServiceType(), subSchemaPath, null, false, debug, resourceBundleCache,
+                        defaultLocale).getJsonValue(null, subConfig, context);
+                result.get("result").add(value.getObject());
+            }
+
+            return newActionResponse(result).asPromise();
+        } catch (SMSException e) {
+            debug.warning("::SmsCollectionProvider:: SMSException on nextdescendents action", e);
+            return new InternalServerErrorException("Unable to perform nextdescendents action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (SSOException e) {
+            debug.warning("::SmsCollectionProvider:: SSOException on nextdescendents action", e);
+            return new InternalServerErrorException("Unable to perform nextdescendents action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
+        }
+    }
+
+    @Action(operationDescription = @Operation, name = "getCreatableTypes")
+    public Promise<ActionResponse, ResourceException> getCreatableTypes(Context context, String actionId, ActionRequest request) {
+        return newActionResponse(json(array())).asPromise();
     }
 
     /**

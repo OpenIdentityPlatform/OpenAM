@@ -131,8 +131,8 @@ public abstract class SmsResourceProvider {
     protected final SmsJsonConverter converter;
     protected final Debug debug;
     protected final ServiceSchema schema;
-    private final AMResourceBundleCache resourceBundleCache;
-    private final Locale defaultLocale;
+    protected final AMResourceBundleCache resourceBundleCache;
+    protected final Locale defaultLocale;
 
     SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
             boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug,
@@ -222,7 +222,7 @@ public abstract class SmsResourceProvider {
         return config;
     }
 
-    private Map<String, String> getUriTemplateVariables(Context context) {
+    static Map<String, String> getUriTemplateVariables(Context context) {
         Map<String, String> uriTemplateVariables = new HashMap<>();
         Context c = context;
         while (c.containsContext(UriRouterContext.class)) {

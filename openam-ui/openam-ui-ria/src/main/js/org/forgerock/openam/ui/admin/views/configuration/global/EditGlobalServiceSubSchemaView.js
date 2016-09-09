@@ -52,9 +52,9 @@ define([
                 getSubSchemaTypes: () => ServicesService.type.subSchema.type.subSchema.type.getAll(
                     serviceType, subSchemaType),
                 getSubSchemaCreatableTypes: () => ServicesService.type.subSchema.type.subSchema.type.getCreatables(
-                    serviceType, subSchemaType),
+                    serviceType, subSchemaType, subSchemaInstanceId),
                 getSubSchemaInstances: () => ServicesService.type.subSchema.type.subSchema.instance.getAll(
-                    serviceType, subSchemaType)
+                    serviceType, subSchemaType, subSchemaInstanceId)
             });
 
             this.parentRender(() => {
