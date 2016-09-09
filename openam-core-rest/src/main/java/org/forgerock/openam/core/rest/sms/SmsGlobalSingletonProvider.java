@@ -25,12 +25,13 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.SingletonProvider;
 import org.forgerock.api.annotations.Update;
-import org.forgerock.guava.common.base.Optional;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
@@ -116,7 +117,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected void addOrganisationSchema(Optional<Context> context, JsonValue result) {
+    protected void addOrganisationSchema(Context context, JsonValue result) {
         if (organizationSchema != null) {
             addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
         }

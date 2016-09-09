@@ -54,12 +54,9 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import org.forgerock.api.models.ApiDescription;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -85,7 +82,6 @@ import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
-import org.forgerock.services.descriptor.Describable;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
 
@@ -99,8 +95,7 @@ import org.forgerock.util.promise.Promise;
  * and resource providers are updated accordingly.
  * @since 13.0.0
  */
-public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener,
-        Describable<ApiDescription, Request> {
+public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener {
 
     private static final Pattern DEFAULT_IGNORED_ROUTES =
             Pattern.compile("services/platform/(\\{sites\\}|sites|servers|secondary-urls)(/.*)?$");
@@ -654,23 +649,4 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         // no-op
     }
 
-    @Override
-    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
-        return routeTree.api(apiProducer);
-    }
-
-    @Override
-    public ApiDescription handleApiRequest(Context context, Request request) {
-        return routeTree.handleApiRequest(context, request);
-    }
-
-    @Override
-    public void addDescriptorListener(Listener listener) {
-        routeTree.addDescriptorListener(listener);
-    }
-
-    @Override
-    public void removeDescriptorListener(Listener listener) {
-        routeTree.removeDescriptorListener(listener);
-    }
 }

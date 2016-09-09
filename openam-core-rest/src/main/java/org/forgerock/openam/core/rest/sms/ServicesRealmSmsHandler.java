@@ -73,7 +73,7 @@ import com.sun.identity.sm.ServiceManager;
  *
  * @since 14.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
 public class ServicesRealmSmsHandler {
 
     private final Debug debug;

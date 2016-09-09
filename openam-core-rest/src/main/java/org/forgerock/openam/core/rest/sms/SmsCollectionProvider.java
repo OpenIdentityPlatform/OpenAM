@@ -18,16 +18,6 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
-import static org.forgerock.api.enums.CreateMode.ID_FROM_CLIENT;
-import static org.forgerock.api.enums.ParameterSource.PATH;
-import static org.forgerock.api.models.Action.action;
-import static org.forgerock.api.models.Create.create;
-import static org.forgerock.api.models.Delete.delete;
-import static org.forgerock.api.models.Items.items;
-import static org.forgerock.api.models.Parameter.parameter;
-import static org.forgerock.api.models.Query.query;
-import static org.forgerock.api.models.Read.read;
-import static org.forgerock.api.models.Update.update;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -52,20 +42,10 @@ import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
-import org.forgerock.api.enums.CreateMode;
-import org.forgerock.api.enums.ParameterSource;
 import org.forgerock.api.enums.QueryType;
-import org.forgerock.api.models.ApiDescription;
-import org.forgerock.api.models.Items;
-import org.forgerock.api.models.Parameter;
-import org.forgerock.api.models.Paths;
-import org.forgerock.api.models.Resource;
-import org.forgerock.api.models.Schema;
-import org.forgerock.api.models.SubResources;
-import org.forgerock.api.models.VersionedPath;
-import org.forgerock.guava.common.base.Optional;
-import org.forgerock.http.ApiProducer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
@@ -76,12 +56,10 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.services.context.Context;
-import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.ExceptionHandler;
@@ -105,12 +83,11 @@ import com.sun.identity.sm.ServiceSchema;
  * A CREST collection provider for SMS schema config.
  * @since 13.0.0
  */
-@CollectionProvider(details = @Handler(mvccSupported = false))
+@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = Object.class)))
 public class SmsCollectionProvider extends SmsResourceProvider {
 
     private final boolean autoCreatedAuthModule;
     private final String authModuleResourceName;
-    private final ApiDescription description;
 
     @Inject
     SmsCollectionProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
@@ -125,24 +102,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         autoCreatedAuthModule = subSchemaPath.size() == 1 && getAuthenticationServiceNames().contains(serviceName) &&
                 super.uriPath.size() == 1 && AUTO_CREATED_AUTHENTICATION_MODULES.containsValue(super.uriPath.get(0));
         authModuleResourceName = autoCreatedAuthModule ? super.uriPath.get(0) : null;
-        description = ApiDescription.apiDescription().id("fake").version("v")
-                .paths(Paths.paths().put("", VersionedPath.versionedPath()
-                        .put(VersionedPath.UNVERSIONED, Resource.resource()
-                                .title(getI18NName())
-                                .mvccSupported(false)
-                                .items(items().pathParameter(parameter().name("id").type("string").source(PATH).build())
-                                        .read(read().build())
-                                        .update(update().build())
-                                        .delete(delete().build())
-                                        .create(create().mode(ID_FROM_CLIENT).build())
-                                        .build())
-                                .resourceSchema(Schema.schema().schema(createSchema(Optional.<Context>absent())).build())
-                                .query(query().type(QueryType.FILTER).queryableFields().build())
-                                .create(create().mode(ID_FROM_CLIENT).build())
-                                .action(action().name("schema").build())
-                                .action(action().name("template").build())
-                                .build()).build()
-                ).build()).build();
     }
 
     /**
@@ -151,7 +110,7 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * {@inheritDoc}
      */
     @Create(operationDescription = @Operation)
-    public Promise<ResourceResponse, ResourceException> createInstance(final Context context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> create(final Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         final String realm = realmFor(context);
         try {
@@ -443,25 +402,5 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                 }
             }
         };
-    }
-
-    @Override
-    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
-        return description;
-    }
-
-    @Override
-    public ApiDescription handleApiRequest(Context context, Request request) {
-        return description;
-    }
-
-    @Override
-    public void addDescriptorListener(Listener listener) {
-
-    }
-
-    @Override
-    public void removeDescriptorListener(Listener listener) {
-
     }
 }
