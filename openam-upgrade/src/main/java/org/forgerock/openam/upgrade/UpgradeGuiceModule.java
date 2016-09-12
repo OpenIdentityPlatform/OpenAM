@@ -56,7 +56,7 @@ public final class UpgradeGuiceModule extends PrivateModule {
     @Exposed
     @Named("attributeKeys")
     Set<String> getAttributeKeys() {
-        return asSet("resourceName", "order");
+        return asSet("resourceName", "order", "hideConfigUI");
     }
 
 }
