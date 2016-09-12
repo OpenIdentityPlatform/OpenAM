@@ -114,7 +114,6 @@
         <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
         <forgerock.ui.version>15.0.5</forgerock.ui.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
-        <forgerock.openapi.war.overlay.version>21.0.0-SNAPSHOT</forgerock.openapi.war.overlay.version>
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
@@ -1751,12 +1750,6 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-bloomfilter-monitoring</artifactId>
                 <version>${forgerock.bloomfilter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>openapi-war-overlay</artifactId>
-                <version>${forgerock.openapi.war.overlay.version}</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
