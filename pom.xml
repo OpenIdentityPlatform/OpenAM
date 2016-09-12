@@ -112,7 +112,7 @@
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
 
         <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
-        <forgerock.ui.version>15.0.4</forgerock.ui.version>
+        <forgerock.ui.version>15.0.5</forgerock.ui.version>
         <forgerock.guice.version>1.1.0</forgerock.guice.version>
         <forgerock.openapi.war.overlay.version>21.0.0-SNAPSHOT</forgerock.openapi.war.overlay.version>
 
