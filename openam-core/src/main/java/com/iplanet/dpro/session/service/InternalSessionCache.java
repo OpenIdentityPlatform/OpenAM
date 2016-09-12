@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -42,29 +42,29 @@ import java.util.concurrent.ConcurrentHashMap;
  * when they are no longer referenced by the InternalSession.
  */
 @Singleton
-public class InternalSessionCache {
+class InternalSessionCache {
     private final ConcurrentHashMap<SessionID, InternalSession> cache;
-    private final SingleValueMapper<String, InternalSession> handle = new SingleValueMapper<String, InternalSession>();
-    private final SingleValueMapper<SessionID, InternalSession> restricted = new SingleValueMapper<SessionID, InternalSession>();
+    private final SingleValueMapper<String, InternalSession> handle = new SingleValueMapper<>();
+    private final SingleValueMapper<SessionID, InternalSession> restricted = new SingleValueMapper<>();
 
     /**
      * Construct an InternalSessionCache intended to provide Session caching for provided SessionService configuration.
      * @param config Non null configuration to base caching estimates from.
      */
     @Inject
-    public InternalSessionCache(SessionServiceConfig config) {
-        cache = new ConcurrentHashMap<SessionID, InternalSession>(config.getMaxSessions());
+    InternalSessionCache(SessionServiceConfig config) {
+        cache = new ConcurrentHashMap<>(config.getMaxSessions());
     }
 
-    public InternalSession getBySessionID(SessionID sessionID) {
+    InternalSession getBySessionID(SessionID sessionID) {
         return cache.get(sessionID);
     }
 
-    public InternalSession getByHandle(String sessionHandle) {
+    InternalSession getByHandle(String sessionHandle) {
         return handle.get(sessionHandle);
     }
 
-    public InternalSession getByRestrictedID(SessionID sessionID) {
+    InternalSession getByRestrictedID(SessionID sessionID) {
         return restricted.get(sessionID);
     }
 
@@ -75,11 +75,9 @@ public class InternalSessionCache {
      * - Session Handle
      * - Restricted Tokens
      *
-     * Synchronized: makes updates to multiple data structures atomic.
-     *
      * @param session Non null InternalSession to store.
      */
-    public synchronized void put(InternalSession session) {
+    void put(InternalSession session) {
         Reject.ifNull(session);
         cache.put(session.getID(), session);
 
@@ -97,13 +95,11 @@ public class InternalSessionCache {
     /**
      * Remove the Session from the cache.
      *
-     * Synchronized: makes updates to multiple data structures atomic.
-     *
      * @param sessionID Non null SessionID.
      *
      * @return The InternalSession that was removed from the cache.
      */
-    public synchronized InternalSession remove(SessionID sessionID) {
+    InternalSession remove(SessionID sessionID) {
         InternalSession remove = cache.remove(sessionID);
 
         if (remove == null) {
@@ -127,28 +123,28 @@ public class InternalSessionCache {
      * @param session The InternalSession to remove.
      * @return Non null InternalSession removed from the cache.
      */
-    public InternalSession remove(InternalSession session) {
+    InternalSession remove(InternalSession session) {
         return remove(session.getID());
     }
 
     /**
      * @return Current number of sessions stored in the cache.
      */
-    public int size() {
+    int size() {
         return cache.size();
     }
 
     /**
      * @return <tt>true</tt> if this cache is empty.
      */
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return cache.isEmpty();
     }
 
     /**
      * @return Unmodifiable collection of all Sessions that are stored in the cache.
      */
-    public Collection<InternalSession> getAllSessions() {
+    Collection<InternalSession> getAllSessions() {
         return Collections.unmodifiableCollection(cache.values());
     }
 }
