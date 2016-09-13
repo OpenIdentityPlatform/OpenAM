@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -22,7 +22,6 @@ public class SessionConstants {
     public static final String SESSION_DEBUG = "amSession";
     public static final String PRIMARY_SERVER_URL = "primaryServerURL";
     public static final String STATS_MASTER_TABLE = "amMasterSessionTableStats";
-    public static final String PURGE_DELAY_PROPERTY = "com.iplanet.am.session.purgedelay";
 
     /**
      * Session service attribute to enable/disable session blacklisting.

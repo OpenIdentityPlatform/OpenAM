@@ -18,7 +18,10 @@ package com.iplanet.dpro.session.service;
 
 import static org.mockito.Mockito.*;
 
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionMeta;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.AfterMethod;
@@ -48,13 +51,13 @@ public class InternalSessionTest {
 
     @AfterMethod
     public void restorePurgeDelay() {
-        InternalSession.setPurgeDelay(Long.getLong("com.iplanet.am.session.purgedelay", 120));
+        InternalSession.setPurgeDelayInSeconds(SessionMeta.getPurgeDelay(TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldNotUpdateIfAboutToDelete() {
         // Given
-        InternalSession.setPurgeDelay(0);
+        InternalSession.setPurgeDelayInSeconds(0);
         session.setTimedOutAt(12345L);
         session.save();
         reset(mockSessionService);
@@ -69,7 +72,7 @@ public class InternalSessionTest {
     @Test
     public void shouldUpdateIfNotTimedOut() {
         // Given
-        InternalSession.setPurgeDelay(0);
+        InternalSession.setPurgeDelayInSeconds(0);
         session.setState(SessionConstants.VALID);
         session.setTimedOutAt(0);
         session.save();
@@ -85,7 +88,7 @@ public class InternalSessionTest {
     @Test
     public void shouldUpdateIfTimedOutButPurgeDelayExists() {
         // Given
-        InternalSession.setPurgeDelay(120L);
+        InternalSession.setPurgeDelayInSeconds(120L);
         session.save();
         session.setTimedOutAt(12345L);
         reset(mockSessionService);
