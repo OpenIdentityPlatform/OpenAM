@@ -110,8 +110,10 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     @Override
     protected void addOrganisationAttributes(String realm, ServiceConfig config, JsonValue result) {
         if (organizationSchema != null) {
-            result.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults(), true)
-                    .getObject());
+            JsonValue defaults = organizationConverter.toJson(organizationSchema.getAttributeDefaults(), true);
+            if (defaults.size() > 0) {
+                result.add("defaults", defaults.getObject());
+            }
         }
     }
 
