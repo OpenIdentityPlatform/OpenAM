@@ -35,7 +35,7 @@ class ListGlobalServicesView extends Component {
     }
     render () {
         const items = this.state.items.map((item) => (
-            <ListGroupItem href={ `#configure/global-services/${item._id}` } key={ item._id }>
+            <ListGroupItem href={ `#configure/global-services/${encodeURIComponent(item._id)}` } key={ item._id }>
                 { item.name }
             </ListGroupItem>)
         );
