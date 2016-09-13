@@ -34,6 +34,7 @@ import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.service.model.SCConfigModel;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPropertySheetModel;
@@ -57,6 +58,17 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
     public SCConfigAuthViewBean() {
         super("SCConfigAuth", DEFAULT_DISPLAY_URL);
     }
+
+    @Override
+    protected void beginDisplay(DisplayEvent event, boolean setSelectedTabNode) throws ModelControlException {
+        if (isXuiAdminConsoleEnabled()) {
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.GLOBAL_SERVICES);
+        } else {
+            super.beginDisplay(event, setSelectedTabNode);
+        }
+    }
+
+
 
     protected void createPropertyModel() {
         psModel = new CCPropertySheetModel(
