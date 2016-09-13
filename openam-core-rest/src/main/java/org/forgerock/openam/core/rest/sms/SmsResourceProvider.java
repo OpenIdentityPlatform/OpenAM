@@ -110,7 +110,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * creatable types, while allowing all of those mechanisms to be overridden by more specific subclasses.
  * @since 13.0.0
  */
-abstract class SmsResourceProvider implements Describable<ApiDescription, Request> {
+public abstract class SmsResourceProvider implements Describable<ApiDescription, Request> {
 
     protected static final ClassLoader CLASS_LOADER = SmsResourceProvider.class.getClassLoader();
 
