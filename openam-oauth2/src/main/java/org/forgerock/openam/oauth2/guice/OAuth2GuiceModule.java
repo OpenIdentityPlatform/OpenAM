@@ -15,11 +15,11 @@
  */
 package org.forgerock.openam.oauth2.guice;
 
-import static com.google.inject.name.Names.*;
+import static com.google.inject.name.Names.named;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
-import static org.forgerock.oauth2.core.TokenStore.*;
+import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
-import static org.forgerock.openam.rest.service.RestletUtils.*;
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -116,10 +116,10 @@ import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openidconnect.ClaimsParameterValidator;
 import org.forgerock.openidconnect.CodeVerifierValidator;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
@@ -128,6 +128,7 @@ import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.SubjectTypeValidator;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
+import org.forgerock.openidconnect.ssoprovider.OpenIdConnectSSOProvider;
 import org.restlet.Restlet;
 
 import com.google.inject.AbstractModule;
@@ -226,6 +227,8 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessCheck.class);
         bind(new TypeLiteral<TokenAdapter<StatelessTokenMetadata>>(){}).to(StatelessTokenCtsAdapter.class);
+
+        bind(OpenIdConnectSSOProvider.class);
     }
 
     public static class DefaultStatelessCheck implements StatelessCheck<Boolean> {

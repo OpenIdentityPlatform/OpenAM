@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 /*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
@@ -22,6 +22,7 @@ package org.forgerock.openam.utils;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Pattern;
 
 import org.testng.annotations.Test;
 
@@ -134,5 +135,19 @@ public class StringUtilsTest {
     }
 
 
+    @Test
+    public void shouldReturnEmptyListWhenSplittingANullValue() {
+        assertThat(StringUtils.split(null, null)).isNotNull().isEmpty();
+    }
 
+    @Test
+    public void shouldReturnSingleElementListIfPatternDoesNotMatch() {
+        assertThat(StringUtils.split("one", Pattern.compile(","))).containsExactly("one");
+    }
+
+    @Test
+    public void shouldReturnListOfElementsThatMatchSplitPattern() {
+        assertThat(StringUtils.split("one,  two\t,\rthree  ,  four", Pattern.compile("\\s*,\\s*")))
+                .containsExactly("one", "two", "three", "four");
+    }
 }

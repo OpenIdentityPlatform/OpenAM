@@ -40,21 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
@@ -79,6 +64,23 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 /**
  * Models all of the possible settings the OAuth2 provider can have and that can be configured.
@@ -1245,6 +1247,14 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
      */
     public boolean clientsCanSkipConsent() throws ServerException {
         return Boolean.parseBoolean(getStringSettingValue(OAuth2Constants.OAuth2ProviderService.CLIENTS_CAN_SKIP_CONSENT));
+    }
+
+    /**
+     * Whether OpenID Connect ID Tokens are accepted as SSOTokens in this realm or not.
+     * @return {@code true} if ID Tokens are accepted as SSOTokens in this realm.
+     */
+    public boolean isOpenIDConnectSSOProviderEnabled() throws ServerException {
+        return Boolean.parseBoolean(getStringSettingValue(OIDC_SSOPROVIDER_ENABLED));
     }
 
     /**

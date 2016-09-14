@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  */
 /*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
@@ -19,15 +19,17 @@
 
 package org.forgerock.openam.utils;
 
-import org.forgerock.util.Reject;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.forgerock.util.Reject;
 
 /**
  * Utility class for handling Strings.
@@ -289,5 +291,20 @@ public final class StringUtils {
         }
 
         return true;
+    }
+
+    /**
+     * Splits a string into a list of elements by a pattern.
+     *
+     * @param content the content to split into a list of elements.
+     * @param pattern the regular expression to use to split elements.
+     * @return the list of elements, or an empty list if the content was null.
+     */
+    public static List<String> split(String content, Pattern pattern) {
+        List<String> result = Collections.emptyList();
+        if (content != null) {
+            result = Arrays.asList(pattern.split(content));
+        }
+        return result;
     }
 }

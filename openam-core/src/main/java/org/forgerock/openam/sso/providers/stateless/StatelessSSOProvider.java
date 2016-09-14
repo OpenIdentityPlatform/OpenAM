@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sso.providers.stateless;
 
-import static com.sun.identity.authentication.util.ISAuthConstants.*;
+import static com.sun.identity.authentication.util.ISAuthConstants.AUTH_SERVICE_NAME;
 
 import java.security.AccessController;
 import java.security.Principal;
@@ -29,13 +29,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOProvider;
+import com.iplanet.sso.SSOProviderPlugin;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -53,7 +54,7 @@ import com.sun.identity.sm.ServiceListener;
  * gateway barrier for stateless sessions to hit up against when stateless sessions are not enabled
  * (they fail validation to be handled by this provider).
  */
-public class StatelessSSOProvider implements SSOProvider, ServiceListener {
+public class StatelessSSOProvider implements SSOProviderPlugin, ServiceListener {
 
     private final StatelessSessionManager statelessSessionManager;
     private final Blacklist<Session> sessionBlacklist;
@@ -80,6 +81,21 @@ public class StatelessSSOProvider implements SSOProvider, ServiceListener {
         } catch (SMSException | SSOException e) {
             debug.error("Unable to register StatelessSSOProvider against the service config listening system.");
         }
+    }
+
+    @Override
+    public boolean isApplicable(final HttpServletRequest request) {
+        try {
+            return statelessSessionManager.containsJwt(request);
+        } catch (SessionException e) {
+            debug.message("Error whilst inspecting request for JWT: {0}", request, e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isApplicable(final String tokenId) {
+        return StringUtils.isNotBlank(tokenId) && statelessSessionManager.containsJwt(tokenId);
     }
 
     private SSOToken createSSOToken(SessionID sessionId) throws SSOException {

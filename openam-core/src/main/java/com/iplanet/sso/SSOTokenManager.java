@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -29,22 +29,21 @@
 
 package com.iplanet.sso;
 
-import java.security.Principal;
-import java.util.Set;
+import static org.forgerock.openam.utils.StringUtils.split;
 
-import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
-import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.providers.dpro.SSOProviderBundle;
 import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -85,39 +84,40 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class SSOTokenManager {
 
-    /*
-     * SSOTokenManager is not a real PROVIDER but implements SSOProvider for
-     * consistency in the methods.
+    /** Debug class that can be used by SSOProvider implementations */
+    public static final Debug debug = Debug.getInstance(IUMSConstants.UMS_DEBUG);
+
+    /**
+     * System property containing a list of SSOProvider plugins that should be used.
      */
+    private static final String PROVIDER_PLUGIN_PROPERTY = "org.forgerock.openam.sso.providers.list";
+
+    /**
+     * Regular expression for splitting the SSOProvider list property. Splits by commas surrounded by optional
+     * whitespace.
+     */
+    private static final Pattern COMMA_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
     /**
      * Grappa SSOProvider class that will be used by default if
      * providerimplclass property is not present.
      */
-    static final String GRAPPA_PROVIDER_PACKAGE =
-        "com.sun.identity.authentication.internal";
+    private static final String GRAPPA_PROVIDER_PACKAGE = "com.sun.identity.authentication.internal";
 
-    /**
-     * Package name of the stateless SSO provider.
-     */
-    private static final String STATELESS_PROVIDER_PACKAGE = StatelessSSOProvider.class.getPackage().getName();
+    private static SSOProvider grappaProvider = null;
 
-    static SSOProvider grappaProvider = null;
+    private static final String DPRO_PROVIDER_PACKAGE = "com.iplanet.sso.providers.dpro";
 
     /**
      * DPRO SSOProvider class
      */
-    static SSOProvider dProProvider = null;
-
-    /** Debug class that can be used by SSOProvider implementations */
-    public static Debug debug = Debug.getInstance(IUMSConstants.UMS_DEBUG);
+    private static SSOProvider dProProvider = null;
 
     // Singleton instance of SSOTokenManager
     private static volatile SSOTokenManager instance = null;
 
-    // Guice provided, lazy initialised, Server Mode only, for Stateless Sessions.
-    private static SSOProvider statelessProvider;
-    private static StatelessSessionManager statelessSessionManager;
+    // Guice provided, lazy initialized, Server Mode only, for additional SSO providers.
+    private static final List<SSOProviderPlugin> ssoProviders = new CopyOnWriteArrayList<>();
 
     /**
      * Returns the singleton instance of
@@ -166,34 +166,29 @@ public class SSOTokenManager {
     }
 
     /**
-     * Note: SSOTokenManager is initialised early in system sequence. This lazy initialiser is required
-     * to smooth over this issue.
-     * @return Null if client mode, otherwise non null Guice initialised.
+     * Loads and returns the set of registered SSOProvider plugins from Guice. Only used in server mode, otherwise
+     * returns an empty set.
+     *
+     * @return the set of registered SSOProvider plugins, or an empty set if not running in server mode.
      */
-    private SSOProvider getStatelessProvider() {
+    private List<SSOProviderPlugin> getSsoProviderPlugins() {
         if (!SystemProperties.isServerMode()) {
-            return null;
+            return ssoProviders;
         }
 
-        if (statelessProvider == null) {
-            statelessProvider = InjectorHolder.getInstance(StatelessSSOProvider.class);
+        if (ssoProviders.isEmpty() && AMSetupServlet.isConfigured()) {
+            for (String providerClass : split(SystemProperties.get(PROVIDER_PLUGIN_PROPERTY), COMMA_SEPARATOR)) {
+                try {
+                    Class<? extends SSOProviderPlugin> pluginClass = Class.forName(providerClass)
+                                                                          .asSubclass(SSOProviderPlugin.class);
+                    ssoProviders.add(InjectorHolder.getInstance(pluginClass));
+                } catch (ClassNotFoundException e) {
+                    debug.error("SSOTokenManager: cannot load SSOProvider plugin {}", providerClass, e);
+                }
+            }
         }
-        return statelessProvider;
-    }
 
-    /**
-     * Note: SSOTokenManager is initialised early in system sequence. This lazy initialiser is required
-     * to smooth over this issue.
-     * @return Null if client mode, otherwise non null Guice initialised.
-     */
-    private StatelessSessionManager getStatelessSessionManager() {
-        if (!SystemProperties.isServerMode()) {
-            return null;
-        }
-        if (statelessSessionManager == null) {
-            statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
-        }
-        return statelessSessionManager;
+        return ssoProviders;
     }
 
     /**
@@ -260,17 +255,24 @@ public class SSOTokenManager {
         }
 
         String packageName = token.getClass().getName();
-        if (packageName.startsWith(STATELESS_PROVIDER_PACKAGE)) {
-            return getStatelessProvider();
-        } else if (packageName.startsWith(GRAPPA_PROVIDER_PACKAGE)) {
+
+        if (packageName.startsWith(GRAPPA_PROVIDER_PACKAGE)) {
             if (grappaProvider == null) {
                 I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
-                throw new SSOException(i18n.getResBundleName(),
-                        IUMSConstants.SSO_NOPROVIDERCLASS, null);
+                throw new SSOException(i18n.getResBundleName(), IUMSConstants.SSO_NOPROVIDERCLASS, null);
             }
-            return (grappaProvider);
+            return grappaProvider;
+        } else if (packageName.startsWith(DPRO_PROVIDER_PACKAGE)) {
+            return dProProvider;
         }
-        return (dProProvider);
+
+        for (SSOProvider ssoProvider : getSsoProviderPlugins()) {
+            if (packageName.startsWith(ssoProvider.getClass().getPackage().getName())) {
+                return ssoProvider;
+            }
+        }
+
+        return dProProvider;
     }
 
     /**
@@ -290,8 +292,10 @@ public class SSOTokenManager {
             javax.servlet.http.HttpServletRequest request)
             throws UnsupportedOperationException, SSOException {
 
-        if (containsJwt(request)) {
-            return getStatelessProvider().createSSOToken(request);
+        for (SSOProviderPlugin ssoProvider : getSsoProviderPlugins()) {
+            if (ssoProvider.isApplicable(request)) {
+                return ssoProvider.createSSOToken(request);
+            }
         }
 
         if (dProProvider != null)
@@ -361,8 +365,10 @@ public class SSOTokenManager {
     public SSOToken createSSOToken(String tokenId)
             throws UnsupportedOperationException, SSOException {
 
-        if (StringUtils.isNotBlank(tokenId) && containsJwt(tokenId)) {
-            return getStatelessProvider().createSSOToken(tokenId);
+        for (SSOProviderPlugin ssoProvider : getSsoProviderPlugins()) {
+            if (ssoProvider.isApplicable(tokenId)) {
+                return ssoProvider.createSSOToken(tokenId);
+            }
         }
 
         if (dProProvider != null)
@@ -389,8 +395,10 @@ public class SSOTokenManager {
     public SSOToken createSSOToken(String tokenId, String clientIP)
             throws UnsupportedOperationException, SSOException {
 
-        if (containsJwt(tokenId)) {
-            return getStatelessProvider().createSSOToken(tokenId, clientIP);
+        for (SSOProviderPlugin ssoProvider : getSsoProviderPlugins()) {
+            if (ssoProvider.isApplicable(tokenId)) {
+                return ssoProvider.createSSOToken(tokenId, clientIP);
+            }
         }
 
         if (dProProvider != null)
@@ -410,8 +418,10 @@ public class SSOTokenManager {
     public SSOToken retrieveValidTokenWithoutResettingIdleTime(String tokenId)
             throws UnsupportedOperationException, SSOException {
 
-        if (containsJwt(tokenId)) {
-            return getStatelessProvider().createSSOToken(tokenId, false, false);
+        for (SSOProviderPlugin ssoProvider : getSsoProviderPlugins()) {
+            if (ssoProvider.isApplicable(tokenId)) {
+                return ssoProvider.createSSOToken(tokenId, false, false);
+            }
         }
 
         if (dProProvider != null)
@@ -574,29 +584,5 @@ public class SSOTokenManager {
      */
     public void logout(SSOToken token) throws SSOException {
         getProvider(token).logout(token);
-    }
-
-    /**
-     * Helper function to ensure that JWT based checks are only applied in server mode.
-     * @param object Non null HttpServletRequest, SessionID or TokenID in String format.
-     * @return True if the object contained a JWT.
-     */
-    private boolean containsJwt(Object object) {
-        if (!SystemProperties.isServerMode()) {
-            return false;
-        }
-
-        try {
-            if (object instanceof HttpServletRequest) {
-                return getStatelessSessionManager().containsJwt((HttpServletRequest) object);
-            } else if (object instanceof SessionID) {
-                return getStatelessSessionManager().containsJwt((SessionID) object);
-            }
-            return getStatelessSessionManager().containsJwt(object.toString());
-        } catch (SessionException | IllegalArgumentException e) {
-            debug.message("Error whilst inspecting JWT:\nClass: {0}\n{1}",
-                    object.getClass(), object, e);
-            return false;
-        }
     }
 }
