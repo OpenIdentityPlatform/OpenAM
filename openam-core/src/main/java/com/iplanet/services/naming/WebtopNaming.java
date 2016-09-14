@@ -31,6 +31,7 @@ package com.iplanet.services.naming;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.client.SendRequestException;
 import com.iplanet.services.comm.share.Request;
@@ -368,6 +369,26 @@ public class WebtopNaming {
             }
         }
         return null;
+    }
+
+    /**
+     * Return the mapped server URL if there is a site. Otherwise, return the server URL from the session
+     * @param sessionId the session id
+     * @return the site URL
+     * @throws URLNotFoundException
+     */
+    public static URL mapSiteToServer(String sessionId) throws URLNotFoundException {
+        SessionID sid  = new SessionID(sessionId);
+        URL mappedURL = WebtopNaming.mapSiteToServer(sid.getSessionServerProtocol(), sid.getSessionServer(),
+                sid.getSessionServerPort(), sid.getSessionServerURI());
+        if (mappedURL == null) {
+            try {
+                return new URL(sid.getSessionServerURL());
+            } catch (MalformedURLException e) {
+                throw new URLNotFoundException(e.getMessage());
+            }
+        }
+        return mappedURL;
     }
 
     /**
