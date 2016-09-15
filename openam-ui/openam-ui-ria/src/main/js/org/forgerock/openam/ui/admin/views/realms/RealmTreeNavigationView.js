@@ -32,6 +32,26 @@ define([
         icon: "fa-dashboard",
         route: "realmsDashboard"
     }, {
+        title: "console.common.navigation.applications",
+        icon: "fa-list-alt",
+        children: [{
+            title: "console.common.navigation.saml20",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_FEDERATION"
+        }, {
+            title: "console.common.navigation.wsfed",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_FEDERATION"
+        }, {
+            title: "console.common.navigation.oauth20",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
+        }, {
+            title: "console.common.navigation.agents",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
+        }]
+    }, {
         title: "console.common.navigation.authentication",
         icon: "fa-user",
         children: [{
@@ -75,10 +95,6 @@ define([
         title: "console.common.navigation.subjects",
         icon: "fa-users",
         event: "main.navigation.EVENT_REDIRECT_TO_JATO_SUBJECTS"
-    }, {
-        title: "console.common.navigation.agents",
-        icon: "fa-male",
-        event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
     }, {
         title: "console.common.navigation.sts",
         icon: "fa-ticket",
