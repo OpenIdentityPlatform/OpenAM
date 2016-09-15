@@ -31,6 +31,19 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_401_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_405_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SERVERS_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -42,14 +55,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.CollectionProvider;
-import org.forgerock.api.annotations.Create;
 import org.forgerock.api.annotations.Delete;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Read;
-import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
@@ -83,7 +96,17 @@ import com.sun.identity.sm.SMSException;
  *
  * Since 14.0.0
  */
-@CollectionProvider(details = @Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@CollectionProvider(
+        details = @Handler(
+                title = SERVERS_RESOURCE + TITLE,
+                description = SERVERS_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "ServersResource.schema.json"),
+                mvccSupported = false),
+        pathParam = @Parameter(
+                name = "id",
+                type = "string",
+                description = SERVERS_RESOURCE + PATH_PARAM + DESCRIPTION))
+
 public final class ServersResourceProvider {
 
     private final Debug debug;
@@ -93,7 +116,12 @@ public final class ServersResourceProvider {
         this.debug = debug;
     }
 
-    @Create(operationDescription = @Operation)
+    @Action(name = "create",
+            operationDescription = @Operation(
+                    description = SERVERS_RESOURCE + "action.create." + DESCRIPTION
+            ),
+            request = @Schema(schemaResource = "ServersResource.create.request.schema.json"),
+            response = @Schema(schemaResource = "ServersResource.schema.json"))
     public Promise<ResourceResponse, ResourceException> create(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         String id = request.getNewResourceId();
@@ -131,7 +159,22 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Delete(operationDescription = @Operation)
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = SERVERS_RESOURCE + DELETE + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                            code = 401,
+                            description = SERVERS_RESOURCE + DELETE + ERROR_401_DESCRIPTION
+                    ),
+                    @ApiError(
+                            code = 500,
+                            description = SERVERS_RESOURCE + ERROR_500_DESCRIPTION
+                    )},
+            description = SERVERS_RESOURCE + DELETE_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> delete(Context context, String id) {
         try {
             SSOToken token = getSsoToken(context);
@@ -147,7 +190,23 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Query(operationDescription = @Operation,type = QueryType.FILTER, queryableFields = "*")
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = SERVERS_RESOURCE + QUERY + ERROR_400_DESCRIPTION
+                    ),
+                    @ApiError(
+                            code = 405,
+                            description = SERVERS_RESOURCE + QUERY + ERROR_405_DESCRIPTION
+                    ),
+                    @ApiError(
+                            code = 500,
+                            description = SERVERS_RESOURCE + ERROR_500_DESCRIPTION
+                    )},
+            description = SERVERS_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*")
     public Promise<QueryResponse, ResourceException> query(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
@@ -172,7 +231,15 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Read(operationDescription = @Operation)
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = SERVERS_RESOURCE + ERROR_500_DESCRIPTION
+                    )
+            },
+            description = SERVERS_RESOURCE + READ_DESCRIPTION
+    ))
     public Promise<ResourceResponse, ResourceException> read(Context context, String id) {
         try {
             SSOToken token = getSsoToken(context);
@@ -187,7 +254,12 @@ public final class ServersResourceProvider {
         }
     }
 
-    @Action(operationDescription = @Operation)
+    @Action(name = "clone",
+            operationDescription = @Operation(
+                    description = SERVERS_RESOURCE + "action.clone." + DESCRIPTION
+            ),
+            request = @Schema(schemaResource = "ServersResource.clone.request.schema.json"),
+            response = @Schema(schemaResource = "ServersResource.schema.json"))
     public Promise<ActionResponse, ResourceException> clone(
             String existingServerId, Context context, ActionRequest request) {
         try {
