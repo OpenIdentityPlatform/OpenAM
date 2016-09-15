@@ -15,11 +15,9 @@
  */
 
 define([
-    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants"
-], ($, AbstractDelegate, Configuration, Constants) => {
+], (AbstractDelegate, Constants) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`);
     const redirector = (tab) => (realm) => {
         obj.realm.redirectToTab(tab, realm);
@@ -84,20 +82,17 @@ define([
     };
 
     obj.getJATOPageSession = function (realm) {
-        const promise = obj.serviceCall({
+        return obj.serviceCall({
             url: `/realm/RMRealm?RMRealm.tblDataActionHref=${realm}&requester=XUI`,
             dataType: "html"
+        }).then((data) => {
+            const sessionRegEx = /jato.pageSession=(.*?)"/;
+            if (sessionRegEx.test(data)) {
+                return data.match(sessionRegEx)[1];
+            } else {
+                return null;
+            }
         });
-
-        return $.when(promise)
-            .then((data) => {
-                const sessionRegEx = /jato.pageSession=(.*?)"/;
-                if (sessionRegEx.test(data)) {
-                    return data.match(sessionRegEx)[1];
-                } else {
-                    return null;
-                }
-            });
     };
 
     return obj;
