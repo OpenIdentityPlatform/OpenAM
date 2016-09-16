@@ -1246,19 +1246,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         try {
             admin = getSSOToken(getCookieFromServerContext(context));
-            dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
-            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            if (debug.messageEnabled()) {
-                debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
-                        "principalName={}", resourceId, realm, principalName);
-            }
-            return newResultPromise(buildResourceResponse(resourceId, context, dtls));
-        } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : User does not have enough " +
-                            "privileges.", resourceId,  needMoreCredentials);
-            return new ForbiddenException("User does not have enough privileges.", needMoreCredentials).asPromise();
-        } catch (final ObjectNotFound objectNotFound) {
-            if (isIgnoredProfile(resourceId, admin, realm)) {
+            if (!isIgnoredProfile(resourceId, admin, realm)) {
+                dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
+                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                if (debug.messageEnabled()) {
+                    debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
+                            "principalName={}", resourceId, realm, principalName);
+                }
+            } else {
                 if (debug.messageEnabled()) {
                     debug.message("IdentityResource.readInstance() :: profile for resourceId {} is set to Ignore, " +
                             "returning basic entry.", resourceId);
@@ -1267,12 +1262,17 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 dtls.setName(resourceId);
                 dtls.setRealm(realm);
                 dtls.setType(USER_TYPE);
-                return newResultPromise(buildResourceResponse(resourceId, context, dtls));
-            } else {
-                debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Resource cannot be found.",
-                        resourceId, objectNotFound);
-                return new NotFoundException("Resource cannot be found.", objectNotFound).asPromise();
             }
+            return newResultPromise(buildResourceResponse(resourceId, context, dtls));
+        } catch (final NeedMoreCredentials needMoreCredentials) {
+            debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : User does not have enough " +
+                            "privileges.", resourceId,  needMoreCredentials);
+            return new ForbiddenException("User does not have enough privileges.", needMoreCredentials).asPromise();
+        } catch (final ObjectNotFound objectNotFound) {
+            debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Resource cannot be found.",
+                    resourceId, objectNotFound);
+            return new NotFoundException("Resource cannot be found.", objectNotFound).asPromise();
+
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.readInstance() :: Cannot READ resourceId={} : Unauthorized", resourceId,
                     tokenExpired);
