@@ -162,15 +162,6 @@ define([
             RedirectToLegacyConsole.realm.sts(event);
         }
     }, {
-        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SERVER_SITE,
-        description: "",
-        dependencies: [
-            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
-        ],
-        processDescription (event, RedirectToLegacyConsole) {
-            RedirectToLegacyConsole.serverSite();
-        }
-    }, {
         startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
         description: "",
         dependencies: [
