@@ -83,6 +83,7 @@ define([
 
             // Create an array of objects which each contain the schema and values paired together
             let orderedSchemaValuePairs = _.map(orderedSchemaPropertyKeys, (key) => ({
+                key,
                 schema: schemas[key],
                 values: new JSONValues(values[key])
             }));
@@ -106,7 +107,15 @@ define([
             return this;
         },
         getData () {
-            const values = _.map(this.subviews, (view) => view.getData());
+            const values = _.map(this.subviews, (view) => {
+                let viewData;
+                if (view.options.key) {
+                    viewData = { [view.options.key]: view.getData() };
+                } else {
+                    viewData = view.getData();
+                }
+                return viewData;
+            });
 
             return _.reduce(values, _.merge, {});
         }
