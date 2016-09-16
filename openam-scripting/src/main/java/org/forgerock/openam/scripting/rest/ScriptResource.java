@@ -29,7 +29,6 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUE
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SCRIPT_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TRANSLATION_KEY_PREFIX;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.MISSING_SCRIPT;
@@ -50,7 +49,9 @@ import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -259,7 +260,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    @Create(operationDescription = @Operation(
+    @Read(operationDescription = @Operation(
             errors = {
                     @ApiError(code = 400,
                             description = 
@@ -276,7 +277,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    @Create(operationDescription = @Operation(
+    @Update(operationDescription = @Operation(
             errors = {
                     @ApiError(code = 400,
                             description = SCRIPT_RESOURCE + "error.script.decode"),

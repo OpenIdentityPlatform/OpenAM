@@ -3,6 +3,11 @@
   "title": "i18n:api-descriptor/ScriptResource#schema.title",
   "description": "i18n:api-descriptor/ScriptResource#schema.description",
   "properties": {
+    "_id": {
+      "title": "i18n:api-descriptor/ScriptResource#id.title",
+      "description": "i18n:api-descriptor/ScriptResource#id.description",
+      "type": "string"
+    },
     "name": {
       "title": "i18n:api-descriptor/ScriptResource#name.title",
       "description": "i18n:api-descriptor/ScriptResource#name.description",
@@ -36,7 +41,7 @@
     "creationDate": {
       "title": "i18n:api-descriptor/ScriptResource#creationDate.title",
       "description": "i18n:api-descriptor/ScriptResource#creationDate.description",
-      "type": "integer"
+      "type": "number"
     },
     "lastModifiedBy": {
       "title": "i18n:api-descriptor/ScriptResource#lastModifiedBy.title",
@@ -46,7 +51,7 @@
     "lastModifiedDate": {
       "title": "i18n:api-descriptor/ScriptResource#lastModifiedDate.title",
       "description": "i18n:api-descriptor/ScriptResource#lastModifiedDate.description",
-      "type": "integer"
+      "type": "number"
     }
   },
   "required": [
