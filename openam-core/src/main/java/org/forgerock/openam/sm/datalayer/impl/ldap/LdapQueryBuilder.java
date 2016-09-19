@@ -112,6 +112,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
 
         CTSDJLDAPv3PersistentSearch pSearch = builder
                 .withSearchFilter(getLDAPFilter())
+                .returnAttributes(requestedAttributes)
                 .withRetry(EventService.RETRY_INTERVAL)
                 .withSearchBaseDN(dataLayerConfiguration.getTokenStoreRootSuffix())
                 .withSearchScope(SearchScope.WHOLE_SUBTREE).build();

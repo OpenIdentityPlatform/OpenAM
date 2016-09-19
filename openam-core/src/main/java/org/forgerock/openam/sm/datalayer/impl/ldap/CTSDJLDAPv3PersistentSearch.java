@@ -15,12 +15,16 @@
 */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.cts.continuous.ChangeType;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -36,7 +40,7 @@ import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
  * translate between the CTS's {@link ContinuousQueryListener}s and the OpenDJ LDAP supported implementation of the
  * datastore.
  */
-public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<ContinuousQueryListener, Set<Void>>
+public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<ContinuousQueryListener<Attribute>, Set<Void>>
         implements ContinuousQuery {
 
     private final SearchResultEntryHandler resultEntryHandler = new PSearchResultEntryHandler();
@@ -50,10 +54,11 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
      * @param searchFilter The filter against which events on LDAP are compared.
      * @param searchScope The scope from the base DN under which to search.
      * @param factory Used to produce connections down to the CTS.
+     * @param attributeNames Declared attributes to return from the query.
      */
     public CTSDJLDAPv3PersistentSearch(int retry, DN searchBaseDN, Filter searchFilter,
-                                       SearchScope searchScope, ConnectionFactory factory) {
-        super(retry, searchBaseDN, searchFilter, searchScope, factory);
+                                       SearchScope searchScope, ConnectionFactory factory, String... attributeNames) {
+        super(retry, searchBaseDN, searchFilter, searchScope, factory, attributeNames);
     }
 
     @Override
@@ -78,7 +83,7 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
     }
 
     @Override
-    public void addListener(ContinuousQueryListener listener, Set<Void> idTypes) {
+    public void addListener(ContinuousQueryListener<Attribute> listener, Set<Void> idTypes) {
         throw new UnsupportedOperationException("Please use the addContinuousQueryListener method definition.");
     }
 
@@ -104,8 +109,27 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
         @Override
         public boolean handle(SearchResultEntry entry, String dn, DN previousDn, PersistentSearchChangeType type) {
             if (type != null) {
-                for (ContinuousQueryListener listener : getListeners().keySet()) {
-                    listener.objectChanged(dn);
+                for (ContinuousQueryListener<Attribute> listener : getListeners().keySet()) {
+                    Map<String, Attribute> changeset = new HashMap<>();
+                    for (Attribute a : entry.getAllAttributes()) {
+                        changeset.put(a.getAttributeDescriptionAsString(), a);
+                    }
+
+                    ChangeType changeType = null;
+
+                    switch (type) {
+                        case ADD:
+                            changeType = ChangeType.ADD;
+                            break;
+                        case MODIFY:
+                        case MODIFY_DN:
+                            changeType = ChangeType.MODIFY;
+                            break;
+                        case DELETE:
+                            changeType = ChangeType.DELETE;
+                    }
+
+                    listener.objectChanged(dn, changeset, changeType);
                 }
             }
             return true;

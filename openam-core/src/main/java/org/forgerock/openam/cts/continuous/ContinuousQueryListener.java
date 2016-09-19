@@ -15,7 +15,9 @@
 */
 package org.forgerock.openam.cts.continuous;
 
+import java.util.Map;
 import java.util.Set;
+
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 
@@ -35,15 +37,19 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
  *
  * In the event of a connection failure to the underlying datastore, the {@link ContinuousQuery} should call
  * {@code connectionLost} to ensure that the caller can respond appropriately (clearing caches, etc).
+ *
+ * @param <T> Type of returned attribute from the datastore.
  */
-public interface ContinuousQueryListener {
+public interface ContinuousQueryListener<T> {
 
     /**
      * Notify the listener that the following token has been altered.
      *
      * @param tokenId the identifier of the token which has changed.
+     * @param changeSet the set of changes to the token from the query result.
+     * @param changeType the type of change made to the token.
      */
-    void objectChanged(String tokenId);
+    void objectChanged(String tokenId, Map<String, T> changeSet, ChangeType changeType);
 
     /**
      * Notify the listener that the following tokens have been altered.

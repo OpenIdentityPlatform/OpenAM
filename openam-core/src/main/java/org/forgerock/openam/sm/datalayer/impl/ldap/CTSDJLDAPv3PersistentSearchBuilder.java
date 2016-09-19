@@ -32,6 +32,7 @@ public class CTSDJLDAPv3PersistentSearchBuilder {
     private Filter searchFilter;
     private SearchScope searchScope;
     private int retry;
+    private String[] attributeNames;
 
     /**
      * Generates a new builder.
@@ -93,6 +94,18 @@ public class CTSDJLDAPv3PersistentSearchBuilder {
     }
 
     /**
+     * Set the attribute names to return, if any specific attributes are required to be pulled back from
+     * this query in their result entries.
+     *
+     * @param attributeNames Array of attribute names to return.
+     * @return this builder.
+     */
+    public CTSDJLDAPv3PersistentSearchBuilder returnAttributes(String... attributeNames) {
+        this.attributeNames = attributeNames;
+        return this;
+    }
+
+    /**
      * Constructs a new {@link CTSDJLDAPv3PersistentSearch} from the provided criteria.
      *
      * @return the constructed persistent search object.
@@ -115,7 +128,8 @@ public class CTSDJLDAPv3PersistentSearchBuilder {
             throw new IllegalStateException("Unable to construct CTSDJLDAPv3PersistentSearch object, " + message);
         }
 
-        return new CTSDJLDAPv3PersistentSearch(retry, searchBaseDN, searchFilter, searchScope, connectionFactory);
+        return new CTSDJLDAPv3PersistentSearch(retry, searchBaseDN, searchFilter, searchScope, connectionFactory,
+                attributeNames);
     }
 
 }

@@ -204,6 +204,7 @@ public class LdapAdapter implements TokenStorageAdapter {
     @Override
     public ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener) {
         return queryFactory.createInstance()
+            .returnTheseAttributes(filter.getReturnFields())
             .withFilter(filter.getQuery().accept(queryConverter, null))
             .executeContinuousQuery(listener);
     }
