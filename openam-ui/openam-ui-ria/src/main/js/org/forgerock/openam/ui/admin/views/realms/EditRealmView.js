@@ -141,7 +141,7 @@ define([
                         this.toggleSubmitButton(true);
                     }
 
-                    const generalPropertyPath = this.data.newEntity ? "schema.properties.defaults.general"
+                    const generalPropertyPath = this.data.newEntity ? "schema.properties.defaults.properties.general"
                                                                     : "schema.properties.general";
 
                     this.subviews = [
