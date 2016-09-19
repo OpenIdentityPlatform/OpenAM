@@ -359,6 +359,37 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>precommit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No snapshot dependencies allowed</message>
+                                            <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                                            <excludes>
+                                                <exclude>org.forgerock.openam:*</exclude>
+                                                <exclude>org.forgerock.commons:forgerock-persistit-core:*</exclude>
+                                                <exclude>org.forgerock.openig:openig-toolkit:*</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <!-- OpenAM Child Modules -->
