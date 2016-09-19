@@ -24,7 +24,7 @@
  *
  * $Id: DatabaseRepo.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -42,6 +42,7 @@ import javax.security.auth.callback.PasswordCallback;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -1730,11 +1731,15 @@ public class DatabaseRepo extends IdRepo {
         return (AUTHN_ENABLED);
     }
 
-    /*
+    /**
      * Returns <code>true</code> if the data store successfully authenticates
      * the identity with the provided credentials. In case the data store
      * requires additional credentials, the list would be returned via the
      * <code>IdRepoException</code> exception.
+     *
+     * @param credentials The username/password combination.
+     * @return <code>true</code> if the bind operation was successful.
+     * @throws InvalidPasswordException If the provided password is not valid, so Account Lockout can be triggered.
      */
     public boolean authenticate(Callback[] credentials) throws IdRepoException,
             AuthLoginException {
@@ -1787,15 +1792,16 @@ public class DatabaseRepo extends IdRepo {
             return (false);
         }
         String storedPassword = (String) storedPasswords.iterator().next();
-        /**if (hashAttributes.contains(passwordAttributeName)) {
-            password = Hash.hash(password);
-        }
-        */
+
         if (debug.messageEnabled()) {
             debug.message("DatabaseRepo.authenticate: AuthN of " + username + "=" +
                 password.equals(storedPassword));
         }
-        return (password.equals(storedPassword));
+        if (password.equals(storedPassword)) {
+            return true;
+        } else {
+            throw new InvalidPasswordException("amIdRepoDatabase", "InvalidUP", null, username, null);
+        }
     }
 
     private Map searchForAuthN(IdType type, String userName)
