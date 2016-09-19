@@ -16,6 +16,12 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.forgerock.api.enums.CreateMode.ID_FROM_CLIENT;
+import static org.forgerock.api.enums.CreateMode.ID_FROM_SERVER;
+import static org.forgerock.api.models.Create.create;
+import static org.forgerock.api.models.Delete.delete;
+import static org.forgerock.api.models.Read.read;
+import static org.forgerock.api.models.Update.update;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -42,8 +48,12 @@ import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
 import org.forgerock.api.models.ApiDescription;
+import org.forgerock.api.models.Paths;
+import org.forgerock.api.models.Resource;
+import org.forgerock.api.models.VersionedPath;
 import org.forgerock.guava.common.base.Optional;
 import org.forgerock.http.ApiProducer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -83,6 +93,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     final ServiceSchema dynamicSchema;
     private final SmsJsonConverter dynamicConverter;
     private AMIdentityRepositoryFactory idRepoFactory;
+    private ApiDescription description;
 
     @Inject
     SmsSingletonProvider(@Assisted SmsJsonConverter converter,  @Assisted("schema") ServiceSchema schema,
@@ -101,6 +112,26 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             this.dynamicConverter = null;
         }
         this.idRepoFactory = idRepoFactory;
+
+        initDescription(schema);
+
+    }
+
+    protected void initDescription(ServiceSchema schema) {
+        description = ApiDescription.apiDescription().id("fake").version("v")
+                .paths(Paths.paths().put("", VersionedPath.versionedPath()
+                        .put(VersionedPath.UNVERSIONED, Resource.resource()
+                                .title(getI18NName())
+                                .description(getSchemaDescription(schema.getI18NKey()))
+                                .mvccSupported(false)
+                                .resourceSchema(org.forgerock.api.models.Schema.schema().schema(
+                                        createSchema(Optional.<Context>absent())).build())
+                                .read(read().build())
+                                .update(update().build())
+                                .delete(delete().build())
+                                .create(create().mode(ID_FROM_CLIENT).singleton(true).build())
+                                .build()).build()
+                ).build()).build();
     }
 
     /**
@@ -296,7 +327,8 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     @Override
     protected void addDynamicSchema(Optional<Context> context, JsonValue result) {
         if (dynamicSchema != null) {
-            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, context);
+            addAttributeSchema(result, "/properties/dynamic/properties/", dynamicSchema, context);
+            result.put(new JsonPointer("/properties/dynamic/type"), "object");
         }
     }
 
@@ -403,13 +435,12 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     @Override
     public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
-        // TODO AME-11777 and AME-11778
-        return null;
+        return description;
     }
 
     @Override
     public ApiDescription handleApiRequest(Context context, Request request) {
-        return null;
+        return description;
     }
 
     @Override
