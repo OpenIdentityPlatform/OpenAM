@@ -179,6 +179,11 @@ public interface ISAuthConstants {
     public static final String SESSION_SERVICE_NAME = "iPlanetAMSessionService";
 
     /**
+     * Agent Service Name
+     */
+    public static final String AGENT_SERVICE_NAME = "AgentService";
+
+    /**
      * Application Module Name
      */
     public static final String APPLICATION_MODULE = "Application";

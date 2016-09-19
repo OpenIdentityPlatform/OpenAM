@@ -238,7 +238,9 @@ public class SmsJsonConverter {
                         Iterator<String> itr = object.iterator();
                         while (itr.hasNext()) {
                             Pair<String, String> entry = nameValueParser.parse(itr.next());
-                            map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            if(entry != null) {
+                                map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            }
                         }
                         jsonAttributeValue = map;
                     } else {

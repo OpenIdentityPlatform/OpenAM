@@ -46,7 +46,6 @@ public class ExcludedServicesFactory {
             }
         }
         excludedServices.addAll(Arrays.asList(
-                IdConstants.AGENT_SERVICE,
                 EntitlementService.SERVICE_NAME,
                 EntitlementUtils.INDEXES_NAME,
                 CoreTokenConstants.CORE_TOKEN_STORE_SERVICE_NAME,

@@ -48,6 +48,7 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
     public final Predicate<String> AUTHENTICATION_CHAINS_HANDLES_FUNCTION;
     public final Predicate<String> ENTITYPROVIDER_HANDLES_FUNCTION;
     public final Predicate<String> AUTHENTICATION_MODULE_HANDLES_FUNCTION;
+    public final Predicate<String> AGENTS_MODULE_HANDLES_FUNCTION;
 
     /**
      * List of services which are known to have their own handling registered.
@@ -60,6 +61,7 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
         CIRCLES_OF_TRUST_HANDLES_FUNCTION = new SingleServiceFunction(COT_CONFIG_SERVICE);
         AUTHENTICATION_HANDLES_FUNCTION = new SingleServiceFunction(ISAuthConstants.AUTH_SERVICE_NAME);
         AUTHENTICATION_CHAINS_HANDLES_FUNCTION = new SingleServiceFunction(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
+        AGENTS_MODULE_HANDLES_FUNCTION = new SingleServiceFunction(ISAuthConstants.AGENT_SERVICE_NAME);
         ENTITYPROVIDER_HANDLES_FUNCTION = new MultiServiceFunction(
                 IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
         AUTHENTICATION_MODULE_HANDLES_FUNCTION = new MultiServiceFunction(authenticationServiceNames);
@@ -69,7 +71,8 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
                 AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
                 AUTHENTICATION_MODULE_HANDLES_FUNCTION,
                 CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                ENTITYPROVIDER_HANDLES_FUNCTION
+                ENTITYPROVIDER_HANDLES_FUNCTION,
+                AGENTS_MODULE_HANDLES_FUNCTION
         );
     }
 
