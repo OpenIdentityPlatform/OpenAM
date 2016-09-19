@@ -22,8 +22,9 @@ define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
-    "org/forgerock/openam/ui/common/services/fetchUrl"
-], (_, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl) => {
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/Promise"
+], (_, AbstractDelegate, Constants, SMSServiceUtils, fetchUrl, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
     function getRealmPath (realm) {
@@ -36,22 +37,9 @@ define([
         }
     }
 
-    function newEncodeRealm (path) {
-        const encodedPath = [];
-        const realmPath = path.split("/");
-        encodedPath.push("realms");
-        encodedPath.push("root");
-
-        _.each(realmPath, function (pathFragment) {
-            if (pathFragment !== "") {
-                encodedPath.push("realms");
-                encodedPath.push(encodeURIComponent(pathFragment));
-            }
-        });
-
-        return `/${encodedPath.join("/")}`;
+    function encodePath (path) {
+        return btoa(path);
     }
-
 
     obj.realms = {
         /**
@@ -60,7 +48,7 @@ define([
          */
         all () {
             return obj.serviceCall({
-                url: fetchUrl.default("/global-config/realms/root?_queryFilter=true", { realm: false }),
+                url: fetchUrl.default("/global-config/realms?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
                 data.result = _(data.result).each((realm) => {
@@ -76,7 +64,9 @@ define([
          */
         create (data) {
             return obj.serviceCall({
-                url: fetchUrl.default("/global-config/realms/root?_action=create", { realm: false }),
+                url: fetchUrl.default(
+                    "/global-config/realms?_action=create",
+                    { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "POST",
                 suppressEvents: true,
@@ -86,12 +76,28 @@ define([
 
         /**
          * Gets a realm's schema together with it's values.
-         * @param  {String} path Encoded realm path (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Encoded realm path
          * @returns {Promise.<Object>} Service promise
          */
         get (path) {
-            return SMSServiceUtils.schemaWithValues(obj, fetchUrl.default(
-                `/global-config${newEncodeRealm(path)}`, { realm: false }));
+            const collectionUrl = fetchUrl.default("/global-config/realms", { realm: false });
+
+            return Promise.all([
+                obj.serviceCall({
+                    url: `${collectionUrl}?_action=schema`,
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                    type: "POST"
+                }),
+                obj.serviceCall({
+                    url: `${collectionUrl}/${encodePath(path)}`,
+                    headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
+                })
+            ]).then(function (results) {
+                return {
+                    schema: SMSServiceUtils.sanitizeSchema(results[0][0]),
+                    values: results[1][0]
+                };
+            });
         },
 
         /**
@@ -99,19 +105,19 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.default("/global-config/realms/root", {
+            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.default("/global-config/realms", {
                 realm: false
             }));
         },
 
         /**
          * Removes a realm.
-         * @param  {String} path Encoded realm path (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Encoded realm path
          * @returns {Promise} Service promise
          */
         remove (path) {
             return obj.serviceCall({
-                url: fetchUrl.default(`/global-config${newEncodeRealm(path)}`, { realm: false }),
+                url: fetchUrl.default(`/global-config/realms/${encodePath(path)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -126,7 +132,7 @@ define([
         update (data) {
             return obj.serviceCall({
                 url: fetchUrl.default(
-                    `/global-config${newEncodeRealm(getRealmPath(data))}`, { realm: false }),
+                    `/global-config/realms/${encodePath(getRealmPath(data))}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data),

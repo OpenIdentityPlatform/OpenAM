@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.forgerock.openam.core.rest.sms.SmsRealmProvider.REALMS_PATH;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
 
@@ -78,7 +79,7 @@ public class CoreRestSmsGuiceModule extends AbstractModule {
 
         MapBinder<MatchingResourcePath, CrestAuthorizationModule> smsGlobalAuthzModuleBinder =
                 MapBinder.newMapBinder(binder(), MatchingResourcePath.class, CrestAuthorizationModule.class);
-        smsGlobalAuthzModuleBinder.addBinding(resourcePath(REALM_ROUTE)).to(AnyPrivilegeAuthzModule.class);
+        smsGlobalAuthzModuleBinder.addBinding(resourcePath(REALMS_PATH)).to(AnyPrivilegeAuthzModule.class);
         smsGlobalAuthzModuleBinder.addBinding(resourcePath("authentication/modules/*"))
                 .to(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class);
         smsGlobalAuthzModuleBinder.addBinding(resourcePath("services/scripting"))

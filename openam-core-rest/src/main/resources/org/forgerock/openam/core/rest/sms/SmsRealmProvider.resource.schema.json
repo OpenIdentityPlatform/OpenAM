@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SmsRealmProvider#schema.title",
+  "description": "i18n:api-descriptor/SmsRealmProvider#schema.description",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SmsRealmProvider#schema.name.title",
+      "description": "i18n:api-descriptor/SmsRealmProvider#schema.name.description"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/SmsRealmProvider#schema.active.title",
+      "description": "i18n:api-descriptor/SmsRealmProvider#schema.active.description"
+    },
+    "parentPath": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SmsRealmProvider#schema.parentPath.title",
+      "description": "i18n:api-descriptor/SmsRealmProvider#schema.parentPath.description"
+    },
+    "aliases": {
+      "type": "array",
+      "title": "i18n:api-descriptor/SmsRealmProvider#schema.aliases.title",
+      "description": "i18n:api-descriptor/SmsRealmProvider#schema.aliases.description",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "active",
+    "parentPath",
+    "aliases"
+  ]
+}

@@ -237,6 +237,9 @@ public final class ApiDescriptorConstants {
     public static final String SMS_AGGREGATING_AGENTS_QUERY_HANDLER = TRANSLATION_KEY_PREFIX +
             "SmsAggregatingAgentsQueryHandler#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SMS_REALM_PROVIDER = TRANSLATION_KEY_PREFIX + "SmsRealmProvider#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }
