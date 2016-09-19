@@ -58,7 +58,7 @@ define([
             });
 
             this.parentRender(() => {
-                new Backlink().render();
+                new Backlink().render(2);
                 this.$el.find("[data-global-configuration]").append(editComponent.render().$el);
             });
         }

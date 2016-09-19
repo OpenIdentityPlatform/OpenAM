@@ -38,8 +38,9 @@ define([
         render (fragmentIndex = 1) {
             const allFragments = URIUtils.getCurrentFragment().split("/");
             const pageFragment = allFragments[fragmentIndex];
+            const defaultValue = _.startCase(`${pageFragment}`);
             const data = {
-                "title": $.t(`console.common.navigation.${pageFragment}`),
+                "title": $.t(`console.common.navigation.${pageFragment}`, { defaultValue }),
                 "hash": `#${getBaseURI(allFragments, fragmentIndex)}`
             };
 
