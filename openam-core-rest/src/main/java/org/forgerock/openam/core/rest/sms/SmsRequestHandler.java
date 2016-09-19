@@ -20,12 +20,12 @@ import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.Resources.newAnnotatedRequestHandler;
 import static org.forgerock.json.resource.Resources.newCollection;
-import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
-import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.branch;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.filter;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.leaf;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.tree;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -41,22 +41,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.api.models.ApiDescription;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
@@ -90,6 +77,23 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.descriptor.Describable;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
+
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -245,8 +249,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     //routes under global-config/realms/{realms} route
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(RoutingMode.STARTS_WITH, REALM_ROUTE, realmRoutingFactory.createRouter(
-                    new SmsRealmProvider(sessionCache, coreWrapper, realmNormaliser)));
+            routeTree.addRoute(RoutingMode.STARTS_WITH, SmsRealmProvider.REALM_REF_ROUTE,
+                    new SmsRealmProvider(sessionCache, coreWrapper, realmNormaliser));
         }
     }
 
