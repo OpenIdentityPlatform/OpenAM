@@ -15,12 +15,13 @@
  */
 
 define([
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function (AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (AbstractView, Constants) {
     const ApiDocView = AbstractView.extend({
         template: "templates/admin/views/common/IframeViewTemplate.html",
         render (args, callback) {
-            this.data.iframeSrc = "/openam/json/docs/api";
+            this.data.iframeSrc = `/${Constants.context}/json/docs/api`;
             this.data.iframeClass = "api-explorer-iframe";
             this.parentRender (function () {
                 if (callback) {

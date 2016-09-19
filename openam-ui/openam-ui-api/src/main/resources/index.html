@@ -43,11 +43,15 @@
 
     <script type="text/javascript">
         $(function () {
+            var path = window.location.pathname.replace(new RegExp("^/|/$", "g"), "").split("/");
+            path.splice(-1);
+            var joinedPath = path.join("/");
+
             var url = window.location.search.match(/url=([^&]+)/);
             if (url && url.length > 1) {
                 url = decodeURIComponent(url[1]);
             } else {
-                url = "/openam/json?_api";
+                url = "/" + joinedPath + "/json?_api";
             }
 
             var getCookie = function (c_name) {
