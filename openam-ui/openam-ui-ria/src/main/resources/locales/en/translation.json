@@ -738,7 +738,8 @@
                 "sts": "STS",
                 "subjects": "Subjects",
                 "uma": "UMA",
-                "wsfed": "WS-Fed"
+                "wsfed": "WS-Fed",
+                "applications-agents" : "Applications - Agents"
             },
             "description": "Description",
             "type": "Type",
@@ -1295,6 +1296,14 @@
                     "specifyPatterns" : "Specify Patterns",
                     "addPattern": "Add Pattern",
                     "addNewPatternPlaceholder": "Add a new pattern..."
+                }
+            }
+        },
+        "applications": {
+            "agents": {
+                "newSelection" : {
+                    "title": "New Agent",
+                    "description": "Select the type of agent you want to configure."
                 }
             }
         }

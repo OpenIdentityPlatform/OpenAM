@@ -261,14 +261,24 @@ define(function () {
                 navGroup: "admin",
                 forceUpdate: true
             },
-            apiExplorerView : {
+            "realmsApplicationsAgentsSelection": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/applications/agents/NewAgentSelectionView",
+                url: scopedByRealm("applications-agents/select"),
+                pattern: "realms/?/applications-agents/select",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+
+            "apiExplorerView" : {
                 view: "org/forgerock/openam/ui/admin/views/api/ApiExplorerView",
                 role: "ui-global-admin",
                 url: /^api\/explorer$/,
                 pattern: "api/explorer",
                 navGroup: "admin"
             },
-            apiDocView : {
+            "apiDocView" : {
                 view: "org/forgerock/openam/ui/admin/views/api/ApiDocView",
                 role: "ui-global-admin",
                 url: /^api\/doc/,
