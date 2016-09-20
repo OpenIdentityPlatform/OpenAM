@@ -20,12 +20,13 @@ import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.Resources.newAnnotatedRequestHandler;
 import static org.forgerock.json.resource.Resources.newCollection;
-import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.*;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.branch;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.filter;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.leaf;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.tree;
 import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -35,25 +36,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.forgerock.api.models.ApiDescription;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
@@ -89,6 +79,23 @@ import org.forgerock.services.descriptor.Describable;
 import org.forgerock.services.routing.RouteMatcher;
 import org.forgerock.util.promise.Promise;
 
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
  * the SMS configuration services. Uses the {@link ServiceManager} to get a list of all registered
@@ -120,12 +127,17 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final RealmNormaliser realmNormaliser;
     private final ServicesRealmSmsHandler servicesRealmSmsHandler;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
-    private final SmsRouteTree routeTree;
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
     private final SmsServiceHandlerFunction smsServiceHandlerFunction;
     private final SitesResourceProvider sitesResourceProvider;
     private final ServersResourceProvider serversResourceProvider;
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock read = lock.readLock();
+    private final Lock write = lock.writeLock();
+    // Guarded by lock.
+    private final SmsRouteTree routeTree;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
@@ -286,7 +298,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         refreshServiceRoute(type, matcher.group(2), matcher.group(1));
     }
 
-    private synchronized void refreshServiceRoute(int type, String svcName, String svcVersion) {
+    /**
+     * Applies the event type to the service routes.
+     *
+     * @param type Type of event as defined in {@link SMSObjectListener}
+     * @param svcName Non null name of the service.
+     * @param svcVersion Non null version of the service.
+     */
+    private void refreshServiceRoute(int type, String svcName, String svcVersion) {
         try {
             switch (type) {
                 case SMSObjectListener.DELETE:
@@ -300,15 +319,18 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                     }
                     break;
                 case SMSObjectListener.MODIFY:
-                    removeService(svcName);
-                    serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
+                    try {
+                        write.lock();
+                        removeService(svcName);
+                        serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
+                    } finally {
+                        write.unlock();
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown modification type: " + type);
             }
-        } catch (SSOException e) {
-            debug.error("Could not update SMS REST services for change to " + svcName, e);
-        } catch (SMSException e) {
+        } catch (SSOException | SMSException e) {
             debug.error("Could not update SMS REST services for change to " + svcName, e);
         }
     }
@@ -582,65 +604,118 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return routeTree.handleAction(context, request);
+        try {
+            read.lock();
+            return routeTree.handleAction(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Synchronized to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
-        return routeTree.handleCreate(context, request);
+        try {
+            read.lock();
+            return routeTree.handleCreate(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
-        return routeTree.handleDelete(context, request);
+        try {
+            read.lock();
+            return routeTree.handleDelete(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        return routeTree.handlePatch(context, request);
+        try {
+            read.lock();
+            return routeTree.handlePatch(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        return routeTree.handleQuery(context, request, handler);
+        try {
+            read.lock();
+            return routeTree.handleQuery(context, request, handler);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
-        return routeTree.handleRead(context, request);
+        try {
+            read.lock();
+            return routeTree.handleRead(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
-        return routeTree.handleUpdate(context, request);
+        try {
+            read.lock();
+            return routeTree.handleUpdate(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
     @Override
@@ -654,23 +729,74 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         // no-op
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param apiProducer {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
-        return routeTree.api(apiProducer);
+        try {
+            read.lock();
+            return routeTree.api(apiProducer);
+        } finally {
+            read.unlock();
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param context {@inheritDoc}
+     * @param request {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public ApiDescription handleApiRequest(Context context, Request request) {
-        return routeTree.handleApiRequest(context, request);
+        try {
+            read.lock();
+            return routeTree.handleApiRequest(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param listener {@inheritDoc}
+     */
     @Override
     public void addDescriptorListener(Listener listener) {
-        routeTree.addDescriptorListener(listener);
+        try {
+            read.lock();
+            routeTree.addDescriptorListener(listener);
+        } finally {
+            read.unlock();
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param listener {@inheritDoc}
+     */
     @Override
     public void removeDescriptorListener(Listener listener) {
-        routeTree.removeDescriptorListener(listener);
+        try {
+            read.lock();
+            routeTree.removeDescriptorListener(listener);
+        } finally {
+            read.unlock();
+        }
     }
 }
