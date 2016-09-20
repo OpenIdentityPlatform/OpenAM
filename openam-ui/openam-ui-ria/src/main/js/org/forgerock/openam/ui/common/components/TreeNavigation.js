@@ -17,11 +17,15 @@
 define([
     "jquery",
     "lodash",
+    "react-dom",
+    "react",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/util/es6/normaliseModule"
-], ($, _, AbstractView, ModuleLoader, URIUtils, normaliseModule) => {
+], ($, _, ReactDOM, React, AbstractView, ModuleLoader, URIUtils, normaliseModule) => {
+    const isBackbonePage = (view) => view.prototype instanceof AbstractView;
+    const isReactPage = (view) => view.prototype instanceof React.Component || view.WrappedComponent;
     const TreeNavigation = AbstractView.extend({
         template: "templates/admin/views/common/navigation/TreeNavigationTemplate.html",
         partials: [
@@ -82,11 +86,20 @@ define([
         renderPage (Module, args, callback) {
             Module = normaliseModule.default(Module);
 
-            const page = new Module();
+            const elementId = "#sidePageContent";
+
+            if (isBackbonePage(Module)) {
+                const page = new Module();
+                page.element = elementId;
+                page.render(args, callback);
+                this.delegateEvents();
+            } else if (isReactPage(Module)) {
+                ReactDOM.render(React.createElement(Module), this.$el.find(elementId)[0]);
+            } else {
+                throw new Error("[TreeNavigation] Unable to determine page type (Backbone or React).");
+            }
+
             this.nextRenderPage = false;
-            page.element = "#sidePageContent";
-            page.render(args, callback);
-            this.delegateEvents();
         }
     });
 
