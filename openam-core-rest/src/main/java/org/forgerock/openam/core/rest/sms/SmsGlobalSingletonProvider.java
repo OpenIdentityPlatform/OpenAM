@@ -31,6 +31,7 @@ import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.SingletonProvider;
 import org.forgerock.api.annotations.Update;
 import org.forgerock.guava.common.base.Optional;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
@@ -78,6 +79,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
         } else {
             this.organizationConverter = null;
         }
+        initDescription(globalSchema);
     }
 
     @Update(operationDescription = @Operation)
@@ -120,7 +122,10 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     @Override
     protected void addOrganisationSchema(Optional<Context> context, JsonValue result) {
         if (organizationSchema != null) {
-            addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
+            addAttributeSchema(result, "/properties/defaults/properties/", organizationSchema, context);
+            if (result.get("properties").isDefined("defaults")) {
+                result.put(new JsonPointer("/properties/defaults/type"), "object");
+            }
         }
     }
 

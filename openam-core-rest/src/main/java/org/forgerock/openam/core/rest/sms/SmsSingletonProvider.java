@@ -17,7 +17,6 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.api.enums.CreateMode.ID_FROM_CLIENT;
-import static org.forgerock.api.enums.CreateMode.ID_FROM_SERVER;
 import static org.forgerock.api.models.Create.create;
 import static org.forgerock.api.models.Delete.delete;
 import static org.forgerock.api.models.Read.read;
