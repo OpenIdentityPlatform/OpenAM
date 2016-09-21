@@ -658,10 +658,6 @@ public interface ISAuthConstants {
      public static final String COMPOSITE_ADVICE_XML =
          "CompositeAdviceXML";
 
-    // Indicates if Post Process Instances Need be added to Session
-    public static final String KEEP_POSTPROCESS_IN_SESSION = 
-        "sunAMAuthKeepPostProcessInstances";
-
     // Indicates if Auth Module Instances Need be added to Session
     public static final String KEEP_MODULES_IN_SESSION = 
         "sunAMAuthKeepAuthModuleIntances";

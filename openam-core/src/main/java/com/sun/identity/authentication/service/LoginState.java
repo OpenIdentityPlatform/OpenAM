@@ -320,7 +320,6 @@ public class LoginState {
     // Variable indicating a request "forward" after
     // authentication success
     private boolean forwardSuccess = false;
-    private boolean postProcessInSession = false;
     private boolean modulesInSession = false;
 
     // Indicates Session is stateless
@@ -884,13 +883,10 @@ public class LoginState {
      */
     private void populateGlobalProfile() throws AuthException {
         Map attrs = AuthUtils.getGlobalAttributes("iPlanetAMAuthService");
-        String tmpPostProcess = Misc.getMapAttr(attrs, ISAuthConstants.KEEP_POSTPROCESS_IN_SESSION);
-        postProcessInSession = Boolean.parseBoolean(tmpPostProcess);
         String tmpModules = Misc.getMapAttr(attrs, ISAuthConstants.KEEP_MODULES_IN_SESSION);
         modulesInSession = Boolean.parseBoolean(tmpModules);
         if (DEBUG.messageEnabled()) {
             DEBUG.message("LoginState.populateGlobalProfile: Getting Global Profile: " +
-                    "\npostProcessInSession ->" + postProcessInSession +
                     "\nmodulesInSession ->" + modulesInSession);
         }
     }
@@ -4851,16 +4847,6 @@ public class LoginState {
      */
     void postProcess(AuthContext.IndexType indexType, String indexName, PostProcessEvent type) {
         Set<AMPostAuthProcessInterface> postLoginInstanceSet = getPostLoginInstances(getPostLoginClassSet(indexType, indexName));
-        if ((postProcessInSession) && ((postLoginInstanceSet != null) &&
-                (!postLoginInstanceSet.isEmpty()))) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("LoginState.setPostLoginInstances : "
-                        + "Setting post process class in session "
-                        + postLoginInstanceSet);
-            }
-            InternalSession session = getReferencedSession();
-            session.setPostAuthProcesses(postLoginInstanceSet);
-        }
         if ((postLoginInstanceSet != null) &&
                 (!postLoginInstanceSet.isEmpty())) {
             for (AMPostAuthProcessInterface postLoginInstance : postLoginInstanceSet) {

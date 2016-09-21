@@ -175,7 +175,6 @@ public class InternalSession implements Serializable, AMSession {
     private String cookieStr;
     private transient AuthContextLocal authContext;
     private transient LoginContext loginContext;
-    private transient Set<AMPostAuthProcessInterface> postAuthProcesses;
 
     @JsonProperty("creationTime")
     private long creationTimeInSeconds;
@@ -575,22 +574,6 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setLoginContext(LoginContext loginContext) {
         this.loginContext = loginContext;
-    }
-
-    /**
-     * Sets the list of post authentication process to associate with this Session.
-     * @return
-     */
-    public Set<AMPostAuthProcessInterface> getPostAuthProcesses() {
-        return postAuthProcesses;
-    }
-
-    /**
-     * Sets the list of post authentication processes to associate with this Sessio n.
-     * @param postAuthProcesses a set of post authentication processes.
-     */
-    public void setPostAuthProcesses(Set<AMPostAuthProcessInterface> postAuthProcesses) {
-        this.postAuthProcesses = postAuthProcesses;
     }
 
     /**

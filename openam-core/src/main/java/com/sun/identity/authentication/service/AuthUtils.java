@@ -1679,50 +1679,7 @@ public class AuthUtils extends AuthClientUtils {
             }
         }
         
-        Set<AMPostAuthProcessInterface> postAuthSet = null;
-        
-        if (intSession != null) {
-            postAuthSet = intSession.getPostAuthProcesses();
-        }
-        
-        if ((postAuthSet != null) && !(postAuthSet.isEmpty())) {            
-            for (AMPostAuthProcessInterface postLoginInstance : postAuthSet) {
-                try {
-                    postLoginInstance.onLogout(request, response, token);
-                } catch (Exception exp) {
-                   utilDebug.error("AuthUtils.logout: Failed in post logout.", exp);
-                }
-            }
-        } else {
-            String plis = null;
-            
-            if (intSession != null) {
-                plis = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
-            } else {
-                plis = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
-                }
-            }
-            if (plis != null && plis.length() > 0) {
-                StringTokenizer st = new StringTokenizer(plis, "|");
-                
-
-                while (st.hasMoreTokens()) {
-                    String pli = (String)st.nextToken();
-                        
-                    try {
-                        AMPostAuthProcessInterface postProcess =
-                                    (AMPostAuthProcessInterface) Thread.currentThread().
-                                    getContextClassLoader().loadClass(pli).newInstance();
-                            postProcess.onLogout(request, response, token);
-                    } catch (Exception ex) {
-                            utilDebug.error("AuthUtils.logout:" + pli, ex);
-                    }
-                }
-
-            }
-        }
+        processPostAuthenticationPlugins(intSession, token, request, response);
         
         boolean isTokenValid = false;
         
@@ -1746,6 +1703,37 @@ public class AuthUtils extends AuthClientUtils {
         }
         
         return isTokenValid;
+    }
+
+    private static void processPostAuthenticationPlugins(InternalSession intSession,
+                                                         SSOToken token,
+                                                         HttpServletRequest request,
+                                                         HttpServletResponse response) throws SSOException {
+        String postAuthenticationPluginsClassList = null;
+        if (intSession != null) {
+            postAuthenticationPluginsClassList = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+        } else {
+            postAuthenticationPluginsClassList = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
+            }
+        }
+        if (postAuthenticationPluginsClassList != null && postAuthenticationPluginsClassList.length() > 0) {
+            StringTokenizer st = new StringTokenizer(postAuthenticationPluginsClassList, "|");
+
+            while (st.hasMoreTokens()) {
+                String postAuthenticationPluginsClass = st.nextToken();
+
+                try {
+                    AMPostAuthProcessInterface postProcess =
+                            (AMPostAuthProcessInterface) Thread.currentThread().
+                                    getContextClassLoader().loadClass(postAuthenticationPluginsClass).newInstance();
+                    postProcess.onLogout(request, response, token);
+                } catch (Exception ex) {
+                    utilDebug.error("AuthUtils.logout:" + postAuthenticationPluginsClass, ex);
+                }
+            }
+        }
     }
 
     private static void auditLogout(SSOToken token) {
