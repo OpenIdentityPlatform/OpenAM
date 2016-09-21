@@ -272,7 +272,11 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
                 if (idTokenData == null) {
                     throw new SSOException("session not found");
                 }
-                return CollectionUtils.getFirstItem(idTokenData.get(LEGACY_OPS).asSet(String.class));
+                final String sessionId = CollectionUtils.getFirstItem(idTokenData.get(LEGACY_OPS).asSet(String.class));
+                if (sessionId == null) {
+                    throw new SSOException("no session linked to id_token");
+                }
+                return sessionId;
             } catch (ServerException | NotFoundException e) {
                 throw new SSOException(e);
             }

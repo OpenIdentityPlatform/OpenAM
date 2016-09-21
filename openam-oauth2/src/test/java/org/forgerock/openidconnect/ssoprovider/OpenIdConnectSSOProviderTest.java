@@ -24,6 +24,7 @@ import static org.mockito.BDDMockito.given;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.OAuth2Jwt;
@@ -240,6 +241,29 @@ public class OpenIdConnectSSOProviderTest {
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
         given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
         given(mockTokenStore.read(ops)).willReturn(null);
+
+        // When
+        ssoProvider.createSSOToken(tokenId);
+
+        // Then - exception
+    }
+
+    @Test(expectedExceptions = SSOException.class, expectedExceptionsMessageRegExp = "no session linked to id_token")
+    public void shouldRejectJwtIfNoSessionLinked() throws Exception {
+        // Given
+        String tokenId = "a valid jwt";
+        String clientId = "client_id";
+        String ops = "session identifier";
+        JsonValue token = json(object());
+        given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
+        given(mockJwt.isExpired()).willReturn(false);
+        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
+        claimsSet.addAudience(clientId);
+        claimsSet.setClaim(OPS, ops);
+        given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
+        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockTokenStore.read(ops)).willReturn(token);
 
         // When
         ssoProvider.createSSOToken(tokenId);
