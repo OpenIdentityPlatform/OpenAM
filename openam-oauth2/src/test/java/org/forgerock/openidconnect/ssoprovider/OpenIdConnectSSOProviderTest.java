@@ -297,6 +297,31 @@ public class OpenIdConnectSSOProviderTest {
         assertThat(result).isSameAs(mockSsoToken);
     }
 
+    @Test
+    public void shouldUseSSOTokenClaimWhenPresent() throws Exception {
+        // Given
+        String tokenId = "a valid jwt";
+        String clientId = "client_id";
+        String sessionId = "a valid session id";
+
+        given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
+        given(mockJwt.isExpired()).willReturn(false);
+        given(mockProviderSettingsFactory.get("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
+        claimsSet.addAudience(clientId);
+        claimsSet.setClaim(SSOTOKEN, sessionId);
+        given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
+        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockTokenManager.createSSOToken(sessionId)).willReturn(mockSsoToken);
+
+        // When
+        SSOToken result = ssoProvider.createSSOToken(tokenId);
+
+        // Then
+        assertThat(result).isSameAs(mockSsoToken);
+
+    }
+
     @Test(expectedExceptions = SSOException.class, expectedExceptionsMessageRegExp = ".*not enabled.*")
     public void shouldRejectTokenIfProviderNotEnabledInRealm() throws Exception {
         // Given

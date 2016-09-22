@@ -261,6 +261,13 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
                 throw new SSOException("invalid id_token");
             }
 
+            // First check to see if there is an SSOToken claim directly in the JWT (Agents 5)
+            final String ssoToken = claims.getClaim(SSOTOKEN, String.class);
+            if (ssoToken != null) {
+                return ssoToken;
+            }
+
+            // Otherwise look up the session based on the OPS claim in the CTS
             final String ops = claims.getClaim(OPS, String.class);
 
             if (ops == null) {
