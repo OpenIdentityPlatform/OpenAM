@@ -173,10 +173,6 @@ public class AuthD implements ConfigurationListener {
 
     private static final boolean logStatus = "ACTIVE".equalsIgnoreCase(SystemProperties.get(Constants.AM_LOGSTATUS,
             "INACTIVE"));
-    /**
-     * Configured revisionNumber for auth service
-     */
-    public static int revisionNumber;
 
     private final ConcurrentMap<String, AMIdentityRepository> idRepoMap =
             new ConcurrentHashMap<String, AMIdentityRepository>();
@@ -261,10 +257,6 @@ public class AuthD implements ConfigurationListener {
      */
     private void initAuthServiceGlobalSettings() throws Exception {
         ServiceSchemaManager scm = new ServiceSchemaManager(ISAuthConstants.AUTH_SERVICE_NAME, ssoAuthSession);
-        revisionNumber = scm.getRevisionNumber();
-        if (debug.messageEnabled()) {
-            debug.message("revision number = " + revisionNumber);
-        }
         updateAuthServiceGlobals(scm);
         new AuthConfigMonitor(scm);
     }

@@ -681,23 +681,12 @@ public class LoginState {
             stateless = CollectionHelper.getBooleanMapAttr(attrs, ISAuthConstants.AUTH_STATELESS_SESSIONS, false);
 
             aliasAttrNames = attrs.get(ISAuthConstants.AUTH_ALIAS_ATTR);
-            // NEEDED FOR BACKWARD COMPATIBILITY SUPPORT - OPEN ISSUE
-            // TODO: Remove backward compat stuff
-            if (LazyConfig.AUTHD.revisionNumber >=
-                    ISAuthConstants.AUTHSERVICE_REVISION7_0) {
-                identityTypes = attrs.get(ISAuthConstants.
-                        AUTH_ID_TYPE_ATTR);
-            } else {
-                identityTypes = new HashSet<>();
-                Set<String> containerDNs = attrs.get(ISAuthConstants.AUTH_USER_CONTAINER);
-                getContainerDN(containerDNs);
-            }
+            identityTypes = attrs.get(ISAuthConstants.AUTH_ID_TYPE_ATTR);
             userSessionMapping = attrs.get(ISAuthConstants.
                     USER_SESSION_MAPPING);
 
             userNamingAttr = CollectionHelper.getMapAttr(
                     attrs, ISAuthConstants.AUTH_NAMING_ATTR, "uid");
-            // END BACKWARD COMPATIBILITY SUPPORT
 
             defaultRoles = attrs.get(ISAuthConstants.AUTH_DEFAULT_ROLE);
 
@@ -3292,20 +3281,15 @@ public class LoginState {
     private Map<String, Set<String>> getRoleServiceAttributes() throws Exception {
         try {
             if (roleAttributeMap == null) {
-                if (LazyConfig.AUTHD.revisionNumber <
-                        ISAuthConstants.AUTHSERVICE_REVISION7_0) {
-                    roleAttributeMap = amIdentityRole.getServiceAttributes(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
-                } else {
-                    Map roleServiceAttrMap = amIdentityRole.
-                            getServiceAttributes(
-                                    ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
-                    String serviceName = (String) ((Set) roleServiceAttrMap.get(
-                            AMAuthConfigUtils.ATTR_NAME)).iterator().next();
-                    if ((serviceName != null) &&
-                            (!serviceName.equals(ISAuthConstants.BLANK))) {
-                        roleAuthConfig = serviceName;
-                        roleAttributeMap = getServiceAttributes(serviceName);
-                    }
+                Map roleServiceAttrMap = amIdentityRole.
+                        getServiceAttributes(
+                                ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
+                String serviceName = (String) ((Set) roleServiceAttrMap.get(
+                        AMAuthConfigUtils.ATTR_NAME)).iterator().next();
+                if ((serviceName != null) &&
+                        (!serviceName.equals(ISAuthConstants.BLANK))) {
+                    roleAuthConfig = serviceName;
+                    roleAttributeMap = getServiceAttributes(serviceName);
                 }
             }
             if (roleAttributeMap == null) {
@@ -4950,9 +4934,9 @@ public class LoginState {
         Set<String> postLoginClassSet = Collections.emptySet();
         if (indexType == AuthContext.IndexType.ROLE) {
 
-        /* If role based auth then get post process classes from
-         * auth config of that role.
-         */
+            /* If role based auth then get post process classes from
+             * auth config of that role.
+             */
 
             postLoginClassSet = getRolePostLoginClassSet();
         } else if (indexType == AuthContext.IndexType.SERVICE) {
@@ -4962,22 +4946,18 @@ public class LoginState {
              */
 
             if (indexName.equals(ISAuthConstants.CONSOLE_SERVICE)) {
-                if (LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.
-                        AUTHSERVICE_REVISION7_0) {
-                    if ((orgAdminAuthConfig != null) &&
-                            (!orgAdminAuthConfig.equals(ISAuthConstants.BLANK))) {
-                        postLoginClassSet = getServicePostLoginClassSet
-                                (orgAdminAuthConfig);
-                    }
+                if ((orgAdminAuthConfig != null) &&
+                        (!orgAdminAuthConfig.equals(ISAuthConstants.BLANK))) {
+                    postLoginClassSet = getServicePostLoginClassSet
+                            (orgAdminAuthConfig);
                 }
             } else {
                 postLoginClassSet = getServicePostLoginClassSet(indexName);
             }
-        } else if ((indexType == AuthContext.IndexType.USER) &&
-                (LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.AUTHSERVICE_REVISION7_0)) {
+        } else if ((indexType == AuthContext.IndexType.USER)) {
 
-        /* For user based auth, take the auth config from users attributes
-         */
+            /* For user based auth, take the auth config from users attributes
+             */
 
             if (((userAuthConfig != null) && (!userAuthConfig.equals(
                     ISAuthConstants.BLANK)))) {
@@ -4988,16 +4968,15 @@ public class LoginState {
         if (((postLoginClassSet == null) || (postLoginClassSet.isEmpty())) &&
                 ((orgPostLoginClassSet != null) && (!orgPostLoginClassSet.isEmpty()))) {
 
-        /* If no Post Process class is found or module based auth then
-         * default to org level  only if they are defined.
-         */
+            /* If no Post Process class is found or module based auth then
+             * default to org level  only if they are defined.
+             */
             postLoginClassSet = orgPostLoginClassSet;
-        } else if ((LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.
-                AUTHSERVICE_REVISION7_0) && (indexType == null)) {
+        } else if (indexType == null) {
 
-          /* For org based auth, if post process classes are not defined at
-           * org level then use or default config.
-           */
+            /* For org based auth, if post process classes are not defined at
+             * org level then use or default config.
+             */
 
             if ((orgAuthConfig != null) && (!orgAuthConfig.
                     equals(ISAuthConstants.BLANK))) {
@@ -5950,24 +5929,19 @@ public class LoginState {
             finalAuthConfigName = roleAuthConfig;
         } else if (indexType == AuthContext.IndexType.SERVICE) {
             if (indexName.equals(ISAuthConstants.CONSOLE_SERVICE)) {
-                if (LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.
-                        AUTHSERVICE_REVISION7_0) {
-                    if ((orgAdminAuthConfig != null) &&
-                            (!orgAdminAuthConfig.equals(ISAuthConstants.BLANK))) {
-                        finalAuthConfigName = orgAdminAuthConfig;
-                    }
+                if ((orgAdminAuthConfig != null) &&
+                        (!orgAdminAuthConfig.equals(ISAuthConstants.BLANK))) {
+                    finalAuthConfigName = orgAdminAuthConfig;
                 }
             } else {
                 finalAuthConfigName = indexName;
             }
-        } else if ((indexType == AuthContext.IndexType.USER) &&
-                (LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.AUTHSERVICE_REVISION7_0)) {
+        } else if ((indexType == AuthContext.IndexType.USER)) {
             if (((userAuthConfig != null) && (!userAuthConfig.equals(
                     ISAuthConstants.BLANK)))) {
                 finalAuthConfigName = userAuthConfig;
             }
-        } else if ((LazyConfig.AUTHD.revisionNumber >= ISAuthConstants.
-                AUTHSERVICE_REVISION7_0) && (indexType == null)) {
+        } else if (indexType == null) {
             if ((orgAuthConfig != null) && (!orgAuthConfig.
                     equals(ISAuthConstants.BLANK))) {
                 finalAuthConfigName = orgAuthConfig;

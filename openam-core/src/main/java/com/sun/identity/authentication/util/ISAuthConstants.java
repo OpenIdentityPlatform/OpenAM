@@ -630,9 +630,6 @@ public interface ISAuthConstants {
     // blank string for service configurations.
     public static final String BLANK = "[Empty]";
 
-    // revision number for iPlanetAMAuthService in 7.0
-    public static final int AUTHSERVICE_REVISION7_0 = 30;
-
     // attribute to identify the auth module instance name passed in
     // AMConfiguration
     public static final String MODULE_INSTANCE_NAME = "moduleInstanceName";

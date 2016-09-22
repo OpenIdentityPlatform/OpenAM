@@ -24,10 +24,24 @@
  *
  * $Id: AMConfiguration.java,v 1.9 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.config;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+
+import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,19 +55,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.security.auth.login.ConfigFile;
-import org.forgerock.openam.utils.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 
 /**
  * OpenAM JAAS Configuration implementation.
@@ -123,31 +124,11 @@ public class AMConfiguration extends Configuration {
         }
         // clone the entry
         List list = new ArrayList();
-        // get supported modules for this org
-        Set supportedModules = null;
-        if (AuthD.revisionNumber < ISAuthConstants.AUTHSERVICE_REVISION7_0) {
-            supportedModules = amAM.getAllowedModuleNames();
-            if (supportedModules.isEmpty()) {
-                return null;
-            }
-        }
         synchronized (entries) {
             int len = entries.length;
             for (int i = 0; i < len; i++) {
-                String tmp = entries[i].getLoginModuleName();
-                if (AuthD.revisionNumber<ISAuthConstants.AUTHSERVICE_REVISION7_0
-                && !tmp.equals(ISAuthConstants.APPLICATION_MODULE)
-                && !supportedModules.contains(
-                AMAuthConfigUtils.getModuleName(tmp))) {
-                    if (debug.messageEnabled()) {
-                        debug.message("skip module " + tmp);
-                    }
-                    continue;
-                }
-                list.add(new AppConfigurationEntry(
-                entries[i].getLoginModuleName(),
-                entries[i].getControlFlag(),
-                entries[i].getOptions()));
+                list.add(new AppConfigurationEntry(entries[i].getLoginModuleName(), entries[i].getControlFlag(),
+                    entries[i].getOptions()));
             }
         }
         int len = list.size();

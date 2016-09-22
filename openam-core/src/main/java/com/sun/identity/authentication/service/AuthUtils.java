@@ -1226,21 +1226,6 @@ public class AuthUtils extends AuthClientUtils {
         }
         return serviceName;
     }
-    
-    public static int getAuthRevisionNumber(){
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-            ServiceSchemaManager scm = new ServiceSchemaManager(
-            ISAuthConstants.AUTH_SERVICE_NAME, token);
-            return scm.getRevisionNumber();
-        } catch (Exception e) {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("getAuthRevisionNumber error", e);
-            }
-        }
-        return 0;
-    }       
    
     /**
      * Returns success URL for this request. If <code>goto</code> parameter is
