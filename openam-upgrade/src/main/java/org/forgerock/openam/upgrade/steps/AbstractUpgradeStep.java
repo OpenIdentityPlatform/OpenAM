@@ -85,7 +85,7 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
      * @return The set of realmnames available in OpenAM.
      * @throws UpgradeException In case retrieving the realmnames was not successful.
      */
-    protected final Set<String> getRealmNames() throws UpgradeException {
+    protected Set<String> getRealmNames() throws UpgradeException {
         try {
             OrganizationConfigManager ocm = new OrganizationConfigManager(getAdminToken(), "/");
             Set<String> realms = CollectionUtils.asOrderedSet("/");
