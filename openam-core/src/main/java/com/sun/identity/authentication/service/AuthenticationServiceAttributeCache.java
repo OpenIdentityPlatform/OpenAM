@@ -36,6 +36,8 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthConfigUtils;
+import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -43,14 +45,13 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 
 /**
- * This class is a cache and Listener for Authentication 
- * Configuration Service.
+ * This class is a cache for Authentication Configuration Service.
  */
-public class AuthServiceListener implements ServiceListener{
+public class AuthenticationServiceAttributeCache implements ServiceListener {
     private static final String AUTHCONFIG_SERVICE = "iPlanetAMAuthConfiguration";
     private static Map<String, Map<String, Set<String>>> serviceAttributeCache = new HashMap<>();
     private static Debug debug = Debug.getInstance("amAuth");
-    private static AuthServiceListener serviceListener = new AuthServiceListener();
+    private static AuthenticationServiceAttributeCache serviceListener = new AuthenticationServiceAttributeCache();
 
     static {
         SSOToken ssot = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -66,7 +67,7 @@ public class AuthServiceListener implements ServiceListener{
     /**
      * Constructs an instance of <code>AuthServiceListener</code>
      */    
-    private AuthServiceListener() {
+    private AuthenticationServiceAttributeCache() {
     }
     
     /**
@@ -78,31 +79,25 @@ public class AuthServiceListener implements ServiceListener{
      *            auth configuration service name.
      * @return service attributes.
      */
-    public static Map<String, Set<String>> getServiceAttributeCache(String orgDN, String serviceName) {
+    public static Map<String, Set<String>> getServiceAttribute(String orgDN, String serviceName)
+            throws SMSException, AMConfigurationException, SSOException {
+        String key = key(serviceName, orgDN);
+        if (!serviceAttributeCache.containsKey(key)) {
+            Map<String, Set<String>> serviceAttributes =
+                    AMAuthConfigUtils.getNamedConfig(serviceName, orgDN, AuthD.getAuth().getSSOAuthSession());
+            serviceAttributeCache.put(key(serviceName, orgDN), serviceAttributes);
+            debug.message("AuthServiceListener.setServiceAttributeCache(): Cache after add={}, orgDN={}",
+                    serviceAttributeCache, orgDN);
+        }
         Map<String, Set<String>> retVal = serviceAttributeCache.get(key(serviceName, orgDN));
-        debug.message("AuthServiceListener.getServiceAttributeCache(): Returning from cache={}, orgDN={}", retVal,
+        debug.message("AuthServiceListener.getServiceAttribute(): Returning from cache={}, orgDN={}", retVal,
                 orgDN);
+
         return retVal;
     }
 
     private static String key(String serviceName, String orgDN) {
         return serviceName.toLowerCase() + "," + orgDN.toLowerCase();
-    }
-    
-    /**
-     * Sets Auth Config Service attributes in cache.
-     *
-     * @param orgDN
-     *            organization/realm name.
-     * @param serviceName
-     *            auth configuration service name.
-     * @param serviceAttributes
-     *            auth service attributes.
-     */
-    public static void setServiceAttributeCache(String orgDN, String serviceName, Map<String, Set<String>> serviceAttributes) {
-        serviceAttributeCache.put(key(serviceName, orgDN), serviceAttributes);
-        debug.message("AuthServiceListener.setServiceAttributeCache(): Cache after add={}, orgDN={}",
-                serviceAttributeCache, orgDN);
     }
 
     @Override
@@ -125,6 +120,7 @@ public class AuthServiceListener implements ServiceListener{
      * @param serviceComponent Name of the service components that changed.
      * @param type Change type, i.e., ADDED, REMOVED or MODIFIED.
      */
+    @Override
     public void organizationConfigChanged(String serviceName, String version, String orgName, String goupName,
             String serviceComponent, int type) {
         debug.message("AuthServiceListener.organizationConfigChanged : Config changed for Org={}, Service={}, " +

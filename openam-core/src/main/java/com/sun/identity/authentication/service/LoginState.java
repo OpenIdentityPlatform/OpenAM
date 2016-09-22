@@ -3378,15 +3378,7 @@ public class LoginState {
     private Map<String, Set<String>> getServiceAttributes(String indexName) throws Exception {
 
         try {
-            String orgDN = getOrgDN();
-            Map<String, Set<String>> attributeDataMap;
-            attributeDataMap = AuthServiceListener.getServiceAttributeCache(orgDN, indexName);
-            if (attributeDataMap != null) {
-                return attributeDataMap;
-            }
-            attributeDataMap = AMAuthConfigUtils.getNamedConfig(indexName, orgDN, LazyConfig.AUTHD.getSSOAuthSession());
-            AuthServiceListener.setServiceAttributeCache(orgDN, indexName, attributeDataMap);
-            return attributeDataMap;
+            return AuthenticationServiceAttributeCache.getServiceAttribute(orgDN, indexName);
         } catch (Exception e) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Error getting service attribute: ");
