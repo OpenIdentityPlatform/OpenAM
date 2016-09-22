@@ -38,7 +38,7 @@
     <Service name="AgentService" version="1.0">
         <Schema i18nFileName="agentService" revisionNumber="10">
             <Organization>
-                <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001">
+                <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001" hideConfigUI="yes">
                     <AttributeSchema
                             name="agentgroup"
                             type="single"
