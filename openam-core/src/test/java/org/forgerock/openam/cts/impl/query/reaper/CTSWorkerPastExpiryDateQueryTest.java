@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
@@ -32,6 +32,7 @@ import java.util.Iterator;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -41,11 +42,11 @@ import org.forgerock.util.query.QueryFilterVisitor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ReaperImplTest {
+public class CTSWorkerPastExpiryDateQueryTest {
 
     private QueryFactory<Connection, Filter> mockFactory;
     private CoreTokenConfig mockConfig;
-    private ReaperImpl<Connection, Filter> impl;
+    private CTSWorkerPastExpiryDateQuery<Connection, Filter> impl;
     private QueryBuilder<Connection, Filter> mockBuilder;
     private Connection mockConnection;
     private QueryFilterVisitor<Filter, Void, CoreTokenField> mockQueryFilterConverter;
@@ -71,7 +72,7 @@ public class ReaperImplTest {
         mockConfig = mock(CoreTokenConfig.class);
         given(mockConfig.getCleanupPageSize()).willReturn(1);
 
-        impl = new ReaperImpl<Connection, Filter>(mockFactory, mockConfig);
+        impl = new CTSWorkerPastExpiryDateQuery<Connection, Filter>(mockFactory, mockConfig);
     }
 
     @Test (expectedExceptions = NullPointerException.class)

@@ -31,6 +31,7 @@ import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -223,7 +224,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
      *
      * The details of this are managed by the ReaperIterator.
      *
-     * @see org.forgerock.openam.cts.impl.query.reaper.ReaperQuery
+     * @see CTSWorkerQuery
      *
      * @return Non null empty ByteString.
      */

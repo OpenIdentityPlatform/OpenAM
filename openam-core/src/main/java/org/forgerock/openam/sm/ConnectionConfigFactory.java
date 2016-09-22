@@ -84,7 +84,7 @@ public class ConnectionConfigFactory {
             default:
                 throw new IllegalStateException();
         }
-        if (ConnectionType.CTS_REAPER.equals(connectionType)) {
+        if (ConnectionType.CTS_WORKER.equals(connectionType)) {
             configuration = wrapCtsReaperConfiguration(configuration);
         }
         validator.validate(configuration);

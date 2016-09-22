@@ -1,4 +1,6 @@
-/*
+/**
+ * Copyright 2013 ForgeRock, AS.
+ *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -10,22 +12,11 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2014 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.query.reaper;
-
-import org.forgerock.guice.core.InjectorHolder;
 
 /**
- * Generates instances of the ReaperQuery.
+ * Implementation classes that contain the CTS Reaper function, intended to clean up expired
+ * tokens in a multi-threaded fashion.
  */
-public class ReaperQueryFactory {
-    /**
-     * Defers to the {@link InjectorHolder} for instantiation.
-     * @return Non null.
-     */
-    public ReaperQuery getQuery() {
-        return InjectorHolder.getInstance(ReaperQuery.class);
-    }
-}
+
+package org.forgerock.openam.cts.worker;

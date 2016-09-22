@@ -11,20 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.query.reaper;
+package org.forgerock.openam.cts.impl.query.worker;
 
 import java.io.Closeable;
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.LdapInitializationFailedException;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerBaseQuery;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.utils.IOUtils;
 
@@ -37,20 +33,23 @@ import org.forgerock.openam.utils.IOUtils;
  * Threading Policy: This class will detect that the current thread has been interrupted
  * and close the established connection.
  */
-public class ReaperConnection<C extends Closeable> implements ReaperQuery {
+public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery {
+
     private final ConnectionFactory<C> factory;
-    private final ReaperImpl<C, ?> impl;
+    private final CTSWorkerBaseQuery query;
     private C connection;
     private boolean failed = false;
 
     /**
+     * Creates a new CTSWorkerConnection with appropriate {@link ConnectionFactory} to produce
+     * connections and a {@link CTSWorkerBaseQuery} to execute on the connection.
+     *
      * @param factory Required for establishing a connection to the persistence layer.
-     * @param impl The specific implementation that will be delegated to.
+     * @param query The specific implementation that will be delegated to.
      */
-    @Inject
-    public ReaperConnection(@DataLayer(ConnectionType.CTS_REAPER) ConnectionFactory factory, ReaperImpl impl) {
+    public CTSWorkerConnection(ConnectionFactory factory, CTSWorkerBaseQuery query) {
         this.factory = factory;
-        this.impl = impl;
+        this.query = query;
     }
 
     /**
@@ -77,7 +76,7 @@ public class ReaperConnection<C extends Closeable> implements ReaperQuery {
 
         try {
             initConnection();
-            Collection<String> results = impl.nextPage();
+            Collection<String> results = query.nextPage();
             endProcessing(results);
             return results;
         } catch (CoreTokenException e) {
@@ -90,15 +89,15 @@ public class ReaperConnection<C extends Closeable> implements ReaperQuery {
     /**
      * If this is the first call, then initialise the connection.
      *
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If there was an error getting the connection.
+     * @throws CoreTokenException If there was an error getting the connection.
      */
-    private void initConnection() throws LdapInitializationFailedException {
-        if (connection == null) {
+    private void initConnection() throws CoreTokenException {
+        if (connection == null || !factory.isValid(connection)) {
             try {
                 connection = factory.create();
-                impl.setConnection(connection);
+                query.setConnection(connection);
             } catch (DataLayerException e) {
-                throw new LdapInitializationFailedException(e);
+                throw new CoreTokenException("Failed to init connection to data layer", e);
             }
         }
     }

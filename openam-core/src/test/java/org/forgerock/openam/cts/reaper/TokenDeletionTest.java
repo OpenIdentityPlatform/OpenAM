@@ -11,21 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.cts.worker.process.deletion.TokenDeletion;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class TokenDeletionTest {
 

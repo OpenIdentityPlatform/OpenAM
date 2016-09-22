@@ -11,23 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.forgerock.openam.cts.reaper.CTSReaperInit;
+import org.forgerock.openam.cts.worker.CTSWorkerInit;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
@@ -38,6 +38,8 @@ import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.sun.identity.shared.debug.Debug;
+
 public class CoreTokenAdapterTest {
     protected CoreTokenAdapter adapter;
 
@@ -45,14 +47,14 @@ public class CoreTokenAdapterTest {
     private TaskDispatcher mockTaskDispatcher;
     private ResultHandlerFactory mockResultHandlerFactory;
     private Debug mockDebug;
-    private CTSReaperInit mockReaperInit;
+    private CTSWorkerInit mockReaperInit;
 
     @BeforeMethod
     public void setup() {
         mockStrategy = mock(TokenBlobStrategy.class);
         mockTaskDispatcher = mock(TaskDispatcher.class);
         mockResultHandlerFactory = mock(ResultHandlerFactory.class);
-        mockReaperInit = mock(CTSReaperInit.class);
+        mockReaperInit = mock(CTSWorkerInit.class);
         mockDebug = mock(Debug.class);
 
         adapter = new CoreTokenAdapter(mockStrategy, mockTaskDispatcher, mockResultHandlerFactory, mockReaperInit,

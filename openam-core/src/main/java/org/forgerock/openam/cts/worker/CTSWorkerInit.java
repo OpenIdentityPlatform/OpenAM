@@ -11,29 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.reaper;
+package org.forgerock.openam.cts.worker;
 
-import com.google.inject.name.Named;
-import com.sun.identity.shared.debug.Debug;
+import java.util.Collection;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.util.Reject;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.google.inject.name.Named;
+import com.sun.identity.shared.debug.Debug;
 
 /**
- * Responsible for starting the CTS Reaper and coordinating the required
- * dependencies. This simplifies concerns around the CTS Reaper.
+ * Responsible for starting the CTS Worker and coordinating the required
+ * dependencies. This simplifies concerns around the CTS Workers.
  */
 @Singleton
-public class CTSReaperInit {
-    private final CTSReaper reaper;
+public class CTSWorkerInit {
+
+    private final Collection<CTSWorkerTask> workers;
     private final ThreadMonitor monitor;
     private final CoreTokenConfig config;
     private final ScheduledExecutorService scheduledService;
@@ -43,19 +47,18 @@ public class CTSReaperInit {
     /**
      * Default Guice provided instance.
      *
-     * @param reaper Non null, required.
+     * @param workerTaskProvider Non null, required.
      * @param monitor Non null, required for thread monitoring.
      * @param config Non null, required for configuration.
      * @param scheduledService Non null, required for scheduling.
      * @param debug Non null, required for debugging.
      */
     @Inject
-    public CTSReaperInit(CTSReaper reaper,
-                         ThreadMonitor monitor,
+    public CTSWorkerInit(CTSWorkerTaskProvider workerTaskProvider, ThreadMonitor monitor,
                          CoreTokenConfig config,
                          @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduledService,
                          @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-        this.reaper = reaper;
+        this.workers = workerTaskProvider.getTasks();
         this.monitor = monitor;
         this.config = config;
         this.scheduledService = scheduledService;
@@ -63,24 +66,28 @@ public class CTSReaperInit {
     }
 
     /**
-     * Starts the CTS Reaper. Once started the CTS Reaper will be monitored by
-     * the ThreadMonitor.
+     * Initialise the {@link CTSWorkerTask} framework. Each task will be run in its own thread and monitored by a
+     * {@link ThreadMonitor}.
      *
      * @throws IllegalStateException If this function is called more than once.
      */
-    public synchronized void startReaper() throws IllegalStateException {
+    public synchronized void startTasks() throws IllegalStateException {
         Reject.ifTrue(started);
 
-        if (debug.messageEnabled()) {
-            debug.message(CoreTokenConstants.DEBUG_HEADER + "Starting the CTS Reaper");
+        for (CTSWorkerTask worker : workers) {
+            debug.message(CoreTokenConstants.DEBUG_HEADER + "Starting {}", worker);
+
+            // Start the CTS Reaper watch dog which will monitor the CTS Reaper
+            monitor.watchScheduledThread(
+                    scheduledService,
+                    worker,
+                    config.getRunPeriod(),
+                    config.getRunPeriod(),
+                    TimeUnit.MILLISECONDS);
+
+
+            debug.message(CoreTokenConstants.DEBUG_HEADER + "Started {}", worker);
         }
-        // Start the CTS Reaper watch dog which will monitor the CTS Reaper
-        monitor.watchScheduledThread(
-                scheduledService,
-                reaper,
-                config.getRunPeriod(),
-                config.getRunPeriod(),
-                TimeUnit.MILLISECONDS);
 
         started = true;
     }

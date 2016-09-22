@@ -22,8 +22,6 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.sun.identity.shared.debug.Debug;
-
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -35,13 +33,15 @@ import org.forgerock.openam.cts.exceptions.ReadFailedException;
 import org.forgerock.openam.cts.exceptions.SetFailedException;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.forgerock.openam.cts.reaper.CTSReaperInit;
+import org.forgerock.openam.cts.worker.CTSWorkerInit;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * CoreTokenAdapter is the final layer before persistence. In this case it uses the
@@ -69,14 +69,14 @@ public class CoreTokenAdapter {
      */
     @Inject
     public CoreTokenAdapter(TokenBlobStrategy strategy, TaskDispatcher dispatcher, ResultHandlerFactory handlerFactory,
-                            CTSReaperInit reaperInit, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+                            CTSWorkerInit reaperInit, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.strategy = strategy;
         this.handlerFactory = handlerFactory;
         this.dispatcher = dispatcher;
         this.debug = debug;
 
         dispatcher.startDispatcher();
-        reaperInit.startReaper();
+        reaperInit.startTasks();
     }
 
     /**

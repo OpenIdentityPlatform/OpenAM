@@ -39,7 +39,7 @@ public class TimeoutConfig {
         switch (type) {
             case CTS_ASYNC:
                 return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_ASYNC_TIMEOUT, 10);
-            case CTS_REAPER:
+            case CTS_WORKER:
                 return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_REAPER_TIMEOUT, NO_TIMEOUT);
             case DATA_LAYER:
                 return SystemProperties.getAsInt(DataLayerConstants.DATA_LAYER_TIMEOUT, 10);

@@ -11,47 +11,49 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperQueryFactory;
-import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
-
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-public class CTSReaperTest {
-    private CTSReaper reaper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.worker.CTSWorkerFilter;
+import org.forgerock.openam.cts.worker.process.deletion.CTSWorkerDeleteProcess;
+import org.forgerock.openam.cts.worker.process.deletion.TokenDeletion;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.sun.identity.shared.debug.Debug;
+
+public class CTSWorkerDeleteProcessTest {
+
+    private CTSWorkerDeleteProcess reaper;
     private TokenDeletion mockTokenDeletion;
     private CTSReaperMonitoringStore monitoringStore;
-    private ReaperQueryFactory mockQueryFactory;
-    private ReaperQuery mockQuery;
+    private CTSWorkerQuery mockQuery;
+    private CTSWorkerFilter mockFilter = mock(CTSWorkerFilter.class);
 
     @BeforeMethod
     public void setUp() throws Exception {
         mockTokenDeletion = mock(TokenDeletion.class);
         monitoringStore = mock(CTSReaperMonitoringStore.class);
+        mockQuery = mock(CTSWorkerQuery.class);
 
-        mockQuery = mock(ReaperQuery.class);
-        mockQueryFactory = mock(ReaperQueryFactory.class);
-        given(mockQueryFactory.getQuery()).willReturn(mockQuery);
-
-        reaper = new CTSReaper(mockQueryFactory, mockTokenDeletion, monitoringStore, mock(Debug.class));
+        reaper = new CTSWorkerDeleteProcess(mockTokenDeletion, monitoringStore, mock(Debug.class));
     }
 
     @AfterMethod
@@ -63,22 +65,23 @@ public class CTSReaperTest {
     @Test
     public void shouldUseReaperQueryForNextPage() throws CoreTokenException {
         given(mockQuery.nextPage()).willReturn(null);
-        reaper.run();
+        reaper.handle(mockQuery, mockFilter);
         verify(mockQuery).nextPage();
     }
 
     @Test
     public void shouldSignalTokensToTokenDeletion() throws CoreTokenException {
         // Given
-        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        Collection<String> tokens = Collections.unmodifiableCollection(Arrays.asList("badger", "weasel", "ferret"));
+        given(mockFilter.filter(anyCollection())).willReturn(tokens);
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
         given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(new CountDownLatch(0));
 
         // When
-        reaper.run();
+        reaper.handle(mockQuery, mockFilter);
 
         // Then
-        verify(mockTokenDeletion).deleteBatch(eq(tokens));
+        verify(mockTokenDeletion).deleteBatch(tokens);
     }
 
     @Test
@@ -90,11 +93,10 @@ public class CTSReaperTest {
 
         Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(tokens).willReturn(tokens).willReturn(null);
-
         given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(one).willReturn(two).willReturn(three);
 
         // When
-        reaper.run();
+        reaper.handle(mockQuery, mockFilter);
 
         // Then
         verify(one).await();
@@ -111,7 +113,7 @@ public class CTSReaperTest {
         Thread.currentThread().interrupt();
 
         // When
-        reaper.run();
+        reaper.handle(mockQuery, mockFilter);
 
         // Then
         verify(mockTokenDeletion, times(0)).deleteBatch(eq(tokens));

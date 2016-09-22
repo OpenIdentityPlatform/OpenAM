@@ -11,27 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.query.reaper;
-
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.reaper.CTSReaper;
+package org.forgerock.openam.cts.impl.query.worker;
 
 import java.util.Collection;
 
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.worker.CTSWorkerInit;
+import org.forgerock.openam.cts.worker.CTSWorkerTask;
+import org.forgerock.openam.tokens.CoreTokenField;
+
 /**
- * Defines the behaviour of the CTS Reaper paged question which will locate all expired Tokens
- * in the persistence layer.
+ * Defines the ability to perform a paged query. This will be used by a {@link CTSWorkerTask} to
+ * identify all CTS tokens which will be processed by the task.
  *
- * @see CTSReaper
+ * @see CTSWorkerInit
  */
-public interface ReaperQuery {
+public interface CTSWorkerQuery {
+
     /**
      * Repeated calls will return further results from query.
      *
-     * @return Whilst there are further results, non null, non empty collection of the Token ID
-     * of each Token to be purged by the CTS Reaper. Once there are no more results then null.
+     * @return Non null, non empty collection of {@link CoreTokenField#TOKEN_ID} to be
+     * processed by the {@link CTSWorkerTask}. Null indicates there are no more Tokens to process.
      *
      * @throws CoreTokenException If there was any unexpected error during processing.
      */

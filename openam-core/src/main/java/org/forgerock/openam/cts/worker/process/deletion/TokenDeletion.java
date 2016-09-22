@@ -11,17 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.reaper;
+package org.forgerock.openam.cts.worker.process.deletion;
 
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 
 /**
  * Deletes batches of Token IDs from the persistence layer.
@@ -30,7 +31,7 @@ import java.util.concurrent.CountDownLatch;
  * up the responses to ensure that the operation has been processed asynchronously.
  */
 public class TokenDeletion {
-    // Injected
+
     private final TaskDispatcher queue;
 
     @Inject

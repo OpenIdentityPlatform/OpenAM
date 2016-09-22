@@ -25,23 +25,25 @@ import static org.testng.AssertJUnit.*;
 import java.io.Closeable;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerBaseQuery;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ReaperConnectionTest {
+public class CTSWorkerConnectionTest {
 
     private ConnectionFactory mockFactory;
-    private ReaperImpl mockImpl;
-    private ReaperConnection connection;
+    private CTSWorkerBaseQuery mockImpl;
+    private CTSWorkerConnection connection;
     private Closeable mockConnection;
 
     @BeforeMethod
     public void setup() {
         mockFactory = mock(ConnectionFactory.class);
-        mockImpl = mock(ReaperImpl.class);
-        connection = new ReaperConnection(mockFactory, mockImpl);
+        mockImpl = mock(CTSWorkerBaseQuery.class);
+        connection = new CTSWorkerConnection(mockFactory, mockImpl);
 
         mockConnection = mock(Closeable.class);
     }
