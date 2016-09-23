@@ -26,7 +26,7 @@ define([
             const injector = new Squire();
 
             i18next = {
-                t: sinon.stub().withArgs("console.common.global").returns("Global")
+                t: sinon.stub().withArgs("console.common.global").returns("Global Attributes")
             };
 
             injector.mock("i18next", i18next)
@@ -42,10 +42,16 @@ define([
             beforeEach(() => {
                 schema = new JSONSchema({
                     "properties": {
-                        "globalProperty": {},
+                        "globalSimpleProperty": {},
+                        "globalCollectionProperty": {
+                            "type": "object",
+                            "title": "",
+                            "properties": {}
+                        },
                         "defaults": {
                             "defaultsCollection": {
                                 "type": "object",
+                                "title": "",
                                 "properties": {
                                     "defaultsProperty": {}
                                 }
@@ -53,34 +59,37 @@ define([
                             "defaultsSimpleProperty": {}
                         },
                         "dynamic": {
-                            "dynamicCollection": {
-                                "type": "object",
-                                "properties": {
-                                    "dynamicProperty": {}
-                                }
-                            },
-                            "dynamicSimpleProperty": {}
+                            "type": "object",
+                            "title": "",
+                            "properties": {
+                                "dynamicSimpleProperty": {}
+                            }
                         }
                     },
                     "type": "object"
                 });
             });
 
-            it("groups the top-level properties under a \"global\" property", () => {
+            it("groups the top-level simple properties under a \"global\" property", () => {
                 expect(schema.raw.properties).to.contain.keys("global");
-                expect(schema.raw.properties.global.properties).to.have.keys("globalProperty");
+                expect(schema.raw.properties.global.properties).to.have.keys("globalSimpleProperty");
             });
 
-            it("groups the top-level properties with title", () => {
-                expect(i18next.t).to.be.calledWith("console.common.global");
-                expect(schema.raw.properties.global.title).eq("Global");
+            it("groups the top-level simple properties with title", () => {
+                expect(i18next.t).to.be.calledWith("console.common.globalAttributes");
+                expect(schema.raw.properties.global.title).eq("Global Attributes");
             });
 
-            it("groups the top-level properties with property order", () => {
+            it("groups the top-level simple properties with property order", () => {
                 expect(schema.raw.properties.global.propertyOrder).eq(-10);
             });
 
-            it("flattens properties in \"defaults\" onto the top-level properties", () => {
+            it("does not group the top-level collection properties under a \"global\" property", () => {
+                expect(schema.raw.properties).to.contain.keys("global");
+                expect(schema.raw.properties.global.properties).to.not.have.keys("globalCollectionProperty");
+            });
+
+            it("unwraps properties in \"defaults\" onto the top-level properties", () => {
                 expect(schema.raw.properties).to.contain.keys("realmDefaults");
                 expect(schema.raw.properties).to.contain.keys("defaultsCollection");
             });
@@ -89,40 +98,17 @@ define([
                 expect(schema.raw.properties).to.contain.keys("realmDefaults");
                 expect(schema.raw.properties.realmDefaults.properties).to.contain.keys("defaultsSimpleProperty");
             });
-
-            it("flattens properties in \"dynamic\" onto the top-level properties", () => {
-                expect(schema.raw.properties).to.contain.keys("dynamicAttributes");
-                expect(schema.raw.properties).to.contain.keys("dynamicCollection");
-            });
-
-            it("groups simple properties in \"dynamic\" into a pseudo collection \"dynamicAttributes\"", () => {
-                expect(schema.raw.properties).to.contain.keys("dynamicAttributes");
-                expect(schema.raw.properties.dynamicAttributes.properties).to.contain.keys("dynamicSimpleProperty");
-            });
-
-            context("when there is no \"defaults\" or \"dynamic\" properties", () => {
-                beforeEach(() => {
-                    schema = new JSONSchema({
-                        "properties": {
-                            "globalProperty": {}
-                        },
-                        "type": "object"
-                    });
-                });
-
-                it("does not group the top-level properties under a \"global\" property", () => {
-                    expect(schema.raw.properties).to.have.keys("globalProperty");
-                });
-            });
         });
+
         describe("#hasInheritance", () => {
             context("schema has inheritance", () => {
                 it("returns true", () => {
                     const jsonSchema = new JSONSchema({
                         type: "object",
                         properties: {
-                            property: {
+                            propertyCollection: {
                                 type: "object",
+                                title: "",
                                 properties: {
                                     inherited: {}
                                 }
@@ -138,8 +124,9 @@ define([
                 const jsonSchema = new JSONSchema({
                     type: "object",
                     properties: {
-                        property: {
+                        propertyCollection: {
                             type: "object",
+                            title: "",
                             properties: {
                                 property: {}
                             }
@@ -150,18 +137,25 @@ define([
                 expect(jsonSchema.hasInheritance()).to.be.false;
             });
         });
-        describe("#removeUnrequiredProperties", () => {
+
+        describe("#removeNonRequiredProperties", () => {
             let schema;
 
             beforeEach(() => {
                 const jsonSchema = new JSONSchema({
                     "type": "object",
                     "properties": {
-                        "propertyKeyRequired": {
-                            required: true
-                        },
-                        "propertyKeyUnRequired": {
-                            required: false
+                        propertyCollection: {
+                            title: "",
+                            type: "object",
+                            properties: {
+                                "propertyKeyRequired": {
+                                    required: true
+                                },
+                                "propertyKeyNonRequired": {
+                                    required: false
+                                }
+                            }
                         }
                     }
                 });
@@ -169,52 +163,42 @@ define([
             });
 
             it("removes properties where \"required\" is \"false\"", () => {
-                expect(schema.raw.properties).to.have.keys("propertyKeyRequired");
+                expect(schema.raw.properties.propertyCollection).to.not.have.keys("propertyKeyNonRequired");
             });
         });
+
         describe("#toFlatWithInheritanceMeta", () => {
             const jsonValues = new JSONValues({
-                "propertyKey": {
-                    "value": "someValue",
-                    "inherited": true
+                "com.iplanet.am.smtphost":{
+                    "value":"localhost",
+                    "inherited":true
                 },
-                "anotherPropertyKey": {
-                    "value": "anotherValue",
-                    "inherited": false
+                "com.iplanet.am.smtpport":{
+                    "value":25,
+                    "inherited":true
                 }
             });
-
             let schema;
 
             beforeEach(() => {
                 const jsonSchema = new JSONSchema({
-                    "type": "object",
-                    "properties": {
-                        "propertyKey": {
-                            type: "object",
-                            title: "Title",
-                            properties: {
-                                value: {
-                                    type: "string",
-                                    required: true
+                    "title":"Mail Server",
+                    "type":"object",
+                    "propertyOrder":3,
+                    "properties":{
+                        "com.iplanet.am.smtphost":{
+                            "title":"Mail Server Host Name",
+                            "type":"object",
+                            "propertyOrder":0,
+                            "description":"(property name: com.iplanet.am.smtphost)",
+                            "properties":{
+                                "value":{
+                                    "type":"string",
+                                    "required":false
                                 },
-                                inherited: {
-                                    type: "boolean",
-                                    required: true
-                                }
-                            }
-                        },
-                        "anotherPropertyKey": {
-                            type: "object",
-                            title: "Title",
-                            properties: {
-                                value: {
-                                    type: "string",
-                                    required: true
-                                },
-                                inherited: {
-                                    type: "boolean",
-                                    required: true
+                                "inherited":{
+                                    "type":"boolean",
+                                    "required":true
                                 }
                             }
                         }
@@ -224,22 +208,18 @@ define([
             });
 
             it("flattens inherited property values onto the top-level properties", () => {
-                expect(schema.raw.properties).to.contain.keys("propertyKey");
-                expect(schema.raw.properties.propertyKey).to.contain.keys("type", "required");
+                expect(schema.raw.properties).to.contain.keys("com.iplanet.am.smtphost");
+                expect(schema.raw.properties["com.iplanet.am.smtphost"]).to.contain
+                    .keys("type", "required");
             });
 
             it("sets the title on the flattened properties", () => {
-                expect(schema.raw.properties.propertyKey.title).eq("Title");
+                expect(schema.raw.properties["com.iplanet.am.smtphost"].title).eq("Mail Server Host Name");
             });
 
             it("adds 'isInherited' key to each property of the schema", () => {
-                expect(schema.raw.properties).to.contain.keys("propertyKey");
-                expect(schema.raw.properties.propertyKey).to.contain.keys("isInherited");
-                expect(schema.raw.properties.propertyKey.isInherited).eq(true);
-
-                expect(schema.raw.properties).to.contain.keys("anotherPropertyKey");
-                expect(schema.raw.properties.anotherPropertyKey).to.contain.keys("isInherited");
-                expect(schema.raw.properties.anotherPropertyKey.isInherited).eq(false);
+                expect(schema.raw.properties["com.iplanet.am.smtphost"]).to.contain.keys("isInherited");
+                expect(schema.raw.properties["com.iplanet.am.smtphost"].isInherited).eq(true);
             });
         });
     });

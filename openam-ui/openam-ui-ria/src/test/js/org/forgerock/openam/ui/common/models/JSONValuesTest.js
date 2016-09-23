@@ -23,7 +23,13 @@ define([
 
             beforeEach(() => {
                 values = new JSONValues({
-                    "globalValue": {},
+                    "_id": "",
+                    "_type": {},
+                    "globalSimpleKey": "globalSimpleValue",
+                    "globalCollectionKey": {
+                        "collectionItem_1": "collectionItemValue_1",
+                        "collectionItem_2": "collectionItemValue_12"
+                    },
                     "defaults": {
                         "defaultsCollection": {
                             "collectionItem1": "value1",
@@ -32,18 +38,19 @@ define([
                         "defaultsSimple": "simpleValue"
                     },
                     "dynamic": {
-                        "dynamicCollection": {
-                            "collectionItem1": "value1",
-                            "collectionItem2": "value2"
-                        },
                         "dynamicSimple": "simpleValue"
                     }
                 });
             });
 
-            it("groups the top-level values under a \"global\" value", () => {
+            it("groups the top-level simple values under a \"global\" value", () => {
                 expect(values.raw).to.contain.keys("global");
-                expect(values.raw.global).to.contain.keys("globalValue");
+                expect(values.raw.global).to.contain.keys("globalSimpleKey");
+            });
+
+            it("does not group the top-level collection values under a \"global\" value", () => {
+                expect(values.raw).to.contain.keys("global");
+                expect(values.raw.global).to.not.contain.keys("globalCollectionKey");
             });
 
             it("groups simple values in \"defaults\" into a pseudo collection \"realmDefaults\"", () => {
@@ -55,33 +62,8 @@ define([
                 expect(values.raw).to.contain.keys("defaultsCollection");
             });
 
-            it("groups simple values in \"dynamic\" into a pseudo collection \"dynamicAttributes\"", () => {
-                expect(values.raw).to.contain.keys("dynamicAttributes");
-                expect(values.raw.dynamicAttributes).to.contain.keys("dynamicSimple");
-            });
-
-            it("flattens values in \"dynamic\" onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("dynamicCollection");
-            });
-
             it("contains \"_defaultsCollectionProperties\"", () => {
                 expect(values.raw).to.contain.keys("_defaultsCollectionProperties");
-            });
-
-            it("contains \"_dynamicCollectionProperties\"", () => {
-                expect(values.raw).to.contain.keys("_dynamicCollectionProperties");
-            });
-
-            context("when there is no \"defaults\" or \"dynamic\" properties", () => {
-                beforeEach(() => {
-                    values = new JSONValues({
-                        "globalValue": {}
-                    });
-                });
-
-                it("does not group the top-level properties under a \"global\" property", () => {
-                    expect(values.raw).to.have.keys("globalValue");
-                });
             });
         });
         describe("#addInheritance", () => {
@@ -129,26 +111,32 @@ define([
         });
         describe("#toJSON", () => {
             let values;
+            let valueWithDefaultsCollectionProperties;
 
             beforeEach(() => {
                 values = new JSONValues({
                     "_id": {},
                     "_type": {},
                     "globalValue": {},
-                    "_defaultsCollectionProperties": ["defaultsCollection"],
-                    "_dynamicCollectionProperties": ["dynamicCollection"],
+                    "realmDefaults": {
+                        "defaultsSimple": "simpleValue"
+                    },
+                    "dynamic": {
+                        "dynamicSimple": "simpleValue"
+                    }
+                }).toJSON();
+
+                valueWithDefaultsCollectionProperties = new JSONValues({
+                    "_id": {},
+                    "_type": {},
+                    "_defaultsCollectionProperties": ["defaultsCollection", "defaultsCollection2"],
                     "defaultsCollection": {
                         "collectionItem1": "value1",
                         "collectionItem2": "value2"
                     },
-                    "realmDefaults": {
-                        "defaultsSimple": "simpleValue"
-                    },
-                    "dynamicCollection": {
-                        "collectionItem": "value"
-                    },
-                    "dynamicAttributes": {
-                        "dynamicSimple": "simpleValue"
+                    "defaultsCollection2": {
+                        "collectionItem1": "value1",
+                        "collectionItem2": "value2"
                     }
                 }).toJSON();
             });
@@ -164,22 +152,7 @@ define([
 
             it("returns defaults values under a \"defaults\" property", () => {
                 expect(JSON.parse(values)).to.contain.keys("defaults");
-                expect(JSON.parse(values).defaults).to.contain.keys("defaultsCollection");
                 expect(JSON.parse(values).defaults).to.contain.keys("defaultsSimple");
-            });
-
-            it("returns dynamic values under a \"dynamic\" property", () => {
-                expect(JSON.parse(values)).to.contain.keys("dynamic");
-                expect(JSON.parse(values).dynamic).to.contain.keys("dynamicCollection");
-                expect(JSON.parse(values).dynamic).to.contain.keys("dynamicSimple");
-            });
-
-            it("does not return \"_defaultsCollectionProperties\"", () => {
-                expect(JSON.parse(values)).to.not.contain.keys("_defaultsCollectionProperties");
-            });
-
-            it("does not return \"_dynamicCollectionProperties\"", () => {
-                expect(JSON.parse(values)).to.not.contain.keys("_dynamicCollectionProperties");
             });
 
             it("returns \"_id\" at the top-level", () => {
@@ -188,6 +161,24 @@ define([
 
             it("returns \"_type\" at the top-level", () => {
                 expect(JSON.parse(values)).to.contain.keys("_type");
+            });
+
+            // valueWithDefaultsCollectionProperties
+            it("constructs \"defaults\" property from the defaults collection values", () => {
+                expect(JSON.parse(valueWithDefaultsCollectionProperties))
+                    .to.contain.keys("defaults");
+            });
+
+            it("returns defaults collection values under a \"defaults\" property", () => {
+                expect(JSON.parse(valueWithDefaultsCollectionProperties).defaults)
+                    .to.contain.keys("defaultsCollection");
+                expect(JSON.parse(valueWithDefaultsCollectionProperties).defaults)
+                    .to.contain.keys("defaultsCollection2");
+            });
+
+            it("deletes meta info key \"_defaultsCollectionProperties\" from the values", () => {
+                expect(JSON.parse(valueWithDefaultsCollectionProperties))
+                    .to.not.contain.keys("_defaultsCollectionProperties");
             });
         });
     });
