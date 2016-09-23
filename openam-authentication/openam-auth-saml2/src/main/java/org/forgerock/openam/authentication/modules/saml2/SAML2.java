@@ -42,6 +42,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
@@ -205,9 +206,6 @@ public class SAML2 extends AMLoginModule {
     private int initiateSAMLLoginAtIDP(final HttpServletResponse response, final HttpServletRequest request)
             throws SAML2Exception, AuthLoginException {
 
-        if (reqBinding == null) {
-            reqBinding = SAML2Constants.HTTP_REDIRECT;
-        }
 
         final String spEntityID = SPSSOFederate.getSPEntityId(metaAlias);
         final IDPSSODescriptorElement idpsso = SPSSOFederate.getIDPSSOForAuthnReq(realm, entityName);
@@ -218,9 +216,26 @@ public class SAML2 extends AMLoginModule {
                     bundle.getString("samlLocalConfigFailed"));
         }
 
-        final String ssoURL = SPSSOFederate.getSSOURL(idpsso.getSingleSignOnService(), reqBinding);
-        final List extensionsList = SPSSOFederate.getExtensionsList(spEntityID, realm);
+        List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
+        final SingleSignOnServiceElement endPoint = SPSSOFederate
+                .getSingleSignOnServiceEndpoint(ssoServiceList, reqBinding);
 
+        if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+            throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
+        }
+        if (reqBinding == null) {
+            SAML2Utils.debug.message("SAML2 :: initiateSAMLLoginAtIDP() reqBinding is null using endpoint  binding: {}",
+                    endPoint.getBinding());
+            reqBinding = endPoint.getBinding();
+            if (reqBinding == null) {
+                throw new SAML2Exception(SAML2Utils.bundle.getString("UnableTofindBinding"));
+            }
+        }
+
+        String ssoURL = endPoint.getLocation();
+        SAML2Utils.debug.message("SAML2 :: initiateSAMLLoginAtIDP()  ssoURL : {}", ssoURL);
+
+        final List extensionsList = SPSSOFederate.getExtensionsList(spEntityID, realm);
         final Map<String, Collection<String>> spConfigAttrsMap
                 = SPSSOFederate.getAttrsMapForAuthnReq(realm, spEntityID);
         authnRequest = SPSSOFederate.createAuthnRequest(realm, spEntityID, params,

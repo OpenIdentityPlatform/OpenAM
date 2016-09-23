@@ -80,7 +80,6 @@ import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +90,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * This class reads the query parameters and performs the required
@@ -211,10 +211,7 @@ public class SPSSOFederate {
             throw new SAML2Exception(SAML2Utils.bundle.getString("nullIDPEntityID"));
         }
         
-        String binding = getParameter(paramsMap, SAML2Constants.REQ_BINDING);
-        if (binding == null) {
-            binding = SAML2Constants.HTTP_REDIRECT;
-        }
+
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("SPSSOFederate: in initiateSSOFed");
             SAML2Utils.debug.message("SPSSOFederate: spEntityID is : " + spEntityID);
@@ -224,7 +221,7 @@ public class SPSSOFederate {
         String realm = getRealm(realmName);
         
         try {
-            // Retreive MetaData 
+            // Retrieve MetaData
             if (sm == null) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("errorMetaManager"));
             }
@@ -250,14 +247,28 @@ public class SPSSOFederate {
                 LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, data, null);
                 throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
             }
-            
-            List ssoServiceList = idpsso.getSingleSignOnService();
-            String ssoURL = getSSOURL(ssoServiceList, binding);
 
-            if (ssoURL == null || ssoURL.length() == 0) {
-              String[] data = { idpEntityID };
-              LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, null);
-              throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
+            String binding = getParameter(paramsMap, SAML2Constants.REQ_BINDING);
+            List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
+            final SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, binding);
+
+            if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                String[] data = { idpEntityID };
+                LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, null);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
+            }
+
+            String ssoURL = endPoint.getLocation();
+            SAML2Utils.debug.message("SPSSOFederate: SingleSignOnService URL : {}", ssoURL);
+            if (binding == null) {
+                SAML2Utils.debug.message("SPSSOFederate: reqBinding is null using endpoint binding: {} ",
+                        endPoint.getBinding());
+                binding = endPoint.getBinding();
+                if (binding == null) {
+                    String[] data = { idpEntityID };
+                    LogUtil.error(Level.INFO, LogUtil.NO_RETURN_BINDING, data, null);
+                    throw new SAML2Exception(SAML2Utils.bundle.getString("UnableTofindBinding"));
+                }
             }
 
             // create AuthnRequest 
@@ -588,10 +599,13 @@ public class SPSSOFederate {
                                 realm, idpEntityID, SAML2Constants.IDP_ROLE,
                                 SAML2Constants.ENTITY_DESCRIPTION);
                             idpEntry.setName(description);
-                            List ssoServiceList =
-                                idpDesc.getSingleSignOnService();
-                            String ssoURL = getSSOURL(ssoServiceList,
-                                SAML2Constants.SOAP);
+                            List<SingleSignOnServiceElement> ssoServiceList = idpDesc.getSingleSignOnService();
+                            SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, SAML2Constants.SOAP);
+                            if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                                throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
+                            }
+                            String ssoURL = endPoint.getLocation();
+                            SAML2Utils.debug.message("SPSSOFederate.initiateECPRequest URL : {}", ssoURL);
                             idpEntry.setLoc(ssoURL);
                             if (idpEntries == null) {
                                 idpEntries = new ArrayList();
@@ -938,33 +952,30 @@ public class SPSSOFederate {
      }
 
     /**
-     * Returns the SingleSignOnService URL.
+     * Returns the SingleSignOnService service. If no binding is specified
+     * it will return the first endpoint in the list matching either HTTP-Redirect or HTTP-Post.
+     * If the binding is specified it will attempt to return a match.
+     * If either of the above is not found it will return null.
      *
      * @param ssoServiceList list of sso services
-     * @param binding binding of the sso service to get the url for
-     * @return a string url for the sso service
+     * @param binding        binding of the sso service to get the url for
+     * @return a SingleSignOnServiceElement or null if no match found.
      */
-    public static String getSSOURL(List ssoServiceList, String binding) {
-         String ssoURL = null;
-         if ((ssoServiceList != null) && (!ssoServiceList.isEmpty())) {
-            Iterator i = ssoServiceList.iterator();
-            while (i.hasNext()) {
-                SingleSignOnServiceElement sso = 
-                            (SingleSignOnServiceElement) i.next();
-                if ((sso != null && sso.getBinding()!=null) && 
-                            (sso.getBinding().equals(binding))) {
-                    ssoURL = sso.getLocation();
-                    break;
-                }
-                    
+    public static SingleSignOnServiceElement getSingleSignOnServiceEndpoint(
+            List<SingleSignOnServiceElement> ssoServiceList, String binding) {
+        SingleSignOnServiceElement preferredEndpoint = null;
+        boolean noPreferredBinding = StringUtils.isEmpty(binding);
+        for (SingleSignOnServiceElement endpoint : ssoServiceList) {
+            if (noPreferredBinding && (SAML2Constants.HTTP_REDIRECT.equals(endpoint.getBinding())
+                    || SAML2Constants.HTTP_POST.equals(endpoint.getBinding()))) {
+                preferredEndpoint = endpoint;
+                break;
+            } else if (binding.equals(endpoint.getBinding())) {
+                preferredEndpoint = endpoint;
+                break;
             }
-         }
-         if (SAML2Utils.debug.messageEnabled()) {
-               SAML2Utils.debug.message("SPSSOFederate: "
-                                         + " SingleSignOnService URL :" 
-                                         + ssoURL);
-         }
-         return ssoURL;
+        }
+        return preferredEndpoint;
     }
           
     /**

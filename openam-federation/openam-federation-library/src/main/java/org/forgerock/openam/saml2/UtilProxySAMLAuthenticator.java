@@ -27,6 +27,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -190,10 +191,20 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 // In ECP profile, sp doesn't know idp.
                 if (!isFromECP) {
                     // verify Destination
-                    List ssoServiceList = idpSSODescriptor.getSingleSignOnService();
-                    String ssoURL = SPSSOFederate.getSSOURL(ssoServiceList, binding);
-                    if (!SAML2Utils.verifyDestination(data.getAuthnRequest().getDestination(), ssoURL)) {
-                        SAML2Utils.debug.error(classMethod + "authn request destination verification failed.");
+                    List<SingleSignOnServiceElement> ssoServiceList = idpSSODescriptor.getSingleSignOnService();
+                    SingleSignOnServiceElement  endPoint = SPSSOFederate.getSingleSignOnServiceEndpoint(ssoServiceList, binding);
+                    if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                        SAML2Utils.debug
+                                .error("{} authn request unable to get endpoint location for IdpEntity: {}  MetaAlias: {} ",
+                                        classMethod, data.getIdpEntityID(), data.getIdpMetaAlias());
+                        throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
+                    }
+                    if (!SAML2Utils
+                            .verifyDestination(data.getAuthnRequest().getDestination(), endPoint.getLocation())) {
+                        SAML2Utils.debug
+                                .error("{} authn request destination verification failed for IdpEntity: {}  MetaAlias: {} Destination: {}  Location: {}",
+                                        classMethod, data.getIdpEntityID(), data.getIdpMetaAlias(),
+                                        data.getAuthnRequest().getDestination(), endPoint.getLocation());
                         throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
                     }
                 }
