@@ -16,6 +16,13 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.forgerock.api.models.ApiDescription.apiDescription;
+import static org.forgerock.api.models.Paths.paths;
+import static org.forgerock.api.models.Query.query;
+import static org.forgerock.api.models.Resource.resource;
+import static org.forgerock.api.models.Schema.schema;
+import static org.forgerock.api.models.VersionedPath.UNVERSIONED;
+import static org.forgerock.api.models.VersionedPath.versionedPath;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -37,6 +44,8 @@ import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.enums.QueryType;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
@@ -45,6 +54,7 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
@@ -53,6 +63,8 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
+import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 
 import com.iplanet.sso.SSOException;
@@ -74,11 +86,47 @@ import com.sun.identity.sm.ServiceManager;
  * @since 14.0.0
  */
 @RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
-public class ServicesRealmSmsHandler {
+public class ServicesRealmSmsHandler implements Describable<ApiDescription, Request> {
+
+    private static final ApiDescription DESCRIPTION = apiDescription().id("notused").version("notused")
+            .paths(paths().put("", versionedPath()
+                    .put(UNVERSIONED, resource()
+                            .mvccSupported(false)
+                            .title(localizableString("title"))
+                            .description(localizableString("description"))
+                            .resourceSchema(schema()
+                                    .schema(json(object(field("type", "object"), field("properties", object(
+                                            field(ResourceResponse.FIELD_CONTENT_ID, object(
+                                                    field("type", "string"),
+                                                    field("title", localizableString("id.title")),
+                                                    field("description", localizableString("id.description")))),
+                                            field(NAME, object(
+                                                    field("type", "string"),
+                                                    field("title", localizableString("name.title")),
+                                                    field("description", localizableString("name.description"))))
+                                    )))))
+                                    .build())
+                            .query(query()
+                                    .type(QueryType.FILTER)
+                                    .queryableFields("_id")
+                                    .description(localizableString("query.description"))
+                                    .pagingModes()
+                                    .countPolicies()
+                                    .supportedSortKeys()
+                                    .build())
+                            .build())
+                    .build()).build())
+            .build();
+
+    private static LocalizableString localizableString(String s) {
+        return new LocalizableString("i18n:api-descriptor/ServicesRealmSmsHandler#" + s,
+                ServicesRealmSmsHandler.class.getClassLoader());
+    }
 
     private final Debug debug;
     private final SmsConsoleServiceNameFilter consoleNameFilter;
     private SmsRouteTree routeTree;
+    private ApiDescription description;
 
     @Inject
     ServicesRealmSmsHandler(@Named("frRest") Debug debug, SmsConsoleServiceNameFilter consoleNameFilter) {
@@ -86,7 +134,7 @@ public class ServicesRealmSmsHandler {
         this.consoleNameFilter = consoleNameFilter;
     }
 
-    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
+    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "_id")
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest queryRequest,
                                                                  QueryResourceHandler queryResourceHandler) {
         String searchForId;
@@ -149,6 +197,8 @@ public class ServicesRealmSmsHandler {
      * @param request The request.
      * @return The result from the downstream handler.
      */
+    // Not described in API descriptor as it hands off to the route tree, and
+    // each service describes its create operation.
     @Create(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         UriRouterContext ctx = context.asContext(UriRouterContext.class);
@@ -170,4 +220,24 @@ public class ServicesRealmSmsHandler {
         this.routeTree = routeTree;
     }
 
+    @Override
+    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+        description = apiProducer.addApiInfo(DESCRIPTION);
+        return description;
+    }
+
+    @Override
+    public ApiDescription handleApiRequest(Context context, Request request) {
+        return description;
+    }
+
+    @Override
+    public void addDescriptorListener(Listener listener) {
+
+    }
+
+    @Override
+    public void removeDescriptorListener(Listener listener) {
+
+    }
 }
