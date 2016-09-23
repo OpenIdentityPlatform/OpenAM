@@ -447,7 +447,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
-                <SubSchema name="WebAgent" inheritance="multiple">
+                <SubSchema name="WebAgent" inheritance="multiple" i18nKey="a7002">
                     <AttributeSchema
                             name="agentgroup"
                             type="single"
@@ -1683,7 +1683,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
-                <SubSchema name="J2EEAgent" inheritance="multiple">
+                <SubSchema name="J2EEAgent" inheritance="multiple" i18nKey="a7003">
                     <AttributeSchema
                             name="agentgroup"
                             type="single"
@@ -3397,7 +3397,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
-                <SubSchema name="2.2_Agent" inheritance="multiple">
+                <SubSchema name="2.2_Agent" inheritance="multiple" i18nKey="a7004">
                     <AttributeSchema name="userpassword"
                                      type="single"
                                      syntax="password"
@@ -3442,7 +3442,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
-                <SubSchema name="SharedAgent" inheritance="multiple">
+                <SubSchema name="SharedAgent" inheritance="multiple" i18nKey="a7005">
                     <AttributeSchema name="userpassword"
                                      type="single"
                                      syntax="password"
@@ -3491,7 +3491,7 @@
                         </ChoiceValues>
                     </AttributeSchema>
                 </SubSchema>
-                <SubSchema name="SoapSTSAgent" inheritance="multiple">
+                <SubSchema name="SoapSTSAgent" inheritance="multiple" i18nKey="a7006">
                     <AttributeSchema
                             name="agentgroup"
                             type="single"
