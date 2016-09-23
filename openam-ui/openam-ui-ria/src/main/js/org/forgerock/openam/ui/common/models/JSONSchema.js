@@ -55,27 +55,30 @@ define([
         return object.type === "object";
     }
 
-    function groupTopLevelProperties (raw) {
-        if (_.isEmpty(_.omit(raw.properties, "defaults", "dynamic"))) {
+    function groupTopLevelSimpleProperties (raw) {
+        const collectionProperties = _(raw.properties)
+            .pick((property) => _.has(property, "properties"))
+            .keys()
+            .value();
+
+        const predicate = ["defaults", ...collectionProperties];
+        const simplePropertiesToGroup = _.omit(raw.properties, ...predicate);
+
+        if (_.isEmpty(simplePropertiesToGroup)) {
             return raw;
         }
 
         const schema = _.cloneDeep(raw);
 
         schema.properties = {
+            ..._.omit(schema.properties, _.keys(simplePropertiesToGroup)),
             global: {
-                properties: _.omit(raw.properties, "defaults", "dynamic"),
+                properties: simplePropertiesToGroup,
                 propertyOrder: -10,
-                title: i18next.t("console.common.global"),
+                title: i18next.t("console.common.globalAttributes"),
                 type: "object"
             }
         };
-        if (raw.properties.defaults) {
-            schema.properties.defaults = raw.properties.defaults;
-        }
-        if (raw.properties.dynamic) {
-            schema.properties.dynamic = raw.properties.dynamic;
-        }
 
         return schema;
     }
@@ -123,13 +126,13 @@ define([
     }
 
     /**
-    * Ungroups specified property, moving its child properties one level up.
+    * Unwraps specified property, moving its child properties one level up.
     *
     * @param   {Object} raw Schema
     * @param   {string} propertyKey Key of the property value object
     * @returns {JSONSchema} JSONSchema new JSONSchema object
     */
-    function ungroupProperty (raw, propertyKey) {
+    function unwrapProperty (raw, propertyKey) {
         const schema = _.cloneDeep(raw);
 
         schema.properties = { ...schema.properties, ...schema.properties[propertyKey] };
@@ -178,18 +181,13 @@ define([
             const hasDynamic = _.has(schema, "properties.dynamic");
 
             if (hasDefaults || hasDynamic) {
-                schema = groupTopLevelProperties(schema);
+                schema = groupTopLevelSimpleProperties(schema);
+            }
 
-                if (hasDefaults) {
-                    schema = groupSimplePropertiesInPseudoCollection(schema, "defaults", "realmDefaults",
-                        i18next.t("console.common.realmDefaults"));
-                    schema = ungroupProperty(schema, "defaults");
-                }
-                if (hasDynamic) {
-                    schema = groupSimplePropertiesInPseudoCollection(schema, "dynamic", "dynamicAttributes",
-                        i18next.t("console.common.dynamicAttributes"));
-                    schema = ungroupProperty(schema, "dynamic");
-                }
+            if (hasDefaults) {
+                schema = groupSimplePropertiesInPseudoCollection(schema, "defaults", "realmDefaults",
+                    i18next.t("console.common.realmDefaults"));
+                schema = unwrapProperty(schema, "defaults");
             }
 
             schema = cleanJSONSchema(schema);

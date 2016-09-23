@@ -40,24 +40,23 @@
 define([
     "lodash"
 ], (_) => {
-    function groupTopLevelValues (raw) {
-        const globalPropertiesToIngore = ["_id", "_type", "defaults", "dynamic"];
+    function groupTopLevelSimpleValues (raw) {
+        const collectionProperties = _(raw)
+            .pick((property) => _.isObject(property) && !_.isArray(property))
+            .keys()
+            .value();
 
-        if (_.isEmpty(_.omit(raw, ...globalPropertiesToIngore))) {
+        const predicate = ["_id", "_type", "defaults", ...collectionProperties];
+        const simplePropertiesToGroup = _.omit(raw, ...predicate);
+
+        if (_.isEmpty(simplePropertiesToGroup)) {
             return raw;
         }
 
         const values = {
-            _id: raw._id,
-            _type: raw._type,
-            global: _.omit(raw, ...globalPropertiesToIngore)
+            ..._.omit(raw, _.keys(simplePropertiesToGroup)),
+            global: simplePropertiesToGroup
         };
-        if (raw.defaults) {
-            values.defaults = raw.defaults;
-        }
-        if (raw.dynamic) {
-            values.dynamic = raw.dynamic;
-        }
 
         return values;
     }
@@ -86,14 +85,14 @@ define([
     }
 
     /**
-    * Ungroups specified value, moving its child properties one level up.
+    * Unwraps specified value, moving its child properties one level up.
     *
     * @param   {Object} raw Values
     * @param   {string} propertyKey Key of the property value object
     * @param   {string} pseudoCollectionName Simple properties are grouped under this name
     * @returns {JSONValues} JSONValues object with new value set
     */
-    function ungroupValue (raw, propertyKey, pseudoCollectionName) {
+    function unwrapValue (raw, propertyKey, pseudoCollectionName) {
         const values = { ...raw, ...raw[propertyKey] };
         const collectionPropertiesKeys = _.without(_.keys(raw[propertyKey]), pseudoCollectionName);
 
@@ -111,16 +110,12 @@ define([
             const hasDynamic = _.has(values, "dynamic");
 
             if (hasDefaults || hasDynamic) {
-                values = groupTopLevelValues(values);
+                values = groupTopLevelSimpleValues(values);
+            }
 
-                if (hasDefaults) {
-                    values = groupSimplePropertiesInPseudoCollection(values, "defaults", "realmDefaults");
-                    values = ungroupValue(values, "defaults", "realmDefaults");
-                }
-                if (hasDynamic) {
-                    values = groupSimplePropertiesInPseudoCollection(values, "dynamic", "dynamicAttributes");
-                    values = ungroupValue(values, "dynamic", "dynamicAttributes");
-                }
+            if (hasDefaults) {
+                values = groupSimplePropertiesInPseudoCollection(values, "defaults", "realmDefaults");
+                values = unwrapValue(values, "defaults", "realmDefaults");
             }
 
             this.raw = Object.freeze(values);
@@ -225,16 +220,7 @@ define([
                 json = wrapCollectionProperties(json, "defaults");
             }
 
-            if (pseudoCollectionPresent(json, "dynamicAttributes")) {
-                json = unwrapPseudoCollection(json, "dynamic", "dynamicAttributes");
-            }
-
-            if (collectionPropertiesPresent(json, "dynamic")) {
-                json = wrapCollectionProperties(json, "dynamic");
-            }
-
             json = deletePseudoData(json, "defaults", "realmDefaults");
-            json = deletePseudoData(json, "dynamic", "dynamicAttributes");
 
             json = { ...json, ...json.global };
             delete json.global;

@@ -752,6 +752,7 @@
             "secondaryConfigurations": "Secondary Configurations",
             "realmDefaults": "Realm Defaults",
             "dynamicAttributes": "Dynamic Attributes",
+            "globalAttributes": "Global Attributes",
             "global": "Global"
         },
         "sites" : {
