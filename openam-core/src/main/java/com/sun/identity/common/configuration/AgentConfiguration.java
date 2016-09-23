@@ -1000,6 +1000,10 @@ public class AgentConfiguration {
             }
             values = temp;
         }
+
+        if (reformat && AGENT_TYPE_OAUTH2.equalsIgnoreCase(agentType)) {
+            values.remove(ATTR_NAME_PWD);
+        }
         
         return (reformat) ? unparseAttributeMap(agentType, values) :
             correctAttributeNames(agentType, values);
