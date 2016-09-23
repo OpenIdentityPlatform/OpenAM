@@ -66,6 +66,7 @@ import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
+import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 
 import com.google.inject.assistedinject.Assisted;
@@ -328,7 +329,12 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     protected void addDynamicSchema(Optional<Context> context, JsonValue result) {
         if (dynamicSchema != null) {
             addAttributeSchema(result, "/properties/dynamic/properties/", dynamicSchema, context);
-            result.put(new JsonPointer("/properties/dynamic/type"), "object");
+            if (result.isDefined("properties") && result.get("properties").isDefined("dynamic")) {
+                result.put(new JsonPointer("/properties/dynamic/type"), "object");
+                result.put(new JsonPointer("/properties/dynamic/title"),
+                        new LocalizableString("i18n:amConsole#section.label.common.dynamicAttributes",
+                                this.getClass().getClassLoader()));
+            }
         }
     }
 
