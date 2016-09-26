@@ -196,9 +196,6 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String SITES_RESOURCE = TRANSLATION_KEY_PREFIX + "SitesResourceProvider#";
 
-    /** Constant used as key to API Descriptor translations **/
-    public static final String SMS_REALM_PROVIDER = TRANSLATION_KEY_PREFIX + "SmsRealmProvider#";
-
     private ApiDescriptorConstants() {
         // Constants class only
     }

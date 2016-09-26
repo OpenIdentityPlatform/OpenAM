@@ -36,6 +36,23 @@ define([
         }
     }
 
+    function newEncodeRealm (path) {
+        const encodedPath = [];
+        const realmPath = path.split("/");
+        encodedPath.push("realms");
+        encodedPath.push("root");
+
+        _.each(realmPath, function (pathFragment) {
+            if (pathFragment !== "") {
+                encodedPath.push("realms");
+                encodedPath.push(encodeURIComponent(pathFragment));
+            }
+        });
+
+        return `/${encodedPath.join("/")}`;
+    }
+
+
     obj.realms = {
         /**
          * Gets all realms.
@@ -43,7 +60,7 @@ define([
          */
         all () {
             return obj.serviceCall({
-                url: fetchUrl.default("/global-config/realms/%2F?_queryFilter=true", { realm: false }),
+                url: fetchUrl.default("/global-config/realms/root?_queryFilter=true", { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
                 data.result = _(data.result).each((realm) => {
@@ -59,11 +76,9 @@ define([
          */
         create (data) {
             return obj.serviceCall({
-                url: fetchUrl.default(
-                    `/global-config/realms/${encodeURIComponent(data.parentPath)}/${encodeURIComponent(data.name)}`,
-                    { realm: false }),
-                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0", "if-none-match": "*" },
-                type: "PUT",
+                url: fetchUrl.default("/global-config/realms/root?_action=create", { realm: false }),
+                headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+                type: "POST",
                 suppressEvents: true,
                 data: JSON.stringify(data)
             });
@@ -76,7 +91,7 @@ define([
          */
         get (path) {
             return SMSServiceUtils.schemaWithValues(obj, fetchUrl.default(
-                `/global-config/realms/${encodeURIComponent(path)}`, { realm: false }));
+                `/global-config${newEncodeRealm(path)}`, { realm: false }));
         },
 
         /**
@@ -84,7 +99,7 @@ define([
          * @returns {Promise.<Object>} Service promise
          */
         schema () {
-            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.default("/global-config/realms/%2F", {
+            return SMSServiceUtils.schemaWithDefaults(obj, fetchUrl.default("/global-config/realms/root", {
                 realm: false
             }));
         },
@@ -96,7 +111,7 @@ define([
          */
         remove (path) {
             return obj.serviceCall({
-                url: fetchUrl.default(`/global-config/realms/${encodeURIComponent(path)}`, { realm: false }),
+                url: fetchUrl.default(`/global-config${newEncodeRealm(path)}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "DELETE",
                 suppressEvents: true
@@ -111,7 +126,7 @@ define([
         update (data) {
             return obj.serviceCall({
                 url: fetchUrl.default(
-                    `/global-config/realms/${encodeURIComponent(getRealmPath(data))}`, { realm: false }),
+                    `/global-config${newEncodeRealm(getRealmPath(data))}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
                 type: "PUT",
                 data: JSON.stringify(data),
