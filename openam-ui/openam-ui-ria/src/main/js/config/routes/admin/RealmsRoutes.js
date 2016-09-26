@@ -263,14 +263,22 @@ define(function () {
             },
             "realmsApplicationsAgentsSelection": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-                page: "org/forgerock/openam/ui/admin/views/realms/applications/agents/NewAgentSelectionView",
+                page: "org/forgerock/openam/ui/admin/views/realms/applications/agents/SelectAgentView",
                 url: scopedByRealm("applications-agents/select"),
                 pattern: "realms/?/applications-agents/select",
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true
             },
-
+            "realmsApplicationsAgentsNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/applications/agents/NewAgentView",
+                url: scopedByRealm("applications-agents/new/([^/]*)"),
+                pattern: "realms/?/applications-agents/new/?",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
             "apiExplorerView" : {
                 view: "org/forgerock/openam/ui/admin/views/api/ApiExplorerView",
                 role: "ui-global-admin",

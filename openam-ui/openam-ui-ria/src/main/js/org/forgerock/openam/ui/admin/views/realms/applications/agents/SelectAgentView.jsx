@@ -23,7 +23,7 @@ import Card from "components/Card";
 import withRouter from "org/forgerock/commons/ui/common/components/hoc/withRouter";
 import { getCreatableTypes } from "org/forgerock/openam/ui/admin/services/realm/AgentsService";
 
-class NewAgentSelectionView extends Component {
+class SelectAgentView extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -39,17 +39,18 @@ class NewAgentSelectionView extends Component {
         const creatableTypes = this.state.types.map((type) => (
         <Col sm={6} md={4}>
             <Card icon={"fa-male"} href={`#realms/${
-                    encodeURIComponent(this.props.router.params[0])}/applications-agents/edit/${
-                    encodeURIComponent(type._id)}`}>
-                <h3 className="card-name card-name-sm am-text-lines-three text-primary hidden-md">{type.name}</h3>
-                <h3 className="card-name card-name-sm am-text-lines-four text-primary visible-md-block">{type.name}</h3>
+                encodeURIComponent(this.props.router.params[0])}/applications-agents/new/${
+                encodeURIComponent(type._id)}`}>
+                <h3 className="card-name card-name-sm am-text-lines-two text-primary hidden-md">{type._id}</h3>
+                <div className="text-muted small am-text-lines-two ellipsis-wrap">{type.name}</div>
             </Card>
         </Col>
         ));
+
         const footer = (
             <Clearfix>
                 <div className="pull-right">
-                    <a href={`#realms/${encodeURIComponent(this.props.router.params[0])}/applications-agents"`}
+                    <a href={`#realms/${encodeURIComponent(this.props.router.params[0])}/applications-agents`}
                         className="btn fr-btn-secondary">{t ("common.form.cancel")}</a>
                 </div>
             </Clearfix>
@@ -58,10 +59,10 @@ class NewAgentSelectionView extends Component {
         return (
             <div>
                 <PageHeader bsClass="page-header page-header-no-border">
-                    { t("console.applications.agents.newSelection.title") }
+                    { t("console.applications.agents.select.title") }
                 </PageHeader>
                 <PageDescription>
-                    { t("console.applications.agents.newSelection.description") }
+                    { t("console.applications.agents.select.description") }
                 </PageDescription>
                 <Panel className="panel panel-default" footer={footer}>
                     <div className="grid-list">
@@ -73,4 +74,4 @@ class NewAgentSelectionView extends Component {
     }
 }
 
-export default withRouter(NewAgentSelectionView);
+export default withRouter(SelectAgentView);

@@ -1302,9 +1302,14 @@
         },
         "applications": {
             "agents": {
-                "newSelection" : {
+                "select" : {
                     "title": "New Agent",
                     "description": "Select the type of agent you want to configure."
+                },
+                "new" : {
+                    "title": "Create a New __agentType__ Profile",
+                    "description": "First, create an agent profile which will be used during installation of the agent on your server, and to control configuration options of the agent once installed.",
+                    "create": "Create Profile"
                 }
             }
         }
