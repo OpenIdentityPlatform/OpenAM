@@ -168,7 +168,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                                 authenticationChainsFilter)),
                 branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION, false)),
-                leaf("/agents",smsServiceHandlerFunction.AGENTS_MODULE_HANDLES_FUNCTION, false),
+                leaf("/agents",smsServiceHandlerFunction.AGENTS_MODULE_HANDLES_FUNCTION, true),
                 leaf("/services", smsServiceHandlerFunction, true)
         );
 
