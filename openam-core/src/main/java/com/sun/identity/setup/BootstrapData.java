@@ -32,13 +32,16 @@ package com.sun.identity.setup;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,19 +51,44 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.opendj.ldap.DN;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.shared.StringUtils;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.opendj.ldap.DN;
 
 public class BootstrapData {
+
     private List data = new ArrayList();
-    
+
+    // Optional environment variables to bootstrap OpenAM
+    // If these are present - OpenAM will attempt to boot from the env in preference to the bootstrap file
+    // this is a string that mirrors the exact contents of the bootstrap file.
+    public static final String ENV_OPENAM_CONFIG_URL = "OPENAM_CONFIG_URL";
+
+    // These are the individual env vars that can be set in preference to the all in one String above
+    public static final String ENV_OPENAM_CONFIG_STORE_LDAP_PROTO = "OPENAM_CONFIG_STORE_LDAP_PROTOCOL";
+    public static final String ENV_OPENAM_CONFIG_STORE_LDAP_HOST = "OPENAM_CONFIG_STORE_LDAP_HOST";
+    public static final String ENV_OPENAM_CONFIG_STORE_LDAP_PORT = "OPENAM_CONFIG_STORE_LDAP_PORT";
+    public static final String ENV_OPENAM_INSTANCE = "OPENAM_INSTANCE";
+    public static final String ENV_OPENAM_CONFIG_ADMIN_PWD = "OPENAM_ADMIN_PWD";
+    public static final String ENV_OPENAM_CONFIG_STORE_BASE_DN = "OPENAM_CONFIG_STORE_BASE_DN";
+    public static final String ENV_OPENAM_CONFIG_STORE_DIR_MGR = "OPENAM_CONFIG_STORE_DIR_MGR";
+    public static final String ENV_OPENAM_DSAME_USER = "OPENAM_DSAME_USER";
+
+    // The key alias for the dsame user password in the keystore
+    public static final String DSAME_PWD_KEY = "dsameUserPwd";
+    // the key alias for the config store password
+    public static final String CONFIG_PWD_KEY = "configStorePwd";
+
+
     final static String BOOTSTRAP = "bootstrap";
     
     static final String PROTOCOL = "protocol";
@@ -101,22 +129,154 @@ public class BootstrapData {
     private String dsameUserPwd;
     private String instanceName;
 
+    private static final Debug DEBUG = Debug.getInstance(SetupConstants.DEBUG_NAME);
+
+
     /**
      * Creates an instance of this class
      *
      * @param basedir Base Directory of the installation.
      * @throws IOException if cannot read the file.
      */
-    public BootstrapData(String basedir) 
-        throws IOException {
+    public BootstrapData(String basedir) throws IOException {
         this.basedir = basedir;
-        readFile(basedir + "/" + BOOTSTRAP);
+
+        // if there is a bootstrap file, go ahead and boot from it -
+        // trigger the migration of everything AFTER the system is booted
+        String bootstrapFile = basedir + "/" + BOOTSTRAP;
+        if (new File(bootstrapFile).exists()) {
+            readFile(bootstrapFile);
+        }
+        else {
+            readEnvironment(basedir);
+        }
     }
-    
-    public BootstrapData(Map mapConfig)
-        throws UnsupportedEncodingException {
+
+    public BootstrapData(Map mapConfig) throws UnsupportedEncodingException {
         data.add(createBootstrapResource(mapConfig, false));
     }
+
+    /**
+     * Read bootstrap data from environment variables or boot.properties.
+     *
+     * The boot passwords are stored in keystore.jceks.
+     *
+     * This mimics the readFile() call - and as a side effect leaves this.data List populated with
+     * the bootstrap url in the same form as the bootstrap file.
+     *
+     * Sample exports in bash would be:
+     * <pre>
+     * {@code
+     * export OPENAM_CONFIG_STORE_LDAP_PROTOCOL=ldap
+     * export OPENAM_CONFIG_STORE_LDAP_HOST=localhost
+     * export OPENAM_CONFIG_STORE_LDAP_PORT=50389
+     * export OPENAM_INSTANCE="http://openam.test.com:8080/openam"
+     * export OPENAM_CONFIG_STORE_BASE_DN="dc=openam,dc=forgerock,dc=org"
+     * export OPENAM_CONFIG_STORE_DIR_MGR="cn=Directory Manager"
+     * }
+     * </pre>
+     * OPENAM_INSTANCE is mandatory, the other vars can default with values shown above.
+     *
+     */
+
+    private void readEnvironment(String basedir) throws IOException {
+        Properties p = new Properties();
+
+        DEBUG.message("Attempting to boot from environment variables. ");
+        // open props file in base dir
+        File f = new File(basedir + "/boot.properties");
+
+        // note that vars can come from the env, so
+        // if the boot.properties can not be found that is OK
+        if (f.exists()) {
+            InputStream is = new FileInputStream(f);
+            p.load(is);
+            is.close();
+        }
+
+        // Future enhancement: Allow the keystore location to be configurable via env var or boot.properties
+        // We will also need to update the default AMKeyProvider() constructor
+        // It is not clear is this is needed for k8s, since it can overlay a keystore on the filesystem.
+        // String keyStoreBaseDir = getValueOrDefault(p, ENV_OPENAM_CONFIG_KEYSTORE_DIR, basedir);
+
+        String dsamePassword;
+        String configStorePassword;
+
+        AMKeyProvider amKeyProvider = new AMKeyProvider(basedir, false);
+        try {
+            dsamePassword = amKeyProvider.getSecret(DSAME_PWD_KEY);
+            configStorePassword = amKeyProvider.getSecret(CONFIG_PWD_KEY);
+        } catch (KeyStoreException e) {
+            DEBUG.error("Can not get .storepass and .keypass to open keystore");
+            throw new IOException("Can't get the required boot passwords from the keystore", e);
+        }
+
+
+        String server_instance = getValueOrDefault(p, ENV_OPENAM_INSTANCE, null);
+
+        if (server_instance == null) {
+            throw new IOException("Can't bootstrap - missing instance variable " + ENV_OPENAM_INSTANCE);
+        }
+
+        // Check for individual vars
+        String proto = getValueOrDefault(p, ENV_OPENAM_CONFIG_STORE_LDAP_PROTO, "ldap");
+        proto += "://";  // super ugly hack, because createBootstrapResource() expects proto to have :// appended.
+
+        String host_string =getValueOrDefault(p, ENV_OPENAM_CONFIG_STORE_LDAP_HOST, "localhost");
+        String port =       getValueOrDefault(p, ENV_OPENAM_CONFIG_STORE_LDAP_PORT, "50389");
+        String dsame_user = getValueOrDefault(p, ENV_OPENAM_DSAME_USER, "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org");
+        String base_dn =    getValueOrDefault(p, ENV_OPENAM_CONFIG_STORE_BASE_DN, "dc=openam,dc=forgerock,dc=org");
+        String dsmgr =      getValueOrDefault(p, ENV_OPENAM_CONFIG_STORE_DIR_MGR, "cn=Directory Manager");
+
+
+        // We allow ldap config store host to be colon separated multi-value. This is to preserve the
+        // existing behavior where the bootstrap process can fail over to another config server
+        // We should encourage customers to use environment load balancing or LDAP proxies in
+        // preference to this.
+
+        String[] hosts = host_string.split(":");
+
+        for(String host: hosts) {
+            // build the config map that createBootstrapResource() wants to see
+            Map m = new HashMap();
+
+            m.put(PROTOCOL, proto);
+            m.put(DS_HOST, host);
+            m.put(DS_PORT, port);
+            m.put(SERVER_INSTANCE, server_instance);
+            m.put(PWD, configStorePassword);
+            m.put(DS_BASE_DN, base_dn);
+            m.put(USER, dsame_user);
+            m.put(DS_MGR, dsmgr);
+            m.put(DS_PWD, dsamePassword);
+
+            String bootstrap = createBootstrapResource(m, false);
+
+            // just for added pleasure, createBootstrapResource() does not process the dsame user name
+            bootstrap = StringUtils.strReplaceAll(bootstrap, "@DSAMEUSER_NAME@",
+                    URLEncoder.encode(dsame_user, "UTF-8"));
+
+            DEBUG.message("Created bootstrap " + bootstrap);
+            data.add(bootstrap);
+        }
+    }
+
+    // get the value for the named property
+    // Values in the env take precedence over those in the props (boot.properties)
+    // returns a default value if no property is found.
+    private String getValueOrDefault(Properties props, String name, String default_val) {
+        String p_val = props.getProperty(name);
+        String env_val = System.getenv(name);
+
+        if (env_val != null) {
+            return env_val;
+        } else if (p_val != null) {
+            return p_val;
+        }
+        return default_val;
+    }
+    
+
 
     /**
      * Returns list of bootstrap data.
