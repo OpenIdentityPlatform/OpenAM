@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.utils;
 
+import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.encode.URLEncDec;
 import org.testng.Assert;
@@ -24,7 +25,6 @@ import org.testng.annotations.Test;
 
 import javax.crypto.SecretKey;
 import java.security.AccessController;
-import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -41,8 +41,7 @@ public class AMKeyProviderTest {
     private static final String PRIVATE_KEY_ALIAS = "privatekey";
     private static final String SECRET_KEY_ALIAS = "secretkey";
 
-    //KeyProvider amKeyProvider;
-    AMKeyProvider amKeyProvider; // need more specific type for the additional password store methods
+    KeyProvider amKeyProvider;
 
     @BeforeClass
     public void setUp() {
@@ -115,14 +114,6 @@ public class AMKeyProviderTest {
     public void getSecretKeyUsingDefaultPassword() {
         SecretKey key = amKeyProvider.getSecretKey(SECRET_KEY_ALIAS);
         Assert.assertNotNull(key);
-    }
-
-    @Test
-    public void storeAndRetrievePassword() throws KeyStoreException {
-        String password = "the rain in spain!!";
-        amKeyProvider.storeSecret("admin", password);
-        String p = amKeyProvider.getSecret("admin");
-        Assert.assertEquals(password, p);
     }
 
 }

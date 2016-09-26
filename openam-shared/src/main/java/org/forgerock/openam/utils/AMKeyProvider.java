@@ -28,8 +28,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.DestroyFailedException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -49,8 +47,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Implementation of a {@code KeyProvider} interface for retrieving X509 Certificates and private
@@ -96,23 +92,6 @@ public class AMKeyProvider implements KeyProvider {
                 keyStoreTypePropName, privateKeyPassFilePropName);
         mapPk2Cert();
     }
-
-    /**
-     * Constructor - Opens keystore.jceks at a known base dir location.
-     * Assumes the base directory has .storepass and .keypass in cleartext
-     *
-     * @param baseDir - The base directory where keystore.jceks , .storepass and .keypass can be found
-     * @param decryptPassword true if the keystore passwords need to be decrypted with an OpenAM instance key
-     */
-    public AMKeyProvider(String baseDir, boolean decryptPassword) {
-        String b = baseDir.endsWith("/") ?  baseDir : baseDir + "/";
-        this.keystoreFile =     b + "keystore.jceks";
-        this.keystorePass =     readPasswordFile(b + ".storepass", decryptPassword);
-        this.privateKeyPass =   readPasswordFile(b + ".keypass", decryptPassword);
-        this.keystoreType =     "JCEKS";
-        mapPk2Cert();
-    }
-
     /**
      * Constructor.
      * Already resolved is simply to give a different signature
@@ -153,7 +132,19 @@ public class AMKeyProvider implements KeyProvider {
         }
 
         if (kspfile != null) {
-            keystorePass = readPasswordFile(kspfile, false);
+            try {
+                try {
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(kspfile)));
+                    keystorePass = decodePassword(br.readLine());
+                } finally {
+                    if (br != null) {
+                        br.close();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("JKSKeyProvider.initialize: Unable to read keystore password file " + kspfile);
+            }
         } else {
             logger.error("JKSKeyProvider: keystore password is null");
         }
@@ -161,37 +152,20 @@ public class AMKeyProvider implements KeyProvider {
         String pkpfile = SystemPropertiesManager.get(privateKeyPassFilePropName);
 
         if (pkpfile != null) {
-            privateKeyPass = readPasswordFile(pkpfile, false);
-        }
-    }
-
-    /**
-     * Read a keystore password file (.storepass / .keypass ).
-     * @param filePath  Password file
-     * @param decodePassword  true if the password should be decoded with the per AM instance key
-     * @return The password in clear text
-     */
-    private String readPasswordFile(String filePath, boolean decodePassword) {
-        BufferedReader br = null;
-        String p = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
-            p = br.readLine();
-            if (decodePassword) {
-                p = decodePassword(p);
-            }
-        } catch (IOException e) {
-            logger.error("Unable to read private key password file " + filePath, e);
-        } finally {
-            if (br != null) {
+            try {
                 try {
-                    br.close();
-                } catch (IOException e) {
-                    logger.warning("Could not close file " + filePath, e);
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(pkpfile)));
+                    privateKeyPass = decodePassword(br.readLine());
+                } finally {
+                    if (br != null) {
+                        br.close();
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("JKSKeyProvider.initialize: Unable to read privatekey password file " + kspfile);
             }
         }
-        return p;
     }
 
     /**
@@ -231,7 +205,13 @@ public class AMKeyProvider implements KeyProvider {
 
             }
             logger.message("KeyTable size = " + keyTable.size());
-        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+        } catch (KeyStoreException e) {
+            logger.error("mapPk2Cert.JKSKeyProvider:", e);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("mapPk2Cert.JKSKeyProvider:", e);
+        } catch (CertificateException e) {
+            logger.error("mapPk2Cert.JKSKeyProvider:", e);
+        } catch (IOException e) {
             logger.error("mapPk2Cert.JKSKeyProvider:", e);
         }
     }
@@ -441,15 +421,6 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Set a new path for the keystore. If this is used after the keystore is created, it
-     * will cause store() to write to the new path.
-     * @param newPath New path the keystore will be saved to on store()
-     */
-    public void setKeyStoreFilePath(String newPath) {
-        keystoreFile = newPath;
-    }
-
-    /**
      * Get the keystore.
      * @return the keystore
      */
@@ -512,7 +483,6 @@ public class AMKeyProvider implements KeyProvider {
         }
     }
 
-
     /**
      * Return Certificate for the specified PublicKey.
      * @param publicKey Certificate public key
@@ -535,61 +505,4 @@ public class AMKeyProvider implements KeyProvider {
         }
     }
 
-    /**
-     * Store a secret (typically a password) in the keystore
-     *
-     * The secret is protected with the same password as they keystore itself.
-     *
-     * If the alias already exists, the new secret will replace the old one
-     *
-     * @param alias  - the alias to store the password under
-     * @param password - password or secret to store
-     * @throws KeyStoreException if the password can not be stored in the keystore
-     */
-    public void storeSecret(String alias, String password) throws KeyStoreException {
-        SecretKeySpec keyspec =     new SecretKeySpec(password.getBytes(UTF_8), "RAW");
-        KeyStore.PasswordProtection keyStorePP = new KeyStore.PasswordProtection(keystorePass.toCharArray());
-
-        try {
-            if (ks.containsAlias(alias)) {
-                ks.deleteEntry(alias);
-            }
-            KeyStore.SecretKeyEntry entry = new KeyStore.SecretKeyEntry(keyspec);
-            ks.setEntry(alias, entry, keyStorePP);
-        } finally {
-            try {
-                keyStorePP.destroy();
-            } catch (DestroyFailedException e) {
-               // wrap and rethrow
-                throw new KeyStoreException("Destroy failed", e);
-            }
-        }
-
-    }
-
-    /**
-     * Retrieve store secret (usually a password).
-     *
-     * @param alias the alias of the secret
-     * @return the plain text secret
-     * @throws KeyStoreException if the password can not be read
-     */
-    public String getSecret(String alias) throws KeyStoreException  {
-
-        KeyStore.PasswordProtection keyStorePP = new KeyStore.PasswordProtection(keystorePass.toCharArray());
-        try {
-            KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) ks.getEntry(alias, keyStorePP);
-            return new String(entry.getSecretKey().getEncoded(), UTF_8);
-        } catch (Exception e) {
-            // to be nice we wrap and rethrows to a single exception type
-            throw new KeyStoreException("Exception trying to fetch key with alias " + alias, e);
-        } finally {
-            try {
-                keyStorePP.destroy();
-            } catch (DestroyFailedException e) {
-                // wrap and rethrow. This exception should never really happen...
-                throw new KeyStoreException("Destroy failed", e);
-            }
-        }
-    }
 }
