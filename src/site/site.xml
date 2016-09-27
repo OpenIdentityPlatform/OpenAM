@@ -79,25 +79,41 @@
   </menu>
 
   <menu name="OpenAM Docs (in progress)">
-   <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/bootstrap/release-notes/index.html" />
-   <item name="Getting Started" href="./doc/bootstrap/getting-started/index.html" />
-   <item name="Installation Guide" href="./doc/bootstrap/install-guide/index.html" />
+   <!-- Label: Try OpenAM -->
+   <item name="Quick Start Guide" href="./doc/bootstrap/quick-start-guide/index.html" />
+   <!-- Label: Installation and Maintenance -->
+   <item name="Deployment Planning Guide" href="./doc/bootstrap/deployment-planning-guide/index.html" />
+   <item name="Install Guide" href="./doc/bootstrap/install-guide/index.html" />
    <item name="Upgrade Guide" href="./doc/bootstrap/upgrade-guide/index.html" />
-   <item name="Admin Guide" href="./doc/bootstrap/admin-guide/index.html" />
-   <item name="Developer's Guide" href="./doc/bootstrap/dev-guide/index.html" />
-   <item name="Deployment Planning" href="./doc/bootstrap/deployment-planning/index.html" />
+   <item name="Setup and Maintenance Guide" href="./doc/bootstrap/maintenance-guide/index.html" />
+   <item name="UI Customization Guide" href="./doc/bootstrap/ui-customization-guide/index.html" />
+   <item name="Release Notes" href="./doc/bootstrap/release-notes/index.html" />
    <item name="Reference" href="./doc/bootstrap/reference/index.html" />
+   <!-- Label: Access Management -->
+   <item name="Authentication and Single Sign-On Guide" href="./doc/bootstrap/authentication-guide/index.html" />
+   <item name="Authorization Guide" href="./doc/bootstrap/authorization-guide/index.html" />
+   <item name="RADIUS Server Guide" href="./doc/bootstrap/radius-server-guide/index.html" />
+   <!-- Label: User Services -->
+   <item name="User Self-Service Guide" href="./doc/bootstrap/user-self-service-guide/index.html" />
+   <item name="User-Managed Access (UMA) 1.0 Guide" href="./doc/bootstrap/uma-guide/index.html" />
+   <!-- Label: Federation -->
+   <item name="OAuth 2.0 Guide" href="./doc/bootstrap/oauth2-guide/index.html" />
+   <item name="OpenID Connect 1.0 Guide" href="./doc/bootstrap/oidc1-guide/index.html" />
+   <item name="SAML v1.x Guide" href="./doc/bootstrap/saml1-guide/index.html" />
+   <item name="SAML v2.0 Guide" href="./doc/bootstrap/saml2-guide/index.html" />
+   <item name="Security Token Service Guide" href="./doc/bootstrap/sts-guide/index.html" />
+   <!-- Label: Extensibility -->
+   <item name="Development Guide" href="./doc/bootstrap/dev-guide/index.html" />
    <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Java EE Release Notes" href="./doc/bootstrap/jee-release-notes/index.html" />
-   <item name="Java EE User's Guide" href="./doc/bootstrap/jee-users-guide/index.html" />
-   <item name="Java EE Reference" href="./doc/bootstrap/jee-reference/index.html" />
-   <item name="Web Release Notes" href="./doc/bootstrap/web-release-notes/index.html" />
-   <item name="Web User's Guide" href="./doc/bootstrap/web-users-guide/index.html" />
+   <item name="Java EE Policy Agent Guide" href="./doc/bootstrap/javaee-pa-guide/index.html" />
+   <item name="Java EE Policy Agent Release Notes" href="./doc/bootstrap/javaee-pa-rnotes/index.html" />
+   <item name="Web Policy Agent Guide" href="./doc/bootstrap/web-pa-guide/index.html" />
+   <item name="Web Policy Agent Release Notes" href="./doc/bootstrap/web-pa-rnotes/index.html" />
+
   </menu>
 
   <menu name="Project Information">

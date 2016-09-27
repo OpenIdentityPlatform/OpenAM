@@ -23,7 +23,7 @@ RedirectMatch 301 ^/doc/release-notes/(.*)        http://openam.forgerock.org/do
 RedirectMatch 301 ^/doc/getting-started/(.*)      http://openam.forgerock.org/doc/bootstrap/getting-started/$1
 RedirectMatch 301 ^/doc/install-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/install-guide/$1
 RedirectMatch 301 ^/doc/upgrade-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/upgrade-guide/$1
-RedirectMatch 301 ^/doc/admin-guide/(.*)          http://openam.forgerock.org/doc/bootstrap/admin-guide/$1
+RedirectMatch 301 ^/doc/admin-guide/(.*)          https://forgerock.org/documentation/openam/
 RedirectMatch 301 ^/doc/dev-guide/(.*)            http://openam.forgerock.org/doc/bootstrap/dev-guide/$1
 RedirectMatch 301 ^/doc/reference/(.*)            http://openam.forgerock.org/doc/bootstrap/reference/$1
 RedirectMatch 301 ^/doc/jee-release-notes/(.*)    http://openam.forgerock.org/doc/bootstrap/jee-release-notes/$1

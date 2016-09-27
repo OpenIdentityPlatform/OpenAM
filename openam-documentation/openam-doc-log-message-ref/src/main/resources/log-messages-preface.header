@@ -389,14 +389,8 @@
 
    <para>
     For information about configuring the location and verbosity of
-    debug log files, see the section on
-    <link
-     xlink:show="new"
-     xlink:href="admin-guide#debug-logging"
-     xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Debug Logging</citetitle>
-    </link>
-     in the <citetitle>OpenAM Administration Guide</citetitle>.
+    debug log files, see
+    <olink targetdoc="maintenance-guide" targetptr="sec-maint-debug-logging" />.
    </para>
 
   </section>

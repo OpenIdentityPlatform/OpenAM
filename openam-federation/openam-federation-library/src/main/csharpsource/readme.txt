@@ -126,9 +126,9 @@ Portions Copyright 2012-2013 ForgeRock AS
    OpenAM documentation.
 
    * SAMLv2 Service Provider Customization link:
-     http://openam.forgerock.org/doc/admin-guide/index.html#configure-sp
+     https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#saml2-create-hosted-sp
    * SAMLv2 Identity Provider Customization link:
-     http://openam.forgerock.org/doc/admin-guide/index.html#configure-idp
+     https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#saml2-configure-remote-idp
 
    If the identity provider is using a product other than OpenAM,
    they would make the changes according to their product's documentation.
@@ -370,8 +370,7 @@ Portions Copyright 2012-2013 ForgeRock AS
       e) Update the .NET Fedlet's metadata (sp.xml) to include the key
          descriptor for the signing key. Please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
-         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+         https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#import-fedlet-key-pairs-windows
 
          For the Windows environment, use the Certificates Snap-in for the
          Microsoft Management Console used earlier to now export the public key

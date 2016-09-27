@@ -253,8 +253,7 @@ I. Signing
 
       b) The Attribute Query needs to be signed. Please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
-         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+         https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml".
@@ -314,8 +313,7 @@ II. Signing and Encryption
 
       b) For signing and encryption, please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
-         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+         https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#fedlet-signing-encryption
 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml".
@@ -433,8 +431,7 @@ II. Signing
 ==========
       Please follow the links below on creating a key store and using the
       certificate.
-      http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
-      http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+      https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#fedlet-signing-encryption
 	 
          Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".
@@ -504,8 +501,7 @@ III. Encryption
 
       b) For signing and encryption, please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
-         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+         https://forgerock.org/openam/doc/bootstrap/saml2-guide/index.html#fedlet-signing-encryption
 
          Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".
