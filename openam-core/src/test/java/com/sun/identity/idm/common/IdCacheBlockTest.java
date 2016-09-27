@@ -18,13 +18,18 @@ package com.sun.identity.idm.common;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.utils.TimeTravelUtil;
+import org.forgerock.openam.utils.TimeTravelUtil.FastForwardTimeService;
+import org.forgerock.util.time.TimeService;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.am.sdk.common.CacheBlock;
 
 /**
  * Unit test for {@link IdCacheBlock}.
@@ -38,10 +43,16 @@ public class IdCacheBlockTest {
 
     @BeforeMethod
     public void setup() {
+        TimeTravelUtil.setBackingTimeService(FastForwardTimeService.INSTANCE);
         Set<String> values = new HashSet<>(1);
         values.add("Test Value");
         attributes = new AMHashMap(1);
         attributes.put("Test", values);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
     }
 
     @Test
@@ -58,7 +69,7 @@ public class IdCacheBlockTest {
 
         // Go past the default cache expire timeout, not expecting anything to change as a result
         // since cache expiry is disabled.
-        TimeTravelUtil.fastForward(cb.getDefaultEntryExpirationTime() * 2);
+        FastForwardTimeService.INSTANCE.fastForward(cb.getDefaultEntryExpirationTime() * 2, TimeUnit.MILLISECONDS);
 
         Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
         Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));

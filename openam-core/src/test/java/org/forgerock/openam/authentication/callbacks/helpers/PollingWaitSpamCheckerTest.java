@@ -15,13 +15,29 @@
  */
 package org.forgerock.openam.authentication.callbacks.helpers;
 
+import java.util.concurrent.TimeUnit;
+
 import org.fest.assertions.Assertions;
 import org.forgerock.openam.utils.TimeTravelUtil;
+import org.forgerock.openam.utils.TimeTravelUtil.FastForwardTimeService;
+import org.forgerock.util.time.TimeService;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 
 public class PollingWaitSpamCheckerTest {
+
+    @BeforeMethod
+    public void setup() {
+        TimeTravelUtil.setBackingTimeService(FastForwardTimeService.INSTANCE);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
+    }
 
     @Test
     public void shouldNotBeInSpammedStateOnCreation() {
@@ -45,7 +61,7 @@ public class PollingWaitSpamCheckerTest {
         checker.resetSpamCheck(300);
 
         // when
-        TimeTravelUtil.fastForward(250);
+        FastForwardTimeService.INSTANCE.fastForward(250, TimeUnit.MILLISECONDS);
 
         // then
         Assertions.assertThat(checker.isWaitLongEnough()).isTrue();
@@ -71,7 +87,7 @@ public class PollingWaitSpamCheckerTest {
         checker.resetSpamCheck(300);
 
         // when
-        TimeTravelUtil.fastForward(100);
+        FastForwardTimeService.INSTANCE.fastForward(100, TimeUnit.MILLISECONDS);
         for (int i = 0; i < spamCount; i++) {
             if (!checker.isWaitLongEnough()) {
                 checker.incrementSpamCheck();
@@ -91,18 +107,18 @@ public class PollingWaitSpamCheckerTest {
         checker.resetSpamCheck(300);
 
         // when
-        TimeTravelUtil.fastForward(100);
+        FastForwardTimeService.INSTANCE.fastForward(100, TimeUnit.MILLISECONDS);
 
         checker.incrementSpamCheck();
         checker.incrementSpamCheck();
         checker.incrementSpamCheck();
 
-        TimeTravelUtil.fastForward(150);
+        FastForwardTimeService.INSTANCE.fastForward(150, TimeUnit.MILLISECONDS);
 
         checker.resetSpamCheck(300);
-        TimeTravelUtil.fastForward(150);
+        FastForwardTimeService.INSTANCE.fastForward(150, TimeUnit.MILLISECONDS);
         checker.incrementSpamCheck();
-        TimeTravelUtil.fastForward(150);
+        FastForwardTimeService.INSTANCE.fastForward(150, TimeUnit.MILLISECONDS);
 
         // then
         Assertions.assertThat(checker.isWaitLongEnough()).isTrue();

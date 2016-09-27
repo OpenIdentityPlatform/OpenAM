@@ -18,9 +18,13 @@ package com.iplanet.am.sdk.common;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.utils.TimeTravelUtil;
+import org.forgerock.openam.utils.TimeTravelUtil.FastForwardTimeService;
+import org.forgerock.util.time.TimeService;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,6 +42,7 @@ public class CacheBlockExpiryTest {
 
     @BeforeMethod
     public void setup() {
+        TimeTravelUtil.setBackingTimeService(FastForwardTimeService.INSTANCE);
         System.setProperty(CacheBlock.ENTRY_EXPIRATION_ENABLED_KEY, "true");
         System.setProperty(CacheBlock.ENTRY_DEFAULT_EXPIRE_TIME_KEY, "5"); // 5 mins
         System.setProperty(CacheBlock.ENTRY_USER_EXPIRE_TIME_KEY, "5"); // 5 mins
@@ -46,6 +51,11 @@ public class CacheBlockExpiryTest {
         values.add("Test Value");
         attributes = new AMHashMap(1);
         attributes.put("Test", values);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
     }
 
     @Test
@@ -61,7 +71,7 @@ public class CacheBlockExpiryTest {
         Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
 
         // Go past the 5 min cache expiry timeout, expect cache entry to have expired.
-        TimeTravelUtil.fastForward(10 * 60000); // 10 mins
+        FastForwardTimeService.INSTANCE.fastForward(10, TimeUnit.MINUTES);
 
         Assert.assertFalse(cb.hasCache(PRINCIPAL_DN));
         Assert.assertFalse(cb.hasCompleteSet(PRINCIPAL_DN));
@@ -83,7 +93,7 @@ public class CacheBlockExpiryTest {
         Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
 
         // Stay within the cache expire timeout, expect cache entries to still be valid.
-        TimeTravelUtil.fastForward(4 * 60000); // 4 mins
+        FastForwardTimeService.INSTANCE.fastForward(4, TimeUnit.MINUTES);
 
         Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
         Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));

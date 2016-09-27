@@ -19,8 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.openam.utils.TimeTravelUtil;
+import org.forgerock.openam.utils.TimeTravelUtil.FastForwardTimeService;
+import org.forgerock.util.time.TimeService;
 import org.mockito.Mockito;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -33,6 +39,15 @@ public class PollingWaitAssistantTest {
     private static final long TIMEOUT = 30000;
     private Future mockFuture = Mockito.mock(Future.class);
 
+    @BeforeMethod
+    public void setup() {
+        TimeTravelUtil.setBackingTimeService(FastForwardTimeService.INSTANCE);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
+    }
 
     @Test
     public void checkThatNotStartedStateIsReturnedWhenAppropriate() {
@@ -86,7 +101,7 @@ public class PollingWaitAssistantTest {
         when(mockFuture.isDone()).thenReturn(false);
         assistant.start(mockFuture);
 
-        TimeTravelUtil.fastForward(4000);
+        FastForwardTimeService.INSTANCE.fastForward(4, TimeUnit.SECONDS);
 
         // then
         assertThat(assistant.getPollingWaitState())
@@ -102,7 +117,7 @@ public class PollingWaitAssistantTest {
         when(mockFuture.isDone()).thenReturn(true);
         assistant.start(mockFuture);
 
-        TimeTravelUtil.fastForward(4000);
+        FastForwardTimeService.INSTANCE.fastForward(4, TimeUnit.SECONDS);
 
 
         // then
@@ -119,7 +134,7 @@ public class PollingWaitAssistantTest {
         when(mockFuture.isDone()).thenReturn(false);
         assistant.start(mockFuture);
 
-        TimeTravelUtil.fastForward(TIMEOUT + 10);
+        FastForwardTimeService.INSTANCE.fastForward(TIMEOUT + 10, TimeUnit.MILLISECONDS);
 
         // then
         assertThat(assistant.getPollingWaitState())
@@ -150,7 +165,7 @@ public class PollingWaitAssistantTest {
         when(mockFuture.isDone()).thenReturn(false);
         assistant.start(mockFuture);
 
-        TimeTravelUtil.fastForward(waitLength);
+        FastForwardTimeService.INSTANCE.fastForward(waitLength, TimeUnit.MILLISECONDS);
 
         // then
         assertThat(assistant.getWaitPeriod()).isEqualTo(expectedWaitPeriod);
