@@ -2521,10 +2521,10 @@ public class IdServicesImpl implements IdServices {
            while (it.hasNext()) {
                String curr = (String) it.next();
                if (forwardMap.containsKey(curr)) {
-                   resultMap.put((String) forwardMap.get(curr), (Set) attrMap
+                   resultMap.put((String) forwardMap.get(curr), attrMap
                            .get(curr));
                } else {
-                   resultMap.put(curr, (Set) attrMap.get(curr));
+                   resultMap.put(curr, attrMap.get(curr));
                }
            }
        }
