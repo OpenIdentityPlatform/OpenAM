@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.fields;
 
@@ -21,9 +21,13 @@ import org.forgerock.openam.tokens.CoreTokenField;
  * Responsible for describing specific fields of interest in Session Tokens.
  */
 public enum SessionTokenField {
+
     LATEST_ACCESS_TIME("latestAccessTime", CoreTokenField.STRING_ONE),
     SESSION_ID("sessionID", CoreTokenField.STRING_TWO),
-    SESSION_HANDLE("sessionHandle", CoreTokenField.STRING_THREE);
+    SESSION_HANDLE("sessionHandle", CoreTokenField.STRING_THREE),
+    MAX_SESSION_EXPIRATION_TIME("maxSessionExpirationTime", CoreTokenField.DATE_ONE),
+    MAX_IDLE_EXPIRATION_TIME("maxIdleExpirationTime", CoreTokenField.DATE_TWO),
+    PURGE_DELAY_EXPIRATION_TIME("purgeDelayExpirationTime", CoreTokenField.DATE_THREE);
 
     private final String sessionFieldName;
     private final CoreTokenField field;

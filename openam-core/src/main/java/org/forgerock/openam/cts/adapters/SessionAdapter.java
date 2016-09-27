@@ -15,9 +15,10 @@
  */
 package org.forgerock.openam.cts.adapters;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.lang.reflect.Field;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,7 @@ import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.service.InternalSession;
 
@@ -89,10 +91,27 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setUserId(userId);
 
         // Expiry Date
-        long unixTimeMillis = session.getExpirationTime(TimeUnit.MILLISECONDS)
-                + config.getSessionExpiryGracePeriod(TimeUnit.MILLISECONDS);
-        Calendar expiryTimeStamp = TimeUtils.fromUnixTime(unixTimeMillis, TimeUnit.MILLISECONDS);
+        Calendar expiryTimeStamp = TimeUtils.fromUnixTime(
+                session.getExpirationTime(MILLISECONDS) + config.getSessionExpiryGracePeriod(MILLISECONDS),
+                MILLISECONDS);
         token.setExpiryTimestamp(expiryTimeStamp);
+
+        // Max session expiration time
+        setDateAttributeFromMillis(token,
+                SessionTokenField.MAX_SESSION_EXPIRATION_TIME,
+                session.getMaxSessionExpirationTime(MILLISECONDS));
+
+        // Max idle expiration time
+        setDateAttributeFromMillis(token,
+                SessionTokenField.MAX_IDLE_EXPIRATION_TIME,
+                session.getMaxIdleExpirationTime(MILLISECONDS));
+
+        // Purge delay expiration time
+        if (session.isTimedOut()) {
+            setDateAttributeFromMillis(token,
+                    SessionTokenField.PURGE_DELAY_EXPIRATION_TIME,
+                    session.getPurgeDelayExpirationTime(MILLISECONDS));
+        }
 
         // SessionID
         token.setAttribute(SessionTokenField.SESSION_ID.getField(), session.getID().toString());
@@ -110,6 +129,11 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
 
         return token;
+    }
+
+    @VisibleForTesting
+    static void setDateAttributeFromMillis(Token token, SessionTokenField field, long millis) {
+        token.setAttribute(field.getField(), TimeUtils.fromUnixTime(millis, MILLISECONDS));
     }
 
     /**
@@ -154,7 +178,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @param blob The serialised JSON blob string to search.
      * @return -1 if no fields were found, or the index of the start position of a valid JSON field.
      */
-    public int findIndexOfValidField(String blob) {
+    int findIndexOfValidField(String blob) {
         for (Field field : AttributeCompressionStrategy.getAllValidFields(InternalSession.class)) {
             String search = JSONSerialisation.jsonAttributeName(field.getName());
             int index = blob.indexOf(search);
@@ -171,7 +195,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      *
      * @param token Token which will be examined for the serialised field. Non null.
      */
-    public String filterLatestAccessTime(Token token) {
+    String filterLatestAccessTime(Token token) {
         String contents = blobUtils.getBlobAsString(token);
         Matcher matcher = LATEST_ACCESSED_TIME.matcher(contents);
         if (!matcher.find()) {
