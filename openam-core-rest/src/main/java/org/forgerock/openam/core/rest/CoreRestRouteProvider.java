@@ -19,7 +19,7 @@ package org.forgerock.openam.core.rest;
 import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.rest.Routers.*;
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_ID_PARAM_NAME;
+import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_HASH_PARAM_NAME;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -132,7 +132,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .toCollection(SessionResourceV2.class);
 
 
-        realmRouter.route("sessions/{" + TOKEN_ID_PARAM_NAME + "}/properties")
+        realmRouter.route("sessions/{" + TOKEN_HASH_PARAM_NAME + "}/properties")
                 .authenticateWith(ssoToken())
                 .auditAs(SESSION)
                 .authorizeWith(Key.get(AnyOfAuthzModule.class, Names.named("SessionPropertiesResourceAuthzModule")))

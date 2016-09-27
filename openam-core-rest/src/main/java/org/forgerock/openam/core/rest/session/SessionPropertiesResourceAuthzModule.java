@@ -42,8 +42,8 @@ public class SessionPropertiesResourceAuthzModule extends TokenOwnerAuthzModule 
     public final static String NAME = "SessionPropertiesResourceFilter";
 
     @Inject
-    public SessionPropertiesResourceAuthzModule(SSOTokenManager ssoTokenManager) {
-        super("tokenId", ssoTokenManager);
+    public SessionPropertiesResourceAuthzModule(SSOTokenManager ssoTokenManager, TokenHashToIDMapper hashToIdMapper) {
+        super("tokenId", ssoTokenManager, hashToIdMapper);
     }
 
     @Override

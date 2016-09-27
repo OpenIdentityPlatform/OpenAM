@@ -19,7 +19,7 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_ID_PARAM_NAME;
+import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_HASH_PARAM_NAME;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -52,7 +52,6 @@ import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.junit.runner.RunWith;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -64,6 +63,7 @@ public class SessionPropertiesResourceTest {
     private Realm realm = mock(Realm.class);
     private Map<String, String> uriVariables = mock(Map.class);
     private Context context = mock(Context.class);
+    private TokenHashToIDMapper hashToIdMapper = mock(TokenHashToIDMapper.class);
     private SessionUtilsWrapper sessionUtilsWrapper;
     private UriRouterContext uriRouterContext;
     private SSOToken ssoToken;
@@ -71,7 +71,8 @@ public class SessionPropertiesResourceTest {
     private SessionPropertyWhitelist whiteList;
     private SessionResourceUtil sessionResourceUtil;
     private SessionPropertiesResource resource;
-    private String tokenId = "tokenId";
+    private String tokenHash = "tokenHash";
+    private String tokenid = "tokenId";
     private String realmpath = "realm";
     private AMIdentity amIdentity;
     private Map<String, String> properties;
@@ -82,11 +83,11 @@ public class SessionPropertiesResourceTest {
 
         properties = new HashMap<>();
         ssoToken = mock(SSOToken.class);
-        templateVariables.put(TOKEN_ID_PARAM_NAME, tokenId);
+        templateVariables.put(TOKEN_HASH_PARAM_NAME, tokenHash);
         whiteList = mock(SessionPropertyWhitelist.class);
         ssoTokenManager = mock(SSOTokenManager.class);
-        uriRouterContext = new UriRouterContext(context, "/" + tokenId, "", Collections.<String, String>emptyMap());
-        given(uriVariables.get(TOKEN_ID_PARAM_NAME)).willReturn(tokenId);
+        uriRouterContext = new UriRouterContext(context, "/" + tokenHash, "", Collections.<String, String>emptyMap());
+        given(uriVariables.get(TOKEN_HASH_PARAM_NAME)).willReturn(tokenHash);
         given(context.containsContext(RealmContext.class)).willReturn(true);
         given(context.asContext(RealmContext.class)).willReturn(realmContext);
         given(realmContext.getRealm()).willReturn(realm);
@@ -98,6 +99,7 @@ public class SessionPropertiesResourceTest {
         sessionUtilsWrapper = spy(new SessionUtilsWrapper());
         sessionResourceUtil = spy(new SessionResourceUtil(ssoTokenManager, null, null));
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
+        given(hashToIdMapper.map(context, tokenHash)).willReturn(tokenid);
 
         properties.put("foo", "bar");
         properties.put("ping", "pong");
@@ -107,7 +109,7 @@ public class SessionPropertiesResourceTest {
             given(ssoToken.getProperty(key)).willReturn(properties.get(key));
         }
 
-        resource = new SessionPropertiesResource(whiteList, sessionUtilsWrapper, sessionResourceUtil);
+        resource = new SessionPropertiesResource(whiteList, sessionUtilsWrapper, sessionResourceUtil, hashToIdMapper);
         doReturn(amIdentity).when(sessionResourceUtil).getIdentity (ssoToken);
         doReturn(realmpath).when(sessionResourceUtil).convertDNToRealm (amIdentity.getRealm());
     }
@@ -117,7 +119,7 @@ public class SessionPropertiesResourceTest {
         //given
         ReadRequest request = mock(ReadRequest.class);
         given(whiteList.getAllListedProperties(realmpath)).willReturn(properties.keySet());
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
 
         //when
@@ -133,7 +135,7 @@ public class SessionPropertiesResourceTest {
     public void whenSSOExceptionShouldReturnBadRequest() throws SSOException {
         //given
         ReadRequest request = mock(ReadRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willThrow(SSOException.class);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willThrow(SSOException.class);
 
         //when
         Promise<ResourceResponse, ResourceException> promise = resource.readInstance(context, request);
@@ -177,7 +179,7 @@ public class SessionPropertiesResourceTest {
 
         //given
         PatchRequest request = mock(PatchRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getPatchOperations()).willReturn(Arrays.asList(new PatchOperation[]{PatchOperation.remove("foo")}));
 
@@ -193,7 +195,7 @@ public class SessionPropertiesResourceTest {
 
         //given
         PatchRequest request = mock(PatchRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getPatchOperations())
                 .willReturn(Arrays.asList(new PatchOperation[]{PatchOperation.replace("foo", "baar")}));
@@ -209,7 +211,7 @@ public class SessionPropertiesResourceTest {
     public void whenNullContentShouldReturnBadRequest() throws SSOException {
         //given
         UpdateRequest request = mock(UpdateRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
 
         //when
@@ -224,7 +226,7 @@ public class SessionPropertiesResourceTest {
         //given
         UpdateRequest request = mock(UpdateRequest.class);
         given(request.getContent()).willReturn(json(properties));
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(whiteList.isPropertyListed(ssoToken, realmpath, properties.keySet())).willReturn(false);
 
@@ -240,7 +242,7 @@ public class SessionPropertiesResourceTest {
         //given
         UpdateRequest request = mock(UpdateRequest.class);
         given(request.getContent()).willReturn(json(properties));
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(whiteList.isPropertyListed(ssoToken, realmpath, properties.keySet())).willReturn(true);
         given(whiteList.isPropertyMapSettable(ssoToken, properties)).willReturn(false);
@@ -261,7 +263,7 @@ public class SessionPropertiesResourceTest {
         properties.put("ping", "poong");
         properties.put("woo", "hoo");
         given(request.getContent()).willReturn(json(properties));
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenId)).willReturn(ssoToken);
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(tokenid)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(whiteList.getAllListedProperties(realmpath)).willReturn(properties.keySet());
         given(whiteList.isPropertyMapSettable(ssoToken, properties)).willReturn(true);

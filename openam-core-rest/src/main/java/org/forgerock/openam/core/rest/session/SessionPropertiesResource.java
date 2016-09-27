@@ -24,10 +24,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PARAMETER_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATCH_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SERVER_INFO_RESOURCE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_PROPERTIES_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
@@ -83,7 +80,7 @@ import com.sun.identity.shared.debug.Debug;
  * <p>
  * This endpoint allows GET, PATCH and UPDATE
  *
- * GET expects tokenId Path Parameter
+ * GET expects tokenHash Path Parameter
  * Returns:
  * <code>
  *  {'property1' : 'value1', 'property2' : 'value2'}
@@ -110,9 +107,9 @@ import com.sun.identity.shared.debug.Debug;
         mvccSupported = false,
         resourceSchema = @Schema(schemaResource = "SessionPropertiesResource.schema.json"),
         parameters = @Parameter(
-                name = SessionPropertiesResource.TOKEN_ID_PARAM_NAME,
+                name = SessionPropertiesResource.TOKEN_HASH_PARAM_NAME,
                 type = "string",
-                description = SESSION_PROPERTIES_RESOURCE + SessionPropertiesResource.TOKEN_ID_PARAM_NAME + "." + PARAMETER_DESCRIPTION
+                description = SESSION_PROPERTIES_RESOURCE + SessionPropertiesResource.TOKEN_HASH_PARAM_NAME + "." + PARAMETER_DESCRIPTION
         )
     ))
 public class SessionPropertiesResource implements SingletonResourceProvider {
@@ -122,27 +119,30 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
     /**
      * Path Parameter Name
      */
-    public static final String TOKEN_ID_PARAM_NAME = "tokenId";
+    public static final String TOKEN_HASH_PARAM_NAME = "tokenHash";
     private static final Set<String> SUPPORTED_OPERATIONS = new HashSet<>(Arrays.asList(new String[]{
                     PatchOperation.OPERATION_REMOVE,
                     PatchOperation.OPERATION_REPLACE}));
     private final SessionPropertyWhitelist sessionPropertyWhitelist;
     private final SessionUtilsWrapper sessionUtilsWrapper;
     private final SessionResourceUtil sessionResourceUtil;
+    private final TokenHashToIDMapper hashToIDMapper;
 
     /**
      * Constructs a new instance of the SessionPropertiesResource
-     *
-     *  @param sessionPropertyWhitelist An instance of the SessionPropertyWhitelist.
+     *   @param sessionPropertyWhitelist An instance of the SessionPropertyWhitelist.
      * @param sessionUtilsWrapper An instance of SessionUtilsWrapper.
      * @param sessionResourceUtil An instance of SessionResourceUtil.
+     * @param hashToIDMapper An instance of the TokenHashToIDMapper.
      */
     @Inject
     public SessionPropertiesResource(SessionPropertyWhitelist sessionPropertyWhitelist,
-            SessionUtilsWrapper sessionUtilsWrapper, SessionResourceUtil sessionResourceUtil) {
+            SessionUtilsWrapper sessionUtilsWrapper, SessionResourceUtil sessionResourceUtil,
+            TokenHashToIDMapper hashToIDMapper) {
         this.sessionPropertyWhitelist = sessionPropertyWhitelist;
         this.sessionUtilsWrapper = sessionUtilsWrapper;
         this.sessionResourceUtil = sessionResourceUtil;
+        this.hashToIDMapper = hashToIDMapper;
     }
 
     /**
@@ -209,9 +209,10 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
     @Override
     @Read(operationDescription = @Operation(description = SESSION_PROPERTIES_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
-        String tokenId = findTokenIdFromUri(context);
         JsonValue result;
+        String tokenId;
         try {
+            tokenId = findTokenIdFromUri(context);
             result = getSessionProperties(context, tokenId);
         } catch (SSOException | IdRepoException e) {
             LOGGER.message("Unable to read session property due to unreadable SSOToken", e);
@@ -256,7 +257,11 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
         return newResultPromise(newResourceResponse(tokenId, String.valueOf(result.getObject().hashCode()), result));
     }
 
-    private String findTokenIdFromUri(Context context) {
+    private String findTokenIdFromUri(Context context) throws SSOException {
+        return  hashToIDMapper.map(context, findTokenHashFromUri(context));
+    }
+
+    private String findTokenHashFromUri(Context context) {
         if(context == null) {
             return null;
         } else {
@@ -265,14 +270,14 @@ public class SessionPropertiesResource implements SingletonResourceProvider {
                 uriRouterContext = context.asContext(UriRouterContext.class);
             } catch (IllegalArgumentException e) {
                 // URI context not found, check parent
-                return findTokenIdFromUri(context.getParent());
+                return findTokenHashFromUri(context.getParent());
             }
             if(uriRouterContext == null) {
-                return findTokenIdFromUri(context.getParent());
-            } else if(uriRouterContext.getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME) == null) {
-                return findTokenIdFromUri(context.getParent());
+                return findTokenHashFromUri(context.getParent());
+            } else if(uriRouterContext.getUriTemplateVariables().get(TOKEN_HASH_PARAM_NAME) == null) {
+                return findTokenHashFromUri(context.getParent());
             }
-            return uriRouterContext.getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME);
+            return uriRouterContext.getUriTemplateVariables().get(TOKEN_HASH_PARAM_NAME);
         }
     }
 

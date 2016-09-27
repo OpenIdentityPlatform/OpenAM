@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -38,11 +38,11 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
     public final static String NAME = "SessionResourceFilter";
 
     @Inject
-    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
-        super("tokenId", ssoTokenManager,
-                SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
-                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
-                SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
+    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager, TokenHashToIDMapper hashToIdMapper) {
+        super("tokenId", ssoTokenManager, hashToIdMapper,
+                SessionResource.DELETE_PROPERTY_ACTION_ID,
+                SessionResource.GET_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_NAMES_ACTION_ID,
+                SessionResource.SET_PROPERTY_ACTION_ID, SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_ID_PARAM_NAME;
+import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_HASH_PARAM_NAME;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutionException;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.Constants;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.http.routing.UriRouterContext;
@@ -42,7 +41,6 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeTest;
@@ -59,6 +57,7 @@ public class SessionPropertiesResourceAuthzModuleTest {
     private SSOTokenContext ssoTokenContext;
     private UriRouterContext uriRouterContext;
     private Map<String, String> templateVariables;
+    private TokenHashToIDMapper hashToIdMapper;
 
     @BeforeTest
     public void beforeTest() {
@@ -67,9 +66,10 @@ public class SessionPropertiesResourceAuthzModuleTest {
         ssoToken = mock(SSOToken.class);
         userSsoToken = mock(SSOToken.class);
         ssoTokenContext = mock(SSOTokenContext.class);
-        module = new SessionPropertiesResourceAuthzModule(ssoTokenManager);
+        hashToIdMapper = mock(TokenHashToIDMapper.class);
+        module = new SessionPropertiesResourceAuthzModule(ssoTokenManager, hashToIdMapper);
         templateVariables = new HashMap<>();
-        templateVariables.put(TOKEN_ID_PARAM_NAME, "tokenId");
+        templateVariables.put(TOKEN_HASH_PARAM_NAME, "tokenId");
         uriRouterContext = new UriRouterContext(context, "" + "", "", templateVariables);
     }
 
@@ -81,10 +81,11 @@ public class SessionPropertiesResourceAuthzModuleTest {
         given(ssoTokenContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("loggedInUser");
         given(context.asContext(UriRouterContext.class)).willReturn(uriRouterContext);
-        given(ssoTokenManager.createSSOToken(templateVariables.get(TOKEN_ID_PARAM_NAME))).willReturn(userSsoToken);
+        given(ssoTokenManager.createSSOToken(templateVariables.get(TOKEN_HASH_PARAM_NAME))).willReturn(userSsoToken);
         given(userSsoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("loggedInUser");
         ReadRequest request = mock(ReadRequest.class);
         given(request.getResourcePathObject()).willReturn(new ResourcePath());
+        given(hashToIdMapper.map(context, "tokenId")).willReturn("tokenId");
 
         //when
         Promise<AuthorizationResult, ResourceException> promise = module.authorizeRead(context, request);
@@ -101,7 +102,7 @@ public class SessionPropertiesResourceAuthzModuleTest {
         given(ssoTokenContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("loggedInUser");
         given(context.asContext(UriRouterContext.class)).willReturn(uriRouterContext);
-        given(ssoTokenManager.createSSOToken(templateVariables.get(TOKEN_ID_PARAM_NAME))).willReturn(userSsoToken);
+        given(ssoTokenManager.createSSOToken(templateVariables.get(TOKEN_HASH_PARAM_NAME))).willReturn(userSsoToken);
         given(userSsoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("anotherUser");
         ReadRequest request = mock(ReadRequest.class);
         given(request.getResourcePathObject()).willReturn(new ResourcePath());

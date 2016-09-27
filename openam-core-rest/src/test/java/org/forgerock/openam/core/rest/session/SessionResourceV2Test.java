@@ -59,6 +59,7 @@ public class SessionResourceV2Test {
     private AuthUtilsWrapper authUtilsWrapper;
     private SSOTokenManager ssoTokenManager;
     private SessionResourceUtil sessionResourceUtil;
+    private TokenHashToIDMapper hashToIdMapper;
 
     private SessionResourceV2 sessionResource;
 
@@ -71,6 +72,7 @@ public class SessionResourceV2Test {
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
+        hashToIdMapper = mock(TokenHashToIDMapper.class);
 
         sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, sessionQueryManager, null) {
             @Override
@@ -83,8 +85,8 @@ public class SessionResourceV2Test {
                 return "/example/com";
             }
         };
-        sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper, sessionResourceUtil);
-
+        sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper,
+                sessionResourceUtil, hashToIdMapper);
     }
 
 
@@ -162,7 +164,7 @@ public class SessionResourceV2Test {
         //Given
         ActionRequest request = mock(ActionRequest.class);
         given(ssoTokenManager.createSSOToken("unknown")).willThrow(SSOException.class);
-
+        given(hashToIdMapper.map(mockContext, "unknown")).willReturn("unknown");
         given(request.getAction()).willReturn(REFRESH_ACTION_ID);
 
         //When
@@ -179,8 +181,8 @@ public class SessionResourceV2Test {
         ActionRequest request = mock(ActionRequest.class);
         given(ssoTokenManager.createSSOToken("tokenId")).willReturn(ssoToken);
         given(ssoToken.getIdleTime()).willReturn(0L);
-
         given(request.getAction()).willReturn(REFRESH_ACTION_ID);
+        given(hashToIdMapper.map(mockContext, "tokenId")).willReturn("tokenId");
 
         //When
         Promise<ActionResponse, ResourceException> promise =
@@ -201,6 +203,7 @@ public class SessionResourceV2Test {
         given(ssoToken.getMaxSessionTime()).willReturn(600l);
         given(ssoToken.getTimeLeft()).willReturn(575l);
         given(ssoToken.getIdleTime()).willReturn(25l);
+        given(hashToIdMapper.map(mockContext, "tokenId")).willReturn("tokenId");
 
         //When
         Promise<ResourceResponse, ResourceException> promise =
@@ -220,6 +223,7 @@ public class SessionResourceV2Test {
         //Given
         ReadRequest request = mock(ReadRequest.class);
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("unknown")).willThrow(SSOException.class);
+        given(hashToIdMapper.map(mockContext, "unknown")).willReturn("unknown");
 
         //When
         Promise<ResourceResponse, ResourceException> promise =

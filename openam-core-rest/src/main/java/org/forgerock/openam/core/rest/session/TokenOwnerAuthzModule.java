@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_ID_PARAM_NAME;
+import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_HASH_PARAM_NAME;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -70,17 +70,20 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
     private final SSOTokenManager ssoTokenManager;
     private final Set<String> allowedActions;
     private final String tokenIdParameter;
+    private final TokenHashToIDMapper hashToIdMapper;
 
     /**
      * Creates an authz module that will verify that a tokenId provided by the user
      * (via, path params or query params) is the same user (via universal identifier)
      * as the user requesting the action.
-     *
-     * @param tokenIdParameter The tokenId query parameter. May not be null.
+     *  @param tokenIdParameter The tokenId query parameter. May not be null.
      * @param ssoTokenManager An instance of the SSOTokenManager.
+     * @param hashToIdMapper An instance of the TokenHashToIDMapper.
      * @param allowedActions A list of allowed actions. Will be matched ignoring case.
      */
-    public TokenOwnerAuthzModule(String tokenIdParameter, SSOTokenManager ssoTokenManager, String... allowedActions) {
+    public TokenOwnerAuthzModule(String tokenIdParameter, SSOTokenManager ssoTokenManager,
+            TokenHashToIDMapper hashToIdMapper, String... allowedActions) {
+        this.hashToIdMapper = hashToIdMapper;
         Reject.ifNull(allowedActions);
         Reject.ifTrue(StringUtils.isEmpty(tokenIdParameter));
 
@@ -154,19 +157,19 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
         return request.getAdditionalParameter(tokenIdParameter);
     }
 
-    private String getTokenFromPathParam(Context context, Request request) {
-        String tokenId;
+    private String getTokenFromPathParam(Context context, Request request) throws SSOException {
+        String tokenHash;
         if (request.getResourcePathObject().size() == 1) {
             // infer from the token from resource path
-            tokenId =  request.getResourcePath();
+            tokenHash =  request.getResourcePath();
         } else {
-            // infer from the token from template'd resource path
-            tokenId = findTokenIdFromUri(context);
+            // infer from the token hash from template'd resource path
+            tokenHash = findTokenHashFromUri(context);
         }
-        return tokenId;
+        return hashToIdMapper.map(context, tokenHash);
     }
 
-    private String findTokenIdFromUri(Context context) {
+    private String findTokenHashFromUri(Context context) {
         if(context == null) {
             return null;
         } else {
@@ -175,14 +178,14 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
                 uriRouterContext = context.asContext(UriRouterContext.class);
             } catch (IllegalArgumentException e) {
                 // URI context not found, check parent
-                return findTokenIdFromUri(context.getParent());
+                return findTokenHashFromUri(context.getParent());
             }
             if(uriRouterContext == null) {
-                return findTokenIdFromUri(context.getParent());
-            } else if(uriRouterContext.getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME) == null) {
-                return findTokenIdFromUri(context.getParent());
+                return findTokenHashFromUri(context.getParent());
+            } else if(uriRouterContext.getUriTemplateVariables().get(TOKEN_HASH_PARAM_NAME) == null) {
+                return findTokenHashFromUri(context.getParent());
             }
-            return uriRouterContext.getUriTemplateVariables().get(TOKEN_ID_PARAM_NAME);
+            return uriRouterContext.getUriTemplateVariables().get(TOKEN_HASH_PARAM_NAME);
         }
     }
 

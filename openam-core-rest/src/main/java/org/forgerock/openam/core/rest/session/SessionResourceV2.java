@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.core.rest.session;
 
+import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION_DESCRIPTION;
@@ -102,9 +103,9 @@ import org.forgerock.util.promise.Promise;
                 resourceSchema = @Schema(schemaResource = "SessionResource.schema.json")
         ),
         pathParam = @Parameter(
-                name = "userToken",
+                name = "userTokenHash",
                 type = "string",
-                description = SESSION_RESOURCE + SessionResource.TOKEN_ID + "." + PARAMETER_DESCRIPTION
+                description = SESSION_RESOURCE + SessionPropertiesResource.TOKEN_HASH_PARAM_NAME + "." + PARAMETER_DESCRIPTION
         )
 )
 public class SessionResourceV2 implements CollectionResourceProvider {
@@ -122,18 +123,20 @@ public class SessionResourceV2 implements CollectionResourceProvider {
 
     private final Map<String, ActionHandler> actionHandlers;
     private final SessionResourceUtil sessionResourceUtil;
+    private final TokenHashToIDMapper hashToIdMapper;
 
     /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
-     *
-     * @param ssoTokenManager An instance of the SSOTokenManager.
+     *  @param ssoTokenManager An instance of the SSOTokenManager.
      * @param  authUtilsWrapper An instance of the AuthUtilsWrapper.
      * @param sessionResourceUtil An instance of the SessionResourceUtil.
+     * @param hashToIdMapper An instance of the hashToIdMapper.
      */
     @Inject
     public SessionResourceV2(final SSOTokenManager ssoTokenManager, AuthUtilsWrapper authUtilsWrapper,
-            final SessionResourceUtil sessionResourceUtil) {
+            final SessionResourceUtil sessionResourceUtil, TokenHashToIDMapper hashToIdMapper) {
         this.sessionResourceUtil = sessionResourceUtil;
+        this.hashToIdMapper = hashToIdMapper;
         actionHandlers = new CaseInsensitiveHashMap<>();
         actionHandlers.put(REFRESH_ACTION_ID,
                 new RefreshActionHandler(ssoTokenManager, sessionResourceUtil));
@@ -153,9 +156,8 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      * <li>{@link #LOGOUT_ACTION_ID}</li>
      * <li>{@link #REFRESH_ACTION_ID}</li>
      * </ul>
-     *
-     * @param context {@inheritDoc}
-     * @param tokenId The SSO Token Id.
+     *  @param context {@inheritDoc}
+     * @param tokenIdHash The SSO Token Id hash.
      * @param request {@inheritDoc}
      */
     @Actions({
@@ -185,23 +187,31 @@ public class SessionResourceV2 implements CollectionResourceProvider {
                     name = REFRESH_ACTION_ID,
                     response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
             )})
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String tokenId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String tokenIdHash,
             ActionRequest request) {
-        return internalHandleAction(tokenId, context, request);
+        return internalHandleAction(tokenIdHash, context, request);
     }
 
     /**
      * Handle the action specified by the user (i.e. one of those in the validActions set).
-     *
-     * @param tokenId The id of the token to concentrate on.
+     *  @param tokenIdHash The id hash of the token to concentrate on.
      * @param request The ActionRequest, giving us all our parameters.
      */
-    private Promise<ActionResponse, ResourceException> internalHandleAction(String tokenId, Context context, ActionRequest request) {
+    private Promise<ActionResponse, ResourceException> internalHandleAction(String tokenIdHash, Context context, ActionRequest request) {
 
         final String action = request.getAction();
         final ActionHandler actionHandler = actionHandlers.get(action);
-
+        String tokenId = null;
         if (actionHandler != null) {
+            try {
+                tokenId = hashToIdMapper.map(context, tokenIdHash);
+            } catch (SSOException e) {
+                if (LOGGER.messageEnabled()) {
+                    LOGGER.message("SessionResource.internalHandleAction :: Resolving Token ID, " + tokenId +
+                            ", unable to log out associated token.");
+                }
+                return newResultPromise(newActionResponse(sessionResourceUtil.invalidSession()));
+            }
             return actionHandler.handle(tokenId, context, request);
 
         } else {
@@ -290,15 +300,16 @@ public class SessionResourceV2 implements CollectionResourceProvider {
                             code = 500,
                             description = SESSION_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
             description = SESSION_RESOURCE + READ_DESCRIPTION))
-    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String id, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String tokenHash, ReadRequest request) {
         JsonValue content;
         try {
-            SSOToken ssoToken = sessionResourceUtil.getTokenWithoutResettingIdleTime(id);
+            String tokenId = hashToIdMapper.map(context, tokenHash);
+            SSOToken ssoToken = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
             content = sessionResourceUtil.jsonValueOf(ssoToken);
         } catch (SSOException | IdRepoException e) {
             content = sessionResourceUtil.invalidSession();
         }
-        return newResultPromise(newResourceResponse(id, String.valueOf(content.getObject().hashCode()), content));
+        return newResultPromise(newResourceResponse(tokenHash, String.valueOf(content.getObject().hashCode()), content));
     }
 
     /**
