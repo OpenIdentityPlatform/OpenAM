@@ -221,7 +221,8 @@ public class InternalSession implements Serializable {
      * @param service Non null SessionService.
      * @param debug Debugging instance to use for all logging.
      */
-    private InternalSession(SessionID sid,
+    @VisibleForTesting
+    InternalSession(SessionID sid,
                            SessionService service,
                            SessionServiceConfig serviceConfig,
                            SessionLogging sessionLogging,
@@ -459,9 +460,8 @@ public class InternalSession implements Serializable {
      * @return Time left for the internal session to be invalid
      */
     public long getTimeLeft() {
-        long currentTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        long timeLeftInSeconds = creationTimeInSeconds + MINUTES.toSeconds(maxSessionTimeInMinutes) - currentTimeInSeconds;
-        return Math.max(timeLeftInSeconds, 0);
+        long timeLeftInMillis = getMaxSessionExpirationTime(MILLISECONDS) - currentTimeMillis();
+        return MILLISECONDS.toSeconds(Math.max(timeLeftInMillis, 0));
     }
 
     /**
@@ -482,9 +482,8 @@ public class InternalSession implements Serializable {
          * Return the extra time left (in seconds), if the session has timed out due to
          * idle/max time out period
          */
-        long currentTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        long timeLeftInSeconds = timedOutTimeInSeconds + purgeDelayInSeconds - currentTimeInSeconds;
-        return Math.max(timeLeftInSeconds, 0);
+        long timeLeftInMillis = getPurgeDelayExpirationTime(MILLISECONDS) - currentTimeMillis();
+        return MILLISECONDS.toSeconds(Math.max(timeLeftInMillis, 0));
     }
 
     /**
@@ -1273,8 +1272,6 @@ public class InternalSession implements Serializable {
         return new HashSet<>(restrictedTokensBySid.keySet());
     }
 
-
-
     /**
      * Returns true if cookies are supported.
      *
@@ -1374,18 +1371,6 @@ public class InternalSession implements Serializable {
         return sessionHandle;
     }
 
-     /**
-      * Computes session object expiration time as the smallest of the remaining idle time (or purge delay if the
-      * session has already timed out) or the session lifetime limit.
-      * <p>
-      * Time value is in seconds and uses the same epoch start as {@link System#currentTimeMillis()}
-      * @return session expiration time in seconds.
-      * @see #getExpirationTime(TimeUnit)
-      */
-    public long getExpirationTime() {
-        return getExpirationTime(SECONDS);
-    }
-
     /**
      * Computes session object expiration time as the smallest of the remaining idle time (or purge delay if the
      * session has already timed out) or the session lifetime limit.
@@ -1406,6 +1391,50 @@ public class InternalSession implements Serializable {
         return timeUnit.convert(currentTimeMillis(), MILLISECONDS)
                 + Math.min(timeUnit.convert(getTimeLeft(), SECONDS),
                            timeUnit.convert(timeLeftInSeconds, SECONDS));
+    }
+
+    /**
+     * Returns time at which session's lifetime expires.
+     * <p>
+     * Time value is returned in the requested unit (accurate to millisecond) and uses the
+     * same epoch as {@link System#currentTimeMillis()}.
+     *
+     * @see #getMaxSessionTime()
+     * @param timeUnit the time unit to return the result in.
+     * @return the result in the given units.
+     */
+    public long getMaxSessionExpirationTime(final TimeUnit timeUnit) {
+        return timeUnit.convert(creationTimeInSeconds + MINUTES.toSeconds(maxSessionTimeInMinutes), SECONDS);
+    }
+
+    /**
+     * Returns time at which session's idle time expires.
+     * <p>
+     * Time value is returned in the requested unit (accurate to millisecond) and uses the
+     * same epoch as {@link System#currentTimeMillis()}.
+     *
+     * @see #getMaxIdleTime()
+     * @param timeUnit the time unit to return the result in.
+     * @return the result in the given units.
+     */
+    public long getMaxIdleExpirationTime(final TimeUnit timeUnit) {
+        return timeUnit.convert(latestAccessTimeInSeconds + MINUTES.toSeconds(maxIdleTimeInMinutes), SECONDS);
+    }
+
+    /**
+     * If the session has timed out, returns time at which session's purge delay expires.
+     * <p>
+     * Time value is returned in the requested unit (accurate to millisecond) and uses the
+     * same epoch as {@link System#currentTimeMillis()}.
+     *
+     * @param timeUnit the time unit to return the result in.
+     * @return the result in the given units.
+     */
+    public long getPurgeDelayExpirationTime(final TimeUnit timeUnit) {
+        if (!isTimedOut()) {
+            return -1;
+        }
+        return timeUnit.convert(timedOutTimeInSeconds + purgeDelayInSeconds, SECONDS);
     }
 
     /**

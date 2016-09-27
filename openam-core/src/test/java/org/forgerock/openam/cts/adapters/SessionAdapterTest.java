@@ -153,7 +153,7 @@ public class SessionAdapterTest {
 
         given(mockSessionID.toString()).willReturn("badger");
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
-        given(mockSession.getExpirationTime()).willReturn(timestamp);
+        given(mockSession.getExpirationTime(TimeUnit.SECONDS)).willReturn(timestamp);
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
 
@@ -180,7 +180,7 @@ public class SessionAdapterTest {
         String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "ferret";
         given(mockSessionID.toString()).willReturn(sessionId);
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
-        given(mockSession.getExpirationTime()).willReturn(timestamp);
+        given(mockSession.getExpirationTime(TimeUnit.SECONDS)).willReturn(timestamp);
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
 
@@ -195,6 +195,7 @@ public class SessionAdapterTest {
         assertThat(token.<String>getValue(SessionTokenField.SESSION_ID.getField())).isEqualTo(sessionId);
     }
 
+    @Test
     public void shouldAssignSessionHandle() {
         // Given
         long timestamp = 12345l;
@@ -206,7 +207,7 @@ public class SessionAdapterTest {
         String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "ferret";
         given(mockSessionID.toString()).willReturn(sessionId);
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
-        given(mockSession.getExpirationTime()).willReturn(timestamp);
+        given(mockSession.getExpirationTime(TimeUnit.SECONDS)).willReturn(timestamp);
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
 

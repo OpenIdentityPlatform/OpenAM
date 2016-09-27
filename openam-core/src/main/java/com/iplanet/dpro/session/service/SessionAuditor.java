@@ -42,7 +42,7 @@ import java.security.PrivilegedAction;
  * @since 13.0.0
  */
 @Singleton
-public final class SessionAuditor {
+public class SessionAuditor {
 
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
