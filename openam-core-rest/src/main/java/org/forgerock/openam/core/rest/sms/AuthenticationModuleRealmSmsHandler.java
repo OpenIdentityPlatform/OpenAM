@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.REALM_AUTH_MODULES;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -62,7 +63,10 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@RequestHandler(@Handler(mvccSupported = false,
+        title = REALM_AUTH_MODULES + "title",
+        description = REALM_AUTH_MODULES + "description",
+        resourceSchema = @Schema(schemaResource = "AuthenticationModuleRealmSmsHandler.schema.json")))
 public class AuthenticationModuleRealmSmsHandler {
 
     private final SSOToken adminToken;
@@ -85,7 +89,8 @@ public class AuthenticationModuleRealmSmsHandler {
      *
      * {@inheritDoc}
      */
-    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
+    @Query(operationDescription = @Operation(description = REALM_AUTH_MODULES + "query.description"),
+            type = QueryType.FILTER, queryableFields = "_id")
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
