@@ -46,9 +46,9 @@ import java.util.logging.Level;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.guava.common.collect.ImmutableMap;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.http.header.AcceptApiVersionHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -97,6 +97,7 @@ public class LogWriter {
             .put("realm where entity resides", "realm")
             .put("realm where circle of trust resides", "realm")
             .build();
+    private static final Client client = InjectorHolder.getInstance(Client.class);
 
     private LogWriter() {
     }
@@ -186,7 +187,6 @@ public class LogWriter {
     }
 
     private static void sendEvent(String topic, JsonValue eventJson, String sessionId, String baseUrl) throws HttpApplicationException, URISyntaxException {
-        Client client = new Client(new HttpClientHandler());
         Request request = new Request();
         request.setMethod("POST");
         if (eventJson.isDefined(EVENT_REALM)) {
@@ -268,6 +268,7 @@ public class LogWriter {
                         logger.warn("Could not log audit via REST API: Status: {}, Response: {}",
                                 response.getStatus(), responseText);
                     }
+                    response.close();
                     return null;
                 }
             };

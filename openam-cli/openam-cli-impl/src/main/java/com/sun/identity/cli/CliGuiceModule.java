@@ -21,8 +21,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfigurationImpl;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
@@ -34,6 +32,7 @@ import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 
 /**
  * Guice module for bindings that are required for the command line tools to work but are declared
@@ -59,10 +58,6 @@ public class CliGuiceModule extends AbstractModule {
 
         bind(SessionCache.class).toInstance(SessionCache.getInstance());
 
-        try {
-            bind(Client.class).toInstance(new Client(new HttpClientHandler()));
-        } catch (HttpApplicationException haE) {
-            throw new RuntimeException("Unable to create http client", haE);
-        }
+        bind(Client.class).toProvider(CloseableHttpClientProvider.class);
     }
 }
