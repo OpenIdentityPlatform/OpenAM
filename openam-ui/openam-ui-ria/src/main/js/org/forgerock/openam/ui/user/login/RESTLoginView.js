@@ -43,6 +43,14 @@ define([
     URIUtils, logout, query, gotoUrl, store) => {
     isRealmChanged = isRealmChanged.default;
 
+    function hasSsoRedirectOrPost (goto) {
+        let decodedGoto;
+        if (goto) {
+            decodedGoto = decodeURIComponent(goto);
+        }
+        return goto && (_.startsWith(decodedGoto, "/SSORedirect") || _.startsWith(decodedGoto, "/SSOPOST"));
+    }
+
     function populateTemplate () {
         var self = this,
             firstUserNamePassStage = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
@@ -415,8 +423,8 @@ define([
                     }
                 });
             }
-            // Special case for SSORedirect
-            if (params.goto && params.goto.indexOf("/SSORedirect") === 0) {
+            // Special case for SSORedirect and SSOPOST
+            if (hasSsoRedirectOrPost(params.goto)) {
                 params.goto = `/${Constants.context}${params.goto}`;
                 Configuration.globalData.auth.additional.replace("&goto=", `&goto=/${Constants.context}`);
             }
