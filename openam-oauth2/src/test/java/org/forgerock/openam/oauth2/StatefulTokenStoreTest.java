@@ -117,8 +117,8 @@ public class StatefulTokenStoreTest {
     public void shouldReadAccessToken() throws Exception {
         //Given
         JsonValue token = json(object(
-                field("tokenName", Collections.singleton("access_token")),
-                field("realm", Collections.singleton("/testrealm"))));
+                field("tokenName", Collections.singletonList("access_token")),
+                field("realm", Collections.singletonList("/testrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
         ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
         attributes.put("realm", "/testrealm");
@@ -140,8 +140,8 @@ public class StatefulTokenStoreTest {
     public void shouldNotReadOtherRealmsAccessToken() throws Exception {
         //Given
         JsonValue token = json(object(
-                field("tokenName", Collections.singleton("access_token")),
-                field("realm", Collections.singleton("/otherrealm"))));
+                field("tokenName", Collections.singletonList("access_token")),
+                field("realm", Collections.singletonList("/otherrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
         given(realmNormaliser.normalise("/otherrealm")).willReturn("/otherrealm");
         ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
@@ -205,8 +205,8 @@ public class StatefulTokenStoreTest {
                 providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
                 cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator);
         JsonValue token = json(object(
-                field("tokenName", Collections.singleton("access_token")),
-                field("realm", Collections.singleton("/otherrealm"))));
+                field("tokenName", Collections.singletonList("access_token")),
+                field("realm", Collections.singletonList("/otherrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
         ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
         given(request.getAttributes()).willReturn(attributes);
@@ -265,7 +265,7 @@ public class StatefulTokenStoreTest {
     @Test(expectedExceptions = InvalidGrantException.class)
     public void shouldThrowExceptionForInvalidDeviceCodeJsonValue() throws Exception {
         // Given
-        given(tokenStore.read("123")).willReturn(json(object(field("tokenName", asSet("device_code")))));
+        given(tokenStore.read("123")).willReturn(json(object(field("tokenName", asList("device_code")))));
 
         // When
         openAMtokenStore.readDeviceCode(null, "123", mock(OAuth2Request.class));
@@ -275,11 +275,11 @@ public class StatefulTokenStoreTest {
     public void shouldReadValidDeviceCode() throws Exception {
         // Given
         given(tokenStore.read("123")).willReturn(json(object(
-                field("tokenName", asSet("device_code")),
-                field("id", asSet("123")),
-                field("user_code", asSet("456")),
-                field("realm", asSet("/")),
-                field("clientID", asSet("CLIENT_ID")))));
+                field("tokenName", asList("device_code")),
+                field("id", asList("123")),
+                field("user_code", asList("456")),
+                field("realm", asList("/")),
+                field("clientID", asList("CLIENT_ID")))));
         final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
         given(realmNormaliser.normalise("/")).willReturn("/");
@@ -297,11 +297,11 @@ public class StatefulTokenStoreTest {
     public void shouldUpdateDeviceCode() throws Exception {
         // Given
         DeviceCode code = new DeviceCode(json(object(
-                field("tokenName", asSet("device_code")),
-                field("id", asSet("123")),
-                field("user_code", asSet("456")),
-                field("realm", asSet("/")),
-                field("clientID", asSet("CLIENT_ID")))));
+                field("tokenName", asList("device_code")),
+                field("id", asList("123")),
+                field("user_code", asList("456")),
+                field("realm", asList("/")),
+                field("clientID", asList("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
         final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));
@@ -318,11 +318,11 @@ public class StatefulTokenStoreTest {
     public void shouldDeleteDeviceCode() throws Exception {
         // Given
         DeviceCode code = new DeviceCode(json(object(
-                field("tokenName", asSet("device_code")),
-                field("id", asSet("123")),
-                field("user_code", asSet("456")),
-                field("realm", asSet("/")),
-                field("clientID", asSet("CLIENT_ID")))));
+                field("tokenName", asList("device_code")),
+                field("id", asList("123")),
+                field("user_code", asList("456")),
+                field("realm", asList("/")),
+                field("clientID", asList("CLIENT_ID")))));
         given(tokenStore.read("123")).willReturn(code);
         final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "/")));

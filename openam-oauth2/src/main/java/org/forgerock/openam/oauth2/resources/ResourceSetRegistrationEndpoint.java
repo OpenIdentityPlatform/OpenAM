@@ -16,11 +16,15 @@
 
 package org.forgerock.openam.oauth2.resources;
 
+import static java.util.Collections.emptyList;
+
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -157,12 +161,16 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
         store.create(oAuth2Request, resourceSetDescription);
         if (labels.isNotNull()) {
-            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.asSet());
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.getObject());
+        } else {
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, emptyList());
         }
         labelRegistration.updateLabelsForNewResourceSet(resourceSetDescription);
         for (ResourceRegistrationFilter filter : extensionFilterManager.getFilters(ResourceRegistrationFilter.class)) {
             filter.afterResourceRegistration(resourceSetDescription);
         }
+
+
 
         for (ResourceSetRegistrationHook hook : hooks) {
             hook.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
@@ -191,10 +199,10 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         JsonValue labels = resourceSetDescription.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
         resourceSetDescription.getDescription().remove(OAuth2Constants.ResourceSets.LABELS);
         store.update(resourceSetDescription);
-        if(labels.isNotNull()) {
-            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.asSet());
+        if (labels.isNotNull()) {
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels.getObject());
         } else {
-            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, new HashSet<String>());
+            resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, emptyList());
         }
         labelRegistration.updateLabelsForExistingResourceSet(resourceSetDescription);
 
@@ -223,7 +231,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
         ResourceSetDescription resourceSetDescription = store.read(resourceSetId, getResourceOwnerId());
 
-        Set<String> labels = new HashSet<String>();
+        List<String> labels = new ArrayList<>();
         try {
             Set<ResourceSetLabel> labelSet = umaLabelsStore.forResourceSet(resourceSetDescription.getRealm(),
                     resourceSetDescription.getResourceOwnerId(), resourceSetDescription.getId(), false);

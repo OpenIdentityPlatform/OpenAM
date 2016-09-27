@@ -19,6 +19,7 @@ package org.forgerock.openidconnect.ssoprovider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.*;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 
@@ -288,7 +289,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.setClaim(OPS, ops);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
         given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
-        given(mockTokenStore.read(ops)).willReturn(json(object(field(LEGACY_OPS, asSet(sessionId)))));
+        given(mockTokenStore.read(ops)).willReturn(json(object(field(LEGACY_OPS, asList(sessionId)))));
         given(mockTokenManager.createSSOToken(sessionId)).willReturn(mockSsoToken);
 
         // When

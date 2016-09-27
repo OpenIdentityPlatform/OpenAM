@@ -48,10 +48,12 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.REA
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SITES_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -207,7 +209,7 @@ public class SitesResourceProvider {
             if (SiteConfiguration.isSiteExist(token, id)) {
                 return new ConflictException("Site with id already exists: " + id).asPromise();
             }
-            SiteConfiguration.createSite(token, id, url, content.get(SECONDARY_URLS).asSet());
+            SiteConfiguration.createSite(token, id, url, content.get(SECONDARY_URLS).asCollection());
             debug.message("Site created: {}", id);
             return newResultPromise(getSite(token, id));
         } catch (SMSException | SSOException | ConfigurationException e) {
@@ -320,7 +322,7 @@ public class SitesResourceProvider {
                 field("_id", siteName),
                 field("id", SiteConfiguration.getSiteID(token, siteName)),
                 field("url", SiteConfiguration.getSitePrimaryURL(token, siteName)),
-                field("secondaryURLs", SiteConfiguration.getSiteSecondaryURLs(token, siteName)),
+                field("secondaryURLs", newList(SiteConfiguration.getSiteSecondaryURLs(token, siteName))),
                 field("servers", array())
         ));
         JsonValue servers = site.get("servers");
@@ -397,7 +399,7 @@ public class SitesResourceProvider {
                 return new PreconditionFailedException("Revision did not match").asPromise();
             }
             SiteConfiguration.setSitePrimaryURL(token, id, content.get("url").asString());
-            SiteConfiguration.setSiteSecondaryURLs(token, id, content.get("secondaryURLs").asSet());
+            SiteConfiguration.setSiteSecondaryURLs(token, id, content.get("secondaryURLs").asCollection());
             return newResultPromise(getSite(token, id));
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not update site {}", id, e);

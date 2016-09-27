@@ -372,10 +372,7 @@ public class EntitlementService implements EntitlementConfiguration {
     private ServiceConfig getApplicationConfiguration(SSOToken token, String realm) {
         try {
             if (token != null) {
-                if (realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX) ||
-                    realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX2)) {
-                    realm = "/";
-                } 
+                realm = getEntitlementConfigurationRealm(realm);
                 // TODO. Since applications for the hidden realms have to be
                 // the same as root realm mainly for delegation without any
                 // referrals, the hack is to use root realm for hidden realm.

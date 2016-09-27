@@ -18,8 +18,10 @@ package org.forgerock.openam.core.rest.session.action;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.core.rest.session.SessionResource.KEYWORD_PROPERTIES;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.util.Collection;
 import java.util.Set;
 
 import com.iplanet.sso.SSOException;
@@ -75,13 +77,13 @@ public class DeletePropertyActionHandler implements ActionHandler {
             final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             final SSOToken target = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
 
-            JsonValue content = request.getContent().get(SessionResource.KEYWORD_PROPERTIES);
+            JsonValue content = request.getContent().get(KEYWORD_PROPERTIES);
 
             if (content == null || content.isNull()) {
                 return new BadRequestException().asPromise(); //no properties = bad request
             }
 
-            final Set<String> propSet = request.getContent().get(SessionResource.KEYWORD_PROPERTIES).asSet(String.class);
+            final Collection<String> propSet = request.getContent().get(KEYWORD_PROPERTIES).asCollection(String.class);
 
             if (sessionPropertyWhitelist.isPropertyListed(caller, realm, propSet) &&
                     sessionPropertyWhitelist.isPropertySetSettable(caller, propSet)) {

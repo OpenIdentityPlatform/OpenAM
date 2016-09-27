@@ -19,6 +19,7 @@ package org.forgerock.openam.core.rest.session.action;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.core.rest.session.SessionResource.KEYWORD_PROPERTIES;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Collections;
@@ -79,13 +80,13 @@ public class GetPropertyActionHandler implements ActionHandler {
             final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             final SSOToken target = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
 
-            if (request.getContent() == null || request.getContent().get(SessionResource.KEYWORD_PROPERTIES).isNull()) {
+            if (request.getContent() == null || request.getContent().get(KEYWORD_PROPERTIES).isNull()) {
                 for (String property : sessionPropertyWhitelist.getAllListedProperties(realm)) {
                     final String value = target.getProperty(property);
                     result.add(property, value == null ? "" : value);
                 }
             } else {
-                for (String requestedResult : request.getContent().get(SessionResource.KEYWORD_PROPERTIES).asSet(String.class)) {
+                for (String requestedResult : request.getContent().get(KEYWORD_PROPERTIES).asCollection(String.class)) {
                     if (sessionPropertyWhitelist.isPropertyListed(caller, realm, Collections.singleton(requestedResult))) {
                         final String value = target.getProperty(requestedResult);
                         result.add(requestedResult, value == null ? "" : value);

@@ -16,15 +16,13 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.openam.utils.Time.*;
-
-import com.sun.jdi.IntegerValue;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
@@ -78,8 +76,8 @@ public class DeviceCode extends JsonValue implements Token {
         setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
         setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
         setStringProperty(OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID, auditTrackingId);
-        put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
-        put(SCOPE, scope);
+        setStringProperty(EXPIRE_TIME, String.valueOf(expiryTime));
+        put(SCOPE, newList(scope));
     }
 
     /**
@@ -306,7 +304,7 @@ public class DeviceCode extends JsonValue implements Token {
     private Set<String> getParameter(String paramName) {
         final JsonValue param = get(paramName);
         if (param != null) {
-            return (Set<String>) param.getObject();
+            return param.as(setOf(String.class));
         }
         return null;
     }
@@ -321,7 +319,7 @@ public class DeviceCode extends JsonValue implements Token {
 
     private void setStringProperty(String key, String value) {
         if (value != null) {
-            put(key, CollectionUtils.asSet(value));
+            put(key, CollectionUtils.asList(value));
         }
     }
 

@@ -17,6 +17,7 @@
 package org.forgerock.openidconnect.ssoprovider;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.*;
+import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import java.security.Principal;
 import java.util.Set;
@@ -247,7 +248,7 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
             }
 
             final JwtClaimsSet claims = idToken.getSignedJwt().getClaimsSet();
-            final String clientId = CollectionUtils.getFirstItem(claims.getAudience());
+            final String clientId = getFirstItem(claims.getAudience());
             final String realm = claims.get(REALM).defaultTo("/").asString();
 
             final OpenIdConnectClientRegistration clientRegistration;
@@ -279,7 +280,7 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
                 if (idTokenData == null) {
                     throw new SSOException("session not found");
                 }
-                final String sessionId = CollectionUtils.getFirstItem(idTokenData.get(LEGACY_OPS).asSet(String.class));
+                final String sessionId = getFirstItem(idTokenData.get(LEGACY_OPS).asCollection(String.class));
                 if (sessionId == null) {
                     throw new SSOException("no session linked to id_token");
                 }

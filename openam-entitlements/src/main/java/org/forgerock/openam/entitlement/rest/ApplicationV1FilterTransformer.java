@@ -77,10 +77,10 @@ public class ApplicationV1FilterTransformer {
         final Map<String, Boolean> actions = new HashMap<>();
         final Set<String> resources = new HashSet<>();
 
-        final Set<String> resourceTypeUuids = jsonValue
+        final Collection<String> resourceTypeUuids = jsonValue
                 .get(RESOURCE_TYPE_UUIDS)
                 .required()
-                .asSet(String.class);
+                .asCollection(String.class);
 
         for (String resourceTypeUuid : resourceTypeUuids) {
             final ResourceType resourceType = resourceTypeService

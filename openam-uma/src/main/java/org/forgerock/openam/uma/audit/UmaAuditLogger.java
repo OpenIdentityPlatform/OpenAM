@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.uma.audit;
 
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Inject;

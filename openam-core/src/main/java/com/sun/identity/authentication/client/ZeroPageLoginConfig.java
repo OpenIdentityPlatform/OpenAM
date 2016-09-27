@@ -21,10 +21,12 @@ import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
 /**
  * Interface to different methods for configuring Zero Page Login (ZPL). For local authentication, this uses the
@@ -100,7 +102,7 @@ public final class ZeroPageLoginConfig {
 
     public JsonValue toJson() {
         return json(object(field("enabled", enabled),
-                           field("whitelist", whitelist),
+                           field("whitelist", newList(whitelist)),
                            field("allowWithoutReferer", allowWithoutReferer)));
     }
 

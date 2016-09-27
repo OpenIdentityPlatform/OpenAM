@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.config.user;
@@ -34,6 +34,7 @@ import java.util.Set;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
 /**
  * This class encapsulates the configuration pertaining to the OnBehalfOf and ActAs elements in the WS-Trust specification.
@@ -175,7 +176,8 @@ public class SoapDelegationConfig {
     }
 
     public JsonValue toJson() {
-        JsonValue baseValue = json(object(field(CUSTOM_DELEGATION_TOKEN_HANDLERS, customDelegationTokenHandlers)));
+        JsonValue baseValue = json(object(
+                field(CUSTOM_DELEGATION_TOKEN_HANDLERS, newList(customDelegationTokenHandlers))));
 
         JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<>(validatedDelegatedTokenConfiguration.size()));
         List<Object> validationList = validatedTokenConfiguration.asList();
@@ -248,7 +250,7 @@ public class SoapDelegationConfig {
         have an entry if the instance was first marshaled to json, which is the first step in marshaling to an attribute map.
          */
         if (attributeMap.get(CUSTOM_DELEGATION_TOKEN_HANDLERS) != null) {
-            Set<String> jsonHandlerSet = new HashSet<>();
+            List<String> jsonHandlerSet = new ArrayList<>();
             JsonValue jsonHandlerTypes = new JsonValue(jsonHandlerSet);
             jsonAttributes.remove(CUSTOM_DELEGATION_TOKEN_HANDLERS);
             jsonAttributes.put(CUSTOM_DELEGATION_TOKEN_HANDLERS, jsonHandlerTypes);

@@ -27,6 +27,8 @@ import static org.forgerock.util.query.QueryFilter.and;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -49,6 +51,7 @@ import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONObject;
 import org.restlet.Request;
@@ -218,11 +221,8 @@ public class TokenRevocationResource extends ServerResource {
         JsonValue jsonValue = token.get(attributeName);
         if (jsonValue.isString()) {
             value = jsonValue.asString();
-        } else if (jsonValue.isSet()) {
-            Set<String> set = jsonValue.asSet(String.class);
-            if (!set.isEmpty()) {
-                value = set.iterator().next();
-            }
+        } else if (jsonValue.isCollection()) {
+            value = CollectionUtils.getFirstItem(jsonValue.asCollection(String.class));
         }
         return value;
     }

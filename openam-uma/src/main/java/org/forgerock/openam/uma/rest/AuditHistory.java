@@ -88,7 +88,8 @@ public class AuditHistory {
     public Promise<ActionResponse, ResourceException> getHistory(Context context, ActionRequest request) {
         AMIdentity identity = getIdentity(context);
         try {
-            return newResultPromise(newActionResponse(new JsonValue(auditLogger.getHistory(identity, null))));
+            Set<UmaAuditEntry> history = auditLogger.getHistory(identity, null);
+            return newResultPromise(newActionResponse(new JsonValue(new ArrayList<>(history))));
         } catch (ServerException e) {
             return new InternalServerErrorException(e).asPromise();
         }

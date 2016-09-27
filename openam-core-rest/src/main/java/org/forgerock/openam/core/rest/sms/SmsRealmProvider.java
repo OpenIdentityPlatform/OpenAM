@@ -70,6 +70,7 @@ import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -517,7 +518,7 @@ public class SmsRealmProvider implements RequestHandler {
                 field(PATH_ATTRIBUTE_NAME, parentPath),
                 field(ACTIVE_ATTRIBUTE_NAME, isActive(realmManager)),
                 field(REALM_NAME_ATTRIBUTE_NAME, realmName),
-                field(ALIASES_ATTRIBUTE_NAME, getAliases(realmManager))));
+                field(ALIASES_ATTRIBUTE_NAME, newList(getAliases(realmManager)))));
     }
 
     private ResourceResponse getResource(JsonValue jsonValue) {

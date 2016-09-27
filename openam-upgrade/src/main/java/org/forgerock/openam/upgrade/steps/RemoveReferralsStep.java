@@ -176,7 +176,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         }
 
         Set<String> listedApplications = referralJson.get("mapApplNameToResources").required().keys();
-        Set<String> listedRealms = referralJson.get("realms").required().asSet(String.class);
+        List<String> listedRealms = referralJson.get("realms").required().asList(String.class);
 
         for (String application : listedApplications) {
             Set<String> destinationRealms = applicationsToClone.get(application);

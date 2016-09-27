@@ -60,9 +60,7 @@ public class CrestProtocolEnforcementFilter implements Filter {
             enforceProtocolVersion(defaultProtocolVersion(request));
             return next.handle(context, request);
         } catch (BadRequestException e) {
-            Response response = new Response()
-                    .setStatus(Status.valueOf(e.getCode()))
-                    .setEntity(e.toJsonValue().getObject());
+            Response response = new Response(Status.valueOf(e.getCode())).setEntity(e.toJsonValue().getObject());
             return newResultPromise(response);
         }
     }

@@ -16,15 +16,32 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static java.lang.String.valueOf;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.PARENT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.REALM;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +53,6 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
 /**
@@ -150,7 +166,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
     }
 
     public void setClaims(String claims) {
-        put(OAuth2Constants.Custom.CLAIMS, CollectionUtils.asSet(claims));
+        setStringProperty(OAuth2Constants.Custom.CLAIMS, claims);
     }
 
     /**
@@ -158,7 +174,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setId(String id) {
-        put(ID, stringToSet(id));
+        setStringProperty(ID, id);
     }
 
     /**
@@ -166,7 +182,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(USERNAME, CollectionUtils.asSet(resourceOwnerId));
+        setStringProperty(USERNAME, resourceOwnerId);
     }
 
     /**
@@ -174,7 +190,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setClientId(String clientId) {
-        put(CLIENT_ID, CollectionUtils.asSet(clientId));
+        setStringProperty(CLIENT_ID, clientId);
     }
 
     /**
@@ -182,7 +198,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setRedirectUri(String redirectUri) {
-        put(REDIRECT_URI, stringToSet(redirectUri));
+        setStringProperty(REDIRECT_URI, redirectUri);
     }
 
     /**
@@ -190,7 +206,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setScope(Set<String> scope) {
-        put(SCOPE, scope);
+        put(SCOPE, new ArrayList<>(scope));
     }
 
     /**
@@ -198,7 +214,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setExpiryTime(long expiryTime) {
-        put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+        setStringProperty(EXPIRE_TIME, valueOf(expiryTime));
     }
 
     /**
@@ -206,7 +222,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setTokenType(String tokenType) {
-        put(TOKEN_TYPE, stringToSet(tokenType));
+        setStringProperty(TOKEN_TYPE, tokenType);
     }
 
     /**
@@ -214,7 +230,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setTokenName(String tokenName) {
-        put(TOKEN_NAME, stringToSet(tokenName));
+        setStringProperty(TOKEN_NAME, tokenName);
     }
 
     /**
@@ -222,7 +238,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setGrantType(String grantType) {
-        put(OAuth2Constants.Params.GRANT_TYPE, stringToSet(grantType));
+        setStringProperty(GRANT_TYPE, grantType);
     }
 
 
@@ -234,11 +250,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param realm The realm.
      */
     private void setRealm(final String realm) {
-        if (realm == null || realm.isEmpty()) {
-            this.put(REALM, stringToSet("/"));
-        } else {
-            this.put(REALM, stringToSet(realm));
-        }
+        setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
     }
 
     /**
@@ -266,11 +278,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getClientId() {
-        final Set<String> value = getParameter(CLIENT_ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(CLIENT_ID);
     }
 
     /**
@@ -278,11 +286,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getResourceOwnerId() {
-        final Set<String> value = getParameter(USERNAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(USERNAME);
     }
 
     /**
@@ -290,11 +294,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getTokenId() {
-        final Set<String> value = getParameter(ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(ID);
     }
 
     /**
@@ -303,11 +303,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @return The realm.
      */
     public String getRealm() {
-        final Set<String> value = getParameter(OAuth2Constants.Custom.REALM);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(REALM);
     }
 
     /**
@@ -315,11 +311,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getTokenName() {
-        final Set<String> value = getParameter(TOKEN_NAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(TOKEN_NAME);
     }
 
     /**
@@ -327,9 +319,9 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public long getExpiryTime() {
-        final Set<String> value = getParameter(EXPIRE_TIME);
+        final String value = getStringProperty(EXPIRE_TIME);
         if (value != null && !value.isEmpty()) {
-            return Long.parseLong(value.iterator().next());
+            return Long.parseLong(value);
         }
         return 0;
     }
@@ -339,11 +331,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getTokenType() {
-        final Set<String> value = getParameter(TOKEN_TYPE);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(TOKEN_TYPE);
     }
 
     /**
@@ -352,7 +340,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param authorizationCode The authorization code.
      */
     protected void setAuthorizationCode(String authorizationCode) {
-        put(PARENT, stringToSet(authorizationCode));
+        setStringProperty(PARENT, authorizationCode);
     }
 
     /**
@@ -361,7 +349,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param refreshTokenId The refresh token id.
      */
     protected void setRefreshTokenId(String refreshTokenId) {
-        put(REFRESH_TOKEN, stringToSet(refreshTokenId));
+        setStringProperty(REFRESH_TOKEN, refreshTokenId);
     }
 
     /**
@@ -370,7 +358,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param nonce The nonce.
      */
     protected void setNonce(String nonce) {
-        put(OAuth2Constants.Custom.NONCE, stringToSet(nonce));
+        setStringProperty(NONCE, nonce);
     }
 
     /**
@@ -380,11 +368,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getNonce() {
-        final Set<String> value = getParameter(OAuth2Constants.Custom.NONCE);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(NONCE);
     }
 
     /**
@@ -408,11 +392,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public String getGrantType() {
-        final Set<String> value = getParameter(OAuth2Constants.Params.GRANT_TYPE);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(GRANT_TYPE);
     }
 
     @Override
@@ -429,7 +409,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
     private Set<String> getParameter(String paramName) {
         final JsonValue param = get(paramName);
         if (param != null) {
-            return (Set<String>) param.getObject();
+            return param.as(setOf(String.class));
         }
         return null;
     }
@@ -509,7 +489,7 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     protected void setAuthTime(long authTime) {
-        put(OAuth2Constants.CoreTokenParams.AUTH_TIME, stringToSet(String.valueOf(authTime)));
+        setStringProperty(AUTH_TIME, valueOf(authTime));
     }
 
     /**
@@ -517,18 +497,8 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      */
     @Override
     public long getAuthTimeSeconds() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.AUTH_TIME);
-        final long defaultVal = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
-        return Long.parseLong(CollectionUtils.getFirstItem(value, String.valueOf(defaultVal)));
-    }
-
-    /**
-     * Set a string property in the store.
-     * @param key The property key.
-     * @param value The value.
-     */
-    protected void setStringProperty(String key, String value) {
-        put(key, stringToSet(value));
+        final String value = getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_TIME);
+        return value == null ? TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) : Long.parseLong(value);
     }
 
     @Override

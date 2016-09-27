@@ -28,6 +28,7 @@ import static org.forgerock.util.promise.Promises.*;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1305,7 +1306,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      */
     JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
         if (authenticatedUserMatchesUserProfile(context, resourceId)) {
-            Set<String> roles = Sets.newHashSet();
+            List<String> roles = new ArrayList<>();
             for (UiRolePredicate predicate : uiRolePredicates) {
                 if (predicate.apply(context)) {
                     roles.add(predicate.getRole());

@@ -41,7 +41,7 @@ public class XMLResourceExceptionHandlerTest {
         //given
         MessageContext context = mock(MessageContext.class);
         AuditTrail mockAudit = mock(AuditTrail.class);
-        Response response = new Response();
+        Response response = new Response(Status.NOT_FOUND);
         doReturn(mockAudit).when(context).getAuditTrail();
         doReturn(response).when(context).getResponse();
 
@@ -64,7 +64,7 @@ public class XMLResourceExceptionHandlerTest {
     public void testAsXMLDOM() throws Exception {
         //given
         ResourceException ex = new NotFoundException("I don't know where it is");
-        AbstractMap.SimpleEntry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>("a", 1);
+        AbstractMap.SimpleEntry<String, Object> entry = new AbstractMap.SimpleEntry<String, Object>("a", 1);
         ex.setDetail(new JsonValue(JsonValue.array(new JsonValue(JsonValue.object(entry)))));
 
         //when

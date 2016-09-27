@@ -34,10 +34,12 @@ import javax.inject.Named;
 
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -513,7 +515,7 @@ public class StatelessTokenStore implements TokenStore {
         } catch (CoreTokenException e) {
             throw new ServerException("Token not found in CTS");
         }
-        Set<Map<String, Object>> results = new HashSet<>();
+        List<Map<String, Object>> results = new ArrayList<>();
         for (Token token : tokens) {
             results.add(tokenAdapter.fromToken(token).asMap());
         }

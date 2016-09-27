@@ -18,9 +18,13 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.json.JsonValue;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
@@ -224,7 +228,8 @@ public abstract class StatefulToken extends JsonValue {
             if (value.isString()) {
                 return value.asString();
             } else if (value.isCollection()) {
-                return (String) value.asList().iterator().next();
+                Collection<String> strings = value.asCollection(String.class);
+                return strings.isEmpty() ? null : strings.iterator().next();
             }
         }
         return null;
@@ -232,9 +237,9 @@ public abstract class StatefulToken extends JsonValue {
 
     @SuppressWarnings("unchecked")
     protected Set<String> getSetProperty(String key) {
-        final Set<String> scope = (Set<String>) get(key).getObject();
+        final Collection<String> scope = get(key).asCollection(String.class);
         if (!Utils.isEmpty(scope)) {
-            return scope;
+            return new HashSet<>(scope);
         }
         return Collections.emptySet();
     }
@@ -244,8 +249,8 @@ public abstract class StatefulToken extends JsonValue {
      * @param key The property key.
      * @param value The value.
      */
-    protected void setStringProperty(String key, String value) {
-        put(key, value);
+    protected final void setStringProperty(String key, String value) {
+        put(key, value == null || value.isEmpty() ? emptyList() : singletonList(value));
     }
 
     public JsonValue toJsonValue() {

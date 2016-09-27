@@ -21,6 +21,8 @@ import static org.forgerock.util.query.QueryFilter.and;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
+
+import java.util.Collection;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
@@ -28,6 +30,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2RealmResolver;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,11 +92,8 @@ public class TokenInvalidator {
         JsonValue jsonValue = token.get(attributeName);
         if (jsonValue.isString()) {
             value = jsonValue.asString();
-        } else if (jsonValue.isSet()) {
-            Set<String> set = jsonValue.asSet(String.class);
-            if (!set.isEmpty()) {
-                value = set.iterator().next();
-            }
+        } else if (jsonValue.isCollection()) {
+            value = CollectionUtils.getFirstItem(jsonValue.asCollection(String.class));
         }
         return value;
     }

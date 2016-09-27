@@ -32,6 +32,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import java.security.AccessController;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -125,7 +126,7 @@ public class SessionPropertyWhitelist {
      * @param propertyNames The names they wish for a response to.
      * @return true if all requested properties are whitelisted.
      */
-    public boolean isPropertyListed(SSOToken caller, String realm, Set<String> propertyNames)
+    public boolean isPropertyListed(SSOToken caller, String realm, Collection<String> propertyNames)
             throws DelegationException, SSOException {
         return userHasReadAdminPrivs(caller, realm) || getWhitelist(realm).containsAll(propertyNames);
     }
@@ -161,7 +162,7 @@ public class SessionPropertyWhitelist {
      * @param properties The property names they wish to set.
      * @return true if all requested properties are settable.
      */
-    public boolean isPropertySetSettable(SSOToken caller, Set<String> properties) {
+    public boolean isPropertySetSettable(SSOToken caller, Collection<String> properties) {
         for (String property : properties) {
             try {
                 SessionUtils.checkPermissionToSetProperty(caller, property, null);

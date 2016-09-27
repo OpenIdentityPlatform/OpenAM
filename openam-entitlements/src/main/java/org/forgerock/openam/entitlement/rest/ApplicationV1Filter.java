@@ -16,6 +16,7 @@
  */
 package org.forgerock.openam.entitlement.rest;
 
+import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +121,7 @@ public class ApplicationV1Filter implements Filter {
 
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
-        final Set<String> resources = jsonValue.get(RESOURCES).asSet(String.class);
+        final Collection<String> resources = jsonValue.get(RESOURCES).asCollection(String.class);
         final String bodyRealm = jsonValue.get(REALM).asString();
         final String pathRealm = contextHelper.getRealm(context);
 
@@ -138,7 +140,7 @@ public class ApplicationV1Filter implements Filter {
 
         try {
             final ResourceType resourceType = findOrCreateResourceType(actions, resources, context, request);
-            jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<>(Arrays.asList(resourceType.getUUID())));
+            jsonValue.put(RESOURCE_TYPE_UUIDS, array(resourceType.getUUID()));
 
             // Forward onto next handler.
             return applicationTransformer.transform(next.handleCreate(context, request), context);
@@ -168,7 +170,7 @@ public class ApplicationV1Filter implements Filter {
      *         should some error occur finding or creating a resource type
      */
     private ResourceType findOrCreateResourceType(
-            final Map<String, Boolean> actions, Set<String> resources,
+            final Map<String, Boolean> actions, Collection<String> resources,
             final Context context, CreateRequest request) throws EntitlementException {
 
         final Subject callingSubject = contextHelper.getSubject(context);
@@ -248,7 +250,7 @@ public class ApplicationV1Filter implements Filter {
 
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
-        final Set<String> resources = jsonValue.get(RESOURCES).asSet(String.class);
+        final Collection<String> resources = jsonValue.get(RESOURCES).asCollection(String.class);
         final String bodyRealm = jsonValue.get(REALM).asString();
         final String pathRealm = contextHelper.getRealm(context);
 
@@ -308,7 +310,7 @@ public class ApplicationV1Filter implements Filter {
             }
 
             // Ensure the resource type UUID isn't lost.
-            jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<String>(Arrays.asList(resourceTypeUuid)));
+            jsonValue.put(RESOURCE_TYPE_UUIDS, array(resourceTypeUuid));
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application update CREST request", eE);

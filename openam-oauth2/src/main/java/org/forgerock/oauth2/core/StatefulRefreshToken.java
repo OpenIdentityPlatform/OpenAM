@@ -16,6 +16,9 @@
 
 package org.forgerock.oauth2.core;
 
+import static java.lang.String.valueOf;
+import static java.util.Collections.singletonList;
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.oauth2.core.Utils.stringToSet;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
@@ -153,7 +156,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      */
     @Override
     protected void setExpiryTime(long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+        setStringProperty(EXPIRE_TIME, valueOf(expiryTime));;
     }
 
     /**
@@ -162,11 +165,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      * @param realm The realm.
      */
     private void setRealm(String realm) {
-        if (realm == null || realm.isEmpty()) {
-            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, "/");
-        } else {
-            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm);
-        }
+        setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm == null || realm.isEmpty() ? "/" : realm);
     }
 
     /**
@@ -201,29 +200,11 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      */
     @Override
     public long getExpiryTime() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        final String value = getStringProperty(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
         if (value != null && !value.isEmpty()) {
-            return Long.parseLong(value.iterator().next());
+            return Long.parseLong(value);
         }
         return -1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setStringProperty(String key, String value) {
-        put(key, stringToSet(value));
-    }
-
-    @Override
-    public String getStringProperty(String key) {
-        final Set<String> value = getParameter(key);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-
     }
 
     /**
@@ -338,7 +319,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
     private Set<String> getParameter(String paramName) {
         final JsonValue param = get(paramName);
         if (param != null) {
-            return (Set<String>) param.getObject();
+            return param.as(setOf(String.class));
         }
         return null;
     }
@@ -367,7 +348,7 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      */
     @Override
     protected void setAuthTime(long authTime) {
-        put(OAuth2Constants.CoreTokenParams.AUTH_TIME, stringToSet(String.valueOf(authTime)));
+        setStringProperty(AUTH_TIME, valueOf(authTime));;
     }
 
     /**
@@ -375,9 +356,8 @@ public class StatefulRefreshToken extends StatefulToken implements RefreshToken 
      */
     @Override
     public long getAuthTimeSeconds() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.AUTH_TIME);
-        final long defaultVal = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis());
-        return Long.parseLong(CollectionUtils.getFirstItem(value, String.valueOf(defaultVal)));
+        final String value = getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_TIME);
+        return value == null ? TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()) : Long.parseLong(value);
     }
 
     @Override

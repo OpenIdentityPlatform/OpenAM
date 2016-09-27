@@ -152,7 +152,7 @@ public class AbstractHttpAccessAuditFilterTest {
     public void shouldGetUserIdForAccessOutcomeIfNotSet() {
 
         //Given
-        Response response = new Response();
+        Response response = new Response(Status.OK);
         AuditRequestContext.putProperty(USER_ID, null);
 
         //When

@@ -93,7 +93,7 @@ public class ResourceSetDescriptionValidator {
             throw new BadRequestException("Invalid Resource Set Description. Missing required attribute, 'scopes'.");
         }
         try {
-            description.get(OAuth2Constants.ResourceSets.SCOPES).asSet(String.class);
+            description.get(OAuth2Constants.ResourceSets.SCOPES).asCollection(String.class);
         } catch (JsonValueException e) {
             throw new BadRequestException("Invalid Resource Set Description. Required attribute, 'scopes', must be an "
                     + "array of Strings.");
@@ -113,7 +113,7 @@ public class ResourceSetDescriptionValidator {
 
     private void validateLabels(JsonValue description) throws BadRequestException {
         try {
-            description.get(OAuth2Constants.ResourceSets.LABELS).asSet(String.class);
+            description.get(OAuth2Constants.ResourceSets.LABELS).asCollection(String.class);
         } catch (JsonValueException e) {
             throw new BadRequestException("Invalid Resource Set Description. Optional attribute, 'labels', must be an "
                     + "array of Strings.");

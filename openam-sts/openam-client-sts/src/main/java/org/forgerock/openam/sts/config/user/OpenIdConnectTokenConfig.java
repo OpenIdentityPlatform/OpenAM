@@ -41,6 +41,7 @@ import java.util.StringTokenizer;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
 /**
  * Encapsulates the configuration state necessary to produce OpenId Connect Id Tokens.
@@ -428,7 +429,7 @@ public class OpenIdConnectTokenConfig {
                     field(PUBLIC_KEY_REFERENCE_TYPE, publicKeyReferenceType.name()),
                     field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
                     field(AUTHORIZED_PARTY, authorizedParty),
-                    field(AUDIENCE, audience),
+                    field(AUDIENCE, newList(audience)),
                     field(SIGNATURE_ALGORITHM, signatureAlgorithm.name()),
                     field(CLAIM_MAP, claimMap),
                     field(CUSTOM_CLAIM_MAPPER_CLASS, customClaimMapperClass),
@@ -536,7 +537,7 @@ public class OpenIdConnectTokenConfig {
         }
         jsonAttributes.put(CLAIM_MAP, new JsonValue(jsonAttributeMap));
 
-        jsonAttributes.put(AUDIENCE, new JsonValue(smsAttributeMap.get(AUDIENCE)));
+        jsonAttributes.put(AUDIENCE, new JsonValue(newList(smsAttributeMap.get(AUDIENCE))));
 
         return fromJson(new JsonValue(jsonAttributes));
     }

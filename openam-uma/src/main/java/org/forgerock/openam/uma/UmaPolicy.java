@@ -22,7 +22,9 @@ import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 import static org.forgerock.openam.uma.UmaPolicyUtils.getPolicyScopes;
 import static org.forgerock.openam.uma.UmaPolicyUtils.getPolicySubject;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -148,7 +150,7 @@ public class UmaPolicy {
         for (Map.Entry<String, Set<String>> permission : subjectPermissions.entrySet()) {
             permissions.add(object(
                     field(SUBJECT_KEY, permission.getKey()),
-                    field(SCOPES_KEY, permission.getValue())));
+                    field(SCOPES_KEY, newList(permission.getValue()))));
         }
         return new UmaPolicy(resourceSet, umaPolicy, underlyingPolicyIds);
     }

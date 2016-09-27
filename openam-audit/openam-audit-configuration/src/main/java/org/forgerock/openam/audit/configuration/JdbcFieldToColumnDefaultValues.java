@@ -18,6 +18,7 @@ package org.forgerock.openam.audit.configuration;
 
 import static java.util.Collections.emptySet;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
@@ -35,7 +36,7 @@ import java.util.Set;
 public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
 
     private static final JsonValue DEFAULT_VALUES = json(object(
-            field(AUTHENTICATION_TOPIC, set(
+            field(AUTHENTICATION_TOPIC, array(
                     "[_id]=id",
                     "[transactionId]=transactionid",
                     "[timestamp]=timestamp_",
@@ -48,7 +49,7 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[entries]=entries",
                     "[component]=component",
                     "[realm]=realm")),
-            field(ACTIVITY_TOPIC, set(
+            field(ACTIVITY_TOPIC, array(
                     "[_id]=id",
                     "[transactionId]=transactionid",
                     "[timestamp]=timestamp_",
@@ -64,7 +65,7 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[revision]=rev",
                     "[component]=component",
                     "[realm]=realm")),
-            field(ACCESS_TOPIC, set(
+            field(ACCESS_TOPIC, array(
                     "[_id]=id",
                     "[transactionId]=transactionid",
                     "[timestamp]=timestamp_",
@@ -92,7 +93,7 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
                     "[response/elapsedTimeUnits]=response_elapsedtimeunits",
                     "[component]=component",
                     "[realm]=realm")),
-            field(CONFIG_TOPIC, set(
+            field(CONFIG_TOPIC, array(
                     "[_id]=id",
                     "[transactionId]=transactionid",
                     "[timestamp]=timestamp_",
@@ -131,7 +132,7 @@ public final class JdbcFieldToColumnDefaultValues extends DefaultValues {
      */
     public static Set<String> getDefaultValues(String topic) {
         if (DEFAULT_VALUES.isDefined(topic)) {
-            return DEFAULT_VALUES.get(topic).asSet(String.class);
+            return DEFAULT_VALUES.get(topic).as(setOf(String.class));
         }
         return emptySet();
     }

@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2.rest;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.CLIENT_ID;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.EXPIRY_TIME;
 import static org.forgerock.openam.cts.api.fields.OAuthTokenField.ID;
@@ -79,6 +80,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -297,12 +299,12 @@ public class OAuth2UserApplications {
     }
 
     private String getAttributeValue(JsonValue token, String attributeName) {
-        String value = null;
+        String value;
         JsonValue jsonValue = token.get(attributeName);
         if (jsonValue.isString()) {
             value = jsonValue.asString();
-        } else if (jsonValue.isSet()) {
-            value = (String)jsonValue.asSet().iterator().next();
+        } else if (jsonValue.isCollection()) {
+            value = CollectionUtils.getFirstItem(jsonValue.asCollection(String.class));
         } else {
             value = jsonValue.toString();
         }
@@ -314,8 +316,8 @@ public class OAuth2UserApplications {
         JsonValue jsonValue = token.get(attributeName);
         if (jsonValue.isString()) {
             value.add(jsonValue.asString());
-        } else if (jsonValue.isSet()) {
-            value = jsonValue.asSet(String.class);
+        } else if (jsonValue.isCollection()) {
+            value = jsonValue.as(setOf(String.class));
         }
         return value;
     }

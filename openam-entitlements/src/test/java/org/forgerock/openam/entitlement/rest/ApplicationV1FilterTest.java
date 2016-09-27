@@ -16,7 +16,8 @@
 */
 package org.forgerock.openam.entitlement.rest;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.anyCollectionOf;
@@ -157,7 +158,7 @@ public class ApplicationV1FilterTest {
             filter.filterCreate(context, createRequest, requestHandler);
 
         // Then
-        assertThat(jsonValue.get("resourceTypeUuids").asSet(String.class))
+        assertThat(jsonValue.get("resourceTypeUuids")).isArray()
                 .containsOnly(TestData.DATA_SET_1.getResourceTypeUuid());
         verify(requestHandler).handleCreate(eq(context), eq(createRequest));
     }
@@ -203,7 +204,7 @@ public class ApplicationV1FilterTest {
         filter.filterCreate(context, createRequest, requestHandler);
 
         // Then
-        assertThat(jsonValue.get("resourceTypeUuids").asSet(String.class)).containsOnly("some-test-uuid");
+        assertThat(jsonValue.get("resourceTypeUuids")).isArray().containsOnly("some-test-uuid");
         verify(requestHandler).handleCreate(eq(context), eq(createRequest));
 
         ResourceType capturedResourceType = resourceTypeCaptor.getValue();
@@ -302,7 +303,7 @@ public class ApplicationV1FilterTest {
         filter.filterUpdate(context, updateRequest, requestHandler);
 
         // Then
-        assertThat(jsonValue.get("resourceTypeUuids").asSet(String.class)).containsOnly("abc-def-ghi");
+        assertThat(jsonValue.get("resourceTypeUuids")).isArray().containsOnly("abc-def-ghi");
         verify(resourceTypeService).updateResourceType(eq(subject), eq("/abc"), resourceTypeCaptor.capture());
         verify(requestHandler).handleUpdate(eq(context), eq(updateRequest));
 

@@ -17,6 +17,7 @@ package org.forgerock.openam.core.rest.server;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.server.SelfServiceInfo.SelfServiceInfoBuilder;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
@@ -121,11 +122,11 @@ public class ServerInfoResource extends RealmAwareResource {
      */
     private Promise<ResourceResponse, ResourceException> getCookieDomains() {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        Set<String> cookieDomains;
+        List<String> cookieDomains;
         ResourceResponse resource;
         int rev;
         try {
-            cookieDomains = AuthClientUtils.getCookieDomains();
+            cookieDomains = getCookieDomainsList();
             rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
             resource = newResourceResponse(COOKIE_DOMAINS, Integer.toString(rev), result);
@@ -140,6 +141,10 @@ public class ServerInfoResource extends RealmAwareResource {
         }
     }
 
+    private List<String> getCookieDomainsList() {
+        return newList(AuthClientUtils.getCookieDomains());
+    }
+
     /**
      * Retrieves all server info set on the server.
      *
@@ -150,7 +155,6 @@ public class ServerInfoResource extends RealmAwareResource {
      */
     private Promise<ResourceResponse, ResourceException> getAllServerInfo(Context context, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        Set<String> cookieDomains;
         ResourceResponse resource;
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
@@ -165,9 +169,8 @@ public class ServerInfoResource extends RealmAwareResource {
         protectedUserAttributes.addAll(restSecurity.getProtectedUserAttributes());
 
         try {
-            cookieDomains = AuthClientUtils.getCookieDomains();
-            result.put("domains", cookieDomains);
-            result.put("protectedUserAttributes", protectedUserAttributes);
+            result.put("domains", getCookieDomainsList());
+            result.put("protectedUserAttributes", new ArrayList<>(protectedUserAttributes));
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(selfServiceInfo.isForgottenPasswordEnabled()));

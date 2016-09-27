@@ -291,9 +291,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             opsId = UUID.randomUUID().toString();
             try {
                 tokenStore.create(json(object(
-                        field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
-                        field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
-                        field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
+                        field(OAuth2Constants.CoreTokenParams.ID, array(opsId)),
+                        field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, array(ops)),
+                        field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, array(Long.toString(exp))))));
             } catch (CoreTokenException e) {
                 logger.error("Unable to create id_token user session token", e);
                 throw new ServerException("Could not create token in CTS");
@@ -989,7 +989,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
                 throw new InvalidGrantException();
             }
 
-            DeviceCode deviceCode = new DeviceCode(json(token.asSet().iterator().next()));
+            DeviceCode deviceCode = new DeviceCode(json(token.asCollection().iterator().next()));
             request.setToken(DeviceCode.class, deviceCode);
             return deviceCode;
         } catch (CoreTokenException e) {

@@ -33,6 +33,7 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPD
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.MISSING_SCRIPT;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.SCRIPT_DECODING_FAILED;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -163,7 +164,9 @@ public class ScriptResource extends RealmAwareResource {
                             field("column", error.getColumnNumber()),
                             field("message", error.getMessage())));
                 }
-                return newResultPromise(newActionResponse(json(object(field("success", false), field("errors", errors)))));
+                return newResultPromise(newActionResponse(json(object(
+                        field("success", false),
+                        field("errors", newList(errors))))));
             } catch (ScriptException se) {
                 return exceptionMappingHandler.handleError(context, request, se).asPromise();
             }

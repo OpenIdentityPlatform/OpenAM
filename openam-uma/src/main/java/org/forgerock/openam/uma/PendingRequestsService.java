@@ -19,12 +19,14 @@ package org.forgerock.openam.uma;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -284,7 +286,7 @@ public class PendingRequestsService {
                         Set<String> subjectScopes =
                                 new HashSet<>(subjectPermission.get(SCOPES_KEY).asCollection(String.class));
                         subjectScopes.addAll(scopes);
-                        subjectPermission.put(SCOPES_KEY, subjectScopes);
+                        subjectPermission.put(SCOPES_KEY, new ArrayList<>(subjectScopes));
 
                         return policyService.updatePolicy(context, request.getResourceSetId(), policyJson);
                     }
@@ -306,7 +308,7 @@ public class PendingRequestsService {
                 field(PERMISSIONS_KEY, array(
                         object(
                                 field(SUBJECT_KEY, requestingPartyId),
-                                field(SCOPES_KEY, scopes)
+                                field(SCOPES_KEY, newList(scopes))
                         )
                 ))));
     }

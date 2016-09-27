@@ -877,7 +877,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     private void validateScopes(ResourceSetDescription resourceSet, Set<String> requestedScopes)
             throws BadRequestException {
-        Set<String> availableScopes = resourceSet.getDescription().get("scopes").asSet(String.class);
+        Collection<String> availableScopes = resourceSet.getDescription().get("scopes").asCollection(String.class);
         if (!availableScopes.containsAll(requestedScopes)) {
             throw new BadRequestException("Defined Resource Set scopes, " + availableScopes.toString()
                     + ", do not contain requested scopes, " + requestedScopes.toString());

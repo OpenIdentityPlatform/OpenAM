@@ -17,9 +17,12 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
@@ -75,11 +78,11 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
         JsonValue configuration = json(object(
                 field("version", providerSettings.getVersion()),
                 field("issuer", umaUris.getIssuer()),
-                field("pat_profiles_supported", providerSettings.getSupportedPATProfiles()),
-                field("aat_profiles_supported", providerSettings.getSupportedAATProfiles()),
-                field("rpt_profiles_supported", providerSettings.getSupportedRPTProfiles()),
-                field("pat_grant_types_supported", providerSettings.getSupportedPATGrantTypes()),
-                field("aat_grant_types_supported", providerSettings.getSupportedAATGrantTypes()),
+                field("pat_profiles_supported", newList(providerSettings.getSupportedPATProfiles())),
+                field("aat_profiles_supported", newList(providerSettings.getSupportedAATProfiles())),
+                field("rpt_profiles_supported", newList(providerSettings.getSupportedRPTProfiles())),
+                field("pat_grant_types_supported", newList(providerSettings.getSupportedPATGrantTypes())),
+                field("aat_grant_types_supported", newList(providerSettings.getSupportedAATGrantTypes())),
                 field("token_endpoint", umaUris.getTokenEndpoint()),
                 field("authorization_endpoint", umaUris.getAuthorizationEndpoint()),
                 field("introspection_endpoint", umaUris.getTokenIntrospectionEndpoint()),

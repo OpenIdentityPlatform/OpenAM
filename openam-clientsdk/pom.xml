@@ -30,6 +30,10 @@
     <artifactId>openam-clientsdk</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <shade.package>org.forgerock.openam.sdk</shade.package>
+    </properties>
+
     <!-- Build -->
     <build>
         <finalName>ClientSDK-${project.version}</finalName>
@@ -79,6 +83,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <!-- Local build for MSHADE-237 and MSHADE-182 -->
+                <version>3.0.0-forgerock-alpha-1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -117,6 +123,9 @@
                             <include>org.forgerock.commons.guava:forgerock-guava-base</include>
                             <include>org.forgerock.commons.guava:forgerock-guava-collect</include>
                             <include>org.forgerock.http:chf-http-core</include>
+                            <include>com.fasterxml.jackson.core:jackson-databind</include>
+                            <include>com.fasterxml.jackson.core:jackson-core</include>
+                            <include>com.fasterxml.jackson.core:jackson-annotations</include>
                             <include>joda-time:joda-time</include>
                             <include>org.slf4j:slf4j-api</include>
                         </includes>
@@ -127,6 +136,7 @@
                             <includes>
                                 <include>amAuth.properties</include>
                                 <include>amAuthContext.properties</include>
+                                <include>amDelegation.properties</include>
                                 <include>amIdRepo.properties</include>
                                 <include>amNaming.properties</include>
                                 <include>amPolicy.properties</include>
@@ -136,6 +146,7 @@
                                 <include>amSSOProvider.properties</include>
                                 <include>amSecurity.properties</include>
                                 <include>amSession.properties</include>
+                                <include>EntitlementException.properties</include>
                                 <include>serverAttributeMap.properties</include>
                                 <include>com/iplanet/am/sdk/**</include>
                                 <include>com/iplanet/am/util/**</include>
@@ -606,7 +617,42 @@
                                 <!-- TODO Add License to Manifest -->
                             </manifestEntries>
                         </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                     </transformers>
+                    <relocations>
+                        <relocation>
+                            <pattern>org/</pattern>
+                            <shadedPattern>${shade.package}.org.</shadedPattern>
+                            <excludes>
+                                <exclude>org.forgerock.openam.**.*</exclude>
+                                <exclude>org.w3c.dom.**.*</exclude>
+                                <exclude>org.xml.sax.**.*</exclude>
+                            </excludes>
+                        </relocation>
+                        <relocation>
+                            <pattern>com/</pattern>
+                            <shadedPattern>${shade.package}.com.</shadedPattern>
+                            <excludes>
+                                <exclude>com.sun.identity.**.*</exclude>
+                                <exclude>com.iplanet.**.*</exclude>
+                            </excludes>
+                        </relocation>
+                        <relocation>
+                            <pattern>javax.inject</pattern>
+                            <shadedPattern>${shade.package}.javax.inject</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javax.mail</pattern>
+                            <shadedPattern>${shade.package}.javax.mail</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javax.activation</pattern>
+                            <shadedPattern>${shade.package}.javax.activation</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <shadeSourcesContent>true</shadeSourcesContent>
                     <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
                     <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                 </configuration>

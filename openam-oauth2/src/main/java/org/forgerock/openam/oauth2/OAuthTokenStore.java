@@ -33,8 +33,11 @@ import org.forgerock.util.query.QueryFilter;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -149,7 +152,7 @@ public class OAuthTokenStore {
      * @return The JsonValue expected by the caller.
      */
     private JsonValue convertResults(Collection<Token> tokens) {
-        Set<Map<String, Object>> results = new HashSet<Map<String, Object>>();
+        List<Map<String, Object>> results = new ArrayList<>();
 
         for (Token token : tokens) {
             results.add(convertToken(token));

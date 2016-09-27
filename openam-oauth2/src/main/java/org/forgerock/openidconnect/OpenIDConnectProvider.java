@@ -17,6 +17,7 @@
 package org.forgerock.openidconnect;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -89,7 +90,7 @@ public class OpenIDConnectProvider {
     /**
      * Destroys a users session.
      *
-     * @param kid The key id of the id token JWT
+     * @param opsId The key id of the id token JWT
      * @throws ServerException If any internal server error occurs.
      */
     public void destroySession(String opsId) throws ServerException {
@@ -102,8 +103,8 @@ public class OpenIDConnectProvider {
 
             JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(opsToken);
             cts.delete(opsId);
-            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.LEGACY_OPS)
-                    .asSet(String.class).iterator().next();
+            String sessionId = getFirstItem(idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.LEGACY_OPS)
+                    .asCollection(String.class));
 
             // for some grant type, there is no OpenAM session associated with a id_token
             if (sessionId != null) {

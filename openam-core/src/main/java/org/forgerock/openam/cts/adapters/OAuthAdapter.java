@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -90,7 +90,7 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      */
     public Token toToken(JsonValue request) {
         assertObjectIsAMap(request);
-        Set<String> idSet = (Set<String>) request.get(TokenIdFactory.ID).getObject();
+        Collection<String> idSet = request.get(TokenIdFactory.ID).asCollection(String.class);
         String id = null;
         if (idSet != null && !idSet.isEmpty()){
             id = tokenIdFactory.generateTokenId(idSet.iterator().next());
@@ -175,15 +175,6 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         JsonValue r;
         try {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
-            Set<String> keys = new HashSet<String>(r.keys());
-            for (String key : keys){
-                if (r.get(key).isList()) {
-                    List<String> x = r.get(key).asList(String.class);
-                    Set<String> set = new HashSet<String>(x);
-                    r.remove(key);
-                    r.add(key, set);
-                }
-            }
         } catch (IllegalStateException e) {
             // OAuth tokens are expected to be of type Map
             // but if this may happen if reading a token which isn't an OAuth token

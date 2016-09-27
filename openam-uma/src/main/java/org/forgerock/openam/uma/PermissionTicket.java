@@ -17,7 +17,10 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValueFunctions.setOf;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
@@ -58,7 +61,7 @@ public class PermissionTicket implements UmaToken {
         this.id = id;
         this.resourceSetId = resourceSetId;
         this.resourceServerClientId = resourceServerClientId;
-        contents.put(SCOPES, scopes);
+        contents.put(SCOPES, newList(scopes));
     }
 
     public String getId() {
@@ -95,11 +98,11 @@ public class PermissionTicket implements UmaToken {
 
     public Set<String> getScopes() {
         JsonValue scopes = contents.get(SCOPES);
-        return scopes == null ? null : scopes.asSet(String.class);
+        return scopes == null ? null : scopes.as(setOf(String.class));
     }
 
     public void setScopes(Set<String> scopes) {
-        contents.put(SCOPES, scopes);
+        contents.put(SCOPES, newList(scopes));
     }
 
     public String getResourceServerClientId() {

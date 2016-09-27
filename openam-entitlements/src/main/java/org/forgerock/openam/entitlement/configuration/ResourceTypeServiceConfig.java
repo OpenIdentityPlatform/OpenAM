@@ -47,6 +47,7 @@ public class ResourceTypeServiceConfig {
      * @throws SSOException If the Admin token could not be found.
      */
     ServiceConfig getOrgConfig(Subject subject, String realm) throws SMSException, SSOException {
+        realm = getEntitlementConfigurationRealm(realm);
         final SSOToken token = getSSOToken(subject);
         if (token == null) {
             throw new SSOException("Could not find Admin token.");

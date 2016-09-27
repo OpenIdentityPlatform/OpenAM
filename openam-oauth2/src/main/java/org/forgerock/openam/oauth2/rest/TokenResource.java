@@ -377,7 +377,7 @@ public class TokenResource implements CollectionResourceProvider {
      * @return The attribute value.
      */
     private String getAttributeValue(JsonValue token, String attributeName) {
-        final Set<String> value = getAttributeAsSet(token, attributeName);
+        final Collection<String> value = getAttributeAsSet(token, attributeName);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -392,10 +392,10 @@ public class TokenResource implements CollectionResourceProvider {
      * @return The attribute set.
      */
     @SuppressWarnings("unchecked")
-    private Set<String> getAttributeAsSet(JsonValue value, String attributeName) {
+    private Collection<String> getAttributeAsSet(JsonValue value, String attributeName) {
         final JsonValue param = value.get(attributeName);
         if (param != null) {
-            return (Set<String>) param.getObject();
+            return param.asCollection(String.class);
         }
         return null;
     }
@@ -484,22 +484,16 @@ public class TokenResource implements CollectionResourceProvider {
         ResourceResponse resource = newResourceResponse("result", "1", response);
         JsonValue value = resource.getContent();
         String acceptLanguage = context.asContext(HttpContext.class).getHeaderAsString("accept-language");
-        Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) value.getObject();
 
-        JsonValue val;
+        for (JsonValue val : value) {
+            Client client = getClient(val);
 
-        if (list != null && !list.isEmpty()) {
-            for (HashMap<String, Set<String>> entry : list) {
-                val = new JsonValue(entry);
-                Client client = getClient(val);
+            val.put(EXPIRE_TIME_KEY, getExpiryDate(val, context));
+            val.put(OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME.getType(), getClientName(client));
+            val.put(OAuth2Constants.ShortClientAttributeNames.SCOPES.getType(), getScopes(client, val,
+                    acceptLanguage));
 
-                val.put(EXPIRE_TIME_KEY, getExpiryDate(json(entry), context));
-                val.put(OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME.getType(), getClientName(client));
-                val.put(OAuth2Constants.ShortClientAttributeNames.SCOPES.getType(), getScopes(client, val,
-                        acceptLanguage));
-
-                handler.handleResource(resource(val, uid));
-            }
+            handler.handleResource(resource(val, uid));
         }
         return newResultPromise(newQueryResponse());
     }
@@ -510,7 +504,7 @@ public class TokenResource implements CollectionResourceProvider {
 
     private String getScopes(Client client, JsonValue entry, String acceptLanguage) throws UnauthorizedClientException {
         JsonValue allScopes = client.get(OAuth2Constants.ShortClientAttributeNames.SCOPES.getType());
-        Set<String> allowedScopes = getAttributeAsSet(entry, "scope");
+        Collection<String> allowedScopes = getAttributeAsSet(entry, "scope");
 
         java.util.Locale locale = Locale.getLocaleObjFromAcceptLangHeader(acceptLanguage);
 
@@ -634,7 +628,7 @@ public class TokenResource implements CollectionResourceProvider {
             if (expireTimeValue.isNumber()) {
                 expireTime = expireTimeValue.asLong();
             } else {
-                Set<String> expireTimeSet = (Set<String>) expireTimeValue.getObject();
+                Collection<String> expireTimeSet = expireTimeValue.asCollection(String.class);
                 expireTime = Long.parseLong(expireTimeSet.iterator().next());
             }
 

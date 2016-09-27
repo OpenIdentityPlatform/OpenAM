@@ -53,6 +53,7 @@ import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * Utility methods for managing entitlements.
@@ -520,5 +521,20 @@ public final class EntitlementUtils {
         }
 
         throw new UnsupportedOperationException("Requested operation is not supported in Client Mode.");
+    }
+
+    /**
+     * Gets the realm to obtain entitlements configuration ({@code Application} and {@code ResourceType} instances)
+     * from. For all realms except {@code /sunamhiddenrealmdelegationservicepermissions}, this will be the realm as
+     * passed in. For that realm, however, the root realm is returned.
+     * @param realm The realm being queried.
+     * @return The realm to use for entitlements configuration objects.
+     */
+    public static String getEntitlementConfigurationRealm(String realm) {
+        if (realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX) ||
+                realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX2)) {
+            return "/";
+        }
+        return realm;
     }
 }

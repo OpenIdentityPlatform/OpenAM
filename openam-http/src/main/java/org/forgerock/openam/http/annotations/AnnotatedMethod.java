@@ -81,16 +81,16 @@ public class AnnotatedMethod {
             Object result = method.invoke(requestHandler, args);
             return responseAdapter.apply(result);
         } catch (IllegalAccessException e) {
-            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR)
+            return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR)
                     .setCause(new IllegalStateException("Cannot access the annotated method: " + method.getName(), e)));
         } catch (InvocationTargetException e) {
-            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR)
+            return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR)
                     .setCause(new IllegalStateException("Exception from invocation should be handled by promise", e)));
         }
     }
 
     private Response createErrorResponse(Status status, Object entity) {
-        return new Response().setStatus(status).setEntity(entity);
+        return new Response(status).setEntity(entity);
     }
 
     static AnnotatedMethod findMethod(Object requestHandler, Class<? extends Annotation> annotation) {
@@ -163,10 +163,7 @@ public class AnnotatedMethod {
         @Override
         public Promise<Response, NeverThrowsException> apply(Object o) {
             Object content = entityConverter.apply(o);
-            return newResultPromise(
-                    new Response()
-                            .setEntity(content)
-                            .setStatus(content == null ? Status.NO_CONTENT : Status.OK));
+            return newResultPromise(new Response(content == null ? Status.NO_CONTENT : Status.OK).setEntity(content));
         }
 
         /**

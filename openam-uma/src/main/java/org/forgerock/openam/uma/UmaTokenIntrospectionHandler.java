@@ -18,6 +18,9 @@ package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.*;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -84,7 +87,7 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
         for (Permission p : token.getPermissions()) {
             JsonValue permission = json(object(
                     field(UmaConstants.RESOURCE_SET_ID, p.getResourceSetId()),
-                    field(UmaConstants.SCOPES, p.getScopes())));
+                    field(UmaConstants.SCOPES, newList(p.getScopes()))));
             if (p.getExpiryTime() != null) {
                 permission.add(OAuth2Constants.JWTTokenParams.EXP, p.getExpiryTime());
             }

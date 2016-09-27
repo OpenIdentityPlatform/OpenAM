@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.session.action;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.iplanet.sso.SSOToken;
@@ -62,7 +63,7 @@ public class GetPropertyNamesActionHandler implements ActionHandler {
             final SSOToken caller = context.asContext(SSOTokenContext.class).getCallerSSOToken();
             final String realm = context.asContext(RealmContext.class).getRealm().asPath();
             return newResultPromise(newActionResponse(json(object(field(SessionResource.KEYWORD_PROPERTIES,
-                    sessionPropertyWhitelist.getAllListedProperties(realm))))));
+                    newList(sessionPropertyWhitelist.getAllListedProperties(realm)))))));
         } catch (Exception e) {
             LOGGER.message("Unable to read all whitelisted session properties.", e);
         }

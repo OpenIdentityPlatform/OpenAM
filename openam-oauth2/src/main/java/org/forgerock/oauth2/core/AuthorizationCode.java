@@ -16,14 +16,18 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.Utils.stringToSet;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_CODE_TYPE;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,7 +81,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         setStringProperty(CLIENT_ID, clientId);
         setStringProperty(REDIRECT_URI, redirectUri);
         setStringProperty(EXPIRE_TIME, String.valueOf(expiryTime));
-        put(SCOPE, scope);
+        put(SCOPE, newList(scope));
         setStringProperty(TOKEN_TYPE, "Bearer");
         setStringProperty(TOKEN_NAME, OAUTH_CODE_TYPE);
         setStringProperty(NONCE, nonce);
@@ -88,7 +92,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         setStringProperty(AUTH_GRANT_ID, authGrantId);
         setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
         setStringProperty(SSO_TOKEN_ID, ssoTokenId);
-        put(CLAIMS, CollectionUtils.asSet(claims));
+        put(CLAIMS, CollectionUtils.asList(claims));
         setStringProperty(AUDIT_TRACKING_ID, auditId);
     }
 
@@ -156,8 +160,8 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return {@code true} if the authorization code has been issued.
      */
     public boolean isIssued() {
-        Set<String> issued = getParameter(ISSUED);
-        return issued != null && Boolean.parseBoolean(issued.iterator().next());
+        String issued = getStringProperty(ISSUED);
+        return issued != null && Boolean.parseBoolean(issued);
     }
 
     /**
@@ -237,22 +241,23 @@ public class AuthorizationCode extends JsonValue implements Token {
     private Set<String> getParameter(String paramName) {
         final JsonValue param = get(paramName);
         if (param != null) {
-            return (Set<String>) param.getObject();
+            return param.as(setOf(String.class));
         }
         return null;
     }
 
     private String getStringProperty(String key) {
-        final Set<String> value = getParameter(key);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
+        final JsonValue value = get(key);
+        if (value != null && value.isCollection()) {
+            Collection<String> strings = value.asCollection(String.class);
+            return strings.isEmpty() ? null : strings.iterator().next();
         }
         return null;
 
     }
 
     private void setStringProperty(String key, String value) {
-        put(key, stringToSet(value));
+        put(key, value == null || value.isEmpty() ? emptyList() : singletonList(value));
     }
 
     /**
