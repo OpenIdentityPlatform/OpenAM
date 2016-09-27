@@ -11,10 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
- */
-
-/*
+ * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package org.forgerock.openam.core.rest.authn.core;
@@ -186,7 +183,11 @@ public class LoginAuthenticator {
         HttpServletResponse response = loginConfiguration.getHttpResponse();
         SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
         boolean isSessionUpgrade = false;
-        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull() || loginConfiguration.isForceAuth()) {
+        // If the sessionID is null we don't have an authentication session yet, so we will need to use the existing
+        // session ID when creating the new AuthContext instance. For subsequent requests the sessionID won't be null,
+        // hence the AuthContext should be retrieved using that instead to ensure we only have one authentication
+        // session for this session upgrade.
+        if (sessionID.isNull() && (loginConfiguration.isSessionUpgradeRequest() || loginConfiguration.isForceAuth())) {
             sessionID = new SessionID(loginConfiguration.getSSOTokenId());
             SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(sessionID);
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
