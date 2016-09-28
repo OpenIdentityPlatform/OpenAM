@@ -30,7 +30,7 @@ function cookieDomains () {
 }
 
 function secureCookie () {
-    return Configuration.globalData.auth.secureCookie;
+    return Configuration.globalData.secureCookie;
 }
 
 export function set (token) {
