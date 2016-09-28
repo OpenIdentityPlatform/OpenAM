@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
@@ -246,7 +247,11 @@ public class SessionService {
      * @param sessionID
      */
     public void destroyAuthenticationSession(final SessionID sessionID) {
-        InternalSession authenticationSession = removeCachedInternalSession(sessionID);
+
+        InternalSession authenticationSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).removeSession(sessionID);
+        if (authenticationSession == null) {
+            authenticationSession = removeCachedInternalSession(sessionID);
+        }
         if (authenticationSession != null && authenticationSession.getState() != INVALID) {
             signalRemove(authenticationSession, SessionEvent.DESTROY);
             sessionAuditor.auditActivity(authenticationSession.toSessionInfo(), AM_SESSION_DESTROYED);

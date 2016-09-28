@@ -45,7 +45,7 @@ import com.sun.identity.shared.debug.Debug;
 
 public class LocalOperationsTest {
 
-    public static final String TEST_TOKEN_ID = "TEST_TOKEN_ID";
+
     private LocalOperations local;
     @Mock
     private Session mockRequester;
@@ -126,15 +126,14 @@ public class LocalOperationsTest {
     }
 
     @Test
-    public void shouldDeleteSessionTokenOnLogout() throws Exception {
+    public void shouldRemoveSessionFromSessionAccessManagerOnLogout() throws Exception {
         // Given
         given(mockSession.getSessionID()).willReturn(mockSessionID);
         given(mockSession.getID()).willReturn(mockSessionID);
-        given(tokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TEST_TOKEN_ID);
         // When
         local.logout(mockSession);
         // Then
-        verify(coreTokenService).delete(TEST_TOKEN_ID);
+        verify(sessionAccessManager).removeInternalSession(mockSessionID);
     }
 
     @Test

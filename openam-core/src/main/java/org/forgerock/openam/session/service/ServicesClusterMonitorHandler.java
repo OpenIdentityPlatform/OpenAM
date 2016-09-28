@@ -28,7 +28,6 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.cluster.ClusterMonitor;
 import com.iplanet.dpro.session.service.cluster.MultiServerClusterMonitor;
@@ -51,9 +50,9 @@ public class ServicesClusterMonitorHandler {
      * a different instance (e.g. SFO changing state) then this AtomicReference will ensure
      * thread safety around the access to the ClusterMonitor instance.
      */
-    private AtomicReference<ClusterMonitor> clusterMonitor = new AtomicReference<>();
+    private final AtomicReference<ClusterMonitor> clusterMonitor = new AtomicReference<>();
 
-    private Debug sessionDebug;
+    private final Debug sessionDebug;
     private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
 

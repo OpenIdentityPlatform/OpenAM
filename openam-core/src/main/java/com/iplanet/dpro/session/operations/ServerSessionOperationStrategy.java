@@ -96,14 +96,14 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      */
     @Override
     public SessionOperations getOperation(SessionID sessionID) {
-        if (isClientSide(sessionID)) {
+        if (isStateless(sessionID)) {
             return logAndWrap(sessionID, stateless, SessionMonitorType.STATELESS);
         }
 
         return logAndWrap(sessionID, local, SessionMonitorType.LOCAL);
     }
 
-    private boolean isClientSide(SessionID sessionID) {
+    private boolean isStateless(SessionID sessionID) {
         return statelessSessionManager.containsJwt(sessionID);
     }
 

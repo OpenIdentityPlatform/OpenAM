@@ -89,6 +89,7 @@ import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -368,6 +369,9 @@ public class LoginState {
     private final SessionAccessManager sessionAccessManager =
             InjectorHolder.getInstance(SessionAccessManager.class);
 
+    private final AuthenticationSessionStore authenticationSessionStore =
+            InjectorHolder.getInstance(AuthenticationSessionStore.class);
+
     /**
      * Attempts to load the configured session property upgrader class.
      */
@@ -441,7 +445,7 @@ public class LoginState {
             }
             return null;
         }
-        InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
+        InternalSession session = getReferencedSession();
         if (session == null || session.getState() == INACTIVE ||
                 session.getState() == DESTROYED) {
             if (DEBUG.messageEnabled()) {
@@ -1128,7 +1132,7 @@ public class LoginState {
                 setSuccessLoginURL(AuthContext.IndexType.SERVICE, getAuthConfigName(indexType, indexName));
             }
 
-            InternalSession internalSession = sessionAccessManager.getInternalSession(sessionReference);
+            InternalSession internalSession = getReferencedSession();
             final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
                     internalSession, subject, loginContext);
             if (isSessionActivated) {
@@ -1910,14 +1914,14 @@ public class LoginState {
         if (null == sessionReference) {
             return null;
         }
-        return sessionAccessManager.getInternalSession(sessionReference);
+        return AuthD.getSession(sessionReference);
     }
 
     private InternalSession getReferencedOldSession() {
         if (null == oldSessionReference) {
             return null;
         }
-        return sessionAccessManager.getInternalSession(oldSessionReference);
+        return AuthD.getSession(oldSessionReference);
     }
 
     /**
@@ -5313,9 +5317,7 @@ public class LoginState {
         if (stateless || isNoSession()) {
             return;
         }
-        InternalSession session = getSession();
-        session.setStored(true);
-        AuthD.getSessionService().update(session);
+        authenticationSessionStore.promoteSession(sessionReference);
     }
 
     /**

@@ -16,19 +16,26 @@
 
 package org.forgerock.openam.authentication.service;
 
-import static org.forgerock.openam.session.SessionConstants.APPLICATION_SESSION;
-import static org.forgerock.openam.session.SessionConstants.VALID;
+import static org.forgerock.openam.ldap.LDAPUtils.*;
+import static org.forgerock.openam.session.SessionConstants.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.service.SessionAccessManager;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.service.*;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.service.AuthenticationSessionStore;
+import com.iplanet.dpro.session.service.DsameAdminTokenProvider;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionFactory;
+import com.iplanet.dpro.session.service.MonitoringOperations;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceManager;
 
 /**
  * Factory for creating and caching an Authentication Session which is used by the authentication framework.
@@ -38,19 +45,19 @@ public class AuthSessionFactory {
 
     private InternalSession authSession; // cached auth session
     private final Debug sessionDebug;
-    private final SessionAccessManager sessionAccessManager;
+    private final AuthenticationSessionStore authenticationSessionStore;
     private final MonitoringOperations monitoringOperations;
     private final InternalSessionFactory internalSessionFactory;
     private final DsameAdminTokenProvider dsameAdminTokenProvider;
 
     @Inject
     public AuthSessionFactory(final @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
-                              final SessionAccessManager sessionAccessManager,
+                              AuthenticationSessionStore authenticationSessionStore,
                               final MonitoringOperations monitoringOperations,
                               final InternalSessionFactory internalSessionFactory,
                               final DsameAdminTokenProvider dsameAdminTokenProvider) {
         this.sessionDebug = sessionDebug;
-        this.sessionAccessManager = sessionAccessManager;
+        this.authenticationSessionStore = authenticationSessionStore;
         this.monitoringOperations = monitoringOperations;
         this.internalSessionFactory = internalSessionFactory;
         this.dsameAdminTokenProvider = dsameAdminTokenProvider;
@@ -61,13 +68,13 @@ public class AuthSessionFactory {
      *
      * @param domain      Authentication Domain
      */
-    public Session getAuthenticationSession(String domain) {
+    public InternalSession getAuthenticationSession(String domain) {
         try {
             if (authSession == null) {
                 // Create a special InternalSession for Authentication Service
-                authSession = getServiceSession(domain);
+                authSession = initAuthSession(domain);
             }
-            return authSession != null ? sessionAccessManager.getSession(authSession.getID()) : null;
+            return authSession;
         } catch (Exception e) {
             sessionDebug.error("Error creating service session", e);
             return null;
@@ -88,10 +95,27 @@ public class AuthSessionFactory {
             session.setNonExpiring();
             session.setState(VALID);
             monitoringOperations.incrementActiveSessions();
+            authenticationSessionStore.promoteSession(session.getSessionID());
             return session;
         } catch (Exception e) {
             sessionDebug.error("Error creating service session", e);
             return null;
         }
+    }
+
+    private InternalSession initAuthSession(String domain) throws SSOException, SessionException {
+        InternalSession authSession = getServiceSession(domain);
+
+        String clientID = authSession.getClientID(); //TODO: NPE risk
+        authSession.putProperty("Principal", clientID);
+        authSession.putProperty("Organization", domain);
+        authSession.putProperty("Host", authSession.getID().getSessionServer());
+
+        if (LDAPUtils.isDN(clientID)) {
+            String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
+            authSession.putProperty(Constants.UNIVERSAL_IDENTIFIER, id);
+        }
+
+        return authSession;
     }
 }

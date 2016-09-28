@@ -288,7 +288,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      */
     static class ClusterStateServiceFactory {
 
-        public ClusterStateService createClusterStateService(
+        ClusterStateService createClusterStateService(
                 ForeignSessionHandler foreignSessionHandler,
                 SessionServerConfig sessionServerConfig,
                 SessionServiceConfig sessionServiceConfig,

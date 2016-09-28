@@ -20,46 +20,85 @@ import static org.forgerock.openam.session.SessionConstants.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 
-import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.session.SessionCache;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.iplanet.dpro.session.service.*;
 import com.sun.identity.shared.debug.Debug;
 
 public class SessionAccessManagerTest {
 
+    public static final String TEST_TOKEN_ID = "TEST_TOKEN_ID";
+
     private SessionAccessManager sessionAccessManager;
-    @Mock
-    private SessionService mockSessionService;
-    @Mock private SessionServiceConfig mockSessionServiceConfig;
-    @Mock private SessionLogging mockSessionLogging;
-    @Mock private SessionAuditor mockSessionAuditor;
     @Mock private Debug mockDebug;
+    @Mock private CTSPersistentStore mockCoreTokenStore;
+    @Mock private TokenIdFactory tokenIdFactory;
+
+    @Mock private Session mockSession;
+    @Mock private SessionID mockSessionID;
+    @Mock private InternalSession mockInternalSession;
+    @Mock private InternalSessionCache internalSessionCache;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        sessionAccessManager = InjectorHolder.getInstance(SessionAccessManager.class);
+        sessionAccessManager = new SessionAccessManager(mockDebug, mock(ForeignSessionHandler.class),
+                mock(SessionCache.class), internalSessionCache, tokenIdFactory,
+                mockCoreTokenStore, mock(SessionAdapter.class), mock(SessionNotificationSender.class),
+                mock(SessionLogging.class), mock(SessionAuditor.class), mock(MonitoringOperations.class));
+
+        given(internalSessionCache.remove(mockSessionID)).willReturn(mockInternalSession);
+        given(mockSession.getID()).willReturn(mockSessionID);
+
     }
 
     @Test
-    public void shouldNotUpdateIfAboutToDelete() {
+    public void shouldNotUpdateIfAboutToDelete() throws CoreTokenException {
         // Given
         final InternalSession session = mock(InternalSession.class);
-        given(session.getState()).willReturn(VALID);
+
+        // set session up to be updated
+        given(session.getTimeLeftBeforePurge()).willReturn(100L);
+        given(session.willExpire()).willReturn(true);
+        given(session.isStored()).willReturn(true);
         given(session.isTimedOut()).willReturn(true);
+
+        // now set it to be destroyed instead
+        given(session.getState()).willReturn(DESTROYED);
 
         // When
         sessionAccessManager.update(session);
 
         // Then
-//        verify(sessionAccessManager, never()).save(session); //TODO: how to unit test this?
+        verify(mockCoreTokenStore, never()).update((Token) Mockito.any()); //TODO: how to unit test this?
+    }
+
+    @Test
+    public void shouldDeleteSessionTokenOnLogout() throws Exception {
+        // Given
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockInternalSession.getID()).willReturn(mockSessionID);
+        given(tokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TEST_TOKEN_ID);
+
+        given(mockInternalSession.isStored()).willReturn(true);
+        given(mockInternalSession.getState()).willReturn(DESTROYED);
+        // When
+        sessionAccessManager.removeInternalSession(mockSessionID);
+        // Then
+        verify(mockCoreTokenStore).delete(TEST_TOKEN_ID);
     }
 }

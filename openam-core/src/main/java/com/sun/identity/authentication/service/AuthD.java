@@ -29,8 +29,6 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.ldap.LDAPUtils.*;
-
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -52,15 +50,17 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.AuthSessionFactory;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.session.AMSession;
+import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
@@ -226,7 +226,11 @@ public class AuthD implements ConfigurationListener {
         debug.message("AuthD initializing");
         try {
             rootSuffix = defaultOrg = ServiceManager.getBaseDN();
-            final Session authSession = initAuthSession();
+            final InternalSession authSession = authSessionFactory.getAuthenticationSession(defaultOrg);
+            if (authSession == null) {
+                debug.error("AuthD failed to get auth session");
+                throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
+            }
             ssoAuthSession = initSsoAuthSession(authSession);
             initAuthServiceGlobalSettings();
             initPlatformServiceGlobalSettings();
@@ -564,14 +568,15 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(SessionID sessionId) {
-        if (null == sessionId){
+        if (null == sessionId) {
             return null;
         }
-        SessionService sessionService = getSessionService();
-        if (null == sessionService){
-            return null;
+        InternalSession internalSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).getSession(sessionId);
+        if (internalSession != null) {
+            return internalSession;
         }
-        return sessionService.getInternalSession(sessionId);
+
+        return InjectorHolder.getInstance(SessionAccessManager.class).getInternalSession(sessionId);
     }
         
         
@@ -795,28 +800,8 @@ public class AuthD implements ConfigurationListener {
     public SSOToken getSSOAuthSession()  {
         return ssoAuthSession;
     }
-
-    private Session initAuthSession() throws SSOException, SessionException {
-        final Session authSession = authSessionFactory.getAuthenticationSession(defaultOrg);
-        if (authSession == null) {
-            debug.error("AuthD failed to get auth session");
-            throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
-        }
-
-        String clientID = authSession.getClientID();
-        authSession.setProperty("Principal", clientID);
-        authSession.setProperty("Organization", defaultOrg);
-        authSession.setProperty("Host", authSession.getID().getSessionServer());
-
-        if (LDAPUtils.isDN(clientID)) {
-            String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
-            authSession.setProperty(Constants.UNIVERSAL_IDENTIFIER, id);
-        }
-
-        return authSession;
-    }
     
-    private SSOToken initSsoAuthSession(Session authSession) throws SSOException, SessionException {
+    private SSOToken initSsoAuthSession(AMSession authSession) throws SSOException, SessionException {
         SSOTokenManager ssoManager = SSOTokenManager.getInstance();
         return ssoManager.createSSOToken(authSession.getID().toString());
     }

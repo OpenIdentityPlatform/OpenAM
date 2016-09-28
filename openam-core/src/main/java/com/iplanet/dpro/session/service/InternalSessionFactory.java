@@ -36,6 +36,7 @@ import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.service.SessionAccessManager;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
@@ -63,24 +64,21 @@ public class InternalSessionFactory {
     private final SessionCookies sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
 
     private final Debug sessionDebug;
-    private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
-    private final HttpConnectionFactory httpConnectionFactory;
-    private final InternalSessionCache cache;
+    private final AuthenticationSessionStore authenticationSessionStore;
+    private final SessionAccessManager sessionAccessManager;
 
     @Inject
     public InternalSessionFactory(
             @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
-            SessionServiceConfig serviceConfig,
             SessionServerConfig serverConfig,
-            HttpConnectionFactory httpConnectionFactory,
-            InternalSessionCache cache) {
+            AuthenticationSessionStore authenticationSessionStore,
+            SessionAccessManager sessionAccessManager) {
 
         this.sessionDebug = sessionDebug;
-        this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
-        this.httpConnectionFactory = httpConnectionFactory;
-        this.cache = cache;
+        this.authenticationSessionStore = authenticationSessionStore;
+        this.sessionAccessManager = sessionAccessManager;
     }
 
     /**
@@ -107,7 +105,7 @@ public class InternalSessionFactory {
             String sessionHandle = sid.generateSessionHandle(serverConfig);
             session.setSessionHandle(sessionHandle);
 
-            cache.put(session);
+            authenticationSessionStore.addSession(session);
 
             if (SystemProperties.isServerMode()) {
                 if (MonitoringUtil.isRunning()) {
@@ -139,7 +137,8 @@ public class InternalSessionFactory {
         SessionID sid;
         do {
             sid = SessionID.generateSessionID(serverConfig, domain);
-        } while (cache.getBySessionID(sid) != null || cache.getByHandle(sid.toString()) != null);
+        } while (sessionAccessManager.getInternalSession(sid) != null
+                || sessionAccessManager.getInternalSessionByHandle(sid.toString()) != null);
         return sid;
     }
 

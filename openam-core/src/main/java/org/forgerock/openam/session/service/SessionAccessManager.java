@@ -33,6 +33,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -72,13 +73,19 @@ public class SessionAccessManager {
     private final SessionAuditor sessionAuditor;
     private final MonitoringOperations monitoringOperations; // Note: there should be an increment and a decrement in this class for this to make sense
 
-
+    @VisibleForTesting
     @Inject
-    private SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug, ForeignSessionHandler foreignSessionHandler, final SessionCache sessionCache,
+    SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
+                                 final ForeignSessionHandler foreignSessionHandler,
+                                 final SessionCache sessionCache,
                                  final InternalSessionCache internalSessionCache,
-                                 TokenIdFactory tokenIdFactory,
-                                 CTSPersistentStore coreTokenService,
-                                 SessionAdapter tokenAdapter, SessionNotificationSender sessionNotificationSender, SessionLogging sessionLogging, SessionAuditor sessionAuditor, MonitoringOperations monitoringOperations) {
+                                 final TokenIdFactory tokenIdFactory,
+                                 final CTSPersistentStore coreTokenService,
+                                 final SessionAdapter tokenAdapter,
+                                 final SessionNotificationSender sessionNotificationSender,
+                                 final SessionLogging sessionLogging,
+                                 final SessionAuditor sessionAuditor,
+                                 final MonitoringOperations monitoringOperations) {
         this.debug = debug;
         this.foreignSessionHandler = foreignSessionHandler;
         this.sessionCache = sessionCache;
@@ -362,7 +369,7 @@ public class SessionAccessManager {
         try {
             String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
             coreTokenService.delete(tokenId);
-        } catch (Exception e) { // TODO: now that CTS is the master copy we should be handling exceptions and passing them up UNIT TEST
+        } catch (Exception e) {
             debug.error("SessionService : failed deleting session ", e);
         }
     }

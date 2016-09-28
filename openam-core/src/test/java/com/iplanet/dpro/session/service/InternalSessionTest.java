@@ -55,7 +55,7 @@ public class InternalSessionTest {
 
     @Test
     public void shouldSetDefaultTimeoutsWhenConstructed() {
-        // Give
+        // Given
 
         // When
         final InternalSession session = createSession();
