@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedAction;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -36,6 +37,8 @@ import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -56,6 +59,9 @@ public class UpgradeAuditServiceStep extends AbstractUpgradeStep {
     private static final String OLD_I18N_FILE_NAME = "commonAudit";
     private static final String NEW_I18N_FILE_NAME = "audit";
     public static final String I18N_FILE_NAME = "i18nFileName";
+    private static final String OLD_HOSTNAME_VALIDATOR = "org.forgerock.openam.audit.validation.HostnameValidator";
+    private static final String NEW_HOSTNAME_VALIDATOR = "org.forgerock.openam.sm.validation.HostnameValidator";
+    public static final String HOSTNAME_VALIDATOR = "HostnameValidator";
     private boolean isApplicable = false;
 
     @Inject
@@ -74,10 +80,22 @@ public class UpgradeAuditServiceStep extends AbstractUpgradeStep {
         try {
             ServiceSchemaManager ssm = new ServiceSchemaManager(AuditConstants.SERVICE_NAME, getAdminToken());
             final ServiceSchema globalSchema = ssm.getGlobalSchema();
-            final ServiceSchema subSchema = globalSchema.getSubSchema("CSV");
-            DEBUG.message("i18nFileName found in CSV subschema was: {}", subSchema.getI18NFileName());
-            if (OLD_I18N_FILE_NAME.equals(subSchema.getI18NFileName())) {
+            final ServiceSchema csvSubSchema = globalSchema.getSubSchema("CSV");
+            final ServiceSchema syslogSubSchema = globalSchema.getSubSchema("Syslog");
+            DEBUG.message("i18nFileName found in CSV subschema was: {}", csvSubSchema.getI18NFileName());
+            DEBUG.message("HostnameValidator found in Syslog subschema was: {}", 
+                    syslogSubSchema.getAttributeSchema(HOSTNAME_VALIDATOR).getDefaultValues());
+
+            if (OLD_I18N_FILE_NAME.equals(csvSubSchema.getI18NFileName())){ 
                 isApplicable = true;
+            }
+            Iterator <String> defaultValues = syslogSubSchema.getAttributeSchema(HOSTNAME_VALIDATOR).getDefaultValues().iterator();
+            while (defaultValues.hasNext()){
+                String defaultValue = defaultValues.next();
+                if (OLD_HOSTNAME_VALIDATOR.equals(defaultValue)){
+                    isApplicable = true;
+                    break;
+                }
             }
         } catch (ServiceNotFoundException snfe) {
             DEBUG.message("Audit service definition not found in old configuration");
@@ -94,12 +112,32 @@ public class UpgradeAuditServiceStep extends AbstractUpgradeStep {
             ServiceSchemaManager ssm = new ServiceSchemaManager(AuditConstants.SERVICE_NAME, getAdminToken());
             final Document document = XMLUtils.toDOMDocument(ssm.getSchema(), DEBUG);
             final NodeList subSchemas = document.getElementsByTagName("SubSchema");
+            final NodeList attributeSchemas = document.getElementsByTagName("AttributeSchema");
 
             for (int i = 0 ; i < subSchemas.getLength(); i++) {
                 final Element subSchema = (Element) subSchemas.item(i);
                 if (subSchema.hasAttribute(I18N_FILE_NAME)
                         && OLD_I18N_FILE_NAME.equals(subSchema.getAttribute(I18N_FILE_NAME))) {
                     subSchema.setAttribute(I18N_FILE_NAME, NEW_I18N_FILE_NAME);
+                }
+            }
+
+            for (int i = 0 ; i < attributeSchemas.getLength(); i++) {
+                final Element attributeSchema = (Element) attributeSchemas.item(i);
+                if ((attributeSchema.hasAttribute("name")) && HOSTNAME_VALIDATOR.equals(attributeSchema.getAttribute("name"))) {
+                    final NodeList hostnameSchema = attributeSchema.getElementsByTagName("DefaultValues");
+                    for (int j = 0 ; j < hostnameSchema.getLength(); j++) {
+                        final Node hostnameNode =  hostnameSchema.item(j);
+                        if (hostnameNode.getNodeType() == Node.ELEMENT_NODE) {  
+                            Node nodeValue = (Node) ((Element) hostnameNode).getElementsByTagName("Value").item(0);
+                            
+                            if (OLD_HOSTNAME_VALIDATOR.equals(nodeValue.getTextContent())) {
+                                DEBUG.message("Replacing HostnameValidator attribute {} with {}", 
+                                        nodeValue.getTextContent(), NEW_HOSTNAME_VALIDATOR);
+                                nodeValue.setTextContent(NEW_HOSTNAME_VALIDATOR);
+                            }
+                        }
+                    }
                 }
             }
 
