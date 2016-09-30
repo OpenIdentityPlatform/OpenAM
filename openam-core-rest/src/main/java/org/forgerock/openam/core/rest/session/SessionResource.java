@@ -741,6 +741,9 @@ public class SessionResource implements CollectionResourceProvider {
                 sessions = sessionResourceUtil.generateAllSessions();
                 LOGGER.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
             } else {
+                if (SERVER_QUERY_ID.equals(id)) {
+                    id = request.getAdditionalParameter(KEYWORD_SERVER_ID);
+                }
                 sessions = sessionResourceUtil.generateNamedServerSession(id);
                 LOGGER.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
             }

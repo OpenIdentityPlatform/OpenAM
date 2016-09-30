@@ -114,8 +114,11 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     public static final String LOGOUT_ACTION_ID = "logout";
     public static final String REFRESH_ACTION_ID = "refresh";
 
-
     public static final String KEYWORD_ALL = "all";
+    public static final String KEYWORD_SERVER_ID = "serverId";
+
+    private final String ALL_QUERY_ID = "all";
+    private final String SERVER_QUERY_ID = "server";
 
     private final Map<String, ActionHandler> actionHandlers;
     private final SessionResourceUtil sessionResourceUtil;
@@ -224,33 +227,33 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      * @param handler {@inheritDoc}
      */
     @Queries({
-            @Query(
-                    operationDescription = @Operation(
-                            description = SESSION_RESOURCE + "server." + ID_QUERY_DESCRIPTION,
-                            errors = {
-                                    @ApiError(
-                                            code = 401,
-                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                    )
-                            },
-                            parameters = @Parameter(name = "serverId", type = "string", description = SESSION_RESOURCE + "server." + ID_QUERY + "serverId." + PARAMETER_DESCRIPTION)
-                    ),
-                    type = QueryType.ID,
-                    id = "server"
+        @Query(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                },
+                parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION)
             ),
-            @Query(
-                    operationDescription = @Operation(
-                            description = SESSION_RESOURCE + "all." + ID_QUERY_DESCRIPTION,
-                            errors = {
-                                    @ApiError(
-                                            code = 401,
-                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                    )
-                            }
-                    ),
-                    type = QueryType.ID,
-                    id = "all"
-            )
+            type = QueryType.ID,
+            id = SERVER_QUERY_ID
+        ),
+        @Query(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            type = QueryType.ID,
+            id = ALL_QUERY_ID
+        )
     })
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
@@ -262,6 +265,9 @@ public class SessionResourceV2 implements CollectionResourceProvider {
             sessions =  sessionResourceUtil.generateAllSessions();
             LOGGER.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
         } else {
+            if (SERVER_QUERY_ID.equals(id)) {
+                id = request.getAdditionalParameter(KEYWORD_SERVER_ID);
+            }
             sessions = sessionResourceUtil.generateNamedServerSession(id);
             LOGGER.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
         }
