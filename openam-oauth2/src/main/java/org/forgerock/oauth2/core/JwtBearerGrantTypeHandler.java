@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -57,7 +58,7 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException,
             InvalidRequestException, InvalidGrantException, InvalidCodeException,
             ServerException, UnauthorizedClientException, InvalidScopeException, 
-            InvalidClientException, NotFoundException {
+            InvalidClientException, NotFoundException, InvalidConfirmationKeyException {
 
         final String jwtParameter = request.getParameter(OAuth2Constants.SAML20.ASSERTION);
         final OAuth2Jwt jwt = OAuth2Jwt.create(jwtParameter);

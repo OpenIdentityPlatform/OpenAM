@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -72,11 +73,12 @@ public class AuthorizationTokenIssuer {
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     public AuthorizationToken issueTokens(OAuth2Request request, ClientRegistration clientRegistration,
             ResourceOwner resourceOwner, Set<String> authorizationScope, OAuth2ProviderSettings providerSettings)
             throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException,
-            NotFoundException {
+            NotFoundException, InvalidConfirmationKeyException {
 
         //issue tokens
         final Set<String> requestedResponseTypes =

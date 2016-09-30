@@ -16,8 +16,6 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.json.JsonValue;
-
 import java.util.Map;
 
 /**
@@ -64,6 +62,13 @@ public interface AccessToken extends IntrospectableToken {
      * @return The token's grant type.
      */
     String getGrantType();
+
+    /**
+     * Get's the tokens confirmation claim.
+     *
+     * @return the confirmation representation or null
+     */
+    Map<String, Object> getConfirmationKey();
 
     @Override
     Map<String, Object> toMap();

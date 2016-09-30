@@ -16,23 +16,36 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACCESS_TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.REFRESH_TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.USER_ID;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.forgerock.guava.common.base.Joiner;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandler {
+
     private static final Joiner SCOPE_JOINER = Joiner.on(' ');
+    private static final JsonPointer CNF_POINTER = new JsonPointer(ProofOfPossession.CNF);
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
@@ -69,7 +82,7 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
      */
     private JsonValue renderOAuth2Token(OAuth2Request request, IntrospectableToken token)
             throws ServerException, NotFoundException {
-        return json(object(
+        JsonValue tokenRepresentation = json(object(
                 field(ACTIVE, true),
                 field(OAuth2Constants.Params.SCOPE, SCOPE_JOINER.join(token.getScope())),
                 field(OAuth2Constants.Params.CLIENT_ID, token.getClientId()),
@@ -80,6 +93,16 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
                 field(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId()),
                 field(OAuth2Constants.JWTTokenParams.ISS, urisFactory.get(request).getIssuer())
         ));
+
+        if (token instanceof AccessToken) {
+            Map<String, Object> confirmationKey = ((AccessToken) token).getConfirmationKey();
+
+            if (confirmationKey != null) {
+                tokenRepresentation.putPermissive(CNF_POINTER, confirmationKey);
+            }
+        }
+
+        return tokenRepresentation;
     }
 
     protected IntrospectableToken getIntrospectableToken(OAuth2Request request, String tokenType, String tokenId)

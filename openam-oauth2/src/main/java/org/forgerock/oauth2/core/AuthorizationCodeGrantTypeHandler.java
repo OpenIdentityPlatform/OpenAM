@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -82,7 +83,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
     public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidClientException,
             InvalidRequestException,  InvalidCodeException, InvalidGrantException,
-            ServerException, NotFoundException {
+            ServerException, NotFoundException, InvalidConfirmationKeyException {
 
         for (final AuthorizationCodeRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);

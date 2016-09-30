@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation;
@@ -49,11 +50,12 @@ public interface ResponseTypeHandler {
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     Map.Entry<String, Token> handle(String tokenType, Set<String> scope, ResourceOwner resourceOwner,
                                     String clientId, String redirectUri, String nonce, OAuth2Request request,
                                     String codeChallenge, String codeChallengeMethod)
-            throws ServerException, InvalidClientException, NotFoundException;
+            throws ServerException, InvalidClientException, NotFoundException, InvalidConfirmationKeyException;
 
     /**
      * Returns the location in which the token should be returned, {@link UrlLocation}.

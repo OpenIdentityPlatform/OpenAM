@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
 
 /**
  * Models a stateless OpenAM OAuth2 access token.
@@ -73,6 +74,18 @@ public final class StatelessAccessToken extends StatelessToken implements Access
 
     protected String getResourceString(String s) {
         return RESOURCE_BUNDLE.getString(s);
+    }
+
+    @Override
+    public Map<String, Object> getConfirmationKey() {
+        if (!jwt.getClaimsSet().isDefined(ProofOfPossession.CNF)) {
+            return null;
+        }
+
+        // This is a safe cast as the map is expected to have a single string key.
+        @SuppressWarnings("unchecked")
+        Map<String, Object> cnfKey = jwt.getClaimsSet().getClaim(ProofOfPossession.CNF, Map.class);
+        return cnfKey;
     }
 
     @Override

@@ -415,6 +415,11 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         return null;
     }
 
+    @Override
+    public Map<String, Object> getConfirmationKey() {
+        return null;
+    }
+
     /**
      * Gets the specified parameter from the JsonValue.
      *

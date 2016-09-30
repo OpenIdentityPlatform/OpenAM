@@ -62,6 +62,21 @@ public final class JsonValueBuilder {
     }
 
     /**
+     * Converts a byte array into a JsonValue.
+     *
+     * @param json json represented in bytes
+     * @return A JsonValue object.
+     * @throws JsonException If there is a problem parsing the json byte array.
+     */
+    public static JsonValue toJsonValue(byte[] json) throws JsonException {
+        try {
+            return new JsonValue(MAPPER.readValue(json, Map.class));
+        } catch (IOException e) {
+            throw new JsonException("Failed to parse json", e);
+        }
+    }
+
+    /**
      * Converts the passed json string into a {@link JsonValue} represented as a list.
      *
      * @param json

@@ -33,6 +33,7 @@ import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -86,7 +87,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request)
-            throws ServerException, NotFoundException {
+            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         return createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId,
                     clientId, redirectUri, scope, refreshToken, nonce, claims, request,
                     TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
@@ -96,7 +97,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request, long authTime)
-            throws ServerException, NotFoundException {
+            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         if (statelessCheck.byRequest(request)) {
             return statelessTokenStore.createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId,
                     clientId, redirectUri, scope, refreshToken, nonce, claims, request, authTime);

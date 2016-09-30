@@ -24,6 +24,7 @@ import java.security.AccessController;
 import java.text.ParseException;
 import java.util.Set;
 
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -51,7 +52,8 @@ public class GrantTypeAccessTokenGenerator {
 
     public AccessToken generateAccessToken(OAuth2ProviderSettings providerSettings, String grantType, String clientId,
             String resourceOwnerId, String redirectUri, Set<String> scope, String validatedClaims,
-            String authorizationCode, String nonce, OAuth2Request request) throws ServerException, NotFoundException {
+            String authorizationCode, String nonce, OAuth2Request request)
+            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         //retrieve end user's original authenticated time from session
         long authTime = 0;
         AuthorizationCode authCode = request.getToken(AuthorizationCode.class);

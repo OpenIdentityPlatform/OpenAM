@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -71,12 +72,13 @@ public abstract class GrantTypeHandler {
      * @throws AuthorizationPendingException If authorization is still pending.
      * @throws AuthorizationDeclinedException If authorization has been declined.
      * @throws BadRequestException If the request is invalid or malformed.
+     * @throws InvalidConfirmationKeyException blah blah blah
      */
     public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, InvalidGrantException,
             InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException,
             NotFoundException, ExpiredTokenException, AuthorizationPendingException, AuthorizationDeclinedException,
-            BadRequestException {
+            BadRequestException, InvalidConfirmationKeyException {
         final OAuth2Uris uris = urisFactory.get(request);
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
                 uris.getTokenEndpoint());
@@ -87,5 +89,5 @@ public abstract class GrantTypeHandler {
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException,
             InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException,
             InvalidScopeException, NotFoundException, InvalidClientException, AuthorizationDeclinedException,
-            ExpiredTokenException, BadRequestException, AuthorizationPendingException;
+            ExpiredTokenException, BadRequestException, AuthorizationPendingException, InvalidConfirmationKeyException;
 }

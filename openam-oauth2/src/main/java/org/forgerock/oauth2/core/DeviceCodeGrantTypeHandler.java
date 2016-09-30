@@ -31,6 +31,7 @@ import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -74,7 +75,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
             OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException,
             InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException,
             InvalidScopeException, NotFoundException, InvalidClientException, AuthorizationDeclinedException,
-            ExpiredTokenException, BadRequestException, AuthorizationPendingException {
+            ExpiredTokenException, BadRequestException, AuthorizationPendingException, InvalidConfirmationKeyException {
 
         final String code = request.getParameter(CODE);
 
@@ -128,7 +129,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
 
     private AccessToken generateAccessToken(OAuth2ProviderSettings providerSettings, String grantType, String clientId,
             String resourceOwnerId, Set<String> scope, String validatedClaims, OAuth2Request request)
-            throws ServerException, NotFoundException {
+            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         return accessTokenGenerator.generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, null,
                 scope, validatedClaims, null, null, request);
     }

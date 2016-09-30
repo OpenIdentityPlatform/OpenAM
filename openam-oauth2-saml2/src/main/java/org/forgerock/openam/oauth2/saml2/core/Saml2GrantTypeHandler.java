@@ -16,10 +16,44 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
+import static org.forgerock.oauth2.core.Utils.splitScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
-import static org.forgerock.oauth2.core.Utils.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.newDate;
+
+import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.ClientAuthenticator;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.GrantTypeHandler;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2Uris;
+import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.util.Reject;
+import org.forgerock.util.encode.Base64url;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -36,37 +70,6 @@ import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
-
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.ClientAuthenticator;
-import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.GrantTypeHandler;
-import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.oauth2.OAuth2UrisFactory;
-import org.forgerock.util.Reject;
-import org.forgerock.util.encode.Base64url;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-
-import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @since 12.0.0
@@ -87,7 +90,8 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
     }
 
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
-            InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
+            InvalidRequestException, ServerException, InvalidScopeException,
+            NotFoundException, InvalidConfirmationKeyException {
         String clientId = request.getParameter(OAuth2Constants.Params.CLIENT_ID);
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");
 

@@ -24,11 +24,14 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.EXPIRES_IN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Token.*;
+import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
+import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Collection;
@@ -61,6 +64,7 @@ import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -73,6 +77,8 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
+import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
@@ -97,6 +103,7 @@ public class StatelessTokenStore implements TokenStore {
     private final Blacklist<Blacklistable> tokenBlacklist;
     private final CTSPersistentStore cts;
     private final TokenAdapter<StatelessTokenMetadata> tokenAdapter;
+    private final ConfirmationKeyValidator confirmationKeyValidator;
 
 
     /**
@@ -118,7 +125,8 @@ public class StatelessTokenStore implements TokenStore {
             OAuth2ProviderSettingsFactory providerSettingsFactory, @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
+            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter,
+            ConfirmationKeyValidator confirmationKeyValidator) {
         this.statefulTokenStore = statefulTokenStore;
         this.jwtBuilder = jwtBuilder;
         this.providerSettingsFactory = providerSettingsFactory;
@@ -129,6 +137,7 @@ public class StatelessTokenStore implements TokenStore {
         this.tokenBlacklist = tokenBlacklist;
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
+        this.confirmationKeyValidator = confirmationKeyValidator;
     }
 
     @Override
@@ -142,7 +151,7 @@ public class StatelessTokenStore implements TokenStore {
     @Override
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
             resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
-            String nonce, String claims, OAuth2Request request) throws ServerException, NotFoundException {
+            String nonce, String claims, OAuth2Request request) throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         return createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId, clientId,
                 redirectUri, scope, refreshToken, nonce, claims, request,
                 TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
@@ -152,7 +161,7 @@ public class StatelessTokenStore implements TokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
             resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
             String nonce, String claims, OAuth2Request request, long authTime) 
-                    throws ServerException, NotFoundException {
+                    throws ServerException, NotFoundException, InvalidConfirmationKeyException {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         Duration currentTime = Duration.millis(currentTimeMillis());
@@ -188,6 +197,12 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
+
+        JsonValue confirmationJwk = getConfirmationKey(request);
+        if (confirmationJwk != null) {
+            claimsSetBuilder.claim(ProofOfPossession.CNF, confirmationJwk.asMap());
+        }
+
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
@@ -313,6 +328,19 @@ public class StatelessTokenStore implements TokenStore {
         } catch (IllegalArgumentException e) {
             throw new ServerException("Invalid Token signing algorithm");
         }
+    }
+
+    private JsonValue getConfirmationKey(OAuth2Request request) throws InvalidConfirmationKeyException {
+        String cnfKeyString = request.getParameter(ProofOfPossession.CNF_KEY);
+
+        if (isBlank(cnfKeyString)) {
+            return null;
+        }
+
+        JsonValue cnfKey = toJsonValue(Base64.decode(cnfKeyString));
+        confirmationKeyValidator.validate(cnfKey);
+
+        return cnfKey;
     }
 
     private boolean isAlgorithmSupported(OAuth2Request request, JwsAlgorithm algorithm) throws ServerException,

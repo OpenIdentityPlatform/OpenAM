@@ -1086,4 +1086,22 @@ public class OAuth2Constants {
         /** Profile scope. */
         public static final String PROFILE = "profile";
     }
+
+    /**
+     * Constants for proof of possession as described by RFC-7800.
+     */
+    public static class ProofOfPossession {
+
+        /**
+         * Confirmation claim, expected format is either a valid jwk, jwe or a jku.
+         */
+        public static final String CNF = "cnf";
+
+        /**
+         * OAuth2 request parameter, expected to be base64 encoded.
+         */
+        public static final String CNF_KEY = "cnf_key";
+
+    }
+
 }

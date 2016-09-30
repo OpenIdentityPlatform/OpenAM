@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -76,7 +77,7 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
     public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
             OAuth2ProviderSettings providerSettings) throws InvalidClientException,
             InvalidRequestException, UnauthorizedClientException, InvalidGrantException, ServerException,
-            InvalidScopeException, NotFoundException {
+            InvalidScopeException, NotFoundException, InvalidConfirmationKeyException {
 
         for (final PasswordCredentialsRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);
