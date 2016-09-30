@@ -89,7 +89,6 @@ public class AuthenticationSessionStore {
 
         session.setStored(true);
         sessionAccessManager.putInternalSessionIntoInternalSessionCache(session);
-        sessionAccessManager.update(session);
         session.reschedule();
         removeSession(sessionID);
     }

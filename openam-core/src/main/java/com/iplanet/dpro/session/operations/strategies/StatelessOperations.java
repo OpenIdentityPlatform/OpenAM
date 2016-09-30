@@ -16,9 +16,8 @@
 
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,9 +29,13 @@ import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
-import com.iplanet.dpro.session.*;
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionEvent;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -152,11 +155,6 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
         localOperations.setExternalProperty(clientToken, sessionId, name, value);
-    }
-
-    @Override
-    public void update(InternalSession session) {
-        throw new UnsupportedOperationException();
     }
 
 }

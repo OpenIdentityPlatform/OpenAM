@@ -331,11 +331,6 @@ public class LocalOperations implements SessionOperations {
         return sessionAccessManager.getSession(sessionID);
     }
 
-    @Override
-    public void update(InternalSession session) { // To replace with listener system
-        sessionAccessManager.update(session);
-    }
-
     private void logoutInternalSession(final SessionID sessionId) {
         InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
         if (session != null && session.getState() != INVALID) {

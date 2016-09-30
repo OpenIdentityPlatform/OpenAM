@@ -360,8 +360,4 @@ public class ClientSdkOperations implements SessionOperations {
         return null;
     }
 
-    @Override
-    public void update(InternalSession session) {
-        throw new UnsupportedOperationException();
-    }
 }

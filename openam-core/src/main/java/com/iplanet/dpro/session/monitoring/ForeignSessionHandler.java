@@ -172,8 +172,6 @@ public class ForeignSessionHandler {
         if (!serverConfig.isLocalServer(primaryID)) {
             add(sessionID);
         }
-        InjectorHolder.getInstance(SessionAccessManager.class).putInternalSessionIntoInternalSessionCache(session);
-        //TODO : untangle dependency loop. also this bit is weird anyway. maybe ForeignSessionHandler should only be called by SessionAccessManager?
         session.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
     }
 

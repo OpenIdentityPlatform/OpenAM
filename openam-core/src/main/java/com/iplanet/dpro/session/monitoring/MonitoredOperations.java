@@ -22,7 +22,6 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 
@@ -130,11 +129,6 @@ public class MonitoredOperations implements SessionOperations {
     @Override
     public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
         sessionOperations.setExternalProperty(clientToken,sessionId, name, value); // Not monitored at present
-    }
-
-    @Override
-    public void update(InternalSession session) {
-        sessionOperations.update(session);
     }
 
     @Override

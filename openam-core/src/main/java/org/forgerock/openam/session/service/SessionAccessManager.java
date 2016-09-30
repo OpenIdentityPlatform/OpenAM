@@ -32,6 +32,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -56,7 +57,7 @@ import com.sun.identity.shared.debug.Debug;
  * to optimise performance.
  */
 @Singleton
-public class SessionAccessManager {
+public class SessionAccessManager implements SessionPersistenceManager {
 
     private final Debug debug;
     private final ForeignSessionHandler foreignSessionHandler;
@@ -150,7 +151,9 @@ public class SessionAccessManager {
      * @param session the session to cache
      */
     public void putInternalSessionIntoInternalSessionCache(InternalSession session) {
+        session.setPersistenceManager(this);
         internalSessionCache.put(session);
+        update(session);
     }
 
     /**
@@ -208,7 +211,9 @@ public class SessionAccessManager {
             sessionCache.readSession(sessionId).setSessionIsLocal(false);
         }
 
-        return internalSessionCache.remove(sessionId);
+        InternalSession internalSession = internalSessionCache.remove(sessionId);
+        internalSession.setPersistenceManager(null);
+        return internalSession;
     }
 
     /**
@@ -220,7 +225,9 @@ public class SessionAccessManager {
         if (null == sessionId) {
             return null;
         }
-        return removeInternalSession(internalSessionCache.remove(sessionId));
+        InternalSession internalSession = internalSessionCache.remove(sessionId);
+        internalSession.setPersistenceManager(null);
+        return removeInternalSession(internalSession);
     }
 
     /**
@@ -256,6 +263,7 @@ public class SessionAccessManager {
         session.scheduleExpiry();
         boolean destroyed = destroySessionIfNecessary(session);
         if(!destroyed) {
+            putInternalSessionIntoInternalSessionCache(session);
             foreignSessionHandler.updateSessionMaps(session);
         }
 
@@ -341,7 +349,7 @@ public class SessionAccessManager {
      * Called to notify the session access manager that an InternalSession has been updated.
      * @param session The session that was updated.
      */
-    public void update(InternalSession session) {
+    private void update(InternalSession session) {
         if (session.isStored()) {
             if (session.getState() != VALID) {
                 delete(session);
@@ -372,5 +380,15 @@ public class SessionAccessManager {
         } catch (Exception e) {
             debug.error("SessionService : failed deleting session ", e);
         }
+    }
+
+    @Override
+    public void notifyUpdate(SessionID sessionID) {
+        InternalSession internalSession = getInternalSession(sessionID);
+        if (internalSession == null) {
+            throw new IllegalStateException(
+                    "SessionAccessManager notified of event for InternalSession it does not contain");
+        }
+        update(internalSession);
     }
 }

@@ -80,10 +80,10 @@ public class SessionAccessManagerTest {
         given(session.getState()).willReturn(DESTROYED);
 
         // When
-        sessionAccessManager.update(session);
+        sessionAccessManager.putInternalSessionIntoInternalSessionCache(session);
 
         // Then
-        verify(mockCoreTokenStore, never()).update((Token) Mockito.any()); //TODO: how to unit test this?
+        verify(mockCoreTokenStore, never()).update((Token) Mockito.any());
     }
 
     @Test

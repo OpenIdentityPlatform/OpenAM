@@ -19,7 +19,6 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 
@@ -151,9 +150,4 @@ public interface SessionOperations {
      */
     Session resolveSession(SessionID sessionID) throws SessionException;
 
-    /**
-     * Called to notify the relevant code that an InternalSession has been updated.
-     * @param session The session that was updated.
-     */
-    void update(InternalSession session);
 }

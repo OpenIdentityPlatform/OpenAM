@@ -260,15 +260,6 @@ public class SessionService {
     }
 
     /**
-     * Updates the session in the underlying storage mechanism based on local changes to the session.
-     * @param session the locally updated session object.
-     */
-    public void update(InternalSession session) {
-        sessionOperationStrategy.getOperation(session.getSessionID()).update(session);
-
-    }
-
-    /**
      * Checks whether current session should be considered local (so that local
      * invocations of SessionService methods are to be used) and if local and
      * Session Failover is enabled will recover the Session if the Session is

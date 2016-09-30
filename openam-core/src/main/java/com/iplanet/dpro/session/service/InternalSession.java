@@ -58,6 +58,8 @@ import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionMeta;
+import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -75,7 +77,6 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TimerPool;
@@ -114,7 +115,7 @@ import com.sun.identity.shared.debug.Debug;
  * </pre>
  *
  */
-public class InternalSession implements Serializable, AMSession {
+public class InternalSession implements Serializable, AMSession, SessionPersistenceObservable {
 
     /*
      * Logging message
@@ -175,6 +176,7 @@ public class InternalSession implements Serializable, AMSession {
     private String cookieStr;
     private transient AuthContextLocal authContext;
     private transient LoginContext loginContext;
+    private transient SessionPersistenceManager persistenceManager;
 
     @JsonProperty("creationTime")
     private long creationTimeInSeconds;
@@ -331,7 +333,7 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setType(int type) {
         sessionType = type;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -350,7 +352,7 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setClientID(String id) {
         clientID = id;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -370,7 +372,7 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setClientDomain(String domain) {
         clientDomain = domain;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -396,7 +398,7 @@ public class InternalSession implements Serializable, AMSession {
         if (taskRunnable.isScheduled() && mayReschedule) {
             reschedule();
         }
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -423,7 +425,7 @@ public class InternalSession implements Serializable, AMSession {
         if (taskRunnable.isScheduled() && (mayReschedule || reschedulePossible)) {
             reschedule();
         }
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -443,7 +445,7 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setMaxCachingTime(long t) {
         maxCachingTimeInMinutes = t;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -789,7 +791,7 @@ public class InternalSession implements Serializable, AMSession {
             sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
             sessionAuditor.auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED);
         }
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -801,7 +803,7 @@ public class InternalSession implements Serializable, AMSession {
     */
     public void setIsSessionUpgrade(boolean value) {
         isSessionUpgrade = value;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -1078,7 +1080,7 @@ public class InternalSession implements Serializable, AMSession {
         long oldLatestAccessTime = latestAccessTimeInSeconds;
         latestAccessTimeInSeconds = currentTimeMillis() / 1000;
         if ((latestAccessTimeInSeconds - oldLatestAccessTime) > interval) {
-            sessionService.update(this);
+            notifyPersistenceManager();
         }
     }
 
@@ -1089,7 +1091,7 @@ public class InternalSession implements Serializable, AMSession {
      */
     public void setState(int state) {
         sessionState = state;
-        sessionService.update(this);
+        notifyPersistenceManager();
     }
 
     /**
@@ -1152,7 +1154,7 @@ public class InternalSession implements Serializable, AMSession {
         }
 
         if (sids.add(sid))  {
-            sessionService.update(this);
+            notifyPersistenceManager();
         }
     }
 
@@ -1223,7 +1225,7 @@ public class InternalSession implements Serializable, AMSession {
         SessionID previousValue = restrictedTokensByRestriction.putIfAbsent(restriction, sid);
         if (previousValue == null) {
             restrictedTokensBySid.put(sid, restriction);
-            sessionService.update(this);
+            notifyPersistenceManager();
             return null;
         }
         return previousValue;
@@ -1440,6 +1442,17 @@ public class InternalSession implements Serializable, AMSession {
     @VisibleForTesting
     void setTimedOutAt(long timedOutAt) {
         this.timedOutTimeInSeconds = timedOutAt;
+    }
+
+    @Override
+    public void setPersistenceManager(SessionPersistenceManager manager) {
+        persistenceManager = manager;
+    }
+
+    private void notifyPersistenceManager() {
+        if (persistenceManager != null) {
+            persistenceManager.notifyUpdate(getSessionID());
+        }
     }
 
     private class InternalSessionTaskRunnable extends GeneralTaskRunnable {
