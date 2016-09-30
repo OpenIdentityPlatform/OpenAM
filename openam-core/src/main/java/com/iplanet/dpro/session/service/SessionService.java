@@ -179,19 +179,12 @@ public class SessionService {
      *
      * @param sessionId Session ID
      */
-    // this method is duplicated in LocalOperations.  It is needed here to handle authentication sessions.
     InternalSession removeCachedInternalSession(final SessionID sessionId) {
         if (null == sessionId) {
             return null;
         }
 
-        InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
-        return removeInternalSession(session);
-    }
-
-    // this method is duplicated in LocalOperations.  It is needed here to handle authentication sessions.
-    private InternalSession removeInternalSession(final InternalSession session) {
-        return sessionAccessManager.removeInternalSession(session.getSessionID());
+        return sessionAccessManager.removeInternalSession(sessionId);
     }
 
     /**

@@ -75,7 +75,7 @@ public class AuthenticationSessionStoreTest {
     public void shouldUseSessionAccessManagerForPromotion() {
         store.addSession(mockSession);
         store.promoteSession(mockSessionID);
-        verify(mockAccessManager).putInternalSessionIntoInternalSessionCache(eq(mockSession));
+        verify(mockAccessManager).persistInternalSession(eq(mockSession));
     }
 
     @Test

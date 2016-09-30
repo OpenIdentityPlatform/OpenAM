@@ -18,12 +18,8 @@ package com.iplanet.dpro.session.operations.strategies;
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -60,15 +56,7 @@ public class LocalOperationsTest {
     @Mock
     private SessionInfoFactory sessionInfoFactory;
     @Mock
-    private ServicesClusterMonitorHandler servicesClusterMonitorHandler;
-    @Mock
     private SessionServerConfig serverConfig;
-    @Mock
-    private TokenIdFactory tokenIdFactory;
-    @Mock
-    private CTSPersistentStore coreTokenService;
-    @Mock
-    private SessionAdapter tokenAdapter;
     @Mock
     private MonitoringOperations monitoringOperations;
     @Mock
@@ -86,8 +74,7 @@ public class LocalOperationsTest {
         given(sessionAccessManager.removeInternalSession(mockSessionID)).willReturn(mockInternalSession);
         given(mockSession.getID()).willReturn(mockSessionID);
 
-        local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory,
-                servicesClusterMonitorHandler, serverConfig, tokenIdFactory, coreTokenService, tokenAdapter,
+        local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory, serverConfig,
                 mock(SessionNotificationSender.class),
                 mock(SessionLogging.class), mock(SessionAuditor.class), sessionChangeAuthorizer);
     }

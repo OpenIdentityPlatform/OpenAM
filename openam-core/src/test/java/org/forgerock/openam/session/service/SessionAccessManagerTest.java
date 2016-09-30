@@ -80,7 +80,7 @@ public class SessionAccessManagerTest {
         given(session.getState()).willReturn(DESTROYED);
 
         // When
-        sessionAccessManager.putInternalSessionIntoInternalSessionCache(session);
+        sessionAccessManager.persistInternalSession(session);
 
         // Then
         verify(mockCoreTokenStore, never()).update((Token) Mockito.any());

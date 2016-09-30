@@ -104,14 +104,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
     }
 
     /**
-     * Get the size of the underlying InternalSessionCache.
-     * @return The number of InternalSessions in the InternalSessionCache.
-     */
-    public int getInternalSessionLimit() {
-        return internalSessionCache.size();
-    }
-
-    /**
      * Get the Session based on the SessionId.
      *
      * @param sessionId The session ID to recover the Session for.
@@ -120,6 +112,14 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public Session getSession(SessionID sessionId) throws SessionException {
         return sessionCache.getSession(sessionId);
+    }
+
+    /**
+     * Removes a session from the session cache.
+     * @param sessionID the ID of the session to remove from the cache
+     */
+    public void removeSessionId(SessionID sessionID) {
+        sessionCache.removeSID(sessionID);
     }
 
     /**
@@ -211,42 +211,10 @@ public class SessionAccessManager implements SessionPersistenceManager {
         return session;
     }
 
-    /**
-     * Puts an internal session into a cache.
-     *
-     * @param session the session to cache
-     */
-    public void putInternalSessionIntoInternalSessionCache(InternalSession session) {
+    private void putInternalSessionIntoInternalSessionCache(InternalSession session) {
         session.setPersistenceManager(this);
         internalSessionCache.put(session);
         update(session);
-    }
-
-    /**
-     * Removes a session from the session cache.
-     * @param sessionID the ID of the session to remove from the cache
-     */
-    public void removeSessionId(SessionID sessionID) {
-        sessionCache.removeSID(sessionID);
-    }
-
-    /**
-     * Gets whether the internal session is present in the cache.
-     * @param sessionId the id of the session to check for presence in the cache
-     * @return true if a session was found in the cache for the given session ID
-     */
-    public boolean isInternalSessionPresentInCache(SessionID sessionId) {
-        return internalSessionCache.getBySessionID(sessionId) != null
-                || internalSessionCache.getByRestrictedID(sessionId) != null
-                || internalSessionCache.getByHandle(sessionId.toString()) != null;
-    }
-
-    /**
-     * Get the number of internal sessions in the cache.
-     * @return the number of sessions in the cache.
-     */
-    public int getInternalSessionCount() {
-        return internalSessionCache.size();
     }
 
     /**
@@ -256,6 +224,44 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public InternalSession getByRestrictedID(SessionID sessionID) {
         return internalSessionCache.getByRestrictedID(sessionID);
+    }
+
+    /**
+     * Persist the provided InternalSession to the backend.
+     * @param session The session to persist.
+     */
+    public void persistInternalSession(InternalSession session) {
+        session.setStored(true);
+        putInternalSessionIntoInternalSessionCache(session);
+        update(session);
+    }
+
+    /**
+     * Method responsible for keeping the local references to a session up to date. Call if the Session handle or
+     * restricted ids change.
+     * @param session The session to reload.
+     */
+    public void reloadSessionHandleAndRestrictedIds(InternalSession session) {
+        if (internalSessionCache.getBySessionID(session.getSessionID()) == null) {
+            throw new IllegalStateException("Tried to reload metadata for a session that was not stored.");
+        }
+        internalSessionCache.put(session); // called for side effects of reloading cache at this point in time
+    }
+
+    /**
+     * Get the size of the underlying InternalSessionCache.
+     * @return The number of InternalSessions in the InternalSessionCache.
+     */
+    public int getInternalSessionLimit() {
+        return internalSessionCache.size();
+    }
+
+    /**
+     * Get the number of internal sessions in the cache.
+     * @return the number of sessions in the cache.
+     */
+    public int getInternalSessionCount() {
+        return internalSessionCache.size();
     }
 
     /**

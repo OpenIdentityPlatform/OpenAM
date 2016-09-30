@@ -23,12 +23,8 @@ import java.text.MessageFormat;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 
 import com.iplanet.dpro.session.Session;
@@ -61,11 +57,7 @@ public class LocalOperations implements SessionOperations {
     private final Debug debug;
     private final SessionAccessManager sessionAccessManager;
     private final SessionInfoFactory sessionInfoFactory;
-    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
     private final SessionServerConfig serverConfig;
-    private final TokenIdFactory tokenIdFactory;
-    private final CTSPersistentStore coreTokenService;
-    private final SessionAdapter tokenAdapter;
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
@@ -76,11 +68,7 @@ public class LocalOperations implements SessionOperations {
      * @param debug Non null.
      * @param sessionAccessManager access manager for returning the session information from the storage mechanism
      * @param sessionInfoFactory the factory for creating session information objects from a session
-     * @param servicesClusterMonitorHandler handler for dealing with server cluster monitoring related operations
      * @param serverConfig session server config
-     * @param tokenIdFactory token id factory
-     * @param coreTokenService core token service
-     * @param tokenAdapter session adapter
      * @param sessionNotificationSender notification sender for session removal notification
      * @param sessionLogging special logging service for session removal logging
      * @param sessionAuditor audit logger
@@ -93,11 +81,7 @@ public class LocalOperations implements SessionOperations {
     LocalOperations(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                     final SessionAccessManager sessionAccessManager,
                     final SessionInfoFactory sessionInfoFactory,
-                    final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
                     final SessionServerConfig serverConfig,
-                    final TokenIdFactory tokenIdFactory,
-                    final CTSPersistentStore coreTokenService,
-                    final SessionAdapter tokenAdapter,
                     final SessionNotificationSender sessionNotificationSender,
                     final SessionLogging sessionLogging,
                     final SessionAuditor sessionAuditor,
@@ -105,11 +89,7 @@ public class LocalOperations implements SessionOperations {
         this.debug = debug;
         this.sessionAccessManager = sessionAccessManager;
         this.sessionInfoFactory = sessionInfoFactory;
-        this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
         this.serverConfig = serverConfig;
-        this.tokenIdFactory = tokenIdFactory;
-        this.coreTokenService = coreTokenService;
-        this.tokenAdapter = tokenAdapter;
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
@@ -222,16 +202,6 @@ public class LocalOperations implements SessionOperations {
     }
 
     /**
-     * This method checks if Internal session is already present locally
-     *
-     * @param sessionId
-     * @return a boolean
-     */
-    private boolean isSessionPresent(SessionID sessionId) {
-        return sessionAccessManager.isInternalSessionPresentInCache(sessionId);
-    }
-
-    /**
      * As opposed to locateSession() this one accepts normal or restricted token
      * This is expected to be only called once the session is detected as local
      *
@@ -293,7 +263,7 @@ public class LocalOperations implements SessionOperations {
             restrictedSessionID = session.getID().generateRelatedSessionID(serverConfig);
             SessionID previousValue = session.addRestrictedToken(restrictedSessionID, restriction);
             if (previousValue == null) {
-                sessionAccessManager.putInternalSessionIntoInternalSessionCache(session);
+                sessionAccessManager.reloadSessionHandleAndRestrictedIds(session);
             } else {
                 restrictedSessionID = previousValue;
             }
