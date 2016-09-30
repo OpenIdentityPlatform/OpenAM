@@ -579,7 +579,7 @@ public class AMKeyProvider implements KeyProvider {
         KeyStore.PasswordProtection keyStorePP = new KeyStore.PasswordProtection(keystorePass.toCharArray());
         try {
             KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) ks.getEntry(alias, keyStorePP);
-            return new String(getSecretKey(alias).getEncoded(), UTF_8);
+            return new String(entry.getSecretKey().getEncoded(), UTF_8);
         } catch (Exception e) {
             // to be nice we wrap and rethrows to a single exception type
             throw new KeyStoreException("Exception trying to fetch key with alias " + alias, e);
