@@ -24,7 +24,7 @@
  *
  * $Id: ConfigurationBase.java,v 1.4 2009/07/07 06:14:12 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
@@ -83,14 +83,7 @@ public abstract class ConfigurationBase {
         throws SMSException, SSOException {
         Set<String> currentIds = new HashSet<String>();
 
-        ServiceConfig rootServerConfig = getRootServerConfig(ssoToken);
-        if (rootServerConfig == null || !rootServerConfig.isValid()) {
-            //Because SMS classes are wrapped and cached as class variable,
-            //there is no way to "lock" these classes from getting cleared
-            //by SMSNotificationManager if these objects are being used. 
-            //The best we can do at the moment is to retry just one more time
-            rootServerConfig = getRootServerConfig(ssoToken);
-        }
+        ServiceConfig rootServerConfig = getRootServerConfigWithRetry(ssoToken);
         Set<String> serverConfigIds = getServerConfigurationId(rootServerConfig);
         currentIds.addAll(serverConfigIds);
 
@@ -226,13 +219,22 @@ public abstract class ConfigurationBase {
         }
         return null;
     }
-    
-    protected static ServiceConfig getServerConfig(SSOToken ssoToken, String name) throws SMSException, SSOException {
-        ServiceConfig sc = getRootServerConfig(ssoToken);
-        if (sc == null || !sc.isValid()) {
-            //give one more chance
-            sc = getRootServerConfig(ssoToken);
+
+    protected static ServiceConfig getRootServerConfigWithRetry(SSOToken ssoToken)
+            throws SMSException, SSOException {
+        ServiceConfig serverConfig = getRootServerConfig(ssoToken);
+        if (serverConfig == null || !serverConfig.isValid()) {
+            //Because SMS classes are wrapped and cached as class variable,
+            //there is no way to "lock" these classes from getting cleared
+            //by SMSNotificationManager if these objects are being used. 
+            //The best we can do at the moment is to retry just one more time
+            serverConfig = getRootServerConfig(ssoToken);
         }
+        return serverConfig;
+    }
+
+    protected static ServiceConfig getServerConfig(SSOToken ssoToken, String name) throws SMSException, SSOException {
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
         return (sc != null && sc.isValid()) ? sc.getSubConfig(name) : null;
     }
     
