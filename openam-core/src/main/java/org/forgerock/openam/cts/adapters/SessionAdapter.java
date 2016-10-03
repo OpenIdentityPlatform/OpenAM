@@ -31,6 +31,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -90,6 +91,10 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         String userId = config.getUserId(session);
         token.setUserId(userId);
 
+        // Session state
+        String state = getSessionState(session);
+        token.setAttribute(SessionTokenField.SESSION_STATE.getField(), state);
+
         // Expiry Date
         Calendar expiryTimeStamp = TimeUtils.fromUnixTime(
                 session.getExpirationTime(MILLISECONDS) + config.getSessionExpiryGracePeriod(MILLISECONDS),
@@ -129,6 +134,23 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
 
         return token;
+    }
+
+    @VisibleForTesting
+    static String getSessionState(InternalSession session) {
+        int state = session.getState();
+        switch (state) {
+            case SessionConstants.INVALID:
+                return "INVALID";
+            case SessionConstants.VALID:
+                return "VALID";
+            case SessionConstants.INACTIVE:
+                return "INACTIVE";
+            case SessionConstants.DESTROYED:
+                return "DESTROYED";
+            default:
+                throw new IllegalStateException("Unknown session state");
+        }
     }
 
     @VisibleForTesting

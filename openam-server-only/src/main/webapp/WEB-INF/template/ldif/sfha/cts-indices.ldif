@@ -78,6 +78,10 @@ objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString10
 ds-cfg-index-type: equality
 
+# coreTokenString13 should not be indexed as it is used to store session state. As session state
+# is an enumeration of only 4 distinct values, indexing on session state would cause a performance
+# bottleneck on writes.
+
 dn: ds-cfg-attribute=coreTokenString14,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index

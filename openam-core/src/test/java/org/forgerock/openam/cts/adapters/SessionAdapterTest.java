@@ -35,6 +35,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
@@ -82,6 +83,7 @@ public class SessionAdapterTest {
         given(mockCoreTokenConfig.getUserId(eq(mockSession))).willReturn(mockUserId);
         given(mockSession.getExpirationTime(MILLISECONDS)).willReturn(SECONDS.toMillis(mockTimestamp));
         given(mockSession.getSessionHandle()).willReturn(mockSessionHandle);
+        given(mockSession.getState()).willReturn(SessionConstants.VALID);
 
         // Avoid serialisation when using mock InternalSessions
         given(mockJsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(mockSession);
@@ -93,6 +95,7 @@ public class SessionAdapterTest {
         token.setBlob(mockByteData);
         token.setAttribute(SessionTokenField.SESSION_ID.getField(), mockSessionId);
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), mockSessionHandle);
+        token.setAttribute(SessionTokenField.SESSION_STATE.getField(), "VALID");
         SessionAdapter.setDateAttributeFromMillis(token, SessionTokenField.MAX_SESSION_EXPIRATION_TIME, 0);
         SessionAdapter.setDateAttributeFromMillis(token, SessionTokenField.MAX_IDLE_EXPIRATION_TIME, 0);
 
@@ -188,6 +191,58 @@ public class SessionAdapterTest {
 
         // Then
         assertThat(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField())).isEqualTo(mockSessionHandle);
+    }
+
+    @Test
+    public void shouldAssignSessionStateInvalidToTokenAttribute() {
+        // Given
+        InternalSession mockSession = prototypeMockInternalSession();
+        given(mockSession.getState()).willReturn(SessionConstants.INVALID);
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("INVALID");
+    }
+
+    @Test
+    public void shouldAssignSessionStateValidToTokenAttribute() {
+        // Given
+        InternalSession mockSession = prototypeMockInternalSession();
+        given(mockSession.getState()).willReturn(SessionConstants.VALID);
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("VALID");
+    }
+
+    @Test
+    public void shouldAssignSessionStateInactiveToTokenAttribute() {
+        // Given
+        InternalSession mockSession = prototypeMockInternalSession();
+        given(mockSession.getState()).willReturn(SessionConstants.INACTIVE);
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("INACTIVE");
+    }
+
+    @Test
+    public void shouldAssignSessionStateDestroyedToTokenAttribute() {
+        // Given
+        InternalSession mockSession = prototypeMockInternalSession();
+        given(mockSession.getState()).willReturn(SessionConstants.DESTROYED);
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("DESTROYED");
     }
 
     @Test

@@ -25,6 +25,7 @@ public enum SessionTokenField {
     LATEST_ACCESS_TIME("latestAccessTime", CoreTokenField.STRING_ONE),
     SESSION_ID("sessionID", CoreTokenField.STRING_TWO),
     SESSION_HANDLE("sessionHandle", CoreTokenField.STRING_THREE),
+    SESSION_STATE("sessionState", CoreTokenField.STRING_THIRTEEN), // Must be an un-indexed field for write performance
     MAX_SESSION_EXPIRATION_TIME("maxSessionExpirationTime", CoreTokenField.DATE_ONE),
     MAX_IDLE_EXPIRATION_TIME("maxIdleExpirationTime", CoreTokenField.DATE_TWO),
     PURGE_DELAY_EXPIRATION_TIME("purgeDelayExpirationTime", CoreTokenField.DATE_THREE);
