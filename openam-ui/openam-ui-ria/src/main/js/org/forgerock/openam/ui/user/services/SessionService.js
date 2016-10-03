@@ -35,7 +35,8 @@ define([
     function getSessionInfo (token, options) {
         return obj.serviceCall(_.merge({
             url: `/${token}`,
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            errorsHandlers: { "Unauthorized": { status: 401 } }
         }, options));
     }
 

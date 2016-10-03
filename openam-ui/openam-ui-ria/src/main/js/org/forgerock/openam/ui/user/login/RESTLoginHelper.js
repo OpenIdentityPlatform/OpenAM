@@ -86,7 +86,7 @@ define([
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
             SessionToken.remove();
 
-            if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
+            if (_.get(xhr, "responseJSON.code") === 404) {
                 errorCallback("loggedIn");
             } else {
                 errorCallback();
