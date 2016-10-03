@@ -16,7 +16,6 @@
 package com.iplanet.dpro.session.operations.strategies;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.text.MessageFormat;
 
@@ -39,6 +38,7 @@ import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
@@ -152,7 +152,7 @@ public class LocalOperations implements SessionOperations {
      */
     private void destroyInternalSession(SessionID sessionID) {
         InternalSession sess = sessionAccessManager.removeInternalSession(sessionID);
-        if (sess != null && sess.getState() != INVALID) {
+        if (sess != null && sess.getState() != SessionState.INVALID) {
             signalRemove(sess, SessionEvent.DESTROY);
             sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
         }
@@ -186,7 +186,7 @@ public class LocalOperations implements SessionOperations {
     @Override
     public void addSessionListener(SessionID sessionId, String url) throws SessionException {
         InternalSession session = resolveToken(sessionId);
-        if (session.getState() == INVALID) {
+        if (session.getState() == SessionState.INVALID) {
             throw new SessionException(SessionBundle.getString("invalidSessionState") + sessionId.toString());
         }
         if (!sessionId.equals(session.getID()) && session.getRestrictionForToken(sessionId) == null) {
@@ -303,7 +303,7 @@ public class LocalOperations implements SessionOperations {
 
     private void logoutInternalSession(final SessionID sessionId) {
         InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
-        if (session != null && session.getState() != INVALID) {
+        if (session != null && session.getState() != SessionState.INVALID) {
             signalRemove(session, SessionEvent.LOGOUT);
             sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);
         }
@@ -316,7 +316,7 @@ public class LocalOperations implements SessionOperations {
      */
     private void signalRemove(InternalSession session, int event) {
         sessionLogging.logEvent(session.toSessionInfo(), event);
-        session.setState(DESTROYED);
+        session.setState(SessionState.DESTROYED);
         sessionNotificationSender.sendEvent(session, event);
     }
 }

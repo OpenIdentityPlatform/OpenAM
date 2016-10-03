@@ -16,16 +16,18 @@
 package com.iplanet.dpro.session.utils;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import java.text.MessageFormat;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.TokenRestrictionFactory;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-
-import java.text.MessageFormat;
 
 /**
  * Responsible for providing a collection of utility functions for
@@ -73,7 +75,7 @@ public class SessionInfoFactory {
             throw new IllegalArgumentException("Session id mismatch");
         }
 
-        if (internalSession.getState() != VALID) {
+        if (internalSession.getState() != SessionState.VALID) {
             if (internalSession.getTimeLeftBeforePurge() > 0) {
                 throw new SessionTimedOutException(MessageFormat.format(ERROR_FORMAT,
                         SessionBundle.getString(SESSION_TIMED_OUT),

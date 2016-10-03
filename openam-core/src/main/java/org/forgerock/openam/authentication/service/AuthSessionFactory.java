@@ -32,6 +32,7 @@ import com.iplanet.dpro.session.service.DsameAdminTokenProvider;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionFactory;
 import com.iplanet.dpro.session.service.MonitoringOperations;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -93,7 +94,7 @@ public class AuthSessionFactory {
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
             session.setNonExpiring();
-            session.setState(VALID);
+            session.setState(SessionState.VALID);
             monitoringOperations.incrementActiveSessions();
             authenticationSessionStore.promoteSession(session.getSessionID());
             return session;

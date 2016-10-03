@@ -40,17 +40,6 @@ public class SessionConstants {
             SystemProperties.get(Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME, "JSESSIONID");
 
     /**
-     * Session States
-     */
-    public static final int INVALID = 0;
-
-    public static final int VALID = 1;
-
-    public static final int INACTIVE = 2;
-
-    public static final int DESTROYED = 3;
-
-    /**
      * Session Types
      */
     public static final int USER_SESSION = 0;

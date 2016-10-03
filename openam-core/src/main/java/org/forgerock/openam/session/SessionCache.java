@@ -27,7 +27,6 @@
 
 package org.forgerock.openam.session;
 
-import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +46,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.session.util.RestrictedTokenContext;
@@ -171,7 +171,7 @@ public class SessionCache {
 
             // ensure session has destroyed state and observers are notified (exactly once)
             if (session.getRemoved().compareAndSet(false, true)) {
-                session.setState(DESTROYED);
+                session.setState(SessionState.DESTROYED);
                 SessionEvent event = new SessionEvent(session, SessionEvent.DESTROY, eventTime);
                 SessionEvent.invokeListeners(event);
             }
@@ -292,7 +292,7 @@ public class SessionCache {
              * session will be left in the {@link #sessionTable} until it is purged. This check will
              * detect this condition and indicate to the caller their SessionID is invalid.
              */
-            if (session.getState(false) == DESTROYED && getPurgeDelayForReducedCrosstalk() > 0) {
+            if (session.getState(false) == SessionState.DESTROYED && getPurgeDelayForReducedCrosstalk() > 0) {
                 throw new SessionException("Session is in a destroyed state");
             }
 

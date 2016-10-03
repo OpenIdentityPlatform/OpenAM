@@ -30,6 +30,7 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
@@ -109,7 +110,7 @@ public class StatelessSession extends Session {
     }
 
     @Override
-    public int getState(boolean reset) throws SessionException {
+    public SessionState getState(boolean reset) throws SessionException {
         return sessionState;
     }
 

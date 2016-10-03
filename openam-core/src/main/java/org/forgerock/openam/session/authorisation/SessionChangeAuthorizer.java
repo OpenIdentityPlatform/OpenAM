@@ -15,8 +15,6 @@
  */
 package org.forgerock.openam.session.authorisation;
 
-import static org.forgerock.openam.session.SessionConstants.VALID;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +31,7 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -169,7 +168,7 @@ public class SessionChangeAuthorizer {
      */
     public boolean hasPermissionToDestroySession(final Session requester,
                                                  final SessionID sessionId) throws SessionException {
-        if (requester.getState(false) != VALID) {
+        if (requester.getState(false) != SessionState.VALID) {
             throw new SessionException(SessionBundle.getString("invalidSessionState") + sessionId.toString());
         }
 

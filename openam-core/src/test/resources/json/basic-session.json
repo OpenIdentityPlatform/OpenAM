@@ -14,7 +14,7 @@
     "sessionEventURLs": {},
     "sessionID": null,
     "sessionProperties": null,
-    "sessionState": 0,
+    "sessionState": "INVALID",
     "sessionType": 0,
     "timedOutAt": 0,
     "willExpireFlag": false

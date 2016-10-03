@@ -35,7 +35,6 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
-import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
@@ -46,6 +45,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 
 public class SessionAdapterTest {
 
@@ -83,7 +83,7 @@ public class SessionAdapterTest {
         given(mockCoreTokenConfig.getUserId(eq(mockSession))).willReturn(mockUserId);
         given(mockSession.getExpirationTime(MILLISECONDS)).willReturn(SECONDS.toMillis(mockTimestamp));
         given(mockSession.getSessionHandle()).willReturn(mockSessionHandle);
-        given(mockSession.getState()).willReturn(SessionConstants.VALID);
+        given(mockSession.getState()).willReturn(SessionState.VALID);
 
         // Avoid serialisation when using mock InternalSessions
         given(mockJsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(mockSession);
@@ -197,7 +197,7 @@ public class SessionAdapterTest {
     public void shouldAssignSessionStateInvalidToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.getState()).willReturn(SessionConstants.INVALID);
+        given(mockSession.getState()).willReturn(SessionState.INVALID);
 
         // When
         Token token = adapter.toToken(mockSession);
@@ -210,7 +210,7 @@ public class SessionAdapterTest {
     public void shouldAssignSessionStateValidToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.getState()).willReturn(SessionConstants.VALID);
+        given(mockSession.getState()).willReturn(SessionState.VALID);
 
         // When
         Token token = adapter.toToken(mockSession);
@@ -223,7 +223,7 @@ public class SessionAdapterTest {
     public void shouldAssignSessionStateInactiveToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.getState()).willReturn(SessionConstants.INACTIVE);
+        given(mockSession.getState()).willReturn(SessionState.INACTIVE);
 
         // When
         Token token = adapter.toToken(mockSession);
@@ -236,7 +236,7 @@ public class SessionAdapterTest {
     public void shouldAssignSessionStateDestroyedToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.getState()).willReturn(SessionConstants.DESTROYED);
+        given(mockSession.getState()).willReturn(SessionState.DESTROYED);
 
         // When
         Token token = adapter.toToken(mockSession);
@@ -374,6 +374,7 @@ public class SessionAdapterTest {
         givenMockSessionID(mockSession, "badger");
         given(mockSession.getExpirationTime(SECONDS)).willReturn(mockTimestamp);
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
+        given(mockSession.getState()).willReturn(SessionState.INVALID);
         given(mockJsonSerialisation.serialise(any())).willReturn("");
         given(mockJsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(mockSession);
 

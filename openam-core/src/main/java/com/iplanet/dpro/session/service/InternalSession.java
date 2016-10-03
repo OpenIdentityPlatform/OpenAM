@@ -85,34 +85,11 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * The <code>InternalSession</code> class represents a Webtop internal
- * session. A session has four states: invalid, valid, inactive, and destroy.
- * The initial state of a session is invalid.
- *
- * The following is the state diagram for a session:
- * <pre>
- *
- *                     |
- *                     |
- *                     |
- *                     V
- *       ---------- invalid
- *      |              |
- *      |              |creation (authentication OK)
- *      |              |
- *      |max login time|   max idle time
- *      |destroy       V  ---------------&gt;
- *      |            valid              inactive --
- *      |              |  &lt;--------------           |
- *      |              |       reactivate           |
- *      |              |                            |
- *      |              | logout                     | destroy
- *      |              | destroy                    | max session time
- *      |              | max session time           |
- *      |              V                            |
- *       ---------&gt;  destroy  &lt;---------------------
- *
- * </pre>
+ * The <code>InternalSession</code> class represents a Webtop internal session.
+ * <p>
+ * A session has four states: invalid, valid, inactive, and destroyed. The initial state of a session is invalid.
+ * 
+ * @see SessionState
  *
  */
 public class InternalSession implements Serializable, AMSession, SessionPersistenceObservable {
@@ -166,7 +143,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     private SessionID sessionID;
     private int sessionType; // Either user or application (TODO: Replace these constants with an enum)
-    private int sessionState; // INACTIVE, VALID, INVALID, DESTROYED (TODO: Replace these constants with an enum)
+    private SessionState sessionState = SessionState.INVALID;
     private String clientID;
     private String clientDomain;
     private Properties sessionProperties; // e.g. LoginURL, Timeout, Host, etc
@@ -237,7 +214,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         maxIdleTimeInMinutes = maxDefaultIdleTimeInMinutes;
         maxSessionTimeInMinutes = maxDefaultIdleTimeInMinutes;
         reschedulePossible = maxDefaultIdleTimeInMinutes > maxIdleTimeInMinutes;
-        sessionState = INVALID;
+        sessionState = SessionState.INVALID;
         sessionProperties = new Properties();
         willExpireFlag = true;
         setCreationTime();
@@ -525,7 +502,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * Returns the state of the Internal Session
      * @return the session state can be VALID, INVALID, INACTIVE or DESTROYED
      */
-    public int getState() {
+    public SessionState getState() {
         return sessionState;
     }
 
@@ -785,7 +762,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             sessionProperties.put(key, value);
         }
 
-        if (sessionState == VALID && serviceConfig.isSendPropertyNotification(key)) {
+        if (sessionState == SessionState.VALID && serviceConfig.isSendPropertyNotification(key)) {
             sessionService.sendEvent(this, SessionEvent.PROPERTY_CHANGED);
             SessionInfo sessionInfo = toSessionInfo();
             sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
@@ -875,7 +852,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             }
         }
         setLatestAccessTime();
-        setState(VALID);
+        setState(SessionState.VALID);
         if (reschedulePossible && !stateless) {
             reschedule();
         }
@@ -917,7 +894,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         taskRunnable.cancel();
         setCreationTime();
         setLatestAccessTime();
-        setState(VALID);
+        setState(SessionState.VALID);
         reschedule();
         SessionInfo sessionInfo = toSessionInfo();
         sessionLogging.logEvent(sessionInfo, SessionEvent.REACTIVATION);
@@ -970,7 +947,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                 return StateTransition.MAX_TIMEOUT;
             }
 
-            if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes) && sessionState != INACTIVE) {
+            if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes) && sessionState != SessionState.INACTIVE) {
                 return StateTransition.IDLE_TIMEOUT;
             }
             return StateTransition.NO_CHANGE;
@@ -1003,7 +980,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         if (!isAppSession() || serviceConfig.isReturnAppSessionEnabled()) {
             sessionService.decrementActiveSessions();
         }
-        setState(INVALID);
+        setState(SessionState.INVALID);
         if (serviceConfig.isSessionTrimmingEnabled()){
             trimSession();
         }
@@ -1013,7 +990,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Changes the state of the session. Does not notify SessionService, or anything else using Session Notification.
      */
-    public void changeStateWithoutNotify(int state) {
+    public void changeStateWithoutNotify(SessionState state) {
         this.sessionState = state;
     }
 
@@ -1052,16 +1029,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             info.setNeverExpiring(true);
         }
 
-        if (isInvalid()) {
-            info.setState("invalid");
-        } else if (sessionState == VALID) {
-            info.setState("valid");
-        } else if (sessionState == INACTIVE) {
-            info.setState("inactive");
-        } else if (sessionState == DESTROYED) {
-            info.setState("destroyed");
-        }
-
+        info.setState(sessionState.name().toLowerCase());
         info.setProperties((Hashtable<String, String>) sessionProperties.clone());
         if (withIds && sessionHandle != null) {
             //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
@@ -1089,7 +1057,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      *
      * @param state
      */
-    public void setState(int state) {
+    public void setState(SessionState state) {
         sessionState = state;
         notifyPersistenceManager();
     }
@@ -1413,7 +1381,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @return True if the Session has reached an invalid state.
      */
     public boolean isInvalid() {
-        return sessionState == INVALID;
+        return sessionState == SessionState.INVALID;
     }
 
     /**
@@ -1423,7 +1391,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         SessionInfo sessionInfo = toSessionInfo();
         sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-        setState(DESTROYED);
+        setState(SessionState.DESTROYED);
         sessionService.removeCachedInternalSession(sessionID);
         sessionService.sendEvent(this, SessionEvent.DESTROY);
     }
@@ -1498,7 +1466,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                 timeoutSessionAndSchedulePurge(SessionEvent.MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
             } else {
                 long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                if (idleTimeLeftInSeconds <= 0 && sessionState != INACTIVE) {
+                if (idleTimeLeftInSeconds <= 0 && sessionState != SessionState.INACTIVE) {
                     timeoutSessionAndSchedulePurge(SessionEvent.IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
                 } else {
                     if (timerPool != null) {
@@ -1577,7 +1545,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                         }
                     } else {
                         long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                        if (idleTimeLeftInSeconds <= 0 && sessionState != INACTIVE) {
+                        if (idleTimeLeftInSeconds <= 0 && sessionState != SessionState.INACTIVE) {
                             changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
                             sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
                             if (timerPool != null) {

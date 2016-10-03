@@ -57,6 +57,7 @@ import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -77,31 +78,6 @@ import com.sun.identity.shared.debug.Debug;
  * client ID (user ID or application ID), session idle time, time left on the
  * session, and session state. It also allows applications to add listener for
  * session events.
- *
- * <pre>
- *  The following is the state diagram for a session:
- *
- *                     |
- *                     |
- *                     |
- *                     V
- *       ---------- invalid
- *      |              |
- *      |              |creation (authentication OK)
- *      |              |
- *      |max login time|   max idle time
- *      |destroy       V  ---------------&gt;
- *      |            valid              inactive --
- *      |              |  &lt;--------------           |
- *      |              |       reactivate           |
- *      |              |                            |
- *      |              | logout                     | destroy
- *      |              | destroy                    | max session time
- *      |              | max session time           |
- *      |              V                            |
- *       ---------&gt;  destroy  &lt;---------------------
- *
- * </pre>
  *
  * @see com.iplanet.dpro.session.SessionID
  * @see com.iplanet.dpro.session.SessionListener
@@ -167,13 +143,13 @@ public class Session implements Blacklistable, AMSession{
     /**
      * Four possible values for the state of the session:
      * <ul>
-     *     <li>0 - Invalid</li>
-     *     <li>1 - Valid</li>
-     *     <li>2 - Inactive</li>
-     *     <li>3 - Destroyed</li>
+     *     <li>Invalid</li>
+     *     <li>Valid</li>
+     *     <li>Inactive</li>
+     *     <li>Destroyed</li>
      * </ul>
      */
-    protected int sessionState;
+    protected SessionState sessionState = SessionState.INVALID;
 
     /**
      * If this is a Remote session that has been destroyed but not yet removed from the
@@ -463,7 +439,7 @@ public class Session implements Blacklistable, AMSession{
      *            there was an error during communication with session
      *            service.
      */
-    public int getState(boolean reset) throws SessionException {
+    public SessionState getState(boolean reset) throws SessionException {
         if (!usingCachedBasedPolling() && maxCachingTimeReached()) {
             refresh(reset);
         } else {
@@ -474,7 +450,7 @@ public class Session implements Blacklistable, AMSession{
         return sessionState;
     }
 
-    public void setState(int state) {
+    public void setState(SessionState state) {
         sessionState = state;
     }
 
@@ -658,7 +634,7 @@ public class Session implements Blacklistable, AMSession{
      * @exception SessionException if the session state is not valid.
      */
     public void addSessionListener(SessionListener listener, boolean force) throws SessionException {
-        if (!force && sessionState != VALID) {
+        if (!force && sessionState != SessionState.VALID) {
             throw new SessionException(SessionBundle.rbName, "invalidSessionState", null);
         }
         localSessionEventListeners.add(listener);
@@ -847,18 +823,7 @@ public class Session implements Blacklistable, AMSession{
         sessionIdleTime = info.getTimeIdle();
         sessionExpiryTime = info.getExpiryTime(TimeUnit.MILLISECONDS);
         sessionTimeLeft = info.getTimeLeft();
-        if (info.getState().equals("invalid")) {
-            sessionState = INVALID;
-        }
-        else if (info.getState().equals("valid")) {
-            sessionState = VALID;
-        }
-        else if (info.getState().equals("inactive")) {
-            sessionState = INACTIVE;
-        }
-        else if (info.getState().equals("destroyed")) {
-            sessionState = DESTROYED;
-        }
+        sessionState = SessionState.valueOf(info.getState().toUpperCase());
         sessionProperties = info.getProperties();
         if (timedOutAt <= 0) {
             String sessionTimedOutProp = sessionProperties.get("SessionTimedOut");

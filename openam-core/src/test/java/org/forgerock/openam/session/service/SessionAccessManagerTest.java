@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.session.SessionConstants.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 
@@ -35,7 +34,13 @@ import org.testng.annotations.Test;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
-import com.iplanet.dpro.session.service.*;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionCache;
+import com.iplanet.dpro.session.service.MonitoringOperations;
+import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.SessionLogging;
+import com.iplanet.dpro.session.service.SessionNotificationSender;
+import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
 
 public class SessionAccessManagerTest {
@@ -77,7 +82,7 @@ public class SessionAccessManagerTest {
         given(session.isTimedOut()).willReturn(true);
 
         // now set it to be destroyed instead
-        given(session.getState()).willReturn(DESTROYED);
+        given(session.getState()).willReturn(SessionState.DESTROYED);
 
         // When
         sessionAccessManager.persistInternalSession(session);
@@ -95,7 +100,7 @@ public class SessionAccessManagerTest {
         given(tokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TEST_TOKEN_ID);
 
         given(mockInternalSession.isStored()).willReturn(true);
-        given(mockInternalSession.getState()).willReturn(DESTROYED);
+        given(mockInternalSession.getState()).willReturn(SessionState.DESTROYED);
         // When
         sessionAccessManager.removeInternalSession(mockSessionID);
         // Then

@@ -20,16 +20,17 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.*;
-import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.util.Hashtable;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionCacheTest {
 
@@ -67,7 +68,7 @@ public class SessionCacheTest {
     public void shouldResetIdleTimeResetSetToTrue() throws SessionException {
         //given
         session.update(sessionInfo);
-        when(session.getState(true)).thenReturn(VALID);
+        when(session.getState(true)).thenReturn(SessionState.VALID);
 
         //when
         session = cache.getSession(sessionID, false, true);
@@ -82,7 +83,7 @@ public class SessionCacheTest {
     public void shouldNotResetIdleTimeWhenResetSetToFalse() throws SessionException {
         //given
         session.update(sessionInfo);
-        when(session.getState(false)).thenReturn(VALID);
+        when(session.getState(false)).thenReturn(SessionState.VALID);
 
         //when
         session = cache.getSession(sessionID, false, false);
@@ -97,7 +98,7 @@ public class SessionCacheTest {
     public void shouldIgnoreResetIdleTimeWhenInvaliodSessionIsAllowed() throws SessionException {
         //given
         session.update(sessionInfo);
-        when(session.getState(true)).thenReturn(VALID);
+        when(session.getState(true)).thenReturn(SessionState.VALID);
 
         //when
         session = cache.getSession(sessionID, true, true);

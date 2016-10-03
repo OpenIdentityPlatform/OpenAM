@@ -227,7 +227,7 @@ public class SessionService {
      */
     void destroyInternalSession(SessionID sessionID) {
         InternalSession internalSession = removeCachedInternalSession(sessionID);
-        if (internalSession != null && internalSession.getState() != INVALID) {
+        if (internalSession != null && internalSession.getState() != SessionState.INVALID) {
             signalRemove(internalSession, SessionEvent.DESTROY);
             sessionAuditor.auditActivity(internalSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
@@ -245,7 +245,7 @@ public class SessionService {
         if (authenticationSession == null) {
             authenticationSession = removeCachedInternalSession(sessionID);
         }
-        if (authenticationSession != null && authenticationSession.getState() != INVALID) {
+        if (authenticationSession != null && authenticationSession.getState() != SessionState.INVALID) {
             signalRemove(authenticationSession, SessionEvent.DESTROY);
             sessionAuditor.auditActivity(authenticationSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
@@ -289,7 +289,7 @@ public class SessionService {
         synchronized (sessionAccessManager) {
             List<InternalSession> sessions = new ArrayList<>();
             for (InternalSession session : sessionAccessManager.getAllInternalSessions()) {
-                if (session.getState() == VALID
+                if (session.getState() == SessionState.VALID
                         && (!session.isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
                     sessions.add(session);
                 }
@@ -413,7 +413,7 @@ public class SessionService {
      */
     private void signalRemove(InternalSession session, int event) {
         sessionLogging.logEvent(session.toSessionInfo(), event);
-        session.setState(DESTROYED);
+        session.setState(SessionState.DESTROYED);
         sendEvent(session, event);
     }
 
@@ -454,7 +454,7 @@ public class SessionService {
      * @throws SessionException
      */
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
-        if (s.getState(false) != VALID) {
+        if (s.getState(false) != SessionState.VALID) {
             throw new SessionException(SessionBundle
                     .getString("invalidSessionState")
                     + s.getID().toString());

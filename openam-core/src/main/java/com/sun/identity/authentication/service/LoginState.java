@@ -91,6 +91,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -445,8 +446,8 @@ public class LoginState {
             return null;
         }
         InternalSession session = getReferencedSession();
-        if (session == null || session.getState() == INACTIVE ||
-                session.getState() == DESTROYED) {
+        if (session == null || session.getState() == SessionState.INACTIVE ||
+                session.getState() == SessionState.DESTROYED) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message(
                         "Session is INACTIVE OR DESTROYED :" + session);
@@ -1818,7 +1819,7 @@ public class LoginState {
             return null;
         }
         InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
-        if (!stateless && (session == null || session.getState() == INACTIVE)) {
+        if (!stateless && (session == null || session.getState() == SessionState.INACTIVE)) {
             return null;
         }
 
@@ -1875,7 +1876,7 @@ public class LoginState {
         }
 
         String cookieName = AuthUtils.getCookieName();
-        if (!useAMCookie && session.getState() == INVALID) {
+        if (!useAMCookie && session.getState() == SessionState.INVALID) {
             cookieName = AuthUtils.getAuthCookieName();
         }
 
@@ -5513,8 +5514,8 @@ public class LoginState {
      */
     boolean isSessionInvalid() {
         InternalSession session = getReferencedSession();
-        return (session == null || session.getState() == INVALID ||
-                session.getState() == DESTROYED);
+        return (session == null || session.getState() == SessionState.INVALID ||
+                session.getState() == SessionState.DESTROYED);
     }
 
     /**

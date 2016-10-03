@@ -16,7 +16,6 @@
 package org.forgerock.openam.session.service;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.util.Collection;
 
@@ -53,6 +52,7 @@ import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
 
@@ -364,7 +364,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
                 // intentional fall through to destroy
             case DESTROY:
                 delete(session);
-                session.changeStateWithoutNotify(DESTROYED);
+                session.changeStateWithoutNotify(SessionState.DESTROYED);
                 sessionNotificationSender.sendEvent(session, SessionEvent.DESTROY);
                 return true;
             case MAX_TIMEOUT:
@@ -389,7 +389,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
         foreignSessionHandler.remove(session.getID());
         session.cancel();
         // Session Constraint
-        if (session.getState() == VALID) {
+        if (session.getState() == SessionState.VALID) {
             monitoringOperations.decrementActiveSessions();
         }
 
@@ -405,7 +405,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     private void update(InternalSession session) {
         if (session.isStored()) {
-            if (session.getState() != VALID) {
+            if (session.getState() != SessionState.VALID) {
                 delete(session);
             } else if (!session.isTimedOut() || session.getTimeLeftBeforePurge() > 0) {
                 // Only save if we are not about to delete the session anyway.

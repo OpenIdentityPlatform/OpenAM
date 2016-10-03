@@ -92,7 +92,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setUserId(userId);
 
         // Session state
-        String state = getSessionState(session);
+        String state = session.getState().name();
         token.setAttribute(SessionTokenField.SESSION_STATE.getField(), state);
 
         // Expiry Date
@@ -134,23 +134,6 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
 
         return token;
-    }
-
-    @VisibleForTesting
-    static String getSessionState(InternalSession session) {
-        int state = session.getState();
-        switch (state) {
-            case SessionConstants.INVALID:
-                return "INVALID";
-            case SessionConstants.VALID:
-                return "VALID";
-            case SessionConstants.INACTIVE:
-                return "INACTIVE";
-            case SessionConstants.DESTROYED:
-                return "DESTROYED";
-            default:
-                throw new IllegalStateException("Unknown session state");
-        }
     }
 
     @VisibleForTesting

@@ -58,6 +58,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -912,7 +913,6 @@ public class AuthUtils extends AuthClientUtils {
         LoginState loginState = null;
         boolean sessionUpgrade = false;
         AuthD ad = AuthD.getAuth();
-        int sessionState = -1;
         SSOToken ssot = null;
         String indexName = null;
         if (xmlReq != null) {
@@ -941,12 +941,12 @@ public class AuthUtils extends AuthClientUtils {
                 if (sess == null) {
                     sessionUpgrade = false;
                 } else {
-                    sessionState = sess.getState();
+                    SessionState sessionState = sess.getState();
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("sid from sess is : " + sess.getID());
                         utilDebug.message("sess is : " + sessionState);
                     }
-                    if (!((sessionState == INVALID)  || (isLogout))) {
+                    if (!((sessionState == SessionState.INVALID)  || (isLogout))) {
                         ssot = AuthUtils.
                             getExistingValidSSOToken(sid);
                         if ((indexType != null) && (indexName != null)) {
