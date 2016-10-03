@@ -29,8 +29,9 @@
 
 package com.iplanet.dpro.session;
 
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.session.SessionConstants.SESSION_SERVICE;
+import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.net.URL;
 import java.security.AccessController;
@@ -58,6 +59,7 @@ import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionState;
+import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -88,10 +90,9 @@ public class Session implements Blacklistable, AMSession{
     public static final String CACHED_BASE_POLLING_PROPERTY = "com.iplanet.am.session.client.polling.cacheBased";
 
     /**
-     * Defines the type of Session that has been created. Where 0 for User
-     * Session; and 1 for Application Session.
+     * Defines the type of Session that has been created.
      */
-    private int sessionType;
+    private SessionType sessionType = SessionType.USER;
 
     /**
      * Identification string of the Client using this Session.
@@ -294,7 +295,7 @@ public class Session implements Blacklistable, AMSession{
      *
      * @return The session type.
      */
-    public int getType() {
+    public SessionType getType() {
         return sessionType;
     }
 
@@ -811,9 +812,9 @@ public class Session implements Blacklistable, AMSession{
      */
     public synchronized void update(SessionInfo info) throws SessionException {
         if (info.getSessionType().equals("user")) {
-            sessionType = USER_SESSION;
+            sessionType = SessionType.USER;
         } else if (info.getSessionType().equals("application")) {
-            sessionType = APPLICATION_SESSION;
+            sessionType = SessionType.APPLICATION;
         }
         clientID = info.getClientID();
         clientDomain = info.getClientDomain();

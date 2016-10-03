@@ -15,7 +15,7 @@
     "sessionID": null,
     "sessionProperties": null,
     "sessionState": "INVALID",
-    "sessionType": 0,
+    "sessionType": "USER",
     "timedOutAt": 0,
     "willExpireFlag": false
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.session;
 
@@ -38,13 +38,6 @@ public class SessionConstants {
      */
     public static final String HTTP_SESSION_TRACKING_COOKIE_NAME =
             SystemProperties.get(Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME, "JSESSIONID");
-
-    /**
-     * Session Types
-     */
-    public static final int USER_SESSION = 0;
-
-    public static final int APPLICATION_SESSION = 1;
 
     /**
      * Session Handle Property reference

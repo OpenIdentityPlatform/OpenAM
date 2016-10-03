@@ -152,6 +152,7 @@
                                 <include>com/iplanet/am/util/**</include>
                                 <include>com/iplanet/dpro/session/service/InternalSession*</include>
                                 <include>com/iplanet/dpro/session/service/SessionState*</include>
+                                <include>com/iplanet/dpro/session/service/SessionType*</include>
                                 <include>com/iplanet/dpro/session/service/SessionService*</include>
                                 <include>com/iplanet/dpro/session/operations/SessionOperations*</include>
                                 <include>com/iplanet/dpro/session/operations/SessionOperationStrategy*</include>

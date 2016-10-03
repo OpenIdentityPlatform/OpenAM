@@ -28,8 +28,6 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.session.SessionConstants.*;
-
 import java.net.URL;
 import java.security.AccessController;
 import java.util.Collections;

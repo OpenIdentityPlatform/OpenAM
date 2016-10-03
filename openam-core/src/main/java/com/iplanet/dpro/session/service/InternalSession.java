@@ -31,7 +31,7 @@ package com.iplanet.dpro.session.service;
 import static java.util.concurrent.TimeUnit.*;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -142,7 +142,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * State
      */
     private SessionID sessionID;
-    private int sessionType; // Either user or application (TODO: Replace these constants with an enum)
+    private SessionType sessionType = SessionType.USER;
     private SessionState sessionState = SessionState.INVALID;
     private String clientID;
     private String clientDomain;
@@ -295,20 +295,18 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
     /**
      * Returns the type of Internal Session.
-     * @return  <code>0 </code> if it is a USER_SESSION
-     *          <code>1 </code> if it s a APPLICATION_SESSION
+     * @return <code>USER</code> or <code>APPLICATION</code>.
      */
-    public int getType() {
+    public SessionType getType() {
         return sessionType;
     }
 
     /**
      * Set the type of Internal Session. User OR Application.
      *
-     * @param type <code>0</code> for <code>USER_SESSION</code>.
-     *             <code>1</code> for <code>APPLICATION_SESSION</code>.
+     * @param type <code>USER</code> or <code>APPLICATION</code>.
      */
-    public void setType(int type) {
+    public void setType(SessionType type) {
         sessionType = type;
         notifyPersistenceManager();
     }
@@ -1011,9 +1009,9 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             info.setSecret(java.util.UUID.randomUUID().toString());
         }
 
-        if (sessionType == USER_SESSION) {
+        if (sessionType == SessionType.USER) {
             info.setSessionType("user");
-        } else if (sessionType == APPLICATION_SESSION) {
+        } else if (sessionType == SessionType.APPLICATION) {
             info.setSessionType("application");
         }
         info.setClientID(clientID);
@@ -1170,7 +1168,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @return <code>true</code> if this is an application session, <code>false</code> otherwise.
      */
     boolean isAppSession() {
-        return sessionType == APPLICATION_SESSION;
+        return sessionType == SessionType.APPLICATION;
     }
 
     /**

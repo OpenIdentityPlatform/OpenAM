@@ -32,7 +32,6 @@ package com.sun.identity.authentication.service;
 
 import static java.util.Collections.unmodifiableSet;
 import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
-import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.Time.newDate;
 
@@ -92,6 +91,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionState;
+import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -1400,7 +1400,7 @@ public class LoginState {
                     || isAgent(amIdentityUser)) {
 
                 session.setClientID(token);
-                session.setType(APPLICATION_SESSION);
+                session.setType(SessionType.APPLICATION);
                 if (isAgent(amIdentityUser) && AGENT_SESSION_IDLE_TIME > 0) {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("setSessionProperties for agent " +
@@ -1419,7 +1419,7 @@ public class LoginState {
             } else {
                 DEBUG.message("request: in putProperty stuff");
                 session.setClientID(userDN);
-                session.setType(USER_SESSION);
+                session.setType(SessionType.USER);
                 session.setMaxSessionTime(maxSession);
                 session.setMaxIdleTime(idleTime);
                 session.setMaxCachingTime(cacheTime);

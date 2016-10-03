@@ -16,8 +16,7 @@
 
 package org.forgerock.openam.authentication.service;
 
-import static org.forgerock.openam.ldap.LDAPUtils.*;
-import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +32,7 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionFactory;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionState;
+import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -90,7 +90,7 @@ public class AuthSessionFactory {
     private InternalSession getServiceSession(String domain) {
         try {
             InternalSession session = internalSessionFactory.newInternalSession(domain, false);
-            session.setType(APPLICATION_SESSION);
+            session.setType(SessionType.APPLICATION);
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
             session.setNonExpiring();
