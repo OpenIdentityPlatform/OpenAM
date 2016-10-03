@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,18 +15,19 @@
  */
 package com.iplanet.dpro.session.operations;
 
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
 
-public class RemoteSessionOperationStrategyTest {
+public class ClientSdkSessionOperationStrategyTest {
     @Test
-    public void shouldProvideRemoteOperationStrategy() {
+    public void shouldProvideClietnSDKOperationStrategy() {
         // Given
-        RemoteOperations mockRemote = mock(RemoteOperations.class);
-        RemoteSessionOperationStrategy strategy = new RemoteSessionOperationStrategy(mockRemote);
+        ClientSdkOperations mockRemote = mock(ClientSdkOperations.class);
+        ClientSdkSessionOperationStrategy strategy = new ClientSdkSessionOperationStrategy(mockRemote);
         // When
         SessionOperations operation = strategy.getOperation(null);
         // Then

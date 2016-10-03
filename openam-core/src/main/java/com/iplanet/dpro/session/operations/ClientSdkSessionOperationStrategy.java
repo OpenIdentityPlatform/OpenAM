@@ -16,21 +16,21 @@
 package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
 
 /**
  * Responsible for providing a SessionOperationStrategy which is appropriate
  * for ClientSDK usage.
  */
-public class RemoteSessionOperationStrategy implements SessionOperationStrategy {
-    private final RemoteOperations remoteOperations;
+public class ClientSdkSessionOperationStrategy implements SessionOperationStrategy {
+    private final ClientSdkOperations clientSdkOperations;
 
     /**
      * Default constructor appropriate for Client SDK usage.
-     * @param remoteOperations
+     * @param clientSdkOperations
      */
-    public RemoteSessionOperationStrategy(RemoteOperations remoteOperations) {
-        this.remoteOperations = remoteOperations;
+    public ClientSdkSessionOperationStrategy(ClientSdkOperations clientSdkOperations) {
+        this.clientSdkOperations = clientSdkOperations;
     }
 
     /**
@@ -40,6 +40,6 @@ public class RemoteSessionOperationStrategy implements SessionOperationStrategy 
      */
     @Override
     public SessionOperations getOperation(SessionID sessionID) {
-        return remoteOperations;
+        return clientSdkOperations;
     }
 }

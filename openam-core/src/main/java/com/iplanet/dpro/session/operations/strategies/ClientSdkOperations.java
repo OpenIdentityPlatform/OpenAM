@@ -55,12 +55,12 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * Responsible for providing remote implementations of the SessionOperations. These
+ * Responsible for providing ClientSDK implementations of the SessionOperations. These
  * are all moved from {@link Session}. Importantly they use the SessionRequest PLL
  * mechanism for performing these operations.
  */
 @Singleton
-public class RemoteOperations implements SessionOperations {
+public class ClientSdkOperations implements SessionOperations {
     protected static final String INVALID_SESSION_STATE = "invalidSessionState";
     protected static final String UNEXPECTED_SESSION = "unexpectedSession";
 
@@ -72,12 +72,12 @@ public class RemoteOperations implements SessionOperations {
     private HttpConnectionFactory httpConnectionFactory;
 
     @Inject
-    public RemoteOperations(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                            final Requests requests,
-                            final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
-                            final SessionServiceURLService sessionServiceURLService,
-                            final SessionServerConfig serverConfig,
-                            final HttpConnectionFactory httpConnectionFactory) {
+    public ClientSdkOperations(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
+                               final Requests requests,
+                               final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
+                               final SessionServiceURLService sessionServiceURLService,
+                               final SessionServerConfig serverConfig,
+                               final HttpConnectionFactory httpConnectionFactory) {
         this.debug = debug;
         this.requests = requests;
         this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;

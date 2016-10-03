@@ -43,9 +43,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class RemoteOperationsTest {
+public class ClientSdkOperationsTest {
 
-    private RemoteOperations remoteOperations;
+    private ClientSdkOperations clientSdkOperations;
 
     @Mock
     private Requests mockRequests;
@@ -78,7 +78,7 @@ public class RemoteOperationsTest {
                 any(SessionRequest.class),
                 any(Session.class))).willReturn(mockResponse);
 
-        remoteOperations = new RemoteOperations(mock(Debug.class), mockRequests, mockServicesClusterMonitorHandler,
+        clientSdkOperations = new ClientSdkOperations(mock(Debug.class), mockRequests, mockServicesClusterMonitorHandler,
                 mockSessionServiceURLService, mockServerConfig, mockHttpConnectionFactor);
     }
 
@@ -89,7 +89,7 @@ public class RemoteOperationsTest {
         given(mockResponse.getSessionInfo()).willReturn(Arrays.asList(mockSessionInfo));
 
         // When
-        SessionInfo result = remoteOperations.refresh(mockSession, true);
+        SessionInfo result = clientSdkOperations.refresh(mockSession, true);
 
         // Then
         assertThat(result).isEqualTo(mockSessionInfo);
@@ -102,10 +102,10 @@ public class RemoteOperationsTest {
 
         // When
         try {
-            remoteOperations.refresh(mockSession, true);
+            clientSdkOperations.refresh(mockSession, true);
         } catch (SessionException e) {
             // Then
-            assertThat(e.getErrorCode()).isEqualTo(RemoteOperations.INVALID_SESSION_STATE);
+            assertThat(e.getErrorCode()).isEqualTo(ClientSdkOperations.INVALID_SESSION_STATE);
         }
     }
 
@@ -118,10 +118,10 @@ public class RemoteOperationsTest {
 
         // When
         try {
-            remoteOperations.refresh(mockSession, true);
+            clientSdkOperations.refresh(mockSession, true);
         } catch (SessionException e) {
             // Then
-            assertThat(e.getErrorCode()).isEqualTo(RemoteOperations.UNEXPECTED_SESSION);
+            assertThat(e.getErrorCode()).isEqualTo(ClientSdkOperations.UNEXPECTED_SESSION);
         }
     }
 
@@ -130,7 +130,7 @@ public class RemoteOperationsTest {
         // Given
 
         // When
-        remoteOperations.logout(mockSession);
+        clientSdkOperations.logout(mockSession);
 
         // Then
         verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
@@ -141,7 +141,7 @@ public class RemoteOperationsTest {
         // Given
 
         // When
-        remoteOperations.destroy(mockRequester, mockSession);
+        clientSdkOperations.destroy(mockRequester, mockSession);
 
         // Then
         verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
@@ -153,7 +153,7 @@ public class RemoteOperationsTest {
         String name = "name";
         String value = "value";
         // When
-        remoteOperations.setProperty(mockSession, name, value);
+        clientSdkOperations.setProperty(mockSession, name, value);
 
         // Then
         verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));

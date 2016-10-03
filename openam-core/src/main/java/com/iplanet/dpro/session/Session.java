@@ -51,11 +51,11 @@ import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
+import com.iplanet.dpro.session.operations.ClientSdkSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperations;
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -261,8 +261,8 @@ public class Session implements Blacklistable, AMSession{
             sessionCookies = SessionCookies.getInstance();
             sessionServiceURLService = SessionServiceURLService.getInstance();
             requests = new Requests(null, null, new SessionPLLSender(sessionCookies));
-            sessionOperationStrategy = new RemoteSessionOperationStrategy(
-                    new RemoteOperations(sessionDebug, requests, null, sessionServiceURLService, null, null));
+            sessionOperationStrategy = new ClientSdkSessionOperationStrategy(
+                    new ClientSdkOperations(sessionDebug, requests, null, sessionServiceURLService, null, null));
         }
     }
 
