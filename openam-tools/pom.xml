@@ -37,7 +37,6 @@
         <module>openam-configurator-tool</module>
         <module>openam-installtools</module>
         <module>openam-installtools-launcher</module>
-        <module>openam-diagnostics</module>
         <module>openam-upgrade-tool</module>
         <module>openam-license-core</module>
         <module>openam-license-manager-cli</module>

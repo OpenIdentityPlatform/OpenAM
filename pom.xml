@@ -1113,22 +1113,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-diagnostics-schema</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-diagnostics-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-diagnostics-plugins</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- Distribution dependencies -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -1162,12 +1146,6 @@
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-upgrade-tool</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-distribution-diagnostics</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
