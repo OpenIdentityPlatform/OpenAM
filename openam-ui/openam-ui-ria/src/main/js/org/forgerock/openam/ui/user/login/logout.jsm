@@ -23,19 +23,24 @@ import Configuration from "org/forgerock/commons/ui/common/main/Configuration";
 import {
     get as getSessionToken, remove as removeSessionToken
 } from "org/forgerock/openam/ui/user/login/tokens/SessionToken";
-import SessionService from "org/forgerock/openam/ui/user/services/SessionService";
+import { isSessionValid, logout as serviceLogout } from "org/forgerock/openam/ui/user/services/SessionService";
 
-export default function logout () {
+const logout = () => {
     const sessionToken = getSessionToken();
     Configuration.setProperty("loggedUser", null);
 
-    return SessionService.isSessionValid(sessionToken)
-        .then((result) => {
-            if (result.valid) {
-                return SessionService.logout(sessionToken);
+    if (sessionToken) {
+        return isSessionValid(sessionToken).then((isValid) => {
+            if (isValid) {
+                return serviceLogout(sessionToken);
             } else {
                 return $.Deferred().resolve();
             }
         })
         .then(removeSessionToken, removeSessionToken);
-}
+    } else {
+        return $.Deferred().resolve();
+    }
+};
+
+export default logout;

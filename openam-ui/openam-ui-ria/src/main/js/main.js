@@ -49,29 +49,31 @@ require.config({
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
 
-        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
-        "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
-        "form2js"     : "libs/form2js-2.0-769718a",
-        "handlebars"  : "libs/handlebars-4.0.5",
-        "i18next"     : "libs/i18next-1.7.3-min",
-        "jquery"      : "libs/jquery-2.1.1-min",
-        "js2form"     : "libs/js2form-2.0-769718a",
-        "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
-        "lodash"      : "libs/lodash-3.10.1-min",
-        "moment"      : "libs/moment-2.8.1-min",
-        "qrcode"      : "libs/qrcode-1.0.0-min",
-        "sortable"    : "libs/jquery-nestingSortable-0.9.12",
-        "spin"        : "libs/spin-2.0.1-min",
-        "xdate"       : "libs/xdate-0.8-min",
-        "selectize"   : "libs/selectize-non-standalone-0.12.1-min",
-        "sifter"      : "libs/sifter-0.4.1-min",
-        "microplugin" : "libs/microplugin-0.0.3",
+        "clockPicker"      : "libs/bootstrap-clockpicker-0.0.7-min",
+        "crypto-js-sha256" : "libs/crypto-js-3.1.2-sha256.min",
+        "crypto-js"        : "libs/crypto-js-3.1.2-min",
+        "doTimeout"        : "libs/jquery.ba-dotimeout-1.0-min",
+        "form2js"          : "libs/form2js-2.0-769718a",
+        "handlebars"       : "libs/handlebars-4.0.5",
+        "i18next"          : "libs/i18next-1.7.3-min",
+        "jquery"           : "libs/jquery-2.1.1-min",
+        "js2form"          : "libs/js2form-2.0-769718a",
+        "jsonEditor"       : "libs/jsoneditor-0.7.23-custom",
+        "lodash"           : "libs/lodash-3.10.1-min",
+        "microplugin"      : "libs/microplugin-0.0.3",
+        "moment"           : "libs/moment-2.8.1-min",
         "popoverclickaway" : "libs/popover-clickaway",
-        "text": "libs/text-2.0.15",
-        "redux": "libs/redux-3.5.2-min",
-        "react": "libs/react-15.2.1-min",
-        "react-dom": "libs/react-dom-15.2.1-min",
-        "react-bootstrap": "libs/react-bootstrap-0.30.1-min"
+        "qrcode"           : "libs/qrcode-1.0.0-min",
+        "react-bootstrap"  : "libs/react-bootstrap-0.30.1-min",
+        "react-dom"        : "libs/react-dom-15.2.1-min",
+        "react"            : "libs/react-15.2.1-min",
+        "redux"            : "libs/redux-3.5.2-min",
+        "selectize"        : "libs/selectize-non-standalone-0.12.1-min",
+        "sifter"           : "libs/sifter-0.4.1-min",
+        "sortable"         : "libs/jquery-nestingSortable-0.9.12",
+        "spin"             : "libs/spin-2.0.1-min",
+        "text"             : "libs/text-2.0.15",
+        "xdate"            : "libs/xdate-0.8-min"
     },
     shim: {
         "autosizeInput": {
@@ -116,6 +118,12 @@ require.config({
         "clockPicker": {
             deps: ["jquery"],
             exports: "clockPicker"
+        },
+        "crypto-js": {
+            exports: "CryptoJS"
+        },
+        "crypto-js-sha256": {
+            deps: ["crypto-js"]
         },
         "doTimeout": {
             deps: ["jquery"],
