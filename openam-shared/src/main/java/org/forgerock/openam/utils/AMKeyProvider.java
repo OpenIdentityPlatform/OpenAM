@@ -230,7 +230,6 @@ public class AMKeyProvider implements KeyProvider {
                 keyTable.put(key, cert);
 
             }
-            logger.message("KeyTable size = " + keyTable.size());
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             logger.error("mapPk2Cert.JKSKeyProvider:", e);
         }

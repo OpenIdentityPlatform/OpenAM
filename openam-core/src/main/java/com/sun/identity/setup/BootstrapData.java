@@ -129,8 +129,6 @@ public class BootstrapData {
     private String dsameUserPwd;
     private String instanceName;
 
-    private static final Debug DEBUG = Debug.getInstance(SetupConstants.DEBUG_NAME);
-
 
     /**
      * Creates an instance of this class
@@ -181,8 +179,6 @@ public class BootstrapData {
 
     private void readEnvironment(String basedir) throws IOException {
         Properties p = new Properties();
-
-        DEBUG.message("Attempting to boot from environment variables. ");
         // open props file in base dir
         File f = new File(basedir + "/boot.properties");
 
@@ -207,8 +203,7 @@ public class BootstrapData {
             dsamePassword = amKeyProvider.getSecret(DSAME_PWD_KEY);
             configStorePassword = amKeyProvider.getSecret(CONFIG_PWD_KEY);
         } catch (KeyStoreException e) {
-            DEBUG.error("Can not get .storepass and .keypass to open keystore");
-            throw new IOException("Can't get the required boot passwords from the keystore", e);
+            throw new IOException("Can't open .storepass / .keypass or keystore.jceks to get the required boot passwords from the keystore", e);
         }
 
 
@@ -256,7 +251,6 @@ public class BootstrapData {
             bootstrap = StringUtils.strReplaceAll(bootstrap, "@DSAMEUSER_NAME@",
                     URLEncoder.encode(dsame_user, "UTF-8"));
 
-            DEBUG.message("Created bootstrap " + bootstrap);
             data.add(bootstrap);
         }
     }

@@ -93,6 +93,8 @@ public class DSConfigMgr implements IDSConfigMgr {
 
     static {        
         debugger = Debug.getInstance(IUMSConstants.UMS_DEBUG);
+        // this suppresses message level debug on initialization.
+        debugger.setDebug(Debug.ERROR);
     }
 
     DSConfigMgr() {

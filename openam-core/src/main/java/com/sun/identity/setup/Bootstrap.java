@@ -75,8 +75,6 @@ public class Bootstrap {
      */
     public static final String JVM_OPT_BOOTSTRAP = "bootstrap.dir";
     private static boolean isBootstrap;
-    private static final Debug DEBUG = Debug.getInstance(SetupConstants.DEBUG_NAME);
-
 
     private Bootstrap() {
     }
@@ -180,8 +178,6 @@ public class Bootstrap {
         Properties properties = null;
         bootstrapData.initSMS(bStartDS);
 
-        DEBUG.message("getConfiguration()");
-
         if (reinit) {
             AdminUtils.initialize();
             SMSAuthModule.initialize();
@@ -190,7 +186,6 @@ public class Bootstrap {
         DSConfigMgr dsCfg = DSConfigMgr.getDSConfigMgr();
         ServerGroup sg = dsCfg.getServerGroup("sms");
         if (sg == null) {
-            DEBUG.message("sms server group configuration not found");
             return null;
         }
         try (ConnectionFactory factory = dsCfg.getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
@@ -198,7 +193,6 @@ public class Bootstrap {
             // Success case. Managed to get connection
         } catch (LDAPServiceException e) {
             // ignore, DS is down
-            DEBUG.message("Could not connect to LDAP",e);
             return null;
         }
 
@@ -213,7 +207,6 @@ public class Bootstrap {
             properties = ServerConfiguration.getServerInstance(
                 ssoToken, instanceName);
 
-            DEBUG.message("get ServerConfig ssotoken = " + ssoToken + " instance " + instanceName + " props=" + properties);
             if (properties != null) {
                 // set debug level to error because debug.message in
                 // SMSEntry.initializedClass won't work and will print out
@@ -279,10 +272,8 @@ public class Bootstrap {
             }
         } catch (SMSException e) {
             //ignore. product is not configured yet.
-            DEBUG.warning("Bootstrap - looks like OpenAM is not configured", e);
             properties = null;
         }
-        DEBUG.message("Properties created " + properties);
         return properties;
     }
    
