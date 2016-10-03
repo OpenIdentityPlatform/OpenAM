@@ -172,7 +172,11 @@ public class SessionChangeAuthorizer {
         if (requester.getState(false) != VALID) {
             throw new SessionException(SessionBundle.getString("invalidSessionState") + sessionId.toString());
         }
+
         try {
+            if (hasTopLevelAdminRole(requester.getSessionID())){
+                return true;
+            }
             // a session can destroy itself
             if (requester.getID().equals(sessionId)) {
                 return true;

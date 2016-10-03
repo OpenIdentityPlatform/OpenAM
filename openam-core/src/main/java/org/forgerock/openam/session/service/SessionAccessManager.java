@@ -27,12 +27,16 @@ import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -61,7 +65,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     private final Debug debug;
     private final ForeignSessionHandler foreignSessionHandler;
-
 
     private final InternalSessionCache internalSessionCache;
     private final SessionCache sessionCache;
@@ -110,6 +113,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     /**
      * Get the Session based on the SessionId.
+     *
      * @param sessionId The session ID to recover the Session for.
      * @return The Session from the SessionCache.
      * @throws SessionException If anything goes wrong.
@@ -120,12 +124,14 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     /**
      * Get the InternalSession based on the SessionId.
+     *
      * @param sessionId The session ID to recover the InternalSession for.
-     * @return The InternalSession from the InternalSessionCache.
+     * @return The InternalSession from the InternalSessionCache or null if the internal session could not be retrieved
+     * or recovered.
      * @throws SessionException If anything goes wrong.
      */
     public InternalSession getInternalSession(SessionID sessionId) {
-        if (sessionId == null || StringUtils.isEmpty(sessionId.toString())) {
+        if (sessionId == null || StringUtils.isEmpty(sessionId.toString()) || sessionId.isSessionHandle()) {
             return null;
         }
         InternalSession internalSession = internalSessionCache.getBySessionID(sessionId);
@@ -142,7 +148,67 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return Internal Session corresponding to a session handle
      */
     public InternalSession getInternalSessionByHandle(String sessionHandle) {
-        return internalSessionCache.getByHandle(sessionHandle);
+        if (StringUtils.isBlank(sessionHandle)) {
+            return null;
+        }
+        InternalSession internalSession = internalSessionCache.getByHandle(sessionHandle);
+        if (internalSession == null) {
+            return recoverSessionByHandle(sessionHandle);
+        }
+        return internalSession;
+    }
+
+    private InternalSession recoverSessionByHandle(String sessionHandle) {
+
+        final TokenFilter tokenFilter = new TokenFilterBuilder()
+                .withAttribute(SessionTokenField.SESSION_HANDLE.getField(), sessionHandle)
+                .build();
+
+        Token token = null;
+
+        try {
+            final Collection<Token> results = coreTokenService.query(tokenFilter);
+            if (results.isEmpty()) {
+                return null;
+            }
+            if (results.size() != 1) {
+                debug.error("Duplicate session handle found in Core Token Service");
+                return null;
+            }
+            token = CollectionUtils.getFirstItem(results);
+        } catch (CoreTokenException e) {
+            debug.error("Failed to retrieve session by its handle", e);
+        }
+        if (token == null) {
+            return null;
+        }
+        return getInternalSessionFromToken(token);
+
+
+    }
+
+    private InternalSession getInternalSessionFromToken(Token token) {
+
+        /*
+         * As a side effect of deserialising an InternalSession, we must trigger
+         * the InternalSession to reschedule its timing task to ensure it
+         * maintains the session expiry function.
+         */
+        InternalSession session = tokenAdapter.fromToken(token);
+        session.setSessionServiceDependencies(InjectorHolder.getInstance(SessionService.class),
+                InjectorHolder.getInstance(SessionServiceConfig.class),
+                InjectorHolder.getInstance(SessionLogging.class),
+                InjectorHolder.getInstance(SessionAuditor.class),
+                debug);
+        session.scheduleExpiry();
+
+        boolean destroyed = destroySessionIfNecessary(session);
+        if (!destroyed) {
+            putInternalSessionIntoInternalSessionCache(session);
+            foreignSessionHandler.updateSessionMaps(session);
+        }
+
+        return session;
     }
 
     /**
@@ -243,31 +309,13 @@ public class SessionAccessManager implements SessionPersistenceManager {
         try {
             token = coreTokenService.read(tokenId);
         } catch (CoreTokenException e) {
-            debug.error("Failed to retrieve new session", e);
+            debug.error("Failed to retrieve session by its handle", e);
         }
         if (token == null) {
             return null;
         }
 
-        /*
-         * As a side effect of deserialising an InternalSession, we must trigger
-         * the InternalSession to reschedule its timing task to ensure it
-         * maintains the session expiry function.
-         */
-        InternalSession session = tokenAdapter.fromToken(token);
-        session.setSessionServiceDependencies(InjectorHolder.getInstance(SessionService.class),
-                InjectorHolder.getInstance(SessionServiceConfig.class),
-                InjectorHolder.getInstance(SessionLogging.class),
-                InjectorHolder.getInstance(SessionAuditor.class),
-                debug);
-        session.scheduleExpiry();
-        boolean destroyed = destroySessionIfNecessary(session);
-        if(!destroyed) {
-            putInternalSessionIntoInternalSessionCache(session);
-            foreignSessionHandler.updateSessionMaps(session);
-        }
-
-        return session;
+        return getInternalSessionFromToken(token);
     }
 
     /**

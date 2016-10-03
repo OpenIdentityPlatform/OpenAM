@@ -160,8 +160,11 @@ public class LocalOperations implements SessionOperations {
         }
 
         if (internalSessionToDestroy != null) {
-            sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
-            destroyInternalSession(session.getSessionID());
+            if (sessionChangeAuthorizer.hasPermissionToDestroySession(requester, internalSessionToDestroy.getSessionID())) {
+                destroyInternalSession(internalSessionToDestroy.getSessionID());
+            } else {
+                throw new SessionException(SessionBundle.rbName, "No Permission", null);
+            }
         }
     }
 
