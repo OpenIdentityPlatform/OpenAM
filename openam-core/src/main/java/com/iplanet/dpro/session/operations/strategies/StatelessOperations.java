@@ -40,6 +40,7 @@ import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 
 /**
  * Handles client-side sessions.
@@ -103,6 +104,11 @@ public class StatelessOperations implements SessionOperations {
     }
 
     @Override
+    public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
         sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
 
@@ -133,7 +139,7 @@ public class StatelessOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
+    public void addSessionListener(Session session, String url) throws SessionException {
         throw new UnsupportedOperationException();
     }
 

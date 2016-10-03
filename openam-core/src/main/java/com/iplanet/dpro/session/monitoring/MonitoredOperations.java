@@ -24,6 +24,7 @@ import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 
 /**
  * Wraps a provided {@link SessionOperations} instance with timing meta information, and
@@ -83,6 +84,11 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
+    public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
+        return sessionOperations.getValidSessions(session, pattern); // Not monitored at present
+    }
+
+    @Override
     public void destroy(Session requester, Session session) throws SessionException {
         final long start = System.nanoTime();
         sessionOperations.destroy(requester, session);
@@ -107,8 +113,8 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
-        sessionOperations.addSessionListener(sessionId, url); // Not monitored at present
+    public void addSessionListener(Session session, String url) throws SessionException {
+        sessionOperations.addSessionListener(session, url); // Not monitored at present
     }
 
     @Override

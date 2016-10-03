@@ -35,6 +35,7 @@ import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
@@ -58,6 +59,8 @@ public class LocalOperationsTest {
     @Mock
     private SessionServerConfig serverConfig;
     @Mock
+    private SessionServiceConfig serviceConfig;
+    @Mock
     private MonitoringOperations monitoringOperations;
     @Mock
     private SessionCookies sessionCookies;
@@ -76,7 +79,7 @@ public class LocalOperationsTest {
 
         local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory, serverConfig,
                 mock(SessionNotificationSender.class),
-                mock(SessionLogging.class), mock(SessionAuditor.class), sessionChangeAuthorizer);
+                mock(SessionLogging.class), mock(SessionAuditor.class), sessionChangeAuthorizer, serviceConfig);
     }
 
     @Test

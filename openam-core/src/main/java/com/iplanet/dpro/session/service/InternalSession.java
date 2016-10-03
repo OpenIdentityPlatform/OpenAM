@@ -1167,7 +1167,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      *
      * @return <code>true</code> if this is an application session, <code>false</code> otherwise.
      */
-    boolean isAppSession() {
+    public boolean isAppSession() {
         return sessionType == SessionType.APPLICATION;
     }
 

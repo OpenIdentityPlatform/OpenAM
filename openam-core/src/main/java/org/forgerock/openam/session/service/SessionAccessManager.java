@@ -279,10 +279,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return the internal session that has been released
      */
     public InternalSession releaseSession(SessionID sessionId) {
-        if (sessionCache.hasSession(sessionId)) {
-            sessionCache.readSession(sessionId).setSessionIsLocal(false);
-        }
-
         InternalSession internalSession = internalSessionCache.remove(sessionId);
         internalSession.setPersistenceManager(null);
         return internalSession;

@@ -29,12 +29,10 @@
 
 package com.iplanet.dpro.session;
 
-import static org.forgerock.openam.session.SessionConstants.SESSION_SERVICE;
-import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.net.URL;
-import java.security.AccessController;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -57,19 +55,15 @@ import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.dpro.session.share.SessionRequest;
-import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.SearchResults;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
@@ -88,6 +82,17 @@ import com.sun.identity.shared.debug.Debug;
 public class Session implements Blacklistable, AMSession{
 
     public static final String CACHED_BASE_POLLING_PROPERTY = "com.iplanet.am.session.client.polling.cacheBased";
+    private static final Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
+
+    private final SessionCookies sessionCookies;
+    private final SessionCache sessionCache;
+    private final SessionServiceURLService sessionServiceURLService;
+
+    /*
+     * Used instead of SessionService in order to avoid potential issues in the ClientSDK. Should eventually not be used
+     * here.
+     */
+    private final SessionOperationStrategy sessionOperationStrategy;
 
     /**
      * Defines the type of Session that has been created.
@@ -183,11 +188,6 @@ public class Session implements Blacklistable, AMSession{
      */
     private volatile boolean needToReset = false;
 
-    /**
-     * Indicates whether to use local or remote calls to Session Service
-     */
-    protected boolean sessionIsLocal = false;
-
 
     private String cookieStr;
 
@@ -197,23 +197,12 @@ public class Session implements Blacklistable, AMSession{
 
     private Object context = null;
 
-    // Debug instance
-    private static Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
+    private SessionID sessionID;
 
     /**
      * Set of session event listeners for THIS session only
      */
-    private Set<SessionListener> localSessionEventListeners = new HashSet<SessionListener>();
-
-    private Requests requests;
-
-    private final SessionCookies sessionCookies;
-    private final SessionCache sessionCache;
-    private final SessionServiceURLService sessionServiceURLService;
-    private final SessionOperationStrategy sessionOperationStrategy;
-    private final SessionService sessionService;
-
-    private SessionID sessionID;
+    private Set<SessionListener> localSessionEventListeners = new HashSet<>();
 
     /**
      * Constructor used by this package only.
@@ -229,27 +218,15 @@ public class Session implements Blacklistable, AMSession{
             sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
             sessionCache = InjectorHolder.getInstance(SessionCache.class);
             sessionServiceURLService = InjectorHolder.getInstance(SessionServiceURLService.class);
-            sessionService = InjectorHolder.getInstance(SessionService.class);
             sessionOperationStrategy = InjectorHolder.getInstance(ServerSessionOperationStrategy.class);
-            requests = InjectorHolder.getInstance(Requests.class);
         } else {
-            sessionService = null; // Intentionally null in client mode.
             sessionCache = SessionCache.getInstance();
             sessionCookies = SessionCookies.getInstance();
             sessionServiceURLService = SessionServiceURLService.getInstance();
-            requests = new Requests(null, null, new SessionPLLSender(sessionCookies));
+            Requests requests = new Requests(sessionDebug, null, null, new SessionPLLSender(sessionCookies));
             sessionOperationStrategy = new ClientSdkSessionOperationStrategy(
                     new ClientSdkOperations(sessionDebug, requests, null, sessionServiceURLService, null, null));
         }
-    }
-
-    private Session(SessionID sessionId, boolean sessionIsLocal) {
-        this(sessionId);
-        this.sessionIsLocal = sessionIsLocal;
-    }
-
-    public void setSessionIsLocal(boolean sessionIsLocal) {
-        this.sessionIsLocal = sessionIsLocal;
     }
 
     public AtomicBoolean getRemoved() {
@@ -489,7 +466,8 @@ public class Session implements Blacklistable, AMSession{
         String masterSID;
 
         try {
-            masterSID = sessionService.deferenceRestrictedID(s, restrictedId);
+            SessionOperations operations = sessionOperationStrategy.getOperation(sessionID);
+            masterSID = operations.deferenceRestrictedID(s, new SessionID(restrictedId));
         }
         catch (Exception e) {
             sessionDebug.error("unable to find master token for  " + restrictedId, e);
@@ -700,42 +678,22 @@ public class Session implements Blacklistable, AMSession{
     private SearchResults<Session> getValidSessions(URL svcurl, String pattern)
             throws SessionException {
         try {
-            int status;
-            int totalResultCount;
-            Set<SessionInfo> infos = null;
+            SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
+            SearchResults<SessionInfo> searchResults = operation.getValidSessions(this, pattern);
 
-            boolean isLocal = false;
-            if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
-                SearchResults<SessionInfo> searchResults = sessionService.getValidSessions(this, pattern);
-                infos = searchResults.getSearchResults();
-                totalResultCount = searchResults.getTotalResultCount();
-                status = searchResults.getErrorCode();
-                isLocal = true;
-            } else {
-                SessionRequest sreq =
-                        new SessionRequest(SessionRequest.GetValidSessions, sessionID.toString(), false);
-
-                if (pattern != null) {
-                    sreq.setPattern(pattern);
-                }
-
-                SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, this);
-                infos = new HashSet<>(sres.getSessionInfo());
-                totalResultCount = infos.size();
-                status = sres.getStatus();
-            }
+            Set<SessionInfo> infos = searchResults.getSearchResults();
 
             Set<Session> sessions = new HashSet<>();
 
             for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.getSessionID());
-                Session session = new Session(sid, isLocal);
+                Session session = new Session(sid);
                 session.sessionServiceURL = svcurl;
                 session.update(info);
                 sessions.add(session);
             }
 
-            return new SearchResults<>(totalResultCount, sessions, status);
+            return new SearchResults<>(sessions.size(), sessions, searchResults.getErrorCode());
         } catch (Exception ex) {
             sessionDebug.error("Session:getValidSession : ", ex);
             throw new SessionException(SessionBundle.rbName, "getValidSessionsError", null);
@@ -754,15 +712,6 @@ public class Session implements Blacklistable, AMSession{
      *            service.
      */
     public void refresh(final boolean reset) throws SessionException {
-        // recalculate whether session is local or remote on every refresh
-        // this is just an optmization
-        // it is functionally safe to always use remote mode
-        // but it is not efficient
-        // this check takes care of migration "remote -> local"
-        // reverse migration "local - > remote" will be
-        // done by calling Session.markNonLocal() from
-        // SessionService.handleReleaseSession()
-        sessionIsLocal = checkSessionLocal();
 
         Object activeContext = RestrictedTokenContext.getCurrent();
         if (activeContext == null) {
@@ -867,7 +816,6 @@ public class Session implements Blacklistable, AMSession{
       * @exception SessionException
       * @param appSSOToken application SSO Token to bet set
       */
-
      void createContext(SSOToken appSSOToken) throws SessionException
      {
 
@@ -886,76 +834,12 @@ public class Session implements Blacklistable, AMSession{
          }
      }
 
-   /**
-     * Handle exception coming back from server in the Sessionresponse
-     * @exception SessionException
-     * @param sres SessionResponse object holding the exception
+    /**
+     * Set the timeout time for this Session if it wasn't already set.
      */
-
-    void processSessionResponseException(SessionResponse sres, SSOToken appSSOToken) throws SessionException {
-        try {
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("Session."
-                        + "processSessionResponseException: exception received"
-                        + " from server:" + sres.getException());
-            }
-            // Check if this exception was thrown due to Session Time out or not
-            // If yes then set the private variable timedOutAt to the current
-            // time But before that check if this timedOutAt is already set
-            // or not. No need of setting it again
-            String exceptionMessage = sres.getException();
-            if(timedOutAt <= 0) {
-               if (exceptionMessage.indexOf("SessionTimedOutException") != -1) {
-                    timedOutAt = currentTimeMillis() / 1000;
-                }
-            }
-            if (exceptionMessage.indexOf(SessionBundle.getString(
-                    "appTokenInvalid")) != -1)  {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("Session."
-                        + "processSessionResponseException: AppTokenInvalid = TRUE");
-                }
-
-                if (!SystemProperties.isServerMode()) {
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("Session."
-                            + "processSessionResponseException: Destroying AppToken");
-                    }
-
-                    AdminTokenAction.invalid();
-                    RestrictedTokenContext.clear();
-
-                    if (sessionDebug.warningEnabled()) {
-                        sessionDebug.warning("Session."
-                            +"processSessionResponseException"
-                            +" processSessionResponseException"
-                            +": server responded with app token invalid"
-                            +" error,refetching the app sso token");
-                    }
-                    SSOToken newAppSSOToken = (SSOToken)
-                        AccessController.doPrivileged(
-                                AdminTokenAction.getInstance());
-
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("Session."
-                            + "processSessionResponseException: creating New AppToken"
-                            + " TokenID = " + newAppSSOToken);
-                    }
-                    createContext(newAppSSOToken);
-                } else {
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("Session."
-                            + "processSessionResponseException: AppToken invalid in" +
-                              " server mode; throwing exception");
-                    }
-                    RestrictedTokenContext.clear();
-                    throw new SessionException(sres.getException());
-                }
-            } else {
-                throw new SessionException(sres.getException());
-            }
-        } catch (Exception ex) {
-            throw new SessionException(ex);
+    public void timeout() {
+        if (timedOutAt <= 0) {
+            timedOutAt = currentTimeMillis() / 1000;
         }
     }
 
@@ -970,15 +854,8 @@ public class Session implements Blacklistable, AMSession{
                         SessionNotificationHandler.handler);
             }
             String url = WebtopNaming.getNotificationURL().toString();
-            if (isLocal()) {
-                sessionService.addSessionListener(sessionID, url);
-            } else {
-                SessionRequest sreq = new SessionRequest(
-                        SessionRequest.AddSessionListener,
-                        sessionID.toString(), false);
-                sreq.setNotificationURL(url);
-                requests.sendRequestWithRetry(getSessionServiceURL(), sreq, this);
-            }
+            SessionOperations operations = sessionOperationStrategy.getOperation(sessionID);
+            operations.addSessionListener(this, url);
         } catch (Exception e) {
             //todo : something! :-D
         }
@@ -1030,30 +907,6 @@ public class Session implements Blacklistable, AMSession{
         }
         if (cookieMode != null) {
             this.cookieMode = cookieMode;
-        }
-    }
-
-    /**
-     * Indicates whether local or remote invocation of Sesion Service should be
-     * used
-     *
-     * @return true if local invocation should be used, false otherwise
-     */
-    boolean isLocal() {
-        return sessionIsLocal;
-    }
-
-    /**
-     * Actively checks whether current session should be considered local (so
-     * that local invocations of Session Service methods are to be used).
-     *
-     * @return true if the session local.
-     */
-    private boolean checkSessionLocal() throws SessionException {
-        if (SystemProperties.isServerMode()) {
-            return sessionService.checkSessionLocal(sessionID);
-        } else {
-            return false;
         }
     }
 

@@ -20,17 +20,21 @@ import java.net.URL;
 import java.security.AccessController;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
+import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for performing the Session based logic of sending a request.
@@ -48,12 +52,14 @@ public class Requests {
     private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
     private final ForeignSessionHandler foreignSessionHandler;
     private final SessionPLLSender pllSender;
+    private final Debug sessionDebug;
 
     @Inject
-    public Requests(
+    public Requests(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                     final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
                     final ForeignSessionHandler foreignSessionHandler,
                     final SessionPLLSender pllSender) {
+        this.sessionDebug = debug;
         this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
         this.foreignSessionHandler = foreignSessionHandler;
         this.pllSender = pllSender;
@@ -125,7 +131,7 @@ public class Requests {
             }
             sres = pllSender.sendPLLRequest(svcurl, sreq);
             while (sres.getException() != null) {
-                session.processSessionResponseException(sres, appSSOToken);
+                processSessionResponseException(session, sres);
                 context = session.getContext();
                 if (context != null) {
                     sreq.setRequester(RestrictedTokenContext.marshal(context));
@@ -138,5 +144,51 @@ public class Requests {
         }
 
         return sres;
+    }
+
+    /**
+     * Handle exception coming back from server in the Sessionresponse
+     * @exception SessionException
+     * @param sres SessionResponse object holding the exception
+     */
+    private void processSessionResponseException(Session session, SessionResponse sres) throws SessionException {
+        try {
+            // Check if this exception was thrown due to Session Time out or not. If so, time out the session.
+            String exceptionMessage = sres.getException();
+
+            sessionDebug.message("Session. processSessionResponseException: exception received  from server:{}",
+                    sres.getException());
+
+            if (exceptionMessage.contains("SessionTimedOutException")) {
+                session.timeout();
+            }
+            if (exceptionMessage.contains(SessionBundle.getString("appTokenInvalid")))  {
+                sessionDebug.message("Requests.processSessionResponseException: AppTokenInvalid = TRUE");
+
+                if (!SystemProperties.isServerMode()) {
+                    sessionDebug.message("Requests.processSessionResponseException: Destroying AppToken");
+
+                    AdminTokenAction.invalid();
+                    RestrictedTokenContext.clear();
+
+                    sessionDebug.warning("Requests.processSessionResponseException: server responded with app " +
+                            "token invalid error, refetching the app sso token");
+                    SSOToken newAppSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+
+                    sessionDebug.message("Requests.processSessionResponseException: creating New AppToken TokenID = {}",
+                            newAppSSOToken);
+                    session.createContext(newAppSSOToken);
+                } else {
+                    sessionDebug.message("Requests.processSessionResponseException: AppToken invalid in server mode; " +
+                            "throwing exception");
+                    RestrictedTokenContext.clear();
+                    throw new SessionException(sres.getException());
+                }
+            } else {
+                throw new SessionException(sres.getException());
+            }
+        } catch (Exception ex) {
+            throw new SessionException(ex);
+        }
     }
 }

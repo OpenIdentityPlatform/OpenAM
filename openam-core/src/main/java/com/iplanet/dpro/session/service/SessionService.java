@@ -29,13 +29,10 @@
 package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import java.io.InterruptedIOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -50,7 +47,6 @@ import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
@@ -63,13 +59,11 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
-import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -107,7 +101,6 @@ public class SessionService {
 
     private final SessionAccessManager sessionAccessManager;
     private final ForeignSessionHandler foreignSessionHandler;
-    private final SessionChangeAuthorizer sessionChangeAuthorizer;
 
     private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
 
@@ -130,8 +123,7 @@ public class SessionService {
             final SessionAccessManager sessionAccessManager,
             final SessionOperationStrategy sessionOperationStrategy,
             final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
-            final ForeignSessionHandler foreignSessionHandler,
-            final SessionChangeAuthorizer sessionChangeAuthorizer) {
+            final ForeignSessionHandler foreignSessionHandler) {
 
         this.sessionDebug = sessionDebug;
         this.ssoTokenManager = ssoTokenManager;
@@ -147,7 +139,6 @@ public class SessionService {
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionAccessManager = sessionAccessManager;
         this.foreignSessionHandler = foreignSessionHandler;
-        this.sessionChangeAuthorizer = sessionChangeAuthorizer;
 
         try {
 
@@ -293,131 +284,6 @@ public class SessionService {
     }
 
     /**
-     * Get all valid Internal Sessions.
-     */
-    private List<InternalSession> getValidInternalSessions() {
-
-        synchronized (sessionAccessManager) {
-            List<InternalSession> sessions = new ArrayList<>();
-            for (InternalSession session : sessionAccessManager.getAllInternalSessions()) {
-                if (session.getState() == SessionState.VALID
-                        && (!session.isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
-                    sessions.add(session);
-                }
-            }
-            return sessions;
-        }
-    }
-
-    /**
-     * Get all valid Internal Sessions matched with pattern.
-     */
-    private SearchResults<InternalSession> getValidInternalSessions(String pattern)
-            throws SessionException {
-        Set<InternalSession> sessions = new HashSet<>();
-        int errorCode = SearchResults.SUCCESS;
-
-        if (pattern == null) {
-            pattern = "*";
-        }
-
-        try {
-            long startTime = currentTimeMillis();
-
-            pattern = pattern.toLowerCase();
-            List<InternalSession> allValidSessions = getValidInternalSessions();
-            boolean matchAll = pattern.equals("*");
-
-            for (InternalSession sess : allValidSessions) {
-                if (!matchAll) {
-                    // For application sessions, the client ID
-                    // will not be in the DN format but just uid.
-                    String clientID = (!sess.isAppSession()) ?
-                            DNUtils.DNtoName(sess.getClientID()) :
-                            sess.getClientID();
-
-                    if (clientID == null) {
-                        continue;
-                    } else {
-                        clientID = clientID.toLowerCase();
-                    }
-
-                    if (!matchFilter(clientID, pattern)) {
-                        continue;
-                    }
-                }
-
-                if (sessions.size() == serviceConfig.getMaxSessionListSize()) {
-                    errorCode = SearchResults.SIZE_LIMIT_EXCEEDED;
-                    break;
-                }
-                sessions.add(sess);
-
-                if ((currentTimeMillis() - startTime) >=
-                        serviceConfig.getSessionRetrievalTimeout()) {
-                    errorCode = SearchResults.TIME_LIMIT_EXCEEDED;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            sessionDebug.error("SessionService : "
-                    + "Unable to get Session Information ", e);
-            throw new SessionException(e);
-        }
-        return new SearchResults<>(sessions.size(), sessions, errorCode);
-    }
-
-    /**
-     * Returns true if the given pattern is contained in the string.
-     *
-     * @param string  to examine
-     * @param pattern to match
-     * @return true if string matches <code>filter</code>
-     */
-    private boolean matchFilter(String string, String pattern) {
-        if (pattern.equals("*") || pattern.equals(string)) {
-            return true;
-        }
-
-        int length = pattern.length();
-        int wildCardIndex = pattern.indexOf("*");
-
-        if (wildCardIndex >= 0) {
-            String patternSubStr = pattern.substring(0, wildCardIndex);
-
-            if (!string.startsWith(patternSubStr, 0)) {
-                return false;
-            }
-
-            int beginIndex = patternSubStr.length() + 1;
-            int stringIndex = 0;
-
-            if (wildCardIndex > 0) {
-                stringIndex = beginIndex;
-            }
-
-            String sub = pattern.substring(beginIndex, length);
-
-            while ((wildCardIndex = pattern.indexOf("*", beginIndex)) != -1) {
-                patternSubStr = pattern.substring(beginIndex, wildCardIndex);
-
-                if (string.indexOf(patternSubStr, stringIndex) == -1) {
-                    return false;
-                }
-
-                beginIndex = wildCardIndex + 1;
-                stringIndex = stringIndex + patternSubStr.length() + 1;
-                sub = pattern.substring(beginIndex, length);
-            }
-
-            if (string.endsWith(sub)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Simplifies the signalling that a Session has been removed.
      * @param session Non null InternalSession.
      * @param event An integrate from the SessionEvent class.
@@ -465,37 +331,7 @@ public class SessionService {
      * @throws SessionException
      */
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
-        if (s.getState(false) != SessionState.VALID) {
-            throw new SessionException(SessionBundle
-                    .getString("invalidSessionState")
-                    + s.getID().toString());
-        }
-
-        try {
-
-            SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
-            Set<SessionID> sessionIdList = new HashSet<>();
-            for (InternalSession session : sessions.getSearchResults()) {
-                sessionIdList.add(session.getSessionID());
-            }
-
-            Collection<InternalSession> sessionsWithPermission = sessionChangeAuthorizer.filterPermissionToAccess(
-                    s.getSessionID(), sessions.getSearchResults());
-
-
-            Set<SessionInfo> infos = new HashSet<>(sessionsWithPermission.size());
-
-            for (InternalSession session : sessionsWithPermission) {
-                SessionInfo info = session.toSessionInfo();
-                // replace session id with session handle to prevent impersonation
-                info.setSessionID(session.getSessionHandle());
-                infos.add(info);
-            }
-
-            return new SearchResults<>(sessions.getTotalResultCount(), infos, sessions.getErrorCode());
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
+        return sessionOperationStrategy.getOperation(s.getSessionID()).getValidSessions(s, pattern);
     }
 
     /**
@@ -511,12 +347,12 @@ public class SessionService {
     /**
      * Adds listener to a Internal Sessions.
      *
-     * @param sessionId Session ID
+     * @param session Session
      * @param url
      * @throws SessionException Session is null OR the Session is invalid
      */
-    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
-        sessionOperationStrategy.getOperation(sessionId).addSessionListener(sessionId, url);
+    public void addSessionListener(Session session, String url) throws SessionException {
+        sessionOperationStrategy.getOperation(session.getSessionID()).addSessionListener(session, url);
     }
 
     /**

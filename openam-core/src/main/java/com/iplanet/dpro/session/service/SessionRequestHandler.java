@@ -394,7 +394,7 @@ public class SessionRequestHandler implements RequestHandler {
                 break;
 
             case SessionRequest.AddSessionListener:
-                sessionService.addSessionListener(requesterSession.getSessionID(), req.getNotificationURL());
+                sessionService.addSessionListener(requesterSession, req.getNotificationURL());
                 break;
 
             case SessionRequest.SetProperty:

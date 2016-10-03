@@ -21,6 +21,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 
 /**
  * Describes the ability to perform an operation on a Session.
@@ -87,11 +88,11 @@ public interface SessionOperations {
 
     /**
      * Add a session listener notification url.  The url will receive a notification when session change events occur.
-     * @param sessionId the session id to listen to.
-     * @param url the listener notifcation url
+     * @param session the session to listen to.
+     * @param url the listener notification url
      * @throws SessionException if the session could not be accessed.
      */
-    void addSessionListener(SessionID sessionId, String url) throws SessionException;
+    void addSessionListener(Session session, String url) throws SessionException;
 
     /**
      * Check that a session is a local session.
@@ -149,5 +150,15 @@ public interface SessionOperations {
      * @throws SessionException if the session could not be accessed.
      */
     Session resolveSession(SessionID sessionID) throws SessionException;
+
+    /**
+     * Returns all sessions which are accessible using the provided session for authorization, and which match the
+     * provided filter. Will return early if size or time limits are exceeded.
+     * @param session The session to use for authorization.
+     * @param pattern The pattern to use to match the sessions.
+     * @return The list of sessioninfos found, capped based on time and quantity.
+     * @throws SessionException If the request fails.
+     */
+    SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException;
 
 }

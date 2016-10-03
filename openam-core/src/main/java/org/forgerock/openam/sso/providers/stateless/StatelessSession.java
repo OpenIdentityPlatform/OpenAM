@@ -61,7 +61,6 @@ public class StatelessSession extends Session {
     public StatelessSession(SessionID sid, SessionInfo sessionInfo, StatelessSessionManager statelessSessionManager)
             throws SessionException {
         super(sid);
-        this.sessionIsLocal = false;
         update(sessionInfo);
         Reject.ifNull(sessionInfo.getSecret());
         this.stableId = sessionInfo.getSecret();

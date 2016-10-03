@@ -21,7 +21,9 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,6 +52,7 @@ import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
@@ -142,6 +145,23 @@ public class ClientSdkOperations implements SessionOperations {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
+        SessionRequest sreq =
+                new SessionRequest(SessionRequest.GetValidSessions, session.getSessionID().toString(), false);
+
+        if (pattern != null) {
+            sreq.setPattern(pattern);
+        }
+
+        URL svcurl = sessionServiceURLService.getSessionServiceURL(session.getSessionID());
+
+        SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, session);
+        Set<SessionInfo> infos = new HashSet<>(sres.getSessionInfo());
+
+        return new SearchResults<>(infos.size(), infos, sres.getStatus());
+    }
+
     /**
      * Destroys the Session via the Session remote service URL.
      *
@@ -205,8 +225,12 @@ public class ClientSdkOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(SessionID sessionId, String url) throws SessionException {
-        throw new UnsupportedOperationException();
+    public void addSessionListener(Session session, String url) throws SessionException {
+        SessionRequest sreq = new SessionRequest(
+                SessionRequest.AddSessionListener,
+                session.getSessionID().toString(), false);
+        sreq.setNotificationURL(url);
+        requests.sendRequestWithRetry(sessionServiceURLService.getSessionServiceURL(session.getSessionID()), sreq, session);
     }
 
     @Override
