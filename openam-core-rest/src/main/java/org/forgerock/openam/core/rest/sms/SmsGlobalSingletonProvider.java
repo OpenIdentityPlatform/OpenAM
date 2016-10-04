@@ -40,6 +40,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.i18n.LocalizableString;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
@@ -123,8 +124,11 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     protected void addOrganisationSchema(Optional<Context> context, JsonValue result) {
         if (organizationSchema != null) {
             addAttributeSchema(result, "/properties/defaults/properties/", organizationSchema, context);
-            if (result.get("properties").isDefined("defaults")) {
+            if (result.isDefined("properties") && result.get("properties").isDefined("defaults")) {
                 result.put(new JsonPointer("/properties/defaults/type"), "object");
+                result.put(new JsonPointer("/properties/defaults/title"),
+                        new LocalizableString("i18n:amConsole#section.label.common.realmDefaults",
+                                this.getClass().getClassLoader()));
             }
         }
     }
