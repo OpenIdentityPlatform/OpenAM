@@ -273,8 +273,8 @@ define(function () {
             "realmsApplicationsAgentsSelection": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/applications/agents/SelectAgentView",
-                url: scopedByRealm("applications-agents/select"),
-                pattern: "realms/?/applications-agents/select",
+                url: scopedByRealm("applications-agents/new"),
+                pattern: "realms/?/applications-agents/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true

@@ -17,8 +17,8 @@
 import $ from "jquery";
 import AbstractView from "org/forgerock/commons/ui/common/main/AbstractView";
 import FlatJSONSchemaView from "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView";
-import { getInitialState } from "org/forgerock/openam/ui/admin/services/realm/AgentsService";
-
+import { create, getInitialState } from "org/forgerock/openam/ui/admin/services/realm/AgentsService";
+import Messages from "org/forgerock/commons/ui/common/components/Messages";
 
 class NewAgentView extends AbstractView {
     constructor () {
@@ -42,6 +42,7 @@ class NewAgentView extends AbstractView {
             };
 
             this.jsonSchemaView = new FlatJSONSchemaView(options);
+            this.type = agentType;
             this.data.realmPath = realmPath;
             this.data.title = $.t("console.applications.agents.new.title", { agentType });
             this.parentRender(() => {
@@ -51,7 +52,14 @@ class NewAgentView extends AbstractView {
 
     }
     onCreateClick () {
-        // TODO
+        create(this.data.realmPath, this.type, this.jsonSchemaView.getData()).then(() => {
+            // TODO - Edit Agent Views
+        }, (response) => {
+            Messages.addMessage({
+                response,
+                type: Messages.TYPE_DANGER
+            });
+        });
     }
 }
 

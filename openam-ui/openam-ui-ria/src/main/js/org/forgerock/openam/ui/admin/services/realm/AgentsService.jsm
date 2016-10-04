@@ -35,6 +35,15 @@ export function getCreatableTypes (realm) {
     }).then((data) => data.result);
 }
 
+export function create (realm, type, data) {
+    return obj.serviceCall({
+        url: fetchUrl(`/realm-config/agents/${type}?_action=create`, { realm }),
+        type: "POST",
+        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
+        data: JSON.stringify(data)
+    });
+}
+
 export function getInitialState (realm, type) {
     function getTemplate () {
         return obj.serviceCall({
