@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -84,6 +84,8 @@ public class UmaEnabledFilterTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         context = ClientContext.newInternalClientContext(new RealmContext(new RootContext(), Realm.root()));
         requestHandler = mock(RequestHandler.class);
         when(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
@@ -100,8 +102,6 @@ public class UmaEnabledFilterTest {
                 .thenReturn(promise(newResourceResponse(null, null, null)));
         when(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class)))
                 .thenReturn(promise(newResourceResponse(null, null, null)));
-        realmTestHelper = new RealmTestHelper();
-        realmTestHelper.setupRealmClass();
     }
 
     @AfterMethod
