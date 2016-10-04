@@ -19,7 +19,6 @@ package org.forgerock.openam.core.rest.session;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CORE_TOKEN_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_401_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ID_QUERY;
@@ -54,6 +53,7 @@ import org.forgerock.api.annotations.Queries;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.ParameterSource;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -159,34 +159,32 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Actions({
-        @Action(
-                operationDescription = @Operation(
-                        description = SESSION_RESOURCE + LOGOUT_ACTION_ID + "." + ACTION_DESCRIPTION,
-                        errors = {
-                                @ApiError(
-                                        code = 401,
-                                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                )
-                        },
-                        parameters = @Parameter(name = "tokenId", type = "string", description = SESSION_RESOURCE + "tokenId." + PARAMETER_DESCRIPTION)
-                ),
-                name = LOGOUT_ACTION_ID,
-                response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
-        ),
-        @Action(
-                operationDescription = @Operation(
-                        description = SESSION_RESOURCE + REFRESH_ACTION_ID + "." + ACTION_DESCRIPTION,
-                        errors = {
-                                @ApiError(
-                                        code = 401,
-                                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                )
-                        },
-                        parameters = @Parameter(name = "tokenId", type = "string", description = SESSION_RESOURCE + "tokenId." + PARAMETER_DESCRIPTION)
-                ),
-                name = REFRESH_ACTION_ID,
-                response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
-        )})
+            @Action(
+                    operationDescription = @Operation(
+                            description = SESSION_RESOURCE + LOGOUT_ACTION_ID + "." + ACTION_DESCRIPTION,
+                            errors = {
+                                    @ApiError(
+                                            code = 401,
+                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                                    )
+                            }
+                    ),
+                    name = LOGOUT_ACTION_ID,
+                    response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+            ),
+            @Action(
+                    operationDescription = @Operation(
+                            description = SESSION_RESOURCE + REFRESH_ACTION_ID + "." + ACTION_DESCRIPTION,
+                            errors = {
+                                    @ApiError(
+                                            code = 401,
+                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                                    )
+                            }
+                    ),
+                    name = REFRESH_ACTION_ID,
+                    response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+            )})
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String tokenId,
             ActionRequest request) {
         return internalHandleAction(tokenId, context, request);
@@ -227,33 +225,35 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      * @param handler {@inheritDoc}
      */
     @Queries({
-        @Query(
-            operationDescription = @Operation(
-                description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
-                errors = {
-                    @ApiError(
-                        code = 401,
-                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                    )
-                },
-                parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION)
+            @Query(
+                    operationDescription = @Operation(
+                            description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                            errors = {
+                                    @ApiError(
+                                            code = 401,
+                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                                    )
+                            },
+                            parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE +
+                                    SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION,
+                                    source = ParameterSource.ADDITIONAL)
+                    ),
+                    type = QueryType.ID,
+                    id = SERVER_QUERY_ID
             ),
-            type = QueryType.ID,
-            id = SERVER_QUERY_ID
-        ),
-        @Query(
-            operationDescription = @Operation(
-                description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
-                errors = {
-                    @ApiError(
-                        code = 401,
-                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                    )
-                }
-            ),
-            type = QueryType.ID,
-            id = ALL_QUERY_ID
-        )
+            @Query(
+                    operationDescription = @Operation(
+                            description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                            errors = {
+                                    @ApiError(
+                                            code = 401,
+                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                                    )
+                            }
+                    ),
+                    type = QueryType.ID,
+                    id = ALL_QUERY_ID
+            )
     })
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
@@ -296,7 +296,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
             SSOToken ssoToken = sessionResourceUtil.getTokenWithoutResettingIdleTime(id);
             content = sessionResourceUtil.jsonValueOf(ssoToken);
         } catch (SSOException | IdRepoException e) {
-           content = sessionResourceUtil.invalidSession();
+            content = sessionResourceUtil.invalidSession();
         }
         return newResultPromise(newResourceResponse(id, String.valueOf(content.getObject().hashCode()), content));
     }
