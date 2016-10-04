@@ -140,55 +140,49 @@ public class SitesResourceProvider {
         this.debug = debug;
     }
 
-    @Actions({
-            @Action(name = RestConstants.TEMPLATE,
-                    operationDescription = @Operation(
-                            description = SITES_RESOURCE + ACTION + "template." + DESCRIPTION),
-                    response = @Schema(schemaResource = "SitesResourceProvider.action.template.response.schema.json")),
-            @Action(name = RestConstants.SCHEMA,
-                    operationDescription = @Operation(
-                            description = SITES_RESOURCE + ACTION + "schema." + DESCRIPTION),
-                    response = @Schema(schemaResource = "SitesResourceProvider.action.schema.response.schema.json"))})
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        switch (request.getAction()) {
-            case RestConstants.TEMPLATE:
-                return newResultPromise(newActionResponse(json(object(
-                        field(PRIMARY_URL, ""),
-                        field(SERVERS, array()),
-                        field(SECONDARY_URLS, array())))));
-            case RestConstants.SCHEMA:
-                ResourceBundle i18n = ResourceBundle.getBundle("amConsole");
-                return newResultPromise(newActionResponse(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
-                        field(SITE_ID, object(
-                                field(TYPE, STRING_TYPE),
-                                field(READONLY, true)
+    @Action(operationDescription = @Operation(
+            description = SITES_RESOURCE + ACTION + "template." + DESCRIPTION),
+            response = @Schema(schemaResource = "SitesResourceProvider.action.template.response.schema.json"))
+    public Promise<ActionResponse, ResourceException> template(Context context, ActionRequest request) {
+        return newResultPromise(newActionResponse(json(object(
+                field(PRIMARY_URL, ""),
+                field(SERVERS, array()),
+                field(SECONDARY_URLS, array())))));
+    }
+
+    @Action(operationDescription = @Operation(
+            description = SITES_RESOURCE + ACTION + "schema." + DESCRIPTION),
+            response = @Schema(schemaResource = "SitesResourceProvider.action.schema.response.schema.json"))
+    public Promise<ActionResponse, ResourceException> schema(Context context, ActionRequest request) {
+        ResourceBundle i18n = ResourceBundle.getBundle("amConsole");
+        return newResultPromise(newActionResponse(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
+                field(SITE_ID, object(
+                        field(TYPE, STRING_TYPE),
+                        field(READONLY, true)
                         )),
-                        field(SITE_NAME, object(
-                                field(TYPE, STRING_TYPE),
-                                field(TITLE, i18n.getString(NAME_LABEL))
+                field(SITE_NAME, object(
+                        field(TYPE, STRING_TYPE),
+                        field(TITLE, i18n.getString(NAME_LABEL))
                         )),
-                        field(PRIMARY_URL, object(
-                                field(TYPE, STRING_TYPE),
-                                field(TITLE, i18n.getString(PRIMARY_URL_LABEL))
+                field(PRIMARY_URL, object(
+                        field(TYPE, STRING_TYPE),
+                        field(TITLE, i18n.getString(PRIMARY_URL_LABEL))
                         )),
-                        field(SERVERS, object(
-                                field(TYPE, ARRAY_TYPE),
-                                field(TITLE, i18n.getString(SERVERS_LABEL)),
-                                field(ITEMS, object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
-                                        field(SERVER_ID, object(field(TYPE, STRING_TYPE))),
-                                        field(SERVER_URL, object(field(TYPE, STRING_TYPE)))
+                field(SERVERS, object(
+                        field(TYPE, ARRAY_TYPE),
+                        field(TITLE, i18n.getString(SERVERS_LABEL)),
+                        field(ITEMS, object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
+                                field(SERVER_ID, object(field(TYPE, STRING_TYPE))),
+                                field(SERVER_URL, object(field(TYPE, STRING_TYPE)))
                                 )))),
-                                field(READONLY, true)
+                        field(READONLY, true)
                         )),
-                        field(SECONDARY_URLS, object(
-                                field(TYPE, ARRAY_TYPE),
-                                field(TITLE, i18n.getString(SECONDARY_URLS_LABEL)),
-                                field(ITEMS, object(field(TYPE, STRING_TYPE)))
+                field(SECONDARY_URLS, object(
+                        field(TYPE, ARRAY_TYPE),
+                        field(TITLE, i18n.getString(SECONDARY_URLS_LABEL)),
+                        field(ITEMS, object(field(TYPE, STRING_TYPE)))
                         ))
                 ))))));
-            default:
-                return new BadRequestException("Action not supported: " + request.getAction()).asPromise();
-        }
     }
 
     @Create(operationDescription = @Operation(
