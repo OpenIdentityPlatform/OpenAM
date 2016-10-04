@@ -191,11 +191,9 @@ public class PolicyResourceEvaluationTest {
         // Then...
         verify(request).getAction();
         verify(requestFactory).buildRequest(PolicyAction.EVALUATE, context, request);
-        verify(request).getRequestType();
 
         assertThat(promise).failedWithException().isInstanceOf(BadRequestException.class);
-        verifyNoMoreInteractions(request, requestFactory,
-                policyRequest, factory, evaluator, parser);
+        verifyNoMoreInteractions(requestFactory, policyRequest, factory, evaluator, parser);
     }
 
     @Test

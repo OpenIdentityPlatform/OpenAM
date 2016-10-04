@@ -20,7 +20,10 @@ import static org.forgerock.json.JsonValueFunctions.enumConstant;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.sun.identity.common.LocaleContext;
@@ -42,9 +45,11 @@ import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -127,6 +132,11 @@ public class UmaLabelResource {
         try {
             label = labelStore.create(realm, userName, new ResourceSetLabel(null, labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
             return newResultPromise(newResourceResponse(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
+        } catch (ConflictException e) {
+            if (isContractConformantUserProvidedIdCreate(serverContext, createRequest)) {
+                return new PreconditionFailedException(e.getMessage()).asPromise();
+            }
+            return e.asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
         }

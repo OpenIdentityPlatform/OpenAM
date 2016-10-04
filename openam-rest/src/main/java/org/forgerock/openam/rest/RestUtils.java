@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest;
 
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
+
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -56,9 +58,13 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 
+import org.forgerock.http.header.AcceptApiVersionHeader;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.http.HttpUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
@@ -66,6 +72,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -297,6 +304,46 @@ final public class RestUtils {
             }
             return headerValue;
         }
+    }
+
+    /**
+     * Get the CREST protocol version from the content.
+     * @param context The request context.
+     * @return The protocol version.
+     */
+    public static Version crestProtocolVersion(Context context) {
+        Reject.ifFalse(context.containsContext(HttpContext.class), "Context does not contain an HttpContext");
+        String versionHeader = context.asContext(HttpContext.class).getHeaderAsString(AcceptApiVersionHeader.NAME);
+        if (versionHeader == null) {
+            return HttpUtils.DEFAULT_PROTOCOL_VERSION;
+        }
+        Version requestedProtocolVersion = AcceptApiVersionHeader.valueOf(versionHeader).getProtocolVersion();
+        return requestedProtocolVersion == null ? HttpUtils.DEFAULT_PROTOCOL_VERSION : requestedProtocolVersion;
+    }
+
+    /**
+     * Check to see if the create request should be treated as a client-provided ID create request in a CREST
+     * contract-conformant way.
+     * <p>
+     *     When handling CREST create requests with protocol 1.0, OpenAM returned a 'Conflict' error response regardless
+     *     of whether the resource's ID was client-specified or server-generated. In the case of the former, a create
+     *     request was supposed to always have an {@code if-none-match} header (note: OpenAM functional tests generally
+     *     did not conform to this either). This being the case, the correct response would be precondition-failed,
+     *     rather than conflict.
+     * </p>
+     * <p>
+     *     As OpenAM will have to honour its incorrect behaviour for pre-OpenAM 14 clients, this method can be used to
+     *     distinguish a request that should be handled in a conformant way rather than one that should be handled in
+     *     the legacy way. New resource providers should <i>not</i> use this method, but should correctly handle all
+     *     client-provided ID request (where {@link CreateRequest#getNewResourceId()} return a non-null value) properly.
+     * </p>
+     * @param serverContext The context for the request.
+     * @param createRequest The request object.
+     * @return How the request should be handled.
+     */
+    public static boolean isContractConformantUserProvidedIdCreate(Context serverContext, CreateRequest createRequest) {
+        return createRequest.getNewResourceId() != null
+                && crestProtocolVersion(serverContext).compareTo(PROTOCOL_VERSION_1) > 0;
     }
 
     /**

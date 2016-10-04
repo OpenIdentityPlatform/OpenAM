@@ -23,6 +23,7 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ARRAY_TYPE;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ITEMS;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.OBJECT_TYPE;
@@ -47,6 +48,8 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.REA
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -207,7 +210,7 @@ public class SitesResourceProvider {
         try {
             SSOToken token = getSsoToken(context);
             if (SiteConfiguration.isSiteExist(token, id)) {
-                return new ConflictException("Site with id already exists: " + id).asPromise();
+                throw new ConflictException("Site with id already exists: " + id);
             }
             SiteConfiguration.createSite(token, id, url, content.get(SECONDARY_URLS).asCollection());
             debug.message("Site created: {}", id);
@@ -215,6 +218,11 @@ public class SitesResourceProvider {
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not create site", e);
             return new InternalServerErrorException("Could not create site").asPromise();
+        } catch (ConflictException e) {
+            if (isContractConformantUserProvidedIdCreate(context, request)) {
+                return new PreconditionFailedException(e.getMessage()).asPromise();
+            }
+            return e.asPromise();
         } catch (NotFoundException e) {
             return new InternalServerErrorException("Could not read site just created").asPromise();
         }

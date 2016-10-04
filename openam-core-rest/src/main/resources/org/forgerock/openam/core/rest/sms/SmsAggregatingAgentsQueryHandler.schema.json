@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SmsAggregatingAgentsQueryHandler#schema.title",
+  "description": "i18n:api-descriptor/SmsAggregatingAgentsQueryHandler#schema.description"
+}

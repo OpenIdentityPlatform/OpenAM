@@ -22,6 +22,7 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
@@ -73,6 +74,7 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
@@ -934,7 +936,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             SSOToken admin = RestUtils.getToken();
             final String finalTokenID = tokenID;
 
-            return createInstance(admin, jVal, realm)
+            return createInstance(admin, jVal, realm, context, null)
                     .thenAsync(new AsyncFunction<ActionResponse, ActionResponse, ResourceException>() {
                         @Override
                         public Promise<ActionResponse, ResourceException> apply(ActionResponse response) {
@@ -1022,13 +1024,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
      * @param details resource details that needs to be created
      * @return A successful promise containing the identity details if the create was successful
      */
-    private Promise<ActionResponse, ResourceException> createInstance(SSOToken admin, JsonValue details, final String realm) {
+    private Promise<ActionResponse, ResourceException> createInstance(SSOToken admin, JsonValue details,
+                                                                      final String realm, Context context,
+                                                                      CreateRequest request) {
 
         JsonValue jVal = details;
         IdentityDetails identity = jsonValueToIdentityDetails(objectType, jVal, realm);
         final String resourceId = identity.getName();
 
-        return attemptResourceCreation(realm, admin, identity, resourceId)
+        return attemptResourceCreation(realm, admin, identity, resourceId, context, request)
                 .thenAsync(new AsyncFunction<IdentityDetails, ActionResponse, ResourceException>() {
                     @Override
                     public Promise<ActionResponse, ResourceException> apply(IdentityDetails dtls) {
@@ -1081,7 +1085,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                                                             userAttributeInfo.getValidCreationAttributes());
 
             final String id = resourceId;
-            return attemptResourceCreation(realm, admin, identity, resourceId)
+            return attemptResourceCreation(realm, admin, identity, resourceId, context, request)
                     .thenAsync(new AsyncFunction<IdentityDetails, ResourceResponse, ResourceException>() {
                         @Override
                         public Promise<ResourceResponse, ResourceException> apply(IdentityDetails dtls) {
@@ -1107,7 +1111,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
     }
 
     private Promise<IdentityDetails, ResourceException> attemptResourceCreation(String realm, SSOToken admin,
-            IdentityDetails identity, String resourceId) {
+            IdentityDetails identity, String resourceId, Context context, CreateRequest request) {
 
         IdentityDetails dtls = null;
 
@@ -1145,6 +1149,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     accessDenied);
             return new ForbiddenException("Token is not authorized: " + accessDenied.getMessage(), accessDenied)
                     .asPromise();
+        } catch (ConflictException re) {
+            debug.warning("IdentityResource.createInstance() :: Create already existing resourceId={}", resourceId, re);
+            if (isContractConformantUserProvidedIdCreate(context, request)) {
+                return new PreconditionFailedException(re.getMessage()).asPromise();
+            } else {
+                return re.asPromise();
+            }
         } catch (ResourceException re) {
             debug.warning("IdentityResource.createInstance() :: Cannot CREATE resourceId={}", resourceId, re);
             return re.asPromise();

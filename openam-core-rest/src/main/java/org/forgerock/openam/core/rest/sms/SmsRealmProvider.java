@@ -18,9 +18,11 @@ package org.forgerock.openam.core.rest.sms;
 import static com.sun.identity.sm.SMSException.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.forgerock.util.promise.Promises.*;
+import static org.restlet.engine.header.HeaderConstants.HEADER_IF_NONE_MATCH;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -49,6 +51,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -57,6 +60,7 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
@@ -271,7 +275,11 @@ public class SmsRealmProvider implements RequestHandler {
             JsonValue jsonValue = getJsonValue(path, parentRealm);
             return newResultPromise(getResource(jsonValue));
         } catch (SMSException e) {
-            return configureErrorMessage(e).asPromise();
+            if (isContractConformantUserProvidedIdCreate(serverContext, createRequest)) {
+                return new PreconditionFailedException("Unable to create Realm: " + e.getMessage()).asPromise();
+            } else {
+                return configureErrorMessage(e).asPromise();
+            }
         } catch (SSOException sso) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, sso);
             return new PermanentException(401, "Access Denied", null).asPromise();

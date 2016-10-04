@@ -31,6 +31,7 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
@@ -44,6 +45,8 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUE
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SERVERS_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -74,6 +77,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -135,7 +139,7 @@ public final class ServersResourceProvider {
         try {
             SSOToken token = getSsoToken(context);
             if (hasServerOrSiteId(token, id)) {
-                return new ConflictException("Server with ID already exists: " + id).asPromise();
+                throw new ConflictException("Server with ID already exists: " + id);
             }
             if (isServerInstanceExist(token, url)) {
                 return new ConflictException("Server with URL already exists: " + url).asPromise();
@@ -154,6 +158,11 @@ public final class ServersResourceProvider {
         } catch (NotFoundException e) {
             debug.error("Could not read server", e);
             return new InternalServerErrorException("Could not read server just created").asPromise();
+        } catch (ConflictException e) {
+            if (isContractConformantUserProvidedIdCreate(context, request)) {
+                return new PreconditionFailedException(e.getMessage()).asPromise();
+            }
+            return e.asPromise();
         } catch (UnknownPropertyNameException | ConfigurationException e) {
            return new BadRequestException(e).asPromise();
         }

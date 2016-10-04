@@ -21,6 +21,7 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SMS_AGGREGATING_AGENTS_QUERY_HANDLER;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +67,10 @@ import com.sun.identity.sm.ServiceSchema;
  *
  * @since 14.0.0
  */
-@RequestHandler(@Handler(mvccSupported = false, resourceSchema = @Schema(fromType = String.class)))
+@RequestHandler(@Handler(mvccSupported = false,
+        title = SMS_AGGREGATING_AGENTS_QUERY_HANDLER + "title",
+        description = SMS_AGGREGATING_AGENTS_QUERY_HANDLER + "description",
+        resourceSchema = @Schema(schemaResource = "SmsAggregatingAgentsQueryHandler.schema.json")))
 public class SmsAggregatingAgentsQueryHandler {
 
     private static final ClassLoader CLASS_LOADER = SmsAggregatingAgentsQueryHandler.class.getClassLoader();
@@ -112,7 +116,8 @@ public class SmsAggregatingAgentsQueryHandler {
      * @return The query result
      * @throws InternalServerErrorException Thrown when query fails
      */
-    @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
+    @Query(operationDescription = @Operation(description = SMS_AGGREGATING_AGENTS_QUERY_HANDLER + "query.description"),
+            type = QueryType.FILTER, queryableFields = "*")
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) throws InternalServerErrorException {
 

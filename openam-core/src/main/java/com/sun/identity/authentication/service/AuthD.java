@@ -486,7 +486,7 @@ public class AuthD implements ConfigurationListener {
         if (realmIdentity.getAssignedServices().contains(serviceName)) {
             realmIdentity.modifyService(serviceName, attributes);
         } else {
-            //TODO add it somehow?
+            realmIdentity.assignService(serviceName, attributes);
         }
     }
 

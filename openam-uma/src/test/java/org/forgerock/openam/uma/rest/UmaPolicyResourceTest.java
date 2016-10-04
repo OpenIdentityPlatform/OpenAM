@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
@@ -28,8 +29,12 @@ import static org.mockito.Mockito.*;
 import java.util.Collection;
 import java.util.HashSet;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -38,6 +43,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
@@ -91,10 +97,10 @@ public class UmaPolicyResourceTest {
     public void shouldHandledFailedCreatePolicy() {
 
         //Given
-        Context context = mock(Context.class);
-        CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
-        ResourceException resourceException = mock(ResourceException.class);
-        Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
+        Context context = new HttpContext(json(object(field("headers", object()), field("parameters", object()))),
+                this.getClass().getClassLoader());
+        CreateRequest request = Requests.newCreateRequest("/policies", json(object())).setNewResourceId("id");
+        Promise<UmaPolicy, ResourceException> promise = new ConflictException().asPromise();
 
         given(policyService.createPolicy(context, request.getContent())).willReturn(promise);
 
@@ -102,7 +108,7 @@ public class UmaPolicyResourceTest {
         Promise<ResourceResponse, ResourceException> result = policyResource.createInstance(context, request);
 
         //Then
-        assertThat(result).failedWithResourceException().isEqualTo(resourceException);
+        assertThat(result).failedWithResourceException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test

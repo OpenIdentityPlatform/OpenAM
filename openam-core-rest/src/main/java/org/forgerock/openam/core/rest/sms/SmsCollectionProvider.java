@@ -35,7 +35,10 @@ import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SMS_RESOURCE_PROVIDER;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -68,7 +71,9 @@ import org.forgerock.api.models.Schema;
 import org.forgerock.api.models.VersionedPath;
 import org.forgerock.guava.common.base.Optional;
 import org.forgerock.http.ApiProducer;
+import org.forgerock.http.routing.ApiVersionRouterContext;
 import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -78,6 +83,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -85,6 +91,7 @@ import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
@@ -242,7 +249,11 @@ public class SmsCollectionProvider extends SmsResourceProvider {
                     });
         } catch (ServiceAlreadyExistsException e) {
             debug.warning("::SmsCollectionProvider:: ServiceAlreadyExistsException on create", e);
-            return new ConflictException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            if (isContractConformantUserProvidedIdCreate(context, request)) {
+                return new PreconditionFailedException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            } else {
+                return new ConflictException("Unable to create SMS config: " + e.getMessage()).asPromise();
+            }
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             return new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()).asPromise();

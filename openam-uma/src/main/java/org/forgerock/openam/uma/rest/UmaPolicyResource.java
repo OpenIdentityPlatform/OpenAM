@@ -20,7 +20,9 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -39,8 +41,11 @@ import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
 import org.forgerock.api.enums.QueryType;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -122,7 +127,11 @@ public class UmaPolicyResource {
                     @ApiError(
                             code = INTERNAL_ERROR,
                             description = UMA_POLICY_RESOURCE + CREATE + ERROR_500_DESCRIPTION)}))
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
+            final CreateRequest request) {
+        if (request.getNewResourceId() != null) {
+            return new NotSupportedException("Cannot provide a policy ID").asPromise();
+        }
         return umaPolicyService.createPolicy(context, request.getContent())
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
                     @Override

@@ -195,7 +195,10 @@ public class ScriptResource extends RealmAwareResource {
             description = SCRIPT_RESOURCE + CREATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         try {
-             final ScriptConfiguration sc = serviceFactory
+            if (request.getNewResourceId() != null) {
+                return new NotSupportedException("IDs for scripts are generated and cannot be provided").asPromise();
+            }
+            final ScriptConfiguration sc = serviceFactory
                     .create(getRealm(context))
                     .create(fromJson(request.getContent()), getContextSubject(context));
             return newResultPromise(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));

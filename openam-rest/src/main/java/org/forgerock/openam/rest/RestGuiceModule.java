@@ -175,15 +175,14 @@ public class RestGuiceModule extends AbstractModule {
     @Named("ChfRealmRouter")
     @Singleton
     org.forgerock.http.routing.Router getChfRealmRouter(@Named("CrestRealmHandler") RequestHandler crestRealmHandler,
-            ContextFilter contextFilter, CrestProtocolEnforcementFilter crestProtocolEnforcementFilter) {
+            ContextFilter contextFilter) {
         org.forgerock.http.routing.Router chfRealmRouter = new org.forgerock.http.routing.Router();
 
         ConnectionFactory connectionFactory = Resources.newInternalConnectionFactory(new FilterChain(crestRealmHandler, contextFilter));
         CrestApplication crestApplication = Applications.simpleCrestApplication(connectionFactory, "frapi:openam", "1.0");
 
         chfRealmRouter.setDefaultRoute(Handlers.chainOf(
-                newHttpHandler(crestApplication),
-                crestProtocolEnforcementFilter));
+                newHttpHandler(crestApplication)));
         return chfRealmRouter;
     }
 
@@ -231,12 +230,11 @@ public class RestGuiceModule extends AbstractModule {
     @Named("RootResourceRouter")
     ResourceRouter getRootResourceRouter(@Named("CrestRootRouter") Router crestRootRouter,
             @Named("ChfRootRouter")org.forgerock.http.routing.Router chfRootRouter,
-            CrestProtocolEnforcementFilter crestProtocolEnforcementFilter,
             @Named("InvalidRealmNames") Set<String> invalidRealms,
             AuthenticationEnforcer defaultAuthenticationEnforcer, AuditFilter auditFilter,
             ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
-        return new Routers.RootResourceRouterImpl(crestRootRouter, chfRootRouter, crestProtocolEnforcementFilter,
-                invalidRealms, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
+        return new Routers.RootResourceRouterImpl(crestRootRouter, chfRootRouter, invalidRealms,
+                defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
     }
 
     @Provides

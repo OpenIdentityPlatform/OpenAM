@@ -25,6 +25,7 @@ import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Collections;
@@ -54,14 +55,17 @@ import org.forgerock.guava.common.base.Optional;
 import org.forgerock.http.ApiProducer;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
@@ -141,6 +145,7 @@ public class SmsSingletonProvider extends SmsResourceProvider {
     public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext) {
         String resourceId = resourceId();
         try {
+
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             if (serviceNotAssignedToRealm(config, serverContext)) {
                 throw new NotFoundException();
@@ -278,22 +283,37 @@ public class SmsSingletonProvider extends SmsResourceProvider {
             Map<String, Set<String>> attrsDynamic = convertFromJsonDynamic(content, realm);
             Map<String, Set<String>> attrsDefaultAndGlobal = convertFromJson(content, realm);
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
-            ServiceConfig config;
+            ServiceConfig config = null;
             if (subSchemaPath.isEmpty()) {
                 if (type == SchemaType.GLOBAL) {
                     config = scm.createGlobalConfig(attrsDefaultAndGlobal);
                 } else {
-                    if (dynamicSchema != null) {
-                        AMIdentity realmIdentity = getRealmIdentity(realm, ssoToken);
-                        if (isAssignableIdentityService(serviceName, realmIdentity)) {
-                            realmIdentity.assignService(serviceName, attrsDynamic);
-                        }
-                    }
-
                     if (serviceHasDefaultOrGlobalSchema()) {
-                        config = scm.createOrganizationConfig(realm, attrsDefaultAndGlobal);
-                    }
-                    else {
+                        if (scm.getOrganizationConfig(realm, null).exists()) {
+                            if (isContractConformantUserProvidedIdCreate(serverContext, createRequest)) {
+                                return new PreconditionFailedException("Service Already Exists").asPromise();
+                            } else {
+                                return new ConflictException("Service already exists").asPromise();
+                            }
+                        } else {
+                            config = scm.createOrganizationConfig(realm, attrsDefaultAndGlobal);
+                            if (dynamicSchema != null) {
+                                AMIdentity realmIdentity = getRealmIdentity(realm, ssoToken);
+                                if (isAssignableIdentityService(serviceName, realmIdentity)) {
+                                    AuthD.getAuth().setOrgServiceAttributes(realm, serviceName, attrsDynamic);
+                                }
+                            }
+                        }
+                    } else {
+                        if (serviceNotAssignedToRealm(null, serverContext)) {
+                            AuthD.getAuth().setOrgServiceAttributes(realm, serviceName, attrsDynamic);
+                        } else {
+                            if (isContractConformantUserProvidedIdCreate(serverContext, createRequest)) {
+                                return new PreconditionFailedException("Service Already Exists").asPromise();
+                            } else {
+                                return new ConflictException("Service already exists").asPromise();
+                            }
+                        }
                         config = null;
                     }
                 }
