@@ -15,6 +15,8 @@
  */
 package com.sun.identity.shared.debug;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Debug constant
  * Having in one place, every global constants used for the debug logging
@@ -54,6 +56,8 @@ public final class DebugConstants {
      * name.
      */
     public static final String CONFIG_DEBUG_PROVIDER = "com.sun.identity.util.debug.provider";
+
+    public static final SimpleDateFormat DEBUG_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
 
     private DebugConstants() {
 

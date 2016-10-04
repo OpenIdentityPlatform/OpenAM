@@ -28,6 +28,7 @@
  */
 package com.sun.identity.shared.debug.impl;
 
+import static com.sun.identity.shared.debug.DebugConstants.DEBUG_DATE_FORMAT;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 import static org.forgerock.openam.utils.Time.*;
 
@@ -69,8 +70,6 @@ public class DebugImpl implements IDebug {
     private boolean mergeAllMode = false;
 
     private DebugLevel debugLevel = DebugLevel.ON;
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
 
     private DebugFileProvider debugFileProvider;
     private DebugFile debugFile = null;
@@ -240,8 +239,8 @@ public class DebugImpl implements IDebug {
 
         StringBuilder prefix = new StringBuilder();
         String dateFormatted;
-        synchronized (dateFormat) {
-            dateFormatted = this.dateFormat.format(newDate());
+        synchronized (DEBUG_DATE_FORMAT) {
+            dateFormatted = DEBUG_DATE_FORMAT.format(newDate());
         }
         prefix.append(debugName)
                 .append(":").append(dateFormatted)
