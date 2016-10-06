@@ -23,6 +23,13 @@ import { t } from "i18next";
 import Navigation from "org/forgerock/commons/ui/common/components/Navigation";
 import Router from "org/forgerock/commons/ui/common/main/Router";
 
+export const hideAPILinksOnAPIDescriptionsDisabled = (response) => {
+    if (!response.values.raw.descriptionsEnabled) {
+        Navigation.configuration.helpLinks = [];
+        Navigation.reload();
+    }
+};
+
 export const hideDeploymentSitesOnNoSites = (sites) => {
     if (!sites.length) {
         const filteredUrls = _.reject(Navigation.configuration.links.admin.urls.deployment.urls, {
