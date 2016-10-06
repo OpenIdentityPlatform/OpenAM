@@ -42,7 +42,7 @@ public class AuthenticationSessionStoreTest {
         mockSession = mock(InternalSession.class);
         mockSessionID = mock(SessionID.class);
 
-        given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
         given(mockSession.getTimeLeft()).willReturn(1000L);
 
         store = new AuthenticationSessionStore(mockAccessManager);
@@ -103,13 +103,14 @@ public class AuthenticationSessionStoreTest {
         verify(mockSession).reschedule();
     }
 
-    @Test (expectedExceptions = IllegalStateException.class)
+    @Test (expectedExceptions = NullPointerException.class)
     public void shouldThrowExceptionIfNullSessionIsRemoved() {
         store.removeSession(null);
     }
 
-    @Test (expectedExceptions = IllegalStateException.class)
-    public void shouldThrowExceptionIfSessionNotInStore() {
-        store.removeSession(mockSessionID);
+    @Test
+    public void shouldReturnNullIfSessionNotInStore() {
+        InternalSession result = store.removeSession(mockSessionID);
+        assertThat(result).isNull();
     }
 }

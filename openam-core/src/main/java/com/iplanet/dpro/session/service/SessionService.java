@@ -28,14 +28,21 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.InterruptedIOException;
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,7 +56,11 @@ import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.*;
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionEvent;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.share.SessionBundle;

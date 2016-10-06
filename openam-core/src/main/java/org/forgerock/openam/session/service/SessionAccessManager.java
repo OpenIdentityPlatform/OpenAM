@@ -297,7 +297,13 @@ public class SessionAccessManager implements SessionPersistenceManager {
         if (null == sessionId) {
             return null;
         }
+
         InternalSession internalSession = internalSessionCache.remove(sessionId);
+
+        if (internalSession == null) {
+            return null;
+        }
+
         internalSession.setPersistenceManager(null);
         return removeInternalSession(internalSession);
     }

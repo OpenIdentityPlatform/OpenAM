@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.SessionID;
 
@@ -32,8 +33,6 @@ import com.iplanet.dpro.session.SessionID;
  *
  * Authentication sessions will be stored for the duration of their {@link InternalSession#getTimeLeft()}
  * value, after which they will be removed from this store.
- *
- * Thread Safety: This class is thread safe.
  */
 @Singleton
 public class AuthenticationSessionStore {
@@ -48,15 +47,17 @@ public class AuthenticationSessionStore {
 
     public void addSession(InternalSession session) {
         cullExpiredSessions();
+
         if (session.isStored()) {
             throw new IllegalStateException("Session was added to temporary store when it is already persisted.");
         }
-        if (store.containsKey(session.getID())) {
+
+        if (store.containsKey(session.getSessionID())) {
             throw new IllegalStateException("Session was added to temporary store twice.");
         }
         session.cancel();
 
-        store.put(session.getID(), session);
+        store.put(session.getSessionID(), session);
     }
 
     /**
@@ -71,8 +72,13 @@ public class AuthenticationSessionStore {
         if (sessionID == null) {
             return null;
         }
-        cullSessionIfNecessary(sessionID);
-        return store.get(sessionID);
+
+        InternalSession session = store.get(sessionID);
+        if (cullSessionIfNecessary(session)) {
+            return null;
+        } else {
+            return session;
+        }
     }
 
     /**
@@ -82,7 +88,7 @@ public class AuthenticationSessionStore {
      * @throws IllegalStateException if session not found in the store.
      */
     public void promoteSession(SessionID sessionID) {
-        InternalSession session = getSession(sessionID);
+        InternalSession session = removeSession(sessionID);
         if (session == null) {
             throw new IllegalStateException("Attempted to promote non existent session");
         }
@@ -90,23 +96,25 @@ public class AuthenticationSessionStore {
         session.setStored(true);
         sessionAccessManager.persistInternalSession(session);
         session.reschedule();
-        removeSession(sessionID);
     }
 
     private void cullExpiredSessions() {
-        for (SessionID sessionId : store.keySet()) {
-            cullSessionIfNecessary(sessionId);
+        for (InternalSession session : store.values()) {
+            cullSessionIfNecessary(session);
         }
     }
 
-    private void cullSessionIfNecessary(SessionID sessionId) {
-        if (shouldRemove(sessionId)) {
-            removeSession(sessionId);
+    private boolean cullSessionIfNecessary(InternalSession session) {
+        if (shouldRemove(session)) {
+            removeSession(session.getSessionID());
+            return true;
+        } else {
+            return false;
         }
     }
 
-    private boolean shouldRemove(SessionID sessionId) {
-        return store.containsKey(sessionId) && store.get(sessionId).getTimeLeft() == 0;
+    private boolean shouldRemove(InternalSession session) {
+        return session != null && session.getTimeLeft() == 0;
     }
 
     /**
@@ -118,9 +126,7 @@ public class AuthenticationSessionStore {
      * @throws IllegalStateException If the session was not found in the store.
      */
     public InternalSession removeSession(SessionID sessionID) {
-        if (sessionID == null || !store.containsKey(sessionID)) {
-            throw new IllegalStateException("Attempted to remove a non existent session");
-        }
+        Reject.ifNull(sessionID);
         return store.remove(sessionID);
     }
 }
