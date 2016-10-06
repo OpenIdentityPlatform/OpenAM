@@ -197,6 +197,7 @@ define([
         dependencies: [
             "org/forgerock/commons/ui/common/main/Configuration",
             "org/forgerock/openam/ui/admin/services/global/RealmsService",
+            "org/forgerock/openam/ui/admin/services/global/SitesService",
             "org/forgerock/openam/ui/common/sessions/SessionValidator",
             "org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy",
             "org/forgerock/openam/ui/common/util/NavigationHelper",
@@ -206,6 +207,7 @@ define([
             event,
             Configuration,
             RealmsService,
+            SitesService,
             SessionValidator,
             MaxIdleTimeLeftStrategy,
             NavigationHelper,
@@ -220,6 +222,7 @@ define([
 
             if (Configuration.loggedUser && Configuration.loggedUser.hasRole("ui-realm-admin")) {
                 RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
+                SitesService.sites.getAll().then(NavigationHelper.hideDeploymentSitesOnNoSites);
             }
 
             if (Configuration.loggedUser && Configuration.globalData.xuiUserSessionValidationEnabled &&

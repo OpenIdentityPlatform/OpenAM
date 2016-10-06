@@ -24,7 +24,17 @@ define([
     "org/forgerock/commons/ui/common/main/Router"
 ], function (_, $, Navigation, Router) {
     return {
+        hideDeploymentSitesOnNoSites (sites) {
+            if (!sites.length) {
+                const filteredUrls = _.reject(Navigation.configuration.links.admin.urls.deployment.urls, {
+                    "url": "#deployment/sites"
+                });
 
+                Navigation.configuration.links.admin.urls.deployment.urls = filteredUrls;
+
+                Navigation.reload();
+            }
+        },
         /**
          * Reset and populate the realm dynamic links in the navigation realms dropdown
          * @param  {Object} data Result of the service call
