@@ -57,15 +57,30 @@
                                  i18nKey="a102"
                                  order="200">
                     <BooleanValues>
-                        <BooleanTrueValue i18nKey="a102a">Enabled</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="a102b">Disabled</BooleanFalseValue>
+                        <BooleanTrueValue i18nKey="a102a">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="a102b">false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>Enabled</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-            </Global>
+                <AttributeSchema name="openam-rest-apis-descriptions-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 any="display"
+                                 resourceName="descriptionsEnabled"
+                                 i18nKey="a103"
+                                 order="300">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="a103a">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="a103b">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
+            </Global>
         </Schema>
     </Service>
 </ServicesConfiguration>
