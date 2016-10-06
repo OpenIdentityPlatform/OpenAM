@@ -35,8 +35,7 @@ const getSessionInfo = (token, options) => {
         headers: {
             "Accept-API-Version": "protocol=1.0,resource=2.0",
             "user-session-token": token
-        },
-        errorsHandlers: { "Unauthorized": { status: 401 } }
+        }
     }, options));
 };
 
@@ -44,8 +43,8 @@ export const getTimeLeft = (token) => {
     return getSessionInfo(token, { suppressSpinner: true }).then((sessionInfo) => sessionInfo.maxtime);
 };
 
-export const updateSessionInfo = (token) => {
-    return getSessionInfo(token).then((response) => {
+export const updateSessionInfo = (token, options) => {
+    return getSessionInfo(token, options).then((response) => {
         store.dispatch(sessionAddInfo({
             maxidletime: response.maxidletime,
             realm: response.realm

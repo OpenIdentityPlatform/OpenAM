@@ -105,8 +105,11 @@ define([
             Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
 
+        // We do not want to trigger an unauthorized error when we are getting the logged user.
+        const suppressError = { errorsHandlers : { "Unauthorized": { status: 401 } } };
+
         if (sessionToken) {
-            return SessionService.updateSessionInfo(sessionToken).then((data) => {
+            return SessionService.updateSessionInfo(sessionToken, suppressError).then((data) => {
                 return UserModel.fetchById(data.uid).then(successCallback);
             }, noSessionHandler);
         } else {
