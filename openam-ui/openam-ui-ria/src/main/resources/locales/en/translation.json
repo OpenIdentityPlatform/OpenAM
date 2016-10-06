@@ -108,7 +108,6 @@
                         "servers" : "Servers",
                         "sites" : "Sites"
                     },
-                    "federation": "Federation",
                     "configuration": "Configuration",
                     "sessions": "Sessions",
                     "dashboard" : "Dashboard",

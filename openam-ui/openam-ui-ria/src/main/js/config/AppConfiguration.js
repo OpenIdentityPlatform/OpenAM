@@ -199,12 +199,6 @@ define([
                                 }],
                                 "visibleToRoles": ["ui-global-admin"]
                             },
-                            "federation": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
-                                "name": "config.AppConfiguration.Navigation.links.federation",
-                                "icon": "fa fa-building-o hidden-md",
-                                "visibleToRoles": ["ui-global-admin"]
-                            },
                             "sessions": {
                                 "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
                                 "name": "config.AppConfiguration.Navigation.links.sessions",
