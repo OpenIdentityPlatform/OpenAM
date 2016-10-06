@@ -16,13 +16,14 @@
 package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACCESS_TOKEN_TYPE;
 import static org.mockito.BDDMockito.given;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -72,8 +73,7 @@ public final class OAuth2TokenIntrospectionHandlerTest {
         given(token.getScope()).willReturn(Collections.singleton("open"));
         given(uriFactory.get(request)).willReturn(oAuth2Uris);
 
-        Map<String, Object> confirmationKey = new HashMap<>();
-        confirmationKey.put("jwk", Collections.emptyMap());
+        JsonValue confirmationKey = json(object(field("jwk", object())));
         given(token.getConfirmationKey()).willReturn(confirmationKey);
 
         // When
@@ -94,7 +94,8 @@ public final class OAuth2TokenIntrospectionHandlerTest {
         given(token.getScope()).willReturn(Collections.singleton("open"));
         given(uriFactory.get(request)).willReturn(oAuth2Uris);
 
-        given(token.getConfirmationKey()).willReturn(null);
+        JsonValue confirmationKey = json(null);
+        given(token.getConfirmationKey()).willReturn(confirmationKey);
 
         // When
         JsonValue json = handler.introspect(request, "some-client-id", ACCESS_TOKEN_TYPE, "abc-def-hij");

@@ -26,8 +26,6 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.USER_ID;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.forgerock.guava.common.base.Joiner;
@@ -95,10 +93,10 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
         ));
 
         if (token instanceof AccessToken) {
-            Map<String, Object> confirmationKey = ((AccessToken) token).getConfirmationKey();
+            JsonValue confirmationKey = ((AccessToken) token).getConfirmationKey();
 
-            if (confirmationKey != null) {
-                tokenRepresentation.putPermissive(CNF_POINTER, confirmationKey);
+            if (confirmationKey.isNotNull()) {
+                tokenRepresentation.putPermissive(CNF_POINTER, confirmationKey.getObject());
             }
         }
 

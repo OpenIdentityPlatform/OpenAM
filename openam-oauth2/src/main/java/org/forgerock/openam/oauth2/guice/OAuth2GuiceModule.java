@@ -16,9 +16,18 @@
 package org.forgerock.openam.oauth2.guice;
 
 import static com.google.inject.name.Names.named;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.FORM_BODY;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_FORM_BODY;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
 import static org.forgerock.oauth2.core.TokenStore.REALM_AGNOSTIC_TOKEN_STORE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.DEVICE_CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.JWT_BEARER;
+import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.PASSWORD;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import java.security.SecureRandom;
@@ -97,6 +106,7 @@ import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2GlobalSettings;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
@@ -330,13 +340,13 @@ public class OAuth2GuiceModule extends AbstractModule {
             ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder,
             Blacklist<Blacklistable> tokenBlacklist, CTSPersistentStore cts,
             TokenAdapter<StatelessTokenMetadata> tokenAdapter, RecoveryCodeGenerator recoveryCodeGenerator,
-            ConfirmationKeyValidator confirmationKeyValidator) {
+            OAuth2Utils utils) {
         StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
                 providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
+                cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator, utils);
         StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
                 realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
-                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter, confirmationKeyValidator);
+                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils);
         return new OpenAMTokenStore(realmAgnosticStatefulTokenStore,
                 realmAgnosticStatelessTokenStore, new DefaultStatelessCheck(providerSettingsFactory));
     }
@@ -391,9 +401,10 @@ public class OAuth2GuiceModule extends AbstractModule {
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
                 Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory,
-                RecoveryCodeGenerator recoveryCodeGenerator) {
-            super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser,
-                    ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
+                RecoveryCodeGenerator recoveryCodeGenerator, OAuth2Utils utils) {
+            super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore,
+                    realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom,
+                    failureFactory, recoveryCodeGenerator, utils);
         }
 
         @Override
@@ -408,10 +419,9 @@ public class OAuth2GuiceModule extends AbstractModule {
                 OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter,
-                ConfirmationKeyValidator confirmationKeyValidator) {
+                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils) {
             super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
-                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter, confirmationKeyValidator);
+                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils);
         }
 
         @Override

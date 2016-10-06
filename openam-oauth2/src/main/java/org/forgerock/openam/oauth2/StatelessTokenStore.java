@@ -18,19 +18,26 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.EXPIRES_IN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.*;
-import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
-import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_TOKEN_TYPE;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -45,7 +52,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -80,7 +89,6 @@ import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
-import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
@@ -89,6 +97,8 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.Duration;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Stateless implementation of the OAuth2 Token Store.
@@ -105,7 +115,7 @@ public class StatelessTokenStore implements TokenStore {
     private final Blacklist<Blacklistable> tokenBlacklist;
     private final CTSPersistentStore cts;
     private final TokenAdapter<StatelessTokenMetadata> tokenAdapter;
-    private final ConfirmationKeyValidator confirmationKeyValidator;
+    private final OAuth2Utils utils;
 
 
     /**
@@ -121,14 +131,14 @@ public class StatelessTokenStore implements TokenStore {
      * @param tokenBlacklist An instance of the token blacklist.
      * @param cts An instance of the CTSPersistentStoreImpl
      * @param tokenAdapter An instance of the StatelessTokenCtsAdapter
+     * @param utils OAuth2 utilities
      */
     @Inject
     public StatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
             OAuth2ProviderSettingsFactory providerSettingsFactory, @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter,
-            ConfirmationKeyValidator confirmationKeyValidator) {
+            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils) {
         this.statefulTokenStore = statefulTokenStore;
         this.jwtBuilder = jwtBuilder;
         this.providerSettingsFactory = providerSettingsFactory;
@@ -139,7 +149,7 @@ public class StatelessTokenStore implements TokenStore {
         this.tokenBlacklist = tokenBlacklist;
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
-        this.confirmationKeyValidator = confirmationKeyValidator;
+        this.utils = utils;
     }
 
     @Override
@@ -200,7 +210,7 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
 
-        JsonValue confirmationJwk = getConfirmationKey(request);
+        JsonValue confirmationJwk = utils.getConfirmationKey(request);
         if (confirmationJwk != null) {
             claimsSetBuilder.claim(ProofOfPossession.CNF, confirmationJwk.asMap());
         }
@@ -330,19 +340,6 @@ public class StatelessTokenStore implements TokenStore {
         } catch (IllegalArgumentException e) {
             throw new ServerException("Invalid Token signing algorithm");
         }
-    }
-
-    private JsonValue getConfirmationKey(OAuth2Request request) throws InvalidConfirmationKeyException {
-        String cnfKeyString = request.getParameter(ProofOfPossession.CNF_KEY);
-
-        if (isBlank(cnfKeyString)) {
-            return null;
-        }
-
-        JsonValue cnfKey = toJsonValue(Base64.decode(cnfKeyString));
-        confirmationKeyValidator.validate(cnfKey);
-
-        return cnfKey;
     }
 
     private boolean isAlgorithmSupported(OAuth2Request request, JwsAlgorithm algorithm) throws ServerException,

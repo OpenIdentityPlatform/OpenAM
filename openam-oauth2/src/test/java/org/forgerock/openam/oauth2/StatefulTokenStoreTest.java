@@ -16,15 +16,22 @@
 
 package org.forgerock.openam.oauth2;
 
-import static java.util.Collections.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyInt;
 import static org.mockito.BDDMockito.anyString;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
@@ -52,8 +59,8 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.Alphabet;
-import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.query.QueryFilter;
 import org.restlet.Request;
@@ -81,6 +88,9 @@ public class StatefulTokenStoreTest {
     private ClientAuthenticationFailureFactory failureFactory;
     private OAuth2RequestFactory oAuth2RequestFactory;
     private RecoveryCodeGenerator recoveryCodeGenerator;
+    private OAuth2Request oAuth2Request;
+    private OAuth2ProviderSettings settings;
+    private OAuth2Utils utils;
 
     @BeforeMethod
     public void setUp() {
@@ -97,6 +107,9 @@ public class StatefulTokenStoreTest {
         debug = mock(Debug.class);
         failureFactory = mock(ClientAuthenticationFailureFactory.class);
         recoveryCodeGenerator = mock(RecoveryCodeGenerator.class);
+        utils = mock(OAuth2Utils.class);
+        settings = mock(OAuth2ProviderSettings.class);
+        oAuth2Request = mock(OAuth2Request.class);
 
         oAuth2RequestFactory = new OAuth2RequestFactory(new JacksonRepresentationFactory(new ObjectMapper()),
                 clientRegistrationStore);
@@ -110,7 +123,7 @@ public class StatefulTokenStoreTest {
 
         openAMtokenStore = new StatefulTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
                 clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
-                new SecureRandom(), failureFactory, recoveryCodeGenerator);
+                new SecureRandom(), failureFactory, recoveryCodeGenerator, utils);
     }
 
     @Test
@@ -203,7 +216,7 @@ public class StatefulTokenStoreTest {
         //Given
         StatefulTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticStatefulTokenStore(tokenStore,
                 providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator);
+                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator, utils);
         JsonValue token = json(object(
                 field("tokenName", Collections.singletonList("access_token")),
                 field("realm", Collections.singletonList("/otherrealm"))));
@@ -334,4 +347,40 @@ public class StatefulTokenStoreTest {
         // Then
         verify(tokenStore).delete("123");
     }
+
+    @Test
+    public void whenCnfIsPresentInRequestItGetsAddedToToken() throws Exception {
+        // Given
+        given(providerSettingsFactory.get(oAuth2Request)).willReturn(settings);
+        given(oAuth2Request.getParameter("realm")).willReturn("/abc");
+        given(realmNormaliser.normalise("/abc")).willReturn("/def");
+
+        given(utils.getConfirmationKey(oAuth2Request)).willReturn(json(object(field("jwk", object()))));
+
+        // When
+        AccessToken token = openAMtokenStore.createAccessToken("authorization_code", "example", "123-456-789",
+                "owner-id", "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", oAuth2Request);
+
+        // Then
+        assertThat(token.getConfirmationKey().isNotNull()).isTrue();
+        assertThat(token.getConfirmationKey().isDefined("jwk")).isTrue();
+    }
+
+    @Test
+    public void whenCnfIsNotPresentInRequestItDoesNotGetAddedToToken() throws Exception {
+        // Given
+        given(providerSettingsFactory.get(oAuth2Request)).willReturn(settings);
+        given(oAuth2Request.getParameter("realm")).willReturn("/abc");
+        given(realmNormaliser.normalise("/abc")).willReturn("/def");
+
+        given(utils.getConfirmationKey(oAuth2Request)).willReturn(json(null));
+
+        // When
+        AccessToken token = openAMtokenStore.createAccessToken("authorization_code", "example", "123-456-789",
+                "owner-id", "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", oAuth2Request);
+
+        // Then
+        assertThat(token.getConfirmationKey().isNull()).isTrue();
+    }
+
 }

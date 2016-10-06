@@ -18,6 +18,8 @@ package org.forgerock.oauth2.core;
 
 import java.util.Map;
 
+import org.forgerock.json.JsonValue;
+
 /**
  * Models an OAuth2 access token.
  *
@@ -66,9 +68,9 @@ public interface AccessToken extends IntrospectableToken {
     /**
      * Get's the tokens confirmation claim.
      *
-     * @return the confirmation representation or null
+     * @return the JSON confirmation key
      */
-    Map<String, Object> getConfirmationKey();
+    JsonValue getConfirmationKey();
 
     @Override
     Map<String, Object> toMap();

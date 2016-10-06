@@ -17,6 +17,9 @@ package org.forgerock.openam.oauth2;
 
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.mockito.BDDMockito.given;
 
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -33,8 +36,6 @@ import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.Blacklistable;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
-import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.mockito.Mock;
@@ -76,7 +77,7 @@ public final class StatelessTokenStoreTest {
     @Mock
     private TokenAdapter<StatelessTokenMetadata> tokenAdapter;
     @Mock
-    private ConfirmationKeyValidator confirmationKeyValidator;
+    private OAuth2Utils utils;
     @Mock
     private OAuth2Request request;
     @Mock
@@ -87,7 +88,7 @@ public final class StatelessTokenStoreTest {
         MockitoAnnotations.initMocks(this);
         tokenStore = new StatelessTokenStore(statefulTokenStore, new JwtBuilderFactory(), providerSettingsFactory,
                 logger, clientRegistrationStore, realmNormaliser, oAuth2UrisFactory, tokenBlacklist,
-                cts, tokenAdapter, confirmationKeyValidator);
+                cts, tokenAdapter, utils);
     }
 
     @Test
@@ -104,17 +105,15 @@ public final class StatelessTokenStoreTest {
         given(settings.getTokenSigningAlgorithm()).willReturn("HS256");
         given(settings.getSupportedIDTokenSigningAlgorithms()).willReturn(singleton("HS256"));
         given(settings.getTokenHmacSharedSecret()).willReturn("c2VjcmV0");
-
-        // Base64 string contains a dumb but valid JWK.
-        given(request.getParameter(ProofOfPossession.CNF_KEY)).willReturn("eyAiandrIjogeyAidGVzdCI6IDEyMyB9IH0=");
+        given(utils.getConfirmationKey(request)).willReturn(json(object(field("jwk", object()))));
 
         // When
         AccessToken token = tokenStore.createAccessToken("authorization_code", "exmple", "123-456-789", "owner-id",
                 "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", request);
 
         // Then
-        assertThat(token.getConfirmationKey()).isNotNull();
-        assertThat(token.getConfirmationKey()).containsKey("jwk");
+        assertThat(token.getConfirmationKey().isNotNull()).isTrue();
+        assertThat(token.getConfirmationKey().isDefined("jwk")).isTrue();
     }
 
     @Test
@@ -131,13 +130,14 @@ public final class StatelessTokenStoreTest {
         given(settings.getTokenSigningAlgorithm()).willReturn("HS256");
         given(settings.getSupportedIDTokenSigningAlgorithms()).willReturn(singleton("HS256"));
         given(settings.getTokenHmacSharedSecret()).willReturn("c2VjcmV0");
+        given(utils.getConfirmationKey(request)).willReturn(null);
 
         // When
         AccessToken token = tokenStore.createAccessToken("authorization_code", "exmple", "123-456-789", "owner-id",
                 "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", request);
 
         // Then
-        assertThat(token.getConfirmationKey()).isNull();
+        assertThat(token.getConfirmationKey().isNull()).isTrue();
     }
 
 }

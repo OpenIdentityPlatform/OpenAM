@@ -17,11 +17,15 @@
 package org.forgerock.oauth2.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.json.JsonValue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -66,6 +70,16 @@ public final class StatefulAccessTokenTest {
         assertThat(clientId).isEqualTo(CLIENT_1_WITH_SPACE);
     }
 
+    @Test
+    public void settingConfirmationKeyIsAccessibleViaGetter() {
+        // When
+        JsonValue confirmationKey = openAMAccessToken.getConfirmationKey();
+
+        // Then
+        assertThat(confirmationKey.isNotNull()).isTrue();
+        assertThat(confirmationKey.isDefined("jwk")).isTrue();
+    }
+
     private StatefulAccessToken newStatefulAccessToken() {
         String id = "2dec6816-cf19-4207-8d88-818c809ea6cc";
         String authorizationCode = null;
@@ -81,9 +95,10 @@ public final class StatefulAccessTokenTest {
         String realm = "/";
         String claims = null;
         String auditTrackingId = "4ed857de-5d18-4afa-bc85-56991b0f8d3d";
+        JsonValue confirmationKey = json(object(field("jwk", object())));
 
-        return new StatefulAccessToken(id, authorizationCode, resourceOwnerId, client, redirectUri,
-                scope, expiryTime, refreshToken, tokenName, grantType, nonce, realm, claims, auditTrackingId);
+        return new StatefulAccessToken(id, authorizationCode, resourceOwnerId, client, redirectUri, scope, expiryTime,
+                refreshToken, tokenName, grantType, nonce, realm, claims, auditTrackingId, confirmationKey);
     }
 
 }

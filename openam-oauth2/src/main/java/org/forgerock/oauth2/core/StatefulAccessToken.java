@@ -17,16 +17,16 @@
 package org.forgerock.oauth2.core;
 
 import static java.lang.String.valueOf;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CONFIRMATION_KEY;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.PARENT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REDIRECT_URI;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REFRESH_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
@@ -34,7 +34,6 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_TYPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.REALM;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
@@ -54,6 +53,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 
 /**
  * Models a OAuth2 access token.
@@ -107,14 +107,15 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param realm The realm.
      * @param claims The requested claims.
      * @param auditTrackingId The tracking ID, used for tracking tokens throughout the audit logs.
+     * @param confirmationKey JSON confirmation key
      */
     public StatefulAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
             String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
             String tokenName, String grantType, String nonce, String realm, String claims,
-            String auditTrackingId) {
+            String auditTrackingId, JsonValue confirmationKey) {
         this(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshToken,
             tokenName, grantType, nonce, realm, claims, auditTrackingId,
-            TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
+            TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()), confirmationKey);
     }
 
     /**
@@ -135,11 +136,12 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
      * @param claims The requested claims.
      * @param auditTrackingId The tracking ID, used for tracking tokens throughout the audit logs.
      * @param authTime The end user's original auth time.
+     * @param confirmationKey JSON confirmation key
      */
     public StatefulAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
             String redirectUri, Set<String> scope, long expiryTime, RefreshToken refreshToken,
             String tokenName, String grantType, String nonce, String realm, String claims,
-            String auditTrackingId, long authTime) {
+            String auditTrackingId, long authTime, JsonValue confirmationKey) {
         super(new HashMap<String, Object>());
         setId(id);
         setAuthorizationCode(authorizationCode);
@@ -162,6 +164,10 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
 
         if (!StringUtils.isBlank(claims)) {
             setClaims(claims);
+        }
+
+        if (confirmationKey != null) {
+            setConfirmationKey(confirmationKey);
         }
     }
 
@@ -396,8 +402,19 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
     }
 
     @Override
-    public Map<String, Object> getConfirmationKey() {
-        return null;
+    public JsonValue getConfirmationKey() {
+        return get(CONFIRMATION_KEY);
+    }
+
+    /**
+     * Sets the confirmation key.
+     *
+     * @param confirmationKey
+     *         the non-null JSON confirmation key
+     */
+    protected void setConfirmationKey(JsonValue confirmationKey) {
+        Reject.ifNull(confirmationKey);
+        put(CONFIRMATION_KEY, confirmationKey.getObject());
     }
 
     /**
@@ -434,6 +451,12 @@ public class StatefulAccessToken extends StatefulToken implements AccessToken {
         tokenInfo.put(getResourceString(CLIENT_ID), getClientId());
         tokenInfo.put(getResourceString(GRANT_TYPE), getGrantType());
         tokenInfo.put(getResourceString(REALM), getRealm());
+
+        JsonValue confirmationKey = getConfirmationKey();
+        if (confirmationKey.isNotNull()) {
+            tokenInfo.put(getResourceString(CONFIRMATION_KEY), confirmationKey.getObject());
+        }
+
         return tokenInfo;
     }
 

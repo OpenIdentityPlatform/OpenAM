@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,8 +30,13 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.json.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
+import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
+import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.forgerock.util.encode.Base64;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -51,14 +58,17 @@ public class OAuth2Utils {
     public static final String SCOPE_DELIMITER = " ";
 
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private final ConfirmationKeyValidator confirmationKeyValidator;
 
     /**
      * Default constructor with guice provided variables.
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public OAuth2Utils(JacksonRepresentationFactory jacksonRepresentationFactory) {
+    public OAuth2Utils(JacksonRepresentationFactory jacksonRepresentationFactory,
+            ConfirmationKeyValidator confirmationKeyValidator) {
         this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+        this.confirmationKeyValidator = confirmationKeyValidator;
     }
 
     /**
@@ -323,4 +333,29 @@ public class OAuth2Utils {
             return null;
         }
     }
+
+    /**
+     * Given an OAuth2 request, attempts to pull out the confirmation key; this is optional.
+     *
+     * @param request
+     *         OAuth2 request
+     *
+     * @return confirmation key represented as JSON, or null if not present
+     *
+     * @throws InvalidConfirmationKeyException
+     *         if the confirmation key is an invalid format
+     */
+    JsonValue getConfirmationKey(OAuth2Request request) throws InvalidConfirmationKeyException {
+        String cnfKeyString = request.getParameter(ProofOfPossession.CNF_KEY);
+
+        if (isBlank(cnfKeyString)) {
+            return null;
+        }
+
+        JsonValue cnfKey = toJsonValue(Base64.decode(cnfKeyString));
+        confirmationKeyValidator.validate(cnfKey);
+
+        return cnfKey;
+    }
+
 }
