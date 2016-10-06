@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
@@ -872,5 +873,10 @@ public class ApplicationsResourceTest {
             return resource.getId();
         }
 
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ApplicationsResource.class).hasValidAnnotations();
     }
 }

@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/ApplicationsResource#schema.title",
+  "description": "i18n:api-descriptor/ApplicationsResource#schema.description",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.name.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.name.description"
+    },
+    "displayName": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.displayName.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.displayName.description"
+    },
+    "description": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.description.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.description.description"
+    },
+    "applicationType": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.applicationType.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.applicationType.description"
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "i18n:api-descriptor/ApplicationsResource#schema.conditions.title",
+        "description": "i18n:api-descriptor/ApplicationsResource#schema.conditions.description"
+      }
+    },
+    "subjects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "i18n:api-descriptor/ApplicationsResource#schema.subjects.title",
+        "description": "i18n:api-descriptor/ApplicationsResource#schema.subjects.description"
+      }
+    },
+    "resourceTypeUuids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "i18n:api-descriptor/ApplicationsResource#schema.resourceTypeUuids.title",
+        "description": "i18n:api-descriptor/ApplicationsResource#schema.resourceTypeUuids.description"
+      }
+    },
+    "entitlementCombiner": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.entitlementCombiner.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.entitlementCombiner.description"
+    },
+    "searchIndex": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.searchIndex.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.searchIndex.description"
+    },
+    "saveIndex": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.saveIndex.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.saveIndex.description"
+    },
+    "resourceComparator": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.resourceComparator.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.resourceComparator.description"
+    },
+    "attributeNames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "i18n:api-descriptor/ApplicationsResource#schema.attributeNames.title",
+        "description": "i18n:api-descriptor/ApplicationsResource#schema.attributeNames.description"
+      }
+    },
+    "createdBy": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.createdBy.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.createdBy.description"
+    },
+    "lastModifiedBy": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.lastModifiedBy.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.lastModifiedBy.description"
+    },
+    "creationDate": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.creationDate.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.creationDate.description"
+    },
+    "lastModifiedDate": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.lastModifiedDate.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.lastModifiedDate.description"
+    },
+    "editable": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/ApplicationsResource#schema.editable.title",
+      "description": "i18n:api-descriptor/ApplicationsResource#schema.editable.description"
+    }
+  },
+  "required": [
+    "name",
+    "applicationType",
+    "entitlementCombiner"
+  ]
+}
