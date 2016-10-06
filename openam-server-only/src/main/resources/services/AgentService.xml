@@ -1087,6 +1087,16 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
+                            name="com.sun.identity.agents.config.cdsso.redirect.uri"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a165"
+                            order="17550">
+                        <DefaultValues>
+                            <Value>agent/cdsso-oauth2</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
                             name="com.sun.identity.agents.config.client.ip.validation.enable"
                             type="single"
                             syntax="boolean"

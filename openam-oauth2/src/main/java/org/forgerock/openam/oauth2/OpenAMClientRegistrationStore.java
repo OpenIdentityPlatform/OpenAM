@@ -122,7 +122,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
         try {
             final String normalisedRealm = realmNormaliser.normalise(realm);
             AMIdentity identity = getIdentity(clientId, normalisedRealm, request);
-            if (isJ2eeAgent(identity)) {
+            if (isJ2eeAgent(identity) || isWebAgent(identity)) {
                 return new AgentClientRegistration(identity);
             } else {
                 OAuth2ProviderSettings providerSettings =
@@ -178,5 +178,9 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
 
     private boolean isJ2eeAgent(AMIdentity identity) throws IdRepoException, SSOException {
         return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(AgentConfiguration.getAgentType(identity));
+    }
+
+    private boolean isWebAgent(AMIdentity identity) throws IdRepoException, SSOException {
+        return AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(AgentConfiguration.getAgentType(identity));
     }
 }

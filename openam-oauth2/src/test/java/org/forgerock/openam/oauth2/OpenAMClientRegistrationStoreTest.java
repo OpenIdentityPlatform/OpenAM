@@ -95,7 +95,18 @@ public class OpenAMClientRegistrationStoreTest {
     }
 
     @Test
-    public void getWithOauth2RequestReturnsAgentRegistrationIfNotJ2eeAgent()
+    public void getWithOauth2RequestReturnsAgentRegistrationIfWebAgent()
+            throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
+        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true);
+        OAuth2Request request = createRequest();
+
+        OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, request);
+
+        assertThat(registration).isInstanceOf(AgentClientRegistration.class);
+    }
+
+    @Test
+    public void getWithOauth2RequestReturnsAgentRegistrationIfNotJ2eeOrWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
         setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true);
         OAuth2Request request = createRequest();
@@ -116,7 +127,17 @@ public class OpenAMClientRegistrationStoreTest {
     }
 
     @Test
-    public void getReturnsAgentRegistrationIfNotJ2eeAgent()
+    public void getReturnsAgentRegistrationIfWebAgent()
+            throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
+        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true);
+
+        OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, REALM, null);
+
+        assertThat(registration).isInstanceOf(AgentClientRegistration.class);
+    }
+
+    @Test
+    public void getReturnsAgentRegistrationIfNotJ2eeOrWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
         setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true);
 
