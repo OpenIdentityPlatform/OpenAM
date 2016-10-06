@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
-
 package com.sun.identity.common;
 
 import static org.forgerock.openam.utils.Time.*;
@@ -122,9 +121,8 @@ public class ConfigMonitoring {
          * will result in monitoring getting disabled.
          */
         int i = getMonServiceAttrs();
-        if (i != 0) {
-            debug.error(classMethod + "getMonServiceAttrs returns " + i +
-                ", monitoring disabled");
+        if (i < Agent.MON_CONFIG_DISABLED) {
+            debug.error("{}getMonServiceAttrs returns {}, monitoring disabled", classMethod, i);
             Agent.setMonitoringDisabled();
             return;
         }
