@@ -31,7 +31,7 @@ define([
         route: "editServerDefaultsSecurity"
     }, {
         title: "console.common.navigation.session",
-        icon: "fa-key",
+        icon: "fa-ticket",
         route: "editServerDefaultsSession"
     }, {
         title: "console.common.navigation.sdk",

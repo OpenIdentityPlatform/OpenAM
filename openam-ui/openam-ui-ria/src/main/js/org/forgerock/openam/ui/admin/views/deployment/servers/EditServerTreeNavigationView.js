@@ -32,7 +32,7 @@ define([
         route: "editServerSecurity"
     }, {
         title: "console.common.navigation.session",
-        icon: "fa-key",
+        icon: "fa-ticket",
         route: "editServerSession"
     }, {
         title: "console.common.navigation.sdk",

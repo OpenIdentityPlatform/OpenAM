@@ -15,8 +15,7 @@
  */
 
 define([
-    "org/forgerock/openam/ui/common/util/Constants"
-], function (Constants) {
+], function () {
     var obj = {
         moduleDefinition: [{
             moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
@@ -197,12 +196,6 @@ define([
                                     "name": "config.AppConfiguration.Navigation.links.deployment.sites",
                                     "icon": "fa fa-bookmark-o"
                                 }],
-                                "visibleToRoles": ["ui-global-admin"]
-                            },
-                            "sessions": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
-                                "name": "config.AppConfiguration.Navigation.links.sessions",
-                                "icon": "fa fa-users hidden-md",
                                 "visibleToRoles": ["ui-global-admin"]
                             }
                         }

@@ -109,7 +109,6 @@
                         "sites" : "Sites"
                     },
                     "configuration": "Configuration",
-                    "sessions": "Sessions",
                     "dashboard" : "Dashboard",
                     "users" : "Users",
                     "apps" : "Applications",
@@ -732,6 +731,7 @@
                 "servers": "Servers",
                 "services": "Services",
                 "session": "Session",
+                "sessions": "Sessions",
                 "settings": "Settings",
                 "sites": "Sites",
                 "sts": "STS",

@@ -72,6 +72,10 @@ define([
         icon:"fa-plug",
         route:"realmsServices"
     }, {
+        title: "console.common.navigation.sessions",
+        icon: "fa-ticket",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_SESSIONS"
+    }, {
         title: "console.common.navigation.dataStores",
         icon: "fa-database",
         event: "main.navigation.EVENT_REDIRECT_TO_JATO_DATASTORES"
@@ -97,7 +101,7 @@ define([
         event: "main.navigation.EVENT_REDIRECT_TO_JATO_SUBJECTS"
     }, {
         title: "console.common.navigation.sts",
-        icon: "fa-ticket",
+        icon: "fa-tty",
         event: "main.navigation.EVENT_REDIRECT_TO_JATO_STS"
     }, {
         title: "console.common.navigation.scripts",
