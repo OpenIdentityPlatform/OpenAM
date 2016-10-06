@@ -32,6 +32,7 @@ import org.forgerock.openam.cts.worker.CTSWorkerFilter;
 import org.forgerock.openam.cts.worker.CTSWorkerProcess;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
  * A process which defines the deletion of tokens returned from a reaper query, having applied the provided
@@ -73,9 +74,9 @@ public class CTSWorkerDeleteProcess implements CTSWorkerProcess {
         try {
             long total = 0;
             queryStopWatch.start();
-            for (Collection<String> ids = query.nextPage(); ids != null; ids = query.nextPage()) {
+            for (Collection<PartialToken> tokens = query.nextPage(); tokens != null; tokens = query.nextPage()) {
 
-                Collection<String> filteredIds = filter.filter(ids);
+                 Collection<PartialToken> filteredTokens = filter.filter(tokens);
 
                 // If the thread has been interrupted, exit all processing.
                 if (Thread.interrupted()) {
@@ -83,10 +84,10 @@ public class CTSWorkerDeleteProcess implements CTSWorkerProcess {
                     return;
                 }
 
-                total += filteredIds.size();
+                total += filteredTokens.size();
 
                 // Latch will track the deletions of the page
-                latches.add(tokenDeletion.deleteBatch(filteredIds));
+                latches.add(tokenDeletion.deleteBatch(filteredTokens));
             }
 
             queryStopWatch.stop();

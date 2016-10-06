@@ -145,6 +145,7 @@ public class CoreTokenFieldTypes {
         switch (field) {
             case TOKEN_ID:
             case USER_ID:
+            case ETAG:
             case STRING_ONE:
             case STRING_TWO:
             case STRING_THREE:

@@ -28,14 +28,18 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 public class DeleteTask extends AbstractTask {
 
     private final String tokenId;
+    private final String etag;
 
     /**
      * @param tokenID The Token ID to delete when executed.
+     * @param etag The ETag of the revision of the token to delete,
+     *             When null prevents concurrent modification check.
      * @param handler Non null result handler for signalling status of operation.
      */
-    public DeleteTask(String tokenID, ResultHandler<String, ?> handler) {
+    public DeleteTask(String tokenID, String etag, ResultHandler<String, ?> handler) {
         super(handler);
         this.tokenId = tokenID;
+        this.etag = etag;
     }
 
     /**
@@ -47,7 +51,7 @@ public class DeleteTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.delete(tokenId);
+        adapter.delete(tokenId, etag);
         handler.processResults(tokenId);
     }
 

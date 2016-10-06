@@ -31,10 +31,12 @@ public interface TokenStorageAdapter {
     /**
      * Create the Token in the database.
      *
-     * @param token      Non null Token to create.
+     * @param token Non null Token to create.
+     * @return token The instance of the newly created token.
+     *               The newly created token would contain the additional etag information.
      * @throws org.forgerock.openam.sm.datalayer.api.DataLayerException If the operation failed for a known reason.
      */
-    void create(Token token) throws DataLayerException;
+    Token create(Token token) throws DataLayerException;
 
     /**
      * Performs a read against the database connection and converts the result into a Token.
@@ -49,18 +51,21 @@ public interface TokenStorageAdapter {
      *
      * @param previous The non null previous Token to check against.
      * @param updated The non null Token to update with.
-     * @return True if the token was updated, or false if there were no changes detected.
+     * @return A copy of the updated token. The token would contain the updated etag.
      * @throws DataLayerException If the operation failed for a known reason.
+     * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an assertion on the tokens ETag.
      */
-    boolean update(Token previous, Token updated) throws DataLayerException;
+    Token update(Token previous, Token updated) throws DataLayerException;
 
     /**
      * Performs a delete against the Token ID provided.
      *
      * @param tokenId The non null Token ID to delete.
+     * @param etag The ETag of the revision of the token to delete.
      * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
+     * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an assertion on the tokens ETag.
      */
-    void delete(String tokenId) throws DataLayerException;
+    void delete(String tokenId, String etag) throws DataLayerException;
 
     /**
      * Performs a full-token query using the provided filter.

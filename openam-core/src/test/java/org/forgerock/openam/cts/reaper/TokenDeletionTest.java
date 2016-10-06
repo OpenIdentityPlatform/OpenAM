@@ -25,6 +25,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.worker.process.deletion.TokenDeletion;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -41,14 +42,18 @@ public class TokenDeletionTest {
 
     @Test
     public void shouldQueueEachTokenProvided() throws CoreTokenException {
-        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         deletion.deleteBatch(tokens);
-        verify(mockQueue, times(3)).delete(anyString(), any(ResultHandler.class));
+        verify(mockQueue, times(3)).delete(anyString(), anyString(), any(ResultHandler.class));
     }
 
     @Test
     public void shouldReturnCountDownLatchThatCorrespondsToTokensProvided() throws CoreTokenException {
-        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         assertThat(deletion.deleteBatch(tokens).getCount()).isEqualTo(tokens.size());
+    }
+
+    private PartialToken partialToken() {
+        return mock(PartialToken.class);
     }
 }

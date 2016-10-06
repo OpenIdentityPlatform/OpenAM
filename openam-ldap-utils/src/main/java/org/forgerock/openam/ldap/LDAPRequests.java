@@ -201,7 +201,7 @@ public final class LDAPRequests {
      * @param entry the entry to add.
      * @return the add request.
      */
-    public static Entry newAddRequest(final Entry entry) {
+    public static AddRequest newAddRequest(final Entry entry) {
         return Requests.newAddRequest(entry)
                        .addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()));
     }

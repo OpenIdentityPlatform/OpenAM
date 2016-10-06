@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.reaper;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.eq;
@@ -27,17 +27,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.worker.CTSWorkerFilter;
 import org.forgerock.openam.cts.worker.process.deletion.CTSWorkerDeleteProcess;
 import org.forgerock.openam.cts.worker.process.deletion.TokenDeletion;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.sun.identity.shared.debug.Debug;
 
 public class CTSWorkerDeleteProcessTest {
 
@@ -72,7 +72,7 @@ public class CTSWorkerDeleteProcessTest {
     @Test
     public void shouldSignalTokensToTokenDeletion() throws CoreTokenException {
         // Given
-        Collection<String> tokens = Collections.unmodifiableCollection(Arrays.asList("badger", "weasel", "ferret"));
+        Collection<PartialToken> tokens = Collections.unmodifiableCollection(Arrays.asList(partialToken(), partialToken(), partialToken()));
         given(mockFilter.filter(anyCollection())).willReturn(tokens);
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
         given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(new CountDownLatch(0));
@@ -91,7 +91,7 @@ public class CTSWorkerDeleteProcessTest {
         CountDownLatch two = mock(CountDownLatch.class);
         CountDownLatch three = mock(CountDownLatch.class);
 
-        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(tokens).willReturn(tokens).willReturn(null);
         given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(one).willReturn(two).willReturn(three);
 
@@ -107,7 +107,7 @@ public class CTSWorkerDeleteProcessTest {
     @Test
     public void shouldRespondToInterruptSignal() throws CoreTokenException {
         // Given
-        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
 
         Thread.currentThread().interrupt();
@@ -117,5 +117,9 @@ public class CTSWorkerDeleteProcessTest {
 
         // Then
         verify(mockTokenDeletion, times(0)).deleteBatch(eq(tokens));
+    }
+
+    private PartialToken partialToken() {
+        return mock(PartialToken.class);
     }
 }

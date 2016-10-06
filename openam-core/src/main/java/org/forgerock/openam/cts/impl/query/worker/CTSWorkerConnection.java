@@ -22,6 +22,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerBaseQuery;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.utils.IOUtils;
 
 /**
@@ -63,7 +64,7 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
      * @throws CoreTokenException {@inheritDoc}
      */
     @Override
-    public Collection<String> nextPage() throws CoreTokenException {
+    public Collection<PartialToken> nextPage() throws CoreTokenException {
         // Detect interruption.
         if (Thread.currentThread().isInterrupted()) {
             close();
@@ -76,7 +77,7 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
 
         try {
             initConnection();
-            Collection<String> results = query.nextPage();
+            Collection<PartialToken> results = query.nextPage();
             endProcessing(results);
             return results;
         } catch (CoreTokenException e) {
@@ -107,7 +108,7 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
      *
      * @param results If null, then this signals end of processing.
      */
-    private void endProcessing(Collection<String> results) {
+    private void endProcessing(Collection<PartialToken> results) {
         if (results == null) {
             close();
         }

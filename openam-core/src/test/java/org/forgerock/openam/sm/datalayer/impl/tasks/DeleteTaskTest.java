@@ -29,27 +29,29 @@ public class DeleteTaskTest {
     private DeleteTask task;
     private LdapAdapter mockAdapter;
     private String tokenId;
+    private String etag;
     private ResultHandler<String, ?> mockResultHandler;
 
     @BeforeMethod
     public void setup() {
         tokenId = "badger";
+        etag = "ETAG";
         mockAdapter = mock(LdapAdapter.class);
         mockResultHandler = mock(ResultHandler.class);
 
-        task = new DeleteTask(tokenId, mockResultHandler);
+        task = new DeleteTask(tokenId, etag, mockResultHandler);
     }
 
     @Test
     public void shouldUseAdapterForDelete() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).delete(eq(tokenId));
+        verify(mockAdapter).delete(eq(tokenId), eq(etag));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).delete(anyString());
+                .when(mockAdapter).delete(anyString(), anyString());
         task.execute(mockAdapter);
         verify(mockResultHandler).processError(any(CoreTokenException.class));
     }

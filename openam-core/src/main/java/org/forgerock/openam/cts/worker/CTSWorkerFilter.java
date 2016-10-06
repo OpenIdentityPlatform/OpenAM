@@ -18,19 +18,19 @@ package org.forgerock.openam.cts.worker;
 import java.util.Collection;
 
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
- * Interface defining how to filter a set of IDs, which have been returned from the data layer in response to
- * a query by a {@link CTSWorkerQuery}.
+ * Interface defining how to filter a set of partial tokens, which have been returned from the data
+ * layer in response to a query by a {@link CTSWorkerQuery}.
  */
 public interface CTSWorkerFilter {
 
     /**
-     * Filters the set of ids passed in.
+     * Filters the set of partial tokens passed in.
      *
-     * @param ids Set of ids to filter.
-     * @return Set of filtered ids.
+     * @param tokens Set of partial tokens to filter.
+     * @return Set of filtered partial tokens.
      */
-    Collection<String> filter(Collection<String> ids);
-
+    Collection<PartialToken> filter(Collection<PartialToken> tokens);
 }

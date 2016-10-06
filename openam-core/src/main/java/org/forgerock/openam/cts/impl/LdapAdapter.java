@@ -16,10 +16,10 @@
 
 package org.forgerock.openam.cts.impl;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
-import javax.inject.Inject;
-
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -31,23 +31,33 @@ import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
+import org.forgerock.openam.sm.datalayer.api.OptimisticConcurrencyCheckFailedException;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.AssertionFailureException;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.DecodeException;
+import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.Entries;
 import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.controls.AssertionRequestControl;
+import org.forgerock.opendj.ldap.controls.PostReadRequestControl;
+import org.forgerock.opendj.ldap.controls.PostReadResponseControl;
+import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.Request;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-
-import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
@@ -87,13 +97,17 @@ public class LdapAdapter implements TokenStorageAdapter {
      * Create the Token in LDAP.
      *
      * @param token Non null Token to create.
+     * @return A copy of the created {@literal} {@code Token} with the ETag set.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    public void create(Token token) throws DataLayerException {
+    public Token create(Token token) throws DataLayerException {
         Entry entry = conversion.getEntry(token);
         try {
             getConnection();
-            processResult(connection.add(LDAPRequests.newAddRequest(entry)));
+            Result result = connection.add(LDAPRequests
+                .newAddRequest(entry)
+                .addControl(PostReadRequestControl.newControl(true, CoreTokenField.ETAG.toString())));
+            return tokenWithNewEtag(token, result);
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
@@ -111,7 +125,8 @@ public class LdapAdapter implements TokenStorageAdapter {
 
         try {
             getConnection();
-            SearchResultEntry resultEntry = connection.searchSingleEntry(LDAPRequests.newSingleEntrySearchRequest(dn));
+            SearchRequest request = LDAPRequests.newSingleEntrySearchRequest(dn, "*", CoreTokenField.ETAG.toString());
+            SearchResultEntry resultEntry = connection.searchSingleEntry(request);
             return conversion.tokenFromEntry(resultEntry);
         } catch (LdapException e) {
             Result result = e.getResult();
@@ -125,12 +140,17 @@ public class LdapAdapter implements TokenStorageAdapter {
     /**
      * Update the Token based on whether there were any changes between the two.
      *
+     * <p>If the {@literal previous} {@code Token} contains a non-{@code null}
+     * {@link CoreTokenField#ETAG} attribute value then the update will be performed with an
+     * optimistic concurrency check. If it does not contain the attribute or it contains a
+     * {@code null} value the update will be performed without any concurrency checks.</p>
+     *
      * @param previous The non null previous Token to check against.
-     * @param updated The non null Token to update with.
-     * @return True if the token was updated, or false if there were no changes detected.
-     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an
+     * assertion on the tokens ETag. Only possible if the {@link CoreTokenField#ETAG} attribute is
+     * present on the {@literal previous} token.
      */
-    public boolean update(Token previous, Token updated) throws DataLayerException {
+    public Token update(Token previous, Token updated) throws DataLayerException {
         Entry currentEntry = conversion.getEntry(updated);
         LdapTokenAttributeConversion.stripObjectClass(currentEntry);
 
@@ -140,33 +160,47 @@ public class LdapAdapter implements TokenStorageAdapter {
         ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry,
             Entries.diffOptions().replaceSingleValuedAttributes());
 
-        request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()));
-
         if (request.getModifications().isEmpty()) {
-            return false;
+            return previous;
         }
+
+        request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()))
+                .addControl(PostReadRequestControl.newControl(true, CoreTokenField.ETAG.toString()));
+        String previousEtag = previous.getValue(CoreTokenField.ETAG);
+        request = addEtagAssertionControl(request, previousEtag);
 
         try {
             getConnection();
-            processResult(connection.modify(request));
+            Result result = connection.modify(request);
+            return tokenWithNewEtag(updated, result);
+        } catch (AssertionFailureException e) {
+            throw new OptimisticConcurrencyCheckFailedException(updated.getTokenId(), previousEtag, e);
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
-
-        return true;
     }
 
     /**
      * Performs a delete against the Token ID provided.
      *
+     * <p>If the {@literal etag} parameter is a non-{@code null} value then the delete will be
+     * performed with an optimistic concurrency check. If it is {@code null} then the delete will
+     * be performed without any concurrency checks.</p>
+     *
      * @param tokenId The non null Token ID to delete.
+     * @param etag The ETag of the revision of the token to delete.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an assertion on the tokens ETag.
      */
-    public void delete(String tokenId) throws DataLayerException {
+    public void delete(String tokenId, String etag) throws DataLayerException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
         try {
             getConnection();
-            processResult(connection.delete(LDAPRequests.newDeleteRequest(dn)));
+            DeleteRequest request = LDAPRequests.newDeleteRequest(dn);
+            request = addEtagAssertionControl(request, etag);
+            verifySuccess(connection.delete(request));
+        } catch (AssertionFailureException e) {
+            throw new OptimisticConcurrencyCheckFailedException(tokenId, etag, e);
         } catch (LdapException e) {
             Result result = e.getResult();
             if (e.getResult() != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
@@ -215,11 +249,18 @@ public class LdapAdapter implements TokenStorageAdapter {
      * @param result Non null.
      * @throws LdapOperationFailedException Thrown if the result was not successful.
      */
-    private void processResult(Result result) throws LdapOperationFailedException {
+    private void verifySuccess(Result result) throws LdapOperationFailedException {
         ResultCode resultCode = result.getResultCode();
         if (resultCode.isExceptional()) {
             throw new LdapOperationFailedException(result);
         }
+    }
+
+    private Token tokenWithNewEtag(Token token, Result result) throws LdapOperationFailedException {
+        verifySuccess(result);
+        Token newToken = new Token(token);
+        newToken.setAttribute(CoreTokenField.ETAG, extractEtag(result));
+        return newToken;
     }
 
     private synchronized void getConnection() throws DataLayerException {
@@ -229,4 +270,23 @@ public class LdapAdapter implements TokenStorageAdapter {
         }
     }
 
+    private String extractEtag(Result result) throws LdapOperationFailedException {
+        try {
+            PostReadResponseControl control =
+                    result.getControl(PostReadResponseControl.DECODER, new DecodeOptions());
+            Entry entry = control.getEntry();
+            return entry.getAttribute(CoreTokenField.ETAG.toString()).firstValueAsString();
+        } catch (final DecodeException e) {
+            throw new LdapOperationFailedException("Failed to extract the e-tag", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Request> T addEtagAssertionControl(T request, String etag) {
+        if (etag != null) {
+            return (T) request.addControl(AssertionRequestControl.newControl(true,
+                    Filter.equality(CoreTokenField.ETAG.toString(), etag)));
+        }
+        return request;
+    }
 }

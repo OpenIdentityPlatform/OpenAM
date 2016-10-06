@@ -48,8 +48,8 @@ public class CreateTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.create(token);
-        handler.processResults(token);
+        Token created = adapter.create(token);
+        handler.processResults(created);
     }
 
     @Override

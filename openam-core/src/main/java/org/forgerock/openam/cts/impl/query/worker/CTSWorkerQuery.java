@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.worker.CTSWorkerInit;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
@@ -33,10 +34,10 @@ public interface CTSWorkerQuery {
     /**
      * Repeated calls will return further results from query.
      *
-     * @return Non null, non empty collection of {@link CoreTokenField#TOKEN_ID} to be
+     * @return Non null, non empty collection of {@link PartialToken} to be
      * processed by the {@link CTSWorkerTask}. Null indicates there are no more Tokens to process.
      *
      * @throws CoreTokenException If there was any unexpected error during processing.
      */
-    Collection<String> nextPage() throws CoreTokenException;
+    Collection<PartialToken> nextPage() throws CoreTokenException;
 }

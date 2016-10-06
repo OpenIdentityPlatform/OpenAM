@@ -30,6 +30,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.OptimisticConcurrencyCheckFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
@@ -169,9 +170,26 @@ public class TaskDispatcher {
      * @throws IllegalArgumentException If tokenId was null.
      */
     public void delete(String tokenId, ResultHandler<String, ?> handler) throws CoreTokenException {
+        delete(tokenId, null, handler);
+    }
+
+    /**
+     * The Token ID, for a specific revision of the token, to delete from the persistent store.
+     *
+     * @see TaskDispatcher
+     * @see org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration#getQueueTimeout()
+     *
+     * @param tokenId Non null Token ID.
+     * @param etag The ETag of the revision of the token to delete.
+     * @param handler Non null ResultHandler to notify.
+     *
+     * @throws CoreTokenException If there was an unexpected error during processing.
+     * @throws IllegalArgumentException If tokenId was null.
+     */
+    public void delete(String tokenId, String etag, ResultHandler<String, ?> handler) throws CoreTokenException {
         Reject.ifNull(tokenId);
         try {
-            taskExecutor.execute(tokenId, taskFactory.delete(tokenId, handler));
+            taskExecutor.execute(tokenId, taskFactory.delete(tokenId, etag, handler));
         } catch (DataLayerException e) {
             throw new CoreTokenException("Error in data layer", e);
         }

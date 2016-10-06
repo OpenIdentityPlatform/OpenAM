@@ -19,14 +19,15 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.forgerock.openam.cts.worker.CTSWorkerFilter;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
- * Basic filter that will return all ids passed in.
+ * Basic filter that will return all partial tokens passed in.
  */
 public class CTSWorkerSelectAllFilter implements CTSWorkerFilter {
 
     @Override
-    public Collection<String> filter(Collection<String> ids) {
+    public Collection<PartialToken> filter(Collection<PartialToken> ids) {
         return Collections.unmodifiableCollection(ids);
     }
 

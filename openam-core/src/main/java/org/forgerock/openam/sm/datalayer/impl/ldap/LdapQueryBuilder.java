@@ -16,15 +16,17 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import com.iplanet.services.ldap.event.EventService;
+import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
@@ -38,6 +40,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DecodeException;
@@ -48,9 +51,6 @@ import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
-
-import com.iplanet.services.ldap.event.EventService;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Constructs LDAP queries for execution of a specific {@link Filter} over a specific {@link Connection}.
@@ -130,7 +130,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
                 dataLayerConfiguration.getTokenStoreRootSuffix(),
                 SearchScope.WHOLE_SUBTREE,
                 ldapFilter,
-                requestedAttributes);
+                getRequestedAttributes());
         searchRequest.setSizeLimit(sizeLimit);
 
         if (isPagingResults()) {
@@ -173,6 +173,34 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
         }
 
         return entries;
+    }
+
+    /**
+     * We modify the requested attributes here to ensure the etag is
+     * returned in addition to what is already being requested for.
+     *
+     * @return The attributes to be queried for.
+     */
+    private String[] getRequestedAttributes() {
+        String[] attributes;
+        if (requestedAttributes.length == 0) {
+            attributes = new String[] {"*", CoreTokenField.ETAG.toString()};
+        } else if (isETagRequested()) {
+            attributes = requestedAttributes;
+        } else {
+            attributes = Arrays.copyOf(requestedAttributes, requestedAttributes.length + 1);
+            attributes[attributes.length - 1] = CoreTokenField.ETAG.toString();
+        }
+        return attributes;
+    }
+
+    private boolean isETagRequested() {
+        for (String attr : requestedAttributes) {
+            if (CoreTokenField.ETAG.toString().equals(attr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

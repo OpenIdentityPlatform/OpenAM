@@ -50,12 +50,13 @@ public class UpdateTask extends AbstractTask {
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
         Token previous = adapter.read(token.getTokenId());
+        Token updated;
         if (previous == null) {
-            adapter.create(token);
+            updated = adapter.create(token);
         } else {
-            adapter.update(previous, token);
+            updated = adapter.update(previous, token);
         }
-        handler.processResults(token);
+        handler.processResults(updated);
     }
 
     @Override

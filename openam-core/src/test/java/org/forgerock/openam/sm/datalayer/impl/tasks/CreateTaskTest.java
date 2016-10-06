@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -33,13 +34,16 @@ public class CreateTaskTest {
     private CreateTask task;
     private LdapAdapter mockAdapter;
     private Token mockToken;
+    private Token mockCreated;
     private ResultHandler<Token, ?> mockHandler;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws DataLayerException {
         mockToken = mock(Token.class);
+        mockCreated = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
         mockHandler = mock(ResultHandler.class);
+        given(mockAdapter.create(mockToken)).willReturn(mockCreated);
 
         task = new CreateTask(mockToken, mockHandler);
     }
@@ -61,6 +65,6 @@ public class CreateTaskTest {
     @Test
     public void shouldUpdateHandlerOnSuccess() throws Exception {
         task.execute(mockAdapter);
-        verify(mockHandler).processResults(mockToken);
+        verify(mockHandler).processResults(mockCreated);
     }
 }

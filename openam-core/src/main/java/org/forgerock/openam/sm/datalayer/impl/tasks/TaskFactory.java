@@ -71,7 +71,18 @@ public class TaskFactory {
      * @return Non null. Token delete Task.
      */
     public Task delete(String tokenId, ResultHandler<String, ?> handler) {
-        return new DeleteTask(tokenId, handler);
+        return delete(tokenId, null, handler);
+    }
+
+    /**
+     * Used to signal a delete operation for the given Token ID for a particular revision of the token.
+     *
+     * @param tokenId Non null. The token ID to delete.
+     * @param etag The ETag of the revision of the token to delete.
+     * @return Non null. Token delete Task.
+     */
+    public Task delete(String tokenId, String etag, ResultHandler<String, ?> handler) {
+        return new DeleteTask(tokenId, etag, handler);
     }
 
     /**

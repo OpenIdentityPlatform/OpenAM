@@ -34,30 +34,35 @@ import org.testng.annotations.Test;
 public class UpdateTaskTest {
     private UpdateTask task;
     private LdapAdapter mockAdapter;
-    private Token mockToken;
+    private Token mockPrevious;
+    private Token mockUpdated;
+    private Token mockReturned;
     private ResultHandler<Token, ?> mockHandler;
 
     @BeforeMethod
     public void setup() throws Exception {
-        mockToken = mock(Token.class);
+        mockUpdated = mock(Token.class);
+        mockPrevious = mock(Token.class);
+        mockReturned = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
         mockHandler = mock(ResultHandler.class);
-        task = new UpdateTask(mockToken, mockHandler);
+        task = new UpdateTask(mockUpdated, mockHandler);
 
-        given(mockAdapter.read(anyString())).willReturn(mockToken);
+        given(mockAdapter.read(anyString())).willReturn(mockPrevious);
+        given(mockAdapter.update(mockPrevious, mockUpdated)).willReturn(mockReturned);
     }
 
     @Test
     public void shouldUpdateWhenTokenPresent() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).update(any(Token.class), eq(mockToken));
+        verify(mockAdapter).update(eq(mockPrevious), eq(mockUpdated));
     }
 
     @Test
     public void shouldCreateWhenNotPresent() throws Exception {
         given(mockAdapter.read(anyString())).willReturn(null);
         task.execute(mockAdapter);
-        verify(mockAdapter).create(eq(mockToken));
+        verify(mockAdapter).create(eq(mockUpdated));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
@@ -70,6 +75,6 @@ public class UpdateTaskTest {
     @Test
     public void shouldCallHandlerOnSuccess() throws Exception {
         task.execute(mockAdapter);
-        verify(mockHandler).processResults(eq(mockToken));
+        verify(mockHandler).processResults(eq(mockReturned));
     }
 }

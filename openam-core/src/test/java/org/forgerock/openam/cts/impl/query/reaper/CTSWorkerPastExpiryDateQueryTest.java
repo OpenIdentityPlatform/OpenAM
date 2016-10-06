@@ -33,6 +33,7 @@ import java.util.Iterator;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -57,7 +58,7 @@ public class CTSWorkerPastExpiryDateQueryTest {
         mockBuilder = mock(QueryBuilder.class);
         given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
         given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
-        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
+        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class), any(CoreTokenField.class))).willReturn(mockBuilder);
 
         mockQueryFilterConverter = mock(QueryFilterVisitor.class);
         given(mockQueryFilterConverter.visitLessThanFilter((Void)isNull(), eq(CoreTokenField.EXPIRY_DATE), any(Calendar.class)))
@@ -84,37 +85,40 @@ public class CTSWorkerPastExpiryDateQueryTest {
     public void shouldQueryForNextPage() throws CoreTokenException {
         //given
         impl.setConnection(mockConnection);
-        Iterator<Collection<String>> mockIterator = mock(Iterator.class);
+        Iterator<Collection<PartialToken>> mockIterator = mock(Iterator.class);
         given(mockIterator.hasNext()).willReturn(true);
-        given(mockIterator.next()).willReturn(Arrays.asList("fred"));
-        given(mockBuilder.executeRawResults(mockConnection, String.class)).willReturn(mockIterator);
+        PartialToken token = mock(PartialToken.class);
+        given(mockIterator.next()).willReturn(Arrays.asList(token));
+        given(mockBuilder.executeRawResults(mockConnection, PartialToken.class)).willReturn(mockIterator);
 
         // when
-        Collection<String> page = impl.nextPage();
+        Collection<PartialToken> page = impl.nextPage();
 
         // then
         verify(mockIterator).hasNext();
         verify(mockIterator).next();
-        assertThat(page).containsOnly("fred");
+        assertThat(page).containsOnly(token);
     }
 
     @Test
     public void shouldLoopUntilIteratorEmpty() throws CoreTokenException {
         // Given
         impl.setConnection(mockConnection);
-        Iterator<Collection<String>> mockIterator = mock(Iterator.class);
-        given(mockBuilder.executeRawResults(mockConnection, String.class)).willReturn(mockIterator);
+        Iterator<Collection<PartialToken>> mockIterator = mock(Iterator.class);
+        given(mockBuilder.executeRawResults(mockConnection, PartialToken.class)).willReturn(mockIterator);
         given(mockIterator.hasNext()).willReturn(true, true, false);
-        given(mockIterator.next()).willReturn(Arrays.asList("fred"), Arrays.asList("barney"));
+        PartialToken token1 = mock(PartialToken.class);
+        PartialToken token2 = mock(PartialToken.class);
+        given(mockIterator.next()).willReturn(Arrays.asList(token1), Arrays.asList(token2));
 
         // When
-        Collection<String> page1 = impl.nextPage();
-        Collection<String> page2 = impl.nextPage();
-        Collection<String> page3 = impl.nextPage();
+        Collection<PartialToken> page1 = impl.nextPage();
+        Collection<PartialToken> page2 = impl.nextPage();
+        Collection<PartialToken> page3 = impl.nextPage();
 
         // Then
-        assertThat(page1).containsOnly("fred");
-        assertThat(page2).containsOnly("barney");
+        assertThat(page1).containsOnly(token1);
+        assertThat(page2).containsOnly(token2);
         assertThat(page3).isNull();
         verify(mockIterator, times(2)).next();
     }

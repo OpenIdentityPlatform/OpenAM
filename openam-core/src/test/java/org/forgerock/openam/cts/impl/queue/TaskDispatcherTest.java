@@ -121,7 +121,7 @@ public class TaskDispatcherTest {
     public void shouldDelete() throws Exception {
         // Given
         Task task = mock(Task.class);
-        given(mockTaskFactory.delete("123", mockHandler)).willReturn(task);
+        given(mockTaskFactory.delete(eq("123"), anyString(), eq(mockHandler))).willReturn(task);
 
         // When
         queue.delete("123", mockHandler);

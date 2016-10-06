@@ -16,15 +16,17 @@
 
 package org.forgerock.openam.cts.impl;
 
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.*;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -41,19 +43,29 @@ import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.DecodeException;
+import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.controls.AssertionRequestControl;
+import org.forgerock.opendj.ldap.controls.ControlDecoder;
+import org.forgerock.opendj.ldap.controls.PostReadRequestControl;
+import org.forgerock.opendj.ldap.controls.PostReadResponseControl;
+import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.Request;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
@@ -95,8 +107,8 @@ public class LdapAdapterTest {
         when(mockConnectionFactory.create()).thenReturn(mockConnection).thenReturn(mockConnection2);
 
         Result successResult = mockSuccessfulResult();
-        given(mockConnection2.add(any(Entry.class))).willReturn(successResult);
-        given(mockConnection.add(any(Entry.class))).willReturn(successResult);
+        given(mockConnection2.add(any(AddRequest.class))).willReturn(successResult);
+        given(mockConnection.add(any(AddRequest.class))).willReturn(successResult);
         given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
 
         //when
@@ -104,8 +116,8 @@ public class LdapAdapterTest {
         adapter.create(token); // second call fails validation of first connection, creates second
 
         //then
-        verify(mockConnection2, times(1)).add(any(Entry.class));
-        verify(mockConnection, times(1)).add(any(Entry.class));
+        verify(mockConnection2, times(1)).add(any(AddRequest.class));
+        verify(mockConnection, times(1)).add(any(AddRequest.class));
         verify(mockConnection, times(1)).close();
     }
 
@@ -115,7 +127,7 @@ public class LdapAdapterTest {
         Token token = new Token("badger", TokenType.SESSION);
 
         Result successResult = mockSuccessfulResult();
-        given(mockConnection.add(any(Entry.class))).willReturn(successResult);
+        given(mockConnection.add(any(AddRequest.class))).willReturn(successResult);
 
         given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
 
@@ -123,7 +135,7 @@ public class LdapAdapterTest {
         adapter.create(token);
 
         // Then
-        verify(mockConnection).add(any(Entry.class));
+        verify(mockConnection).add(any(AddRequest.class));
     }
 
     @Test
@@ -174,12 +186,187 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When
-        adapter.delete(tokenId);
+        adapter.delete(tokenId, null);
 
         // Then
         ArgumentCaptor<DeleteRequest> captor = ArgumentCaptor.forClass(DeleteRequest.class);
         verify(mockConnection).delete(captor.capture());
         assertEquals(testDN, captor.getValue().getName());
+    }
+
+    @Test
+    public void shouldAskForETagOnCreate() throws Exception {
+        //Given
+        Token token = new Token("badger", TokenType.SESSION);
+
+        Result successResult = mockSuccessfulResult();
+        given(mockConnection.add(any(AddRequest.class))).willReturn(successResult);
+        given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
+
+        //When
+        adapter.create(token);
+
+        //Then
+        ArgumentCaptor<AddRequest> requestCaptor = ArgumentCaptor.forClass(AddRequest.class);
+        verify(mockConnection).add(requestCaptor.capture());
+
+        PostReadRequestControl postReadRequestControl =
+                requestCaptor.getValue().getControl(PostReadRequestControl.DECODER, new DecodeOptions());
+        assertThat(postReadRequestControl).isNotNull();
+        assertThat(postReadRequestControl.getAttributes()).hasSize(1).containsExactly(CoreTokenField.ETAG.toString());
+    }
+
+    @Test
+    public void shouldAskForETagOnRead() throws Exception {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        // When
+        adapter.read(tokenId);
+
+        //Then
+        ArgumentCaptor<SearchRequest> requestCaptor = ArgumentCaptor.forClass(SearchRequest.class);
+        verify(mockConnection).searchSingleEntry(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().getAttributes())
+                .hasSize(2)
+                .containsExactly("*", CoreTokenField.ETAG.toString());
+    }
+
+    @Test
+    public void shouldAskForETagOnUpdate() throws Exception {
+        // Given
+        Token first = new Token("weasel", TokenType.SESSION);
+        Token second = new Token("badger", TokenType.SESSION);
+
+        Result successResult = mockSuccessfulResult();
+
+        given(mockConnection.modify(any(ModifyRequest.class))).willReturn(successResult);
+
+        LdapDataLayerConfiguration config = mock(LdapDataLayerConfiguration.class);
+        when(config.getTokenStoreRootSuffix()).thenReturn(DN.valueOf("ou=unit-test"));
+        LDAPDataConversion dataConversion = new LDAPDataConversion();
+        LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
+        LdapAdapter adapter = new LdapAdapter(conversion, null, null, mockConnectionFactoryProvider);
+
+        // When
+        adapter.update(first, second);
+
+        // Then
+        ArgumentCaptor<ModifyRequest> requestCaptor = ArgumentCaptor.forClass(ModifyRequest.class);
+        verify(mockConnection).modify(requestCaptor.capture());
+        PostReadRequestControl postReadRequestControl =
+                requestCaptor.getValue().getControl(PostReadRequestControl.DECODER, new DecodeOptions());
+        assertThat(postReadRequestControl).isNotNull();
+        assertThat(postReadRequestControl.getAttributes()).hasSize(1).containsExactly(CoreTokenField.ETAG.toString());
+    }
+
+    @Test
+    public void shouldAddETagAssertionOnUpdate() throws Exception {
+        // Given
+        Token first = new Token("weasel", TokenType.SESSION);
+        Token second = new Token("badger", TokenType.SESSION);
+        first.setAttribute(CoreTokenField.ETAG, "ETAG");
+
+        Result successResult = mockSuccessfulResult();
+
+        given(mockConnection.modify(any(ModifyRequest.class))).willReturn(successResult);
+
+        LdapDataLayerConfiguration config = mock(LdapDataLayerConfiguration.class);
+        when(config.getTokenStoreRootSuffix()).thenReturn(DN.valueOf("ou=unit-test"));
+        LDAPDataConversion dataConversion = new LDAPDataConversion();
+        LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
+        LdapAdapter adapter = new LdapAdapter(conversion, null, null, mockConnectionFactoryProvider);
+
+        // When
+        adapter.update(first, second);
+
+        // Then
+        ArgumentCaptor<ModifyRequest> requestCaptor = ArgumentCaptor.forClass(ModifyRequest.class);
+        verify(mockConnection).modify(requestCaptor.capture());
+
+        AssertionRequestControl assertionRequestControl =
+                requestCaptor.getValue().getControl(AssertionRequestControl.DECODER, new DecodeOptions());
+        assertThat(assertionRequestControl).isNotNull();
+        assertThat(assertionRequestControl.getFilter().toString()).isEqualTo("(etag=ETAG)");
+    }
+
+    @Test
+    public void shouldAddETagAssertionOnDelete() throws Exception {
+        // Given
+        String tokenId = "badger";
+        String etag = "ETAG";
+        DN testDN = DN.rootDN();
+
+        Result successResult = mockSuccessfulResult();
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        // When
+        adapter.delete(tokenId, etag);
+
+        // Then
+        ArgumentCaptor<DeleteRequest> requestCaptor = ArgumentCaptor.forClass(DeleteRequest.class);
+        verify(mockConnection).delete(requestCaptor.capture());
+
+        AssertionRequestControl assertionRequestControl =
+                requestCaptor.getValue().getControl(AssertionRequestControl.DECODER, new DecodeOptions());
+        assertThat(assertionRequestControl).isNotNull();
+        assertThat(assertionRequestControl.getFilter().toString()).isEqualTo("(etag=ETAG)");
+    }
+
+    @Test
+    public void shouldNotAddETagAssertionOnUpdateIfETagIsNull() throws Exception {
+        // Given
+        Token first = new Token("weasel", TokenType.SESSION);
+        Token second = new Token("badger", TokenType.SESSION);
+
+        Result successResult = mockSuccessfulResult();
+
+        given(mockConnection.modify(any(ModifyRequest.class))).willReturn(successResult);
+
+        LdapDataLayerConfiguration config = mock(LdapDataLayerConfiguration.class);
+        when(config.getTokenStoreRootSuffix()).thenReturn(DN.valueOf("ou=unit-test"));
+        LDAPDataConversion dataConversion = new LDAPDataConversion();
+        LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
+        LdapAdapter adapter = new LdapAdapter(conversion, null, null, mockConnectionFactoryProvider);
+
+        // When
+        adapter.update(first, second);
+
+        // Then
+        ArgumentCaptor<ModifyRequest> requestCaptor = ArgumentCaptor.forClass(ModifyRequest.class);
+        verify(mockConnection).modify(requestCaptor.capture());
+
+        AssertionRequestControl assertionRequestControl =
+                requestCaptor.getValue().getControl(AssertionRequestControl.DECODER, new DecodeOptions());
+        assertThat(assertionRequestControl).isNull();
+    }
+
+    @Test
+    public void shouldNotAddETagAssertionOnDeleteIfETagIsNull() throws Exception {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+
+        Result successResult = mockSuccessfulResult();
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        // When
+        adapter.delete(tokenId, null);
+
+        // Then
+        ArgumentCaptor<DeleteRequest> requestCaptor = ArgumentCaptor.forClass(DeleteRequest.class);
+        verify(mockConnection).delete(requestCaptor.capture());
+
+        AssertionRequestControl assertionRequestControl =
+                requestCaptor.getValue().getControl(AssertionRequestControl.DECODER, new DecodeOptions());
+        assertThat(assertionRequestControl).isNull();
     }
 
     @Test
@@ -194,7 +381,7 @@ public class LdapAdapterTest {
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
 
         // When / Then
-        adapter.delete(tokenId);
+        adapter.delete(tokenId, null);
     }
 
     @Test
@@ -210,7 +397,7 @@ public class LdapAdapterTest {
 
         // When / Then
         try {
-            adapter.delete(tokenId);
+            adapter.delete(tokenId, null);
             fail();
         } catch (LdapOperationFailedException e) {}
     }
@@ -327,10 +514,18 @@ public class LdapAdapterTest {
         assertThat(result).containsOnly(partialToken);
     }
 
-    private static Result mockSuccessfulResult() {
+    private static Result mockSuccessfulResult() throws DecodeException {
         Result result = mock(Result.class);
+        Entry entry = mock(Entry.class);
+        PostReadResponseControl control = PostReadResponseControl.newControl(entry);
+        Attribute attribute = mock(Attribute.class);
         ResultCode resultCode = ResultCode.SUCCESS;
+        given(result.addControl(any(PostReadRequestControl.class))).willReturn(result);
         given(result.getResultCode()).willReturn(resultCode);
+        given(result.getControl(Matchers.<ControlDecoder<PostReadResponseControl>>any(),
+                any(DecodeOptions.class))).willReturn(control);
+        given(entry.getAttribute(CoreTokenField.ETAG.toString())).willReturn(attribute);
+        given(attribute.firstValueAsString()).willReturn(RandomStringUtils.random(4));
         return result;
     }
 }

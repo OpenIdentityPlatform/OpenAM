@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * Deletes batches of Token IDs from the persistence layer.
@@ -44,18 +46,18 @@ public class TokenDeletion {
      *
      * This function will defer to the {@link TaskDispatcher} for deletion requests.
      *
-     * @param tokens The Token ID's to delete.
+     * @param tokens The partial tokens to delete.
      *
      * @return CountDownLatch A CountDownLatch which can be blocked on to ensure that
      * the delete tasks have been completed.
      *
      * @throws CoreTokenException If there was any problem queuing the delete operation.
      */
-    public CountDownLatch deleteBatch(Collection<String> tokens) throws CoreTokenException {
+    public CountDownLatch deleteBatch(Collection<PartialToken> tokens) throws CoreTokenException {
         CountDownLatch latch = new CountDownLatch(tokens.size());
         ResultHandler<String, CoreTokenException> handler = new CountdownHandler(latch);
-        for (String token : tokens) {
-            queue.delete(token, handler);
+        for (PartialToken token : tokens) {
+            queue.delete(token.<String>getValue(CoreTokenField.TOKEN_ID), null, handler);
         }
         return latch;
     }

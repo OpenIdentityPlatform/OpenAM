@@ -15,11 +15,10 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
-import static org.forgerock.openam.utils.Time.*;
-
-import java.util.Calendar;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
 
 import javax.inject.Inject;
+import java.util.Calendar;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -57,7 +56,7 @@ public class CTSWorkerPastExpiryDateQuery<C, F> extends CTSWorkerBaseQuery {
         return queryFactory.createInstance()
                 .withFilter(filter.accept(queryFactory.createFilterConverter(), null))
                 .pageResultsBy(pageSize)
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID);
+                .returnTheseAttributes(CoreTokenField.TOKEN_ID, CoreTokenField.ETAG);
     }
 
 }

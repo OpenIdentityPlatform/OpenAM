@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.util.Reject;
 
@@ -31,7 +32,7 @@ import org.forgerock.util.Reject;
  */
 public abstract class CTSWorkerBaseQuery<C, F> implements CTSWorkerQuery {
 
-    private Iterator<Collection<String>> results;
+    private Iterator<Collection<PartialToken>> results;
     private C connection;
 
     /**
@@ -50,11 +51,11 @@ public abstract class CTSWorkerBaseQuery<C, F> implements CTSWorkerQuery {
      * @throws CoreTokenException {@inheritDoc}
      */
     @Override
-    public Collection<String> nextPage() throws CoreTokenException {
+    public Collection<PartialToken> nextPage() throws CoreTokenException {
         Reject.ifTrue(connection == null, "Connection must be assigned before use");
 
         if (results == null) {
-            results = getQuery().executeRawResults(connection, String.class);
+            results = getQuery().executeRawResults(connection, PartialToken.class);
         }
 
         if (isQueryComplete()) {
