@@ -14,15 +14,16 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
+import _ from "lodash";
 import $ from "jquery";
+
+import { populateRealmsDropdown } from "org/forgerock/openam/ui/common/util/NavigationHelper";
 import AbstractView from "org/forgerock/commons/ui/common/main/AbstractView";
 import BootstrapDialog from "org/forgerock/commons/ui/common/components/BootstrapDialog";
 import Messages from "org/forgerock/commons/ui/common/components/Messages";
-import NavigationHelper from "org/forgerock/openam/ui/common/util/NavigationHelper";
 import RealmsService from "org/forgerock/openam/ui/admin/services/global/RealmsService";
 import TemplateBasedView from "org/forgerock/openam/ui/common/components/TemplateBasedView";
 import ToggleCardListView from "org/forgerock/openam/ui/admin/views/common/ToggleCardListView";
-import _ from "lodash";
 
 class ListRealmsView extends AbstractView {
     constructor () {
@@ -128,7 +129,7 @@ class ListRealmsView extends AbstractView {
             }
             self.data.realms = data.result;
             self.data.allRealmPaths = [];
-            NavigationHelper.populateRealmsDropdown(data);
+            populateRealmsDropdown(data);
 
             _.each(self.data.realms, (realm) => {
                 realm.isTopLevelRealm = self.isTopLevelRealm(realm.path);
