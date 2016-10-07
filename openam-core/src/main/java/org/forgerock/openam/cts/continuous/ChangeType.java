@@ -1,4 +1,4 @@
-package org.forgerock.openam.cts.continuous;/*
+/*
 * The contents of this file are subject to the terms of the Common Development and
 * Distribution License (the License). You may not use this file except in compliance with the
 * License.
@@ -13,6 +13,8 @@ package org.forgerock.openam.cts.continuous;/*
 *
 * Copyright 2016 ForgeRock AS.
 */
+
+package org.forgerock.openam.cts.continuous;
 
 /**
  * Indicates the type of change which occurred to a token, which can be understood at the CTS (above the data layer)
