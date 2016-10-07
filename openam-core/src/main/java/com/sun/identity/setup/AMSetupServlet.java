@@ -915,7 +915,7 @@ public class AMSetupServlet extends HttpServlet {
             // create .storepass and .keypass files to unlock the keystore
             // The template keystore file stores the password protected with "changeit"
             String storePass = AMSetupUtils.getRandomString();
-            createPasswordFiles(basedir, storePass, "changeit");
+            createPasswordFiles(basedir + deployuri, storePass, "changeit");
             if (!isDITLoaded) {
                 if ((userRepo == null) || userRepo.isEmpty()) {
                     createDemoUser();
@@ -1058,12 +1058,12 @@ public class AMSetupServlet extends HttpServlet {
      */
     static String getBootStrapFile() throws ConfiguratorException {
         String bootstrap = null;
-        String bootProps = null;
+        String bootJson = null;
 
         String configDir = getPresetConfigDir();
         if (configDir != null && configDir.length() > 0) {
             bootstrap = configDir + "/bootstrap";
-            bootProps = configDir + "/boot.properties";
+            bootJson = configDir + "/boot.json";
         } else {
             String locator = getBootstrapLocator();
             FileReader frdr = null;
@@ -1073,7 +1073,7 @@ public class AMSetupServlet extends HttpServlet {
                 BufferedReader brdr = new BufferedReader(frdr);
                 String basePath = brdr.readLine();
                 bootstrap = basePath + "/bootstrap";
-                bootProps = basePath + "/boot.properties";
+                bootJson = basePath + "/boot.json";
             } catch (IOException e) {
                 //ignore
             } finally {
@@ -1093,22 +1093,21 @@ public class AMSetupServlet extends HttpServlet {
                 bootstrap = null;
             }
         }
-        if (bootProps != null) {
-            File test = new File(bootProps);
+        if (bootJson != null) {
+            File test = new File(bootJson);
             if (!test.exists()) {
-                bootProps = null;
+                bootJson = null;
             }
         }
 
-        return bootstrap != null ? bootstrap : bootProps;
+        return bootstrap != null ? bootstrap : bootJson;
     }
 
     /**
      * Determine if we can boot from one of
      * <ul>
      *     <li>legacy bootstrap file</li>
-     *     <li>boot.properties</li>
-     *     <li>environment variables</li>
+     *     <li>boot.json</li>
      * </ul>
      *
      * @return true if the system can boot from files or environment variables
@@ -1116,20 +1115,8 @@ public class AMSetupServlet extends HttpServlet {
      */
     static boolean canBootstrap() throws ConfiguratorException {
         String bsFile = getBootStrapFile();
-        if (bsFile != null) {
-            return true;
-        }
-        // if no boot props found we can still boot from env vars
-        // this is the minimal env var required - the rest can default
-
-        String env = null;
-
-        try {
-            env = System.getenv(BootstrapData.ENV_OPENAM_INSTANCE);
-        } catch(SecurityException ex) {
-            throw new ConfiguratorException("Could not read environment variables e=" + ex.getMessage());
-        }
-        return env != null;
+        // We may do more checks here in the future.
+        return bsFile != null;
     }
 
     // this is the file which contains the base dir.
@@ -1571,7 +1558,7 @@ public class AMSetupServlet extends HttpServlet {
      * @param f - the File handle to the file
      * @throws IOException if the file does not exist or permissions can not be changed
      */
-    private static void chmodFileReadOnly(File f) throws IOException {
+    public static void chmodFileReadOnly(File f) throws IOException {
         // Tyy to chmod the file to be owner readable only
         if ( !(f.setReadOnly() && f.setReadable(false, false) && f.setReadable(true, true))) {
             // Unable to set permissions...

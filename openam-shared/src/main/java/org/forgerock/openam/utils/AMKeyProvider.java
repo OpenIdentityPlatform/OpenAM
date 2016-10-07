@@ -20,16 +20,8 @@
 
 package org.forgerock.openam.utils;
 
-import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.security.SecurityDebug;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
+import static java.nio.charset.StandardCharsets.*;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.DestroyFailedException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,7 +42,18 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
+
+import org.forgerock.openam.keystore.KeyStoreConfig;
+
+import com.sun.identity.saml.xmlsig.KeyProvider;
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.security.SecurityDebug;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * Implementation of a {@code KeyProvider} interface for retrieving X509 Certificates and private
@@ -70,6 +73,8 @@ public class AMKeyProvider implements KeyProvider {
     private String keystorePass   = "";
     private String keystoreFile = "";
     private String keystoreType = "JKS";
+    private String storePassPath;
+    private String keyPassPath;
 
     HashMap keyTable = new HashMap();
 
@@ -79,6 +84,23 @@ public class AMKeyProvider implements KeyProvider {
     public AMKeyProvider() {
         this(DEFAULT_KEYSTORE_FILE_PROP, DEFAULT_KEYSTORE_PASS_FILE_PROP,
                 DEFAULT_KEYSTORE_TYPE_PROP, DEFAULT_PRIVATE_KEY_PASS_FILE_PROP);
+    }
+
+    /**
+     * Create a new instance of AMKeyProvider from a KeyStoreConfiguration object.
+     *
+     * @param kc The KeyStore configuration
+     * @throws KeyStoreException if the keystore could not be opened or initialized
+     * @throws IOException If the storepass or keypass files could not be opened
+     */
+    public AMKeyProvider(KeyStoreConfig kc) throws KeyStoreException, IOException {
+        this.keystoreFile =     kc.getKeyStoreFile();
+        this.keystorePass =     new String(kc.getKeyStorePassword());
+        this.privateKeyPass =   new String(kc.getKeyPassword());
+        this.keystoreType =     kc.getKeyStoreType();
+        this.storePassPath =    kc.getKeyStorePasswordFile();
+        this.keyPassPath =      kc.getKeyPasswordFile();
+        mapPk2Cert();
     }
 
     /**
@@ -94,22 +116,6 @@ public class AMKeyProvider implements KeyProvider {
             String keyStoreTypePropName, String privateKeyPassFilePropName) {
         initialize(keyStoreFilePropName, keyStorePassFilePropName,
                 keyStoreTypePropName, privateKeyPassFilePropName);
-        mapPk2Cert();
-    }
-
-    /**
-     * Constructor - Opens keystore.jceks at a known base dir location.
-     * Assumes the base directory has .storepass and .keypass in cleartext
-     *
-     * @param baseDir - The base directory where keystore.jceks , .storepass and .keypass can be found
-     * @param decryptPassword true if the keystore passwords need to be decrypted with an OpenAM instance key
-     */
-    public AMKeyProvider(String baseDir, boolean decryptPassword) {
-        String b = baseDir.endsWith("/") ?  baseDir : baseDir + "/";
-        this.keystoreFile =     b + "keystore.jceks";
-        this.keystorePass =     readPasswordFile(b + ".storepass", decryptPassword);
-        this.privateKeyPass =   readPasswordFile(b + ".keypass", decryptPassword);
-        this.keystoreType =     "JCEKS";
         mapPk2Cert();
     }
 
@@ -145,23 +151,23 @@ public class AMKeyProvider implements KeyProvider {
             logger.error("JKSKeyProvider: keystore file does not exist");
         }
 
-        String kspfile = SystemPropertiesManager.get(keyStorePassFilePropName);
+        this.storePassPath = SystemPropertiesManager.get(keyStorePassFilePropName);
 
         String tmpKsType = SystemPropertiesManager.get(keyStoreTypePropName);
         if (null != tmpKsType) {
             keystoreType = tmpKsType.trim();
         }
 
-        if (kspfile != null) {
-            keystorePass = readPasswordFile(kspfile, false);
+        if (storePassPath != null) {
+            keystorePass = readPasswordFile(storePassPath, false);
         } else {
             logger.error("JKSKeyProvider: keystore password is null");
         }
 
-        String pkpfile = SystemPropertiesManager.get(privateKeyPassFilePropName);
+        this.keyPassPath = SystemPropertiesManager.get(privateKeyPassFilePropName);
 
-        if (pkpfile != null) {
-            privateKeyPass = readPasswordFile(pkpfile, false);
+        if (keyPassPath != null) {
+            privateKeyPass = readPasswordFile(keyPassPath, false);
         }
     }
 
@@ -440,13 +446,23 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
-     * Set a new path for the keystore. If this is used after the keystore is created, it
-     * will cause store() to write to the new path.
-     * @param newPath New path the keystore will be saved to on store()
+     * Get the storepass path.
+     *
+     * @return the file path to .storepass
      */
-    public void setKeyStoreFilePath(String newPath) {
-        keystoreFile = newPath;
+    public String getKeystorePasswordFilePath() {
+        return this.storePassPath;
     }
+
+    /**
+     * Get the .keypass path. This is the optional per key password, and is usually the same as the storepass.
+     *
+     * @return the file path to .keypass
+     */
+    public String getKeyPasswordFilePath() {
+        return this.keyPassPath;
+    }
+
 
     /**
      * Get the keystore.
@@ -496,7 +512,7 @@ public class AMKeyProvider implements KeyProvider {
      */
     public void store() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
         try {
-//            Save keystore to file.
+            //  Save keystore to file.
             FileOutputStream keyStoreOStream =
                     new FileOutputStream(keystoreFile);
             ks.store(keyStoreOStream, keystorePass.toCharArray());
@@ -563,7 +579,6 @@ public class AMKeyProvider implements KeyProvider {
                 // guaranteed to work anyway.
             }
         }
-
     }
 
     /**
