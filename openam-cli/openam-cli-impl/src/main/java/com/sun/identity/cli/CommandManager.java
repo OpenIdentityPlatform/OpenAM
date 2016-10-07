@@ -114,6 +114,11 @@ public class CommandManager {
             try {
                 //Set specific modules for the Guice InjectorHolder to be initialised with.
                 InjectorConfiguration.setGuiceModuleLoader(new CliGuiceModuleLoader());
+                // Due to changes in the bootstrap code, ssoadm triggers earlier logging of the amSecurity instance
+                // This happens at MESSSAGE level - which gets sent to stdout, and messes up the output of ssoadm
+                // We suppresses the MESSAGE level default for this debug instance.
+                final Debug debug = Debug.getInstance("amSecurity");
+                debug.setDebug(Debug.ERROR);
                 Bootstrap.load();
                 // Initialize AdminTokenAction
                 AdminTokenAction.getInstance().authenticationInitialized();
