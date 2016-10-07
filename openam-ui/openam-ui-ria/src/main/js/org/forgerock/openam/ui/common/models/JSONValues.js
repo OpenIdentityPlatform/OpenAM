@@ -122,7 +122,7 @@ define([
          * @returns {JSONValues} JSONValues object with new value set
          */
         addValueForKey (path, key, value) {
-            const clone = _.clone(this.raw);
+            const clone = _.cloneDeep(this.raw);
             clone[path][key] = value;
             return new JSONValues(clone);
         }
