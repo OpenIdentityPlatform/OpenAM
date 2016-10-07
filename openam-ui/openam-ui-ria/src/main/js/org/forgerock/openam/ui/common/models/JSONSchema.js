@@ -83,42 +83,6 @@ define([
         return schema;
     }
 
-    /**
-     * Groups simple properties together in a pseudo collection. Property is considered simple, if it is not a
-     * collection of properties itself. The new collection will be translated into its own tab on the UI.
-     *
-     * @param   {Object} raw Schema
-     * @param   {string} propertyKey Key of the property value object
-     * @param   {string} pseudoCollectionName Simple properties will be grouped under this name
-     * @param   {string} pseudoCollectionDisplayName Display name of the pseudo tab
-     * @returns {JSONSchema} JSONSchema new JSONSchema object
-     */
-    function groupSimplePropertiesInPseudoCollection (raw, propertyKey, pseudoCollectionName,
-        pseudoCollectionDisplayName) {
-
-        if (_.isEmpty(_.pick(raw.properties, propertyKey))) {
-            return raw;
-        }
-
-        const schema = _.cloneDeep(raw);
-        const simpleProperties = _.pick(schema.properties[propertyKey], (property) => {
-            return !_.has(property, "properties");
-        });
-
-        if (!_.isEmpty(simpleProperties)) {
-            schema.properties[propertyKey][pseudoCollectionName] = {
-                properties: simpleProperties,
-                propertyOrder: -10,
-                title: pseudoCollectionDisplayName,
-                type: "object"
-            };
-
-            schema.properties[propertyKey] = _.omit(schema.properties[propertyKey], _.keys(simpleProperties));
-        }
-
-        return schema;
-    }
-
     function throwOnNoSchemaRootType (schema) {
         if (!schema.type) {
             throw new Error("[JSONSchema] No \"type\" attribute found on schema root object.");
@@ -126,17 +90,29 @@ define([
     }
 
     /**
-    * Unwraps specified property, moving its child properties one level up.
+    * Ungroups collection properties, moving them one level up.
     *
     * @param   {Object} raw Schema
-    * @param   {string} propertyKey Key of the property value object
+    * @param   {string} groupKey Group key of the property value object
     * @returns {JSONSchema} JSONSchema new JSONSchema object
     */
-    function unwrapProperty (raw, propertyKey) {
-        const schema = _.cloneDeep(raw);
+    function ungroupCollectionProperties (raw, groupKey) {
+        const collectionProperties = _.pick(raw.properties[groupKey].properties, (value) => {
+            return value.type === "object";
+        });
 
-        schema.properties = { ...schema.properties, ...schema.properties[propertyKey] };
-        delete schema.properties[propertyKey];
+        if (_.isEmpty(collectionProperties)) {
+            return raw;
+        }
+
+        const schema = _.cloneDeep(raw);
+        schema.properties = { ...schema.properties, ...collectionProperties };
+        schema.properties[groupKey].properties =
+            _.omit(schema.properties[groupKey].properties, _.keys(collectionProperties));
+
+        if (_.isEmpty(schema.properties[groupKey].properties)) {
+            delete schema.properties[groupKey];
+        }
 
         return schema;
     }
@@ -185,9 +161,7 @@ define([
             }
 
             if (hasDefaults) {
-                schema = groupSimplePropertiesInPseudoCollection(schema, "defaults", "realmDefaults",
-                    i18next.t("console.common.realmDefaults"));
-                schema = unwrapProperty(schema, "defaults");
+                schema = ungroupCollectionProperties(schema, "defaults");
             }
 
             schema = cleanJSONSchema(schema);

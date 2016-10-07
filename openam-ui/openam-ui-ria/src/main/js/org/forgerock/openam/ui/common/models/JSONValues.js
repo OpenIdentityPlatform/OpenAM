@@ -62,44 +62,30 @@ define([
     }
 
     /**
-     * Groups simple properties together in a pseudo collection. Property is considered simple, if it is not a
-     * collection of properties itself. The new collection will be translated into its own tab on the UI.
-     *
-     * @param   {Object} raw Values
-     * @param   {string} propertyKey Key of the property value object
-     * @param   {string} pseudoCollectionName Simple properties will be grouped under this name
-     * @returns {JSONValues} JSONValues object with new value set
-     */
-    function groupSimplePropertiesInPseudoCollection (raw, propertyKey, pseudoCollectionName) {
-        const values = _.cloneDeep(raw);
-        const simpleProperties = _.pick(values[propertyKey], (value) => {
-            return !_.isObject(value) || _.isArray(value);
-        });
-
-        if (!_.isEmpty(simpleProperties)) {
-            values[propertyKey][pseudoCollectionName] = simpleProperties;
-            values[propertyKey] = _.omit(values[propertyKey], _.keys(simpleProperties));
-        }
-
-        return values;
-    }
-
-    /**
-    * Unwraps specified value, moving its child properties one level up.
+    * Ungroups collection properties, moving them one level up.
     *
     * @param   {Object} raw Values
-    * @param   {string} propertyKey Key of the property value object
-    * @param   {string} pseudoCollectionName Simple properties are grouped under this name
+    * @param   {string} groupKey Group key of the property value object
     * @returns {JSONValues} JSONValues object with new value set
     */
-    function unwrapValue (raw, propertyKey, pseudoCollectionName) {
-        const values = { ...raw, ...raw[propertyKey] };
-        const collectionPropertiesKeys = _.without(_.keys(raw[propertyKey]), pseudoCollectionName);
+    function ungroupCollectionProperties (raw, groupKey) {
+        const collectionProperties = _.pick(raw[groupKey], (value) => {
+            return _.isObject(value) && !_.isArray(value);
+        });
 
-        if (!_.isEmpty(collectionPropertiesKeys)) {
-            values[`_${propertyKey}CollectionProperties`] = collectionPropertiesKeys;
+        if (_.isEmpty(collectionProperties)) {
+            return raw;
         }
-        delete values[propertyKey];
+
+        const values = { ...raw, ...collectionProperties };
+
+        const collectionPropertiesKeys = _.keys(collectionProperties);
+        values[`_${groupKey}CollectionProperties`] = collectionPropertiesKeys;
+        values[groupKey] = _.omit(values[groupKey], collectionPropertiesKeys);
+
+        if (_.isEmpty(values[groupKey])) {
+            delete values[groupKey];
+        }
 
         return values;
     }
@@ -114,8 +100,7 @@ define([
             }
 
             if (hasDefaults) {
-                values = groupSimplePropertiesInPseudoCollection(values, "defaults", "realmDefaults");
-                values = unwrapValue(values, "defaults", "realmDefaults");
+                values = ungroupCollectionProperties(values, "defaults");
             }
 
             this.raw = Object.freeze(values);
@@ -177,14 +162,6 @@ define([
         toJSON () {
             let json = _.cloneDeep(this.raw);
 
-            const unwrapPseudoCollection = (json, propertyKey, pseudoCollectionName) => {
-                const data = _.cloneDeep(json);
-
-                data[propertyKey] = data[pseudoCollectionName];
-
-                return data;
-            };
-
             const wrapCollectionProperties = (json, propertyKey) => {
                 let data = _.cloneDeep(json);
 
@@ -196,31 +173,15 @@ define([
                 return data;
             };
 
-            const deletePseudoData = (json, propertyKey, pseudoChildrenCollectionName) => {
-                const data = _.cloneDeep(json);
-
-                delete data[`_${propertyKey}CollectionProperties`];
-                delete data[pseudoChildrenCollectionName];
-
-                return data;
-            };
-
-            const pseudoCollectionPresent = (json, collectionName) => json.hasOwnProperty(collectionName);
-
             const collectionPropertiesPresent = (json, propertyKey) => {
                 const collectionPropertiesKeys = json[`_${propertyKey}CollectionProperties`];
                 return collectionPropertiesKeys && !_.isEmpty(collectionPropertiesKeys);
             };
 
-            if (pseudoCollectionPresent(json, "realmDefaults")) {
-                json = unwrapPseudoCollection(json, "defaults", "realmDefaults");
-            }
-
             if (collectionPropertiesPresent(json, "defaults")) {
                 json = wrapCollectionProperties(json, "defaults");
+                delete json._defaultsCollectionProperties;
             }
-
-            json = deletePseudoData(json, "defaults", "realmDefaults");
 
             json = { ...json, ...json.global };
             delete json.global;
