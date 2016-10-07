@@ -19,10 +19,12 @@ define([
 ], (JSONValues) => {
     describe("org/forgerock/openam/ui/common/models/JSONValues", () => {
         describe("#constructor", () => {
-            let values;
+            let globalValues;
+            let defaultsValues;
+            let defaultsCollectionValues;
 
             beforeEach(() => {
-                values = new JSONValues({
+                globalValues = new JSONValues({
                     "_id": "",
                     "_type": {},
                     "globalSimpleKey": "globalSimpleValue",
@@ -30,40 +32,64 @@ define([
                         "collectionItem_1": "collectionItemValue_1",
                         "collectionItem_2": "collectionItemValue_12"
                     },
+                    "dynamic": {}
+                });
+
+                defaultsValues = new JSONValues({
+                    "_id": "",
+                    "_type": {},
                     "defaults": {
                         "defaultsCollection": {
                             "collectionItem1": "value1",
                             "collectionItem2": "value2"
                         },
                         "defaultsSimple": "simpleValue"
-                    },
-                    "dynamic": {
-                        "dynamicSimple": "simpleValue"
+                    }
+                });
+
+                defaultsCollectionValues = new JSONValues({
+                    "_id": "",
+                    "_type": {},
+                    "defaults": {
+                        "defaultsCollection": {
+                            "collectionItem1": "value1",
+                            "collectionItem2": "value2"
+                        }
                     }
                 });
             });
 
+            //Global values
             it("groups the top-level simple values under a \"global\" value", () => {
-                expect(values.raw).to.contain.keys("global");
-                expect(values.raw.global).to.contain.keys("globalSimpleKey");
+                expect(globalValues.raw).to.contain.keys("global");
+                expect(globalValues.raw.global).to.contain.keys("globalSimpleKey");
             });
 
             it("does not group the top-level collection values under a \"global\" value", () => {
-                expect(values.raw).to.contain.keys("global");
-                expect(values.raw.global).to.not.contain.keys("globalCollectionKey");
+                expect(globalValues.raw).to.contain.keys("global");
+                expect(globalValues.raw.global).to.not.contain.keys("globalCollectionKey");
             });
 
-            it("groups simple values in \"defaults\" into a pseudo collection \"realmDefaults\"", () => {
-                expect(values.raw).to.contain.keys("realmDefaults");
-                expect(values.raw.realmDefaults).to.contain.keys("defaultsSimple");
+            //Defaults values
+            it("does not ungroup \"defaults\" simple values", () => {
+                expect(defaultsValues.raw).to.contain.keys("defaults");
+                expect(defaultsValues.raw.defaults).to.contain.keys("defaultsSimple");
             });
 
-            it("flattens values in \"defaults\" onto the top-level values", () => {
-                expect(values.raw).to.contain.keys("defaultsCollection");
+            it("ungroups \"defaults\" collection values, moving them one level up", () => {
+                expect(defaultsValues.raw).to.contain.keys("defaultsCollection");
             });
 
             it("contains \"_defaultsCollectionProperties\"", () => {
-                expect(values.raw).to.contain.keys("_defaultsCollectionProperties");
+                expect(defaultsValues.raw).to.contain.keys("_defaultsCollectionProperties");
+            });
+
+            it("ungroups \"defaults\" collection values, moving them one level up (collection props only)", () => {
+                expect(defaultsCollectionValues.raw).to.contain.keys("defaultsCollection");
+            });
+
+            it("removes \"defaults\" property when there are no simple props", () => {
+                expect(defaultsCollectionValues.raw).to.not.have.keys("defaults");
             });
         });
         describe("#addInheritance", () => {
@@ -118,7 +144,7 @@ define([
                     "_id": {},
                     "_type": {},
                     "globalValue": {},
-                    "realmDefaults": {
+                    "defaults": {
                         "defaultsSimple": "simpleValue"
                     },
                     "dynamic": {

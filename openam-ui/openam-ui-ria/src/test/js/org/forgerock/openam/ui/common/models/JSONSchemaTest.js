@@ -37,10 +37,12 @@ define([
         });
 
         describe("#constructor", () => {
-            let schema;
+            let schemaWithGlobalProps;
+            let schemaWithDefaultsProps;
+            let schemaWithDefaultsCollectionProps;
 
             beforeEach(() => {
-                schema = new JSONSchema({
+                schemaWithGlobalProps = new JSONSchema({
                     "properties": {
                         "globalSimpleProperty": {},
                         "globalCollectionProperty": {
@@ -48,21 +50,40 @@ define([
                             "title": "",
                             "properties": {}
                         },
+                        "dynamic": {}
+                    },
+                    "type": "object"
+                });
+
+                schemaWithDefaultsProps = new JSONSchema({
+                    "properties": {
                         "defaults": {
-                            "defaultsCollection": {
-                                "type": "object",
-                                "title": "",
-                                "properties": {
-                                    "defaultsProperty": {}
-                                }
-                            },
-                            "defaultsSimpleProperty": {}
-                        },
-                        "dynamic": {
                             "type": "object",
                             "title": "",
                             "properties": {
-                                "dynamicSimpleProperty": {}
+                                "defaultsSimpleProperty": {},
+                                "defaultsCollectionProperty": {
+                                    type: "object",
+                                    title: "",
+                                    properties: {}
+                                }
+                            }
+                        }
+                    },
+                    "type": "object"
+                });
+
+                schemaWithDefaultsCollectionProps = new JSONSchema({
+                    "properties": {
+                        "defaults": {
+                            "type": "object",
+                            "title": "",
+                            "properties": {
+                                "defaultsCollectionProperty": {
+                                    type: "object",
+                                    title: "",
+                                    properties: {}
+                                }
                             }
                         }
                     },
@@ -70,33 +91,43 @@ define([
                 });
             });
 
+            // Global properties
             it("groups the top-level simple properties under a \"global\" property", () => {
-                expect(schema.raw.properties).to.contain.keys("global");
-                expect(schema.raw.properties.global.properties).to.have.keys("globalSimpleProperty");
+                expect(schemaWithGlobalProps.raw.properties).to.contain.keys("global");
+                expect(schemaWithGlobalProps.raw.properties.global.properties).to.contain.keys("globalSimpleProperty");
             });
 
             it("groups the top-level simple properties with title", () => {
                 expect(i18next.t).to.be.calledWith("console.common.globalAttributes");
-                expect(schema.raw.properties.global.title).eq("Global Attributes");
+                expect(schemaWithGlobalProps.raw.properties.global.title).eq("Global Attributes");
             });
 
             it("groups the top-level simple properties with property order", () => {
-                expect(schema.raw.properties.global.propertyOrder).eq(-10);
+                expect(schemaWithGlobalProps.raw.properties.global.propertyOrder).eq(-10);
             });
 
             it("does not group the top-level collection properties under a \"global\" property", () => {
-                expect(schema.raw.properties).to.contain.keys("global");
-                expect(schema.raw.properties.global.properties).to.not.have.keys("globalCollectionProperty");
+                expect(schemaWithGlobalProps.raw.properties).to.contain.keys("global");
+                expect(schemaWithGlobalProps.raw.properties.global.properties).to.not.have
+                    .keys("globalCollectionProperty");
             });
 
-            it("unwraps properties in \"defaults\" onto the top-level properties", () => {
-                expect(schema.raw.properties).to.contain.keys("realmDefaults");
-                expect(schema.raw.properties).to.contain.keys("defaultsCollection");
+            //Defaults properties
+            it("ungroups \"defaults\" collection properties, moving them one level up", () => {
+                expect(schemaWithDefaultsProps.raw.properties).to.contain.keys("defaultsCollectionProperty");
             });
 
-            it("groups simple properties in \"defaults\" into a pseudo collection \"realmDefaults\"", () => {
-                expect(schema.raw.properties).to.contain.keys("realmDefaults");
-                expect(schema.raw.properties.realmDefaults.properties).to.contain.keys("defaultsSimpleProperty");
+            it("does not ungroup \"defaults\" simple properties", () => {
+                expect(schemaWithDefaultsProps.raw.properties.defaults.properties).to.contain
+                    .keys("defaultsSimpleProperty");
+            });
+
+            it("ungroups \"defaults\" collection properties, moving them one level up (collection props only)", () => {
+                expect(schemaWithDefaultsCollectionProps.raw.properties).to.contain.keys("defaultsCollectionProperty");
+            });
+
+            it("removes \"defaults\" property when there are no simple props", () => {
+                expect(schemaWithDefaultsCollectionProps.raw.properties).to.not.have.keys("defaults");
             });
         });
 
