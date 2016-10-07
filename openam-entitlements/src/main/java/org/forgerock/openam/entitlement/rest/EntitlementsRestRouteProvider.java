@@ -63,7 +63,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("resourcetypes")
                 .auditAs(POLICY)
                 .authorizeWith(CrestPrivilegeAuthzModule.class)
-                .toCollection(ResourceTypesResource.class);
+                .toAnnotatedCollection(ResourceTypesResource.class);
 
         rootRouter.route("applicationtypes")
                 .auditAs(POLICY)

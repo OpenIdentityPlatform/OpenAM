@@ -55,6 +55,7 @@ import org.forgerock.openam.rest.query.QueryException;
 import org.forgerock.openam.rest.query.QueryResponseHandler;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.SecurityContext;
@@ -686,4 +687,8 @@ public class ResourceTypesResourceTest {
         return mock;
     }
 
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ResourceTypesResource.class).hasValidAnnotations();
+    }
 }

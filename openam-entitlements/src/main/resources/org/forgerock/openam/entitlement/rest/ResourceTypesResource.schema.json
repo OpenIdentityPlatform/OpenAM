@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/ResourceTypesResource#schema.title",
+  "description": "i18n:api-descriptor/ResourceTypesResource#schema.description",
+  "properties": {
+    "uuid": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.uuid.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.uuid.description",
+      "type": "string"
+    },
+    "name": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.name.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.name.description",
+      "type": "string"
+    },
+    "description": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.description.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.description.description",
+      "type": "string"
+    },
+    "patterns": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.patterns.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.patterns.description",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actions": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.actions.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.actions.description",
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "createdBy": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.createdBy.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.createdBy.description",
+      "type": "string"
+    },
+    "creationDate": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.creationDate.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.creationDate.description",
+      "type": "number"
+    },
+    "lastModifiedBy": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.lastModifiedBy.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.lastModifiedBy.description",
+      "type": "string"
+    },
+    "lastModifiedDate": {
+      "title": "i18n:api-descriptor/ResourceTypesResource#schema.lastModifiedDate.title",
+      "description": "i18n:api-descriptor/ResourceTypesResource#schema.lastModifiedDate.description",
+      "type": "number"
+    }
+  }
+}

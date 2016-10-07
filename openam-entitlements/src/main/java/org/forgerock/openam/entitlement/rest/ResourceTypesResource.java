@@ -17,6 +17,19 @@ package org.forgerock.openam.entitlement.rest;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_404_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_409_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.RESOURCE_TYPES_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -31,6 +44,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -72,6 +97,16 @@ import com.sun.identity.shared.debug.Debug;
  * {@link org.forgerock.openam.entitlement.ResourceType}s can be changed, so the full range of CRUD operations are
  * supported here.
  */
+@CollectionProvider(
+        details = @Handler(
+                title = RESOURCE_TYPES_RESOURCE + TITLE,
+                description = RESOURCE_TYPES_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "ResourceTypesResource.schema.json")),
+        pathParam = @Parameter(
+                name = "resourceId",
+                type = "string",
+                description = RESOURCE_TYPES_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class ResourceTypesResource extends RealmAwareResource {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -122,6 +157,18 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 409,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_409_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = RESOURCE_TYPES_RESOURCE + CREATE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         String principalName = "unknown";
@@ -158,6 +205,18 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 404,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = RESOURCE_TYPES_RESOURCE + DELETE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
@@ -199,6 +258,21 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Update(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 404,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = 409,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_409_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = RESOURCE_TYPES_RESOURCE + UPDATE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
@@ -239,6 +313,18 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 404,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = RESOURCE_TYPES_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
@@ -290,6 +376,15 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 404,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_404_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = RESOURCE_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = RESOURCE_TYPES_RESOURCE + READ_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
