@@ -23,20 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -50,9 +40,8 @@ import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
+import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -67,9 +56,8 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     private final InternalSessionCache internalSessionCache;
     private final SessionCache sessionCache;
-    private final TokenIdFactory tokenIdFactory;
-    private final CTSPersistentStore coreTokenService;
-    private final SessionAdapter tokenAdapter;
+
+    private final SessionPersistentStore sessionPersistentStore;
 
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionLogging sessionLogging;
@@ -79,27 +67,23 @@ public class SessionAccessManager implements SessionPersistenceManager {
     @VisibleForTesting
     @Inject
     SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                                 final ForeignSessionHandler foreignSessionHandler,
-                                 final SessionCache sessionCache,
-                                 final InternalSessionCache internalSessionCache,
-                                 final TokenIdFactory tokenIdFactory,
-                                 final CTSPersistentStore coreTokenService,
-                                 final SessionAdapter tokenAdapter,
-                                 final SessionNotificationSender sessionNotificationSender,
-                                 final SessionLogging sessionLogging,
-                                 final SessionAuditor sessionAuditor,
-                                 final MonitoringOperations monitoringOperations) {
+                         final ForeignSessionHandler foreignSessionHandler,
+                         final SessionCache sessionCache,
+                         final InternalSessionCache internalSessionCache,
+                         final SessionNotificationSender sessionNotificationSender,
+                         final SessionLogging sessionLogging,
+                         final SessionAuditor sessionAuditor,
+                         final MonitoringOperations monitoringOperations,
+                         final SessionPersistentStore sessionPersistentStore) {
         this.debug = debug;
         this.foreignSessionHandler = foreignSessionHandler;
         this.sessionCache = sessionCache;
         this.internalSessionCache = internalSessionCache;
-        this.tokenIdFactory = tokenIdFactory;
-        this.coreTokenService = coreTokenService;
-        this.tokenAdapter = tokenAdapter;
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
         this.monitoringOperations = monitoringOperations;
+        this.sessionPersistentStore = sessionPersistentStore;
     }
 
     /**
@@ -115,6 +99,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     /**
      * Removes a session from the session cache.
+     *
      * @param sessionID the ID of the session to remove from the cache
      */
     public void removeSessionId(SessionID sessionID) {
@@ -135,7 +120,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
         InternalSession internalSession = internalSessionCache.getBySessionID(sessionId);
         if (internalSession == null) {
-            return recoverSession(sessionId);
+            return cacheSession(sessionPersistentStore.recoverSession(sessionId));
         }
         return internalSession;
     }
@@ -152,55 +137,15 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
         InternalSession internalSession = internalSessionCache.getByHandle(sessionHandle);
         if (internalSession == null) {
-            return recoverSessionByHandle(sessionHandle);
+            return cacheSession(sessionPersistentStore.recoverSessionByHandle(sessionHandle));
         }
         return internalSession;
     }
 
-    private InternalSession recoverSessionByHandle(String sessionHandle) {
-
-        final TokenFilter tokenFilter = new TokenFilterBuilder()
-                .withAttribute(SessionTokenField.SESSION_HANDLE.getField(), sessionHandle)
-                .build();
-
-        Token token = null;
-
-        try {
-            final Collection<Token> results = coreTokenService.query(tokenFilter);
-            if (results.isEmpty()) {
-                return null;
-            }
-            if (results.size() != 1) {
-                debug.error("Duplicate session handle found in Core Token Service");
-                return null;
-            }
-            token = CollectionUtils.getFirstItem(results);
-        } catch (CoreTokenException e) {
-            debug.error("Failed to retrieve session by its handle", e);
-        }
-        if (token == null) {
+    private InternalSession cacheSession(InternalSession session) {
+        if (session == null) {
             return null;
         }
-        return getInternalSessionFromToken(token);
-
-
-    }
-
-    private InternalSession getInternalSessionFromToken(Token token) {
-
-        /*
-         * As a side effect of deserialising an InternalSession, we must trigger
-         * the InternalSession to reschedule its timing task to ensure it
-         * maintains the session expiry function.
-         */
-        InternalSession session = tokenAdapter.fromToken(token);
-        session.setSessionServiceDependencies(InjectorHolder.getInstance(SessionService.class),
-                InjectorHolder.getInstance(SessionServiceConfig.class),
-                InjectorHolder.getInstance(SessionLogging.class),
-                InjectorHolder.getInstance(SessionAuditor.class),
-                debug);
-        session.scheduleExpiry();
-
         boolean destroyed = destroySessionIfNecessary(session);
         if (!destroyed) {
             putInternalSessionIntoInternalSessionCache(session);
@@ -209,12 +154,63 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
         return session;
     }
+    /**
+     * Checks if session has to be destroyed and to remove it
+     * if so.
+     *
+     * @param sess session object
+     * @return true if session has been destroyed
+     */
+    private boolean destroySessionIfNecessary(InternalSession sess) {
+        boolean wasDestroyed = false;
+        try {
+            wasDestroyed = performSessionDestroyIfNecessary(sess);
+        } catch (Exception ex) {
+            debug.error("Exception in session destroyIfNecessary() : ", ex);
+            wasDestroyed = true;
+        }
+
+        if (wasDestroyed) {
+            try {
+                removeInternalSession(sess.getID());
+            } catch (Exception ex) {
+                debug.error("Exception while removing session : ", ex);
+            }
+        }
+        return wasDestroyed;
+    }
+
+    /**
+     * Checks whether the session should be destroyed or not, and if so performs the operation.
+     */
+    private boolean performSessionDestroyIfNecessary(InternalSession session) {
+        switch (session.checkSessionUpdate()) {
+            case NO_CHANGE:
+                return false;
+            case DESTROY:
+                delete(session);
+                session.changeStateWithoutNotify(SessionState.DESTROYED);
+                sessionNotificationSender.sendEvent(session, SessionEvent.DESTROY);
+                return true;
+            case MAX_TIMEOUT:
+                session.changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
+                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
+                return false;
+            case IDLE_TIMEOUT:
+                session.changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
+                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
+                return false;
+            default:
+                return false;
+        }
+    }
 
     private void putInternalSessionIntoInternalSessionCache(InternalSession session) {
         session.setPersistenceManager(this);
         internalSessionCache.put(session);
         update(session);
     }
+
 
     /**
      * Get a restricted session from a given SessionID.
@@ -300,99 +296,18 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
 
         internalSession.setPersistenceManager(null);
-        return removeInternalSession(internalSession);
-    }
 
-    /**
-     * This will recover the specified session from the repository, and add it to the cache.
-     * Returns null if no session was recovered.
-     * @param sessionID Session ID
-     */
-    private InternalSession recoverSession(SessionID sessionID) {
-
-        String tokenId = tokenIdFactory.toSessionTokenId(sessionID);
-        Token token = null;
-
-        try {
-            token = coreTokenService.read(tokenId);
-        } catch (CoreTokenException e) {
-            debug.error("Failed to retrieve session by its handle", e);
-        }
-        if (token == null) {
-            return null;
-        }
-
-        return getInternalSessionFromToken(token);
-    }
-
-    /**
-     * Utility method to check if session has to be destroyed and to remove it
-     * if so.
-     *
-     * @param sess session object
-     * @return true if session should (and has !) been destroyed
-     */
-    private boolean destroySessionIfNecessary(InternalSession sess) {
-        boolean wasDestroyed = false;
-        try {
-            wasDestroyed = performSessionDestroyIfNecessary(sess);
-        } catch (Exception ex) {
-            debug.error("Exception in session destroyIfNecessary() : ", ex);
-            wasDestroyed = true;
-        }
-
-        if (wasDestroyed) {
-            try {
-                removeInternalSession(sess.getID());
-            } catch (Exception ex) {
-                debug.error("Exception while removing session : ", ex);
-            }
-        }
-        return wasDestroyed;
-    }
-
-    /**
-     * Checks whether the session should be destroyed or not, and if so performs the operation.
-     */
-    private boolean performSessionDestroyIfNecessary(InternalSession session) {
-        switch (session.checkSessionUpdate()) {
-            case NO_CHANGE:
-                return false;
-            case DESTROY:
-                delete(session);
-                session.changeStateWithoutNotify(SessionState.DESTROYED);
-                sessionNotificationSender.sendEvent(session, SessionEvent.DESTROY);
-                return true;
-            case MAX_TIMEOUT:
-                session.changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
-                return false;
-            case IDLE_TIMEOUT:
-                session.changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
-                return false;
-            default:
-                return false;
-        }
-    }
-
-    private InternalSession removeInternalSession(final InternalSession session) {
-
-        if (null == session) {
-            return null;
-        }
-
-        foreignSessionHandler.remove(session.getID());
-        session.cancel();
+        foreignSessionHandler.remove(internalSession.getID());
+        internalSession.cancel();
         // Session Constraint
-        if (session.getState() == SessionState.VALID) {
+        if (internalSession.getState() == SessionState.VALID) {
             monitoringOperations.decrementActiveSessions();
         }
 
-        if (session.isStored()) {
-            delete(session);
+        if (internalSession.isStored()) {
+            delete(internalSession);
         }
-        return session;
+        return internalSession;
     }
 
     /**
@@ -416,7 +331,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
             return;
         }
         try {
-            coreTokenService.update(tokenAdapter.toToken(session));
+            sessionPersistentStore.save(session);
         } catch (Exception e) {
             debug.error("SessionService.save: " + "exception encountered", e);
         }
@@ -425,8 +340,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
     private void delete(InternalSession session) {
         session.setStored(false);
         try {
-            String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
-            coreTokenService.delete(tokenId);
+            sessionPersistentStore.delete(session);
         } catch (Exception e) {
             debug.error("SessionService : failed deleting session ", e);
         }

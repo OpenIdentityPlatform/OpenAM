@@ -16,17 +16,15 @@
 
 package org.forgerock.openam.session.service;
 
+import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.mock;
 
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -45,13 +43,9 @@ import com.sun.identity.shared.debug.Debug;
 
 public class SessionAccessManagerTest {
 
-    public static final String TEST_TOKEN_ID = "TEST_TOKEN_ID";
-
     private SessionAccessManager sessionAccessManager;
     @Mock private Debug mockDebug;
-    @Mock private CTSPersistentStore mockCoreTokenStore;
-    @Mock private TokenIdFactory tokenIdFactory;
-
+    @Mock private SessionPersistentStore sessionPersistentStore;
     @Mock private Session mockSession;
     @Mock private SessionID mockSessionID;
     @Mock private InternalSession mockInternalSession;
@@ -61,9 +55,9 @@ public class SessionAccessManagerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         sessionAccessManager = new SessionAccessManager(mockDebug, mock(ForeignSessionHandler.class),
-                mock(SessionCache.class), internalSessionCache, tokenIdFactory,
-                mockCoreTokenStore, mock(SessionAdapter.class), mock(SessionNotificationSender.class),
-                mock(SessionLogging.class), mock(SessionAuditor.class), mock(MonitoringOperations.class));
+                mock(SessionCache.class), internalSessionCache, mock(SessionNotificationSender.class),
+                mock(SessionLogging.class), mock(SessionAuditor.class), mock(MonitoringOperations.class),
+                sessionPersistentStore);
 
         given(internalSessionCache.remove(mockSessionID)).willReturn(mockInternalSession);
         given(mockSession.getID()).willReturn(mockSessionID);
@@ -87,7 +81,7 @@ public class SessionAccessManagerTest {
         sessionAccessManager.persistInternalSession(session);
 
         // Then
-        verify(mockCoreTokenStore, never()).update((Token) Mockito.any());
+        verify(sessionPersistentStore, never()).save(any(InternalSession.class));
     }
 
     @Test
@@ -96,13 +90,12 @@ public class SessionAccessManagerTest {
         given(mockSession.getSessionID()).willReturn(mockSessionID);
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockInternalSession.getID()).willReturn(mockSessionID);
-        given(tokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TEST_TOKEN_ID);
 
         given(mockInternalSession.isStored()).willReturn(true);
         given(mockInternalSession.getState()).willReturn(SessionState.DESTROYED);
         // When
         sessionAccessManager.removeInternalSession(mockSessionID);
         // Then
-        verify(mockCoreTokenStore).delete(TEST_TOKEN_ID);
+        verify(sessionPersistentStore).delete(mockInternalSession);
     }
 }
