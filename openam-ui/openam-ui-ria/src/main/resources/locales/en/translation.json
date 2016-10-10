@@ -1299,6 +1299,9 @@
                 }
             }
         },
+        "sessions": {
+            "title": "Sessions"
+        },
         "applications": {
             "agents": {
                 "select" : {

@@ -162,6 +162,15 @@ define(function () {
                 navGroup: "admin",
                 forceUpdate: true
             },
+            "realmsSessions": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/sessions/SessionsView",
+                url: scopedByRealm("sessions"),
+                pattern: "realms/?/sessions",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
             "realmsPolicySets": {
                 view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView",
