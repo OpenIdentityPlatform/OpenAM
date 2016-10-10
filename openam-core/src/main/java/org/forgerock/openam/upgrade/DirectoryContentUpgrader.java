@@ -131,8 +131,10 @@ public class DirectoryContentUpgrader {
         upgraders.add(new AddUmaPendingRequestsSchema());
         upgraders.add(new AddUmaResourceSetLabelsContainer());
         upgraders.add(new AddUmaResourceSetLabelsSchema());
+        upgraders.add(new UpgradeCTSToMultiValue());
         if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
+            upgraders.add(new UpgradeCTSIndexes());
             upgraders.add(new UpdateCTSDate01Index());
             upgraders.add(new DeleteUnusedCTSIndices());
             upgraders.add(new AddDashboardSchema());
@@ -355,6 +357,19 @@ public class DirectoryContentUpgrader {
         }
     }
 
+    private class UpgradeCTSToMultiValue implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/sfha/cts-add-multivalue.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasAttributeType(CoreTokenField.MULTI_STRING_ONE.toString());
+        }
+    }
+
     private class CreateCTSContainer implements Upgrader {
 
         @Override
@@ -399,6 +414,22 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             DN indexDN = DN.valueOf("ds-cfg-attribute=" + CoreTokenField.EXPIRY_DATE.toString()
+                    + ",cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config");
+            return !entryExists(conn, indexDN);
+        }
+    }
+
+
+    private class UpgradeCTSIndexes implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/sfha/cts-add-multivalue-indices.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            DN indexDN = DN.valueOf("ds-cfg-attribute=" + CoreTokenField.MULTI_STRING_ONE.toString()
                     + ",cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config");
             return !entryExists(conn, indexDN);
         }

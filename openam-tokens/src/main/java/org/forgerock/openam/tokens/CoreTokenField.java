@@ -182,7 +182,21 @@ public enum CoreTokenField {
     /**
      * Generic token date five field name.
      */
-    DATE_FIVE("coreTokenDate05", Calendar.class);
+    DATE_FIVE("coreTokenDate05", Calendar.class),
+    /**
+     * Generic token multi value String one field name.
+     */
+    MULTI_STRING_ONE("coreTokenMultiString01", String.class),
+
+    /**
+     * Generic token multi value String two field name.
+     */
+    MULTI_STRING_TWO("coreTokenMultiString02", String.class),
+
+    /**
+     * Generic token multi value String three field name.
+     */
+    MULTI_STRING_THREE("coreTokenMultiString03", String.class);
 
     private final String ldapAttribute;
     private final Class<?> attributeType;

@@ -247,3 +247,24 @@ objectclass: nsIndex
 nsSystemIndex: false
 cn: coreTokenDate05
 nsIndexType: eq
+
+dn: cn=coreTokenMultiString01,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenMultiString01
+nsIndexType: eq
+
+dn: cn=coreTokenMultiString02,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenMultiString02
+nsIndexType: eq
+
+dn: cn=coreTokenMultiString03,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenMultiString03
+nsIndexType: eq

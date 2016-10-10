@@ -15,13 +15,13 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.tokens.CoreTokenField;
-
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Map;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * Provides the mapping between CoreTokenFields and the type of the value that is associated to
@@ -160,6 +160,9 @@ public class CoreTokenFieldTypes {
             case STRING_THIRTEEN:
             case STRING_FOURTEEN:
             case STRING_FIFTEEN:
+            case MULTI_STRING_ONE:
+            case MULTI_STRING_TWO:
+            case MULTI_STRING_THREE:
                 return true;
             default:
                 return false;
