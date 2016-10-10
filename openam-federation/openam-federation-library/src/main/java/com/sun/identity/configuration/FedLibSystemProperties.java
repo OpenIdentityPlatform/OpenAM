@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -29,8 +29,6 @@
 
 package com.sun.identity.configuration;
 
-import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.shared.configuration.ISystemProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,9 +37,12 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.MissingResourceException;
+
+import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.shared.configuration.ISystemProperties;
 
 /**
  * This is the adapter class for Federation Library to the shared library.
@@ -75,7 +76,8 @@ public class FedLibSystemProperties implements ISystemProperties {
 
     @Override
     public String getOrDefault(final String key, final String defaultValue) {
-        return systemConfigProps.getProperty(key, defaultValue);
+        String value = get(key);
+        return value != null ? value : defaultValue;
     }
 
     /**

@@ -46,7 +46,7 @@ import com.sun.identity.security.ISSecurityPermission;
  * data. This class provides a pluggable architecture to encrypt and decrypt
  * data, using the <code>AMEncryption</code> interface class. A class that
  * implements <code>AMEncryption</code> must be specified via the system
- * property: <code>com.iplanet.services.security.encryptor</code>. If none is
+ * property: <code>com.iplanet.security.encryptor</code>. If none is
  * provided, the default provided by iDSAME
  * <code>com.iplanet.services.util.JCEEncryption</code> will be used.
  * <p>
