@@ -50,7 +50,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.AuthSessionFactory;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.opendj.ldap.DN;
@@ -65,7 +64,6 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
@@ -222,12 +220,11 @@ public class AuthD implements ConfigurationListener {
         debug.message("AuthD initializing");
         try {
             rootSuffix = defaultOrg = ServiceManager.getBaseDN();
-            final InternalSession authSession = authSessionFactory.getAuthenticationSession(defaultOrg);
-            if (authSession == null) {
+            ssoAuthSession = authSessionFactory.getAuthenticationSession(defaultOrg);
+            if (ssoAuthSession == null) {
                 debug.error("AuthD failed to get auth session");
                 throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
             }
-            ssoAuthSession = initSsoAuthSession(authSession);
             initAuthServiceGlobalSettings();
             initPlatformServiceGlobalSettings();
             initSessionServiceDynamicSettings();
@@ -791,11 +788,6 @@ public class AuthD implements ConfigurationListener {
      */
     public SSOToken getSSOAuthSession()  {
         return ssoAuthSession;
-    }
-    
-    private SSOToken initSsoAuthSession(AMSession authSession) throws SSOException, SessionException {
-        SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-        return ssoManager.createSSOToken(authSession.getID().toString());
     }
     
     @Override

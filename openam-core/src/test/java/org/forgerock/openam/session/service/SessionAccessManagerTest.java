@@ -16,11 +16,17 @@
 
 package org.forgerock.openam.session.service;
 
+import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.mock;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -53,7 +59,7 @@ public class SessionAccessManagerTest {
         sessionAccessManager = new SessionAccessManager(mockDebug, mock(ForeignSessionHandler.class),
                 mock(SessionCache.class), internalSessionCache, mock(SessionNotificationSender.class),
                 mock(SessionAuditor.class), mock(MonitoringOperations.class),
-                sessionPersistentStore);
+                sessionPersistentStore, mock(ScheduledExecutorService.class), mock(ThreadMonitor.class));
 
         given(internalSessionCache.remove(mockSessionID)).willReturn(mockInternalSession);
         given(mockSession.getID()).willReturn(mockSessionID);

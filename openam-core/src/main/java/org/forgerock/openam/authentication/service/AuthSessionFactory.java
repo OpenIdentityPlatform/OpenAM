@@ -16,13 +16,15 @@
 
 package org.forgerock.openam.authentication.service;
 
-import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+import static com.sun.identity.shared.Constants.*;
+import static org.forgerock.openam.ldap.LDAPUtils.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionConstants;
 
 import com.iplanet.dpro.session.SessionException;
@@ -34,7 +36,8 @@ import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.Constants;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
 
@@ -44,7 +47,7 @@ import com.sun.identity.sm.ServiceManager;
 @Singleton
 public class AuthSessionFactory {
 
-    private InternalSession authSession; // cached auth session
+    private SSOToken authSession; // cached auth session
     private final Debug sessionDebug;
     private final AuthenticationSessionStore authenticationSessionStore;
     private final MonitoringOperations monitoringOperations;
@@ -69,11 +72,11 @@ public class AuthSessionFactory {
      *
      * @param domain      Authentication Domain
      */
-    public InternalSession getAuthenticationSession(String domain) {
+    public SSOToken getAuthenticationSession(String domain) {
         try {
             if (authSession == null) {
                 // Create a special InternalSession for Authentication Service
-                authSession = initAuthSession(domain);
+                authSession = initSsoAuthSession(initAuthSession(domain));
             }
             return authSession;
         } catch (Exception e) {
@@ -90,6 +93,7 @@ public class AuthSessionFactory {
     private InternalSession getServiceSession(String domain) {
         try {
             InternalSession session = internalSessionFactory.newInternalSession(domain, false);
+            session.putProperty(UNIVERSAL_IDENTIFIER, dsameAdminTokenProvider.getDsameAdminDN());
             session.setType(SessionType.APPLICATION);
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
@@ -114,9 +118,14 @@ public class AuthSessionFactory {
 
         if (LDAPUtils.isDN(clientID)) {
             String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
-            authSession.putProperty(Constants.UNIVERSAL_IDENTIFIER, id);
+            authSession.putProperty(UNIVERSAL_IDENTIFIER, id);
         }
 
         return authSession;
+    }
+
+    private SSOToken initSsoAuthSession(AMSession authSession) throws SSOException, SessionException {
+        SSOTokenManager ssoManager = SSOTokenManager.getInstance();
+        return ssoManager.createSSOToken(authSession.getID().toString());
     }
 }

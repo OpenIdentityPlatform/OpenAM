@@ -29,10 +29,9 @@
 package com.iplanet.dpro.session.service;
 
 import static java.util.concurrent.TimeUnit.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_CREATED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_PROPERTY_CHANGED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -86,6 +85,10 @@ import com.sun.identity.shared.debug.Debug;
  *
  */
 public class InternalSession implements Serializable, AMSession, SessionPersistenceObservable {
+    /**
+     * Expiry time which is long enough to make sessions functionally non expiring.
+     */
+    public static final long NON_EXPIRING_SESSION_LENGTH_MINUTES = 42 * TimeUnit.DAYS.toMinutes(365);
 
     /*
      * Logging message
@@ -234,8 +237,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * When deserialised the code responsible for instantiating it will have no means of resolving dependencies.
      *
      * Instead this is deferred to
-     * {@link com.iplanet.dpro.session.service.InternalSession#setSessionServiceDependencies(
-     * SessionService, SessionServiceConfig, SessionLogging, SessionAuditor, com.sun.identity.shared.debug.Debug)}
+     * {@link InternalSession#setSessionServiceDependencies(com.iplanet.dpro.session.service.SessionService,
+     * com.iplanet.dpro.session.service.SessionServiceConfig, com.iplanet.dpro.session.service.SessionEventBroker,
+     * com.iplanet.dpro.session.service.SessionLogging, com.iplanet.dpro.session.service.SessionAuditor,
+     * com.sun.identity.session.util.SessionUtilsWrapper, com.iplanet.dpro.session.service.SessionConstraint,
+     * com.sun.identity.shared.debug.Debug)}
      */
     public InternalSession() {
         isISStored = true;
@@ -348,8 +354,10 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      *            Maximum Session Time
      */
     public void setMaxSessionTime(long maxSessionTimeInMinutes) {
-        this.maxSessionTimeInMinutes = maxSessionTimeInMinutes;
-        notifyPersistenceManager();
+        if (this.maxSessionTimeInMinutes != maxSessionTimeInMinutes) {
+            this.maxSessionTimeInMinutes = maxSessionTimeInMinutes;
+            notifyPersistenceManager();
+        }
     }
 
     /**
@@ -817,8 +825,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * ever expire or not.
      */
     public void setNonExpiring() {
-        maxSessionTimeInMinutes = SECONDS.toMinutes(Long.MAX_VALUE);
-        maxIdleTimeInMinutes = SECONDS.toMinutes(Long.MAX_VALUE);
+        maxSessionTimeInMinutes = NON_EXPIRING_SESSION_LENGTH_MINUTES;
+        maxIdleTimeInMinutes = NON_EXPIRING_SESSION_LENGTH_MINUTES;
         maxCachingTimeInMinutes = serviceConfig.getApplicationMaxCachingTime();
         willExpireFlag = false;
     }

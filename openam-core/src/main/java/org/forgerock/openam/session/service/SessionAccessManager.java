@@ -19,11 +19,13 @@ import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_IDL
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
 
 import java.util.Collection;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionCache;
@@ -31,6 +33,7 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -64,6 +67,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionAuditor sessionAuditor;
     private final MonitoringOperations monitoringOperations; // Note: there should be an increment and a decrement in this class for this to make sense
+    private final NonExpiringSessionManager nonExpiringSessionManager;
 
     @VisibleForTesting
     @Inject
@@ -74,7 +78,9 @@ public class SessionAccessManager implements SessionPersistenceManager {
                          final SessionNotificationSender sessionNotificationSender,
                          final SessionAuditor sessionAuditor,
                          final MonitoringOperations monitoringOperations,
-                         final SessionPersistentStore sessionPersistentStore) {
+                         final SessionPersistentStore sessionPersistentStore,
+                         @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) final ScheduledExecutorService scheduler,
+                         final ThreadMonitor threadMonitor) {
         this.debug = debug;
         this.foreignSessionHandler = foreignSessionHandler;
         this.sessionCache = sessionCache;
@@ -83,6 +89,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
         this.sessionAuditor = sessionAuditor;
         this.monitoringOperations = monitoringOperations;
         this.sessionPersistentStore = sessionPersistentStore;
+        this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduler, threadMonitor);
     }
 
     /**
@@ -229,6 +236,10 @@ public class SessionAccessManager implements SessionPersistenceManager {
         session.setStored(true);
         putInternalSessionIntoInternalSessionCache(session);
         update(session);
+
+        if (!session.willExpire()) {
+            nonExpiringSessionManager.addNonExpiringSession(session);
+        }
     }
 
     /**
@@ -343,7 +354,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
 
     private void save(InternalSession session) {
         // do not save sessions which never expire, or which are not marked for persistence
-        if (!session.willExpire() || !session.isStored()) {
+        if (!session.isStored()) {
             return;
         }
         try {
