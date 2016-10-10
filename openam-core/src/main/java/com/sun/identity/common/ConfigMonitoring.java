@@ -121,8 +121,12 @@ public class ConfigMonitoring {
          * will result in monitoring getting disabled.
          */
         int i = getMonServiceAttrs();
-        if (i < Agent.MON_CONFIG_DISABLED) {
-            debug.error("{}getMonServiceAttrs returns {}, monitoring disabled", classMethod, i);
+        if (i <= Agent.MON_CONFIG_DISABLED) {
+            if (i == Agent.MON_CONFIG_DISABLED) {
+                debug.message("{}getMonServiceAttrs returns {}, monitoring disabled", classMethod, i);
+            } else {
+                debug.error("{}getMonServiceAttrs returns {}, monitoring disabled", classMethod, i);
+            }
             Agent.setMonitoringDisabled();
             return;
         }
