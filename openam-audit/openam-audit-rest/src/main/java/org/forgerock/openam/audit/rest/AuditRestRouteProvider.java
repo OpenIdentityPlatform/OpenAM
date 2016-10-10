@@ -53,7 +53,7 @@ public class AuditRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(1)
                 .toRequestHandler(STARTS_WITH, auditServiceProvider.getDefaultAuditService());
 
-        rootRouter.route("realm-audit")
+        realmRouter.route("realm-audit")
                 .auditAs(AUDIT, AuditEndpointAuditFilter.class)
                 .authorizeWith(SpecialOrAdminOrAgentAuthzModule.class)
                 .forVersion(1)
