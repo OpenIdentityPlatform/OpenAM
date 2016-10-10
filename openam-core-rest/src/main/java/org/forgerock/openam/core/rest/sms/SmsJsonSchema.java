@@ -39,6 +39,7 @@ public class SmsJsonSchema {
     static final String NUMBER_TYPE = "number";
     static final String BOOLEAN_TYPE = "boolean";
     static final String READONLY = "readonly";
+    static final String INTEGER = "integer";
 
     private SmsJsonSchema() {}
 }

@@ -28,23 +28,7 @@ import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ARRAY_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.BOOLEAN_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.DESCRIPTION;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ENUM;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.EXAMPLE_VALUE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.FORMAT;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.ITEMS;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.NUMBER_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.OBJECT_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PASSWORD_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PATTERN_PROPERTIES;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PROPERTIES;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.PROPERTY_ORDER;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.REQUIRED;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.STRING_TYPE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TITLE;
-import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.TYPE;
+import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SMS_RESOURCE_PROVIDER;
 import static org.forgerock.openam.rest.RestConstants.COLLECTION;
@@ -138,7 +122,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
         AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
     }
 
-    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
+    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = asList(DECIMAL, PERCENT, DECIMAL_RANGE, DECIMAL_NUMBER);
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -643,6 +627,8 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
         String type;
         if (syntax == BOOLEAN) {
             type = BOOLEAN_TYPE;
+        } else if (syntax == NUMBER_RANGE || syntax == NUMBER) {
+            type = INTEGER;
         } else if (NUMBER_SYNTAXES.contains(syntax)) {
             type = NUMBER_TYPE;
         } else {
