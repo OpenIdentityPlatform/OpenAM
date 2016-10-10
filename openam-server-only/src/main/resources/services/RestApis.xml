@@ -64,8 +64,23 @@
                         <Value>Enabled</Value>
                     </DefaultValues>
                 </AttributeSchema>
-            </Global>
+                <AttributeSchema name="openam-rest-apis-descriptions-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 any="display"
+                                 resourceName="descriptionsEnabled"
+                                 i18nKey="a103"
+                                 order="300">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="a103a">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="a103b">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
+            </Global>
         </Schema>
     </Service>
 </ServicesConfiguration>
