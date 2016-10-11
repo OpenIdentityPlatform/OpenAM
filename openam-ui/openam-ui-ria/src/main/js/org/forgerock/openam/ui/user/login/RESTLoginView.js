@@ -293,7 +293,6 @@ define([
 
             }, this));
         },
-
         renderForm (reqs, urlParams) {
             var requirements = _.clone(reqs),
                 promise = $.Deferred(),
@@ -326,7 +325,7 @@ define([
                         window.location.replace(redirectCallback.redirectUrl);
                     }
                 } else if (element.type === "PollingWaitCallback") {
-                    const pollingWaitTimeoutMs = _.get(element.output[0], "object.value");
+                    const pollingWaitTimeoutMs = _.find(element.output, { name: "waitTime" }).value;
 
                     _.delay(() => {
                         this.pollingInProgress = true;
