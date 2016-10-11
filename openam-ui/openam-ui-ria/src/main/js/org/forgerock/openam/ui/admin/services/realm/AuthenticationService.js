@@ -157,13 +157,11 @@ define([
                     data: JSON.stringify(data)
                 });
             },
-            get (realm, name, type) {
-                return obj.serviceCall({
+            get (realm, name, type, options) {
+                return obj.serviceCall(_.merge({
                     url: fetchUrl.default(`/realm-config/authentication/modules/${type}/${name}`, { realm }),
                     headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-                }).then(function (data) {
-                    return data;
-                });
+                }, options)).then((data) => data);
             },
             exists (realm, name) {
                 var promise = $.Deferred(),

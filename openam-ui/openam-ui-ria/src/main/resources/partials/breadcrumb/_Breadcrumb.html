@@ -2,9 +2,9 @@
 <ol class="breadcrumb">
     {{#each crumbs}}
         {{#if path}}
-            <li><a href="{{path}}">{{{title}}}</a></li>
+            <li><a href="{{path}}">{{title}}</a></li>
         {{else}}
-            <li>{{{title}}}</li>
+            <li>{{title}}</li>
         {{/if}}
     {{/each}}
 </ol>

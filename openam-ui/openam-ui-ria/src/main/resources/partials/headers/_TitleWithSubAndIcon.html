@@ -15,9 +15,9 @@
     <div class="pull-left">
         <h4 class="page-type">{{t type}}</h4>
         {{#if detail}}
-            <span class="page-header-detail {{detail.class}}">{{#if detail.icon}}<i class="fa {{detail.icon}}"></i> {{/if}} {{t detail.text}}</span>
+            <span class="page-header-detail {{detail.class}}">{{#if detail.icon}}<i class="fa {{detail.icon}}"></i> {{/if}} {{t detail.text safeString=false}}</span>
         {{/if}}
-        <h1 class="wordwrap">{{t title}}</h1>
+        <h1 class="wordwrap">{{t title safeString=false}}</h1>
     </div>
 
 </header>
