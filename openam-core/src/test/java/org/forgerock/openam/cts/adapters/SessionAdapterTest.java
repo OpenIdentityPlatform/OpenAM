@@ -27,6 +27,7 @@ import static org.testng.AssertJUnit.*;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
@@ -54,6 +55,7 @@ public class SessionAdapterTest {
     private CoreTokenConfig mockCoreTokenConfig;
     private JSONSerialisation mockJsonSerialisation;
     private TokenBlobUtils blobUtils;
+    private DNWrapper dnWrapper;
 
     @BeforeMethod
     public void setup() {
@@ -61,7 +63,9 @@ public class SessionAdapterTest {
         mockCoreTokenConfig = mock(CoreTokenConfig.class);
         mockJsonSerialisation = mock(JSONSerialisation.class);
         blobUtils = new TokenBlobUtils();
-        adapter = new SessionAdapter(mockTokenIdFactory, mockCoreTokenConfig, mockJsonSerialisation, blobUtils);
+        dnWrapper = mock(DNWrapper.class);
+        adapter = new SessionAdapter(mockTokenIdFactory, mockCoreTokenConfig, mockJsonSerialisation, blobUtils,
+                dnWrapper);
     }
 
     @Test
@@ -84,6 +88,8 @@ public class SessionAdapterTest {
         given(mockSession.getExpirationTime(MILLISECONDS)).willReturn(SECONDS.toMillis(mockTimestamp));
         given(mockSession.getSessionHandle()).willReturn(mockSessionHandle);
         given(mockSession.getState()).willReturn(SessionState.VALID);
+        given(mockSession.getClientDomain()).willReturn("REALM");
+        given(dnWrapper.orgNameToRealmName(anyString())).willReturn("PRETTY_REALM");
 
         // Avoid serialisation when using mock InternalSessions
         given(mockJsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(mockSession);
@@ -96,6 +102,7 @@ public class SessionAdapterTest {
         token.setAttribute(SessionTokenField.SESSION_ID.getField(), mockSessionId);
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), mockSessionHandle);
         token.setAttribute(SessionTokenField.SESSION_STATE.getField(), "VALID");
+        token.setAttribute(SessionTokenField.REALM.getField(), "PRETTY_REALM");
         SessionAdapter.setDateAttributeFromMillis(token, SessionTokenField.MAX_SESSION_EXPIRATION_TIME, 0);
         SessionAdapter.setDateAttributeFromMillis(token, SessionTokenField.MAX_IDLE_EXPIRATION_TIME, 0);
 
@@ -126,7 +133,7 @@ public class SessionAdapterTest {
                 .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
                 .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
         JSONSerialisation serialisation = new JSONSerialisation(mapper);
-        adapter = new SessionAdapter(mockTokenIdFactory, mockCoreTokenConfig, serialisation, blobUtils);
+        adapter = new SessionAdapter(mockTokenIdFactory, mockCoreTokenConfig, serialisation, blobUtils, dnWrapper);
 
         // When
         InternalSession session = adapter.fromToken(token);
@@ -263,6 +270,19 @@ public class SessionAdapterTest {
     }
 
     @Test
+    public void shouldAssignRealmToTokenAttribute() {
+        //Given
+        InternalSession mockSession = prototypeMockInternalSession();
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        String realm = token.getValue(SessionTokenField.REALM.getField());
+        assertThat(realm).isEqualTo("PRETTY_REALM");
+    }
+
+    @Test
     public void shouldFilterLatestAccessTime() throws CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
@@ -331,6 +351,8 @@ public class SessionAdapterTest {
         given(mockSession.getExpirationTime(SECONDS)).willReturn(mockTimestamp);
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
         given(mockSession.getState()).willReturn(SessionState.INVALID);
+        given(mockSession.getClientDomain()).willReturn("REALM");
+        given(dnWrapper.orgNameToRealmName(anyString())).willReturn("PRETTY_REALM");
         given(mockJsonSerialisation.serialise(any())).willReturn("");
         given(mockJsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(mockSession);
 

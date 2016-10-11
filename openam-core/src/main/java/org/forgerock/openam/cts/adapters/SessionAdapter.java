@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -48,6 +49,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
     private final CoreTokenConfig config;
     private final JSONSerialisation serialisation;
     private final TokenBlobUtils blobUtils;
+    private final DNWrapper dnWrapper;
 
     /**
      * The field name Pattern is required for internal Session JSON fudging.
@@ -63,12 +65,13 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @param blobUtils A collection of Binary Object utilities.
      */
     @Inject
-    public SessionAdapter(TokenIdFactory tokenIdFactory, CoreTokenConfig config,
-                          JSONSerialisation serialisation, TokenBlobUtils blobUtils) {
+    public SessionAdapter(TokenIdFactory tokenIdFactory, CoreTokenConfig config, JSONSerialisation serialisation,
+            TokenBlobUtils blobUtils, DNWrapper dnWrapper) {
         this.tokenIdFactory = tokenIdFactory;
         this.config = config;
         this.serialisation = serialisation;
         this.blobUtils = blobUtils;
+        this.dnWrapper = dnWrapper;
     }
 
     /**
@@ -109,6 +112,9 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         setDateAttributeFromMillis(token,
                 SessionTokenField.MAX_IDLE_EXPIRATION_TIME,
                 session.getMaxIdleExpirationTime(MILLISECONDS));
+
+        // Realm value
+        token.setAttribute(SessionTokenField.REALM.getField(), dnWrapper.orgNameToRealmName(session.getClientDomain()));
 
         // SessionID
         token.setAttribute(SessionTokenField.SESSION_ID.getField(), session.getID().toString());
