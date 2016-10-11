@@ -28,9 +28,15 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static java.util.concurrent.TimeUnit.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.session.SessionConstants.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_CREATED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_PROPERTY_CHANGED;
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+import static org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP;
+import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.Serializable;
@@ -53,7 +59,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
@@ -141,7 +146,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private Boolean cookieMode = null;
     private String cookieStr;
     private transient AuthContextLocal authContext;
-    private transient LoginContext loginContext;
+
     private transient SessionPersistenceManager persistenceManager;
 
     @JsonProperty("creationTime")
@@ -473,22 +478,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     public void clearAuthContext() {
         this.authContext = null;
-    }
-
-    /**
-     * Gets the login context from this session.
-     * @return the login context
-     */
-    public LoginContext getLoginContext() {
-        return loginContext;
-    }
-
-    /**
-     * Sets the login context associated with this session.
-     * @param loginContext a LoginContext to associate with this session.
-     */
-    public void setLoginContext(LoginContext loginContext) {
-        this.loginContext = loginContext;
     }
 
     /**

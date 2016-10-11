@@ -18,8 +18,6 @@ package org.forgerock.openam.authentication.service.activators;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.authentication.service.LoginContext;
-
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.authentication.service.AuthException;
@@ -43,8 +41,7 @@ public final class ForceAuthSessionActivator extends DefaultSessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject,
-                                   final LoginContext loginContext)
+                                   final InternalSession authSession, final Subject subject)
             throws AuthException {
 
         if (!loginState.getForceFlag()) {
@@ -57,8 +54,7 @@ public final class ForceAuthSessionActivator extends DefaultSessionActivator {
         // incrementing the session count. By decrementing before incrementing the count again we ensure that session
         // limits are properly taken into account.
         sessionService.decrementActiveSessions();
-        return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject,
-                loginContext);
+        return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject);
     }
 
     public static ForceAuthSessionActivator getInstance() {

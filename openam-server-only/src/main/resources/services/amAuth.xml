@@ -122,16 +122,6 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="sunAMAuthKeepAuthModuleIntances"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="a149"
-                                 order="3200"
-                                 resourceName="keepAuthModuleInstances">
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="openam-xui-interface-enabled"
                                  type="single"
                                  syntax="boolean"

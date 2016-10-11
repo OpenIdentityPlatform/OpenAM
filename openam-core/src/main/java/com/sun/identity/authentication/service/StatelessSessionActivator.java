@@ -19,7 +19,6 @@ package com.sun.identity.authentication.service;
 import javax.security.auth.Subject;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -49,8 +48,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject,
-                                   final LoginContext loginContext)
+                                   final InternalSession authSession, final Subject subject)
             throws AuthException {
 
         if (loginState.getForceFlag()) {
@@ -76,7 +74,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
         final InternalSession session = createSession(sessionService, loginState);
         loginState.setSession(session);
 
-        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
+        return updateSessions(session, loginState, session, authSession, sessionService, subject);
     }
 
     @Override

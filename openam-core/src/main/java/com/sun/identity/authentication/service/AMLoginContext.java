@@ -29,7 +29,16 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.ACCOUNT_EXPIRED;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.INVALID_PASSWORD;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.LOCKED_OUT;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.LOGIN_TIMEOUT;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.MAX_SESSION_REACHED;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.MODULE_DENIED;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.MODULE_NOT_FOUND;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.NO_CONFIG;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.NO_USER_PROFILE;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.USER_INACTIVE;
 
 import java.security.AccessController;
 import java.text.MessageFormat;
@@ -48,9 +57,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason;
+import org.forgerock.openam.authentication.service.JAASModuleDetector;
 import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.authentication.service.LoginContextFactory;
-import org.forgerock.openam.authentication.service.JAASModuleDetector;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
@@ -622,7 +631,8 @@ public class AMLoginContext {
 
                         updateLoginState(indexType, indexName, configName, orgDN);
                         //activate session
-                        boolean sessionActivated = authContext.getLoginState().activateSession(subject, authContext, loginContext);
+
+                        boolean sessionActivated = authContext.getLoginState().activateSession(subject);
                         if (sessionActivated) {
                             authContext.getLoginState().logSuccess();
                             auditor.auditLoginSuccess(authContext.getLoginState());

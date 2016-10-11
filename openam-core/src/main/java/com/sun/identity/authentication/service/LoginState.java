@@ -31,7 +31,9 @@
 package com.sun.identity.authentication.service;
 
 import static java.util.Collections.unmodifiableSet;
-import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.*;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.INVALID_REALM;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.REALM_INACTIVE;
+import static org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason.USER_NOT_FOUND;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.Time.newDate;
 
@@ -67,7 +69,6 @@ import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.guava.common.collect.ImmutableList;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
-import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionUpgradeHandler;
 import org.forgerock.openam.authentication.service.activators.ForceAuthSessionActivator;
@@ -321,7 +322,6 @@ public class LoginState {
     // Variable indicating a request "forward" after
     // authentication success
     private boolean forwardSuccess = false;
-    private boolean modulesInSession = false;
 
     // Indicates Session is stateless
     public boolean stateless = false;
@@ -871,21 +871,6 @@ public class LoginState {
     }
 
     /**
-     * Populates the global profile.
-     *
-     * @throws AuthException
-     */
-    private void populateGlobalProfile() throws AuthException {
-        Map attrs = AuthUtils.getGlobalAttributes("iPlanetAMAuthService");
-        String tmpModules = Misc.getMapAttr(attrs, ISAuthConstants.KEEP_MODULES_IN_SESSION);
-        modulesInSession = Boolean.parseBoolean(tmpModules);
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("LoginState.populateGlobalProfile: Getting Global Profile: " +
-                    "\nmodulesInSession ->" + modulesInSession);
-        }
-    }
-
-    /**
      * Returns the authenticated subject.
      *
      * @return Authenticated subject
@@ -1093,12 +1078,10 @@ public class LoginState {
      * activated and <code>true</code>.
      *
      * @param subject
-     * @param ac
-     * @param loginContext instance of JAAS <code>LoginContext</code>
      * @return <code>true</code> if user session is activated successfully, <code>false if failed to activated</code>
      * or <code>true</code> if the noSession parameter is set to true.
      */
-    public boolean activateSession(Subject subject, AuthContextLocal ac, LoginContext loginContext) throws AuthException {
+    public boolean activateSession(Subject subject) throws AuthException {
         try {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("activateSession - Token is : " + token);
@@ -1113,7 +1096,7 @@ public class LoginState {
 
             InternalSession internalSession = getReferencedSession();
             final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
-                    internalSession, subject, loginContext);
+                    internalSession, subject);
             if (isSessionActivated) {
                 this.activatedSessionTrackingId = internalSession.getProperty(Constants.AM_CTX_ID);
             }
@@ -1778,7 +1761,6 @@ public class LoginState {
         setDecodedGoToOnFailURL();
         amIdRepo = LazyConfig.AUTHD.getAMIdentityRepository(getOrgDN());
         populateOrgProfile();
-        populateGlobalProfile();
         return authContext;
     }
 
@@ -6086,15 +6068,6 @@ public class LoginState {
 
     private void setLoginLockoutUserWarning(final int loginLockoutUserWarning) {
         this.loginLockoutUserWarning = loginLockoutUserWarning;
-    }
-
-    /**
-     * Whether to keep authentication module instances in the session so that they can be called on logout. This is
-     * useful if the login modules have particular logout callback functionality that must be invoked. See
-     * authentication service setting "sunAMAuthKeepAuthModuleIntances". Not supported for stateless sessions.
-     */
-    boolean isModulesInSessionEnabled() {
-        return modulesInSession;
     }
 
     /**

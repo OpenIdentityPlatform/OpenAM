@@ -18,8 +18,6 @@ package com.sun.identity.authentication.service;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.authentication.service.LoginContext;
-
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 
@@ -36,10 +34,9 @@ public interface SessionActivator {
      * @param sessionService the session service.
      * @param authSession the session used for authentication.
      * @param subject the authenticated subject.
-     * @param loginContext the login context.
      * @return whether activation was successful.
      * @throws AuthException if an error occurs that prevents session activation.
      */
     boolean activateSession(LoginState loginState, SessionService sessionService, InternalSession authSession,
-                            Subject subject, LoginContext loginContext) throws AuthException;
+                            Subject subject) throws AuthException;
 }

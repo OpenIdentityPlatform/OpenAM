@@ -18,8 +18,6 @@ package com.sun.identity.authentication.service;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.authentication.service.LoginContext;
-
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 
@@ -40,8 +38,7 @@ enum NoSessionActivator implements SessionActivator {
      */
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject,
-                                   final LoginContext loginContext) {
+                                   final InternalSession authSession, final Subject subject) {
         sessionService.destroyAuthenticationSession(authSession.getID());
         return true;
     }

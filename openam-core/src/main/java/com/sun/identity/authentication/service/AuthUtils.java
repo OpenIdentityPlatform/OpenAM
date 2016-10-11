@@ -45,7 +45,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.StringUtils;
@@ -1666,17 +1665,6 @@ public class AuthUtils extends AuthClientUtils {
             return false;
         }
 
-        if (intSession != null) {
-            LoginContext loginContext = intSession.getLoginContext();
-            try {
-                if (loginContext != null) {
-                    loginContext.logout();
-                }
-            } catch (javax.security.auth.login.LoginException loginExp) {
-                utilDebug.error("AuthUtils.logout: Cannot Execute module Logout", loginExp);
-            }
-        }
-        
         processPostAuthenticationPlugins(intSession, token, request, response);
         
         boolean isTokenValid = false;

@@ -16,12 +16,10 @@
 
 package com.sun.identity.authentication.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.mock;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -30,7 +28,6 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.authentication.service.LoginContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -74,7 +71,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockSessionService).newInternalSession(eq(ORGDN), anyBoolean());
@@ -86,7 +83,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockNewSession).clearAuthContext();
@@ -102,7 +99,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getProperty("three")).willReturn("c");
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockState).setSessionProperties(mockNewSession);
@@ -119,7 +116,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockSessionService).destroyAuthenticationSession(authSessionID);
@@ -131,7 +128,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockState).setSession(mockNewSession);
@@ -143,7 +140,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         ArgumentCaptor<Subject> subjectArgumentCaptor = ArgumentCaptor.forClass(Subject.class);
@@ -158,39 +155,10 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, subject, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, subject);
 
         // Then
         verify(mockState).setSubject(subject);
         assertThat(subject.getPrincipals()).contains(new SSOTokenPrincipal(SID.toString()));
-    }
-
-    @Test
-    public void shouldStoreLoginContextInSessionIfEnabled() throws Exception {
-        // Given
-        LoginContext loginContext = mock(LoginContext.class);
-        given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
-        given(mockState.isModulesInSessionEnabled()).willReturn(true);
-
-        // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
-
-        // Then
-        verify(mockNewSession).setLoginContext(loginContext);
-    }
-
-    @Test
-    public void shouldNotStoreLoginContextInSessionIfDisabled() throws Exception {
-        // Given
-        LoginContext loginContext = mock(LoginContext.class);
-        given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
-        given(mockState.isModulesInSessionEnabled()).willReturn(false);
-
-        // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
-
-        // Then
-        verify(mockNewSession, never()).setLoginContext(loginContext);
-
     }
 }

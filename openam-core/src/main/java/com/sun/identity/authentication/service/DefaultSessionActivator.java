@@ -37,8 +37,6 @@ import java.util.Enumeration;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.authentication.service.LoginContext;
-
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -61,15 +59,14 @@ public class DefaultSessionActivator implements SessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject,
-                                   final LoginContext loginContext)
+                                   final InternalSession authSession, final Subject subject)
             throws AuthException {
 
         //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
         final InternalSession session = createSession(sessionService, loginState);
         loginState.setSession(session);
 
-        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
+        return updateSessions(session, loginState, session, authSession, sessionService, subject);
     }
 
     /**
@@ -78,7 +75,7 @@ public class DefaultSessionActivator implements SessionActivator {
      */
     protected boolean updateSessions(InternalSession newSession, LoginState loginState,
                                      InternalSession sessionToActivate, InternalSession authSession,
-                                     SessionService sessionService, Subject subject, LoginContext loginContext)
+                                     SessionService sessionService, Subject subject)
             throws AuthException {
 
         final SessionID authSessionId = authSession.getID();
@@ -100,11 +97,6 @@ public class DefaultSessionActivator implements SessionActivator {
 
         //ensure that we've updated the subject (if appropriate, e.g. from anonymous -> known)
         loginState.setSubject(addSSOTokenPrincipal(subject, sessionToActivate.getID()));
-
-        //set the login context for this session
-        if (loginState.isModulesInSessionEnabled() && loginContext != null) {
-            newSession.setLoginContext(loginContext);
-        }
 
         try {
             return activateSession(sessionToActivate, loginState);
