@@ -229,9 +229,9 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             Object value = entry.getValue();
 
             if (!entry.getKey().equals(OAuth2Constants.Params.SCOPE)) {
-                value = ((Set<String>) value).iterator().next();
+                value = ((List<String>) value).iterator().next();
             } else {
-                value = oAuth2Utils.join((Set<String>) value, " ");
+                value = oAuth2Utils.join((List<String>) value, " ");
             }
 
             if (entry.getKey().equals(OAuth2Constants.CoreTokenParams.CLIENT_ID)) {
