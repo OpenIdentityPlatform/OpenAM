@@ -173,6 +173,7 @@
         <fastinfoset.version>1.2.13</fastinfoset.version>
         <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
         <amazon.sns.version>1.10.72</amazon.sns.version>
+        <javax.websocket-api.version>1.1</javax.websocket-api.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -487,6 +488,9 @@
         <module>openam-time-travel</module>
         <module>openam-i18n</module>
         <module>openam-test-utils</module>
+        <module>openam-notifications</module>
+        <module>openam-notifications-websocket</module>
+        <module>openam-notifications-integration</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -671,6 +675,25 @@
                 <artifactId>openam-push-notification</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-notifications</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-notifications-websocket</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-notifications-integration</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
 
             <!-- Include all Authentication Modules -->
             <dependency>
@@ -1330,7 +1353,11 @@
                 </exclusions>
             </dependency>
 
-            <!-- TODO j2ee -->
+            <dependency>
+                <groupId>javax.websocket</groupId>
+                <artifactId>javax.websocket-api</artifactId>
+                <version>${javax.websocket-api.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>javax.xml.bind</groupId>

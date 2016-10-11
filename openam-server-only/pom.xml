@@ -750,6 +750,21 @@
             <artifactId>openam-selfservice</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications-integration</artifactId>
+        </dependency>
+
         <!-- Include all Authentication Modules -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
