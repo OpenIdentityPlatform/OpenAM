@@ -35,7 +35,7 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.InternalSessionCache;
+import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
@@ -55,7 +55,7 @@ public class SessionAccessManagerTest {
     @Mock private Session mockSession;
     @Mock private SessionID mockSessionID;
     @Mock private InternalSession mockInternalSession;
-    @Mock private InternalSessionCache internalSessionCache;
+    @Mock private InternalSessionStore internalSessionCache;
 
     @BeforeMethod
     public void setUp() {

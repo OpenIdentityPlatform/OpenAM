@@ -15,21 +15,21 @@
  */
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.dpro.session.SessionID;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-public class InternalSessionCacheTest {
+import com.iplanet.dpro.session.SessionID;
+
+public class InternalSessionStoreTest {
     private InternalSession session;
     private SessionID sessionId;
-    private InternalSessionCache cache;
+    private InternalSessionStore cache;
 
     @BeforeMethod
     public void setup() {
@@ -39,7 +39,7 @@ public class InternalSessionCacheTest {
 
         SessionServiceConfig mockConfig = mock(SessionServiceConfig.class);
         given(mockConfig.getMaxSessions()).willReturn(10);
-        cache = new InternalSessionCache(mockConfig);
+        cache = new InternalSessionStore(mockConfig);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class InternalSessionCacheTest {
         cache.put(session);
 
         // When
-        cache.remove(session);
+        cache.remove(sessionId);
 
         // Then
         assertThat(cache.getByHandle(handle)).isNull();
@@ -93,7 +93,7 @@ public class InternalSessionCacheTest {
         cache.put(session);
 
         // When
-        cache.remove(session);
+        cache.remove(sessionId);
 
         // Then
         assertThat(cache.getByRestrictedID(restricted)).isNull();

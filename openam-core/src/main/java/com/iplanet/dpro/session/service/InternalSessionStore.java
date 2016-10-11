@@ -22,28 +22,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.utils.SingleValueMapper;
 import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.SessionID;
 
 /**
- * Responsible for caching and providing access to {@link com.iplanet.dpro.session.service.InternalSession} objects.
- *
- * InternalSessions are the representation of the users session which has been homed on a particular server.
- * These sessions are managed entirely by {@link com.iplanet.dpro.session.service.SessionService}.
- *
- * This cache will provide access to the sessions via a number of concepts:
- *
- * - SessionID of the InternalSession
- * - Session handle of the InternalSession
- * - Any of the restricted SessionIDs of the InternalSession
+ * This implementation of the cache which is managed entirely externally.
  *
  * This cache has been designed to remove previous references to Session handles and restricted tokens
  * when they are no longer referenced by the InternalSession.
  */
 @Singleton
-public class InternalSessionCache {
+public class InternalSessionStore implements InternalSessionCache {
     private final ConcurrentHashMap<SessionID, InternalSession> cache;
     private final SingleValueMapper<String, InternalSession> handle = new SingleValueMapper<>();
     private final SingleValueMapper<SessionID, InternalSession> restricted = new SingleValueMapper<>();
@@ -53,36 +45,26 @@ public class InternalSessionCache {
      * @param config Non null configuration to base caching estimates from.
      */
     @Inject
-    InternalSessionCache(SessionServiceConfig config) {
+    InternalSessionStore(SessionServiceConfig config) {
         cache = new ConcurrentHashMap<>(config.getMaxSessions());
     }
 
+    @Override
     public InternalSession getBySessionID(SessionID sessionID) {
         return cache.get(sessionID);
     }
 
+    @Override
     public InternalSession getByHandle(String sessionHandle) {
         return handle.get(sessionHandle);
     }
 
-    /**
-     * Gets a restricted session from a given SessionID.
-     * @param sessionID the ID of the restricted session to retrieve
-     * @return a restricted Internal Session
-     */
+    @Override
     public InternalSession getByRestrictedID(SessionID sessionID) {
         return restricted.get(sessionID);
     }
 
-    /**
-     * Stores the InternalSession in the cache. This will also store any associated references
-     * which have been stored on the Session:
-     *
-     * - Session Handle
-     * - Restricted Tokens
-     *
-     * @param session Non null InternalSession to store.
-     */
+    @Override
     public void put(InternalSession session) {
         Reject.ifNull(session);
         cache.put(session.getID(), session);
@@ -98,13 +80,7 @@ public class InternalSessionCache {
         }
     }
 
-    /**
-     * Remove the Session from the cache.
-     *
-     * @param sessionID Non null SessionID.
-     *
-     * @return The InternalSession that was removed from the cache.
-     */
+    @Override
     public InternalSession remove(SessionID sessionID) {
         InternalSession remove = cache.remove(sessionID);
 
@@ -125,32 +101,19 @@ public class InternalSessionCache {
         return remove;
     }
 
-    /**
-     * @param session The InternalSession to remove.
-     * @return Non null InternalSession removed from the cache.
-     */
-    public InternalSession remove(InternalSession session) {
-        return remove(session.getID());
-    }
-
-    /**
-     * @return Current number of sessions stored in the cache.
-     */
+    @Override
     public int size() {
         return cache.size();
     }
 
-    /**
-     * @return <tt>true</tt> if this cache is empty.
-     */
+    @Override
     public boolean isEmpty() {
         return cache.isEmpty();
     }
 
-    /**
-     * @return Unmodifiable collection of all Sessions that are stored in the cache.
-     */
+    @Override
     public Collection<InternalSession> getAllSessions() {
         return Collections.unmodifiableCollection(cache.values());
     }
+
 }

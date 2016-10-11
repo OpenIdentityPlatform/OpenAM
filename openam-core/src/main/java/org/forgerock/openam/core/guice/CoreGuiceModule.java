@@ -82,6 +82,7 @@ import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
@@ -129,6 +130,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
+import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
@@ -251,6 +253,7 @@ public class CoreGuiceModule extends AbstractModule {
         /**
          * Session related dependencies.
          */
+        bind(InternalSessionCache.class).to(InternalSessionStore.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
         bind(new TypeLiteral<Config<SessionService>>() {
