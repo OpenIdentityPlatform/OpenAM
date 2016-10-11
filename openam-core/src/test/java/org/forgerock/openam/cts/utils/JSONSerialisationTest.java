@@ -16,8 +16,10 @@
 package org.forgerock.openam.cts.utils;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.*;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
@@ -38,9 +40,11 @@ import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.core.guice.DataLayerGuiceModule;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.IOUtils;
+import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -52,7 +56,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class, JSONSerialisationTest.DummyAuditConfigModule.class})
+@GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class,
+        JSONSerialisationTest.DummyConfigModule.class})
 public class JSONSerialisationTest extends GuiceTestCase {
 
     private JSONSerialisation serialization;
@@ -183,12 +188,13 @@ public class JSONSerialisationTest extends GuiceTestCase {
         assertThat(obj).isInstanceOf(ConcurrentHashMap.class);
     }
 
-    public static class DummyAuditConfigModule extends AbstractModule {
+    public static class DummyConfigModule extends AbstractModule {
         @Override
         protected void configure() {
             bind(AuditServiceConfigurationProvider.class).to(DummyAuditServiceConfigurationProvider.class);
             bind(AuditServiceProvider.class).to(DummyAuditServiceProvider.class);
             bind(AuditEventPublisher.class).to(AuditEventPublisherImpl.class);
+            bind(NotificationBroker.class).toInstance(mock(NotificationBroker.class));
         }
     }
 

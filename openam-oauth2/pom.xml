@@ -158,6 +158,11 @@
             <artifactId>forgerock-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications-integration</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Powermock -->
         <dependency>

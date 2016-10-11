@@ -67,6 +67,14 @@ public final class NotificationsWebSocket {
     private Subscription subscription;
 
     /**
+     * No args constructor as required by JSR-356. Instances created
+     * with this constructor are not expected to be used.
+     */
+    public NotificationsWebSocket() {
+        broker = null;
+    }
+
+    /**
      * Constructs a new notification websocket endpoint.
      *
      * @param broker the notification broker

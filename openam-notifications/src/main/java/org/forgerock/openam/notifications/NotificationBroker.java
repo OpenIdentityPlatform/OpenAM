@@ -37,7 +37,8 @@ public interface NotificationBroker {
      *
      * @param topic topic
      * @param notification notification
-     * @return whether the notification has successfully been published.
+     * @return attempts to give some indication whether the topic was successfully published. False gives a guarantee
+     * that publication definitely failed.
      */
     boolean publish(Topic topic, JsonValue notification);
 

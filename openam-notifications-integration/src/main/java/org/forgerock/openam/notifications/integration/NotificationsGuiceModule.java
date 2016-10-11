@@ -19,16 +19,21 @@ package org.forgerock.openam.notifications.integration;
 import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.notifications.NotificationBroker;
-import org.forgerock.openam.notifications.brokers.SingleQueueNotificationBroker;
+import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
+import org.forgerock.openam.notifications.integration.brokers.CTSNotificationBroker;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 
+import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
 
 /**
  * Guice bindings for notifications.
@@ -40,9 +45,16 @@ public class NotificationsGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
-        bind(NotificationBroker.class).to(SingleQueueNotificationBroker.class).in(Singleton.class);
-        bindConstant().annotatedWith(Names.named("queueTimeout")).to(500L);
-        bindConstant().annotatedWith(Names.named("queueSize")).to(10000);
+        bind(NotificationBroker.class)
+                .annotatedWith(Names.named("localBroker"))
+                .to(InMemoryNotificationBroker.class)
+                .in(Singleton.class);
+        bindConstant().annotatedWith(Names.named("queueTimeoutMilliseconds"))
+                .to(SystemProperties.getAsLong("org.forgerock.openam.notifications.local.queueTimeoutMilliseconds", 500L));
+        bindConstant().annotatedWith(Names.named("queueSize"))
+                .to(SystemProperties.getAsInt("org.forgerock.openam.notifications.local.queueSize", 10000));
+        bindConstant().annotatedWith(Names.named("tokenExpirySeconds"))
+                .to(SystemProperties.getAsLong("org.forgerock.openam.notifications.cts.tokenExpirySeconds", 600L));
 
         expose(NotificationBroker.class);
     }
@@ -51,6 +63,16 @@ public class NotificationsGuiceModule extends PrivateModule {
     @Inject
     ExecutorService executorService(ExecutorServiceFactory factory) {
         return factory.createFixedThreadPool(1);
+    }
+
+    @Provides
+    @Exposed
+    @Inject
+    @Singleton
+    NotificationBroker notificationBroker(CTSPersistentStore store,
+            @Named("localBroker") NotificationBroker broker,
+            @Named("tokenExpirySeconds") long tokenExpirySeconds) {
+        return new CTSNotificationBroker(store, broker, tokenExpirySeconds);
     }
 
 }

@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A notification broker that uses a single shared queue for incoming notifications and
+ * A notification broker that uses an in-memory shared queue for incoming notifications and
  * a single thread for reading from it. Routing of notifications to subscriptions is done
  * on the reading thread.
  * <p>
@@ -57,9 +57,9 @@ import org.slf4j.LoggerFactory;
  *
  * @since 14.0.0
  */
-public final class SingleQueueNotificationBroker implements NotificationBroker {
+public final class InMemoryNotificationBroker implements NotificationBroker {
 
-    private static final Logger logger = LoggerFactory.getLogger(SingleQueueNotificationBroker.class);
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryNotificationBroker.class);
     private static final DateTimeFormatter TS_FORMATTER = ISODateTimeFormat.dateTime();
 
     private final BlockingQueue<NotificationEntry> queue;
@@ -67,26 +67,26 @@ public final class SingleQueueNotificationBroker implements NotificationBroker {
     private final TimeService timeService;
     private final Future<?> readerFuture;
 
-    private final long queueTimeout;
+    private final long queueTimeoutMilliseconds;
     private volatile boolean shutdown;
 
     /**
-     * Constructs a new SingleQueueNotificationBroker.
+     * Constructs a new InMemoryNotificationBroker.
      *
      * @param executorService an executor service for creating the reading thread
      * @param timeService a time service for adding timestamps to messages
-     * @param queueTimeout the maximum number of milliseconds to wait when attempting to publish a message
+     * @param queueTimeoutMilliseconds the maximum number of milliseconds to wait when attempting to publish a message
      * @param queueSize the number of notifications to buffer in memory
      */
     @Inject
-    public SingleQueueNotificationBroker(ExecutorService executorService, TimeService timeService,
-            @Named("queueTimeout") long queueTimeout, @Named("queueSize") int queueSize) {
+    public InMemoryNotificationBroker(ExecutorService executorService, TimeService timeService,
+            @Named("queueTimeoutMilliseconds") long queueTimeoutMilliseconds, @Named("queueSize") int queueSize) {
         Reject.ifNull(executorService, "Executor service must not be null");
         Reject.ifNull(timeService, "Time service must not be null");
-        Reject.ifTrue(queueTimeout < 0, "Queue timeout must be a positive integer");
+        Reject.ifTrue(queueTimeoutMilliseconds < 0, "Queue timeout must be a positive integer");
         Reject.ifTrue(queueSize < 0, "Queue size must be a positive integer");
 
-        this.queueTimeout = queueTimeout;
+        this.queueTimeoutMilliseconds = queueTimeoutMilliseconds;
         this.timeService = timeService;
 
         queue = new ArrayBlockingQueue<>(queueSize);
@@ -107,7 +107,7 @@ public final class SingleQueueNotificationBroker implements NotificationBroker {
         try {
             NotificationEntry entry = NotificationEntry.of(topic, packageNotification(topic, notification));
 
-            if (!queue.offer(entry, queueTimeout, TimeUnit.MILLISECONDS)) {
+            if (!queue.offer(entry, queueTimeoutMilliseconds, TimeUnit.MILLISECONDS)) {
                 logger.warn("Failed to publish notification to queue, notification has been discarded");
                 return false;
             }

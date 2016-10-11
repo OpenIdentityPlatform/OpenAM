@@ -1376,6 +1376,11 @@ public interface Constants {
      */
     public static final String ENABLE_TRACE_IN_MESSAGE_MODE = "org.forgerock.openam.slf4j.enableTraceInMessage";
 
+    /**
+     * Property to determine whether notifications should be published for agent consumption.
+     */
+    String NOTIFICATIONS_AGENTS_ENABLED = "org.forgerock.openam.notifications.agents.enabled";
+
     /** Service name for the REST APIs service. */
     String REST_APIS_SERVICE_NAME = "RestApisService";
     

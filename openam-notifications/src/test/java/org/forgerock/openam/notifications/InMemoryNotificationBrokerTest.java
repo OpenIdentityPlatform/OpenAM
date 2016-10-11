@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.notifications.brokers.SingleQueueNotificationBroker;
+import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
 import org.forgerock.util.time.TimeService;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -43,11 +43,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link SingleQueueNotificationBroker}.
+ * Unit test for {@link InMemoryNotificationBroker}.
  *
  * @since 14.0.0
  */
-public final class SingleQueueNotificationBrokerTest {
+public final class InMemoryNotificationBrokerTest {
 
     @Mock
     private ExecutorService executorService;
@@ -69,7 +69,7 @@ public final class SingleQueueNotificationBrokerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         doReturn(readerFuture).when(executorService).submit(any(Runnable.class));
-        broker = new SingleQueueNotificationBroker(executorService, timeService, 10L, 2);
+        broker = new InMemoryNotificationBroker(executorService, timeService, 10L, 2);
     }
 
     @Test

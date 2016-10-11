@@ -29,7 +29,10 @@
 
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.net.URL;
 import java.util.Map;
@@ -39,6 +42,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.Topic;
+import org.forgerock.openam.notifications.NotificationsConfig;
+import org.forgerock.openam.session.SessionEvent;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -74,6 +82,8 @@ public class SessionNotificationSender {
     private final SessionServerConfig serverConfig;
     private final SessionInfoFactory sessionInfoFactory;
     private final ThreadPool threadPool;
+    private final NotificationBroker broker;
+
     /**
      * The URL Vector for ALL session events : SESSION_CREATION, IDLE_TIMEOUT,
      * MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY.
@@ -85,12 +95,14 @@ public class SessionNotificationSender {
             final SessionServiceConfig serviceConfig,
             final SessionServerConfig serverConfig,
             final SessionInfoFactory sessionInfoFactory,
-            final ShutdownManager shutdownManager) {
+            final ShutdownManager shutdownManager,
+            final NotificationBroker broker) {
 
         this.sessionDebug = sessionDebug;
         this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
         this.sessionInfoFactory = sessionInfoFactory;
+        this.broker = broker;
 
         threadPool = new ThreadPool(THREAD_POOL_NAME, serviceConfig.getNotificationThreadPoolSize(),
                 serviceConfig.getNotificationThreadPoolThreshold(), true, sessionDebug);
@@ -119,6 +131,16 @@ public class SessionNotificationSender {
      */
     public void sendEvent(InternalSession session, int eventType) {
         sessionDebug.message("Running sendEvent, type = " + eventType);
+
+        if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
+            SessionEvent sessionEvent = SessionEvent.valueOf(eventType);
+            publishSessionNotification(session.getSessionID(), sessionEvent);
+
+            for (SessionID sessionId : session.getRestrictedTokens()) {
+                publishSessionNotification(sessionId, sessionEvent);
+            }
+        }
+
         try {
             SessionNotificationSenderTask sns = new SessionNotificationSenderTask(session, eventType);
             // First send local notification. sendToLocal will return
@@ -131,6 +153,13 @@ public class SessionNotificationSender {
         } catch (ThreadPoolException e) {
             sessionDebug.error("Sending Notification Error: ", e);
         }
+    }
+
+    private void publishSessionNotification(SessionID sessionId, SessionEvent sessionEvent) {
+        JsonValue notification = json(object(
+                field("tokenId", sessionId.toString()),
+                field("eventType", sessionEvent)));
+        broker.publish(Topic.of("/agent/session"), notification);
     }
 
     /**

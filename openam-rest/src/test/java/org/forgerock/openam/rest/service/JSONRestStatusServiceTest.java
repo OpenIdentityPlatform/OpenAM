@@ -16,20 +16,22 @@
 
 package org.forgerock.openam.rest.service;
 
-import java.io.IOException;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
 
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.json.resource.ResourceException;
-import static org.mockito.Mockito.mock;
-
 import org.forgerock.openam.audit.AuditCoreGuiceModule;
 import org.forgerock.openam.audit.configuration.AuditConfigurationGuiceModule;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.core.guice.DataLayerGuiceModule;
+import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.rest.RestGuiceModule;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
@@ -37,7 +39,6 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -92,6 +93,8 @@ public class JSONRestStatusServiceTest extends GuiceTestCase {
         @Override
         protected void configure() {
             bind(JacksonRepresentationFactory.class);
+            bind(NotificationBroker.class).toInstance(mock(NotificationBroker.class));
         }
+
     }
 }
