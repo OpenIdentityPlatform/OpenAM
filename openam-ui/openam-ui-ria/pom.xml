@@ -154,20 +154,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>crypto-js</artifactId>
-            <version>3.1.2</version>
-            <classifier>min</classifier>
-            <type>js</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>crypto-js</artifactId>
-            <version>3.1.2</version>
-            <classifier>sha256.min</classifier>
-            <type>js</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>classnames</artifactId>
             <version>2.2.5</version>
             <type>js</type>

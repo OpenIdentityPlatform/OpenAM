@@ -38,11 +38,11 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
     public final static String NAME = "SessionResourceFilter";
 
     @Inject
-    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager, TokenHashToIDMapper hashToIdMapper) {
-        super("tokenId", ssoTokenManager, hashToIdMapper,
-                SessionResource.DELETE_PROPERTY_ACTION_ID,
-                SessionResource.GET_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_NAMES_ACTION_ID,
-                SessionResource.SET_PROPERTY_ACTION_ID, SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
+    public SessionResourceAuthzModule(SSOTokenManager ssoTokenManager) {
+        super("tokenId", ssoTokenManager,
+                SessionResource.DELETE_PROPERTY_ACTION_ID, SessionResource.GET_PROPERTY_ACTION_ID,
+                SessionResource.GET_PROPERTY_NAMES_ACTION_ID, SessionResource.SET_PROPERTY_ACTION_ID,
+                SessionResource.GET_TIME_LEFT_ACTION_ID, SessionResource.GET_MAX_IDLE_ACTION_ID);
     }
 
     @Override
@@ -79,7 +79,6 @@ public class SessionResourceAuthzModule extends TokenOwnerAuthzModule {
 
     private boolean actionCanBeInvokedByNonAdmin(String actionId) {
         return SessionResource.VALIDATE_ACTION_ID.equalsIgnoreCase(actionId) ||
-                SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId) ||
-                SessionResourceV2.REFRESH_ACTION_ID.equalsIgnoreCase(actionId);
+                SessionResource.LOGOUT_ACTION_ID.equalsIgnoreCase(actionId);
     }
 }

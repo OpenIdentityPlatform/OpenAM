@@ -15,8 +15,6 @@
  */
 
 import _ from "lodash";
-import "crypto-js-sha256";
-import CryptoJS from "crypto-js";
 
 import { sessionAddInfo } from "store/actions/creators";
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
@@ -24,17 +22,13 @@ import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import store from "store/index";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/sessions`);
-const getHexEncodedSHA256Hash = (input) => {
-    const hash = CryptoJS.SHA256(input);
-
-    return CryptoJS.enc.Hex.stringify(hash);
-};
 const getSessionInfo = (token, options) => {
     return obj.serviceCall(_.merge({
-        url: `/${getHexEncodedSHA256Hash(token)}`,
+        url: `?_action=getSessionInfo&tokenId=${token}`,
+        type: "POST",
+        data: {},
         headers: {
-            "Accept-API-Version": "protocol=1.0,resource=2.0",
-            "user-session-token": token
+            "Accept-API-Version": "protocol=1.0,resource=2.0"
         }
     }, options));
 };
@@ -57,12 +51,11 @@ export const isSessionValid = (token) => getSessionInfo(token).then((response) =
 
 export const logout = (token) => {
     return obj.serviceCall({
-        url: `/${getHexEncodedSHA256Hash(token)}?_action=logout`,
+        url: `?_action=logout&tokenId=${token}`,
         type: "POST",
         data: {},
         headers: {
-            "Accept-API-Version": "protocol=1.0,resource=2.0",
-            "user-session-token": token
+            "Accept-API-Version": "protocol=1.0,resource=2.0"
         },
         errorsHandlers: { "Bad Request": { status: 400 } }
     });

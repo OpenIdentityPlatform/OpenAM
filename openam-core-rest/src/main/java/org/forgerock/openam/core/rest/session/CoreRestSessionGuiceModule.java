@@ -44,20 +44,9 @@ public class CoreRestSessionGuiceModule extends AbstractModule {
     @Named("SessionResourceAuthzModule")
     public AnyOfAuthzModule getSessionResourceAuthzModule(SSOTokenManager ssoTokenManager,
             CrestPrivilegeAuthzModule privilegeAuthzModule,
-            AdminOnlyAuthzModule adminOnlyAuthzModule, TokenHashToIDMapper hashToIdMapper) {
+            AdminOnlyAuthzModule adminOnlyAuthzModule) {
         List<CrestAuthorizationModule> authzList = initializeAuthzList(privilegeAuthzModule, adminOnlyAuthzModule);
-        authzList.add(new SessionResourceAuthzModule(ssoTokenManager, hashToIdMapper));
-        return new AnyOfAuthzModule(authzList);
-    }
-
-    @Provides
-    @Inject
-    @Named("SessionPropertiesResourceAuthzModule")
-    public AnyOfAuthzModule getSessionPropertiesResourceAuthzModule(SSOTokenManager ssoTokenManager,
-            CrestPrivilegeAuthzModule privilegeAuthzModule,
-            AdminOnlyAuthzModule adminOnlyAuthzModule, TokenHashToIDMapper hashToIdMapper) {
-        List<CrestAuthorizationModule> authzList = initializeAuthzList(privilegeAuthzModule, adminOnlyAuthzModule);
-        authzList.add(new SessionPropertiesResourceAuthzModule(ssoTokenManager, hashToIdMapper));
+        authzList.add(new SessionResourceAuthzModule(ssoTokenManager));
         return new AnyOfAuthzModule(authzList);
     }
 
