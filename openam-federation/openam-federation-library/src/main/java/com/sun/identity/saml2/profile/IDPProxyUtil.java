@@ -38,6 +38,8 @@ import java.util.logging.Level;
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.protocol.RequesterID;
+import com.sun.identity.saml2.protocol.impl.RequesterIDImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.encode.URLEncDec;
@@ -385,6 +387,11 @@ public class IDPProxyUtil {
                     newScoping.setProxyCount(new Integer(proxyCount-1));
                 }
                 newScoping.setIDPList(scoping.getIDPList());
+
+                //Set the requesterIDs
+                newScoping.setRequesterIDs(scoping.getRequesterIDs());
+                addRequesterIDToScope(newScoping, origRequest.getIssuer().getValue());
+
                 newRequest.setScoping(newScoping);
             } else {
                 //handling the alwaysIdpProxy case -> the incoming request
@@ -404,6 +411,10 @@ public class IDPProxyUtil {
                         scoping.setProxyCount(proxyCount - 1);
                     }
                 }
+
+                //Set the requesterIDs
+                addRequesterIDToScope(scoping, origRequest.getIssuer().getValue());
+
                 List<String> proxyIdPs = spConfigAttrMap.get(
                         SAML2Constants.IDP_PROXY_LIST);
                 if (proxyIdPs != null && !proxyIdPs.isEmpty()) {
@@ -427,6 +438,19 @@ public class IDPProxyUtil {
                 "Error in creating new authn request.", ex);
             throw new SAML2Exception(ex);
         }
+    }
+
+    public static void addRequesterIDToScope(Scoping scoping, String requesterId) throws SAML2Exception {
+        List<RequesterID> requesterIDs = new ArrayList<>();
+        if (scoping.getRequesterIDs() != null) {
+            requesterIDs.addAll(scoping.getRequesterIDs());
+        }
+
+        RequesterID requesterID = new RequesterIDImpl();
+        requesterID.setValue(requesterId);
+        requesterIDs.add(requesterID);
+
+        scoping.setRequesterIDs(requesterIDs);
     }
     
     /**
