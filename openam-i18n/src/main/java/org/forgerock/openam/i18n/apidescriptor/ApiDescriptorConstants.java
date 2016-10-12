@@ -202,6 +202,12 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String APPLICATIONS_RESOURCE = TRANSLATION_KEY_PREFIX + "ApplicationsResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SERVER_PROPERTIES = TRANSLATION_KEY_PREFIX + "SmsServerPropertiesResource#";
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String CONSOLE = "i18n:amConsole#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

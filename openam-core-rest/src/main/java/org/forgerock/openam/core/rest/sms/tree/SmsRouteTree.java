@@ -24,15 +24,26 @@ import static org.forgerock.api.models.Paths.paths;
 import static org.forgerock.api.models.Resource.resource;
 import static org.forgerock.api.models.VersionedPath.UNVERSIONED;
 import static org.forgerock.api.models.VersionedPath.versionedPath;
-import static org.forgerock.authz.filter.crest.AuthorizationFilters.*;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Requests.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.forgerock.json.resource.ResourcePath.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.json.resource.Router.*;
-import static org.forgerock.openam.rest.RestConstants.*;
-import static org.forgerock.openam.utils.JsonValueBuilder.fromResource;
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Requests.newActionRequest;
+import static org.forgerock.json.resource.Requests.newQueryRequest;
+import static org.forgerock.json.resource.Requests.newReadRequest;
+import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
+import static org.forgerock.json.resource.ResourceException.NOT_FOUND;
+import static org.forgerock.json.resource.ResourceException.NOT_SUPPORTED;
+import static org.forgerock.json.resource.ResourcePath.empty;
+import static org.forgerock.json.resource.ResourcePath.resourcePath;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Router.uriTemplate;
+import static org.forgerock.openam.rest.RestConstants.FOR_UI;
+import static org.forgerock.openam.rest.RestConstants.GET_ALL_TYPES;
+import static org.forgerock.openam.rest.RestConstants.GET_CREATABLE_TYPES;
+import static org.forgerock.openam.rest.RestConstants.GET_TYPE;
+import static org.forgerock.openam.rest.RestConstants.NEXT_DESCENDENTS;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -46,7 +57,6 @@ import org.forgerock.api.models.Definitions;
 import org.forgerock.api.models.Paths;
 import org.forgerock.api.models.Resource;
 import org.forgerock.api.models.Schema;
-import org.forgerock.api.models.TranslateJsonSchema;
 import org.forgerock.api.models.VersionedPath;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guava.common.base.Predicate;
@@ -76,6 +86,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.openam.rest.DescriptorUtils;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
@@ -125,9 +136,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
                     .build());
 
     private static Schema schemaFromResource(String schemaName) {
-        return Schema.newBuilder().schema(
-                fromResource(SmsRouteTree.class, "SmsRouteTree." + schemaName + ".schema.json")
-                        .as(new TranslateJsonSchema(CLASS_LOADER))).build();
+        return DescriptorUtils.fromResource("SmsRouteTree." + schemaName + ".schema.json", SmsRouteTree.class);
     }
 
     /**

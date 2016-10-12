@@ -62,6 +62,10 @@ public class CoreRestSmsGuiceModule extends AbstractModule {
                 .build(SmsCollectionProviderFactory.class));
 
         install(new FactoryModuleBuilder()
+                .implement(SmsServerPropertiesResource.class, SmsServerPropertiesResource.class)
+                .build(SmsServerPropertiesResourceFactory.class));
+
+        install(new FactoryModuleBuilder()
                 .implement(SmsSingletonProvider.class, SmsSingletonProvider.class)
                 .build(SmsSingletonProviderFactory.class));
 
