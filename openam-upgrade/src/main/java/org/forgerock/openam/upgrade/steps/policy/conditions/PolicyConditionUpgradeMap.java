@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
@@ -23,6 +23,7 @@ import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
+import com.sun.identity.entitlement.NotSubject;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
 import com.sun.identity.policy.interfaces.Condition;
@@ -384,15 +385,21 @@ class PolicyConditionUpgradeMap {
                     @Override
                     public EntitlementSubject migrate(PolicySubject subject, MigrationReport migrationReport) {
 
-                        IdentitySubject eSubject = new IdentitySubject();
+                        EntitlementSubject eSubject;
+                        IdentitySubject iSubject = new IdentitySubject();
 
                         Set<String> subjects = subject.getValues();
 
-                        eSubject.setSubjectValues(subjects);
+                        iSubject.setSubjectValues(subjects);
+                        eSubject = iSubject;
+
+                        if (subject.isExclusive()) {
+                            eSubject = new NotSubject(iSubject);
+                        }
 
                         migrationReport.migratedSubjectCondition(
                                 com.sun.identity.policy.plugins.AMIdentitySubject.class.getName(),
-                                IdentitySubject.class.getName());
+                                eSubject.getClass().getName());
                         return eSubject;
                     }
                 });
@@ -401,12 +408,17 @@ class PolicyConditionUpgradeMap {
                 new SubjectConditionMigrator() {
                     @Override
                     public EntitlementSubject migrate(PolicySubject subject, MigrationReport migrationReport) {
+                        EntitlementSubject eSubject;
 
-                        AuthenticatedUsers eSubject = new AuthenticatedUsers();
+                        if (subject.isExclusive()) {
+                            eSubject = new NotSubject(new AuthenticatedUsers());
+                        } else {
+                            eSubject = new AuthenticatedUsers();
+                        }
 
                         migrationReport.migratedSubjectCondition(
                                 com.sun.identity.policy.plugins.AuthenticatedUsers.class.getName(),
-                                AuthenticatedUsers.class.getName());
+                                eSubject.getClass().getName());
                         return eSubject;
                     }
         });

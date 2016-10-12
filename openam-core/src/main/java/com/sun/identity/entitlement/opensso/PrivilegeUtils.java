@@ -552,7 +552,7 @@ public class PrivilegeUtils {
         EntitlementSubject es = privilege.getSubject();
         if ((es != null) && (es != Privilege.NOT_SUBJECT)) {
             Subject sbj = eSubjectToEPSubject(es);
-            policy.addSubject(getSubjectName(es), sbj, false);
+            policy.addSubject(getSubjectName(es), sbj, isExclusive(es));
         }
 
         EntitlementCondition ec = privilege.getCondition();
@@ -593,6 +593,22 @@ public class PrivilegeUtils {
             name = randomName();
         }
         return name;
+    }
+
+    /**
+     * Determine if this subject has exclusive/excluded state.
+     * If the subject is a legacy policy subject then return
+     * it's exclusive state.  Otherwise, return false
+     *
+     * @param subject the subject to check for exclusive/excluded
+     * @return state of the subject exclusive/excluded state
+     */
+    private static boolean isExclusive(EntitlementSubject subject) {
+        if (subject instanceof PolicySubject) {
+           return ((PolicySubject) subject).isExclusive();
+        } else {
+           return false;
+        }
     }
 
     /**
