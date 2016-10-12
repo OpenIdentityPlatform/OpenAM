@@ -32,10 +32,12 @@ import org.forgerock.util.query.QueryFilter;
 /**
  * A query that selects all CTS tokens whose expiry date field is prior to the current timestamp (e.g. who have
  * exceeded their maximum expiry time).
+ *
+ * @param <C> The type of connection queries are made for.
  */
-public class CTSWorkerPastExpiryDateQuery<C, F> extends CTSWorkerBaseQuery {
+public class CTSWorkerPastExpiryDateQuery<C> extends CTSWorkerBaseQuery {
 
-    private final QueryFactory<C, F> queryFactory;
+    private final QueryFactory<C, CoreTokenField> queryFactory;
     private final int pageSize;
 
     @Inject
@@ -56,7 +58,7 @@ public class CTSWorkerPastExpiryDateQuery<C, F> extends CTSWorkerBaseQuery {
         return queryFactory.createInstance()
                 .withFilter(filter.accept(queryFactory.createFilterConverter(), null))
                 .pageResultsBy(pageSize)
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID, CoreTokenField.ETAG);
+                .returnTheseAttributes(CoreTokenField.TOKEN_ID);
     }
 
 }

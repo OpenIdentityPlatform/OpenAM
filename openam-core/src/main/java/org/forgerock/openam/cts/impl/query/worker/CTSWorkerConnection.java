@@ -34,10 +34,10 @@ import org.forgerock.openam.utils.IOUtils;
  * Threading Policy: This class will detect that the current thread has been interrupted
  * and close the established connection.
  */
-public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery {
+public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery, AutoCloseable {
 
     private final ConnectionFactory<C> factory;
-    private final CTSWorkerBaseQuery query;
+    private final CTSWorkerBaseQuery<C> query;
     private C connection;
     private boolean failed = false;
 
@@ -48,7 +48,7 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
      * @param factory Required for establishing a connection to the persistence layer.
      * @param query The specific implementation that will be delegated to.
      */
-    public CTSWorkerConnection(ConnectionFactory factory, CTSWorkerBaseQuery query) {
+    public CTSWorkerConnection(ConnectionFactory<C> factory, CTSWorkerBaseQuery<C> query) {
         this.factory = factory;
         this.query = query;
     }
@@ -80,7 +80,7 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
             Collection<PartialToken> results = query.nextPage();
             endProcessing(results);
             return results;
-        } catch (CoreTokenException e) {
+        } catch (CoreTokenException | RuntimeException e) {
             failed = true;
             close();
             throw e;
@@ -117,7 +117,8 @@ public class CTSWorkerConnection<C extends Closeable> implements CTSWorkerQuery 
     /**
      * Close and null the connection.
      */
-    private void close() {
+    @Override
+    public void close() {
         IOUtils.closeIfNotNull(connection);
     }
 }

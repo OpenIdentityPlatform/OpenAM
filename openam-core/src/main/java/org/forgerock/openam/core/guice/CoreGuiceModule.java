@@ -22,7 +22,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -55,12 +54,9 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerIdleTimeExpiredQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerMaxSessionTimeExpiredQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPurgeDelayExpiredQuery;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
@@ -70,7 +66,7 @@ import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFact
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
 import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
-import org.forgerock.openam.cts.worker.process.deletion.CTSWorkerDeleteProcess;
+import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
@@ -409,61 +405,25 @@ public class CoreGuiceModule extends AbstractModule {
         return esf.createScheduledService(1);
     }
 
-    @Provides @Inject @Named(CTSWorkerConstants.PASSED_EXPIRED_DATE)
-    CTSWorkerQuery getPastExpiryDateQuery(CTSWorkerPastExpiryDateQuery query,
-                                          @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
-    CTSWorkerQuery getMaxSessionTimeExpiredQuery(CTSWorkerMaxSessionTimeExpiredQuery query,
-                                                 @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.IDLE_TIME_EXPIRED)
-    CTSWorkerQuery getMaxSessionTimeExpiredQuery(CTSWorkerIdleTimeExpiredQuery query,
-                                                 @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.PURGE_DELAY_EXPIRED)
-    CTSWorkerQuery getMaxSessionTimeExpiredQuery(CTSWorkerPurgeDelayExpiredQuery query,
-                                                 @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
+    @Provides @Inject @Named(CTSWorkerConstants.PAST_EXPIRY_DATE)
+    CTSWorkerQuery getPastExpiryDateQuery(
+            CTSWorkerPastExpiryDateQuery query,
+            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
         return new CTSWorkerConnection<>(factory, query);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)
-    CTSWorkerTask getDeleteAllMaxExpiredReaperTask(@Named(CTSWorkerConstants.PASSED_EXPIRED_DATE) CTSWorkerQuery query,
-                                                   CTSWorkerDeleteProcess deleteProcess,
-                                                   CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.MARK_SESSION_TIME_EXPIRED)
-    CTSWorkerTask getMarkSessionTimeExpiredReaperTask(@Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED) CTSWorkerQuery query,
-                                                      CTSWorkerDeleteProcess deleteProcess,
-                                                      CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.MARK_IDLE_TIME_EXPIRED)
-    CTSWorkerTask getMarkIdleTimeExpiredReaperTask(@Named(CTSWorkerConstants.IDLE_TIME_EXPIRED) CTSWorkerQuery query,
-                                                   CTSWorkerDeleteProcess deleteProcess,
-                                                   CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.DELETE_PURGE_DELAY_EXPIRED)
-    CTSWorkerTask getDeletePurgeDelayExpiredReaperTask(@Named(CTSWorkerConstants.PURGE_DELAY_EXPIRED) CTSWorkerQuery query,
-                                                       CTSWorkerDeleteProcess deleteProcess,
-                                                       CTSWorkerSelectAllFilter selectAllFilter) {
+    CTSWorkerTask getDeleteAllMaxExpiredReaperTask(
+            @Named(CTSWorkerConstants.PAST_EXPIRY_DATE) CTSWorkerQuery query,
+            CTSWorkerDeleteProcess deleteProcess,
+            CTSWorkerSelectAllFilter selectAllFilter) {
         return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
     }
 
     @Provides @Inject
-    CTSWorkerTaskProvider getReaperTaskProvider(@Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED) CTSWorkerTask deleteAllTask) {
-        return new CTSWorkerTaskProvider(Collections.singletonList(deleteAllTask));
+    CTSWorkerTaskProvider getWorkerTaskProvider(
+            @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED) CTSWorkerTask deleteExpiredTokensTask) {
+        return new CTSWorkerTaskProvider(Arrays.asList(deleteExpiredTokensTask));
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)

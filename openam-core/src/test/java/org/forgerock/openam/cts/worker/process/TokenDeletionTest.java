@@ -13,9 +13,9 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.reaper;
+package org.forgerock.openam.cts.worker.process;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.forgerock.openam.cts.worker.process.deletion.TokenDeletion;
+import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess.TokenDeletion;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.testng.annotations.BeforeMethod;
@@ -33,23 +33,23 @@ public class TokenDeletionTest {
 
     private TokenDeletion deletion;
     private TaskDispatcher mockQueue;
+    private Collection<PartialToken> tokens;
 
     @BeforeMethod
     public void setUp() throws Exception {
         mockQueue = mock(TaskDispatcher.class);
         deletion = new TokenDeletion(mockQueue);
+        tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
     }
 
     @Test
     public void shouldQueueEachTokenProvided() throws CoreTokenException {
-        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         deletion.deleteBatch(tokens);
-        verify(mockQueue, times(3)).delete(anyString(), anyString(), any(ResultHandler.class));
+        verify(mockQueue, times(3)).delete(anyString(), any(ResultHandler.class));
     }
 
     @Test
     public void shouldReturnCountDownLatchThatCorrespondsToTokensProvided() throws CoreTokenException {
-        Collection<PartialToken> tokens = Arrays.asList(partialToken(), partialToken(), partialToken());
         assertThat(deletion.deleteBatch(tokens).getCount()).isEqualTo(tokens.size());
     }
 

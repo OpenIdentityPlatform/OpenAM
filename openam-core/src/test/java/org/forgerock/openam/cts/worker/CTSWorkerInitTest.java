@@ -13,9 +13,9 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.reaper;
+package org.forgerock.openam.cts.worker;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -28,9 +28,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.worker.CTSWorkerInit;
-import org.forgerock.openam.cts.worker.CTSWorkerTask;
-import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

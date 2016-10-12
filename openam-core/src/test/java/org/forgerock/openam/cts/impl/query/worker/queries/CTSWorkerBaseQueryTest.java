@@ -13,86 +13,56 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.query.reaper;
+package org.forgerock.openam.cts.impl.query.worker.queries;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.eq;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.isNull;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.util.query.QueryFilterVisitor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CTSWorkerPastExpiryDateQueryTest {
+public class CTSWorkerBaseQueryTest {
 
-    private QueryFactory<Connection, Filter> mockFactory;
-    private CoreTokenConfig mockConfig;
-    private CTSWorkerPastExpiryDateQuery<Connection, Filter> impl;
+    private FakeQuery query;
     private QueryBuilder<Connection, Filter> mockBuilder;
     private Connection mockConnection;
-    private QueryFilterVisitor<Filter, Void, CoreTokenField> mockQueryFilterConverter;
 
     @BeforeMethod
     public void setup() {
-
         mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
-        given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
-        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class), any(CoreTokenField.class))).willReturn(mockBuilder);
-
-        mockQueryFilterConverter = mock(QueryFilterVisitor.class);
-        given(mockQueryFilterConverter.visitLessThanFilter((Void)isNull(), eq(CoreTokenField.EXPIRY_DATE), any(Calendar.class)))
-                .willReturn(Filter.alwaysTrue());
-
-        mockFactory = mock(QueryFactory.class);
-        given(mockFactory.createFilterConverter()).willReturn(mockQueryFilterConverter);
-        given(mockFactory.createInstance()).willReturn(mockBuilder);
-
         mockConnection = mock(Connection.class);
-
-        mockConfig = mock(CoreTokenConfig.class);
-        given(mockConfig.getCleanupPageSize()).willReturn(1);
-
-        impl = new CTSWorkerPastExpiryDateQuery<Connection, Filter>(mockFactory, mockConfig);
+        query = new FakeQuery(mockBuilder);
     }
 
     @Test (expectedExceptions = NullPointerException.class)
     public void shouldPreventNullConnection() {
-        impl.setConnection(null);
+        query.setConnection(null);
     }
 
     @Test
     public void shouldQueryForNextPage() throws CoreTokenException {
         //given
-        impl.setConnection(mockConnection);
+        query.setConnection(mockConnection);
         Iterator<Collection<PartialToken>> mockIterator = mock(Iterator.class);
         given(mockIterator.hasNext()).willReturn(true);
-        PartialToken token = mock(PartialToken.class);
+        PartialToken token = partialToken();
         given(mockIterator.next()).willReturn(Arrays.asList(token));
         given(mockBuilder.executeRawResults(mockConnection, PartialToken.class)).willReturn(mockIterator);
 
         // when
-        Collection<PartialToken> page = impl.nextPage();
+        Collection<PartialToken> page = query.nextPage();
 
         // then
         verify(mockIterator).hasNext();
@@ -103,18 +73,19 @@ public class CTSWorkerPastExpiryDateQueryTest {
     @Test
     public void shouldLoopUntilIteratorEmpty() throws CoreTokenException {
         // Given
-        impl.setConnection(mockConnection);
+        query.setConnection(mockConnection);
         Iterator<Collection<PartialToken>> mockIterator = mock(Iterator.class);
         given(mockBuilder.executeRawResults(mockConnection, PartialToken.class)).willReturn(mockIterator);
         given(mockIterator.hasNext()).willReturn(true, true, false);
-        PartialToken token1 = mock(PartialToken.class);
-        PartialToken token2 = mock(PartialToken.class);
+        PartialToken token1 = partialToken();
+        PartialToken token2 = partialToken();
+
         given(mockIterator.next()).willReturn(Arrays.asList(token1), Arrays.asList(token2));
 
         // When
-        Collection<PartialToken> page1 = impl.nextPage();
-        Collection<PartialToken> page2 = impl.nextPage();
-        Collection<PartialToken> page3 = impl.nextPage();
+        Collection<PartialToken> page1 = query.nextPage();
+        Collection<PartialToken> page2 = query.nextPage();
+        Collection<PartialToken> page3 = query.nextPage();
 
         // Then
         assertThat(page1).containsOnly(token1);
@@ -125,6 +96,28 @@ public class CTSWorkerPastExpiryDateQueryTest {
 
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void shouldNotStartUnlessConnectionIsProvided() throws CoreTokenException {
-        impl.nextPage();
+        query.nextPage();
+    }
+
+    private PartialToken partialToken() {
+        return mock(PartialToken.class);
+    }
+
+    /**
+     * Subclass which exists purely to allow the inherited behaviour of CTSWorkerBaseQuery to be tested.
+     */
+    private class FakeQuery extends CTSWorkerBaseQuery {
+
+        private final QueryBuilder<Connection, Filter> mockBuilder;
+
+        private FakeQuery(QueryBuilder<Connection, Filter> mockBuilder) {
+            this.mockBuilder = mockBuilder;
+        }
+
+        @Override
+        public QueryBuilder getQuery() {
+            return mockBuilder;
+        }
+
     }
 }

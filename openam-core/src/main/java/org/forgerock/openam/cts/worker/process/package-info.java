@@ -15,7 +15,6 @@
  */
 
 /**
- * Contains classes necessary for generating queries for the CTSWorker Framework.
+ * Package containing processes to be executed by CTSWorkers.
  */
-
-package org.forgerock.openam.cts.impl.query.worker.queries;
+package org.forgerock.openam.cts.worker.process;

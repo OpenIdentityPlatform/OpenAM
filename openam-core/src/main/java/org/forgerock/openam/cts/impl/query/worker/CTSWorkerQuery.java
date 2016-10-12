@@ -21,7 +21,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.worker.CTSWorkerInit;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * Defines the ability to perform a paged query. This will be used by a {@link CTSWorkerTask} to
@@ -29,15 +28,24 @@ import org.forgerock.openam.tokens.CoreTokenField;
  *
  * @see CTSWorkerInit
  */
-public interface CTSWorkerQuery {
+public interface CTSWorkerQuery extends AutoCloseable {
 
     /**
      * Repeated calls will return further results from query.
      *
-     * @return Non null, non empty collection of {@link PartialToken} to be
-     * processed by the {@link CTSWorkerTask}. Null indicates there are no more Tokens to process.
+     * @return Non empty collection of {@link PartialToken} to be processed by the {@link CTSWorkerTask}.
+     *         Null indicates there are no further results matching the query.
      *
      * @throws CoreTokenException If there was any unexpected error during processing.
      */
     Collection<PartialToken> nextPage() throws CoreTokenException;
+
+    /**
+     * Query consumers should call this method if they choose to stop processing
+     * result pages before {@link #nextPage()} returns {@literal null}.
+     * <p>
+     * This allows the query to release resources such as open connections.
+     */
+    void close();
+
 }

@@ -13,19 +13,15 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.query.reaper;
+package org.forgerock.openam.cts.impl.query.worker;
 
-import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.times;
-import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.Closeable;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerBaseQuery;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.testng.annotations.AfterMethod;
