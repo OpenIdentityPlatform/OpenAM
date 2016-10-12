@@ -9,7 +9,6 @@
     "maxCachingTime": 0,
     "maxIdleTime": 0,
     "maxSessionTime": 0,
-    "reschedulePossible": false,
     "restrictedTokensBySid": {
         "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*": {
             "@class": "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction",

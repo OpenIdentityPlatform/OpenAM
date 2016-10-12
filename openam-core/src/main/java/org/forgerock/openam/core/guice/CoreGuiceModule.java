@@ -56,6 +56,8 @@ import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
@@ -66,6 +68,8 @@ import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFact
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
 import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
+import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
+import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
 import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
@@ -412,6 +416,20 @@ public class CoreGuiceModule extends AbstractModule {
         return new CTSWorkerConnection<>(factory, query);
     }
 
+    @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
+    CTSWorkerQuery getMaxSessionTimeExpiredQuery(
+            MaxSessionTimeExpiredQuery query,
+            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
+        return new CTSWorkerConnection<>(factory, query);
+    }
+
+    @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
+    CTSWorkerQuery getSessionIdleTimeExpiredQuery(
+            SessionIdleTimeExpiredQuery query,
+            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
+        return new CTSWorkerConnection<>(factory, query);
+    }
+
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)
     CTSWorkerTask getDeleteAllMaxExpiredReaperTask(
             @Named(CTSWorkerConstants.PAST_EXPIRY_DATE) CTSWorkerQuery query,
@@ -420,10 +438,31 @@ public class CoreGuiceModule extends AbstractModule {
         return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
     }
 
+    @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
+    CTSWorkerTask getMaxSessionTimeExpiredTask(
+            @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED) CTSWorkerQuery query,
+            MaxSessionTimeExpiredProcess maxSessionTimeExpiredProcess,
+            CTSWorkerSelectAllFilter selectAllFilter) {
+        return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter);
+    }
+
+    @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
+    CTSWorkerTask getSessionIdleTimeExpiredTask(
+            @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED) CTSWorkerQuery query,
+            SessionIdleTimeExpiredProcess sessionIdleTimeExpiredProcess,
+            CTSWorkerSelectAllFilter selectAllFilter) {
+        return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter);
+    }
+
     @Provides @Inject
     CTSWorkerTaskProvider getWorkerTaskProvider(
-            @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED) CTSWorkerTask deleteExpiredTokensTask) {
-        return new CTSWorkerTaskProvider(Arrays.asList(deleteExpiredTokensTask));
+            @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED) CTSWorkerTask deleteExpiredTokensTask,
+            @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED) CTSWorkerTask maxSessionTimeExpiredTask,
+            @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED) CTSWorkerTask sessionIdleTimeExpiredTask) {
+        return new CTSWorkerTaskProvider(Arrays.asList(
+                deleteExpiredTokensTask,
+                maxSessionTimeExpiredTask,
+                sessionIdleTimeExpiredTask));
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)

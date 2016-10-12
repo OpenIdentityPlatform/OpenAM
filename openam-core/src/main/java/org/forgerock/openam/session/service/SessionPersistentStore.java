@@ -220,8 +220,6 @@ public class SessionPersistentStore {
                 InjectorHolder.getInstance(SessionLogging.class),
                 InjectorHolder.getInstance(SessionAuditor.class),
                 debug);
-        session.scheduleExpiry();
-
         return session;
     }
 }

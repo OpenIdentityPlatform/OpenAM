@@ -97,16 +97,4 @@ public class StatelessSessionActivatorTest {
         verify(mockLoginState).setSessionID(statelessSessionId);
     }
 
-    @Test
-    public void shouldEnsureSessionIsNotScheduled() throws Exception {
-        // Given
-        InternalSession mockSession = mock(InternalSession.class);
-
-        // When
-        testActivator.activateSession(mockSession, mockLoginState);
-
-        // Then
-        verify(mockSession).cancel();
-    }
-
 }

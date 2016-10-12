@@ -90,19 +90,6 @@ public class AuthenticationSessionStoreTest {
         assertThat(store.getSession(mockSessionID)).isNull();
     }
 
-    @Test
-    public void shouldCancelSessionsAddedToAuthenticationSessionStore() {
-        store.addSession(mockSession);
-        verify(mockSession).cancel();
-    }
-
-    @Test
-    public void shouldScheduleSessionsPromotedFromTheStore() {
-        store.addSession(mockSession);
-        store.promoteSession(mockSessionID);
-        verify(mockSession).reschedule();
-    }
-
     @Test (expectedExceptions = NullPointerException.class)
     public void shouldThrowExceptionIfNullSessionIsRemoved() {
         store.removeSession(null);

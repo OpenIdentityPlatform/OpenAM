@@ -9,7 +9,6 @@
     "maxCachingTime": 0,
     "maxIdleTime": 0,
     "maxSessionTime": 0,
-    "reschedulePossible": false,
     "restrictedTokensBySid": {},
     "sessionEventURLs": {},
     "sessionID": null,

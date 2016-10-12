@@ -161,7 +161,6 @@ public class SessionServiceConfig {
 
         private final JwtSessionMapperConfig jwtSessionMapperConfig;
         private final Set<String> timeoutHandlers;
-        private final boolean sessionTrimmingEnabled;
         private final boolean sessionConstraintEnabled;
         private final boolean denyLoginIfDBIsDown;
         private final String constraintHandler;
@@ -187,7 +186,6 @@ public class SessionServiceConfig {
             propertyNotificationEnabled = loadPropertyNotificationEnabledSchemaSetting(attrs);
             notificationProperties = loadPropertyNotificationPropertiesSchemaSetting(attrs);
             timeoutHandlers = loadTimeoutHandlersServiceSchemaSetting(attrs);
-            sessionTrimmingEnabled = loadSessionTrimmingServiceSchemaSetting(attrs);
             sessionConstraintEnabled = loadSessionConstraintServiceSchemaSetting(attrs);
             denyLoginIfDBIsDown = loadDenyLoginIfDBIsDownServiceSchemaSetting(attrs);
             constraintHandler = loadConstraintHandlerServiceSchemaSetting(attrs);
@@ -263,15 +261,6 @@ public class SessionServiceConfig {
                 sessionDebug.message("timeoutHandlers=" + values);
             }
             return values;
-        }
-
-        private boolean loadSessionTrimmingServiceSchemaSetting(Map attrs) {
-            boolean value = "YES".equalsIgnoreCase(
-                    CollectionHelper.getMapAttr(attrs, Constants.ENABLE_TRIM_SESSION));
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("sessionTrimmingEnabled=" + value);
-            }
-            return value;
         }
 
         private boolean loadSessionConstraintServiceSchemaSetting(Map attrs) {
@@ -498,15 +487,6 @@ public class SessionServiceConfig {
      */
     public boolean isSessionConstraintEnabled() {
         return hotSwappableSessionServiceConfig.sessionConstraintEnabled;
-    }
-
-    /**
-     * Returns true if amSession.xml property "iplanet-am-session-enable-session-trimming" is "YES" (case insensitive).
-     *
-     * Defaults to false.
-     */
-    public boolean isSessionTrimmingEnabled() {
-        return hotSwappableSessionServiceConfig.sessionTrimmingEnabled;
     }
 
     /**

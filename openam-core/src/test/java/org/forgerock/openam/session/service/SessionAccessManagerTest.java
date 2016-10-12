@@ -16,10 +16,7 @@
 
 package org.forgerock.openam.session.service;
 
-import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.never;
-import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.mock;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;

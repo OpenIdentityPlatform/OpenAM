@@ -55,7 +55,6 @@ public class AuthenticationSessionStore {
         if (store.containsKey(session.getSessionID())) {
             throw new IllegalStateException("Session was added to temporary store twice.");
         }
-        session.cancel();
 
         store.put(session.getSessionID(), session);
     }
@@ -95,7 +94,6 @@ public class AuthenticationSessionStore {
 
         session.setStored(true);
         sessionAccessManager.persistInternalSession(session);
-        session.reschedule();
     }
 
     private void cullExpiredSessions() {

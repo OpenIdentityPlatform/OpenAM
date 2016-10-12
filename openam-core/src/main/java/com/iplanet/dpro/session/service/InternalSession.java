@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,12 +53,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
-import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -76,9 +73,6 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -181,8 +175,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private final ConcurrentMap<String, Set<SessionID>> sessionEventURLs = new ConcurrentHashMap<>();
 
     @JsonIgnore private boolean isISStored = false;
-    private volatile boolean reschedulePossible;
-    private transient InternalSessionTaskRunnable taskRunnable = new InternalSessionTaskRunnable();
 
     /* Session handle is used to prevent administrator from impersonating other users. */
     @JsonIgnore private String sessionHandle = null;
@@ -208,7 +200,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
         maxIdleTimeInMinutes = maxDefaultIdleTimeInMinutes;
         maxSessionTimeInMinutes = maxDefaultIdleTimeInMinutes;
-        reschedulePossible = maxDefaultIdleTimeInMinutes > maxIdleTimeInMinutes;
         sessionState = SessionState.INVALID;
         sessionProperties = new Properties();
         willExpireFlag = true;
@@ -267,17 +258,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
         this.debug = debug;
-    }
-
-    /**
-     * Schedule this task to TimerPool according to the current state.
-     */
-    protected void reschedule() {
-        taskRunnable.reschedule();
-    }
-
-    public void cancel() {
-        taskRunnable.cancel();
     }
 
     /**
@@ -354,20 +334,13 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Sets the maximum time(in minutes) allowed for the Internal Session
+     * Sets the maximum time (in minutes) allowed for the Internal Session
      *
-     * @param t
+     * @param maxSessionTimeInMinutes
      *            Maximum Session Time
      */
-    public void setMaxSessionTime(long t) {
-        boolean mayReschedule = false;
-        if (t < maxSessionTimeInMinutes) {
-            mayReschedule = true;
-        }
-        maxSessionTimeInMinutes = t;
-        if (taskRunnable.isScheduled() && mayReschedule) {
-            reschedule();
-        }
+    public void setMaxSessionTime(long maxSessionTimeInMinutes) {
+        this.maxSessionTimeInMinutes = maxSessionTimeInMinutes;
         notifyPersistenceManager();
     }
 
@@ -380,21 +353,12 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Sets the maximum idle time(in minutes) for the Internal Session.
+     * Sets the maximum idle time (in minutes) for the Internal Session.
      *
-     * @param t
+     * @param maxIdleTimeInMinutes
      */
-    public void setMaxIdleTime(long t) {
-        boolean mayReschedule = false;
-        if (t < maxIdleTimeInMinutes) {
-            mayReschedule = true;
-        }
-        maxIdleTimeInMinutes = t;
-        reschedulePossible = (maxDefaultIdleTimeInMinutes > maxIdleTimeInMinutes)
-                || (maxDefaultIdleTimeInMinutes > maxSessionTimeInMinutes);
-        if (taskRunnable.isScheduled() && (mayReschedule || reschedulePossible)) {
-            reschedule();
-        }
+    public void setMaxIdleTime(long maxIdleTimeInMinutes) {
+        this.maxIdleTimeInMinutes = maxIdleTimeInMinutes;
         notifyPersistenceManager();
     }
 
@@ -453,6 +417,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     public void cacheCookieString(String cookieString) {
         this.cookieStr = cookieString;
     }
+
     /**
      * Returns the cached cookie string for this InternalSession. May be null.
      * @return The cached cookie string. May be null.
@@ -661,8 +626,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @exception SessionException is thrown if the key is protected property.
      *
      */
-    public void putExternalProperty(SSOToken clientToken, String key, String value)
-        throws SessionException {
+    public void putExternalProperty(SSOToken clientToken, String key, String value) throws SessionException {
 		try {
         	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
 		} catch (SessionException se) {
@@ -670,10 +634,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 			throw se;
 		}
         internalPutProperty(key,value);
-        if (debug.messageEnabled()) {
-            debug.message("Updated protected property"
-                + " after validating client identity and permissions");
-        }
+        debug.message("Updated protected property after validating client identity and permissions");
     }
 
     /**
@@ -815,18 +776,13 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         if ((serviceConfig.isSessionConstraintEnabled()) && !shouldIgnoreSessionQuotaChecking()) {
 
             if (SessionConstraint.checkQuotaAndPerformAction(this)) {
-                if (debug.messageEnabled()) {
-                    debug.message("Session Quota exhausted!");
-                }
+                debug.message("Session Quota exhausted!");
                 sessionLogging.logEvent(sessionInfo, SessionEvent.QUOTA_EXHAUSTED);
                 return false;
             }
         }
         setLatestAccessTime();
         setState(SessionState.VALID);
-        if (reschedulePossible && !stateless) {
-            reschedule();
-        }
         sessionLogging.logEvent(sessionInfo, SessionEvent.SESSION_CREATION);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_CREATED);
         sessionService.sendEvent(this, SessionEvent.SESSION_CREATION);
@@ -866,8 +822,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         maxSessionTimeInMinutes = SECONDS.toMinutes(Long.MAX_VALUE);
         maxIdleTimeInMinutes = SECONDS.toMinutes(Long.MAX_VALUE);
         maxCachingTimeInMinutes = serviceConfig.getApplicationMaxCachingTime();
-        cancel();
-        taskRunnable.setNonExpiring();
         willExpireFlag = false;
     }
 
@@ -887,7 +841,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * Checks whether the session should change state and returns the state that the session should be in.
      */
     public StateTransition checkSessionUpdate() {
-        if (!willExpireFlag) {
+        if (!willExpire()) {
             return StateTransition.NO_CHANGE;
         }
         if (!isTimedOut()) {
@@ -906,6 +860,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes)) {
                 return StateTransition.IDLE_TIMEOUT;
             }
+
             return StateTransition.NO_CHANGE;
         } else {
             // do something special for the timed out sessions
@@ -990,13 +945,15 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Sets the state of the Internal Session.
+     * Sets the {@link SessionState} of the Internal Session.
      *
-     * @param state
+     * @param sessionState
      */
-    public void setState(SessionState state) {
-        sessionState = state;
-        notifyPersistenceManager();
+    public void setState(SessionState sessionState) {
+        if (this.sessionState != sessionState) {
+            this.sessionState = sessionState;
+            notifyPersistenceManager();
+        }
     }
 
     /**
@@ -1166,41 +1123,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         } else if (this.cookieMode != null) {
             cookieSupport = this.cookieMode;
         }
-        if (debug.messageEnabled()) {
-            debug.message("InternalSession: getCookieSupport: " + cookieSupport);
-        }
+        debug.message("InternalSession: getCookieSupport: {}", cookieSupport);
         return cookieSupport;
-    }
-
-    /**
-     * In case of session timeout the session is trimmed to reduce the memory
-     * overhead. Even if the session lives in the server for the extra time out
-     * period, the memory is not abused. Instance variables preserved are, 1)
-     * sessionID 2) timedOutAt 3) clientID 4) purgeDelayInSeconds 5)
-     * sessionProperties(loginURL/SessionTimedOut/AM_CTX_ID/SAML2IDPSessionIndex)
-     * 6) sessionEventURLs 7) sessionState All other instance variables are
-     * cleaned to save memory.
-     */
-    private void trimSession() {
-        clientDomain = null;
-        cookieStr = null;
-        // Clean Session Properties
-        Properties newProperties = new Properties();
-        String loginURL = getProperty(LOGIN_URL);
-        String sessionTimedOut = getProperty(SESSION_TIMED_OUT);
-        String  idpSessionIndex = getProperty(SAML2_IDP_SESSION_INDEX);
-        if (loginURL != null)
-            newProperties.put(LOGIN_URL, loginURL);
-        if (sessionTimedOut != null)
-            newProperties.put(SESSION_TIMED_OUT, sessionTimedOut);
-        String ctxID = getProperty(Constants.AM_CTX_ID);
-        if (ctxID != null) {
-            newProperties.put(Constants.AM_CTX_ID, ctxID);
-        }
-        if (idpSessionIndex != null) {
-            newProperties.put(SAML2_IDP_SESSION_INDEX, idpSessionIndex);
-        }
-        sessionProperties = newProperties;
     }
 
     /**
@@ -1212,7 +1136,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
 
     public void setCookieMode(Boolean cookieMode) {
-        debug.message("CookieMode is:" + cookieMode);
+        debug.message("CookieMode is: {}", cookieMode);
         if (cookieMode != null) {
             this.cookieMode = cookieMode;
         }
@@ -1286,15 +1210,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Correctly read and reschedule this session when it is read.
-     */
-    public void scheduleExpiry() {
-        if (willExpireFlag) {
-            taskRunnable.scheduleExpiry();
-        }
-    }
-
-    /**
      * @return True if the Session has reached an invalid state.
      */
     public boolean isInvalid() {
@@ -1304,7 +1219,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Signals the Session for removal.
      */
-    private void removeSession() {
+    // TODO: Don't make this method public
+    public void removeSession() {
         SessionInfo sessionInfo = toSessionInfo();
         sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
@@ -1332,140 +1248,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private void notifyPersistenceManager() {
         if (persistenceManager != null) {
             persistenceManager.notifyUpdate(getSessionID());
-        }
-    }
-
-    private class InternalSessionTaskRunnable extends GeneralTaskRunnable {
-        private transient TimerPool timerPool = null;
-
-        public InternalSessionTaskRunnable() {
-            timerPool = SystemTimerPool.getTimerPool();
-        }
-
-        @Override
-        public boolean addElement(Object obj) {
-            return false;
-        }
-
-        @Override
-        public boolean removeElement(Object obj) {
-            return false;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
-
-        /**
-         * @return -1 since it is not a periodic task.
-         */
-        @Override
-        public long getRunPeriod() {
-            return -1;
-        }
-
-        @Override
-        public void run() {
-
-            if (isTimedOut() || isInvalid()) {
-                removeSession();
-                return;
-            }
-
-            long timeLeftInSeconds = getTimeLeft();
-            if (timeLeftInSeconds == 0) {
-                timeoutSession(SessionEvent.MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
-            } else {
-                long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                if (idleTimeLeftInSeconds <= 0) {
-                    timeoutSession(SessionEvent.IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
-                } else {
-                    if (timerPool != null) {
-                        long timeToWaitInSeconds = Math.min(timeLeftInSeconds, idleTimeLeftInSeconds);
-                        long timeoutInMillis = currentTimeMillis() + SECONDS.toMillis(timeToWaitInSeconds);
-                        timerPool.schedule(this, new Date(timeoutInMillis));
-                    }
-                }
-            }
-
-        }
-
-        private void timeoutSession(int event, AuditConstants.EventName eventName) {
-            Reject.ifFalse(event == SessionEvent.MAX_TIMEOUT || event == SessionEvent.IDLE_TIMEOUT);
-            changeStateAndNotify(event);
-            sessionAuditor.auditActivity(toSessionInfo(), eventName);
-        }
-
-        /**
-         * Schedule this task to TimerPool according to the current state.
-         */
-        private void reschedule() {
-            if (timerPool != null) {
-                long timeoutInMillis = Long.MAX_VALUE;
-                switch (sessionState) {
-                    case INVALID:
-                        timeoutInMillis = SECONDS.toMillis(creationTimeInSeconds +
-                                MINUTES.toSeconds(maxDefaultIdleTimeInMinutes));
-                        break;
-                    case VALID:
-                        timeoutInMillis = Math.min(
-                                SECONDS.toMillis(latestAccessTimeInSeconds + MINUTES.toSeconds(maxIdleTimeInMinutes)),
-                                SECONDS.toMillis(creationTimeInSeconds + MINUTES.toSeconds(maxSessionTimeInMinutes)));
-                        break;
-                }
-                if (timeoutInMillis < scheduledExecutionTime()) {
-                    cancel();
-                }
-                if (scheduledExecutionTime() == -1) {
-                    timerPool.schedule(this, new Date(timeoutInMillis));
-                }
-            }
-        }
-
-        /**
-         * Correctly read and reschedule this session when it is read.
-         */
-        private void scheduleExpiry() {
-            timerPool = SystemTimerPool.getTimerPool();
-            if (isTimedOut()) {
-                removeSession();
-            } else {
-                if (isInvalid()) {
-                    // creationTime + maxDefaultIdleTime looks like a suspicious combination
-                    long expectedTimeInMillis = SECONDS.toMillis(creationTimeInSeconds +
-                            MINUTES.toSeconds(maxDefaultIdleTimeInMinutes));
-                    if (expectedTimeInMillis > MILLISECONDS.toSeconds(currentTimeMillis())) {
-                        if (timerPool != null) {
-                            timerPool.schedule(this, new Date(expectedTimeInMillis));
-                        }
-                    } else {
-                        removeSession();
-                    }
-                } else {
-                    long timeLeftInSeconds = getTimeLeft();
-                    if (timeLeftInSeconds == 0) {
-                        changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
-                        sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
-                    } else {
-                        long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                        if (idleTimeLeftInSeconds <= 0) {
-                            changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
-                            sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
-                        } else {
-                            if (timerPool != null) {
-                                long timeToWaitInSeconds = Math.min(timeLeftInSeconds, idleTimeLeftInSeconds);
-                                long timeoutInMillis = currentTimeMillis() + SECONDS.toMillis(timeToWaitInSeconds);
-                                timerPool.schedule(this, new Date(timeoutInMillis));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void setNonExpiring() {
-            timerPool = null;
         }
     }
 

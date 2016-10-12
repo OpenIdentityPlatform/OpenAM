@@ -91,8 +91,6 @@ class StatelessSessionActivator extends DefaultSessionActivator {
             // Update the session id in the login state to reflect the activated session
             loginState.setSessionID(getStatelessSessionManager().generate(session).getID());
         }
-        // Make sure that session is never scheduled
-        session.cancel();
 
         if (oldSession != null) {
             try {

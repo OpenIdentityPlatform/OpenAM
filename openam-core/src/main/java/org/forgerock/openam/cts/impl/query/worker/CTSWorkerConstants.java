@@ -33,6 +33,16 @@ public final class CTSWorkerConstants {
     public static final String DELETE_ALL_MAX_EXPIRED = "DeleteAllMaxExpired";
 
     /**
+     * Marker for identifying queries, processes and tasks relating to max session time expiry.
+     */
+    public static final String MAX_SESSION_TIME_EXPIRED = "MaxSessionTimeExpired";
+
+    /**
+     * Marker for identifying queries, processes and tasks relating to session idle time expiry.
+     */
+    public static final String SESSION_IDLE_TIME_EXPIRED = "SessionIdleTimeExpired";
+
+    /**
      * Uninstantiable.
      */
     private CTSWorkerConstants() {

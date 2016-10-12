@@ -147,12 +147,8 @@ public class ForeignSessionHandler {
     private void handleReleaseSession(SessionID sessionID) {
         // switch to non-local mode for cached client side session image
         InternalSession internalSession = InjectorHolder.getInstance(SessionAccessManager.class).releaseSession(sessionID); //TODO : untangle dependency loop
-        if (internalSession != null) {
-            internalSession.cancel();
-        } else {
-            if (debug.messageEnabled()) {
-                debug.message("releaseSession: session not found " + sessionID);
-            }
+        if (internalSession == null) {
+            debug.message("releaseSession: session not found {}", sessionID);
         }
     }
 

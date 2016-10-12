@@ -989,13 +989,6 @@ public interface Constants {
             "com.sun.am.event.notification.expire.time";
 
     /**
-     * Global schema property name in Session Service.
-     * constant used for session trimming when purge delay > 0
-     */
-    static final String ENABLE_TRIM_SESSION =
-            "iplanet-am-session-enable-session-trimming";
-
-    /**
      * property string to the size of SystemTimerPool
      */
     static final String SYSTEM_TIMERPOOL_SIZE =

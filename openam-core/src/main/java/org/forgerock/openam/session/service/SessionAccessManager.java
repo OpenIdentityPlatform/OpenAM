@@ -15,7 +15,8 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_IDLE_TIMED_OUT;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
 
 import java.util.Collection;
 
@@ -314,9 +315,8 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
 
         internalSession.setPersistenceManager(null);
-
         foreignSessionHandler.remove(internalSession.getID());
-        internalSession.cancel();
+
         // Session Constraint
         if (internalSession.getState() == SessionState.VALID) {
             monitoringOperations.decrementActiveSessions();
@@ -333,6 +333,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @param session The session that was updated.
      */
     private void update(InternalSession session) {
+        // TODO: Simplify this all this logic by replacing it with the implementation of save(session)
         if (session.isStored()) {
             if (session.getState() != SessionState.VALID) {
                 delete(session);

@@ -65,20 +65,6 @@
                         <Value>iplanet-am-session-service</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-session-enable-session-trimming"
-                                 type="single_choice"
-                                 syntax="string"
-                                 resourceName="enableSessionTrimming"
-                                 i18nKey="a122"
-                                 order="1700">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
-                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>NO</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-max-session-list-size"
                                  type="single"
                                  syntax="number_range"

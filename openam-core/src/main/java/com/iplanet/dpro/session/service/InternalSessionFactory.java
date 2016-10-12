@@ -120,9 +120,6 @@ public class InternalSessionFactory {
         String amCtxId = SessionID.generateAmCtxID(serverConfig);
         session.putProperty(Constants.AM_CTX_ID, amCtxId);
         session.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
-        if (!stateless) {
-            session.reschedule();
-        }
         return session;
     }
 
