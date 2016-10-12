@@ -29,6 +29,10 @@
     <artifactId>openam-installtools</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <shade.package>org.forgerock.openam.sdk</shade.package>
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>
@@ -82,24 +86,46 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.forgerock.openam:openam-installtools-launcher</include>
-                                    <include>org.forgerock.openam:openam-license-core</include>
-                                    <include>org.forgerock.openam:openam-license-manager-cli</include>
-                                    <include>org.forgerock.commons:forgerock-guice-core</include>
-                                    <include>org.forgerock.commons:forgerock-util</include>
-                                    <include>org.forgerock.openam:openam-shared</include>
-                                    <include>com.google.inject:guice:no_aop</include>
-                                    <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
-                                    <include>org.slf4j:slf4j-api</include>
-                                    <include>org.slf4j:slf4j-nop</include>
-                                </includes>
-                            </artifactSet>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <shadeSourcesContent>true</shadeSourcesContent>
+                            <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
+                            <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org/</pattern>
+                                    <shadedPattern>${shade.package}.org.</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.forgerock.openam.**.*</exclude>
+                                        <exclude>org.w3c.dom.**.*</exclude>
+                                        <exclude>org.xml.sax.**.*</exclude>
+                                    </excludes>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com/</pattern>
+                                    <shadedPattern>${shade.package}.com.</shadedPattern>
+                                    <excludes>
+                                        <exclude>com.sun.identity.**.*</exclude>
+                                        <exclude>com.iplanet.**.*</exclude>
+                                    </excludes>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.inject</pattern>
+                                    <shadedPattern>${shade.package}.javax.inject</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.mail</pattern>
+                                    <shadedPattern>${shade.package}.javax.mail</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.activation</pattern>
+                                    <shadedPattern>${shade.package}.javax.activation</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -127,4 +153,3 @@
         </dependency>
     </dependencies>
 </project>
-

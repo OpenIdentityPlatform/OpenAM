@@ -110,6 +110,7 @@
                             <include>org.forgerock.openam:openam-jaxrpc-schema</include>
                             <include>org.forgerock.openam:openam-ldap-utils</include>
                             <include>org.forgerock.openam:openam-liberty-schema</include>
+                            <include>org.forgerock.openam:openam-mib-schema</include>
                             <include>org.forgerock.openam:openam-saml2-schema</include>
                             <include>org.forgerock.openam:openam-xacml3-schema</include>
                             <include>org.forgerock.openam:openam-federation-library</include>
@@ -128,6 +129,7 @@
                             <include>com.fasterxml.jackson.core:jackson-annotations</include>
                             <include>joda-time:joda-time</include>
                             <include>org.slf4j:slf4j-api</include>
+                            <include>external:jdmkrt</include>
                         </includes>
                     </artifactSet>
                     <filters>
