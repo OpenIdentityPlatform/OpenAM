@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import static java.util.TimeZone.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +63,7 @@ public class OAuthAdapterTest {
         Token result = adapter.toToken(jsonValue);
 
         // Then
-        assert(result.getValue(field.getField()).toString().contains("badger"));
+        assert(result.getAttribute(field.getField()).toString().contains("badger"));
     }
 
     @Test
@@ -83,7 +82,7 @@ public class OAuthAdapterTest {
         JsonValue jsonValue = makeDefaultJsonValue(values);
 
         // When
-        String result = adapter.toToken(jsonValue).getValue(field.getField());
+        String result = adapter.toToken(jsonValue).getAttribute(field.getField());
 
         // Then
         assertTrue(result.contains(one));

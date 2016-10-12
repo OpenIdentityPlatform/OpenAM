@@ -48,9 +48,9 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.Reject;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.query.QueryFilter;
 
-import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
@@ -221,5 +221,39 @@ public class SessionPersistentStore {
                 InjectorHolder.getInstance(SessionAuditor.class),
                 debug);
         return session;
+    }
+
+    /**
+     * Get a restricted session from a given SessionID.
+     *
+     * @param sessionID the ID of the restricted session to retrieve
+     * @return a restricted Internal Session
+     */
+    public InternalSession getByRestrictedID(SessionID sessionID) {
+        if (sessionID == null || StringUtils.isEmpty(sessionID.toString()) || sessionID.isSessionHandle()) {
+            return null;
+        }
+
+        try {
+            Collection<Token> collection =
+                    coreTokenService.query(new TokenFilterBuilder().withQuery(
+                            QueryFilter.contains(
+                                    SessionTokenField.RESTRICTED_TOKENS.getField(),
+                                    sessionID.toString()))
+                            .build());
+
+            if (CollectionUtils.isEmpty(collection)) {
+                return null;
+            }
+            Token token = CollectionUtils.getFirstItem(collection);
+            if (null == token) {
+                return null;
+            }
+            return getInternalSessionFromToken(token);
+        } catch (CoreTokenException e) {
+            debug.error("Failed to retrieve restricted session by restricted ID: {}", sessionID.toString(), e);
+        }
+
+        return null;
     }
 }

@@ -65,12 +65,12 @@ public class StatelessTokenCtsAdapter implements TokenAdapter<StatelessTokenMeta
     public StatelessTokenMetadata fromToken(Token token) {
         String resourceOwnerId = token.getUserId();
         long expiryTime = token.getExpiryTimestamp().getTime().getTime();
-        String grantId = token.getValue(GRANT_ID_FIELD);
-        String clientId = token.getValue(CLIENT_ID_FIELD);
-        Set<String> scope = new HashSet<>(Arrays.asList(((String) token.getValue(SCOPE_FIELD)).split(",", 0)));
-        String realm = token.getValue(REALM_FIELD);
-        String name = token.getValue(NAME_FIELD);
-        String grantType = token.getValue(GRANT_ID_FIELD);
+        String grantId = token.getAttribute(GRANT_ID_FIELD);
+        String clientId = token.getAttribute(CLIENT_ID_FIELD);
+        Set<String> scope = new HashSet<>(Arrays.asList(((String) token.getAttribute(SCOPE_FIELD)).split(",", 0)));
+        String realm = token.getAttribute(REALM_FIELD);
+        String name = token.getAttribute(NAME_FIELD);
+        String grantType = token.getAttribute(GRANT_ID_FIELD);
         return new StatelessTokenMetadata(token.getTokenId(), resourceOwnerId, expiryTime, grantId, clientId, scope,
                 realm, name, grantType);
     }

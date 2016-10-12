@@ -15,12 +15,11 @@
  */
 package org.forgerock.openam.cts.api.tokens;
 
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CORE_TOKEN_RESOURCE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +51,6 @@ import com.sun.identity.shared.encode.Base64;
  * The Token models the data stored in two ways. Firstly the primary fields of the Token are accessible
  * via getters and setters. All other fields are accessed in a more generic way.
  *
- * @author robert.wapshott@forgerock.com
  */
 @Title(CORE_TOKEN_RESOURCE + "resource.schema." + TITLE)
 @Description(CORE_TOKEN_RESOURCE + "resource.schema." + DESCRIPTION)
@@ -65,7 +63,7 @@ public class Token {
      */
     @Title(CORE_TOKEN_RESOURCE + "resource.schema.property.attributes." + TITLE)
     @Description(CORE_TOKEN_RESOURCE + "resource.schema.property.attributes." + DESCRIPTION)
-    private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+    private Map<String, Object> attributes = new LinkedHashMap<>();
 
     /**
      * Private constructor performs some initialisation to ensure the main fields appear
@@ -176,7 +174,7 @@ public class Token {
      * @return A non null, non modifiable list of the CoreTokenField fields currently assigned.
      */
     public Collection<CoreTokenField> getAttributeNames() {
-        Set<CoreTokenField> fields = new HashSet<CoreTokenField>();
+        Set<CoreTokenField> fields = new HashSet<>();
         for (Map.Entry<String, Object> entry : attributes.entrySet()) {
             CoreTokenField field = CoreTokenField.fromLDAPAttribute(entry.getKey());
             if (entry.getValue() == null) {
@@ -188,13 +186,67 @@ public class Token {
     }
 
     /**
-     * Accessor for the non-primary CoreTokenField attributes.
+     * Accessor for the CoreTokenField attributes.
      *
      * @param field The CoreTokenField to request the value for.
      * @return The value assigned which may be null.
      */
-    public <T> T getValue(CoreTokenField field) {
+    public <T> T getAttribute(CoreTokenField field) {
         return (T) get(field);
+    }
+
+
+    /**
+     * Accessor for the multi-value CoreTokenField attributes.
+     *
+     * @param field The CoreTokenField to request the value for.
+     * @return The value assigned which may be null.
+     */
+    public <T> Set<T> getMultiAttribute(CoreTokenField field) {
+        return Collections.unmodifiableSet((Set<T>) getMulti(field));
+    }
+
+    /**
+     * Mutator for the fields of the Token.
+     *
+     * @param field The CoreTokenField field to store the value against.
+     * @param value The possibly null value to store in this Token.
+     */
+    public <T> void setMultiAttribute(CoreTokenField field, T value) {
+        if (isFieldReadOnly(field)) {
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "Token Field {0} is read only and cannot be set.",
+                    field.toString()));
+        }
+
+        if (!CoreTokenFieldTypes.isMulti(field)) {
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "Token Field {0} is not a multi-attribute field and should not be set using this approach.",
+                    field.toString()));
+        }
+
+        try {
+            CoreTokenFieldTypes.validateType(field, value);
+        } catch (CoreTokenException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+
+        Set<T> result = getMulti(field);
+
+        if (null == result) {
+            result = new HashSet<>();
+        }
+
+        result.add(value);
+        putMulti(field, result);
+    }
+
+    private <T> void putMulti(CoreTokenField field, Set<T> result) {
+        attributes.put(field.toString(), result);
+    }
+
+    private <T> Set<T> getMulti(CoreTokenField field) {
+        return (Set<T>) attributes.get(field.toString());
     }
 
     /**
@@ -210,7 +262,6 @@ public class Token {
                     field.toString()));
         }
 
-        // Validate that the type matches the field they are assigning.
         try {
             CoreTokenFieldTypes.validateType(field, value);
         } catch (CoreTokenException e) {
@@ -238,13 +289,7 @@ public class Token {
      * @return True if the field is read only, and cannot be changed once assigned.
      */
     public static boolean isFieldReadOnly(CoreTokenField field) {
-        if (field.equals(CoreTokenField.TOKEN_TYPE)) {
-            return true;
-        }
-        if (field.equals(CoreTokenField.TOKEN_ID)) {
-            return true;
-        }
-        return false;
+        return field.equals(CoreTokenField.TOKEN_TYPE) || field.equals(CoreTokenField.TOKEN_ID);
     }
 
     /**
@@ -261,7 +306,7 @@ public class Token {
         if (value == null) {
             s = null;
         } else if (CoreTokenField.TOKEN_TYPE.equals(field)) {
-            s = ((TokenType)value).name();
+            s = ((TokenType) value).name();
         } else if (CoreTokenFieldTypes.isCalendar(field)) {
             s = GeneralizedTime.valueOf((Calendar) value).toString();
         } else if (CoreTokenFieldTypes.isByteArray(field)) {
@@ -284,6 +329,9 @@ public class Token {
      * @return May be null
      */
     private Object get(CoreTokenField field) {
+        if (CoreTokenFieldTypes.isMulti(field)) {
+            return getMulti(field);
+        }
         String s = (String) attributes.get(field.toString());
         if (s == null) {
             return null;
@@ -305,7 +353,7 @@ public class Token {
     }
 
     /**
-     * Returns a formatted version fo the Token which is intended to be human readable.
+     * Returns a formatted version of the Token which is intended to be human readable.
      * Some of the field values have been formatted to ensure that their contents are more
      * meaningful.
      *
@@ -328,7 +376,7 @@ public class Token {
             } else if (field.equals(CoreTokenField.BLOB)) {
                 value = Long.toString(getBlob().length) + " bytes";
             } else {
-                value = getValue(field);
+                value = String.valueOf(getAttribute(field));
             }
 
             if (value == null) {

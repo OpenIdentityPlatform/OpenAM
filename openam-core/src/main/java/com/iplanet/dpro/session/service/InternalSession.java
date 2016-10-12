@@ -1092,11 +1092,22 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         return restrictedTokensBySid.get(sid);
     }
 
+    /**
+     * Returns the SessionID of the restricted token for the provided restriction for this session.
+     *
+     * @param restriction restriction used to look up restricted token.
+     * @return restricted token sessionID.
+     */
     public SessionID getRestrictedTokenForRestriction(TokenRestriction restriction) {
         return restrictedTokensByRestriction.get(restriction);
     }
 
-    Set<SessionID> getRestrictedTokens() {
+    /**
+     * Returns all the restricted tokens for this session.
+     *
+     * @return set of restricted token sessionIDs.
+     */
+    public Set<SessionID> getRestrictedTokens() {
         return new HashSet<>(restrictedTokensBySid.keySet());
     }
 

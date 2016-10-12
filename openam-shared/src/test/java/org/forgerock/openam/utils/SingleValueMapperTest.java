@@ -11,27 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
+
+import static org.fest.assertions.Assertions.*;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 public class SingleValueMapperTest {
+
     private SingleValueMapper<String, Integer> map;
+
     @BeforeMethod
     public void setup() {
-        map = new SingleValueMapper<String, Integer>();
+        map = new SingleValueMapper<>();
     }
 
     @Test
     public void shouldStoreValue() {
         String key = "badger";
         int value = 1;
+
         map.put(key, value);
+
         assertThat(map.get(key)).isEqualTo(value);
     }
 
@@ -39,7 +43,9 @@ public class SingleValueMapperTest {
     public void shouldStoreReverseValue() {
         String key = "badger";
         int value = 1;
+
         map.put(key, value);
+
         assertThat(map.getValue(1)).isEqualTo(key);
     }
 
@@ -48,16 +54,21 @@ public class SingleValueMapperTest {
         String firstKey = "badger";
         String secondKey = "ferret";
         int value = 1;
+
         map.put(firstKey, value);
         map.put(secondKey, value);
+
         assertThat(map.get(firstKey)).isNull();
+        assertThat(map.getValue(value)).isEqualTo(secondKey);
     }
 
     @Test
     public void shouldRemoveMapping() {
         String key = "badger";
+
         map.put(key, 1);
         map.remove(key);
+
         assertThat(map.get(key)).isNull();
     }
 

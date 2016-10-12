@@ -28,7 +28,8 @@ public enum SessionTokenField {
     REALM("clientDomain", CoreTokenField.STRING_ELEVEN),
     SESSION_STATE("sessionState", CoreTokenField.STRING_THIRTEEN), // Must be an un-indexed field for write performance
     MAX_SESSION_EXPIRATION_TIME("maxSessionExpirationTime", CoreTokenField.DATE_ONE),
-    MAX_IDLE_EXPIRATION_TIME("maxIdleExpirationTime", CoreTokenField.DATE_TWO);
+    MAX_IDLE_EXPIRATION_TIME("maxIdleExpirationTime", CoreTokenField.DATE_TWO),
+    RESTRICTED_TOKENS("restrictedTokens", CoreTokenField.MULTI_STRING_ONE);
 
     private final String sessionFieldName;
     private final CoreTokenField field;

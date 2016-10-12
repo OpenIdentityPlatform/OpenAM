@@ -11,16 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
 
-import org.forgerock.util.Reject;
-
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.forgerock.util.Reject;
+
 /**
- * A utility collection utility which maintains a the mappings for any given value.
+ * A utility collection which maintains mappings for any given value.
  * At any point, the value can only be mapped to a single key.
  *
  * This class makes an implicit contract with the caller by maintaining only one key
@@ -35,8 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <V> the second value.
  */
 public class SingleValueMapper<K, V> {
-    private final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
-    private final ConcurrentHashMap<V, K> reverse = new ConcurrentHashMap<V, K>();
+
+    private final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<V, K> reverse = new ConcurrentHashMap<>();
 
     /**
      * Gets the value corresponding to the specified key.
@@ -46,6 +47,7 @@ public class SingleValueMapper<K, V> {
      */
     public V get(K k) {
         Reject.ifNull(k);
+
         return map.get(k);
     }
 
@@ -57,6 +59,7 @@ public class SingleValueMapper<K, V> {
      */
     public K getValue(V v) {
         Reject.ifNull(v);
+
         return reverse.get(v);
     }
 
@@ -72,7 +75,7 @@ public class SingleValueMapper<K, V> {
      */
     public synchronized void put(K k, V v) {
         Reject.ifNull(k, v);
-        // Clean up previous mapping if present.
+
         K previousValue = reverse.get(v);
         if (previousValue != null) {
             map.remove(previousValue);
@@ -92,6 +95,7 @@ public class SingleValueMapper<K, V> {
      */
     public synchronized V remove(K k) {
         Reject.ifNull(k);
+
         V remove = map.remove(k);
         reverse.remove(remove);
         return remove;

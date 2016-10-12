@@ -45,8 +45,8 @@ public class TokenTestUtils {
         for (CoreTokenField field : result.getAttributeNames()) {
 
             if (CoreTokenFieldTypes.isCalendar(field)) {
-                Calendar resultCal = result.getValue(field);
-                Calendar expectedCal = expected.getValue(field);
+                Calendar resultCal = result.getAttribute(field);
+                Calendar expectedCal = expected.getAttribute(field);
 
                 if (resultCal.getTimeInMillis() != expectedCal.getTimeInMillis()) {
                     throw new AssertionError(MessageFormat.format(
@@ -72,8 +72,8 @@ public class TokenTestUtils {
                 }
             } else if (CoreTokenFieldTypes.isByteArray(field)) {
 
-                byte[] resultValue = result.getValue(field);
-                byte[] expectedValue = expected.getValue(field);
+                byte[] resultValue = result.getAttribute(field);
+                byte[] expectedValue = expected.getAttribute(field);
 
                 if (!ArrayUtils.isEquals(resultValue, expectedValue)) {
                     throw new AssertionError(MessageFormat.format(
@@ -86,8 +86,8 @@ public class TokenTestUtils {
                 }
 
             } else {
-                Object resultValue = result.getValue(field);
-                Object expectedValue = expected.getValue(field);
+                Object resultValue = result.getAttribute(field);
+                Object expectedValue = expected.getAttribute(field);
 
                 if (!compareValue(resultValue, expectedValue)) {
                     throw new AssertionError(MessageFormat.format(

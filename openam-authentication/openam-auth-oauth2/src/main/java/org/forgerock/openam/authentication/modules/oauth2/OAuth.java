@@ -26,7 +26,6 @@
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
@@ -57,9 +56,6 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -82,9 +78,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
@@ -95,10 +89,8 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.openam.xui.XUIState;
-import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -277,7 +269,7 @@ public class OAuth extends AMLoginModule {
                 try {
                     Token csrfStateToken = ctsStore.read(OAuthUtil.findCookie(request, NONCE_TOKEN_ID));
                     ctsStore.deleteAsync(csrfStateToken);
-                    String expectedCsrfState = csrfStateToken.getValue(CoreTokenField.STRING_ONE);
+                    String expectedCsrfState = csrfStateToken.getAttribute(CoreTokenField.STRING_ONE);
                     if (!expectedCsrfState.equals(csrfState)) {
                         OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
                                 + "contained an unexpected value");

@@ -18,10 +18,11 @@ package org.forgerock.openam.cts.utils;
 
 import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -125,6 +126,8 @@ public class LdapTokenAttributeConversionTest {
         token.setAttribute(CoreTokenField.STRING_TWO, "Weasel");
         token.setAttribute(CoreTokenField.INTEGER_ONE, 1234);
         token.setAttribute(CoreTokenField.DATE_ONE, calendar);
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "one");
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "two");
 
         // When
         Entry entry = conversion.getEntry(token);
@@ -153,10 +156,16 @@ public class LdapTokenAttributeConversionTest {
     @Test
     public void shouldUnderstandEmptyStrings() {
         // Given
+        Set<String> stringCollection = new HashSet<>();
+        stringCollection.add(LdapTokenAttributeConversion.EMPTY);
+        stringCollection.add("wobble");
+
         Entry entry = new LinkedHashMapEntry();
         entry.addAttribute(CoreTokenField.TOKEN_ID.toString(), "id");
         entry.addAttribute(CoreTokenField.TOKEN_TYPE.toString(), TokenType.OAUTH.toString());
         entry.addAttribute(CoreTokenField.STRING_ONE.toString(), LdapTokenAttributeConversion.EMPTY);
+        entry.addAttribute(CoreTokenField.MULTI_STRING_ONE.toString(),
+                stringCollection.toArray(new String[stringCollection.size()]));
 
         LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
 
@@ -164,8 +173,11 @@ public class LdapTokenAttributeConversionTest {
         Token result = conversion.tokenFromEntry(entry);
 
         // Then
-        String string = result.getValue(CoreTokenField.STRING_ONE);
+        String string = result.getAttribute(CoreTokenField.STRING_ONE);
         assertTrue(string.isEmpty());
+        Set<String> strings = result.getMultiAttribute(CoreTokenField.MULTI_STRING_ONE);
+        assertTrue(strings.contains(""));
+        assertTrue(strings.contains("wobble"));
     }
 
     @Test

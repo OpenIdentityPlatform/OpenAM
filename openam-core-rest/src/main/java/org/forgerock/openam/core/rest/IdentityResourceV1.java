@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.mail.MessagingException;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -564,7 +563,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
 
         //check realm
-        if (!realm.equals(ctsToken.getValue(CoreTokenField.STRING_ONE))) {
+        if (!realm.equals(ctsToken.getAttribute(CoreTokenField.STRING_ONE))) {
             debug.error("IdentityResource.validateToken: Invalid realm : {}", realm);
             throw new BadRequestException("Invalid realm", null);
         }

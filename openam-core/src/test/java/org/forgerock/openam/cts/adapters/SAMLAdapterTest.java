@@ -101,6 +101,6 @@ public class SAMLAdapterTest {
         Token token = adapter.toToken(samlToken);
 
         // Then
-        assertThat(token.<String>getValue(SAMLTokenField.SECONDARY_KEY.getField())).isNull();
+        assertThat(token.<String>getAttribute(SAMLTokenField.SECONDARY_KEY.getField())).isNull();
     }
 }

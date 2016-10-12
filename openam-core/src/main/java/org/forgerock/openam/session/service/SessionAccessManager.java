@@ -42,7 +42,6 @@ import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
@@ -63,7 +62,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
     private final SessionPersistentStore sessionPersistentStore;
 
     private final SessionNotificationSender sessionNotificationSender;
-    private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
     private final MonitoringOperations monitoringOperations; // Note: there should be an increment and a decrement in this class for this to make sense
 
@@ -74,7 +72,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
                          final SessionCache sessionCache,
                          final InternalSessionCache internalSessionCache,
                          final SessionNotificationSender sessionNotificationSender,
-                         final SessionLogging sessionLogging,
                          final SessionAuditor sessionAuditor,
                          final MonitoringOperations monitoringOperations,
                          final SessionPersistentStore sessionPersistentStore) {
@@ -83,7 +80,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
         this.sessionCache = sessionCache;
         this.internalSessionCache = internalSessionCache;
         this.sessionNotificationSender = sessionNotificationSender;
-        this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
         this.monitoringOperations = monitoringOperations;
         this.sessionPersistentStore = sessionPersistentStore;
@@ -149,6 +145,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
         if (session == null) {
             return null;
         }
+        
         boolean destroyed = destroySessionIfNecessary(session);
         if (!destroyed) {
             putInternalSessionIntoInternalSessionCache(session);
@@ -221,7 +218,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return a restricted Internal Session
      */
     public InternalSession getByRestrictedID(SessionID sessionID) {
-        return internalSessionCache.getByRestrictedID(sessionID);
+        return sessionPersistentStore.getByRestrictedID(sessionID);
     }
 
     /**

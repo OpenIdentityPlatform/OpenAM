@@ -152,7 +152,7 @@ class SessionExpiryBatchHandler {
         @Override
         public void processResults(Token result) {
             try {
-                String sessionId = result.getValue(SessionTokenField.SESSION_ID.getField());
+                String sessionId = result.getAttribute(SessionTokenField.SESSION_ID.getField());
                 InternalSession session = sessionAccessManager.get().getInternalSession(new SessionID(sessionId));
                 session.changeStateAndNotify(sessionEvent);
                 sessionAuditor.auditActivity(session.toSessionInfo(), auditEvent);

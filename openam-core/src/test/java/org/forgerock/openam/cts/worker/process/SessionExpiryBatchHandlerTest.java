@@ -118,10 +118,10 @@ public class SessionExpiryBatchHandlerTest {
         Iterator<PartialToken> partialTokenIterator = tokens.iterator();
         for (final Token token : tokenArgumentCaptor.getAllValues()) {
             final String expectedTokenId = partialTokenIterator.next().getValue(CoreTokenField.TOKEN_ID);
-            assertThat(token.getValue(CoreTokenField.TOKEN_ID)).isEqualTo(expectedTokenId);
-            assertThat(token.getValue(CoreTokenField.TOKEN_TYPE)).isEqualTo(TokenType.SESSION);
-            assertThat(token.getValue(CoreTokenField.ETAG)).isEqualTo("etag:" + expectedTokenId);
-            assertThat(token.getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo(newState);
+            assertThat(token.getAttribute(CoreTokenField.TOKEN_ID)).isEqualTo(expectedTokenId);
+            assertThat(token.getAttribute(CoreTokenField.TOKEN_TYPE)).isEqualTo(TokenType.SESSION);
+            assertThat(token.getAttribute(CoreTokenField.ETAG)).isEqualTo("etag:" + expectedTokenId);
+            assertThat(token.getAttribute(SessionTokenField.SESSION_STATE.getField())).isEqualTo(newState);
         }
         assertThat(partialTokenIterator.hasNext()).isFalse();
     }

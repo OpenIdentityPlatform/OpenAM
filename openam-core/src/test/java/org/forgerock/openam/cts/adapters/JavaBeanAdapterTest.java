@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.adapters;
@@ -87,10 +87,10 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
                 CoreTokenField.TOKEN_TYPE
         );
         assertThat(t.getTokenId()).isEqualTo("abc123");
-        assertThat(t.<Calendar>getValue(CoreTokenField.DATE_ONE).getTimeInMillis()).isEqualTo(date.getTimeInMillis());
-        assertThat(t.<Integer>getValue(CoreTokenField.INTEGER_ONE)).isEqualTo(50);
-        assertThat(t.<String>getValue(CoreTokenField.STRING_ONE)).isEqualTo("my token");
-        assertThat(t.<byte[]>getValue(CoreTokenField.BLOB)).isEqualTo("{\"fred\":[\"one\",\"two\"]}".getBytes(Charset.forName("UTF-8")));
+        assertThat(t.<Calendar>getAttribute(CoreTokenField.DATE_ONE).getTimeInMillis()).isEqualTo(date.getTimeInMillis());
+        assertThat(t.<Integer>getAttribute(CoreTokenField.INTEGER_ONE)).isEqualTo(50);
+        assertThat(t.<String>getAttribute(CoreTokenField.STRING_ONE)).isEqualTo("my token");
+        assertThat(t.<byte[]>getAttribute(CoreTokenField.BLOB)).isEqualTo("{\"fred\":[\"one\",\"two\"]}".getBytes(Charset.forName("UTF-8")));
 
         //When
         DummyBean roundTrip = adapter.fromToken(t);

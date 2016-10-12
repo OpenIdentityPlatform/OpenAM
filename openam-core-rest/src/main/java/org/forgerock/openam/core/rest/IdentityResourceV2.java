@@ -22,7 +22,6 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
@@ -39,7 +38,6 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +54,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
@@ -69,7 +66,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -636,7 +632,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         }
 
         //check realm
-        if (!realm.equals(ctsToken.getValue(CoreTokenField.STRING_ONE))) {
+        if (!realm.equals(ctsToken.getAttribute(CoreTokenField.STRING_ONE))) {
             debug.error("IdentityResource.validateToken: Invalid realm : {}", realm);
             throw new BadRequestException("Invalid realm", null);
         }

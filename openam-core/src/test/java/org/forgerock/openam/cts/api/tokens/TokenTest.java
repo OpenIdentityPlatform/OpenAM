@@ -15,18 +15,21 @@
  */
 package org.forgerock.openam.cts.api.tokens;
 
-import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.testng.annotations.Test;
-
-import java.util.Calendar;
-import java.util.Collection;
-
 import static org.forgerock.openam.tokens.CoreTokenField.*;
 import static org.forgerock.openam.utils.Time.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.testng.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.forgerock.openam.cts.TokenTestUtils;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.testng.annotations.Test;
 
 public class TokenTest {
     @Test
@@ -38,7 +41,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, value);
         // Then
-        assertEquals(value, token.getValue(key));
+        assertEquals(value, token.getAttribute(key));
     }
 
     @Test
@@ -50,7 +53,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, now);
         // Then
-        Calendar result = token.getValue(key);
+        Calendar result = token.getAttribute(key);
         assertEquals(now.getTimeInMillis(), result.getTimeInMillis());
     }
 
@@ -63,7 +66,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, value);
         // Then
-        assertEquals(value, token.getValue(key));
+        assertEquals(value, token.getAttribute(key));
     }
 
     @Test
@@ -75,7 +78,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, data);
         // Then
-        assertArrayEquals(data, token.<byte[]>getValue(key));
+        assertArrayEquals(data, token.<byte[]>getAttribute(key));
     }
 
     @Test
@@ -131,5 +134,21 @@ public class TokenTest {
         Token token = new Token("", TokenType.SESSION);
         // When/Then
         token.setAttribute(key, "");
+    }
+
+
+    @Test
+    public void shouldAllowMultipleSettings() {
+        // Given
+        Token token = new Token("id", TokenType.SESSION);
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "one");
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "two");
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "three");
+
+        // When
+        Set<String> values = token.getAttribute(CoreTokenField.MULTI_STRING_ONE);
+
+        // Then
+        assertEquals(values, new HashSet<>(Arrays.asList("one", "two", "three")));
     }
 }

@@ -33,7 +33,6 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
@@ -53,7 +52,7 @@ public class SessionAccessManagerTest {
         MockitoAnnotations.initMocks(this);
         sessionAccessManager = new SessionAccessManager(mockDebug, mock(ForeignSessionHandler.class),
                 mock(SessionCache.class), internalSessionCache, mock(SessionNotificationSender.class),
-                mock(SessionLogging.class), mock(SessionAuditor.class), mock(MonitoringOperations.class),
+                mock(SessionAuditor.class), mock(MonitoringOperations.class),
                 sessionPersistentStore);
 
         given(internalSessionCache.remove(mockSessionID)).willReturn(mockInternalSession);

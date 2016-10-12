@@ -16,8 +16,10 @@
 package org.forgerock.openam.cts.utils;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -27,6 +29,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.DN;
@@ -43,7 +46,6 @@ import org.forgerock.opendj.ldap.LinkedHashMapEntry;
  *
  * @see CoreTokenConstants#OBJECT_CLASS
  *
- * @author robert.wapshott@forgerock.com
  */
 public class LdapTokenAttributeConversion {
     /**
@@ -80,23 +82,28 @@ public class LdapTokenAttributeConversion {
 
             // Token Type special case is an Enum
             if (CoreTokenField.TOKEN_TYPE.equals(field)) {
-                TokenType type = token.getValue(field);
+                TokenType type = token.getAttribute(field);
                 entry.addAttribute(key, type.name());
                 continue;
             }
 
-            if (CoreTokenFieldTypes.isCalendar(field)) {
-                Calendar calendar = token.getValue(field);
+            if (CoreTokenFieldTypes.isMulti(field)) {
+                Object[] addition = getMultiAttribute(token, field);
+                if (addition.length > 0) {
+                    entry.addAttribute(key, addition);
+                }
+            } else if (CoreTokenFieldTypes.isCalendar(field)) {
+                Calendar calendar = token.getAttribute(field);
                 String dateString = conversion.toLDAPDate(calendar);
                 entry.addAttribute(key, dateString);
             } else if (CoreTokenFieldTypes.isByteArray(field)) {
-                byte[] array = token.getValue(field);
+                byte[] array = token.getAttribute(field);
                 entry.addAttribute(key, array);
             } else if (CoreTokenFieldTypes.isInteger(field)) {
-                Integer value = token.getValue(field);
+                Integer value = token.getAttribute(field);
                 entry.addAttribute(key, value);
             } else if (CoreTokenFieldTypes.isString(field)) {
-                String value = token.getValue(field);
+                String value = token.getAttribute(field);
                 if (!value.isEmpty()) {
                     entry.addAttribute(key, value);
                 }
@@ -104,7 +111,26 @@ public class LdapTokenAttributeConversion {
                 throw new IllegalStateException();
             }
         }
+
         return entry;
+    }
+
+    private Object[] getMultiAttribute(Token token, CoreTokenField field) {
+        if (CoreTokenFieldTypes.isString(field)) {
+            Collection<String> value = token.getAttribute(field);
+            if (!CollectionUtils.isEmpty(value)) {
+                return value.toArray(new String[value.size()]);
+            }
+        } else if (CoreTokenFieldTypes.isInteger(field)) {
+            Collection<Integer> value = token.getAttribute(field);
+            if (!CollectionUtils.isEmpty(value)) {
+                return value.toArray(new Integer[value.size()]);
+            }
+        } else {
+            throw new IllegalStateException("New parser for multi-value type required for field : " + field);
+        }
+
+        return new Object[0];
     }
 
     /**
@@ -134,16 +160,15 @@ public class LdapTokenAttributeConversion {
                 continue;
             }
 
-            if (CoreTokenFieldTypes.isCalendar(field)) {
+            if (CoreTokenFieldTypes.isMulti(field)) {
+                r.put(field, parseMulti(field, entry, description));
+            } else if (CoreTokenFieldTypes.isCalendar(field)) {
                 String dateString = entry.parseAttribute(description).asString();
                 Calendar calendar = conversion.fromLDAPDate(dateString);
                 r.put(field, calendar);
             } else if (CoreTokenFieldTypes.isString(field)) {
                 String value = entry.parseAttribute(description).asString();
-                if (EMPTY.equals(value)) {
-                    value = "";
-                }
-                r.put(field, value);
+                r.put(field, resolveEmpty(value));
             } else if (CoreTokenFieldTypes.isInteger(field)) {
                 Integer value = entry.parseAttribute(description).asInteger();
                 r.put(field, value);
@@ -156,6 +181,30 @@ public class LdapTokenAttributeConversion {
         }
 
         return r;
+    }
+
+    private String resolveEmpty(String value) {
+        return EMPTY.equals(value) ? "" : value;
+    }
+
+    private Collection<?> parseMulti(CoreTokenField field, Entry entry, AttributeDescription description) {
+        if (CoreTokenFieldTypes.isString(field)) {
+            return resolveEmptyMultiStringValues(entry, description);
+        } else if (CoreTokenFieldTypes.isInteger(field)) {
+            return entry.parseAttribute(description).asSetOfInteger();
+        } else {
+            throw new IllegalStateException("New parser for multi-value type required for field : " + field);
+        }
+    }
+
+    private Collection<String> resolveEmptyMultiStringValues(Entry entry, AttributeDescription description) {
+        Set<String> result = entry.parseAttribute(description).asSetOfString();
+        boolean wasPresent = result.remove(EMPTY);
+        if (wasPresent) {
+            result.add("");
+        }
+
+        return result;
     }
 
     /**
@@ -186,7 +235,14 @@ public class LdapTokenAttributeConversion {
                 continue;
             }
 
-            token.setAttribute(key, value);
+            if (Collection.class.isAssignableFrom(value.getClass())) {
+                Collection collection = (Collection) value;
+                for (Object content : collection) {
+                    token.setMultiAttribute(key, content);
+                }
+            } else {
+                token.setAttribute(key, value);
+            }
         }
         return token;
     }

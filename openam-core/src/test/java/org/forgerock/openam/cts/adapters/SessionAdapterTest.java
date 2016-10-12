@@ -157,7 +157,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(CoreTokenField.USER_ID)).isEqualTo(mockUserID);
+        assertThat(token.<String>getAttribute(CoreTokenField.USER_ID)).isEqualTo(mockUserID);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_ID.getField())).isEqualTo(mockSessionID);
+        assertThat(token.<String>getAttribute(SessionTokenField.SESSION_ID.getField())).isEqualTo(mockSessionID);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField())).isEqualTo(mockSessionHandle);
+        assertThat(token.<String>getAttribute(SessionTokenField.SESSION_HANDLE.getField())).isEqualTo(mockSessionHandle);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("INVALID");
+        assertThat(token.<String>getAttribute(SessionTokenField.SESSION_STATE.getField())).isEqualTo("INVALID");
     }
 
     @Test
@@ -223,7 +223,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("VALID");
+        assertThat(token.<String>getAttribute(SessionTokenField.SESSION_STATE.getField())).isEqualTo("VALID");
     }
 
     @Test
@@ -236,7 +236,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("DESTROYED");
+        assertThat(token.<String>getAttribute(SessionTokenField.SESSION_STATE.getField())).isEqualTo("DESTROYED");
     }
 
     @Test
@@ -250,7 +250,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        Calendar maxSessionExpirationTime = token.getValue(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField());
+        Calendar maxSessionExpirationTime = token.getAttribute(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField());
         assertThat(maxSessionExpirationTime.getTimeInMillis()).isEqualTo(mockTimestampMillis);
     }
 
@@ -265,7 +265,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        Calendar maxIdleExpirationTime = token.getValue(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField());
+        Calendar maxIdleExpirationTime = token.getAttribute(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField());
         assertThat(maxIdleExpirationTime.getTimeInMillis()).isEqualTo(mockTimestampMillis);
     }
 
@@ -278,7 +278,7 @@ public class SessionAdapterTest {
         Token token = adapter.toToken(mockSession);
 
         // Then
-        String realm = token.getValue(SessionTokenField.REALM.getField());
+        String realm = token.getAttribute(SessionTokenField.REALM.getField());
         assertThat(realm).isEqualTo("PRETTY_REALM");
     }
 

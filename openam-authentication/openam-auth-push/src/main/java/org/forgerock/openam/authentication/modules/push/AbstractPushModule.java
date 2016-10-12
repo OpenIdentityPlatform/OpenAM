@@ -135,7 +135,7 @@ public abstract class AbstractPushModule extends AMLoginModule {
             return null;
         }
 
-        Integer deny = coreToken.getValue(CoreTokenField.INTEGER_ONE);
+        Integer deny = coreToken.getAttribute(CoreTokenField.INTEGER_ONE);
 
         if (deny == null) {
             return null;
@@ -164,7 +164,7 @@ public abstract class AbstractPushModule extends AMLoginModule {
             return null;
         }
 
-        Integer accept = coreToken.getValue(CoreTokenField.INTEGER_ONE);
+        Integer accept = coreToken.getAttribute(CoreTokenField.INTEGER_ONE);
 
         if (accept == null) {
             return null;

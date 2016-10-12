@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.adapters;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -33,11 +33,13 @@ import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 
 /**
@@ -134,10 +136,21 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
             token.setAttribute(SessionTokenField.LATEST_ACCESS_TIME.getField(), latestAccessTime);
         }
 
+        // Restricted Tokens
+        if (CollectionUtils.isNotEmpty(session.getRestrictedTokens())) {
+            setRestrictedTokens(token, session);
+        }
+
         // Session handle
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
 
         return token;
+    }
+
+    private void setRestrictedTokens(Token token, InternalSession session) {
+        for (SessionID restrictedToken : session.getRestrictedTokens()) {
+            token.setMultiAttribute(SessionTokenField.RESTRICTED_TOKENS.getField(), restrictedToken.toString());
+        }
     }
 
     @VisibleForTesting
@@ -158,7 +171,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         int index = findIndexOfValidField(jsonBlob);
 
         // Do we need to insert the LatestAccessTime Into the Blob?
-        String latestAccessTime = token.getValue(SessionTokenField.LATEST_ACCESS_TIME.getField());
+        String latestAccessTime = token.getAttribute(SessionTokenField.LATEST_ACCESS_TIME.getField());
         if (latestAccessTime != null && index != -1) {
             // Assemble the Sting to insert
             // latestAccessTime
@@ -176,7 +189,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         if (session.getSessionHandle() == null) {
             //Originally the sessionHandle was stored in the serialize token, so if after the deserialization the
             //sessionHandle field is not set, then we should attempt to retrieve the value directly from the token.
-            session.setSessionHandle(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField()));
+            session.setSessionHandle(token.<String>getAttribute(SessionTokenField.SESSION_HANDLE.getField()));
         }
         return session;
     }

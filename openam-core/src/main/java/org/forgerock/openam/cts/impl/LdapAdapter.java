@@ -166,7 +166,7 @@ public class LdapAdapter implements TokenStorageAdapter {
 
         request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()))
                 .addControl(PostReadRequestControl.newControl(true, CoreTokenField.ETAG.toString()));
-        String previousEtag = previous.getValue(CoreTokenField.ETAG);
+        String previousEtag = previous.getAttribute(CoreTokenField.ETAG);
         request = addEtagAssertionControl(request, previousEtag);
 
         try {
