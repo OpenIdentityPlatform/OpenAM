@@ -16,25 +16,20 @@
 package org.forgerock.openam.core.rest.docs.api;
 
 import static org.forgerock.json.resource.Requests.newApiRequest;
-import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,12 +45,12 @@ import org.forgerock.guava.common.base.Joiner;
 import org.forgerock.guava.common.io.Files;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.io.FileBranchingStream;
-import org.forgerock.http.io.IO;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.http.ApiDescriptorFilter;
 import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.ResourceRouter;
@@ -157,6 +152,9 @@ public class ApiDocsService implements Describable.Listener {
      */
     @Get
     public Response handle(@Contextual Context context, @Contextual Request request) {
+        if (!ApiDescriptorFilter.State.INSTANCE.isEnabled()) {
+            return new Response(Status.NOT_IMPLEMENTED);
+        }
         Response response = new Response(Status.OK);
         File input;
         try {

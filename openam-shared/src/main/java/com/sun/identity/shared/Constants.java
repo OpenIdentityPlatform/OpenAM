@@ -1375,4 +1375,11 @@ public interface Constants {
      * Property to enable capturing trace-level messages from Log4J world when in message-level debug mode.
      */
     public static final String ENABLE_TRACE_IN_MESSAGE_MODE = "org.forgerock.openam.slf4j.enableTraceInMessage";
+
+    /** Service name for the REST APIs service. */
+    String REST_APIS_SERVICE_NAME = "RestApisService";
+    
+    /** Service version for the REST APIs service. */
+    String REST_APIS_SERVICE_VERSION = "1.0";
+
 }

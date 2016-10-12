@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest;
+package org.forgerock.openam.utils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -25,7 +25,7 @@ import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.openam.utils.CollectionUtils;
 
 /**
- * Static utilities for attribute retrieval/setting for the provided
+ * Static utilities for attribute retrieval for the provided
  * service config.
  */
 public class ServiceConfigUtils {

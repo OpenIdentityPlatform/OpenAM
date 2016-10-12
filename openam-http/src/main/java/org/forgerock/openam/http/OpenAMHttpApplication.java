@@ -76,7 +76,7 @@ final class OpenAMHttpApplication implements DescribedHttpApplication {
                             }
                         });
             }
-        }, new OpenApiRequestFilter());
+        }, new ApiDescriptorFilter(), new OpenApiRequestFilter());
     }
 
     @Override
