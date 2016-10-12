@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service;
@@ -411,11 +412,10 @@ public class SessionServiceConfig {
     }
 
     private int loadNotificationThreadPoolSizeSystemProperty() {
-        String size = SystemProperties.get(NOTIFICATION_THREADPOOL_SIZE);
         try {
-            return Integer.parseInt(size);
+            return SystemProperties.getAsInt(NOTIFICATION_THREADPOOL_SIZE, DEFAULT_NOTIFICATION_THEAD_POOL_SIZE);
         } catch (NumberFormatException e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + NOTIFICATION_THREADPOOL_SIZE +
                             " defaulting to " + DEFAULT_NOTIFICATION_THEAD_POOL_SIZE);
             return DEFAULT_NOTIFICATION_THEAD_POOL_SIZE;
@@ -423,11 +423,11 @@ public class SessionServiceConfig {
     }
 
     private int loadNotificationThreadPoolThresholdSystemProperty() {
-        String threshold = SystemProperties.get(NOTIFICATION_THREADPOOL_THRESHOLD);
         try {
-            return Integer.parseInt(threshold);
+            return SystemProperties.getAsInt(NOTIFICATION_THREADPOOL_THRESHOLD,
+                    DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD);
         } catch (NumberFormatException e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + NOTIFICATION_THREADPOOL_THRESHOLD +
                             " defaulting to " + DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD);
             return DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD;
@@ -435,11 +435,11 @@ public class SessionServiceConfig {
     }
 
     private int loadSessionFailoverClusterStateCheckTimeout() {
-        String timeout = SystemProperties.get(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT);
         try {
-            return Integer.parseInt(timeout);
+            return SystemProperties.getAsInt(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT,
+                    ClusterStateService.DEFAULT_TIMEOUT);
         } catch (Exception e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT +
                             " defaulting to " + ClusterStateService.DEFAULT_TIMEOUT);
             return ClusterStateService.DEFAULT_TIMEOUT;
@@ -447,11 +447,11 @@ public class SessionServiceConfig {
     }
 
     private long loadSessionFailoverClusterStateCheckPeriod() {
-        String period = SystemProperties.get(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD);
         try {
-            return Long.parseLong(period);
+            return SystemProperties.getAsLong(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD,
+                    ClusterStateService.DEFAULT_PERIOD);
         } catch (Exception e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD +
                             " defaulting to " + ClusterStateService.DEFAULT_PERIOD);
             return ClusterStateService.DEFAULT_PERIOD;
