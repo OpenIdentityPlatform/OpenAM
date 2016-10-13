@@ -49,6 +49,7 @@ require.config({
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
 
+        "classnames"       : "libs/classnames-2.2.5",
         "clockPicker"      : "libs/bootstrap-clockpicker-0.0.7-min",
         "crypto-js-sha256" : "libs/crypto-js-3.1.2-sha256.min",
         "crypto-js"        : "libs/crypto-js-3.1.2-min",
@@ -67,6 +68,8 @@ require.config({
         "react-bootstrap"  : "libs/react-bootstrap-0.30.1-min",
         "react-dom"        : "libs/react-dom-15.2.1-min",
         "react"            : "libs/react-15.2.1-min",
+        "react-input-autosize": "libs/react-input-autosize-1.1.0-min",
+        "react-select"     : "libs/react-select-1.0.0-rc.2-min",
         "redux"            : "libs/redux-3.5.2-min",
         "selectize"        : "libs/selectize-non-standalone-0.12.1-min",
         "sifter"           : "libs/sifter-0.4.1-min",
@@ -166,8 +169,26 @@ require.config({
         },
         "sortable": {
             deps: ["jquery"]
+        },
+        "react-input-autosize": {
+            deps: ["reactAutosizeInputDep"]
+        },
+        "react-select": {
+            deps: ["reactSelectDep"]
         }
     }
+});
+
+define("reactAutosizeInputDep", ["react"], (React) => {
+    window.React = React;
+    return {};
+});
+
+define("reactSelectDep", ["react-dom", "react-input-autosize", "classnames"], (ReactDOM, autoSize, classNames) => {
+    window.ReactDOM = ReactDOM;
+    window.classNames = classNames;
+    window.AutosizeInput = autoSize;
+    return {};
 });
 
 require([
@@ -185,7 +206,6 @@ require([
     "org/forgerock/openam/ui/main",
     "config/main",
     "store/index"
-
 ], (Constants, EventManager) => {
     EventManager.sendEvent(Constants.EVENT_DEPENDENCIES_LOADED);
 });
