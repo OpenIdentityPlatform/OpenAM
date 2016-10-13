@@ -320,14 +320,14 @@ public class ResourceOwnerSessionValidator {
         for (String acr : acrValues) {
             if (acrMap.containsKey(acr)) {
                 if (serviceUsed.equals(acrMap.get(acr).getName())) {
-                    req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, acr);
+                    req.getAttributes().put(OAuth2Constants.JWTTokenParams.ACR, acr);
                     matched = true;
                     break;
                 }
             }
         }
         if (!matched) {
-            req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, UNMATCHED_ACR_VALUE);
+            req.getAttributes().put(OAuth2Constants.JWTTokenParams.ACR, UNMATCHED_ACR_VALUE);
         }
     }
 
@@ -402,9 +402,6 @@ public class ResourceOwnerSessionValidator {
             final ResourceOwnerSessionValidator.ACRValue chosen = chooseBestAcrValue(request, acrValues.split("\\s+"));
             if (chosen != null) {
                 loginRef.addQueryParameter(chosen.method.getIndexType().toString(), chosen.method.getName());
-
-                // Adjust the GOTO url to indicate which acr value was actually chosen
-                req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, chosen.acr);
             }
         } else if (!isEmpty(moduleName)) {
             loginRef.addQueryParameter(MODULE, moduleName);

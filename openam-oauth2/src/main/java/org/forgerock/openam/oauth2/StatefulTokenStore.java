@@ -245,7 +245,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     }
 
     private String getAuthenticationContextClassReferenceFromRequest(OAuth2Request request) {
-        return request.getParameter(OAuth2Constants.JWTTokenParams.ACR);
+        return (String) request.getRequest().getAttributes().get(OAuth2Constants.JWTTokenParams.ACR);
     }
 
     /**
