@@ -27,6 +27,8 @@ import static org.mockito.Mockito.verify;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
+
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -398,4 +400,10 @@ public class PolicyResourceTest {
         given(mockRequest.getContent()).willReturn(content);
         return mockRequest;
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(PolicyResource.class).hasValidAnnotations();
+    }
+
 }

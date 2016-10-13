@@ -19,20 +19,51 @@ package org.forgerock.openam.entitlement.rest;
 import static org.apache.commons.lang.StringUtils.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ACTION_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
 import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_403_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_404_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_405_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.POLICY_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
+
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.api.annotations.Action;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
@@ -42,7 +73,6 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.entitlement.rest.model.json.PolicyRequest;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
@@ -57,7 +87,17 @@ import java.util.List;
  *
  * @since 12.0.0
  */
-public final class PolicyResource implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = POLICY_RESOURCE + TITLE,
+                description = POLICY_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "PolicyResource.schema.json")),
+        pathParam = @Parameter(
+                name = "resourceId",
+                type = "string",
+                description = POLICY_RESOURCE + PATH_PARAM + DESCRIPTION))
+public final class PolicyResource implements CollectionResourceProvider{
 
     private static final Debug DEBUG = Debug.getInstance("amPolicy");
 
@@ -94,9 +134,46 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Action(operationDescription = @Operation(
+                    errors = {
+                            @ApiError(
+                                    code = 405,
+                                    description = POLICY_RESOURCE + ERROR_405_DESCRIPTION),
+                            @ApiError(
+                                    code = 500,
+                                    description = POLICY_RESOURCE + ERROR_500_DESCRIPTION),
+                            @ApiError(
+                                    code = 501,
+                                    description = POLICY_RESOURCE + "error.501." + DESCRIPTION)},
+                    description = POLICY_RESOURCE + "evaluate." + ACTION_DESCRIPTION),
+            request = @Schema(schemaResource = "PolicyResource.evaluate.action.request.schema.json"),
+            response = @Schema(schemaResource = "PolicyResource.action.response.schema.json")
+    )
+    public Promise<ActionResponse, ResourceException> evaluate (Context context, ActionRequest actionRequest) {
+        return actionCollection(context, actionRequest);
+    }
+
+    @Action(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 405,
+                            description = POLICY_RESOURCE + ERROR_405_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = POLICY_RESOURCE + ERROR_500_DESCRIPTION),
+                    @ApiError(
+                            code = 501,
+                            description = POLICY_RESOURCE + "error.501." + DESCRIPTION)},
+            description = POLICY_RESOURCE + "evaluatetree." + ACTION_DESCRIPTION),
+            request = @Schema(schemaResource = "PolicyResource.evaluatetree.action.request.schema.json"),
+            response = @Schema(schemaResource = "PolicyResource.action.response.schema.json")
+    )
+    public Promise<ActionResponse, ResourceException> evaluateTree (Context context, ActionRequest actionRequest) {
+        return actionCollection(context, actionRequest);
+    }
+
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context,
-            ActionRequest actionRequest) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest actionRequest) {
         final String actionString = actionRequest.getAction();
         final PolicyAction action = PolicyAction.getAction(actionString);
 
@@ -147,6 +224,15 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Create(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = POLICY_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 403,
+                            description = POLICY_RESOURCE + ERROR_403_DESCRIPTION)},
+            description = POLICY_RESOURCE + CREATE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         String providedName = null;
@@ -185,6 +271,15 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Delete(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = POLICY_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 403,
+                            description = POLICY_RESOURCE + ERROR_403_DESCRIPTION)},
+            description = POLICY_RESOURCE + DELETE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
@@ -214,6 +309,15 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = POLICY_RESOURCE + ERROR_400_DESCRIPTION)},
+            description = POLICY_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
@@ -237,6 +341,12 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = POLICY_RESOURCE + ERROR_400_DESCRIPTION)},
+            description = POLICY_RESOURCE + READ_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
@@ -252,6 +362,15 @@ public final class PolicyResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
+    @Update(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = POLICY_RESOURCE + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 404,
+                            description = POLICY_RESOURCE + ERROR_404_DESCRIPTION)},
+            description = POLICY_RESOURCE + UPDATE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {

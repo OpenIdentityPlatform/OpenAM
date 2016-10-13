@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.title",
+  "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.description",
+  "type": "object",
+  "properties": {
+    "resources": {
+      "type": "array",
+      "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.resources.title",
+      "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.resources.description",
+      "items": {
+        "type": "string"
+      }
+    },
+    "application": {
+      "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.application.title",
+      "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.application.description",
+      "type": "string"
+    },
+    "subject": {
+      "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.subject.title",
+      "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.subject.description",
+      "type": "object",
+      "properties": {
+        "ssoToken": {
+          "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.ssoToken.title",
+          "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.ssoToken.description",
+          "type": "string"
+        },
+        "jwt": {
+          "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.jwt.title",
+          "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.jwt.description",
+          "type": "string"
+        },
+        "claims": {
+          "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.claims.title",
+          "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.claims.description",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "environment": {
+      "title": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.environment.title",
+      "description": "i18n:api-descriptor/PolicyResource#evaluate.request.schema.environment.description",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "resources",
+    "application"
+  ]
+}

@@ -40,9 +40,9 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
                 .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(PolicyV1Filter.class)
-                .toCollection(PolicyResource.class)
+                .toAnnotatedCollection(PolicyResource.class)
                 .forVersion(2)
-                .toCollection(PolicyResource.class)
+                .toAnnotatedCollection(PolicyResource.class)
                 .forVersion(2, 1)
                 .toCollection(PolicyResourceWithCopyMoveSupport.class);
 
