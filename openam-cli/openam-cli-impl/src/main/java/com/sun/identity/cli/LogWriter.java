@@ -38,7 +38,6 @@ import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.AccessController;
 import java.util.Arrays;
 import java.util.List;
@@ -58,15 +57,12 @@ import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AMAuditEventBuilder;
 import org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.slf4j.LoggerFactory;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
@@ -187,7 +183,7 @@ public class LogWriter {
                 .toEvent().getValue();
 
         String sessionId = adminSSOToken.getTokenID().toString();
-        sendEvent(topic, eventJson, sessionId, WebtopNaming.mapSiteToServer(sessionId).toString());
+        sendEvent(topic, eventJson, sessionId, new SessionID(sessionId).getSessionServerURL());
     }
 
     private static void sendEvent(String topic, JsonValue eventJson, String sessionId, String baseUrl) throws HttpApplicationException, URISyntaxException {
