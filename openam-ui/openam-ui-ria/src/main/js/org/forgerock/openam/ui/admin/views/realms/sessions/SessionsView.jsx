@@ -14,21 +14,65 @@
 * Copyright 2016 ForgeRock AS.
 */
 
-import { PageHeader } from "react-bootstrap";
 import { t } from "i18next";
+import _ from "lodash";
+
 import React, { Component } from "react";
+import { PageHeader, Panel } from "react-bootstrap";
+import Select from "react-select";
+
+import { getUsers } from "org/forgerock/openam/ui/admin/services/realm/SessionsService";
+
+const MAX_USERS = 10;
+const fetchData = _.debounce((searchTerm, callback) => {
+    if (_.isEmpty(searchTerm)) {
+        callback(null, { options: [] });
+    } else {
+        getUsers(searchTerm, MAX_USERS).then((response) => {
+            callback(null, {
+                options: _.map(response, (user) => ({ label: user, value: user }))
+            });
+        }, (error) => callback(error.statusText));
+    }
+}, 300);
 
 class SessionsView extends Component {
     constructor (props) {
         super(props);
+        this.state = {
+            selectedUser: null
+        };
     }
-    componentDidMount () {}
+
+    renderActiveSessionsTable (userId) {
+        // TODO render table
+        console.log(userId);
+    }
+
+    onUserSelect (value) {
+        const userId = _.get(value, "value");
+
+        this.setState({ selectedUser: userId });
+        this.renderActiveSessionsTable(userId);
+    }
+
     render () {
+        this.onUserSelect = _.bind(this.onUserSelect, this);
+
         return (
             <div>
                 <PageHeader bsClass="page-header page-header-no-border">
                     { t("console.sessions.title") }
                 </PageHeader>
+                <Panel>
+                    <Select.Async
+                        value={this.state.selectedUser}
+                        onChange={this.onUserSelect}
+                        loadOptions={fetchData}
+                        autoload={false}
+                        isLoading
+                    />
+                </Panel>
             </div>
         );
     }
