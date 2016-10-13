@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
@@ -183,7 +184,7 @@ public class LogWriter {
                 .toEvent().getValue();
 
         String sessionId = adminSSOToken.getTokenID().toString();
-        sendEvent(topic, eventJson, sessionId, new SessionID(sessionId).getSessionServerURL());
+        sendEvent(topic, eventJson, sessionId, WebtopNaming.mapSiteToServer(new SessionID(sessionId)));
     }
 
     private static void sendEvent(String topic, JsonValue eventJson, String sessionId, String baseUrl) throws HttpApplicationException, URISyntaxException {
