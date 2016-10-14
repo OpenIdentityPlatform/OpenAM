@@ -24,6 +24,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -118,10 +120,9 @@ public class EmbeddedOpenDJBackupManagerTest {
                 .describedAs("backup zip is not correct").isTrue();
     }
 
-    private void createBaseDirectory(String baseDirectoryTemplateName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File baseDirectoryZipFile = new File(classLoader.getResource(
-                "setup" + File.separator + baseDirectoryTemplateName + ".zip").getFile());
+    private void createBaseDirectory(String baseDirectoryTemplateName) throws IOException, URISyntaxException {
+        String zipFile = "setup" + File.separator + baseDirectoryTemplateName + ".zip";
+        File baseDirectoryZipFile = Paths.get(getClass().getClassLoader().getResource(zipFile).toURI()).toFile();
         extractZip(baseDirectoryZipFile, baseDirectoryZipExtractPath.toPath());
     }
 }
