@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.JsonValueFunctions.setOf;
+import static org.forgerock.json.JsonValueFunctions.uri;
 
 import java.net.URI;
 import java.util.Map;
@@ -153,7 +154,7 @@ public class ResourceSetDescription {
      * @return The resource set uri.
      */
     public URI getUri() {
-        return description.get("uri").asURI();
+        return description.get("uri").as(uri());
     }
 
     /**
@@ -180,7 +181,7 @@ public class ResourceSetDescription {
      * @return The icon uri.
      */
     public URI getIconUri() {
-        return description.get("icon_uri").asURI();
+        return description.get("icon_uri").as(uri());
     }
 
     /**

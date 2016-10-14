@@ -16,12 +16,10 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.rest.RestConstants.COLLECTION;
-import static org.forgerock.openam.rest.RestConstants.NAME;
-import static org.forgerock.util.i18n.LocalizableString.TRANSLATION_KEY_PREFIX;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
@@ -33,13 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Query;
@@ -47,7 +38,6 @@ import org.forgerock.api.annotations.RequestHandler;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonTransformer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
@@ -58,12 +48,18 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.i18n.LocalizableString;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A handler for handling queries on the {@literal realm-config/agents} resource.
@@ -85,7 +81,6 @@ public class SmsAggregatingAgentsQueryHandler {
     private final Debug debug;
     private final String serviceName;
     private final String serviceVersion;
-    private final JsonTransformer transformer = new AgentJsonTransformer();
     private Map<String, SmsJsonConverter> converters = new HashMap<>();
 
 
@@ -152,7 +147,7 @@ public class SmsAggregatingAgentsQueryHandler {
                     JsonValue value = converter.toJson(realm, subConfig.getAttributes(), false, json(object()));
                     value.add("_id", configName);
                     value.add("_type", schemaName);
-                    transformer.transform(value);
+                    transformAgentJson(value);
                     queryRes.add(value);
                 }
             }
@@ -244,34 +239,22 @@ public class SmsAggregatingAgentsQueryHandler {
         }
     }
 
-    /**
-     * Json transformer to transform the status and location attribute to user friendly tags
-     */
-    private static final class AgentJsonTransformer implements JsonTransformer {
+    private static final JsonPointer LOCATION_SOURCE_POINTER =
+            new JsonPointer("/com.sun.identity.agents.config.repository.location");
+    private static final JsonPointer LOCATION_DEST_POINTER = new JsonPointer("/_location");
+    private static final JsonPointer STATUS_SOURCE_POINTER = new JsonPointer("/sunIdentityServerDeviceStatus");
+    private static final JsonPointer STATUS_DEST_POINTER = new JsonPointer("/_status");
 
-        private static final JsonPointer LOCATION_SOURCE_POINTER =
-                new JsonPointer("/com.sun.identity.agents.config.repository.location");
-        private static final JsonPointer LOCATION_DEST_POINTER =
-                new JsonPointer("/_location");
+    private void transformAgentJson(JsonValue value) {
+        move(value, LOCATION_SOURCE_POINTER, LOCATION_DEST_POINTER);
+        move(value, STATUS_SOURCE_POINTER, STATUS_DEST_POINTER);
+    }
 
-        private static final JsonPointer STATUS_SOURCE_POINTER =
-                new JsonPointer("/sunIdentityServerDeviceStatus");
-
-        private static final JsonPointer STATUS_DEST_POINTER =
-                new JsonPointer("/_status");
-
-        @Override
-        public void transform(JsonValue value) {
-            move(value, LOCATION_SOURCE_POINTER, LOCATION_DEST_POINTER);
-            move(value, STATUS_SOURCE_POINTER, STATUS_DEST_POINTER);
-        }
-
-        private void move(JsonValue value, JsonPointer source, JsonPointer dest) {
-            JsonValue target = value.get(source);
-            if (target != null) {
-                value.remove(source);
-                value.add(dest, target.asString());
-            }
+    private void move(JsonValue value, JsonPointer source, JsonPointer dest) {
+        JsonValue target = value.get(source);
+        if (target != null) {
+            value.remove(source);
+            value.add(dest, target.asString());
         }
     }
 }

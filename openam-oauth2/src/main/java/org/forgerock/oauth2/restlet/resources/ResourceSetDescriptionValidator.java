@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.restlet.resources;
 
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValueFunctions.uri;
 
 import javax.inject.Singleton;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class ResourceSetDescriptionValidator {
     private void validateUri(JsonValue description) throws BadRequestException {
         if (!description.get(OAuth2Constants.ResourceSets.URI).isNull()) {
             try {
-                description.get(OAuth2Constants.ResourceSets.URI).asURI();
+                description.get(OAuth2Constants.ResourceSets.URI).as(uri());
             } catch (JsonValueException e) {
                 throw new BadRequestException("Invalid Resource Set Description. Attribute, 'uri', must be a valid "
                         + "URI.");
@@ -103,7 +104,7 @@ public class ResourceSetDescriptionValidator {
     private void validateIconUri(JsonValue description) throws BadRequestException {
         if (!description.get(OAuth2Constants.ResourceSets.ICON_URI).isNull()) {
             try {
-                description.get(OAuth2Constants.ResourceSets.ICON_URI).asURI();
+                description.get(OAuth2Constants.ResourceSets.ICON_URI).as(uri());
             } catch (JsonValueException e) {
                 throw new BadRequestException("Invalid Resource Set Description. Attribute, 'icon_uri', must be a "
                         + "valid URI.");

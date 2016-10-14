@@ -606,7 +606,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>commons-bom</artifactId>
-                <version>21.0.0-alpha-15</version>
+                <version>21.0.0-alpha-17</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

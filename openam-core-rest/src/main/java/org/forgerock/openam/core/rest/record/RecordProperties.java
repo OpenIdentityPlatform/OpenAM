@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.record;
+
+import static org.forgerock.json.JsonValueFunctions.enumConstant;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.debug.DebugLevel;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
+import org.forgerock.json.JsonValueFunctions;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.file.FileSizeUnit;
@@ -124,7 +127,7 @@ public class RecordProperties {
         if (recordProperties.threadDumpEnable) {
             JsonValue jsonThreadDumpDelay = jsonThreadDump.get(RecordConstants.THREAD_DUMP_DELAY_LABEL).required();
             TimeUnit timeUnit = jsonThreadDumpDelay.get(RecordConstants.THREAD_DUMP_DELAY_TIME_UNIT_LABEL).required()
-                    .asEnum(TimeUnit.class);
+                    .as(enumConstant(TimeUnit.class));
 
             Long timeValue = jsonThreadDumpDelay.get(RecordConstants.THREAD_DUMP_DELAY_VALUE_LABEL).required().asLong();
             recordProperties.threadDumpDelayInSeconds = timeUnit.toSeconds(timeValue);
@@ -180,7 +183,7 @@ public class RecordProperties {
         JsonValue jsonDebugLogs = checkIfExist(jsonProperties, RecordConstants.DEBUG_LOGS_LABEL);
 
         recordProperties.debugLevel = jsonDebugLogs.get(RecordConstants.DEBUG_LOGS_DEBUG_LEVEL_LABEL).required()
-                .asEnum(DebugLevel.class);
+                .as(enumConstant(DebugLevel.class));
 
         // Auto stop block
         recordProperties.autoStopEnable = jsonDebugLogs.isDefined(RecordConstants.DEBUG_LOGS_AUTOSTOP_LABEL);
@@ -195,7 +198,7 @@ public class RecordProperties {
                 JsonValue jsonAutoStopTime = jsonAutoStop.get(RecordConstants.DEBUG_LOGS_AUTOSTOP_TIME_LABEL)
                         .required();
                 TimeUnit timeUnit = jsonAutoStopTime.get(RecordConstants.DEBUG_LOGS_AUTOSTOP_TIME_UNIT_LABEL).required()
-                        .asEnum(TimeUnit.class);
+                        .as(enumConstant(TimeUnit.class));
 
                 Long timeValue = jsonAutoStopTime.get(RecordConstants.DEBUG_LOGS_AUTOSTOP_TIME_VALUE_LABEL).required()
                         .asLong();
@@ -210,7 +213,7 @@ public class RecordProperties {
                         .required();
                 FileSizeUnit sizeUnit =
                         jsonAutoStopFileSize.get(RecordConstants.DEBUG_LOGS_AUTOSTOP_FILESIZE_SIZEUNIT_LABEL)
-                        .required().asEnum(FileSizeUnit.class);
+                        .required().as(enumConstant(FileSizeUnit.class));
                 recordProperties.autoStopFileSizedInKB =
                         sizeUnit.toKB(jsonAutoStopFileSize.get(RecordConstants.DEBUG_LOGS_AUTOSTOP_FILESIZE_VALUE_LABEL)
                                 .required().asLong());

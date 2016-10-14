@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.json.JsonValueFunctions.enumConstant;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
@@ -134,7 +135,7 @@ public class UmaLabelResource {
     private void validate(JsonValue umaLabel) throws BadRequestException {
         try {
             umaLabel.get(TYPE_LABEL).required();
-            umaLabel.get(TYPE_LABEL).asEnum(LabelType.class);
+            umaLabel.get(TYPE_LABEL).as(enumConstant(LabelType.class));
             umaLabel.get(NAME_LABEL).required();
         } catch (JsonValueException e) {
             debug.error("Invalid Json - " + e.getMessage());
