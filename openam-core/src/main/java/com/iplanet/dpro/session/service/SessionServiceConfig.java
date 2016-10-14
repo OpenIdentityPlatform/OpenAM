@@ -33,9 +33,6 @@ package com.iplanet.dpro.session.service;
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -43,6 +40,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
@@ -54,9 +59,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
 /**
  * Responsible for collating System Properties and amSession.xml configuration state relating to the Session Service.
@@ -89,6 +91,8 @@ public class SessionServiceConfig {
      */
     static final int DEFAULT_MAX_SESSIONS = 10000;
     private final int maxSessions;
+
+    private static final int DEFAULT_MAX_SESSION_CACHE_SIZE = 5000;
 
     private static final String LOGSTATUS_ACTIVE = "ACTIVE";
     private final boolean logStatus;
@@ -433,6 +437,15 @@ public class SessionServiceConfig {
      */
     public int getMaxSessions() {
         return maxSessions;
+    }
+
+    /**
+     * The maximum number of sessions to cache in the internal session cache.
+     *
+     * @return SystemProperty "org.forgerock.openam.session.service.access.persistence.caching.maxsize". Default 5000.
+     */
+    public int getMaxSessionCacheSize() {
+        return SystemProperties.getAsInt(AM_SESSION_MAX_CACHE_SIZE, DEFAULT_MAX_SESSION_CACHE_SIZE);
     }
 
     /**

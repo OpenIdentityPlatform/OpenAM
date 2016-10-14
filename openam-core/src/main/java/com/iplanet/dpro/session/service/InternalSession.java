@@ -1016,9 +1016,14 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Returns all the restricted tokens for this session.
+     * Returns the set (possibly empty) of restricted session IDs associated with this session. A restricted session
+     * ID can only be used when the associated {@link TokenRestriction} is satisfied. Typically this ties a particular
+     * user session to only be used via a particular agent or from a particular IP address.
+     * <p>
+     * The result is a copy of the current restricted token set: modifications to it will not change the set of
+     * restricted tokens associated with the session.
      *
-     * @return set of restricted token sessionIDs.
+     * @return the set of restricted tokens associated with this session. Never null but can be empty.
      */
     public Set<SessionID> getRestrictedTokens() {
         return new HashSet<>(restrictedTokensBySid.keySet());

@@ -86,8 +86,8 @@ import org.forgerock.openam.session.service.access.persistence.InternalSessionPe
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreChain;
 import org.forgerock.openam.session.service.access.persistence.TimeOutSessionFilterStep;
+import org.forgerock.openam.session.service.access.persistence.caching.InMemoryInternalSessionCacheStep;
 import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCacheStep;
 import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionStorage;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
@@ -354,11 +354,10 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
 
-
     @Provides
     @Inject
     InternalSessionStore getInternalSessionStore(TimeOutSessionFilterStep timeOutSessionFilterStep,
-                                                 InternalSessionCacheStep internalSessionCacheStep,
+                                                 InMemoryInternalSessionCacheStep internalSessionCacheStep,
                                                  InternalSessionPersistenceStoreStep internalSessionPersistenceStoreStep) {
         return new InternalSessionStoreChain(Arrays.asList(timeOutSessionFilterStep, internalSessionCacheStep),
                 internalSessionPersistenceStoreStep);
