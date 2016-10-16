@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -68,6 +69,7 @@ public class SessionResourceV2Test {
     private SSOTokenManager ssoTokenManager;
     private SessionResourceUtil sessionResourceUtil;
     private SessionPropertyWhitelist sessionPropertyWhitelist;
+    private SessionService sessionService;
 
     private SessionResourceV2 sessionResource;
 
@@ -81,6 +83,8 @@ public class SessionResourceV2Test {
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
+        sessionService = mock(SessionService.class);
+
         sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, sessionQueryManager, null) {
             @Override
             public AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
@@ -93,7 +97,7 @@ public class SessionResourceV2Test {
             }
         };
         sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper,
-                sessionResourceUtil, sessionPropertyWhitelist);
+                sessionResourceUtil, sessionPropertyWhitelist, sessionService);
         given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
     }
 

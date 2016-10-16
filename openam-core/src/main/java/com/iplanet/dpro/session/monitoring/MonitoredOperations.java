@@ -15,7 +15,11 @@
 */
 package com.iplanet.dpro.session.monitoring;
 
+import java.util.Collection;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -86,6 +90,11 @@ public class MonitoredOperations implements SessionOperations {
     @Override
     public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
         return sessionOperations.getValidSessions(session, pattern); // Not monitored at present
+    }
+
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
+        return sessionOperations.getMatchingSessions(crestQuery);
     }
 
     @Override

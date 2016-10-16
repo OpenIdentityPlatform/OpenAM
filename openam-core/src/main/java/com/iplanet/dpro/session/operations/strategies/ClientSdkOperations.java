@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.am.util.SystemProperties;
@@ -160,6 +163,11 @@ public class ClientSdkOperations implements SessionOperations {
         Set<SessionInfo> infos = new HashSet<>(sres.getSessionInfo());
 
         return new SearchResults<>(infos.size(), infos, sres.getStatus());
+    }
+
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) {
+        throw new UnsupportedOperationException("Querying sessions is currently not supported with the ClientSDK");
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.shared.debug.Debug;
@@ -132,6 +133,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
                 ldapFilter,
                 getRequestedAttributes());
         searchRequest.setSizeLimit(sizeLimit);
+        searchRequest.setTimeLimit((int) timeLimit.to(TimeUnit.SECONDS));
 
         if (isPagingResults()) {
             searchRequest = searchRequest.addControl(SimplePagedResultsControl.newControl(true, pageSize, pagingCookie));
@@ -219,11 +221,11 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     private Filter getLDAPFilter() {
-        Filter objectClass = Filter.equality(CoreTokenConstants.OBJECT_CLASS, CoreTokenConstants.FR_CORE_TOKEN);
+        Filter objectClassFilter = Filter.equality(CoreTokenConstants.OBJECT_CLASS, CoreTokenConstants.FR_CORE_TOKEN);
         if (filter == null) {
-            return objectClass;
+            return objectClassFilter;
         } else {
-            return Filter.and(objectClass, filter);
+            return Filter.and(filter, objectClassFilter);
         }
     }
 

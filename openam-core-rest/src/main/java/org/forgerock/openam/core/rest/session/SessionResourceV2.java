@@ -13,13 +13,11 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -28,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.shared.Constants;
@@ -52,6 +51,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -69,9 +69,12 @@ import org.forgerock.openam.core.rest.session.action.GetSessionPropertiesActionH
 import org.forgerock.openam.core.rest.session.action.LogoutActionHandler;
 import org.forgerock.openam.core.rest.session.action.RefreshActionHandler;
 import org.forgerock.openam.core.rest.session.action.UpdateSessionPropertiesActionHandler;
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
@@ -122,6 +125,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
 
     private final Map<String, ActionHandler> actionHandlers;
     private final SessionResourceUtil sessionResourceUtil;
+    private final SessionService sessionService;
 
     /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
@@ -133,9 +137,11 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      */
     @Inject
     public SessionResourceV2(final SSOTokenManager ssoTokenManager, AuthUtilsWrapper authUtilsWrapper,
-            final SessionResourceUtil sessionResourceUtil, SessionPropertyWhitelist sessionPropertyWhitelist) {
+            final SessionResourceUtil sessionResourceUtil, SessionPropertyWhitelist sessionPropertyWhitelist,
+            SessionService sessionService) {
         this.sessionResourceUtil = sessionResourceUtil;
         this.sessionPropertyWhitelist = sessionPropertyWhitelist;
+        this.sessionService = sessionService;
         actionHandlers = new CaseInsensitiveHashMap<>();
         actionHandlers.put(REFRESH_ACTION_ID,
                 new RefreshActionHandler(ssoTokenManager, sessionResourceUtil));
@@ -303,10 +309,14 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     }
 
     /**
-     * Queries the session resources using one of the predefined query filters.
-     * <p>
-     * all - (default) will query all Sessions across all servers.
-     * [server-id] - will list the available Sessions on the named server.
+     * Queries the session resources using the provided query filter. The query implementation currently only supports
+     * the following searchfilters:
+     * <ul>
+     *     <li>username eq "foo" and realm eq "bar"</li>
+     *     <li>realm eq "bar"</li>
+     * </ul>
+     *
+     * i.e. searching using only the username is not supported currently.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -346,25 +356,23 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        String id = request.getQueryId();
+        CrestQuery crestQuery = new CrestQuery(request.getQueryId(), request.getQueryFilter(), request.getFields());
 
-        Collection<SessionInfo> sessions;
-
-        if (KEYWORD_ALL.equals(id)) {
-            sessions =  sessionResourceUtil.generateAllSessions();
-            LOGGER.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
-        } else {
-            if (SERVER_QUERY_ID.equals(id)) {
-                id = request.getAdditionalParameter(KEYWORD_SERVER_ID);
+        SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
+        try {
+            final Collection<PartialSession> matchingSessions = sessionService.getMatchingSessions(
+                    ssoTokenContext.getCallerSession(), crestQuery);
+            for (PartialSession matchingSession : matchingSessions) {
+                handler.handleResource(newResourceResponse(null, String.valueOf(matchingSession.hashCode()),
+                        matchingSession.asJson()));
             }
-            sessions = sessionResourceUtil.generateNamedServerSession(id);
-            LOGGER.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
+        } catch (IllegalArgumentException iae) {
+            return new BadRequestException(iae.getMessage()).asPromise();
+        } catch (SessionException se) {
+            LOGGER.error("An error occurred whilst looking for matching sessions with filter '{}'", crestQuery, se);
+            return new InternalServerErrorException("Unable to query for matching sessions").asPromise();
         }
 
-        for (SessionInfo session : sessions) {
-            handler.handleResource(newResourceResponse("Sessions", String.valueOf(currentTimeMillis()),
-                    sessionResourceUtil.jsonValueOf(session)));
-        }
         return newResultPromise(newQueryResponse());
     }
 

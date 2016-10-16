@@ -33,6 +33,7 @@ import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import java.io.InterruptedIOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -46,10 +47,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
@@ -332,6 +336,24 @@ public class SessionService {
      */
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
         return sessionOperationStrategy.getOperation(s.getSessionID()).getValidSessions(s, pattern);
+    }
+
+    /**
+     * Returns partial (stateful) sessions matching the provided CREST query. The resultset size is limited by the
+     * "iplanet-am-session-max-session-list-size" attribute. The returned sessions are only "partial" sessions, meaning
+     * that they do not represent the full session state.
+     *
+     * @param caller The session that initiated the query request. May not be null.
+     * @param crestQuery The CREST query based on which we should look for matching sessions. May not be null.
+     * @return The collection of matching partial sessions.
+     * @throws SessionException If the request fails.
+     * @see com.iplanet.dpro.session.operations.SessionOperations#getMatchingSessions(CrestQuery)
+     */
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
+            throws SessionException {
+        Reject.ifNull(caller, "Caller may not be null");
+        Reject.ifNull(crestQuery, "CREST query may not be null");
+        return sessionOperationStrategy.getOperation(caller.getSessionID()).getMatchingSessions(crestQuery);
     }
 
     /**

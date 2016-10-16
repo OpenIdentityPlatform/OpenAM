@@ -15,6 +15,11 @@
  */
 package com.iplanet.dpro.session.operations;
 
+import java.util.Collection;
+
+import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.utils.CrestQuery;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -161,4 +166,14 @@ public interface SessionOperations {
      */
     SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException;
 
+    /**
+     * Returns partial sessions from the session service backend that matches the provided CREST query. The resultset
+     * size is limited by the session service's "iplanet-am-session-max-session-list-size" attribute. The returned
+     * sessions are only "partial" sessions, meaning that they do not represent the full session state.
+     *
+     * @param crestQuery The CREST query based on which we should look for matching sessions.
+     * @return The collection of matching partial sessions.
+     * @throws SessionException If the request fails.
+     */
+    Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException;
 }

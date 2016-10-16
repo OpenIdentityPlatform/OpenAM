@@ -23,10 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -41,7 +44,6 @@ import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionState;
-import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -265,6 +267,22 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public Collection<InternalSession> getAllInternalSessions() {
         return internalSessionCache.getAllSessions();
+    }
+
+    /**
+     * Return partial sessions matching the provided CREST query filter from the CTS servers.
+     *
+     * @param crestQuery The CREST query based on which we should look for matching sessions.
+     * @return The collection of matching partial sessions.
+     * @throws SessionException  If the request fails.
+     */
+    public Collection<PartialSession> getMatchingValidSessions(CrestQuery crestQuery) throws SessionException {
+        try {
+            return sessionPersistentStore.searchPartialSessions(crestQuery);
+        } catch (CoreTokenException cte) {
+            debug.error("An error occurred whilst querying CTS for matching sessions", cte);
+            throw new SessionException(cte);
+        }
     }
 
     /**

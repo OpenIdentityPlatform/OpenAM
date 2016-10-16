@@ -33,9 +33,11 @@ import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.service.InternalSession;
 
 /**
@@ -81,6 +83,10 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      *
      * Expiry time is a combination of the InternalSession expiration time and a grace
      * period.
+     *
+     * Realm is stored in a searchable attribute as it is used by
+     * {@link com.iplanet.dpro.session.service.SessionService#getMatchingSessions(Session, CrestQuery)} to find all
+     * sessions in a given realm. As such this attribute is stored in the realm name format for ease of use.
      *
      * @param session Non null.
      * @return Non null populated Token.

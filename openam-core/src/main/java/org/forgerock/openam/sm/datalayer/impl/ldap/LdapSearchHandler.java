@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
@@ -25,6 +25,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
@@ -61,8 +62,8 @@ public class LdapSearchHandler {
             return connection.search(request, entries);
         } catch (LdapException e) {
             if (!entries.isEmpty()) {
-                if (debug.warningEnabled()) {
-                    debug.warning("Partial search result has been received due to the following error:", e);
+                if (!ResultCode.SIZE_LIMIT_EXCEEDED.equals(e.getResult().getResultCode()) && debug.warningEnabled()) {
+                    debug.warning("Search abandoned due to error. Returning incomplete search results.", e);
                 }
                 return e.getResult();
             }

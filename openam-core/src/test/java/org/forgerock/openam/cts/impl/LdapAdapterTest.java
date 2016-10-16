@@ -59,11 +59,11 @@ import org.forgerock.opendj.ldap.controls.PostReadResponseControl;
 import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Request;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
+import org.forgerock.util.time.Duration;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
@@ -451,12 +451,10 @@ public class LdapAdapterTest {
     public void shouldQuery() throws Exception {
         // Given
         final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
-            @Override
-            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
-                return mockBuilder;
-            }
-        });
+        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
+        given(mockBuilder.returnTheseAttributes(anySetOf(CoreTokenField.class))).willReturn(mockBuilder);
+        given(mockBuilder.limitResultsTo(anyInt())).willReturn(mockBuilder);
+        given(mockBuilder.within(any(Duration.class))).willReturn(mockBuilder);
         given(mockBuilder.execute(any(Connection.class)))
                 .willReturn(Arrays.asList((Collection<Token>) Arrays.asList(new Token("weasel", TokenType.OAUTH))).iterator());
         given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
@@ -479,18 +477,10 @@ public class LdapAdapterTest {
     public void shouldPartialQuery() throws Exception {
         // Given
         final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
-            @Override
-            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
-                return mockBuilder;
-            }
-        });
-        given(mockBuilder.returnTheseAttributes(anySetOf(CoreTokenField.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
-            @Override
-            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
-                return mockBuilder;
-            }
-        });
+        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
+        given(mockBuilder.returnTheseAttributes(anySetOf(CoreTokenField.class))).willReturn(mockBuilder);
+        given(mockBuilder.limitResultsTo(anyInt())).willReturn(mockBuilder);
+        given(mockBuilder.within(any(Duration.class))).willReturn(mockBuilder);
 
         PartialToken partialToken = new PartialToken(new HashMap<CoreTokenField, Object>());
         given(mockBuilder.executeAttributeQuery(any(Connection.class)))

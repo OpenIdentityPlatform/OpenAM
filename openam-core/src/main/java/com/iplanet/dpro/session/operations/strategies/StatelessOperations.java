@@ -19,15 +19,18 @@ package com.iplanet.dpro.session.operations.strategies;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
+import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -106,6 +109,20 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * This implementation will forward the query call to the local operations in order to allow the return of stateful
+     * sessions even when the request was initiated using a stateless session.
+     * Since stateless sessions are not tracked by OpenAM, it is not possible to query for them.
+     *
+     * @param crestQuery {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws SessionException {@inheritDoc}
+     */
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
+        return localOperations.getMatchingSessions(crestQuery);
     }
 
     @Override

@@ -29,9 +29,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionEvent;
@@ -356,6 +358,11 @@ public class LocalOperations implements SessionOperations {
         } catch (Exception e) {
             throw new SessionException(e);
         }
+    }
+
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
+        return sessionAccessManager.getMatchingValidSessions(crestQuery);
     }
 
     /**

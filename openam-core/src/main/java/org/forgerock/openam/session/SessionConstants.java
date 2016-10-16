@@ -68,6 +68,35 @@ public class SessionConstants {
     public static final String ENABLE_POLLING_PROPERTY =
             "com.iplanet.am.session.client.polling.enable";
 
+    /**
+     * The name of the JSON field which describes the session's username.
+     */
+    public static final String JSON_SESSION_USERNAME = "username";
+
+    /**
+     * The name of the JSON field which describes the session's universal ID.
+     */
+    public static final String JSON_SESSION_UNIVERSAL_ID = "universalId";
+
+    /**
+     * The name of the JSON field which describes the session's realm.
+     */
+    public static final String JSON_SESSION_REALM = "realm";
+
+    /**
+     * The name of the JSON field which describes the session's handle.
+     */
+    public static final String JSON_SESSION_HANDLE = "sessionHandle";
+
+    /**
+     * The name of the JSON field which describes the session's max idle expiration time.
+     */
+    public static final String JSON_SESSION_MAX_IDLE_EXPIRATION_TIME = "maxIdleExpirationTime";
+
+    /**
+     * The name of the JSON field which describes the session's max expiration time.
+     */
+    public static final String JSON_SESSION_MAX_SESSION_EXPIRATION_TIME = "maxSessionExpirationTime";
 
     /**
      * Defaults for the polling threadpool.

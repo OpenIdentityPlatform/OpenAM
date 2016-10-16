@@ -215,6 +215,8 @@ public class LdapAdapter implements TokenStorageAdapter {
         try {
             getConnection();
             return queryFactory.createInstance()
+                    .limitResultsTo(query.getSizeLimit())
+                    .within(query.getTimeLimit())
                     .withFilter(query.getQuery().accept(queryConverter, null))
                     .execute(connection).next();
         } catch (DataLayerRuntimeException e) {
@@ -228,6 +230,8 @@ public class LdapAdapter implements TokenStorageAdapter {
             getConnection();
             return queryFactory.createInstance()
                     .returnTheseAttributes(query.getReturnFields())
+                    .limitResultsTo(query.getSizeLimit())
+                    .within(query.getTimeLimit())
                     .withFilter(query.getQuery().accept(queryConverter, null))
                     .executeAttributeQuery(connection).next();
         } catch (DataLayerRuntimeException e) {

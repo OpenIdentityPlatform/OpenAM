@@ -11,16 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.filter;
+
+import static org.forgerock.util.time.Duration.duration;
 
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.time.Duration;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Describes a collection of filters which can be applied to the CTS query function
@@ -30,8 +37,11 @@ import java.util.*;
  * technical limitation and can be extended in the future.
  */
 public class TokenFilter {
+
     private Set<CoreTokenField> returnFields;
     private QueryFilter<CoreTokenField> query;
+    private int sizeLimit = 0;
+    private Duration timeLimit = duration(0, TimeUnit.SECONDS);
 
     /**
      * Package private field to indicate that the {@link TokenFilterBuilder} is the recommended
@@ -56,6 +66,22 @@ public class TokenFilter {
     public void setQuery(QueryFilter<CoreTokenField> query) {
         Reject.ifNull(query);
         this.query = query;
+    }
+
+    public int getSizeLimit() {
+        return sizeLimit;
+    }
+
+    public void setSizeLimit(int sizeLimit) {
+        this.sizeLimit = sizeLimit;
+    }
+
+    public Duration getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Duration timeLimit) {
+        this.timeLimit = timeLimit;
     }
 
     /**

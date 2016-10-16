@@ -16,50 +16,80 @@
 
 package org.forgerock.openam.session.service;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.util.time.Duration.duration;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.guava.common.collect.ImmutableMap;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.SessionQueryFilterVisitor;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder.FilterAttributeBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is responsible for loading sessions from the CTS.
  */
 public class SessionPersistentStore {
+
+    private static final Map<String, CoreTokenField> JSON_TO_CTS_MAP = ImmutableMap.<String, CoreTokenField>builder()
+            .put(JSON_SESSION_UNIVERSAL_ID, CoreTokenField.USER_ID)
+            .put(JSON_SESSION_REALM, SessionTokenField.REALM.getField())
+            .put(JSON_SESSION_HANDLE, SessionTokenField.SESSION_HANDLE.getField())
+            .put(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField())
+            .put(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField())
+            .build();
     private final Debug debug;
     private final CTSPersistentStore coreTokenService;
     private final SessionAdapter tokenAdapter;
     private final TokenIdFactory tokenIdFactory;
+    private final SessionServiceConfig sessionServiceConfig;
 
     @Inject
     public SessionPersistentStore(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                                   final CTSPersistentStore coreTokenService,
                                   final SessionAdapter tokenAdapter,
-                                  final TokenIdFactory tokenIdFactory) {
+                                  final TokenIdFactory tokenIdFactory,
+                                  final SessionServiceConfig sessionServiceConfig) {
 
         this.debug = debug;
         this.coreTokenService = coreTokenService;
         this.tokenAdapter = tokenAdapter;
         this.tokenIdFactory = tokenIdFactory;
+        this.sessionServiceConfig = sessionServiceConfig;
     }
 
     /**
@@ -133,6 +163,48 @@ public class SessionPersistentStore {
             return null;
         }
         return getInternalSessionFromToken(token);
+    }
+
+    /**
+     * Return partial sessions matching the provided CREST query filter from the CTS servers.
+     *
+     * @param crestQuery The CREST query based on which we should look for matching sessions.
+     * @return The collection of matching partial sessions.
+     * @throws CoreTokenException If the partial query CTS call fails.
+     */
+    public Collection<PartialSession> searchPartialSessions(CrestQuery crestQuery) throws CoreTokenException {
+        final QueryFilter<JsonPointer> queryFilter = crestQuery.getQueryFilter();
+        Reject.ifNull(queryFilter, "Query Filter must be specified in the request");
+
+        FilterAttributeBuilder filterAttributeBuilder = new TokenFilterBuilder()
+                .withSizeLimit(sessionServiceConfig.getMaxSessionListSize())
+                .withTimeLimit(duration(10, TimeUnit.SECONDS)).and();
+        queryFilter.accept(new SessionQueryFilterVisitor(), filterAttributeBuilder);
+        filterAttributeBuilder.withAttribute(SessionTokenField.SESSION_STATE.getField(), SessionState.VALID.toString());
+        addFieldsToFilter(filterAttributeBuilder, crestQuery.getFields());
+        Collection<PartialSession> results;
+        final Collection<PartialToken> partialTokens = coreTokenService.attributeQuery(
+                filterAttributeBuilder.build());
+        results = new ArrayList<>(partialTokens.size());
+        for (PartialToken partialToken : partialTokens) {
+            results.add(new PartialSession(partialToken));
+        }
+        return results;
+    }
+
+    private void addFieldsToFilter(FilterAttributeBuilder filterAttributeBuilder, List<JsonPointer> fields) {
+        if (CollectionUtils.isNotEmpty(fields)) {
+            for (JsonPointer field : fields) {
+                CoreTokenField coreTokenField = JSON_TO_CTS_MAP.get(field.leaf());
+                if (coreTokenField != null) {
+                    filterAttributeBuilder.returnAttribute(coreTokenField);
+                }
+            }
+        } else {
+            for (CoreTokenField coreTokenField : JSON_TO_CTS_MAP.values()) {
+                filterAttributeBuilder.returnAttribute(coreTokenField);
+            }
+        }
     }
 
     private InternalSession getInternalSessionFromToken(Token token) {

@@ -51,6 +51,7 @@ public class SessionPersistentStoreTest extends GuiceTestCase {
     @Mock private SessionAdapter mockTokenAdapter;
     @Mock private TokenIdFactory mockTokenIdFactory;
     @Mock private Token mockToken;
+    @Mock private SessionServiceConfig mockSessionServiceConfig;
 
     private final String TOKEN = "TOKEN";
     private final String HANDLE = "HANDLE";
@@ -61,7 +62,8 @@ public class SessionPersistentStoreTest extends GuiceTestCase {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        sessionPersistentStore = new SessionPersistentStore(mockDebug, mockCoreTokenService, mockTokenAdapter, mockTokenIdFactory);
+        sessionPersistentStore = new SessionPersistentStore(mockDebug, mockCoreTokenService, mockTokenAdapter,
+                mockTokenIdFactory, mockSessionServiceConfig);
 
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockTokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TOKEN);

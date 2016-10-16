@@ -78,6 +78,9 @@ objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString10
 ds-cfg-index-type: equality
 
+# coreTokenString11 should not be indexed as it is used to store the session's realm. As the realm values are not
+# distinct enough, indexing on it would cause a performance bottleneck on writes.
+
 # coreTokenString13 should not be indexed as it is used to store session state. As session state
 # is an enumeration of only 4 distinct values, indexing on session state would cause a performance
 # bottleneck on writes.
