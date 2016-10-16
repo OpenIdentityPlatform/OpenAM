@@ -20,6 +20,7 @@ import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
 import javax.inject.Inject;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +33,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import org.forgerock.guava.common.collect.ImmutableMap;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -87,8 +89,9 @@ public class UpgradeAgentServiceStep extends AbstractUpgradeStep {
             for (int i = 0; i < subSchemas.getLength(); i++) {
                 Element subSchema = (Element) subSchemas.item(i);
                 String name = subSchema.getAttribute(NAME);
-                if (!subschemaIi8nKeys.get(name).equals(subSchema.getAttribute(II8NKEY))) {
-                    subSchema.setAttribute(II8NKEY, subschemaIi8nKeys.get(name));
+                String subschemaIi18nKey = subschemaIi8nKeys.get(name);
+                if (!subSchema.getAttribute(II8NKEY).equals(subschemaIi18nKey)) {
+                    subSchema.setAttribute(II8NKEY, subschemaIi18nKey);
                 }
             }
             String updatedSchema = XMLUtils.print(document);
