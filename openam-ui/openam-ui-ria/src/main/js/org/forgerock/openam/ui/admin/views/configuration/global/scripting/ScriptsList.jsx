@@ -22,6 +22,7 @@ import ScriptsService from "org/forgerock/openam/ui/admin/services/global/Script
 class ScriptsList extends Component {
     constructor (props) {
         super(props);
+
         this.state = {
             items: []
         };
@@ -45,5 +46,9 @@ class ScriptsList extends Component {
         );
     }
 }
+
+ScriptsList.propTypes = {
+    subSchemaType: React.PropTypes.string.isRequired
+};
 
 export default ScriptsList;

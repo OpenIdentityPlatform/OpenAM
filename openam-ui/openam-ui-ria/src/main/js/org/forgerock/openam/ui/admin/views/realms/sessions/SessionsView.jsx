@@ -39,26 +39,24 @@ const fetchData = _.debounce((searchTerm, callback) => {
 class SessionsView extends Component {
     constructor (props) {
         super(props);
+
+        this.handleUserSelect = this.handleUserSelect.bind(this);
+
         this.state = {
             selectedUser: null
         };
     }
-
     renderActiveSessionsTable (userId) {
         // TODO render table
         console.log(userId);
     }
-
-    onUserSelect (value) {
+    handleUserSelect (value) {
         const userId = _.get(value, "value");
 
         this.setState({ selectedUser: userId });
         this.renderActiveSessionsTable(userId);
     }
-
     render () {
-        this.onUserSelect = _.bind(this.onUserSelect, this);
-
         return (
             <div>
                 <PageHeader bsClass="page-header page-header-no-border">
@@ -66,11 +64,11 @@ class SessionsView extends Component {
                 </PageHeader>
                 <Panel>
                     <Select.Async
-                        value={this.state.selectedUser}
-                        onChange={this.onUserSelect}
-                        loadOptions={fetchData}
-                        autoload={false}
+                        autoload={ false }
                         isLoading
+                        loadOptions={ fetchData }
+                        onChange={ this.handleUserSelect }
+                        value={ this.state.selectedUser }
                     />
                 </Panel>
             </div>

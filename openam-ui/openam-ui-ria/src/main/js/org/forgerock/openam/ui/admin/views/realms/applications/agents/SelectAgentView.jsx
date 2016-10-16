@@ -21,6 +21,7 @@ import React, { Component } from "react";
 import PageDescription from "components/PageDescription";
 import Card from "components/Card";
 import withRouter from "org/forgerock/commons/ui/common/components/hoc/withRouter";
+import withRouterPropType from "org/forgerock/commons/ui/common/components/hoc/withRouterPropType";
 import { getCreatableTypes } from "org/forgerock/openam/ui/admin/services/realm/AgentsService";
 
 class SelectAgentView extends Component {
@@ -37,21 +38,27 @@ class SelectAgentView extends Component {
     }
     render () {
         const creatableTypes = this.state.types.map((type) => (
-        <Col sm={6} md={4}>
-            <Card icon={"fa-male"} href={`#realms/${
-                encodeURIComponent(this.props.router.params[0])}/applications-agents/new/${
-                encodeURIComponent(type._id)}`}>
-                <h3 className="card-name card-name-sm am-text-lines-two text-primary hidden-md">{type._id}</h3>
-                <div className="text-muted small am-text-lines-two ellipsis-wrap">{type.name}</div>
-            </Card>
-        </Col>
+            <Col key={ type._id } md={ 4 } sm={ 6 }>
+                <Card
+                    href={ `#realms/${encodeURIComponent(this.props.router.params[0])}/applications-agents/new/${
+                        encodeURIComponent(type._id)}` }
+                    icon={ "fa-male" }
+                >
+                    <h3 className="card-name card-name-sm am-text-lines-two text-primary hidden-md">{type._id}</h3>
+                    <div className="text-muted small am-text-lines-two ellipsis-wrap">{type.name}</div>
+                </Card>
+            </Col>
         ));
 
         const footer = (
             <Clearfix>
                 <div className="pull-right">
-                    <a href={`#realms/${encodeURIComponent(this.props.router.params[0])}/applications-agents`}
-                        className="btn fr-btn-secondary">{t ("common.form.cancel")}</a>
+                    <a
+                        className="btn fr-btn-secondary"
+                        href={ `#realms/${encodeURIComponent(this.props.router.params[0])}/applications-agents` }
+                    >
+                        { t ("common.form.cancel") }
+                    </a>
                 </div>
             </Clearfix>
         );
@@ -64,7 +71,7 @@ class SelectAgentView extends Component {
                 <PageDescription>
                     { t("console.applications.agents.select.description") }
                 </PageDescription>
-                <Panel className="panel panel-default" footer={footer}>
+                <Panel className="panel panel-default" footer={ footer }>
                     <div className="grid-list">
                         { creatableTypes }
                     </div>
@@ -73,5 +80,9 @@ class SelectAgentView extends Component {
         );
     }
 }
+
+SelectAgentView.propTypes = {
+    router: withRouterPropType
+};
 
 export default withRouter(SelectAgentView);

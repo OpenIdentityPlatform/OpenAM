@@ -55,9 +55,9 @@
       "dev": true
     },
     "ajv": {
-      "version": "4.7.7",
+      "version": "4.8.1",
       "from": "ajv@>=4.7.0 <5.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/ajv/-/ajv-4.7.7.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/ajv/-/ajv-4.8.1.tgz",
       "dev": true
     },
     "ajv-keywords": {
@@ -165,7 +165,7 @@
     "asap": {
       "version": "2.0.5",
       "from": "asap@>=2.0.3 <2.1.0",
-      "resolved": "https://registry.npmjs.org/asap/-/asap-2.0.5.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/asap/-/asap-2.0.5.tgz",
       "dev": true,
       "optional": true
     },
@@ -248,7 +248,7 @@
     "babel-helper-builder-react-jsx": {
       "version": "6.9.0",
       "from": "babel-helper-builder-react-jsx@>=6.8.0 <7.0.0",
-      "resolved": "https://registry.npmjs.org/babel-helper-builder-react-jsx/-/babel-helper-builder-react-jsx-6.9.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-helper-builder-react-jsx/-/babel-helper-builder-react-jsx-6.9.0.tgz",
       "dev": true
     },
     "babel-helper-call-delegate": {
@@ -500,7 +500,7 @@
     "babel-plugin-transform-react-jsx-source": {
       "version": "6.9.0",
       "from": "babel-plugin-transform-react-jsx-source@>=6.3.13 <7.0.0",
-      "resolved": "https://registry.npmjs.org/babel-plugin-transform-react-jsx-source/-/babel-plugin-transform-react-jsx-source-6.9.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/babel-plugin-transform-react-jsx-source/-/babel-plugin-transform-react-jsx-source-6.9.0.tgz",
       "dev": true
     },
     "babel-plugin-transform-regenerator": {
@@ -635,7 +635,7 @@
     "bluebird": {
       "version": "3.4.6",
       "from": "bluebird@>=3.4.6 <3.5.0",
-      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.4.6.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/bluebird/-/bluebird-3.4.6.tgz",
       "dev": true
     },
     "body-parser": {
@@ -1061,7 +1061,7 @@
     "doctrine": {
       "version": "1.5.0",
       "from": "doctrine@>=1.2.2 <2.0.0",
-      "resolved": "https://registry.npmjs.org/doctrine/-/doctrine-1.5.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/doctrine/-/doctrine-1.5.0.tgz",
       "dev": true
     },
     "dom-serialize": {
@@ -1195,23 +1195,23 @@
       "dev": true
     },
     "eslint": {
-      "version": "3.8.0",
-      "from": "eslint@3.8.0",
-      "resolved": "https://registry.npmjs.org/eslint/-/eslint-3.8.0.tgz",
+      "version": "3.8.1",
+      "from": "eslint@3.8.1",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/eslint/-/eslint-3.8.1.tgz",
       "dev": true,
       "dependencies": {
         "globals": {
           "version": "9.12.0",
           "from": "globals@>=9.2.0 <10.0.0",
-          "resolved": "https://registry.npmjs.org/globals/-/globals-9.12.0.tgz",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/globals/-/globals-9.12.0.tgz",
           "dev": true
         }
       }
     },
     "eslint-config-forgerock": {
-      "version": "1.1.1",
-      "from": "eslint-config-forgerock@1.1.1",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/eslint-config-forgerock/-/eslint-config-forgerock-1.1.1.tgz",
+      "version": "2.0.0",
+      "from": "eslint-config-forgerock@2.0.0",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/eslint-config-forgerock/-/eslint-config-forgerock-2.0.0.tgz",
       "dev": true
     },
     "eslint-formatter-warning-summary": {
@@ -1223,7 +1223,7 @@
     "eslint-plugin-react": {
       "version": "6.4.1",
       "from": "eslint-plugin-react@6.4.1",
-      "resolved": "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-6.4.1.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/eslint-plugin-react/-/eslint-plugin-react-6.4.1.tgz",
       "dev": true
     },
     "espree": {
@@ -1439,7 +1439,7 @@
     "find-up": {
       "version": "1.1.2",
       "from": "find-up@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/find-up/-/find-up-1.1.2.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/find-up/-/find-up-1.1.2.tgz",
       "dev": true
     },
     "findup-sync": {
@@ -1487,9 +1487,9 @@
       "dev": true,
       "dependencies": {
         "async": {
-          "version": "2.1.1",
+          "version": "2.1.2",
           "from": "async@>=2.0.1 <3.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/async/-/async-2.1.1.tgz",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/async/-/async-2.1.2.tgz",
           "dev": true
         }
       }
@@ -2365,7 +2365,7 @@
     "glob": {
       "version": "7.1.1",
       "from": "glob@>=7.0.3 <8.0.0",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.1.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/glob/-/glob-7.1.1.tgz",
       "dev": true
     },
     "glob-base": {
@@ -2487,9 +2487,9 @@
       "dev": true,
       "dependencies": {
         "async": {
-          "version": "2.1.1",
+          "version": "2.1.2",
           "from": "async@>=2.0.0 <3.0.0",
-          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/async/-/async-2.1.1.tgz",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/async/-/async-2.1.2.tgz",
           "dev": true
         }
       }
@@ -2679,7 +2679,7 @@
     "hosted-git-info": {
       "version": "2.1.5",
       "from": "hosted-git-info@>=2.1.4 <3.0.0",
-      "resolved": "https://registry.npmjs.org/hosted-git-info/-/hosted-git-info-2.1.5.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/hosted-git-info/-/hosted-git-info-2.1.5.tgz",
       "dev": true
     },
     "http-errors": {
@@ -2709,7 +2709,7 @@
     "ignore": {
       "version": "3.2.0",
       "from": "ignore@>=3.1.5 <4.0.0",
-      "resolved": "https://registry.npmjs.org/ignore/-/ignore-3.2.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/ignore/-/ignore-3.2.0.tgz",
       "dev": true
     },
     "image-size": {
@@ -2740,13 +2740,13 @@
     "inflight": {
       "version": "1.0.6",
       "from": "inflight@>=1.0.4 <2.0.0",
-      "resolved": "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/inflight/-/inflight-1.0.6.tgz",
       "dev": true
     },
     "inherits": {
       "version": "2.0.3",
       "from": "inherits@>=2.0.1 <2.1.0",
-      "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/inherits/-/inherits-2.0.3.tgz",
       "dev": true
     },
     "inquirer": {
@@ -2884,7 +2884,7 @@
     "is-stream": {
       "version": "1.1.0",
       "from": "is-stream@>=1.0.1 <2.0.0",
-      "resolved": "https://registry.npmjs.org/is-stream/-/is-stream-1.1.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/is-stream/-/is-stream-1.1.0.tgz",
       "dev": true
     },
     "is-typedarray": {
@@ -3050,7 +3050,7 @@
     "jsx-ast-utils": {
       "version": "1.3.2",
       "from": "jsx-ast-utils@>=1.3.1 <2.0.0",
-      "resolved": "https://registry.npmjs.org/jsx-ast-utils/-/jsx-ast-utils-1.3.2.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/jsx-ast-utils/-/jsx-ast-utils-1.3.2.tgz",
       "dev": true
     },
     "karma": {
@@ -3452,7 +3452,7 @@
         "glob": {
           "version": "7.0.5",
           "from": "glob@7.0.5",
-          "resolved": "https://registry.npmjs.org/glob/-/glob-7.0.5.tgz",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/glob/-/glob-7.0.5.tgz",
           "dev": true
         },
         "json3": {
@@ -3565,7 +3565,7 @@
     "object-assign": {
       "version": "4.1.0",
       "from": "object-assign@>=4.0.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/object-assign/-/object-assign-4.1.0.tgz",
       "dev": true
     },
     "object-component": {
@@ -3675,7 +3675,7 @@
     "path-exists": {
       "version": "2.1.0",
       "from": "path-exists@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/path-exists/-/path-exists-2.1.0.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/path-exists/-/path-exists-2.1.0.tgz",
       "dev": true
     },
     "path-is-absolute": {
@@ -3723,7 +3723,7 @@
     "pinkie-promise": {
       "version": "2.0.1",
       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
       "dev": true
     },
     "pluralize": {
@@ -4157,9 +4157,9 @@
       "dev": true
     },
     "source-map-support": {
-      "version": "0.4.3",
+      "version": "0.4.5",
       "from": "source-map-support@>=0.4.2 <0.5.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/source-map-support/-/source-map-support-0.4.3.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/source-map-support/-/source-map-support-0.4.5.tgz",
       "dev": true
     },
     "spdx-correct": {
@@ -4177,7 +4177,7 @@
     "spdx-license-ids": {
       "version": "1.2.2",
       "from": "spdx-license-ids@>=1.0.2 <2.0.0",
-      "resolved": "https://registry.npmjs.org/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz",
       "dev": true
     },
     "sprintf-js": {
@@ -4261,10 +4261,24 @@
       "dev": true
     },
     "table": {
-      "version": "3.8.0",
+      "version": "3.8.3",
       "from": "table@>=3.7.8 <4.0.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/table/-/table-3.8.0.tgz",
-      "dev": true
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/table/-/table-3.8.3.tgz",
+      "dev": true,
+      "dependencies": {
+        "is-fullwidth-code-point": {
+          "version": "2.0.0",
+          "from": "is-fullwidth-code-point@>=2.0.0 <3.0.0",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz",
+          "dev": true
+        },
+        "string-width": {
+          "version": "2.0.0",
+          "from": "string-width@>=2.0.0 <3.0.0",
+          "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/string-width/-/string-width-2.0.0.tgz",
+          "dev": true
+        }
+      }
     },
     "taffydb": {
       "version": "2.6.2",

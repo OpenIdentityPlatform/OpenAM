@@ -35,6 +35,7 @@ const Block = ({ children, header, description }) => (
 
 Block.propTypes = {
     children: React.PropTypes.arrayOf(React.PropTypes.node).isRequired,
+    description: React.PropTypes.string,
     header: React.PropTypes.string.isRequired
 };
 

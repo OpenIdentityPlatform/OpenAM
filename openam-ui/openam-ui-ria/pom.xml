@@ -324,7 +324,7 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.6.0</nodeVersion>
+                            <nodeVersion>v4.6.1</nodeVersion>
                             <npmVersion>3.10.7</npmVersion>
                             <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot>
                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>

@@ -26,11 +26,11 @@ import React from "react";
  * @returns {ReactElement} Renderable React element
  */
 const Card = ({ href, children, icon }) => (
-    <div data-panel-card className="panel-default panel am-panel-card">
-        <a href={href}>
+    <div className="panel-default panel am-panel-card" data-panel-card>
+        <a href={ href }>
             <div className="card-body">
                 <div className="card-icon-circle card-icon-circle-sm bg-primary">
-                    <i className={`fa ${icon}`}></i>
+                    <i className={ `fa ${icon}` } />
                 </div>
                 { children }
             </div>
@@ -39,9 +39,9 @@ const Card = ({ href, children, icon }) => (
 );
 
 Card.propTypes = {
-    link: React.PropTypes.string.isRequired,
-    icon: React.PropTypes.string.isRequired,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
+    href: React.PropTypes.string.isRequired,
+    icon: React.PropTypes.string.isRequired
 };
 
 export default Card;

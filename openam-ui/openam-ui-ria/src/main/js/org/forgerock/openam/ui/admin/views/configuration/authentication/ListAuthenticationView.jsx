@@ -26,6 +26,7 @@ import AuthenticationService from "org/forgerock/openam/ui/admin/services/global
 export default class ListAuthenticationView extends Component {
     constructor (props) {
         super(props);
+
         this.state = {
             items: []
         };
@@ -51,8 +52,10 @@ export default class ListAuthenticationView extends Component {
                 <PageDescription>{ t("console.configuration.authentication.description") }</PageDescription>
 
                 <Panel>
-                    <Block header={ t("console.configuration.authentication.core.title") }
-                        description={ t("console.configuration.authentication.description") }>
+                    <Block
+                        description={ t("console.configuration.authentication.description") }
+                        header={ t("console.configuration.authentication.core.title") }
+                    >
                         <ListGroup>
                             <ListGroupItem href="#configure/authentication/core">
                                 { t("console.configuration.authentication.core.coreAttributes") }
@@ -60,8 +63,10 @@ export default class ListAuthenticationView extends Component {
                         </ListGroup>
                     </Block>
 
-                    <Block header={ t("console.configuration.authentication.modules.title") }
-                        description={ t("console.configuration.authentication.modules.title") }>
+                    <Block
+                        description={ t("console.configuration.authentication.modules.title") }
+                        header={ t("console.configuration.authentication.modules.title") }
+                    >
                         <ListGroup>
                             { items }
                         </ListGroup>
