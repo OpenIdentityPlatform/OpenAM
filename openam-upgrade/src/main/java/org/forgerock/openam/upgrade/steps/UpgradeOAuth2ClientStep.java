@@ -166,6 +166,9 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                     addAttributeToMap(map, type, subConfig, addedLifetimeProps, realm);
                 }
             }
+            if (!attrs.containsKey(SUBJECT_TYPE)) {
+                addAttributeToMap(map, type, subConfig, SUBJECT_TYPE, realm);
+            }
         }
     }
 
@@ -221,6 +224,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                                 }
                             } else if (ADDED_LIFETIME_PROPERTIES.contains(attrName)) {
                                 attrs.put(attrName, Collections.singleton("0"));
+                            } else if (SUBJECT_TYPE.contains(attrName)) {
+                                attrs.put(attrName, Collections.singleton("Public"));
                             }
                         }
                         oauth2Config.setAttributes(attrs);

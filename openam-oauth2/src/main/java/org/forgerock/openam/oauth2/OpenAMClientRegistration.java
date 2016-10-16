@@ -630,11 +630,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             throw Utils.createException(OAuth2Constants.OAuth2Client.SUBJECT_TYPE, e, logger);
         }
 
-        if (subjectTypeSet.iterator().hasNext()){
-            subjectType = subjectTypeSet.iterator().next();
-        } else { //default to public
-            subjectType = Client.SubjectType.PUBLIC.getType();
-        }
+        subjectType = CollectionUtils.getFirstItem(subjectTypeSet, Client.SubjectType.PUBLIC.getType());
 
         return subjectType;
     }
