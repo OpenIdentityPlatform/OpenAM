@@ -119,7 +119,7 @@ define([
         routes[`editServer${_.capitalize(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
             page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
-            url: new RegExp(`deployment/servers/([^\/]+)/(${suffix})`),
+            url: new RegExp(`deployment/servers/([^/]+)/(${suffix})`),
             pattern: `deployment/servers/?/${suffix}`,
             role: "ui-global-admin",
             navGroup: "admin",

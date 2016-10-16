@@ -173,7 +173,7 @@ define([
                     },
                     render: {
                         item (item) {
-                            return `<div data-value=\"${item.name}\" class=\"item\">${item.name}</div>\"`;
+                            return `<div data-value="${item.name}" class="item">${item.name}</div>"`;
                         }
                     },
                     labelField: "name",

@@ -53,10 +53,10 @@ define([
             });
         },
         createLabelCollection (labelId) {
-            var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
+            var filters = [`resourceOwnerId eq "${Configuration.loggedUser.get("username")}"`];
 
             if (labelId) {
-                filters.push(`labels eq \"${labelId}\"`);
+                filters.push(`labels eq "${labelId}"`);
             }
 
             return this.createCollection(
@@ -67,7 +67,7 @@ define([
             );
         },
         createSetCollection (notResourceOwner) {
-            var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
+            var filters = [`resourceOwnerId eq "${Configuration.loggedUser.get("username")}"`];
 
             if (notResourceOwner) {
                 filters[0] = `! ${filters[0]}`;

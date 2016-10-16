@@ -16,7 +16,7 @@
 
 define(function () {
     var scopedByRealm = function (fragment) {
-            return new RegExp(`^realms\/((?:%2F)[^\/]*)\/${fragment}$`);
+            return new RegExp(`^realms/((?:%2F)[^/]*)/${fragment}$`);
         },
         defaultScopedByRealm = function (fragment) {
             return scopedByRealm(`?(?:${fragment})?`);
