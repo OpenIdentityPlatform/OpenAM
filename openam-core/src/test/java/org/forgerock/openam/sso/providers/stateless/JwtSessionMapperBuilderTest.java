@@ -73,7 +73,10 @@ public class JwtSessionMapperBuilderTest {
     @BeforeMethod
     public void createBuilder() {
         MockitoAnnotations.initMocks(this);
-        testBuilder = new JwtSessionMapperBuilder(mockSigningManager, mockSystemProperties);
+        testBuilder = new JwtSessionMapperBuilder(mockSigningManager, mockSystemProperties){
+            @Override
+            boolean isConfigured() { return true; }
+        };
         ecKeyPair = new KeyPair(mockECPublicKey, mockECPrivateKey);
         rsaKeyPair = new KeyPair(mockRSAPublicKey, mockRSAPrivateKey);
     }

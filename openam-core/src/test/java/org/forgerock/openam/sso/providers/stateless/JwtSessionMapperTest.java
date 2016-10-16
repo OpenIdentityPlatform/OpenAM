@@ -42,7 +42,11 @@ public class JwtSessionMapperTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectConfigurationWithNoEncryptionOrSigning() throws IOException {
-        new JwtSessionMapperBuilder().build();
+        JwtSessionMapperBuilder jwtSessionBuilder = new JwtSessionMapperBuilder(){
+            @Override
+            boolean isConfigured() { return true; }
+        };
+        jwtSessionBuilder.build();
     }
 
     @Test

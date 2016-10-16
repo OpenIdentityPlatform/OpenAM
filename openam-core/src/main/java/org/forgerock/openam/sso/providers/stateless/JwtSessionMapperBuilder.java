@@ -16,6 +16,7 @@
 package org.forgerock.openam.sso.providers.stateless;
 
 import static org.forgerock.util.Reject.checkNotNull;
+import static com.sun.identity.setup.AMSetupServlet.isCurrentConfigurationValid;
 
 import java.nio.charset.Charset;
 import java.security.Key;
@@ -336,7 +337,8 @@ class JwtSessionMapperBuilder {
             Reject.ifTrue(jweAlgorithm.getAlgorithmType() == JweAlgorithmType.RSA && jwsAlgorithm == JwsAlgorithm.NONE,
                     "RSA encryption should not be used without a signature");
         } else {
-            Reject.ifTrue(jwsAlgorithm == JwsAlgorithm.NONE, "No encryption or signature scheme specified!");
+            Reject.ifTrue(jwsAlgorithm == JwsAlgorithm.NONE && isConfigured(),
+                    "No encryption or signature scheme specified!");
         }
 
         return new JwtSessionMapper(this);
@@ -345,5 +347,10 @@ class JwtSessionMapperBuilder {
     @VisibleForTesting
     JwsAlgorithm getJwsAlgorithm() {
         return jwsAlgorithm;
+    }
+
+    @VisibleForTesting
+    boolean isConfigured() {
+        return isCurrentConfigurationValid();
     }
 }

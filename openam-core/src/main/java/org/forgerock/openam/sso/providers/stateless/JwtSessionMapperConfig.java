@@ -63,7 +63,7 @@ public class JwtSessionMapperConfig {
 
         // Configure encryption algorithm and parameters
 
-        String encryptionAlgorithm = CollectionHelper.getMapAttr(attrs, ENCRYPTION_ALGORITHM);
+        String encryptionAlgorithm = CollectionHelper.getMapAttr(attrs, ENCRYPTION_ALGORITHM, NONE);
         final boolean encryptionEnabled = !StringUtils.isEqualTo(NONE, encryptionAlgorithm);
 
         if (encryptionEnabled) {
