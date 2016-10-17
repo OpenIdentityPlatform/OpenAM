@@ -214,6 +214,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String POLICY_RESOURCE = TRANSLATION_KEY_PREFIX + "PolicyResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String DECISION_COMBINERS_RESOURCE = TRANSLATION_KEY_PREFIX + "DecisionCombinersResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

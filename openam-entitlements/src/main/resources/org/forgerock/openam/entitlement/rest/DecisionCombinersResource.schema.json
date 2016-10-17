@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "i18n:api-descriptor/DecisionCombinersResource#schema.title",
+  "description": "i18n:api-descriptor/DecisionCombinersResource#schema.description",
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "i18n:api-descriptor/DecisionCombinersResource#schema.title.title",
+      "description": "i18n:api-descriptor/DecisionCombinersResource#schema.title.description",
+      "type": "string"
+    }
+  }
+}

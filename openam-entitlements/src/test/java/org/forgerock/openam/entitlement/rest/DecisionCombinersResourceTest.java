@@ -33,6 +33,7 @@ import javax.security.auth.Subject;
 
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -145,6 +146,12 @@ public class DecisionCombinersResourceTest {
         assertThat(resultMap.containsKey("title")).isTrue();
         assertThat(resultMap.get("title")).isEqualTo(TEST_COMBINER);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(DecisionCombinersResource.class).hasValidAnnotations();
+    }
+
 
     /**
      * Test combiner type:
