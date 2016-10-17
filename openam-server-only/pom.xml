@@ -41,6 +41,8 @@
         <third.party.legal.directory>legal</third.party.legal.directory>
         <!-- Default value for whether the build is running in oem mode -->
         <is.oem.build>false</is.oem.build>
+        <!-- If the binary-licensing profile is activated, we need the ForgeRock license there -->
+        <forgerock.license.output.dir>${project.build.directory}/${project.build.finalName}/legal-notices</forgerock.license.output.dir>
 
         <full.version.information>@VERSION@ Build @REVISION@ (@DATESTAMP@)</full.version.information>
     </properties>
@@ -107,27 +109,6 @@
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/api</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>Copy license</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
-                                    <type>txt</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/legal-notices</outputDirectory>
-                                    <destFileName>license.txt</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -296,7 +277,7 @@
                         </webResource>
                         <webResource>
                             <!-- Copy all licenses into the legal-notices directory. -->
-                            <directory>${project.build.directory}/legal-notices</directory>
+                            <directory>${project.parent.basedir}/legal</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -305,14 +286,6 @@
                         <webResource>
                             <!-- Copy all third-party licences too. -->
                             <directory>${project.parent.basedir}/${third.party.legal.directory}</directory>
-                            <includes>
-                                <include>**/**</include>
-                            </includes>
-                            <targetPath>legal-notices</targetPath>
-                        </webResource>
-                        <webResource>
-                            <!-- More third party licenses... -->
-                            <directory>${project.parent.basedir}/license</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>

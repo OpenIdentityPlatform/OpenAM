@@ -40,8 +40,10 @@
             forgerock-audit-core,openam-audit-configuration,i18n-slf4j,
             opendj-server-legacy,opendj-config,opendj-cli,chf-http-core,joda-time
         </setupArtifactIDs>
-    </properties>
 
+        <!-- If the binary-licensing profile is activated, we need the ForgeRock license there -->
+        <forgerock.license.output.dir>${project.build.directory}/legal-notices</forgerock.license.output.dir>
+    </properties>
 
     <!-- Build -->
     <build>
@@ -53,26 +55,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.10</version>
                 <executions>
-                    <execution>
-                        <id>Copy license</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
-                                    <type>txt</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/legal-notices</outputDirectory>
-                                    <destFileName>license.txt</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>Copy JARs</id>
                         <phase>prepare-package</phase>

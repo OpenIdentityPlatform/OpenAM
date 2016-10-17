@@ -108,16 +108,17 @@
             <outputDirectory>lib</outputDirectory>
             <directory>${project.build.directory}/lib</directory>
         </fileSet>
+        <!-- Get the ForgeRock binary license (if exists) -->
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
             <directory>${project.build.directory}/legal-notices</directory>
             <includes>
-                <include>license.txt</include>
+                <include>*.txt</include>
             </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
-            <directory>${project.basedir}/../../license</directory>
+            <directory>${project.basedir}/../../legal</directory>
             <includes>
                 <include>**/**</include>
             </includes>
