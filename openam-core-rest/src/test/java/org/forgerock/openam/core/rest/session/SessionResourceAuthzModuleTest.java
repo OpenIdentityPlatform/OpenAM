@@ -17,11 +17,12 @@
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.util.concurrent.ExecutionException;
+
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ForbiddenException;
@@ -35,10 +36,12 @@ import org.testng.annotations.Test;
 public class SessionResourceAuthzModuleTest {
 
     private SessionResourceAuthzModule testModule;
+    private TokenHashToIDMapper hashToIdMapper;
 
     @BeforeTest
     public void beforeTest() {
-        testModule = new SessionResourceAuthzModule(null);
+        hashToIdMapper = mock(TokenHashToIDMapper.class);
+        testModule = new SessionResourceAuthzModule(null, hashToIdMapper);
     }
 
     @Test

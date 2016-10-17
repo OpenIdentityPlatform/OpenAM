@@ -17,17 +17,12 @@
 package org.forgerock.openam.core.rest.session;
 
 
-import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.core.rest.session.SessionResourceUtil.*;
 import static org.forgerock.openam.core.rest.session.SessionResourceV2.REFRESH_ACTION_ID;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -36,19 +31,17 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.promise.Promise;
@@ -57,7 +50,6 @@ import org.testng.annotations.Test;
 
 public class SessionResourceV2Test {
 
-    private static final String REALM_PATH = "/example/com";
 
     private SSOTokenContext mockContext = mock(SSOTokenContext.class);
 
@@ -67,7 +59,7 @@ public class SessionResourceV2Test {
     private AuthUtilsWrapper authUtilsWrapper;
     private SSOTokenManager ssoTokenManager;
     private SessionResourceUtil sessionResourceUtil;
-    private SessionPropertyWhitelist sessionPropertyWhitelist;
+    private TokenHashToIDMapper hashToIdMapper;
 
     private SessionResourceV2 sessionResource;
 
@@ -77,9 +69,10 @@ public class SessionResourceV2Test {
         SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
-        sessionPropertyWhitelist = mock(SessionPropertyWhitelist.class);
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
+
+        hashToIdMapper = mock(TokenHashToIDMapper.class);
 
         sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, sessionQueryManager, null) {
             @Override
@@ -89,22 +82,22 @@ public class SessionResourceV2Test {
 
             @Override
             public String convertDNToRealm(String dn) {
-                return REALM_PATH;
+                return "/example/com";
             }
         };
         sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper,
-                sessionResourceUtil, sessionPropertyWhitelist);
-        given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
+                sessionResourceUtil, hashToIdMapper);
     }
 
+
     @Test
-    public void testActionInstanceIsUnsupported() {
+    public void testActionCollectionIsUnsupported() {
         //given
         ActionRequest request = mock(ActionRequest.class);
 
         //when
-        Promise<ActionResponse, ResourceException> result = sessionResource.actionInstance(mockContext, "resource",
-                request);
+        Promise<ActionResponse, ResourceException> result = sessionResource.actionCollection(mockContext, request);
+
 
         //then
         assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
@@ -132,6 +125,7 @@ public class SessionResourceV2Test {
         Promise<ResourceResponse, ResourceException> result =
                 sessionResource.deleteInstance(mockContext, "resId", request);
 
+
         //then
         assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
     }
@@ -144,6 +138,7 @@ public class SessionResourceV2Test {
         //when
         Promise<ResourceResponse, ResourceException> result =
                 sessionResource.patchInstance(mockContext, "resId", request);
+
 
         //then
         assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
@@ -158,22 +153,23 @@ public class SessionResourceV2Test {
         Promise<ResourceResponse, ResourceException> result =
                 sessionResource.updateInstance(mockContext, "resId", request);
 
+
         //then
         assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
     }
+
 
     @Test
     public void actionInstanceShouldReturnFalseWhenTokenUnknown() throws SSOException {
         //Given
         ActionRequest request = mock(ActionRequest.class);
         given(ssoTokenManager.createSSOToken("unknown")).willThrow(SSOException.class);
+        given(hashToIdMapper.map(mockContext, "unknown")).willReturn("unknown");
         given(request.getAction()).willReturn(REFRESH_ACTION_ID);
-        given(request.getAdditionalParameter("tokenId")).willReturn("unknown");
-
 
         //When
         Promise<ActionResponse, ResourceException> promise =
-                sessionResource.actionCollection(mockContext, request);
+                sessionResource.actionInstance(mockContext, "unknown", request);
 
         //Then
         assertThat(promise).succeeded().withContent().booleanAt("valid").isFalse();
@@ -186,36 +182,36 @@ public class SessionResourceV2Test {
         given(ssoTokenManager.createSSOToken("tokenId")).willReturn(ssoToken);
         given(ssoToken.getIdleTime()).willReturn(0L);
         given(request.getAction()).willReturn(REFRESH_ACTION_ID);
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
+        given(hashToIdMapper.map(mockContext, "tokenId")).willReturn("tokenId");
 
         //When
         Promise<ActionResponse, ResourceException> promise =
-                sessionResource.actionCollection(mockContext, request);
+                sessionResource.actionInstance(mockContext, "tokenId", request);
 
         //Then
         assertThat(promise).succeeded().withContent().longAt(IDLE_TIME).isEqualTo(0);
     }
 
+
     @Test
     public void readShouldReturnSessionInfoForValidToken() throws SSOException {
         //Given
-        ActionRequest request = mock(ActionRequest.class);
+        ReadRequest request = mock(ReadRequest.class);
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("getSessionInfo");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(ssoToken.getMaxIdleTime()).willReturn(1000l);
         given(ssoToken.getMaxSessionTime()).willReturn(600l);
         given(ssoToken.getTimeLeft()).willReturn(575l);
         given(ssoToken.getIdleTime()).willReturn(25l);
+        given(hashToIdMapper.map(mockContext, "tokenId")).willReturn("tokenId");
 
         //When
-        Promise<ActionResponse, ResourceException> promise =
-                sessionResource.actionCollection(mockContext, request);
+        Promise<ResourceResponse, ResourceException> promise =
+                sessionResource.readInstance(mockContext, "tokenId", request);
 
         //Then
         assertThat(promise).succeeded().withContent().stringAt(UID).isEqualTo("demo");
-        assertThat(promise).succeeded().withContent().stringAt(REALM).isEqualTo(REALM_PATH);
+        assertThat(promise).succeeded().withContent().stringAt(REALM).isEqualTo("/example/com");
         assertThat(promise).succeeded().withContent().longAt(MAX_IDLE_TIME).isEqualTo(1000);
         assertThat(promise).succeeded().withContent().longAt(MAX_SESSION_TIME).isEqualTo(600);
         assertThat(promise).succeeded().withContent().longAt(MAX_TIME).isEqualTo(575);
@@ -223,117 +219,15 @@ public class SessionResourceV2Test {
     }
 
     @Test
-    public void getSessionPropertiesActionShouldReturnSessionProperties() throws Exception {
-        //Given
-        ActionRequest request = mock(ActionRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("getSessionProperties");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
-        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        setUpSessionProperties();
-
-        //When
-        Promise<ActionResponse, ResourceException> promise =
-                sessionResource.actionCollection(mockContext, request);
-
-        //Then
-        assertThat(promise).succeeded().withContent().stringAt("foo").isEqualTo("bar");
-        assertThat(promise).succeeded().withContent().stringAt("ping").isEqualTo("pong");
-        assertThat(promise).succeeded().withContent().stringAt("woo").isEqualTo("");
-    }
-
-    @Test
-    public void whenNullContentShouldReturnBadRequest() throws Exception {
-        //given
-        ActionRequest request = mock(ActionRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("updateSessionProperties");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
-        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        setUpSessionProperties();
-
-        //when
-        Promise<ActionResponse, ResourceException> promise = sessionResource.actionCollection(mockContext, request);
-
-        //then
-        assertThat(promise).failedWithException().isInstanceOf(BadRequestException.class);
-    }
-
-    @Test
-    public void whenPropertyNotListedShouldReturnForbidden() throws Exception {
-        //given
-        ActionRequest request = mock(ActionRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("updateSessionProperties");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
-        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        Map<String, String> properties = setUpSessionProperties();
-        given(request.getContent()).willReturn(json(properties));
-        given(sessionPropertyWhitelist.isPropertyListed(ssoToken, REALM_PATH, properties.keySet())).willReturn(false);
-
-        //when
-        Promise<ActionResponse, ResourceException> promise = sessionResource.actionCollection(mockContext, request);
-
-        //then
-        assertThat(promise).failedWithException().isInstanceOf(ForbiddenException.class);
-    }
-
-    @Test
-    public void whenPropertyNotSettableShouldReturnForbidden() throws Exception {
-        //given
-        ActionRequest request = mock(ActionRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("updateSessionProperties");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
-        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        Map<String, String> properties = setUpSessionProperties();
-        given(request.getContent()).willReturn(json(properties));
-        given(sessionPropertyWhitelist.isPropertyListed(ssoToken, REALM_PATH, properties.keySet())).willReturn(true);
-        given(sessionPropertyWhitelist.isPropertyMapSettable(ssoToken, properties)).willReturn(false);
-
-        //when
-        Promise<ActionResponse, ResourceException> promise = sessionResource.actionCollection(mockContext, request);
-
-        //then
-        assertThat(promise).failedWithException().isInstanceOf(ForbiddenException.class);
-    }
-
-    @Test
-    public void whenUpdatedPermittedPropertiesShouldGetUpdated() throws Exception {
-        //given
-        ActionRequest request = mock(ActionRequest.class);
-        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("tokenId")).willReturn(ssoToken);
-        given(request.getAction()).willReturn("updateSessionProperties");
-        given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
-        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        Map<String, String> properties = setUpSessionProperties();
-        Map<String, String> updatedProperties = new HashMap<>();
-        updatedProperties.put("foo", "baar");
-        updatedProperties.put("ping", "poong");
-        updatedProperties.put("woo", "hoo");
-        given(request.getContent()).willReturn(json(updatedProperties));
-        given(sessionPropertyWhitelist.isPropertyMapSettable(ssoToken, updatedProperties)).willReturn(true);
-
-        //when
-        sessionResource.actionCollection(mockContext, request);
-
-        //then
-        verify(ssoToken).setProperty("foo", "baar");
-        verify(ssoToken).setProperty("ping", "poong");
-        verify(ssoToken).setProperty("woo", "hoo");
-    }
-
-    @Test
     public void readShouldReturnFalseWhenTokenUnknown() throws SSOException {
         //Given
-        ActionRequest request = mock(ActionRequest.class);
+        ReadRequest request = mock(ReadRequest.class);
         given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("unknown")).willThrow(SSOException.class);
-        given(request.getAction()).willReturn("getSessionInfo");
-        given(request.getAdditionalParameter("tokenId")).willReturn("unknown");
+        given(hashToIdMapper.map(mockContext, "unknown")).willReturn("unknown");
 
         //When
-        Promise<ActionResponse, ResourceException> promise =
-                sessionResource.actionCollection(mockContext, request);
+        Promise<ResourceResponse, ResourceException> promise =
+                sessionResource.readInstance(mockContext, "unknown", request);
 
         //Then
         assertThat(promise).succeeded().withContent().booleanAt("valid").isFalse();
@@ -342,17 +236,5 @@ public class SessionResourceV2Test {
     @Test
     public void shouldFailIfAnnotationsAreNotValid() {
         ApiAnnotationAssert.assertThat(SessionResourceV2.class).hasValidAnnotations();
-    }
-
-    private Map<String, String> setUpSessionProperties() throws SSOException {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("foo", "bar");
-        properties.put("ping", "pong");
-        properties.put("woo", null);
-        for (String key : properties.keySet()) {
-            given(ssoToken.getProperty(key)).willReturn(properties.get(key));
-        }
-        given(sessionPropertyWhitelist.getAllListedProperties(REALM_PATH)).willReturn(properties.keySet());
-        return properties;
     }
 }

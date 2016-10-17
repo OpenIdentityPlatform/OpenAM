@@ -15,19 +15,20 @@
 */
 package org.forgerock.openam.core.rest.session;
 
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
-import static org.mockito.BDDMockito.*;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertTrue;
+
+import java.security.Principal;
+import java.util.concurrent.ExecutionException;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
-import java.security.Principal;
-import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -43,18 +44,19 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class TokenOwnerAuthzModuleTest {
 
     public static final String EMPTY_RESOURCE_PATH = "";
     private TokenOwnerAuthzModule testModule;
+    private TokenHashToIDMapper hashToIdMapper;
     SessionService mockService;
     SSOTokenManager mockTokenManager;
     Context mockContext;
 
-    @BeforeTest
+    @BeforeMethod
     public void theSetUp() throws SSOException {
         mockService = mock(SessionService.class);
         mockTokenManager  = mock(SSOTokenManager.class);
@@ -63,8 +65,9 @@ public class TokenOwnerAuthzModuleTest {
         Config<SessionService> mockConfig = mock(Config.class);
         given(mockConfig.get()).willReturn(mockService);
         mockContext = setupUser("universal_id");
+        hashToIdMapper = mock(TokenHashToIDMapper.class);
 
-        testModule = new TokenOwnerAuthzModule("tokenId", mockTokenManager, "deleteProperty");
+        testModule = new TokenOwnerAuthzModule("tokenId", mockTokenManager, hashToIdMapper, "deleteProperty");
     }
 
     @Test
@@ -74,6 +77,8 @@ public class TokenOwnerAuthzModuleTest {
         //given
         ActionRequest request = Requests.newActionRequest("", "deleteProperty");
         request.setAdditionalParameter("tokenId", "token");
+        given(hashToIdMapper.map(mockContext, null)).willReturn(null);
+
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
 
@@ -92,6 +97,7 @@ public class TokenOwnerAuthzModuleTest {
 
         //given
         ActionRequest request = Requests.newActionRequest("token", "deleteProperty");
+        given(hashToIdMapper.map(mockContext, "token")).willReturn("token");
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
 
@@ -115,6 +121,7 @@ public class TokenOwnerAuthzModuleTest {
         given(mockService.isSuperUser(eq("john"))).willReturn(false);
         Context otherContext = setupUser("john");
         setupUser("universal_id");
+        given(hashToIdMapper.map(mockContext, null)).willReturn(null);
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(otherContext, request);
@@ -134,6 +141,7 @@ public class TokenOwnerAuthzModuleTest {
         given(mockService.isSuperUser(eq("john"))).willReturn(false);
         Context otherContext = setupUser("john");
         setupUser("universal_id");
+        given(hashToIdMapper.map(otherContext, "token")).willReturn("token");
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(otherContext, request);
@@ -152,6 +160,7 @@ public class TokenOwnerAuthzModuleTest {
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
         given(mockTokenManager.createSSOToken(eq("token"))).willThrow(new SSOException(""));
+        given(hashToIdMapper.map(mockContext, null)).willReturn(null);
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
@@ -169,6 +178,7 @@ public class TokenOwnerAuthzModuleTest {
 
         given(mockService.isSuperUser(eq("universal_id"))).willReturn(false);
         given(mockTokenManager.createSSOToken(eq("token"))).willThrow(new SSOException(""));
+        given(hashToIdMapper.map(mockContext, "token")).willReturn("token");
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, request);
