@@ -57,7 +57,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.authentication.service.LoginContext;
 import org.forgerock.openam.session.AMSession;
-import org.forgerock.openam.session.SessionMeta;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
 import org.forgerock.util.Reject;
@@ -125,10 +124,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * System properties
      */
     private static boolean isEnableHostLookUp = SystemProperties.getAsBoolean(Constants.ENABLE_HOST_LOOKUP);
-
-    /* This is the maximum extra time for which the timed out sessions lives in the session server */
-    @JsonProperty("purgeDelay")
-    private static long purgeDelayInSeconds = SessionMeta.getPurgeDelay(SECONDS);
 
     /* Maximum frequency with which the access time in the repository will be updated. */
     private static int interval = SystemProperties.getAsInt("com.sun.identity.session.interval", 10);
@@ -439,28 +434,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     public long getTimeLeft() {
         long timeLeftInMillis = getMaxSessionExpirationTime(MILLISECONDS) - currentTimeMillis();
-        return MILLISECONDS.toSeconds(Math.max(timeLeftInMillis, 0));
-    }
-
-    /**
-     * Returns the extra time left(in seconds) for the Internal Session after
-     * the session timed out.
-     * @return time remaining before purge. <code> -1 </code> if the session
-     * has not yet timed out due idle/max timeout period.
-     */
-    public long getTimeLeftBeforePurge() {
-        /*
-         * Return -1 if the session has not timed out due to idle/max timeout
-         * period.
-         */
-        if (!isTimedOut()) {
-            return -1;
-        }
-        /*
-         * Return the extra time left (in seconds), if the session has timed out due to
-         * idle/max time out period
-         */
-        long timeLeftInMillis = getPurgeDelayExpirationTime(MILLISECONDS) - currentTimeMillis();
         return MILLISECONDS.toSeconds(Math.max(timeLeftInMillis, 0));
     }
 
@@ -886,21 +859,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Changes the state of the session to ACTIVE from IN-ACTIVE.
-     */
-    public void reactivate() {
-        taskRunnable.cancel();
-        setCreationTime();
-        setLatestAccessTime();
-        setState(SessionState.VALID);
-        reschedule();
-        SessionInfo sessionInfo = toSessionInfo();
-        sessionLogging.logEvent(sessionInfo, SessionEvent.REACTIVATION);
-        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_REACTIVATED);
-        sessionService.sendEvent(this, SessionEvent.REACTIVATION);
-    }
-
-    /**
      * Sets the willExpireFlag. This flag specify that whether the session will
      * ever expire or not.
      */
@@ -945,44 +903,25 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                 return StateTransition.MAX_TIMEOUT;
             }
 
-            if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes) && sessionState != SessionState.INACTIVE) {
+            if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes)) {
                 return StateTransition.IDLE_TIMEOUT;
             }
             return StateTransition.NO_CHANGE;
         } else {
             // do something special for the timed out sessions
-            if (getTimeLeftBeforePurge() <= 0) {
-                return StateTransition.PURGE;
-            } else {
-                return StateTransition.NO_CHANGE;
-            }
+            return StateTransition.NO_CHANGE;
         }
     }
 
     /**
-     * Changes the state of the session and sends Session Notification when
-     * session times out.
-     *
-     * TODO: This logic should be moved into LocalOperations once InternalSessionTaskRunnable is removed.
-     *
+     * Changes the state of the session and sends Session Notification when session times out.
      */
     public void changeStateAndNotify(int eventType) {
         sessionLogging.logEvent(toSessionInfo(), eventType);
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
         putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds));
         sessionService.execSessionTimeoutHandlers(sessionID, eventType);
-        if (purgeDelayInSeconds == 0) {
-            sessionService.destroyInternalSession(sessionID);
-            return;
-        }
-        if (!isAppSession() || serviceConfig.isReturnAppSessionEnabled()) {
-            sessionService.decrementActiveSessions();
-        }
-        setState(SessionState.INVALID);
-        if (serviceConfig.isSessionTrimmingEnabled()){
-            trimSession();
-        }
-        sessionService.sendEvent(this, eventType);
+        sessionService.destroyInternalSession(sessionID);
     }
 
     /**
@@ -1313,10 +1252,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     public long getExpirationTime(final TimeUnit timeUnit) {
         long timeLeftInSeconds = Math.max(0L, MINUTES.toSeconds(getMaxIdleTime()) - getIdleTime());
 
-        if (timeLeftInSeconds == 0) {
-            timeLeftInSeconds = getTimeLeftBeforePurge();
-        }
-
         return timeUnit.convert(currentTimeMillis(), MILLISECONDS)
                 + Math.min(timeUnit.convert(getTimeLeft(), SECONDS),
                            timeUnit.convert(timeLeftInSeconds, SECONDS));
@@ -1351,22 +1286,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * If the session has timed out, returns time at which session's purge delay expires.
-     * <p>
-     * Time value is returned in the requested unit (accurate to millisecond) and uses the
-     * same epoch as {@link System#currentTimeMillis()}.
-     *
-     * @param timeUnit the time unit to return the result in.
-     * @return the result in the given units.
-     */
-    public long getPurgeDelayExpirationTime(final TimeUnit timeUnit) {
-        if (!isTimedOut()) {
-            return -1;
-        }
-        return timeUnit.convert(timedOutTimeInSeconds + purgeDelayInSeconds, SECONDS);
-    }
-
-    /**
      * Correctly read and reschedule this session when it is read.
      */
     public void scheduleExpiry() {
@@ -1392,11 +1311,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         setState(SessionState.DESTROYED);
         sessionService.removeCachedInternalSession(sessionID);
         sessionService.sendEvent(this, SessionEvent.DESTROY);
-    }
-
-    @VisibleForTesting
-    static void setPurgeDelayInSeconds(long newPurgeDelay) {
-        purgeDelayInSeconds = newPurgeDelay;
     }
 
     /**
@@ -1461,11 +1375,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
             long timeLeftInSeconds = getTimeLeft();
             if (timeLeftInSeconds == 0) {
-                timeoutSessionAndSchedulePurge(SessionEvent.MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
+                timeoutSession(SessionEvent.MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
             } else {
                 long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                if (idleTimeLeftInSeconds <= 0 && sessionState != SessionState.INACTIVE) {
-                    timeoutSessionAndSchedulePurge(SessionEvent.IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
+                if (idleTimeLeftInSeconds <= 0) {
+                    timeoutSession(SessionEvent.IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
                 } else {
                     if (timerPool != null) {
                         long timeToWaitInSeconds = Math.min(timeLeftInSeconds, idleTimeLeftInSeconds);
@@ -1477,16 +1391,10 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
         }
 
-        private void timeoutSessionAndSchedulePurge(int event, AuditConstants.EventName eventName) {
+        private void timeoutSession(int event, AuditConstants.EventName eventName) {
             Reject.ifFalse(event == SessionEvent.MAX_TIMEOUT || event == SessionEvent.IDLE_TIMEOUT);
             changeStateAndNotify(event);
             sessionAuditor.auditActivity(toSessionInfo(), eventName);
-            if (timerPool != null) {
-                if (purgeDelayInSeconds > 0) {
-                    long timeoutInMillis = SECONDS.toMillis(timedOutTimeInSeconds + purgeDelayInSeconds);
-                    timerPool.schedule(this, new Date(timeoutInMillis));
-                }
-            }
         }
 
         /**
@@ -1520,7 +1428,9 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
          */
         private void scheduleExpiry() {
             timerPool = SystemTimerPool.getTimerPool();
-            if (!isTimedOut()) {
+            if (isTimedOut()) {
+                removeSession();
+            } else {
                 if (isInvalid()) {
                     // creationTime + maxDefaultIdleTime looks like a suspicious combination
                     long expectedTimeInMillis = SECONDS.toMillis(creationTimeInSeconds +
@@ -1537,19 +1447,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                     if (timeLeftInSeconds == 0) {
                         changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
                         sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
-                        if (timerPool != null) {
-                            long timeoutInMillis = SECONDS.toMillis(timedOutTimeInSeconds + purgeDelayInSeconds);
-                            timerPool.schedule(this, new Date(timeoutInMillis));
-                        }
                     } else {
                         long idleTimeLeftInSeconds = MINUTES.toSeconds(maxIdleTimeInMinutes) - getIdleTime();
-                        if (idleTimeLeftInSeconds <= 0 && sessionState != SessionState.INACTIVE) {
+                        if (idleTimeLeftInSeconds <= 0) {
                             changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
                             sessionAuditor.auditActivity(toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
-                            if (timerPool != null) {
-                                long timeoutInMillis = SECONDS.toMillis(timedOutTimeInSeconds + purgeDelayInSeconds);
-                                timerPool.schedule(this, new Date(timeoutInMillis));
-                            }
                         } else {
                             if (timerPool != null) {
                                 long timeToWaitInSeconds = Math.min(timeLeftInSeconds, idleTimeLeftInSeconds);
@@ -1558,15 +1460,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                             }
                         }
                     }
-                }
-            } else {
-                long expectedTimeInMillis = SECONDS.toMillis(timedOutTimeInSeconds + purgeDelayInSeconds);
-                if (expectedTimeInMillis > currentTimeMillis()) {
-                    if (timerPool != null) {
-                        timerPool.schedule(this, new Date(expectedTimeInMillis));
-                    }
-                } else {
-                    removeSession();
                 }
             }
         }
@@ -1583,7 +1476,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         DESTROY,
         MAX_TIMEOUT,
         IDLE_TIMEOUT,
-        NO_CHANGE,
-        PURGE
+        NO_CHANGE
     }
 }

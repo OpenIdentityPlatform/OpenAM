@@ -29,17 +29,18 @@ package com.iplanet.dpro.session.service;
  *      |              |
  *      |              |creation (authentication OK)
  *      |              |
- *      |max login time|   max idle time
- *      |destroy       V  ---------------&gt;
- *      |            valid              inactive --
- *      |              |  &lt;--------------           |
- *      |              |       reactivate           |
- *      |              |                            |
- *      |              | logout                     | destroy
- *      |              | destroy                    | max session time
- *      |              | max session time           |
- *      |              V                            |
- *       ---------&gt;  destroy  &lt;---------------------
+ *      |max login time|
+ *      |destroy       V
+ *      |            valid
+ *      |              |
+ *      |              |
+ *      |              |
+ *      |              | logout
+ *      |              | destroy
+ *      |              | max idle time
+ *      |              | max session time
+ *      |              V
+ *       ---------&gt;  destroy
  *
  * </pre>
  */
@@ -65,22 +66,10 @@ public enum SessionState {
      * <ul>
      *     <li>The session owner requests logout.</li>
      *     <li>An administrator requests the session be destroyed.</li>
-     *     <li>The session times out (and no purge delay is configured).</li>
+     *     <li>The session times out (max idle time or max session time).</li>
      * </ul>
      */
     VALID,
-
-    /**
-     * Marks a session as inactive.
-     * <p>
-     * Sessions can transition to an {@code INVALID} state from a {@code VALID}.
-     * <p>
-     * An {@code INVALID} session can transition to a {@code DESTROYED} state when:
-     * <ul>
-     *     <li>The purge delay elapses.</li>
-     * </ul>
-     */
-    INACTIVE,
 
     /**
      * Marks a session as destroyed.

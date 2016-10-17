@@ -488,7 +488,7 @@ class SSOTokenImpl implements SSOToken {
                 return true;
             }
             SessionState state = session.getState(possiblyResetIdleTime);
-            return (state == SessionState.VALID) || (state == SessionState.INACTIVE);
+            return state == SessionState.VALID;
         } catch (Exception e) {
             return false;
         }
@@ -507,7 +507,7 @@ class SSOTokenImpl implements SSOToken {
                 return;
             }
             SessionState state = session.getState(true);
-            if (state != SessionState.VALID && state != SessionState.INACTIVE) {
+            if (state != SessionState.VALID) {
                 throw new SSOException(SSOProviderBundle.rbName, "invalidstate", null);
             }
         } catch (Exception e) {

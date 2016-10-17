@@ -63,14 +63,13 @@ public class SessionInfoFactoryTest {
     }
 
     @Test
-    public void shouldFailForTimeoutSessions() {
+    public void shouldFailForTimedOutSessions() {
         // Given
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
-        given(mockSession.getState()).willReturn(SessionState.VALID);
-
         given(mockSession.getState()).willReturn(SessionState.INVALID);
-        given(mockSession.getTimeLeftBeforePurge()).willReturn(1l);
+        given(mockSession.isTimedOut()).willReturn(true);
+
         // When / Then
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
@@ -85,7 +84,6 @@ public class SessionInfoFactoryTest {
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
         given(mockSession.getState()).willReturn(SessionState.VALID);
-        given(mockSession.getTimeLeftBeforePurge()).willReturn(0l);
 
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
         given(mockSession.toSessionInfo()).willReturn(mockSessionInfo);

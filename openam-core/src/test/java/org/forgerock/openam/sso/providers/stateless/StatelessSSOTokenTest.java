@@ -73,7 +73,7 @@ public class StatelessSSOTokenTest {
         boolean result = statelessSSOToken.isValid(false);
 
         // Then
-        if (state == SessionState.INACTIVE || state == SessionState.VALID) {
+        if (state == SessionState.VALID) {
             assertTrue(result, "Token should be valid in state: " + state);
         } else {
             assertFalse(result, "Token should NOT be valid in state: " + state);
@@ -84,7 +84,6 @@ public class StatelessSSOTokenTest {
     public Object[][] sessionStates() {
         return new Object[][] {
                 { SessionState.VALID },
-                { SessionState.INACTIVE },
                 { SessionState.INVALID },
                 { SessionState.DESTROYED }
         };

@@ -220,19 +220,6 @@ public class SessionAdapterTest {
     }
 
     @Test
-    public void shouldAssignSessionStateInactiveToTokenAttribute() {
-        // Given
-        InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.getState()).willReturn(SessionState.INACTIVE);
-
-        // When
-        Token token = adapter.toToken(mockSession);
-
-        // Then
-        assertThat(token.<String>getValue(SessionTokenField.SESSION_STATE.getField())).isEqualTo("INACTIVE");
-    }
-
-    @Test
     public void shouldAssignSessionStateDestroyedToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
@@ -273,37 +260,6 @@ public class SessionAdapterTest {
         // Then
         Calendar maxIdleExpirationTime = token.getValue(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField());
         assertThat(maxIdleExpirationTime.getTimeInMillis()).isEqualTo(mockTimestampMillis);
-    }
-
-    @Test
-    public void shouldAssignPurgeDelayExpirationTimeToTokenAttributeIfSessionTimedOut() {
-        // Given
-        long mockTimestampMillis = 1_376_308_558_000L;
-        InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.isTimedOut()).willReturn(true);
-        given(mockSession.getPurgeDelayExpirationTime(MILLISECONDS)).willReturn(mockTimestampMillis);
-
-        // When
-        Token token = adapter.toToken(mockSession);
-
-        // Then
-        Calendar purgeDelayExpirationTime = token.getValue(SessionTokenField.PURGE_DELAY_EXPIRATION_TIME.getField());
-        assertThat(purgeDelayExpirationTime.getTimeInMillis()).isEqualTo(mockTimestampMillis);
-    }
-
-    @Test
-    public void shouldNotAssignPurgeDelayExpirationTimeToTokenAttributeIfSessionHasNotTimedOut() {
-        // Given
-        InternalSession mockSession = prototypeMockInternalSession();
-        given(mockSession.isTimedOut()).willReturn(false);
-        given(mockSession.getPurgeDelayExpirationTime(MILLISECONDS)).willReturn(-1L);
-
-        // When
-        Token token = adapter.toToken(mockSession);
-
-        // Then
-        Calendar purgeDelayExpirationTime = token.getValue(SessionTokenField.PURGE_DELAY_EXPIRATION_TIME.getField());
-        assertThat(purgeDelayExpirationTime).isNull();
     }
 
     @Test

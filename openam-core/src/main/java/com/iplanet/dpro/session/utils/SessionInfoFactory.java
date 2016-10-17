@@ -15,7 +15,7 @@
  */
 package com.iplanet.dpro.session.utils;
 
-import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
 
 import java.text.MessageFormat;
 
@@ -76,7 +76,7 @@ public class SessionInfoFactory {
         }
 
         if (internalSession.getState() != SessionState.VALID) {
-            if (internalSession.getTimeLeftBeforePurge() > 0) {
+            if (internalSession.isTimedOut()) {
                 throw new SessionTimedOutException(MessageFormat.format(ERROR_FORMAT,
                         SessionBundle.getString(SESSION_TIMED_OUT),
                         sid));

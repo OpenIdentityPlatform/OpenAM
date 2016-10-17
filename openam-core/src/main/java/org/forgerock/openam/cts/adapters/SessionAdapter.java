@@ -31,7 +31,6 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
-import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -110,13 +109,6 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         setDateAttributeFromMillis(token,
                 SessionTokenField.MAX_IDLE_EXPIRATION_TIME,
                 session.getMaxIdleExpirationTime(MILLISECONDS));
-
-        // Purge delay expiration time
-        if (session.isTimedOut()) {
-            setDateAttributeFromMillis(token,
-                    SessionTokenField.PURGE_DELAY_EXPIRATION_TIME,
-                    session.getPurgeDelayExpirationTime(MILLISECONDS));
-        }
 
         // SessionID
         token.setAttribute(SessionTokenField.SESSION_ID.getField(), session.getID().toString());

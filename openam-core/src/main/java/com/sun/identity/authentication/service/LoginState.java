@@ -439,19 +439,12 @@ public class LoginState {
      */
     public InternalSession getSession() {
         if (null == sessionReference) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message(
-                        "Session is null :" + sessionReference);
-            }
+            DEBUG.message("Session is null :{}", sessionReference);
             return null;
         }
         InternalSession session = getReferencedSession();
-        if (session == null || session.getState() == SessionState.INACTIVE ||
-                session.getState() == SessionState.DESTROYED) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message(
-                        "Session is INACTIVE OR DESTROYED :" + session);
-            }
+        if (session == null || session.getState() == SessionState.DESTROYED) {
+            DEBUG.message("Session is DESTROYED :{}", session);
             return null;
         }
         return session;
@@ -1819,7 +1812,7 @@ public class LoginState {
             return null;
         }
         InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
-        if (!stateless && (session == null || session.getState() == SessionState.INACTIVE)) {
+        if (!stateless && session == null) {
             return null;
         }
 

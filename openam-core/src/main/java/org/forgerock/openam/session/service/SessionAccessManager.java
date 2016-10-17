@@ -53,7 +53,6 @@ import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
-import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -359,11 +358,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
         switch (session.checkSessionUpdate()) {
             case NO_CHANGE:
                 return false;
-            case PURGE:
-                SessionInfo sessionInfo = session.toSessionInfo();
-                sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-                // intentional fall through to destroy
             case DESTROY:
                 delete(session);
                 session.changeStateWithoutNotify(SessionState.DESTROYED);
@@ -409,7 +403,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
         if (session.isStored()) {
             if (session.getState() != SessionState.VALID) {
                 delete(session);
-            } else if (!session.isTimedOut() || session.getTimeLeftBeforePurge() > 0) {
+            } else if (!session.isTimedOut()) {
                 // Only save if we are not about to delete the session anyway.
                 save(session);
             }

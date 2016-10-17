@@ -27,32 +27,14 @@
 
 package org.forgerock.openam.session;
 
-import java.util.concurrent.TimeUnit;
-
 import com.iplanet.am.util.SystemProperties;
 
 public class SessionMeta {
 
-    private static final String PURGE_DELAY_PROPERTY = "com.iplanet.am.session.purgedelay";
     private static final String REFRESH_TIME_PROPERTY = "com.iplanet.am.client.appssotoken.refreshtime";
 
-    private static long purgeDelayInMinutes;
     private static long appSSOTokenRefreshTime;
 
-    /**
-     * The maximum extra time for which timed out sessions should be retained.
-     * <p>
-     * Keeping these timed out sessions (in an invalid state) allows user agents attempting
-     * to make use of the session to be informed that their session has timed out.
-     * <p>
-     * Time value is returned in the requested unit (accurate to minute).
-     *
-     * @param timeUnit the time unit to return the result in.
-     * @return purge delay in the requested units.
-     */
-    public static long getPurgeDelay(final TimeUnit timeUnit) {
-        return timeUnit.convert(purgeDelayInMinutes, TimeUnit.MINUTES);
-    }
 
     /**
      * How long before an appSSOToken must refresh (in minutes).
@@ -62,7 +44,6 @@ public class SessionMeta {
     }
 
     static {
-        purgeDelayInMinutes = SystemProperties.getAsLong(PURGE_DELAY_PROPERTY, 120);
         appSSOTokenRefreshTime = SystemProperties.getAsLong(REFRESH_TIME_PROPERTY, 3);
     }
 

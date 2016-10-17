@@ -70,7 +70,7 @@ final class StatelessSSOToken implements SSOToken {
     public boolean isValid(boolean reset) {
         try {
             final SessionState state = session.getState(reset);
-            return (state == SessionState.VALID || state == SessionState.INACTIVE) && !session.isTimedOut();
+            return state == SessionState.VALID && !session.isTimedOut();
         } catch (SessionException e) {
             return false;
         }

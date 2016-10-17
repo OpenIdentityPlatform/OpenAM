@@ -76,7 +76,6 @@ public class SessionAccessManagerTest {
         final InternalSession session = mock(InternalSession.class);
 
         // set session up to be updated
-        given(session.getTimeLeftBeforePurge()).willReturn(100L);
         given(session.willExpire()).willReturn(true);
         given(session.isStored()).willReturn(true);
         given(session.isTimedOut()).willReturn(true);
