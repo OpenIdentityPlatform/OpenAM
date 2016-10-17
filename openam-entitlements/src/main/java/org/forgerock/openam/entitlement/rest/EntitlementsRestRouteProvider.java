@@ -68,7 +68,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("applicationtypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(ApplicationTypesResource.class);
+                .toAnnotatedCollection(ApplicationTypesResource.class);
 
         rootRouter.route("decisioncombiners")
                 .auditAs(POLICY)

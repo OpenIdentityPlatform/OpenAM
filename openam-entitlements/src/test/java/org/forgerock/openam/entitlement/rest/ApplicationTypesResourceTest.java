@@ -37,6 +37,7 @@ import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrap
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
@@ -139,6 +140,10 @@ public class ApplicationTypesResourceTest {
         assertTrue(result.get().getId().equals("test"));
     }
 
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ApplicationTypesResource.class).hasValidAnnotations();
+    }
 
 
 }

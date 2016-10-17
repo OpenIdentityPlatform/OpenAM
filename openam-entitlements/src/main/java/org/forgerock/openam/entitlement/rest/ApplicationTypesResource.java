@@ -17,6 +17,13 @@
 package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.APPLICATION_TYPES_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -31,6 +38,16 @@ import java.util.Set;
 
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -62,6 +79,16 @@ import org.forgerock.util.promise.Promise;
  * These are unmodfiable - even by an administrator. As such this
  * endpoint only supports the READ and QUERY operations.
  */
+@CollectionProvider(
+        details = @Handler(
+                title = APPLICATION_TYPES_RESOURCE + TITLE,
+                description = APPLICATION_TYPES_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "ApplicationTypesResource.schema.json")),
+        pathParam = @Parameter(
+                name = "resourceId",
+                type = "string",
+                description = APPLICATION_TYPES_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class ApplicationTypesResource extends SubjectAwareResource {
 
     private final ApplicationTypeManagerWrapper typeManager;
@@ -142,6 +169,15 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * @param handler {@inheritDoc}
      */
     @Override
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = APPLICATION_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = APPLICATION_TYPES_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
@@ -204,6 +240,12 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
      */
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = APPLICATION_TYPES_RESOURCE + ERROR_500_DESCRIPTION)},
+            description = APPLICATION_TYPES_RESOURCE + READ_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
