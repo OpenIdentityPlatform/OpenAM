@@ -14,18 +14,22 @@
  * Copyright 2016 ForgeRock AS.
  */
 
+import React from "react";
+
 /**
- * @module org/forgerock/openam/ui/admin/services/realm/SessionsService
+ * Call to action component.
+ * @module components/CallToAction
+ * @param {ReactNode[]} props.children Children to add within this component
+ * @returns {ReactElement} Renderable React element
  */
+const CallToAction = ({ children }) => (
+    <div className="call-to-action-block">
+        { children }
+    </div>
+);
 
-import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
-import Constants from "org/forgerock/commons/ui/common/util/Constants";
+CallToAction.propTypes = {
+    children: React.PropTypes.node
+};
 
-const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
-
-export function getUsers (userId) {
-    return obj.serviceCall({
-        url: `/users?_queryId=${userId}*`,
-        headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-    }).then((data) => data.result);
-}
+export default CallToAction;

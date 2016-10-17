@@ -1301,6 +1301,22 @@
             }
         },
         "sessions": {
+            "search": {
+                "intro": "Find sessions by entering a user ID.",
+                "noResults": "No users found",
+                "placeholder": "User ID",
+                "searchPrompt": "Type to search",
+                "title": "User"
+            },
+            "table": {
+                "expires": "Expires __timestamp__",
+                "headers": [
+                    "Idle Time",
+                    "Idle Time Remaining",
+                    "Session Time Remaining"
+                ],
+                "noResults": "No sessions found."
+            },
             "title": "Sessions"
         },
         "applications": {
