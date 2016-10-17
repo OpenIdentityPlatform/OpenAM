@@ -72,6 +72,7 @@
                 dom_id: "swagger-ui-div",
                 defaultModelRendering: 'schema',
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                docExpansion: "list",
                 onComplete: function (swaggerApi, swaggerUi) {
                     $('pre code').each(function (i, e) {
                         hljs.highlightBlock(e)
@@ -88,7 +89,8 @@
         });
     </script>
 </head>
-<body class="swagger-section" style="margin: 1em;">
-<div id="swagger-ui-div" class="swagger-ui-wrap"></div>
+<body class="swagger-section">
+<div id="swagger-ui-div" class="swagger-ui-wrap" style="margin-left: 0px; min-width: 0px">
+</div>
 </body>
 </html>

@@ -32,6 +32,7 @@ import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
 import org.forgerock.openam.core.rest.docs.api.ApiDocsService;
+import org.forgerock.openam.core.rest.docs.api.ApiService;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
@@ -161,5 +162,12 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .authorizeWith(HttpPrivilegeAuthzModule.class)
                 .forVersion(1, 0)
                 .toService(EQUALS, ApiDocsService.class);
+
+        realmRouter.route("api")
+                .auditAs(DOCUMENTATION)
+                .through(HttpContextFilter.class)
+                .authorizeWith(HttpPrivilegeAuthzModule.class)
+                .forVersion(1, 0)
+                .toService(EQUALS, ApiService.class);
     }
 }

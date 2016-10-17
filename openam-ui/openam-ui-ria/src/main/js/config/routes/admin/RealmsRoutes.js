@@ -289,7 +289,7 @@ define(function () {
                 forceUpdate: true
             },
             "apiExplorerView" : {
-                view: "org/forgerock/openam/ui/admin/views/api/ApiExplorerView",
+                view: "org/forgerock/openam/ui/admin/views/api/ListApiView",
                 role: "ui-global-admin",
                 url: /^api\/explorer$/,
                 pattern: "api/explorer",

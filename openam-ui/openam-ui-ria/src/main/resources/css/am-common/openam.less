@@ -252,7 +252,7 @@ body, .modal-open {
 }
 
 .am-selectize-search.selectize-control.single, select.am-selectize-search {
-    width: 250px; 
+    width: 250px;
     .selectize-input {
         border-color: @base-theme-color;
 
@@ -272,11 +272,19 @@ body, .modal-open {
     }
 }
 
-.api-explorer-iframe {
-    position: fixed;
-    width: 100%;
-    border: none;
-    height: 100%;
-    padding-bottom: 163px;
-    margin-bottom: -163px;
+.api-section {
+    .list-panel-style {
+        height: 768px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+    .iframe-panel-style {
+        height: 768px;
+        overflow: hidden;
+    }
+    .api-explorer-style {
+        height: 768px;
+        width: 100%;
+        border: none;
+    }
 }
