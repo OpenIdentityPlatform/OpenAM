@@ -16,34 +16,31 @@
 
 package org.forgerock.openam.core.rest;
 
-import static org.forgerock.http.routing.RoutingMode.*;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.rest.Routers.*;
-import static org.forgerock.openam.core.rest.session.SessionPropertiesResource.TOKEN_HASH_PARAM_NAME;
+import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.dashboard.DashboardResource;
+import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
 import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
 import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
-import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
 import org.forgerock.openam.core.rest.docs.api.ApiDocsService;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
 import org.forgerock.openam.core.rest.server.ServerVersionResource;
 import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
-import org.forgerock.openam.core.rest.session.SessionPropertiesResource;
 import org.forgerock.openam.core.rest.session.SessionResource;
+import org.forgerock.openam.core.rest.session.SessionResourceV2;
 import org.forgerock.openam.http.authz.HttpContextFilter;
 import org.forgerock.openam.http.authz.HttpPrivilegeAuthzModule;
-import org.forgerock.openam.core.rest.session.SessionResourceV2;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
@@ -130,14 +127,6 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .toCollection(SessionResource.class)
                 .forVersion(2, 0)
                 .toCollection(SessionResourceV2.class);
-
-
-        realmRouter.route("sessions/{" + TOKEN_HASH_PARAM_NAME + "}/properties")
-                .authenticateWith(ssoToken())
-                .auditAs(SESSION)
-                .authorizeWith(Key.get(AnyOfAuthzModule.class, Names.named("SessionPropertiesResourceAuthzModule")))
-                .forVersion(2)
-                .toAnnotatedSingleton(SessionPropertiesResource.class);
 
         rootRouter.route("tokens")
                 .auditAs(CTS)

@@ -51,8 +51,6 @@ require.config({
 
         "classnames"       : "libs/classnames-2.2.5",
         "clockPicker"      : "libs/bootstrap-clockpicker-0.0.7-min",
-        "crypto-js-sha256" : "libs/crypto-js-3.1.2-sha256.min",
-        "crypto-js"        : "libs/crypto-js-3.1.2-min",
         "doTimeout"        : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"          : "libs/form2js-2.0-769718a",
         "handlebars"       : "libs/handlebars-4.0.5",
@@ -121,12 +119,6 @@ require.config({
         "clockPicker": {
             deps: ["jquery"],
             exports: "clockPicker"
-        },
-        "crypto-js": {
-            exports: "CryptoJS"
-        },
-        "crypto-js-sha256": {
-            deps: ["crypto-js"]
         },
         "doTimeout": {
             deps: ["jquery"],
