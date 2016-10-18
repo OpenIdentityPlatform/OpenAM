@@ -38,6 +38,7 @@ import javax.security.auth.Subject;
 
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -190,6 +191,12 @@ public class ConditionTypesResourceTest {
         assertThat(resultMap.containsKey("logical")).isTrue();
         assertThat(resultMap.get("logical")).isEqualTo(true);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ConditionTypesResource.class).hasValidAnnotations();
+    }
+
 
     /**
      * Test condition type:
