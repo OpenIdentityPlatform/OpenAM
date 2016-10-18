@@ -36,7 +36,6 @@ import org.forgerock.oauth2.core.exceptions.CsrfException;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
@@ -137,14 +136,13 @@ public class AuthorizationService {
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      * @throws DuplicateRequestParameterException If the request contains duplicate parameter.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     public AuthorizationToken authorize(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             ResourceOwnerConsentRequired, InvalidClientException, UnsupportedResponseTypeException,
             RedirectUriMismatchException, InvalidRequestException, AccessDeniedException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException,
             ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException,
-            DuplicateRequestParameterException, InvalidConfirmationKeyException {
+            DuplicateRequestParameterException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -279,13 +277,12 @@ public class AuthorizationService {
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      * @throws DuplicateRequestParameterException If the request contains duplicate parameter.
      * @throws CsrfException If an CSRF attack is detected.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     public AuthorizationToken authorize(OAuth2Request request, boolean consentGiven, boolean saveConsent)
             throws AccessDeniedException, ResourceOwnerAuthenticationRequired, InvalidClientException,
             UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException,
-            NotFoundException, DuplicateRequestParameterException, CsrfException, InvalidConfirmationKeyException {
+            NotFoundException, DuplicateRequestParameterException, CsrfException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 

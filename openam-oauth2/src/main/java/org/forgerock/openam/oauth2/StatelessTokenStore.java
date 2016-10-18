@@ -18,43 +18,30 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_MODULES;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.CLIENT_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.EXPIRE_TIME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.REALM;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.USERNAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.EXPIRES_IN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_TOKEN_TYPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.newDate;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -75,7 +62,6 @@ import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -97,8 +83,6 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.Duration;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Stateless implementation of the OAuth2 Token Store.
@@ -163,7 +147,7 @@ public class StatelessTokenStore implements TokenStore {
     @Override
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
             resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
-            String nonce, String claims, OAuth2Request request) throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+            String nonce, String claims, OAuth2Request request) throws ServerException, NotFoundException {
         return createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId, clientId,
                 redirectUri, scope, refreshToken, nonce, claims, request,
                 TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis()));
@@ -173,7 +157,7 @@ public class StatelessTokenStore implements TokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String
             resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
             String nonce, String claims, OAuth2Request request, long authTime) 
-                    throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+                    throws ServerException, NotFoundException {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         Duration currentTime = Duration.millis(currentTimeMillis());

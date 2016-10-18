@@ -20,7 +20,6 @@ import static org.mockito.BDDMockito.given;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
 import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -41,18 +40,16 @@ public final class OAuth2UtilsTest {
     @Mock
     private JacksonRepresentationFactory factory;
     @Mock
-    private ConfirmationKeyValidator validator;
-    @Mock
     private OAuth2Request request;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        utils = new OAuth2Utils(factory, validator);
+        utils = new OAuth2Utils(factory);
     }
 
     @Test
-    public void confirmationKeyExtractedFromRequest() throws InvalidConfirmationKeyException {
+    public void confirmationKeyExtractedFromRequest() throws Exception {
         // Given
         // Base64 string contains a dumb but valid JWK.
         given(request.getParameter(ProofOfPossession.CNF_KEY)).willReturn("eyAiandrIjogeyAidGVzdCI6IDEyMyB9IH0=");
@@ -66,7 +63,7 @@ public final class OAuth2UtilsTest {
     }
 
     @Test
-    public void confirmationKeyNotExtractedWhenNotInRequst() throws InvalidConfirmationKeyException {
+    public void confirmationKeyNotExtractedWhenNotInRequst() throws Exception {
         // Given
         given(request.getParameter(ProofOfPossession.CNF_KEY)).willReturn(null);
 

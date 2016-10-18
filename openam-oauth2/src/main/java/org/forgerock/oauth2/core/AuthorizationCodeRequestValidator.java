@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
 /**
  * Request validator for the OAuth2 authorization code grant.
@@ -35,6 +36,7 @@ public interface AuthorizationCodeRequestValidator {
      *
      * @param request The OAuth2 request.  Must not be {@code null}.
      * @param clientRegistration The registration of the client making the request.
+     * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws RedirectUriMismatchException If the redirect uri on the request does not match the redirect uri
      *          registered for the client.
@@ -42,6 +44,6 @@ public interface AuthorizationCodeRequestValidator {
      *          authenticated.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      */
-    void validateRequest(OAuth2Request request, ClientRegistration clientRegistration) throws InvalidRequestException,
-            RedirectUriMismatchException, InvalidClientException;
+    void validateRequest(OAuth2Request request, ClientRegistration clientRegistration) throws
+            UnauthorizedClientException, InvalidRequestException, RedirectUriMismatchException, InvalidClientException;
 }

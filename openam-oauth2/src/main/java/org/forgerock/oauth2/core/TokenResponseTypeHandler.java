@@ -16,16 +16,15 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.ACCESS_TOKEN;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
@@ -57,7 +56,7 @@ public class TokenResponseTypeHandler implements ResponseTypeHandler {
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope, ResourceOwner resourceOwner,
                                            String clientId, String redirectUri, String nonce, OAuth2Request request,
                                            String codeChallenge, String codeChallengeMethod)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+            throws ServerException, NotFoundException {
 
         String claims = null;
 

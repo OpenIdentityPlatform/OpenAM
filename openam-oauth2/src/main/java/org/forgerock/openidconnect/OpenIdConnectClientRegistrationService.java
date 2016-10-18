@@ -19,7 +19,6 @@ package org.forgerock.openidconnect;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.OPENID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.ShortClientAttributeNames.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,7 +46,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -110,7 +108,7 @@ public class OpenIdConnectClientRegistrationService {
      * Creates an OpenId Connect client registration in the OAuth2 provider.
      *
      * @param accessToken The access token for making the registration call.
-     * @param deploymentURL The deployment url of the OAuth2 provider.
+     * @param deploymentUrl The deployment url of the OAuth2 provider.
      * @param request The OAuth2 request.
      * @return JsonValue representation of the client registration.
      * @throws InvalidRedirectUri If redirect urls are invalid.
@@ -119,11 +117,10 @@ public class OpenIdConnectClientRegistrationService {
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
      *          or the OAuth2 provider.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
             throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
-            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri, InvalidConfirmationKeyException {
+            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -484,10 +481,9 @@ public class OpenIdConnectClientRegistrationService {
      * @param request the OAuth2 request.
      * @return the token id of the generated access token.
      * @throws ServerException if an internal error occurs.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     private String createRegistrationAccessToken(Client client, OAuth2Request request)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+            throws ServerException, NotFoundException {
         final AccessToken rat = tokenStore.createAccessToken(
                 null,                           // Grant type
                 OAuth2Constants.Bearer.BEARER,  // Access Token Type

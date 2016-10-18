@@ -32,7 +32,6 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -43,6 +42,7 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +61,7 @@ public class AccessTokenService {
     private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OAuth2UrisFactory urisFactory;
+    private final ConfirmationKeyValidator confirmationKeyValidator;
 
     /**
      * Constructs a new AccessTokenServiceImpl.
@@ -73,12 +74,14 @@ public class AccessTokenService {
     @Inject
     public AccessTokenService(Map<String, GrantTypeHandler> grantTypeHandlers,
             final ClientAuthenticator clientAuthenticator, final TokenStore tokenStore,
-            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory) {
+            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory,
+            final ConfirmationKeyValidator confirmationKeyValidator) {
         this.grantTypeHandlers = grantTypeHandlers;
         this.clientAuthenticator = clientAuthenticator;
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.urisFactory = urisFactory;
+        this.confirmationKeyValidator = confirmationKeyValidator;
     }
 
     /**
@@ -99,13 +102,12 @@ public class AccessTokenService {
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
-     * @throws InvalidConfirmationKeyException If the confirmation key is not valid format.
      */
     public AccessToken requestAccessToken(OAuth2Request request) throws RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, InvalidCodeException,
             InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException,
             NotFoundException, AuthorizationPendingException, ExpiredTokenException, AuthorizationDeclinedException,
-            BadRequestException, InvalidConfirmationKeyException {
+            BadRequestException {
         final String grantType = request.getParameter(GRANT_TYPE);
         final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(grantType);
         if (grantTypeHandler == null) {
@@ -130,13 +132,13 @@ public class AccessTokenService {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidGrantException If the given token is not a refresh token.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
-     * @throws InvalidConfirmationKeyException If the confirmation key is not valid format.
      */
     public AccessToken refreshToken(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException,
-            InvalidScopeException, NotFoundException, InvalidConfirmationKeyException {
+            InvalidScopeException, NotFoundException {
 
         Reject.ifTrue(isEmpty(request.<String>getParameter(REFRESH_TOKEN)), "Missing parameter, 'refresh_token'");
+        confirmationKeyValidator.validateRequest(request);
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final OAuth2Uris uris = urisFactory.get(request);

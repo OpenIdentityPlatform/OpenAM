@@ -17,14 +17,14 @@
 package org.forgerock.openam.oauth2;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.forgerock.json.JsonValue.array;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.MessageDigest;
@@ -38,10 +38,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -60,7 +62,6 @@ import org.forgerock.oauth2.core.StatefulAccessToken;
 import org.forgerock.oauth2.core.StatefulRefreshToken;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -84,13 +85,6 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
@@ -510,7 +504,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+            throws ServerException, NotFoundException {
         return createAccessToken(grantType, accessTokenType, authorizationCode, resourceOwnerId, clientId, 
                 redirectUri, scope, refreshToken, nonce, claims, request, 
                 MILLISECONDS.toSeconds(currentTimeMillis()));
@@ -522,7 +516,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request, long authTime)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException {
+            throws ServerException, NotFoundException {
         OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
         
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);

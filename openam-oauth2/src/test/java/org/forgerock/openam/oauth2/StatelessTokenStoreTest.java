@@ -17,21 +17,16 @@ package org.forgerock.openam.oauth2;
 
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.given;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.Blacklistable;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -42,8 +37,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Unit test for {@link StatelessTokenStore}.
@@ -92,9 +85,7 @@ public final class StatelessTokenStoreTest {
     }
 
     @Test
-    public void whenCnfIsPresentInRequestGetsAddedToToken() throws ServerException, NotFoundException,
-            InvalidConfirmationKeyException, InvalidClientException, org.forgerock.json.resource.NotFoundException {
-
+    public void whenCnfIsPresentInRequestGetsAddedToToken() throws Exception {
         // Given
         given(providerSettingsFactory.get(request)).willReturn(settings);
         given(clientRegistrationStore.get("client-id", request)).willReturn(null);
@@ -117,9 +108,7 @@ public final class StatelessTokenStoreTest {
     }
 
     @Test
-    public void whenCnfIsNotPresentInRequestItDoesNotGetAddedToToken() throws NotFoundException, InvalidClientException,
-            org.forgerock.json.resource.NotFoundException, ServerException, InvalidConfirmationKeyException {
-
+    public void whenCnfIsNotPresentInRequestItDoesNotGetAddedToToken() throws Exception {
         // Given
         given(providerSettingsFactory.get(request)).willReturn(settings);
         given(clientRegistrationStore.get("client-id", request)).willReturn(null);

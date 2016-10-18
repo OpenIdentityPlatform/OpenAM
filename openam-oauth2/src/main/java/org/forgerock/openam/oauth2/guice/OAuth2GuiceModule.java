@@ -121,7 +121,6 @@ import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
-import org.forgerock.openam.oauth2.validation.JwkConfirmationKeyValidator;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
@@ -194,18 +193,22 @@ public class OAuth2GuiceModule extends AbstractModule {
         authorizeRequestValidators.addBinding().to(SubjectTypeValidator.class);
         authorizeRequestValidators.addBinding().to(CodeVerifierValidator.class);
         authorizeRequestValidators.addBinding().to(DuplicateRequestParameterValidator.class);
+        authorizeRequestValidators.addBinding().to(ConfirmationKeyValidator.class);
 
         final Multibinder<AuthorizationCodeRequestValidator> authorizationCodeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizationCodeRequestValidator.class);
         authorizationCodeRequestValidators.addBinding().to(AuthorizationCodeRequestValidatorImpl.class);
+        authorizationCodeRequestValidators.addBinding().to(ConfirmationKeyValidator.class);
 
         final Multibinder<ClientCredentialsRequestValidator> clientCredentialsRequestValidators =
                 Multibinder.newSetBinder(binder(), ClientCredentialsRequestValidator.class);
         clientCredentialsRequestValidators.addBinding().to(ClientCredentialsRequestValidatorImpl.class);
+        clientCredentialsRequestValidators.addBinding().to(ConfirmationKeyValidator.class);
 
         final Multibinder<PasswordCredentialsRequestValidator> passwordCredentialsRequestValidators =
                 Multibinder.newSetBinder(binder(), PasswordCredentialsRequestValidator.class);
         passwordCredentialsRequestValidators.addBinding().to(PasswordCredentialsRequestValidatorImpl.class);
+        passwordCredentialsRequestValidators.addBinding().to(ConfirmationKeyValidator.class);
 
         final MapBinder<String, GrantTypeHandler> grantTypeHandlers =
                 MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
@@ -241,7 +244,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(new TypeLiteral<TokenAdapter<StatelessTokenMetadata>>(){}).to(StatelessTokenCtsAdapter.class);
 
         bind(OpenIdConnectSSOProvider.class);
-        bind(ConfirmationKeyValidator.class).to(JwkConfirmationKeyValidator.class);
     }
 
     public static class DefaultStatelessCheck implements StatelessCheck<Boolean> {

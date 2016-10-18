@@ -19,7 +19,6 @@ package org.forgerock.oauth2.core;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.exceptions.InvalidConfirmationKeyException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -79,12 +78,11 @@ public interface TokenStore {
      * @return An Access Token.
      * @throws ServerException   If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException;
+            throws ServerException, NotFoundException;
 
     /**
      * Creates an Access Token and stores it in the OAuth2 Provider's store.
@@ -104,12 +102,11 @@ public interface TokenStore {
      * @return An Access Token.
      * @throws ServerException   If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
-     * @throws InvalidConfirmationKeyException If the confirmation key is an invalid format.
      */
     AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request, long authTime)
-            throws ServerException, NotFoundException, InvalidConfirmationKeyException;
+            throws ServerException, NotFoundException;
 
     /**
      * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
