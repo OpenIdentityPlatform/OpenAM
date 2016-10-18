@@ -18,6 +18,13 @@ package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SUBJECT_ATTRIBUTES_RESOURCE_V1;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -29,6 +36,15 @@ import java.util.Set;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -58,6 +74,16 @@ import org.forgerock.util.promise.Promise;
  * This resource only supports the QUERY operation, and is intended for use by the
  * XUI to populate fields.
  */
+@CollectionProvider(
+        details = @Handler(
+                title = SUBJECT_ATTRIBUTES_RESOURCE_V1 + TITLE,
+                description = SUBJECT_ATTRIBUTES_RESOURCE_V1 + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "SubjectAttributesResourceV1.schema.json")),
+        pathParam = @Parameter(
+                name = "resourceId",
+                type = "string",
+                description = SUBJECT_ATTRIBUTES_RESOURCE_V1 + PATH_PARAM + DESCRIPTION))
 public class SubjectAttributesResourceV1 extends RealmAwareResource {
 
     private final static String JSON_OBJ_NAME = "SubjectAttributes";
@@ -97,6 +123,18 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
         return RestUtils.generateUnsupportedOperation();
     }
 
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 400,
+                            description = SUBJECT_ATTRIBUTES_RESOURCE_V1 + ERROR_400_DESCRIPTION),
+                    @ApiError(
+                            code = 500,
+                            description = SUBJECT_ATTRIBUTES_RESOURCE_V1 + ERROR_500_DESCRIPTION)},
+            description = SUBJECT_ATTRIBUTES_RESOURCE_V1 + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {

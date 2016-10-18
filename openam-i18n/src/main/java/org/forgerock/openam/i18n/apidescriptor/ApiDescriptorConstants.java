@@ -223,6 +223,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String SUBJECT_TYPES_RESOURCE = TRANSLATION_KEY_PREFIX + "SubjectTypesResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SUBJECT_ATTRIBUTES_RESOURCE_V1 = TRANSLATION_KEY_PREFIX + "SubjectAttributesResourceV1#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }
