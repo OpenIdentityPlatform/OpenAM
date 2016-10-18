@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "i18n:api-descriptor/SubjectTypesResource#schema.title",
+  "description": "i18n:api-descriptor/SubjectTypesResource#schema.description",
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "i18n:api-descriptor/SubjectTypesResource#schema.title.title",
+      "description": "i18n:api-descriptor/SubjectTypesResource#schema.title.description",
+      "type": "string"
+    },
+    "logical": {
+      "title": "i18n:api-descriptor/SubjectTypesResource#schema.logical.title",
+      "description": "i18n:api-descriptor/SubjectTypesResource#schema.logical.description",
+      "type": "boolean"
+    },
+    "config": {
+      "title": "i18n:api-descriptor/SubjectTypesResource#schema.config.title",
+      "description": "i18n:api-descriptor/SubjectTypesResource#schema.config.description",
+      "type": "object"
+    }
+  }
+}

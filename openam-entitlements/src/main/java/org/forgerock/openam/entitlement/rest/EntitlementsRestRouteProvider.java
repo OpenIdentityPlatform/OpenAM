@@ -83,6 +83,6 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("subjecttypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(SubjectTypesResource.class);
+                .toAnnotatedCollection(SubjectTypesResource.class);
     }
 }

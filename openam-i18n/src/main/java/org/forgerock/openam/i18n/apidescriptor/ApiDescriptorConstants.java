@@ -220,6 +220,9 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String CONDITION_TYPES_RESOURCE = TRANSLATION_KEY_PREFIX + "ConditionTypesResource#";
 
+    /** Constant used as key to API Descriptor translations **/
+    public static final String SUBJECT_TYPES_RESOURCE = TRANSLATION_KEY_PREFIX + "SubjectTypesResource#";
+
     private ApiDescriptorConstants() {
         // Constants class only
     }

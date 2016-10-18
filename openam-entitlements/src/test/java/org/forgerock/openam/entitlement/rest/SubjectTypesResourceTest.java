@@ -38,6 +38,7 @@ import com.sun.identity.entitlement.SubjectDecision;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -184,6 +185,11 @@ public class SubjectTypesResourceTest {
         //then
         assertThat(promise).succeeded().withContent().hasBoolean("logical");
         assertThat(promise).succeeded().withContent().booleanAt("logical").isTrue();
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(SubjectTypesResource.class).hasValidAnnotations();
     }
 
     /**
