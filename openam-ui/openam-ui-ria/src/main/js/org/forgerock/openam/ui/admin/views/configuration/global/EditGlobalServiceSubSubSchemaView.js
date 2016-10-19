@@ -15,11 +15,12 @@
  */
 
 define([
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/services/global/ServicesService",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
     "org/forgerock/openam/ui/admin/views/common/schema/EditSchemaComponent"
-], (AbstractView, ServicesService, Backlink, EditSchemaComponent) => {
+], ($, AbstractView, ServicesService, Backlink, EditSchemaComponent) => {
     const EditGlobalServiceSubSchemaView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
         render ([serviceType, subSchemaType, subSchemaInstanceId, subSubSchemaType, subSubSchemaInstanceId]) {
@@ -29,7 +30,8 @@ define([
                     subSchemaType,
                     subSchemaInstanceId,
                     subSubSchemaType,
-                    subSubSchemaInstanceId
+                    subSubSchemaInstanceId,
+                    type: $.t("console.services.subSchema.title", { subSchema: subSubSchemaType })
                 },
 
                 template: "templates/admin/views/common/schema/EditServiceSubSubSchemaTemplate.html",

@@ -15,12 +15,13 @@
  */
 
 define([
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/global/ServicesService",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
     "org/forgerock/openam/ui/admin/views/common/schema/EditSchemaComponent"
-], (AbstractView, Router, ServicesService, Backlink, EditSchemaComponent) => {
+], ($, AbstractView, Router, ServicesService, Backlink, EditSchemaComponent) => {
     const EditGlobalServiceSubSchemaView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
         render ([serviceType, subSchemaType, subSchemaInstanceId]) {
@@ -32,6 +33,7 @@ define([
                     serviceType,
                     subSchemaType,
                     subSchemaInstanceId,
+                    type: $.t("console.services.subSchema.title", { subSchema: subSchemaType }),
                     headerActions: showDeleteButton() ? [
                         { actionPartial: "form/_Button", data: "delete", title: "common.form.delete", icon:"fa-times" }
                     ] : []

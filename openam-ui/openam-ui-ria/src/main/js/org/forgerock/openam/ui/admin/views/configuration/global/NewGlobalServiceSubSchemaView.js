@@ -15,18 +15,23 @@
  */
 
 define([
+    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/global/ServicesService",
     "org/forgerock/openam/ui/admin/views/common/Backlink",
     "org/forgerock/openam/ui/admin/views/common/schema/NewSchemaComponent"
-], (_, AbstractView, Router, ServicesService, Backlink, NewSchemaComponent) => {
+], ($, _, AbstractView, Router, ServicesService, Backlink, NewSchemaComponent) => {
     const NewGlobalServiceSubSchemaView = AbstractView.extend({
         template: "templates/admin/views/configuration/EditGlobalConfigurationBaseTemplate.html",
         render ([serviceInstance, subSchemaType]) {
             const newSchemaComponent = new NewSchemaComponent({
-                data: { serviceInstance, subSchemaType },
+                data: {
+                    serviceInstance,
+                    subSchemaType,
+                    title: $.t("console.services.subSchema.new.title", { subSchema: subSchemaType })
+                },
 
                 listRoute: Router.configuration.routes.editGlobalService,
                 listRouteArgs: [encodeURIComponent(serviceInstance)],

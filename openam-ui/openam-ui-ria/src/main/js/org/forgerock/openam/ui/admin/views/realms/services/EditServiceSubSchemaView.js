@@ -15,12 +15,13 @@
  */
 
 define([
+    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/admin/views/common/schema/EditSchemaComponent"
-], (_, AbstractView, Router, ServicesService, EditSchemaComponent) => AbstractView.extend({
+], ($, _, AbstractView, Router, ServicesService, EditSchemaComponent) => AbstractView.extend({
     render ([realmPath, serviceType, subSchemaType, id]) {
         const editComponent = new EditSchemaComponent({
             data: {
@@ -28,6 +29,7 @@ define([
                 serviceType,
                 subSchemaType,
                 id,
+                type: $.t("console.services.subSchema.title", { subSchema: subSchemaType }),
                 subSchemaInstanceId: decodeURIComponent(id),
                 headerActions: [
                     { actionPartial: "form/_Button", data: "delete", title: "common.form.delete", icon:"fa-times" }

@@ -15,15 +15,21 @@
  */
 
 define([
+    "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/realm/ServicesService",
     "org/forgerock/openam/ui/admin/views/common/schema/NewSchemaComponent"
-], (_, AbstractView, Router, ServicesService, NewSchemaComponent) => AbstractView.extend({
+], ($, _, AbstractView, Router, ServicesService, NewSchemaComponent) => AbstractView.extend({
     render ([realmPath, serviceInstance, subSchemaType]) {
         const newSchemaComponent = new NewSchemaComponent({
-            data: { realmPath, serviceInstance, subSchemaType },
+            data: {
+                realmPath,
+                serviceInstance,
+                subSchemaType,
+                title: $.t("console.services.subSchema.new.title", { subSchema: subSchemaType })
+            },
 
             listRoute: Router.configuration.routes.realmsServiceEdit,
             listRouteArgs: _.map([realmPath, serviceInstance], encodeURIComponent),
