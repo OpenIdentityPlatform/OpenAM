@@ -29,7 +29,7 @@
 
 package com.sun.identity.sm;
 
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.forgerock.guava.common.collect.Ordering;
 import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.util.SystemProperties;
@@ -59,11 +61,14 @@ public class CachedSMSEntry implements SMSEventListener {
         new HashMap(1000));
 
     // Instance variables
-    
-    // Set of listeners that must be updated when the entry changes
-    private Set<SMSEntryUpdateListener> serviceObjects = Collections.synchronizedSet(
-        new HashSet<SMSEntryUpdateListener>());
-    private String notificationID;
+
+    /**
+     * Set of listeners that must be updated when the entry changes. As these may have equals/hashCode
+     * implementations that change as a result of updates, we use the
+     * {@link System#identityHashCode(Object) identity} of the object instances to test for equality.
+     */
+    private final Set<SMSEntryUpdateListener> serviceObjects = new ConcurrentSkipListSet<>(Ordering.arbitrary());
+    private final SMSEventListenerManager.Subscription subscription;
 
     protected Set principals = Collections.synchronizedSet(
         new HashSet(10)); // Principals who have read access
@@ -102,7 +107,7 @@ public class CachedSMSEntry implements SMSEventListener {
         smsEntry.setReadOnly();
         
         // Register for notifications
-        notificationID = SMSEventListenerManager.registerForNotifyChangesToNode(smsEntry.getDN(), this);
+        subscription = SMSEventListenerManager.registerForNotifyChangesToNode(smsEntry.getDN(), this);
 
         // Write debug messages
         if (SMSEntry.debug.messageEnabled()) {
@@ -219,8 +224,7 @@ public class CachedSMSEntry implements SMSEventListener {
      */
     private void clear(boolean removeFromCache) {
         // this entry is no long valid, remove from cache
-        SMSEventListenerManager.removeNotification(notificationID);
-        notificationID = null;
+        subscription.cancel();
         valid = false;
         synchronized(dirtyLock) {
             dirty = true;
@@ -262,22 +266,14 @@ public class CachedSMSEntry implements SMSEventListener {
      * Sends notifications to any object that has added itself as a listener.
      */
     private void updateServiceListeners() {
-        if (SMSEntry.debug.messageEnabled()) {
-            SMSEntry.debug.message("CachedSMSEntry::updateServiceListeners "
-                    + "method called: " + dn2Str);
-        }
-        // Inform the ServiceSchemaManager's of changes to attributes
-        Set<SMSEntryUpdateListener> tmpServiceObjects;
-        synchronized (serviceObjects) {
-            tmpServiceObjects = Collections.unmodifiableSet(serviceObjects);
-        }
+        SMSEntry.debug.message("CachedSMSEntry::updateServiceListeners method called: {}", dn2Str);
 
-        for(SMSEntryUpdateListener updateListener : tmpServiceObjects){
+        // Inform the ServiceSchemaManager's of changes to attributes
+        for (SMSEntryUpdateListener updateListener : serviceObjects) {
             try {
                 updateListener.update();
             } catch (Throwable e) {
-                SMSEntry.debug.error("CachedSMSEntry::unable to " +
-                    "update service listener (" + dn2Str + ")", e);
+                SMSEntry.debug.error("CachedSMSEntry::unable to update service listener ({})", dn2Str, e);
             }
         }
     }
@@ -285,18 +281,17 @@ public class CachedSMSEntry implements SMSEventListener {
     /**
      * Method to add objects that needs notifications
      */
-    protected void addServiceListener(SMSEntryUpdateListener o) {
-        serviceObjects.add(o);
+    protected void addServiceListener(SMSEntryUpdateListener updateListener) {
+        serviceObjects.add(updateListener);
     }
     
     /**
      * Method to remove objects that needs notifications
      */
-    protected void removeServiceListener(Object o) {
-        serviceObjects.remove(o);
+    protected void removeServiceListener(SMSEntryUpdateListener updateListener) {
+        serviceObjects.remove(updateListener);
         if (serviceObjects.isEmpty()) {
-            SMSEventListenerManager.removeNotification(notificationID);
-            notificationID = null;
+            subscription.cancel();
         }
     }
 
@@ -465,7 +460,7 @@ public class CachedSMSEntry implements SMSEventListener {
     }
 
     @Override
-    public void notifySMSEvent(String dn, int event) {
+    public void notifySMSEvent(DN dn, int event) {
         update();
     }
 

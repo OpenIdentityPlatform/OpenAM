@@ -29,6 +29,21 @@
 
 package com.sun.identity.idm.server;
 
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.util.thread.ExecutorServiceFactory;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -53,15 +68,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  *
@@ -79,12 +85,17 @@ public class IdRepoPluginsCache implements ServiceListener {
     private Map idrepoPlugins = new HashMap();
     // Needs to synchronized for get(), put() and clear()
     private Map readonlyPlugins = new Hashtable();
+
+    private final ScheduledExecutorService scheduler;
     
     protected IdRepoPluginsCache() {
         // Initialize listeners
         if (debug.messageEnabled()) {
             debug.message("IdRepoPluginsCache constructor called");
         }
+
+        this.scheduler = InjectorHolder.getInstance(ExecutorServiceFactory.class).createScheduledService(1);
+
         initializeListeners();
     }
 
@@ -288,7 +299,7 @@ public class IdRepoPluginsCache implements ServiceListener {
         ShutdownIdRepoPlugin shutdownrepos = new ShutdownIdRepoPlugin(idrepos);
         // Provide a delay of 500ms for existing operations
         // to complete. the delay is in the forked thread.
-        SMSThreadPool.scheduleTask(shutdownrepos);
+        scheduler.schedule(shutdownrepos, 500, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -691,15 +702,6 @@ public class IdRepoPluginsCache implements ServiceListener {
 
         public void run() {
             // Shutdown the repo
-            try {
-                // Provide a delay of 500ms for caller operations
-                // to complete
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                if (debug.messageEnabled()) {
-                   debug.message("IdRepoPluginsCache.ShutdownIdRepoPlugin: " + e );
-                }
-            }
             if (plugin != null) {
                 plugin.removeListener();
                 plugin.shutdown();

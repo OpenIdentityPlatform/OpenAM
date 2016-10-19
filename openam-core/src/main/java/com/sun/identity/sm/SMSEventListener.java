@@ -16,6 +16,8 @@
 
 package com.sun.identity.sm;
 
+import org.forgerock.opendj.ldap.DN;
+
 /**
  * Defines a listener that should be notified when an SMS event occurs to an object. The notifications are triggered
  * by the SMSEventListenerManager.
@@ -26,5 +28,5 @@ public interface SMSEventListener {
      * @param dn The DN of the object that the event has occurred for.
      * @param event The event that has occurred.
      */
-    void notifySMSEvent(String dn, int event);
+    void notifySMSEvent(DN dn, int event);
 }

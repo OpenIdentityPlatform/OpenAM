@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.schema.CoreSchema;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.sso.SSOException;
@@ -58,7 +60,7 @@ public class CachedSubEntries implements SMSEventListener{
 
     protected CachedSMSEntry cachedEntry;
 
-    protected String notificationID;
+    private final SMSEventListenerManager.Subscription subscription;
 
     // Debug & I18n variables
     private static Debug debug = SMSEntry.debug;
@@ -68,7 +70,7 @@ public class CachedSubEntries implements SMSEventListener{
         try {
             cachedEntry = CachedSMSEntry.getInstance(t, dn);
             // Register for notifications to clear instance cache
-            notificationID = SMSEventListenerManager.registerForNotifyChangesToSubNodes(dn, this);
+            subscription = SMSEventListenerManager.registerForNotifyChangesToSubNodes(dn, this);
         } catch (SSOException ssoe) {
             // invalid ssoToken
             debug.warning("CachedSubEntries::init Invalid SSOToken", ssoe);
@@ -199,8 +201,10 @@ public class CachedSubEntries implements SMSEventListener{
         ssoTokenToSubEntries.clear();
     }
 
+    @Override
     protected void finalize() throws Throwable {
-        SMSEventListenerManager.removeNotification(notificationID);
+        super.finalize();
+        subscription.cancel();
     }
 
     /**
@@ -291,11 +295,12 @@ public class CachedSubEntries implements SMSEventListener{
     }
 
     @Override
-    public void notifySMSEvent(String dn, int event) {
-        if ((dn != null)) {
+    public void notifySMSEvent(DN dn, int event) {
+        if (dn != null) {
             // We do not cache Realm names.
             // We cache only service names and policy names.
-            if (!dn.startsWith(SMSEntry.ORG_PLACEHOLDER_RDN)) {
+
+            if (!dn.rdn().getFirstAVA().getAttributeType().matches(CoreSchema.getOAttributeType())) {
                 if (event == SMSObjectListener.ADD) {
                     add(LDAPUtils.rdnValueFromDn(dn));
                 } else {
