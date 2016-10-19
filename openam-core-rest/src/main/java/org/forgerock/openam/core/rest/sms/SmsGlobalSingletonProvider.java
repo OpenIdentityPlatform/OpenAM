@@ -112,7 +112,9 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
 
     @Override
     protected void addGlobalAttributes(ServiceConfig config, JsonValue result) {
-        converter.toJson(schema.getAttributeDefaults(), false, result);
+        if (schema != organizationSchema) {
+            converter.toJson(schema.getAttributeDefaults(), false, result);
+        }
     }
 
     @Override
