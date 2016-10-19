@@ -17,14 +17,9 @@ package com.iplanet.dpro.session.operations.strategies;
 
 import static com.iplanet.dpro.session.service.SessionState.*;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.utils.Time.*;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +30,7 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
@@ -51,13 +47,11 @@ import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
@@ -72,6 +66,7 @@ public class LocalOperations implements SessionOperations {
 
     private final Debug debug;
     private final SessionAccessManager sessionAccessManager;
+    private SessionQueryManager sessionQueryManager;
     private final SessionInfoFactory sessionInfoFactory;
     private final SessionServerConfig serverConfig;
     private final SessionNotificationSender sessionNotificationSender;
@@ -79,7 +74,6 @@ public class LocalOperations implements SessionOperations {
     private final SessionAuditor sessionAuditor;
     private final InternalSessionListener sessionEventBroker;
     private final SessionChangeAuthorizer sessionChangeAuthorizer;
-    private final SessionServiceConfig serviceConfig;
 
     /**
      * Guice initialised constructor.
@@ -92,23 +86,23 @@ public class LocalOperations implements SessionOperations {
      * @param sessionAuditor audit logger
      * @param sessionEventBroker observer of session events
      * @param sessionChangeAuthorizer class for verifying permissions and authorisation for the current user to
-*                                perform tasks on the session.  Used during deleting a session and getting access
-     * @param serviceConfig contains configuration relating to the session service.
+     *                                perform tasks on the session.  Used during deleting a session and getting access
      *
      */
     @Inject
     LocalOperations(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                     final SessionAccessManager sessionAccessManager,
+                    final SessionQueryManager sessionQueryManager,
                     final SessionInfoFactory sessionInfoFactory,
                     final SessionServerConfig serverConfig,
                     final SessionNotificationSender sessionNotificationSender,
                     final SessionLogging sessionLogging,
                     final SessionAuditor sessionAuditor,
                     final SessionEventBroker sessionEventBroker,
-                    final SessionChangeAuthorizer sessionChangeAuthorizer,
-                    final SessionServiceConfig serviceConfig) {
+                    final SessionChangeAuthorizer sessionChangeAuthorizer) {
         this.debug = debug;
         this.sessionAccessManager = sessionAccessManager;
+        this.sessionQueryManager = sessionQueryManager;
         this.sessionInfoFactory = sessionInfoFactory;
         this.serverConfig = serverConfig;
         this.sessionNotificationSender = sessionNotificationSender;
@@ -116,7 +110,6 @@ public class LocalOperations implements SessionOperations {
         this.sessionAuditor = sessionAuditor;
         this.sessionEventBroker = sessionEventBroker;
         this.sessionChangeAuthorizer = sessionChangeAuthorizer;
-        this.serviceConfig = serviceConfig;
     }
 
     /**
@@ -164,22 +157,22 @@ public class LocalOperations implements SessionOperations {
 
         if (internalSessionToDestroy != null) {
             sessionChangeAuthorizer.checkPermissionToDestroySession(requester, internalSessionToDestroy.getSessionID());
-            destroyInternalSession(internalSessionToDestroy.getSessionID());
+            destroyInternalSession(internalSessionToDestroy);
         }
     }
 
     /**
      * Destroy a Internal Session, whose session id has been specified.
      *
-     * @param sessionID
+     * @param session The InternalSession to destroy.
      */
-    private void destroyInternalSession(SessionID sessionID) {
-        InternalSession sess = sessionAccessManager.removeInternalSession(sessionID);
-        if (sess != null && sess.getState() != INVALID) {
-            signalRemove(sess, SessionEventType.DESTROY);
-            sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
+    private void destroyInternalSession(InternalSession session) {
+        sessionAccessManager.removeInternalSession(session);
+        if (session != null && session.getState() != INVALID) {
+            signalRemove(session, SessionEventType.DESTROY);
+            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_DESTROYED);
         }
-        sessionAccessManager.removeSessionId(sessionID);
+        sessionAccessManager.removeSessionId(session.getSessionID());
     }
 
     /**
@@ -284,13 +277,8 @@ public class LocalOperations implements SessionOperations {
         // attempt to reuse the token if restriction is the same
         SessionID restrictedSessionID = session.getRestrictedTokenForRestriction(restriction);
         if (restrictedSessionID == null) {
-            restrictedSessionID = session.getID().generateRelatedSessionID(serverConfig);
-            SessionID previousValue = session.addRestrictedToken(restrictedSessionID, restriction);
-            if (previousValue == null) {
-                sessionAccessManager.reloadSessionHandleAndRestrictedIds(session);
-            } else {
-                restrictedSessionID = previousValue;
-            }
+            SessionID generatedRestrictedSessionID = session.getID().generateRelatedSessionID(serverConfig);
+            restrictedSessionID = session.addRestrictedToken(generatedRestrictedSessionID, restriction);
         }
         return restrictedSessionID.toString();
     }
@@ -317,7 +305,7 @@ public class LocalOperations implements SessionOperations {
         //if the provided session ID was a restricted token, resolveToken will always validate the restriction, so there is no
         //need to check restrictions here.
         InternalSession internalSession = resolveToken(sessionId);
-        logoutInternalSession(internalSession.getID());
+        logoutInternalSession(internalSession);
     }
 
     @Override
@@ -334,171 +322,16 @@ public class LocalOperations implements SessionOperations {
      */
     @Override
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
-        if (s.getState(false) != VALID) {
-            throw new SessionException(SessionBundle
-                    .getString("invalidSessionState")
-                    + s.getID().toString());
-        }
-
-        try {
-
-            SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
-            Set<SessionID> sessionIdList = new HashSet<>();
-            for (InternalSession session : sessions.getSearchResults()) {
-                sessionIdList.add(session.getSessionID());
-            }
-
-            Collection<InternalSession> sessionsWithPermission = sessionChangeAuthorizer.filterPermissionToAccess(
-                    s.getSessionID(), sessions.getSearchResults());
-
-
-            Set<SessionInfo> infos = new HashSet<>(sessionsWithPermission.size());
-
-            for (InternalSession session : sessionsWithPermission) {
-                SessionInfo info = session.toSessionInfo();
-                // replace session id with session handle to prevent impersonation
-                info.setSessionID(session.getSessionHandle());
-                infos.add(info);
-            }
-
-            return new SearchResults<>(sessions.getTotalResultCount(), infos, sessions.getErrorCode());
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
+        return sessionQueryManager.getValidSessions(s, pattern);
     }
 
     @Override
     public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
-        return sessionAccessManager.getMatchingValidSessions(crestQuery);
+        return sessionQueryManager.getMatchingValidSessions(crestQuery);
     }
 
-    /**
-     * Get all valid Internal Sessions matched with pattern.
-     */
-    private SearchResults<InternalSession> getValidInternalSessions(String pattern)
-            throws SessionException {
-        Set<InternalSession> sessions = new HashSet<>();
-        int errorCode = SearchResults.SUCCESS;
-
-        if (pattern == null) {
-            pattern = "*";
-        }
-
-        try {
-            long startTime = currentTimeMillis();
-
-            pattern = pattern.toLowerCase();
-            List<InternalSession> allValidSessions = getValidInternalSessions();
-            boolean matchAll = pattern.equals("*");
-
-            for (InternalSession sess : allValidSessions) {
-                if (!matchAll) {
-                    // For application sessions, the client ID
-                    // will not be in the DN format but just uid.
-                    String clientID = (!sess.isAppSession()) ?
-                            DNUtils.DNtoName(sess.getClientID()) :
-                            sess.getClientID();
-
-                    if (clientID == null) {
-                        continue;
-                    } else {
-                        clientID = clientID.toLowerCase();
-                    }
-
-                    if (!matchFilter(clientID, pattern)) {
-                        continue;
-                    }
-                }
-
-                if (sessions.size() == serviceConfig.getMaxSessionListSize()) {
-                    errorCode = SearchResults.SIZE_LIMIT_EXCEEDED;
-                    break;
-                }
-                sessions.add(sess);
-
-                if ((currentTimeMillis() - startTime) >=
-                        serviceConfig.getSessionRetrievalTimeout()) {
-                    errorCode = SearchResults.TIME_LIMIT_EXCEEDED;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            debug.error("SessionService : "
-                    + "Unable to get Session Information ", e);
-            throw new SessionException(e);
-        }
-        return new SearchResults<>(sessions.size(), sessions, errorCode);
-    }
-
-    /**
-     * Get all valid Internal Sessions.
-     */
-    private List<InternalSession> getValidInternalSessions() {
-
-        synchronized (sessionAccessManager) {
-            List<InternalSession> sessions = new ArrayList<>();
-            for (InternalSession session : sessionAccessManager.getAllInternalSessions()) {
-                if (session.getState() == VALID
-                        && (!session.isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
-                    sessions.add(session);
-                }
-            }
-            return sessions;
-        }
-    }
-
-    /**
-     * Returns true if the given pattern is contained in the string.
-     *
-     * @param string  to examine
-     * @param pattern to match
-     * @return true if string matches <code>filter</code>
-     */
-    private boolean matchFilter(String string, String pattern) {
-        if (pattern.equals("*") || pattern.equals(string)) {
-            return true;
-        }
-
-        int length = pattern.length();
-        int wildCardIndex = pattern.indexOf("*");
-
-        if (wildCardIndex >= 0) {
-            String patternSubStr = pattern.substring(0, wildCardIndex);
-
-            if (!string.startsWith(patternSubStr, 0)) {
-                return false;
-            }
-
-            int beginIndex = patternSubStr.length() + 1;
-            int stringIndex = 0;
-
-            if (wildCardIndex > 0) {
-                stringIndex = beginIndex;
-            }
-
-            String sub = pattern.substring(beginIndex, length);
-
-            while ((wildCardIndex = pattern.indexOf("*", beginIndex)) != -1) {
-                patternSubStr = pattern.substring(beginIndex, wildCardIndex);
-
-                if (string.indexOf(patternSubStr, stringIndex) == -1) {
-                    return false;
-                }
-
-                beginIndex = wildCardIndex + 1;
-                stringIndex = stringIndex + patternSubStr.length() + 1;
-                sub = pattern.substring(beginIndex, length);
-            }
-
-            if (string.endsWith(sub)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void logoutInternalSession(final SessionID sessionId) {
-        InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
+    private void logoutInternalSession(final InternalSession session) {
+        sessionAccessManager.removeInternalSession(session);
         if (session != null && session.getState() != INVALID) {
             signalRemove(session, SessionEventType.LOGOUT);
             sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);

@@ -13,19 +13,8 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
-
-package org.forgerock.openam.session.service.persistence;
-
-import com.iplanet.dpro.session.SessionID;
-
 /**
- * An interface for handling updates that require a session to be persisted.
+ * Defines interfaces for handling session access.
+ *
  */
-public interface SessionPersistenceManager {
-    /**
-     * Notify this listener of an update to a session.
-     * @param sessionID The session that was updated. Never null.
-     */
-    void notifyUpdate(SessionID sessionID);
-
-}
+package org.forgerock.openam.session.service.access;

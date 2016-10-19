@@ -11,35 +11,39 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
-package com.iplanet.dpro.session.service;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.*;
+package org.forgerock.openam.session.service.access.persistence.caching;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
 
-public class InternalSessionStoreTest {
+public class InternalSessionStorageTest {
     private InternalSession session;
     private SessionID sessionId;
-    private InternalSessionStore cache;
+    private InternalSessionStorage cache;
 
     @BeforeMethod
     public void setup() {
-        session = mock(InternalSession.class);
-        sessionId = mock(SessionID.class);
-        given(session.getID()).willReturn(sessionId);
+        session = Mockito.mock(InternalSession.class);
+        sessionId = Mockito.mock(SessionID.class);
+        BDDMockito.given(session.getID()).willReturn(sessionId);
 
-        SessionServiceConfig mockConfig = mock(SessionServiceConfig.class);
-        given(mockConfig.getMaxSessions()).willReturn(10);
-        cache = new InternalSessionStore(mockConfig);
+        SessionServiceConfig mockConfig = Mockito.mock(SessionServiceConfig.class);
+        BDDMockito.given(mockConfig.getMaxSessions()).willReturn(10);
+        cache = new InternalSessionStorage(mockConfig);
     }
 
     @Test
@@ -50,8 +54,8 @@ public class InternalSessionStoreTest {
 
     @Test
     public void shouldCacheRestrictedToken() {
-        SessionID restrictedID = mock(SessionID.class);
-        given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(restrictedID)));
+        SessionID restrictedID = Mockito.mock(SessionID.class);
+        BDDMockito.given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(restrictedID)));
         cache.put(session);
         assertThat(cache.getByRestrictedID(restrictedID)).isEqualTo(session);
     }
@@ -59,7 +63,7 @@ public class InternalSessionStoreTest {
     @Test
     public void shouldAllowAccessViaSessionHandle() {
         String handle = "session-handle";
-        given(session.getSessionHandle()).willReturn(handle);
+        BDDMockito.given(session.getSessionHandle()).willReturn(handle);
         cache.put(session);
         assertThat(cache.getByHandle(handle)).isEqualTo(session);
     }
@@ -75,7 +79,7 @@ public class InternalSessionStoreTest {
     public void shouldRemoveSessionHandle() {
         // Given
         String handle = "badger";
-        given(session.getSessionHandle()).willReturn(handle);
+        BDDMockito.given(session.getSessionHandle()).willReturn(handle);
         cache.put(session);
 
         // When
@@ -88,8 +92,8 @@ public class InternalSessionStoreTest {
     @Test
     public void shouldRemoveRestrictedSession() {
         // Given
-        SessionID restricted = mock(SessionID.class);
-        given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(restricted)));
+        SessionID restricted = Mockito.mock(SessionID.class);
+        BDDMockito.given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(restricted)));
         cache.put(session);
 
         // When
@@ -103,12 +107,12 @@ public class InternalSessionStoreTest {
     public void shouldRemovePreviousHandle() {
         // Given
         String oldHandle = "badger";
-        given(session.getSessionHandle()).willReturn(oldHandle);
+        BDDMockito.given(session.getSessionHandle()).willReturn(oldHandle);
 
         cache.put(session);
 
         String newHandle = "ferret";
-        given(session.getSessionHandle()).willReturn(newHandle);
+        BDDMockito.given(session.getSessionHandle()).willReturn(newHandle);
 
         // When
         cache.put(session);
@@ -121,13 +125,13 @@ public class InternalSessionStoreTest {
     @Test
     public void shouldRemovePreviousRestrictedSession() {
         // Given
-        SessionID oldRestriction = mock(SessionID.class);
-        given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(oldRestriction)));
+        SessionID oldRestriction = Mockito.mock(SessionID.class);
+        BDDMockito.given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(oldRestriction)));
 
         cache.put(session);
 
-        SessionID newRestriction = mock(SessionID.class);
-        given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(newRestriction)));
+        SessionID newRestriction = Mockito.mock(SessionID.class);
+        BDDMockito.given(session.getRestrictedTokens()).willReturn(new HashSet<SessionID>(Arrays.asList(newRestriction)));
 
         // When
         cache.put(session);

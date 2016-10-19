@@ -173,19 +173,6 @@ public class SessionService {
     }
 
     /**
-     * Removes the Internal Session from the Internal Session table.
-     *
-     * @param sessionId Session ID
-     */
-    private InternalSession removeCachedInternalSession(final SessionID sessionId) {
-        if (null == sessionId) {
-            return null;
-        }
-
-        return sessionAccessManager.removeInternalSession(sessionId);
-    }
-
-    /**
      * Understands how to resolve a Token based on its SessionID.
      *
      * Stateless Sessions by their very nature do not need to be stored in memory, and so
@@ -221,15 +208,15 @@ public class SessionService {
     /**
      * Destroy a Internal Session, whose session id has been specified.
      *
-     * @param sessionID The id of the session to destroy.
+     * @param internalSession The session to destroy.
      */
-    void destroyInternalSession(SessionID sessionID) {
-        InternalSession internalSession = removeCachedInternalSession(sessionID);
+    void destroyInternalSession(InternalSession internalSession) {
+        sessionAccessManager.removeInternalSession(internalSession);
         if (internalSession != null && internalSession.getState() != SessionState.INVALID) {
             signalRemove(internalSession, SessionEventType.DESTROY);
             sessionAuditor.auditActivity(internalSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
-        sessionAccessManager.removeSessionId(sessionID);
+        sessionAccessManager.removeSessionId(internalSession.getSessionID());
     }
 
     /**
@@ -241,7 +228,8 @@ public class SessionService {
 
         InternalSession authenticationSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).removeSession(sessionID);
         if (authenticationSession == null) {
-            authenticationSession = removeCachedInternalSession(sessionID);
+            authenticationSession = sessionAccessManager.getInternalSession(sessionID);
+            sessionAccessManager.removeInternalSession(authenticationSession);
         }
         if (authenticationSession != null && authenticationSession.getState() != SessionState.INVALID) {
             signalRemove(authenticationSession, SessionEventType.DESTROY);

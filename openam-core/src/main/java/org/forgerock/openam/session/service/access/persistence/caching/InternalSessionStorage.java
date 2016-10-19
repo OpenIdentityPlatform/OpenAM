@@ -11,9 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
-package com.iplanet.dpro.session.service;
+package org.forgerock.openam.session.service.access.persistence.caching;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,11 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.utils.SingleValueMapper;
 import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
 
 /**
  * This implementation of the cache which is managed entirely externally.
@@ -35,7 +36,7 @@ import com.iplanet.dpro.session.SessionID;
  * when they are no longer referenced by the InternalSession.
  */
 @Singleton
-public class InternalSessionStore implements InternalSessionCache {
+public class InternalSessionStorage implements InternalSessionCache {
     private final ConcurrentHashMap<SessionID, InternalSession> cache;
     private final SingleValueMapper<String, InternalSession> handle = new SingleValueMapper<>();
     private final SingleValueMapper<SessionID, InternalSession> restricted = new SingleValueMapper<>();
@@ -45,7 +46,7 @@ public class InternalSessionStore implements InternalSessionCache {
      * @param config Non null configuration to base caching estimates from.
      */
     @Inject
-    InternalSessionStore(SessionServiceConfig config) {
+    InternalSessionStorage(SessionServiceConfig config) {
         cache = new ConcurrentHashMap<>(config.getMaxSessions());
     }
 

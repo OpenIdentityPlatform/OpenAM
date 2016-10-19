@@ -15,13 +15,14 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -79,12 +80,12 @@ public class LocalOperationsTest {
         given(mockInternalSession.getID()).willReturn(mockSessionID);
         given(mockInternalSession.getSessionID()).willReturn(mockSessionID);
         given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
-        given(sessionAccessManager.removeInternalSession(mockSessionID)).willReturn(mockInternalSession);
         given(mockSession.getID()).willReturn(mockSessionID);
 
-        local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory, serverConfig,
-                mock(SessionNotificationSender.class), mock(SessionLogging.class), mock(SessionAuditor.class),
-                sessionEventBroker, sessionChangeAuthorizer, serviceConfig);
+        local = new LocalOperations(mock(Debug.class), sessionAccessManager, mock(SessionQueryManager.class),
+                sessionInfoFactory, serverConfig, mock(SessionNotificationSender.class),
+                mock(SessionLogging.class), mock(SessionAuditor.class), sessionEventBroker,
+                sessionChangeAuthorizer);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class LocalOperationsTest {
         // When
         local.logout(mockSession);
         // Then
-        verify(sessionAccessManager).removeInternalSession(mockSessionID);
+        verify(sessionAccessManager).removeInternalSession(mockInternalSession);
     }
 
     @Test

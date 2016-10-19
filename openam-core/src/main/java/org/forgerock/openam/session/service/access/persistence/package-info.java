@@ -14,16 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.service.persistence;
-
 /**
- * Represents a session which can have its persistence managed by a SessionPersistenceManager.
+ * Defines interfaces for handling session persistence.
  */
-public interface SessionPersistenceObservable {
-    /**
-     * Set the manager which handles persistence of this observable.
-     * @param listener The manager to add.
-     */
-    void setPersistenceManager(SessionPersistenceManager listener);
-
-}
+package org.forgerock.openam.session.service.access.persistence;

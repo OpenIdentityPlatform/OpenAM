@@ -14,46 +14,38 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.service.caching;
-
-import java.util.Collection;
+package org.forgerock.openam.session.service.access.persistence;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 
 /**
- * Responsible for caching and providing access to {@link com.iplanet.dpro.session.service.InternalSession} objects.
- *
- * This cache will provide access to the sessions via a number of concepts:
- *
- * <ul>
- *   <li>SessionID of the InternalSession</li>
- *   <li>Session handle of the InternalSession</li>
- *   <li>Any of the restricted SessionIDs of the InternalSession</li>
- * </ul>
+ * Responsible for reading and storing InternalSessions.
  */
-public interface InternalSessionCache {
-
+public interface InternalSessionStore {
     /**
      * Gets a session from a given SessionID.
      * @param sessionID the ID of the session to retrieve
+     * @exception SessionPersistenceException If the storage operation failed.
      * @return an Internal Session
      */
-    InternalSession getBySessionID(SessionID sessionID);
+    InternalSession getBySessionID(SessionID sessionID) throws SessionPersistenceException;
 
     /**
      * Gets a session from a given session handle.
      * @param sessionHandle the handle of the session to retrieve
+     * @exception SessionPersistenceException If the storage operation failed.
      * @return an Internal Session
      */
-    InternalSession getByHandle(String sessionHandle);
+    InternalSession getByHandle(String sessionHandle) throws SessionPersistenceException;
 
     /**
      * Gets a restricted session from a given SessionID.
      * @param sessionID the ID of the restricted session to retrieve
+     * @exception SessionPersistenceException If the storage operation failed.
      * @return a restricted Internal Session
      */
-    InternalSession getByRestrictedID(SessionID sessionID);
+    InternalSession getByRestrictedID(SessionID sessionID) throws SessionPersistenceException;
 
     /**
      * Stores the InternalSession in the cache. This will also store any associated references
@@ -66,32 +58,17 @@ public interface InternalSessionCache {
      * </ul>
      *
      * @param session Non null InternalSession to store.
+     * @exception SessionPersistenceException If the storage operation failed.
      */
-    void put(InternalSession session);
+    void store(InternalSession session) throws SessionPersistenceException;
 
     /**
      * Remove the Session from the cache.
      *
      * @param sessionID Non null SessionID.
-     *
+     * @exception SessionPersistenceException If the storage operation failed.
      * @return The InternalSession that was removed from the cache.
      */
-    InternalSession remove(SessionID sessionID);
+    void remove(SessionID sessionID) throws SessionPersistenceException;
 
-    /**
-     * Currently used for stats gathering about the cache.
-     * @return Current number of sessions stored in the cache.
-     */
-    int size();
-
-    /**
-     * @return <tt>true</tt> if this cache is empty.
-     */
-    boolean isEmpty();
-
-    /**
-     * Currently used by getValidSessions.
-     * @return Unmodifiable collection of all Sessions that are stored in the cache.
-     */
-    Collection<InternalSession> getAllSessions();
 }

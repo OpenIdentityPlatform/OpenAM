@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.service;
+package org.forgerock.openam.session.service.access;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
@@ -27,6 +27,7 @@ import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.session.service.access.persistence.SessionPersistenceStore;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
@@ -41,8 +42,8 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.sun.identity.shared.debug.Debug;
 
-@GuiceModules({SessionPersistentStoreTest.TestSessionGuiceModule.class})
-public class SessionPersistentStoreTest extends GuiceTestCase {
+@GuiceModules({SessionPersistenceStoreTest.TestSessionGuiceModule.class})
+public class SessionPersistenceStoreTest extends GuiceTestCase {
     @Mock private Debug mockDebug;
     @Mock private SessionID mockSessionID;
     @Mock private InternalSession mockSession;
@@ -56,13 +57,13 @@ public class SessionPersistentStoreTest extends GuiceTestCase {
     private final String TOKEN = "TOKEN";
     private final String HANDLE = "HANDLE";
 
-    private SessionPersistentStore sessionPersistentStore;
+    private SessionPersistenceStore sessionPersistenceStore;
 
     @BeforeClass
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        sessionPersistentStore = new SessionPersistentStore(mockDebug, mockCoreTokenService, mockTokenAdapter,
+        sessionPersistenceStore = new SessionPersistenceStore(mockDebug, mockCoreTokenService, mockTokenAdapter,
                 mockTokenIdFactory, mockSessionServiceConfig);
 
         given(mockSession.getID()).willReturn(mockSessionID);
@@ -74,21 +75,21 @@ public class SessionPersistentStoreTest extends GuiceTestCase {
 
     @Test
     public void savesToken() throws Exception {
-        sessionPersistentStore.save(mockSession);
+        sessionPersistenceStore.save(mockSession);
 
         verify(mockCoreTokenService).update(mockToken);
     }
 
     @Test
     public void deletesToken() throws Exception {
-        sessionPersistentStore.delete(mockSession);
+        sessionPersistenceStore.delete(mockSessionID);
 
         verify(mockCoreTokenService).delete(TOKEN);
     }
 
     @Test
     public void recoversSession() throws Exception {
-        assertThat(sessionPersistentStore.recoverSession(mockSessionID)).isEqualTo(mockSession);
+        assertThat(sessionPersistenceStore.recoverSession(mockSessionID)).isEqualTo(mockSession);
     }
 
 
@@ -96,14 +97,14 @@ public class SessionPersistentStoreTest extends GuiceTestCase {
     public void recoversSessionByHandle() throws Exception {
         given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(Collections.list(mockToken));
 
-        assertThat(sessionPersistentStore.recoverSessionByHandle(HANDLE)).isEqualTo(mockSession);
+        assertThat(sessionPersistenceStore.recoverSessionByHandle(HANDLE)).isEqualTo(mockSession);
     }
 
     @Test
     public void failsRecoverSessionByHandleWithNonUniqueMatch() throws Exception {
         given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(Collections.list(mock(Token.class), mockToken));
 
-        assertThat(sessionPersistentStore.recoverSessionByHandle(HANDLE)).isNull();
+        assertThat(sessionPersistenceStore.recoverSessionByHandle(HANDLE)).isNull();
     }
 
     public static class TestSessionGuiceModule extends AbstractModule {

@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.DestroyOldestAction;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -130,7 +131,7 @@ public class SessionConstraint {
         // AM servers and/or session repository
         Map sessions = null;
         try {
-            sessions = InjectorHolder.getInstance(SessionCount.class).getAllSessionsByUUID(internalSession.getUUID());
+            sessions = InjectorHolder.getInstance(SessionQueryManager.class).getAllSessionsByUUID(internalSession.getUUID());
         } catch (Exception e) {
             if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
                 if (debug.messageEnabled()) {

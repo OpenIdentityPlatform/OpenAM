@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionConstants;
 
@@ -38,6 +37,7 @@ import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
 
@@ -85,43 +85,27 @@ public class AuthSessionFactory {
         }
     }
 
-    /**
-     * Returns a non-expiring application token which can be used by services.
-     *
-     * @param domain Authentication Domain
-     */
-    private InternalSession getServiceSession(String domain) {
-        try {
-            InternalSession session = internalSessionFactory.newInternalSession(domain, false);
-            session.putProperty(UNIVERSAL_IDENTIFIER, dsameAdminTokenProvider.getDsameAdminDN());
-            session.setType(SessionType.APPLICATION);
-            session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
-            session.setClientDomain(domain);
-            session.setNonExpiring();
-            session.setState(SessionState.VALID);
-            monitoringOperations.incrementActiveSessions();
-            authenticationSessionStore.promoteSession(session.getSessionID());
-            return session;
-        } catch (Exception e) {
-            sessionDebug.error("Error creating service session", e);
-            return null;
-        }
-    }
-
     private InternalSession initAuthSession(String domain) throws SSOException, SessionException {
-        InternalSession authSession = getServiceSession(domain);
+        InternalSession session = internalSessionFactory.newInternalSession(domain, false);
+        session.setType(SessionType.APPLICATION);
 
-        String clientID = authSession.getClientID(); //TODO: NPE risk
-        authSession.putProperty("Principal", clientID);
-        authSession.putProperty("Organization", domain);
-        authSession.putProperty("Host", authSession.getID().getSessionServer());
+        String clientID = dsameAdminTokenProvider.getDsameAdminDN();
+        session.setClientID(clientID);
+        session.setClientDomain(domain);
+        session.setNonExpiring();
+        session.setState(SessionState.VALID);
 
-        if (LDAPUtils.isDN(clientID)) {
-            String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
-            authSession.putProperty(UNIVERSAL_IDENTIFIER, id);
-        }
+        session.putProperty(ISAuthConstants.PRINCIPAL, clientID);
+        session.putProperty(ISAuthConstants.ORGANIZATION, domain);
+        session.putProperty(ISAuthConstants.HOST, session.getID().getSessionServer());
 
-        return authSession;
+        String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
+        session.putProperty(UNIVERSAL_IDENTIFIER, id);
+
+        monitoringOperations.incrementActiveSessions();
+        authenticationSessionStore.promoteSession(session.getSessionID());
+
+        return session;
     }
 
     private SSOToken initSsoAuthSession(AMSession authSession) throws SSOException, SessionException {

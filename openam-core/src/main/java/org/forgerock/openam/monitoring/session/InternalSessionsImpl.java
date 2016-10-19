@@ -15,13 +15,13 @@
 */
 package org.forgerock.openam.monitoring.session;
 
-import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
-import com.iplanet.dpro.session.monitoring.SessionMonitorType;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.management.snmp.SnmpStatusException;
-import com.sun.management.snmp.agent.SnmpMib;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.SessionAccessManager;
+
+import com.iplanet.dpro.session.monitoring.SessionMonitorType;
+import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
+import com.sun.management.snmp.SnmpStatusException;
+import com.sun.management.snmp.agent.SnmpMib;
 
 /**
  * Implementation for hooking the SNMP {@link InternalSessions} class in to OpenAM to report on our stats.

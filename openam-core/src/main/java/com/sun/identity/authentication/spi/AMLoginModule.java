@@ -29,10 +29,9 @@
 
 package com.sun.identity.authentication.spi;
 
-import static com.sun.identity.authentication.util.ISAuthConstants.LOGIN_IGNORE;
-import static com.sun.identity.authentication.util.ISAuthConstants.LOGIN_SUCCEED;
+import static com.sun.identity.authentication.util.ISAuthConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
-import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+import static org.forgerock.openam.utils.StringUtils.*;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -67,6 +66,7 @@ import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
@@ -74,7 +74,6 @@ import com.iplanet.am.sdk.AMUserPasswordValidation;
 import com.iplanet.am.util.Misc;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionConstraint;
-import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -200,7 +199,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  */
 public abstract class AMLoginModule implements LoginModule {
 
-    private final SessionCount sessionCount;
+    private final SessionQueryManager sessionQueryManager;
 
     // list which holds both presentation and credential callbacks
     List internal = null;
@@ -283,7 +282,7 @@ public abstract class AMLoginModule implements LoginModule {
     public AMLoginModule() {
         auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
         ad = AuthD.getAuth();
-        sessionCount = InjectorHolder.getInstance(SessionCount.class);
+        sessionQueryManager = InjectorHolder.getInstance(SessionQueryManager.class);
     }
     
     /**
@@ -2678,7 +2677,7 @@ public abstract class AMLoginModule implements LoginModule {
 
             if (univId != null) {
                 sessionQuota = getSessionQuota(amIdUser);
-                sessionCount = this.sessionCount.getAllSessionsByUUID(univId).size();
+                sessionCount = sessionQueryManager.getAllSessionsByUUID(univId).size();
 
                 if (debug.messageEnabled()) {
                     debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
@@ -2747,7 +2746,7 @@ public abstract class AMLoginModule implements LoginModule {
             String univId = IdUtils.getUniversalId(amIdUser);
 
             if (univId != null) {
-                Map<String, Long> currentSessions = sessionCount.getAllSessionsByUUID(univId);
+                Map<String, Long> currentSessions = sessionQueryManager.getAllSessionsByUUID(univId);
                 SSOTokenManager manager = SSOTokenManager.getInstance();
 
                 for (String tokenID : currentSessions.keySet()) {

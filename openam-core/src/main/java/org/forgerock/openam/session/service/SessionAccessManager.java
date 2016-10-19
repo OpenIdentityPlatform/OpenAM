@@ -15,9 +15,6 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-
-import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
@@ -25,15 +22,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.caching.InternalSessionCache;
-import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.session.service.access.SessionPersistenceManager;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
+import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
-import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -42,27 +36,23 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.MonitoringOperations;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
 
+
 /**
- * Class for managing access to Sessions.  This class is responsible for any session caching that is required
- * to optimise performance.
+ * Class for managing access to Sessions. This class handles concepts such as persisting a session for the first time,
+ * as well as updating a stored session.
  */
 @Singleton
 public class SessionAccessManager implements SessionPersistenceManager {
 
     private final Debug debug;
 
-    private final InternalSessionCache internalSessionCache;
     private final SessionCache sessionCache;
 
-    private final SessionPersistentStore sessionPersistentStore;
+    private InternalSessionStore internalSessionStore;
 
-    private final SessionNotificationSender sessionNotificationSender;
-    private final SessionAuditor sessionAuditor;
     private final MonitoringOperations monitoringOperations; // Note: there should be an increment and a decrement in this class for this to make sense
     private final NonExpiringSessionManager nonExpiringSessionManager;
 
@@ -70,21 +60,15 @@ public class SessionAccessManager implements SessionPersistenceManager {
     @Inject
     SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                          final SessionCache sessionCache,
-                         final InternalSessionCache internalSessionCache,
-                         final SessionNotificationSender sessionNotificationSender,
-                         final SessionAuditor sessionAuditor,
                          final MonitoringOperations monitoringOperations,
-                         final SessionPersistentStore sessionPersistentStore,
                          @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) final ScheduledExecutorService scheduler,
-                         final ThreadMonitor threadMonitor) {
+                         final ThreadMonitor threadMonitor,
+                         final InternalSessionStore internalSessionStore) {
         this.debug = debug;
         this.sessionCache = sessionCache;
-        this.internalSessionCache = internalSessionCache;
-        this.sessionNotificationSender = sessionNotificationSender;
-        this.sessionAuditor = sessionAuditor;
         this.monitoringOperations = monitoringOperations;
-        this.sessionPersistentStore = sessionPersistentStore;
         this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduler, threadMonitor);
+        this.internalSessionStore = internalSessionStore;
     }
 
     /**
@@ -119,11 +103,11 @@ public class SessionAccessManager implements SessionPersistenceManager {
         if (sessionId == null || StringUtils.isEmpty(sessionId.toString()) || sessionId.isSessionHandle()) {
             return null;
         }
-        InternalSession internalSession = internalSessionCache.getBySessionID(sessionId);
-        if (internalSession == null) {
-            return cacheSession(sessionPersistentStore.recoverSession(sessionId));
+        try {
+            return internalSessionStore.getBySessionID(sessionId);
+        } catch (SessionPersistenceException e) {
+            throw new RuntimeException(e);
         }
-        return internalSession;
     }
 
     /**
@@ -136,82 +120,12 @@ public class SessionAccessManager implements SessionPersistenceManager {
         if (StringUtils.isBlank(sessionHandle)) {
             return null;
         }
-        InternalSession internalSession = internalSessionCache.getByHandle(sessionHandle);
-        if (internalSession == null) {
-            return cacheSession(sessionPersistentStore.recoverSessionByHandle(sessionHandle));
-        }
-        return internalSession;
-    }
-
-    private InternalSession cacheSession(InternalSession session) {
-        if (session == null) {
-            return null;
-        }
-        
-        boolean destroyed = destroySessionIfNecessary(session);
-        if (!destroyed) {
-            putInternalSessionIntoInternalSessionCache(session);
-        }
-
-        return session;
-    }
-    /**
-     * Checks if session has to be destroyed and to remove it
-     * if so.
-     *
-     * @param sess session object
-     * @return true if session has been destroyed
-     */
-    private boolean destroySessionIfNecessary(InternalSession sess) {
-        boolean wasDestroyed = false;
         try {
-            wasDestroyed = performSessionDestroyIfNecessary(sess);
-        } catch (Exception ex) {
-            debug.error("Exception in session destroyIfNecessary() : ", ex);
-            wasDestroyed = true;
-        }
-
-        if (wasDestroyed) {
-            try {
-                removeInternalSession(sess.getID());
-            } catch (Exception ex) {
-                debug.error("Exception while removing session : ", ex);
-            }
-        }
-        return wasDestroyed;
-    }
-
-    /**
-     * Checks whether the session should be destroyed or not, and if so performs the operation.
-     */
-    private boolean performSessionDestroyIfNecessary(InternalSession session) {
-        switch (session.checkSessionUpdate()) {
-            case NO_CHANGE:
-                return false;
-            case DESTROY:
-                delete(session);
-                session.changeStateWithoutNotify(SessionState.DESTROYED);
-                sessionNotificationSender.sendEvent(session, SessionEventType.DESTROY);
-                return true;
-            case MAX_TIMEOUT:
-                session.changeStateAndNotify(SessionEventType.MAX_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
-                return false;
-            case IDLE_TIMEOUT:
-                session.changeStateAndNotify(SessionEventType.IDLE_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
-                return false;
-            default:
-                return false;
+            return internalSessionStore.getByHandle(sessionHandle);
+        } catch (SessionPersistenceException e) {
+            throw new RuntimeException(e);
         }
     }
-
-    private void putInternalSessionIntoInternalSessionCache(InternalSession session) {
-        session.setPersistenceManager(this);
-        internalSessionCache.put(session);
-        update(session);
-    }
-
 
     /**
      * Get a restricted session from a given SessionID.
@@ -219,7 +133,11 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return a restricted Internal Session
      */
     public InternalSession getByRestrictedID(SessionID sessionID) {
-        return sessionPersistentStore.getByRestrictedID(sessionID);
+        try {
+            return internalSessionStore.getByRestrictedID(sessionID);
+        } catch (SessionPersistenceException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -228,24 +146,11 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public void persistInternalSession(InternalSession session) {
         session.setStored(true);
-        putInternalSessionIntoInternalSessionCache(session);
+        session.setPersistenceManager(this);
         update(session);
-
         if (!session.willExpire()) {
             nonExpiringSessionManager.addNonExpiringSession(session);
         }
-    }
-
-    /**
-     * Method responsible for keeping the local references to a session up to date. Call if the Session handle or
-     * restricted ids change.
-     * @param session The session to reload.
-     */
-    public void reloadSessionHandleAndRestrictedIds(InternalSession session) {
-        if (internalSessionCache.getBySessionID(session.getSessionID()) == null) {
-            throw new IllegalStateException("Tried to reload metadata for a session that was not stored.");
-        }
-        internalSessionCache.put(session); // called for side effects of reloading cache at this point in time
     }
 
     /**
@@ -253,7 +158,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return The number of InternalSessions in the InternalSessionCache.
      */
     public int getInternalSessionLimit() {
-        return internalSessionCache.size();
+        return 0;
     }
 
     /**
@@ -261,108 +166,30 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @return the number of sessions in the cache.
      */
     public int getInternalSessionCount() {
-        return internalSessionCache.size();
-    }
-
-    /**
-     * Get all sessions in the internal session cache.
-     * @return a collection of all internal sessions in the internal session cache.
-     */
-    public Collection<InternalSession> getAllInternalSessions() {
-        return internalSessionCache.getAllSessions();
-    }
-
-    /**
-     * Return partial sessions matching the provided CREST query filter from the CTS servers.
-     *
-     * @param crestQuery The CREST query based on which we should look for matching sessions.
-     * @return The collection of matching partial sessions.
-     * @throws SessionException  If the request fails.
-     */
-    public Collection<PartialSession> getMatchingValidSessions(CrestQuery crestQuery) throws SessionException {
-        try {
-            return sessionPersistentStore.searchPartialSessions(crestQuery);
-        } catch (CoreTokenException cte) {
-            debug.error("An error occurred whilst querying CTS for matching sessions", cte);
-            throw new SessionException(cte);
-        }
-    }
-
-    /**
-     * Remove a session from the internal session cache and make it as no longer local.  The Session remains in the
-     * (non-internal) session cache.
-     * @param sessionId the id of the session to be released
-     * @return the internal session that has been released
-     */
-    public InternalSession releaseSession(SessionID sessionId) {
-        InternalSession internalSession = internalSessionCache.remove(sessionId);
-        internalSession.setPersistenceManager(null);
-        return internalSession;
+        return 0;
     }
 
     /**
      * Remove an internal session from the internal session cache.
-     * @param sessionId the session id to remove
+     * @param internalSession the session to remove
      * @return the removed internal session
      */
-    public InternalSession removeInternalSession(SessionID sessionId) {
-        if (null == sessionId) {
-            return null;
+    public void removeInternalSession(InternalSession internalSession) {
+        if (null == internalSession) {
+            return;
         }
 
-        InternalSession internalSession = internalSessionCache.remove(sessionId);
-
-        if (internalSession == null) {
-            return null;
+        try {
+            internalSessionStore.remove(internalSession.getSessionID());
+        } catch (SessionPersistenceException e) {
+            throw new RuntimeException(e);
         }
 
+        internalSession.setStored(false);
         internalSession.setPersistenceManager(null);
-
         // Session Constraint
         if (internalSession.getState() == SessionState.VALID) {
             monitoringOperations.decrementActiveSessions();
-        }
-
-        if (internalSession.isStored()) {
-            delete(internalSession);
-        }
-        return internalSession;
-    }
-
-    /**
-     * Called to notify the session access manager that an InternalSession has been updated.
-     * @param session The session that was updated.
-     */
-    private void update(InternalSession session) {
-        // TODO: Simplify this all this logic by replacing it with the implementation of save(session)
-        if (session.isStored()) {
-            if (session.getState() != SessionState.VALID) {
-                delete(session);
-            } else if (!session.isTimedOut()) {
-                // Only save if we are not about to delete the session anyway.
-                save(session);
-            }
-        }
-    }
-
-    private void save(InternalSession session) {
-        // do not save sessions which never expire, or which are not marked for persistence
-        if (!session.isStored()) {
-            return;
-        }
-        try {
-            sessionPersistentStore.save(session);
-        } catch (Exception e) {
-            debug.error("SessionService.save: " + "exception encountered", e);
-        }
-    }
-
-    private void delete(InternalSession session) {
-        session.setStored(false);
-        try {
-            sessionPersistentStore.delete(session);
-        } catch (Exception e) {
-            debug.error("SessionService : failed deleting session ", e);
         }
     }
 
@@ -374,5 +201,15 @@ public class SessionAccessManager implements SessionPersistenceManager {
                     "SessionAccessManager notified of event for InternalSession it does not contain");
         }
         update(internalSession);
+    }
+
+    private void update(InternalSession session) {
+        if (session.isStored()) {
+            try {
+                internalSessionStore.store(session);
+            } catch (SessionPersistenceException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

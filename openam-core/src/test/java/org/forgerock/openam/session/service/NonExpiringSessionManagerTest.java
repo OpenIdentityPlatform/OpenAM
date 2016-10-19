@@ -16,7 +16,9 @@
 
 package org.forgerock.openam.session.service;
 
+import static org.mockito.BDDMockito.doAnswer;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.times;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.verify;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.session.service.NonExpiringSessionManager;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,7 +37,6 @@ import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.InternalSessionStore;
 
 public class NonExpiringSessionManagerTest {
 
@@ -45,7 +47,6 @@ public class NonExpiringSessionManagerTest {
     @Mock private ThreadMonitor threadMonitor;
     @Mock private SessionID mockSessionID;
     @Mock private InternalSession mockInternalSession;
-    @Mock private InternalSessionStore internalSessionCache;
 
     @BeforeMethod
     public void setUp() {

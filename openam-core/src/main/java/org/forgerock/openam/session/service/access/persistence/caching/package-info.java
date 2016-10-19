@@ -13,8 +13,8 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
+
 /**
- * Defines interfaces for handling session persitence.
- *
+ * Defines an interface and implementations for handling session caching.
  */
-package org.forgerock.openam.session.service.persistence;
+package org.forgerock.openam.session.service.access.persistence.caching;

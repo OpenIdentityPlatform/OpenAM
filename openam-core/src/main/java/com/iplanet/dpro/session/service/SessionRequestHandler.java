@@ -43,6 +43,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.google.inject.Key;
@@ -99,7 +100,7 @@ public class SessionRequestHandler implements RequestHandler {
     private final SessionService sessionService;
     private final Debug sessionDebug;
     private final StatelessSessionManager statelessSessionManager;
-    private final SessionCount sessionCount;
+    private final SessionQueryManager sessionQueryManager;
 
     private SSOToken clientToken = null;
 
@@ -110,7 +111,7 @@ public class SessionRequestHandler implements RequestHandler {
         sessionService = InjectorHolder.getInstance(SessionService.class);
         sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
         statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
-        sessionCount = InjectorHolder.getInstance(SessionCount.class);
+        sessionQueryManager = InjectorHolder.getInstance(SessionQueryManager.class);
     }
 
     /**
@@ -359,7 +360,7 @@ public class SessionRequestHandler implements RequestHandler {
 
             case SessionRequest.GetSessionCount:
                 String uuid = req.getUUID();
-                Map sessions =  sessionCount.getAllSessionsByUUID(uuid);
+                Map sessions =  sessionQueryManager.getAllSessionsByUUID(uuid);
                 if (sessions != null) {
                     res.setSessionsForGivenUUID(sessions);
                 }

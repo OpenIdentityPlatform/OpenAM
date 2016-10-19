@@ -82,7 +82,13 @@ import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.SessionURL;
-import org.forgerock.openam.session.service.caching.InternalSessionCache;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionPersistenceStoreStep;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreChain;
+import org.forgerock.openam.session.service.access.persistence.TimeOutSessionFilterStep;
+import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
+import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCacheStep;
+import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionStorage;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
@@ -131,7 +137,6 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.InternalSessionListener;
-import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionEventBroker;
 import com.iplanet.dpro.session.service.SessionServerConfig;
@@ -253,7 +258,7 @@ public class CoreGuiceModule extends AbstractModule {
         bind(new TypeLiteral<TokenAdapter<SAMLToken>>(){}).to(SAMLAdapter.class);
 
         // Session related dependencies
-        bind(InternalSessionCache.class).to(InternalSessionStore.class);
+        bind(InternalSessionCache.class).to(InternalSessionStorage.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
         bind(new TypeLiteral<Config<SessionService>>() {
@@ -342,6 +347,17 @@ public class CoreGuiceModule extends AbstractModule {
                 .build(OrganizationConfigManagerFactory.class));
 
         install(new RealmGuiceModule());
+    }
+
+
+
+    @Provides
+    @Inject
+    InternalSessionStore getInternalSessionStore(TimeOutSessionFilterStep timeOutSessionFilterStep,
+                                                 InternalSessionCacheStep internalSessionCacheStep,
+                                                 InternalSessionPersistenceStoreStep internalSessionPersistenceStoreStep) {
+        return new InternalSessionStoreChain(Arrays.asList(timeOutSessionFilterStep, internalSessionCacheStep),
+                internalSessionPersistenceStoreStep);
     }
 
     @Provides

@@ -14,13 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.session.service;
+package org.forgerock.openam.session.service.access.persistence;
 
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.util.time.Duration.duration;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -48,9 +52,12 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
@@ -61,12 +68,15 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.session.util.SessionUtilsWrapper;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is responsible for loading sessions from the CTS.
  */
-public class SessionPersistentStore {
+public class SessionPersistenceStore {
+
+    private static final boolean caseSensitiveUUID = SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
 
     private static final Map<String, CoreTokenField> JSON_TO_CTS_MAP = ImmutableMap.<String, CoreTokenField>builder()
             .put(JSON_SESSION_USERNAME, CoreTokenField.USER_ID)
@@ -84,11 +94,11 @@ public class SessionPersistentStore {
     private final SessionServiceConfig sessionServiceConfig;
 
     @Inject
-    public SessionPersistentStore(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                                  final CTSPersistentStore coreTokenService,
-                                  final SessionAdapter tokenAdapter,
-                                  final TokenIdFactory tokenIdFactory,
-                                  final SessionServiceConfig sessionServiceConfig) {
+    public SessionPersistenceStore(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
+                                   final CTSPersistentStore coreTokenService,
+                                   final SessionAdapter tokenAdapter,
+                                   final TokenIdFactory tokenIdFactory,
+                                   final SessionServiceConfig sessionServiceConfig) {
 
         this.debug = debug;
         this.coreTokenService = coreTokenService;
@@ -108,11 +118,11 @@ public class SessionPersistentStore {
 
     /**
      * Remove the provided session from the CTS.
-     * @param session The session to delete from the CTS.
+     * @param sessionID The id of the session to delete from the CTS.
      * @throws CoreTokenException If the operation fails.
      */
-    public void delete(InternalSession session) throws CoreTokenException {
-        String tokenId = tokenIdFactory.toSessionTokenId(session.getID());
+    public void delete(SessionID sessionID) throws CoreTokenException {
+        String tokenId = tokenIdFactory.toSessionTokenId(sessionID);
         coreTokenService.delete(tokenId);
     }
 
@@ -263,5 +273,86 @@ public class SessionPersistentStore {
         }
 
         return null;
+    }
+
+    /**
+     * Returns the expiration information of all sessions belonging to a user
+     * (uuid). The returned value will be a Map (sid->expiration_time).
+     *
+     * @param uuid
+     *            User's universal unique ID.
+     * @return user Sessions
+     * @exception SessionException
+     *             if there is any problem with accessing the session
+     *             repository.
+     */
+    public Map<String, Long> getAllSessionsByUUID(String uuid) throws SessionException {
+        if (!caseSensitiveUUID) {
+            uuid = uuid.toLowerCase();
+        }
+
+        Map<String, Long> sessions;
+        try {
+            sessions = getSessionsFromRepository(uuid);
+        } catch (CoreTokenException e) {
+            throw new SessionException(e);
+        }
+
+        if (sessions == null) {
+            sessions = Collections.emptyMap();
+            debug.error("Error: Unable to determine session count for user: " + uuid +
+                    " returning empty map");
+        }
+
+        return sessions;
+    }
+
+    private Map<String, Long> getSessionsFromRepository(String uuid) throws CoreTokenException {
+
+        try {
+            // Filter and Query the CTS
+            TokenFilter filter = new TokenFilterBuilder()
+                    .returnAttribute(SessionTokenField.SESSION_ID.getField())
+                    .returnAttribute(CoreTokenField.EXPIRY_DATE)
+                    .and()
+                    .withAttribute(CoreTokenField.USER_ID, uuid)
+                    .build();
+            Collection<PartialToken> partialTokens = coreTokenService.attributeQuery(filter);
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        "getSessionsFromRepository query success:\n" +
+                                "Query: {0}\n" +
+                                "Count: {1}",
+                        filter,
+                        partialTokens.size()));
+            }
+
+            // Populate the return Map from the query results.
+            Map<String, Long> sessions = new HashMap<String, Long>();
+            for (PartialToken partialToken : partialTokens) {
+                // Session ID
+                String sessionId = partialToken.getValue(SessionTokenField.SESSION_ID.getField());
+
+                // Expiration Date converted to Unix Time
+                Calendar timestamp = partialToken.getValue(CoreTokenField.EXPIRY_DATE);
+                long unixTime = TimeUtils.toUnixTime(timestamp);
+
+                sessions.put(sessionId, unixTime);
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        "getSessionsFromRepository query results:\n" +
+                                "{0}",
+                        sessions));
+            }
+
+            return sessions;
+        } catch (CoreTokenException e) {
+            debug.error("SessionCount.getSessionsFromRepository: "+
+                    "Session repository is not available", e);
+            throw e;
+        }
     }
 }

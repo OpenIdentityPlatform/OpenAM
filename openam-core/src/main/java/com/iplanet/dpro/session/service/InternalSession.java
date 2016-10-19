@@ -50,6 +50,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.AMSession;
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.session.service.access.SessionPersistenceManager;
+import org.forgerock.openam.session.service.access.SessionPersistenceObservable;
+import org.forgerock.util.annotations.VisibleForTesting;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -65,12 +72,6 @@ import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.AMSession;
-import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
-import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
-import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal session.
@@ -877,7 +878,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
         putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
         sessionService.execSessionTimeoutHandlers(sessionID, eventType); // TODO: Convert to InternalSessionListener (AME-12528)
-        sessionService.destroyInternalSession(sessionID);
+        sessionService.destroyInternalSession(this);
     }
 
     /**
@@ -1054,19 +1055,18 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Add new restricted token pointing at the same session to the list.
      *
-     * @param sid The session ID.
+     * @param newRestrictedTokenId The session ID.
      * @param restriction The token restriction.
-     * @return The existing session ID instance if this TokenRestriction was already mapped to a session ID,
-     * <code>null</code> otherwise.
+     * @return The restricted token id for this TokenRestriction.
      */
-    public SessionID addRestrictedToken(SessionID sid, TokenRestriction restriction) {
-        SessionID previousValue = restrictedTokensByRestriction.putIfAbsent(restriction, sid);
-        if (previousValue == null) {
-            restrictedTokensBySid.put(sid, restriction);
+    public SessionID addRestrictedToken(SessionID newRestrictedTokenId, TokenRestriction restriction) {
+        SessionID currentRestrictedTokenId = restrictedTokensByRestriction.putIfAbsent(restriction, newRestrictedTokenId);
+        if (currentRestrictedTokenId == null) {
+            restrictedTokensBySid.put(newRestrictedTokenId, restriction);
             notifyPersistenceManager();
-            return null;
+            return newRestrictedTokenId;
         }
-        return previousValue;
+        return currentRestrictedTokenId;
     }
 
     /**
