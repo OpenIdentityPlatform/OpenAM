@@ -147,10 +147,13 @@
         <filter-name>AuthZFilter</filter-name>
         <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
     </filter>
-
     <filter>
         <filter-name>AuditContextFilter</filter-name>
         <filter-class>org.forgerock.openam.audit.context.AuditContextFilter</filter-class> <!-- TODO Does this needs updating too? -->
+    </filter>
+    <filter>
+        <filter-name>NotificationsWebSocketFilter</filter-name>
+        <filter-class>org.forgerock.openam.notifications.NotificationsWebSocketFilter</filter-class>
     </filter>
 
     <!-- filter declaration -->
@@ -264,6 +267,10 @@
     <filter-mapping>
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>NotificationsWebSocketFilter</filter-name>
+        <url-pattern>/notifications</url-pattern>
     </filter-mapping>
 
     <!-- filter mapping -->
