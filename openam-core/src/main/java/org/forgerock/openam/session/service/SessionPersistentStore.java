@@ -66,6 +66,7 @@ import com.sun.identity.shared.debug.Debug;
 public class SessionPersistentStore {
 
     private static final Map<String, CoreTokenField> JSON_TO_CTS_MAP = ImmutableMap.<String, CoreTokenField>builder()
+            .put(JSON_SESSION_USERNAME, CoreTokenField.USER_ID)
             .put(JSON_SESSION_UNIVERSAL_ID, CoreTokenField.USER_ID)
             .put(JSON_SESSION_REALM, SessionTokenField.REALM.getField())
             .put(JSON_SESSION_HANDLE, SessionTokenField.SESSION_HANDLE.getField())

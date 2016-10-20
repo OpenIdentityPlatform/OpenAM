@@ -62,18 +62,26 @@ public class PartialSession {
     private String maxSessionExpirationTime;
 
     public PartialSession(PartialToken partialToken) {
-        universalId = partialToken.getValue(CoreTokenField.USER_ID);
-        try {
-            username = new AMIdentity(null, universalId).getName();
-        } catch (IdRepoException ire) {
-            DEBUG.error("Unable to retrieve username from universal ID: {}", universalId, ire);
+        for (CoreTokenField field : partialToken.getFields()) {
+            if (field.equals(CoreTokenField.USER_ID)) {
+                universalId = partialToken.getValue(CoreTokenField.USER_ID);
+                try {
+                    username = new AMIdentity(null, universalId).getName();
+                } catch (IdRepoException ire) {
+                    DEBUG.error("Unable to retrieve username from universal ID: {}", universalId, ire);
+                }
+            } else if (field.equals(SessionTokenField.REALM.getField())) {
+                realm = partialToken.getValue(SessionTokenField.REALM.getField());
+            } else if (field.equals(SessionTokenField.SESSION_HANDLE.getField())) {
+                sessionHandle = partialToken.getValue(SessionTokenField.SESSION_HANDLE.getField());
+            } else if (field.equals(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField())) {
+                maxIdleExpirationTime = DateUtils.toUTCDateFormat(partialToken.<Calendar>getValue(
+                        SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField()).getTime());
+            } else if (field.equals(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField())) {
+                maxSessionExpirationTime = DateUtils.toUTCDateFormat(partialToken.<Calendar>getValue(
+                        SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField()).getTime());
+            }
         }
-        realm = partialToken.getValue(SessionTokenField.REALM.getField());
-        sessionHandle = partialToken.getValue(SessionTokenField.SESSION_HANDLE.getField());
-        maxIdleExpirationTime = DateUtils.toUTCDateFormat(
-                partialToken.<Calendar>getValue(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField()).getTime());
-        maxSessionExpirationTime = DateUtils.toUTCDateFormat(
-                partialToken.<Calendar>getValue(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField()).getTime());
     }
 
     /**
@@ -132,12 +140,12 @@ public class PartialSession {
 
     public JsonValue asJson() {
         return json(object(
-                field(JSON_SESSION_USERNAME, username),
-                field(JSON_SESSION_UNIVERSAL_ID, universalId),
-                field(JSON_SESSION_REALM, realm),
-                field(JSON_SESSION_HANDLE, sessionHandle),
-                field(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, maxIdleExpirationTime),
-                field(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, maxSessionExpirationTime)
+                fieldIfNotNull(JSON_SESSION_USERNAME, username),
+                fieldIfNotNull(JSON_SESSION_UNIVERSAL_ID, universalId),
+                fieldIfNotNull(JSON_SESSION_REALM, realm),
+                fieldIfNotNull(JSON_SESSION_HANDLE, sessionHandle),
+                fieldIfNotNull(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, maxIdleExpirationTime),
+                fieldIfNotNull(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, maxSessionExpirationTime)
         ));
     }
 }
