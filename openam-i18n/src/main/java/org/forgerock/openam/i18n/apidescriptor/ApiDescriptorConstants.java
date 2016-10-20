@@ -229,10 +229,6 @@ public final class ApiDescriptorConstants {
     /** Constant used as key to API Descriptor translations **/
     public static final String APPLICATION_TYPES_RESOURCE = TRANSLATION_KEY_PREFIX + "ApplicationTypesResource#";
 
-    /** Constant used as key to API Descriptor translations **/
-    public static final String POLICY_RESOURCE_WITH_COPY_MOVE = TRANSLATION_KEY_PREFIX +
-            "PolicyResourceWithCopyMoveSupport#";
-
     private ApiDescriptorConstants() {
         // Constants class only
     }

@@ -44,7 +44,7 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(2)
                 .toAnnotatedCollection(PolicyResource.class)
                 .forVersion(2, 1)
-                .toAnnotatedCollection(PolicyResourceWithCopyMoveSupport.class);
+                .toCollection(PolicyResourceWithCopyMoveSupport.class);
 
         realmRouter.route("applications")
                 .auditAs(POLICY)
