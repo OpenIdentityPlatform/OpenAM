@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -13,8 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
+ * Copyright 2013-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.monitoring.cts;
 
 import com.google.inject.Key;
@@ -249,12 +247,11 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
     /**
      * Gets the CTS Reapers current rate of deletion from the CTS monitoring store.
      *
-     * @return The Rate at which the CTS Reaper is deleting sessions.
+     * @return The Rate at which the CTS Reaper is deleting sessions. The monitored value is multiplied by 100 to allow
+     * SNMP clients to display it as floating point value with 2 decimal places.
      */
     @Override
-    public Long getRateOfDeletedSessions() {
-        return (long) reaperMonitoringStore.getRateOfDeletedSessions();
+    public Integer getRateOfDeletedSessions() {
+        return (int) (reaperMonitoringStore.getRateOfDeletedSessions() * 100);
     }
-
 }
-

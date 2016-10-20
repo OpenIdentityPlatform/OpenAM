@@ -1,5 +1,3 @@
---
---  Copyright 2013 ForgeRock AS.
 --  The contents of this file are subject to the terms of the Common Development and
 --  Distribution License (the License). You may not use this file except in compliance with the
 --  License.
@@ -12,10 +10,11 @@
 --  Header, with the fields enclosed by brackets [] replaced by your own identifying
 --  information: "Portions copyright [year] [name of copyright owner]".
 --
+--  Copyright 2013-2016 ForgeRock AS.
+--
 
 --
 -- MIB for CTS Monitoring
--- Copyright (c) 2013-2014, ForgeRock AS, All Rights Reserved.
 --
 
 FORGEROCK-OPENAM-CTS-MIB DEFINITIONS ::= BEGIN
@@ -50,6 +49,16 @@ openam OBJECT IDENTIFIER ::= { snmp 2 }
 --
 
 ctsMonitoring OBJECT IDENTIFIER ::= { openam 3 }
+
+--
+-- Custom syntax definitions
+--
+
+Float2dp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "Float number with 2 decimal point represented as Integer"
+    SYNTAX Integer32
 
 --
 -- Instance of TokenTableEntry
@@ -163,11 +172,11 @@ ctsCRUDOperationsEntry OBJECT-TYPE
 CTSCRUDOperationsEntry ::=
     SEQUENCE        {
                         sCumulativeCount     Counter64,
-                        sAverage             Counter64,
+                        sAverage             Float2dp,
                         sMinimum             Counter64,
                         sMaximum             Counter64,
                         sFailureCount        Counter64,
-                        sFailureAverage      Counter64,
+                        sFailureAverage      Float2dp,
                         sFailureMinimum      Counter64,
                         sFailureMaximum      Counter64
                     }
@@ -181,7 +190,7 @@ sCumulativeCount  	OBJECT-TYPE
     ::= { ctsCRUDOperationsEntry 1 }
 
 sAverage  	OBJECT-TYPE
-    SYNTAX      	Counter64
+    SYNTAX      	Float2dp
     MAX-ACCESS  	read-only
     STATUS      	current
     DESCRIPTION     "Average value"
@@ -213,7 +222,7 @@ sFailureCount       OBJECT-TYPE
     ::= { ctsCRUDOperationsEntry 5 }
 
 sFailureAverage       OBJECT-TYPE
-    SYNTAX          Counter64
+    SYNTAX          Float2dp
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "Average rate of failures of this operation in the current period."
@@ -262,7 +271,7 @@ ctsCRUDOperationsPerTokenTypeEntry     OBJECT-TYPE
 CTSCRUDOperationsPerTokenTypeEntry ::=
     SEQUENCE 		{
                         dCumulative         Counter64,
-                        dAverage 		    Counter64,
+                        dAverage 		    Float2dp,
                         dMinimum 		    Counter64,
                         dMaximum 		    Counter64
                     }
@@ -276,7 +285,7 @@ dCumulativeCount  	OBJECT-TYPE
     ::= { ctsCRUDOperationsPerTokenTypeEntry 1 }
 
 dAverage  	OBJECT-TYPE
-    SYNTAX      	Counter64
+    SYNTAX      	Float2dp
     MAX-ACCESS  	read-only
     STATUS      	current
     DESCRIPTION     "Average value"
@@ -351,7 +360,7 @@ averageDuration OBJECT-TYPE
 --
 
 rateOfDeletedSessions OBJECT-TYPE
-    SYNTAX      	Counter64
+    SYNTAX      	Float2dp
     MAX-ACCESS  	read-only
     STATUS      	current
     DESCRIPTION     "Rate of deleted sessions per reaper run"
@@ -375,7 +384,7 @@ successCumulative  	OBJECT-TYPE
     ::= { ctsConnectionSuccessRate 1 }
 
 successAverage  	OBJECT-TYPE
-    SYNTAX      	Counter64
+    SYNTAX      	Float2dp
     MAX-ACCESS  	read-only
     STATUS      	current
     DESCRIPTION     "Average rate of successful connections made by connection pool"
@@ -409,7 +418,7 @@ failureCumulative  	OBJECT-TYPE
     ::= { ctsConnectionFailureRate 1 }
 
 failureAverage  	OBJECT-TYPE
-    SYNTAX      	Counter64
+    SYNTAX      	Float2dp
     MAX-ACCESS  	read-only
     STATUS      	current
     DESCRIPTION     "Average rate of failed connections made by connection pool"
