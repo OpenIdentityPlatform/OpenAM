@@ -54,17 +54,20 @@
         </dependencySet>
     </dependencySets>
     <fileSets>
-        <!-- Get the ForgeRock binary license (if exists) -->
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
             <directory>${project.build.directory}/legal-notices</directory>
             <includes>
-                <include>*.txt</include>
+                <include>license.txt</include>
             </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
             <directory>../../legal</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>../../license</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>ldif</outputDirectory>
