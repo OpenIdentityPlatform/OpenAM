@@ -72,6 +72,7 @@
                 <include>org.json:json</include>
                 <include>org.codehaus.jackson:jackson-core-asl</include>
                 <include>org.codehaus.jackson:jackson-mapper-asl</include>
+                <include>org.codehaus.jackson:jackson-databind</include>
                 <include>external:jsr173_api</include>
                 <include>javax.mail:mail</include>
                 <include>relaxngDatatype:relaxngDatatype</include>
