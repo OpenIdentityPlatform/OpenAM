@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.worker.process;
 
-import static com.iplanet.dpro.session.SessionEvent.MAX_TIMEOUT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
 import static org.mockito.BDDMockito.*;
@@ -32,6 +31,7 @@ import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
@@ -109,7 +109,7 @@ public class SessionExpiryBatchHandlerTest {
 
         // Then
         assertThat(countDownLatch.getCount()).isZero();
-        verify(mockSession, times(1)).changeStateAndNotify(MAX_TIMEOUT);
+        verify(mockSession, times(1)).changeStateAndNotify(SessionEventType.MAX_TIMEOUT);
         verify(mockSessionAuditor, times(1)).auditActivity(any(SessionInfo.class), eq(AM_SESSION_MAX_TIMED_OUT));
     }
 

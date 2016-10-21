@@ -24,6 +24,7 @@
  *
  * $Id: SessionListener.java,v 1.2 2008/06/25 05:41:29 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -35,12 +36,13 @@ package com.iplanet.dpro.session;
  * 
  * @see com.iplanet.dpro.session.SessionEvent
  */
-
 public interface SessionListener {
+
     /**
      * This method will be invoked when a session event arrives.
      * 
      * @param evt The session event object.
      */
-    public void sessionChanged(SessionEvent evt);
+    void sessionChanged(SessionEvent evt);
+
 }

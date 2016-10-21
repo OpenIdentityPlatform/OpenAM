@@ -29,64 +29,35 @@
 
 package com.iplanet.dpro.session;
 
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.util.Reject;
 
 /**
- * The <code>SessionEvent</code> class represents a session event. If this is
- * a new session, the session event contains all session information of this new
- * session, otherwise, only the changed information of the session is contained
- * in the session event.
- * </p>
- * The following are possible session event types:
- * <code>SESSION_CREATION</code>,
- * <code>IDLE_TIMEOUT</code>,
- * <code>MAX_TIMEOUT</code>,
- * <code>LOGOUT</code>,
- * <code>REACTIVATION</code>, and
- * <code>DESTROY</code>.
+ * This class represents a session event.
+ * <p>
+ * If this is a new session, the event object contains all session information of this new
+ * session; otherwise, only the changed information of the session is contained in the event.
  *
  * @see com.iplanet.dpro.session.Session
+ * @see SessionEventType
  */
-
 public class SessionEvent {
 
     private Session session;
-
-    private int eventType;
-
+    private SessionEventType eventType;
     private long eventTime;
 
-    /** Session creation event */
-    public static final int SESSION_CREATION = 0;
-
-    /** Session idle time out event */
-    public static final int IDLE_TIMEOUT = 1;
-
-    /** Session maximum time out event */
-    public static final int MAX_TIMEOUT = 2;
-
-    /** Session logout event */
-    public static final int LOGOUT = 3;
-
-    /** Session reactivation event */
-    public static final int REACTIVATION = 4;
-
-    /** Session destroy event */
-    public static final int DESTROY = 5;
-
-    /** Session Property changed */
-    public static final int PROPERTY_CHANGED = 6;
-
-    /** Session quota exhausted */
-    public static final int QUOTA_EXHAUSTED = 7;
-
-    /** Session property protected against change */
-    public static final int PROTECTED_PROPERTY = 8;
-
-    public SessionEvent(Session sess, int type, long time) {
-        session = sess;
-        eventType = type;
-        eventTime = time;
+    /**
+     * Creates a new session event.
+     *
+     * @param session The session object which emitted this event.
+     * @param eventType The event which has occurred.
+     * @param eventTime The event time as UTC milliseconds from the epoch.
+     */
+    public SessionEvent(Session session, SessionEventType eventType, long eventTime) {
+        this.session = session;
+        this.eventType = eventType;
+        this.eventTime = eventTime;
     }
 
     /**
@@ -99,18 +70,11 @@ public class SessionEvent {
     }
 
     /**
-     * Gets the type of this event.
+     * Gets the type of event that has occurred.
      * 
-     * @return The type of this event. Possible types are :
-     * 
-     * <code>SESSION_CREATION</code>,
-     * <code>IDLE_TIMEOUT</code>,
-     * <code>MAX_TIMEOUT</code>,
-     * <code>LOGOUT</code>,
-     * <code>REACTIVATION</code>, and
-     * <code>DESTROY</code>.
+     * @return The type of this event.
      */
-    public int getType() {
+    public SessionEventType getType() {
         return eventType;
     }
 
@@ -126,13 +90,13 @@ public class SessionEvent {
     /**
      * Invokes all listeners on the Session associated with the event.
      *
-     * @param evt Non null Session Event.
+     * @param sessionEvent Non null Session Event.
      */
-    public static void invokeListeners(SessionEvent evt) {
-        Reject.ifNull(evt, evt.getSession());
-        final Session session = evt.getSession();
+    public static void invokeListeners(SessionEvent sessionEvent) {
+        Reject.ifNull(sessionEvent, sessionEvent.getSession());
+        final Session session = sessionEvent.getSession();
         for (SessionListener listener : session.getLocalSessionEventListeners()) {
-            listener.sessionChanged(evt);
+            listener.sessionChanged(sessionEvent);
         }
     }
 }

@@ -23,71 +23,80 @@ package org.forgerock.openam.session;
  *
  * @since 14.0.0
  */
-public enum SessionEvent {
+public enum SessionEventType {
 
-    SESSION_CREATION(com.iplanet.dpro.session.SessionEvent.SESSION_CREATION),
+    /**
+     * Session creation event
+     */
+    SESSION_CREATION(0),
 
     /**
      * Session idle time out event
      */
-    IDLE_TIMEOUT(com.iplanet.dpro.session.SessionEvent.IDLE_TIMEOUT),
+    IDLE_TIMEOUT(1),
 
     /**
      * Session maximum time out event
      */
-    MAX_TIMEOUT(com.iplanet.dpro.session.SessionEvent.MAX_TIMEOUT),
+    MAX_TIMEOUT(2),
 
     /**
      * Session logout event
      */
-    LOGOUT(com.iplanet.dpro.session.SessionEvent.LOGOUT),
+    LOGOUT(3),
 
-    /**
-     * Session reactivation event
-     */
-    REACTIVATION(com.iplanet.dpro.session.SessionEvent.REACTIVATION),
+    // code = 4 is skipped as it used to be mapped to REACTIVATION (an event which is no longer possible)
 
     /**
      * Session destroy event
      */
-    DESTROY(com.iplanet.dpro.session.SessionEvent.DESTROY),
+    DESTROY(5),
 
     /**
      * Session Property changed
      */
-    PROPERTY_CHANGED(com.iplanet.dpro.session.SessionEvent.PROPERTY_CHANGED),
+    PROPERTY_CHANGED(6),
 
     /**
      * Session quota exhausted
      */
-    QUOTA_EXHAUSTED(com.iplanet.dpro.session.SessionEvent.QUOTA_EXHAUSTED),
+    QUOTA_EXHAUSTED(7),
 
     /**
      * Session property protected against change
      */
-    PROTECTED_PROPERTY(com.iplanet.dpro.session.SessionEvent.PROTECTED_PROPERTY);
+    PROTECTED_PROPERTY(8);
 
-    private final int sessionEventId;
+    private final int code;
 
-    SessionEvent(int sessionEventId) {
-        this.sessionEventId = sessionEventId;
+    SessionEventType(int code) {
+        this.code = code;
+    }
+
+    /**
+     * An int code identifier for this session event type.
+     *
+     * @return int code.
+     */
+    public int getCode() {
+        return code;
     }
 
     /**
      * Given the session event Id will return the corresponding session event enum.
      *
-     * @param sessionEventId the session event Id
-     * @return the corresponding session event enum
-     * @throws IllegalArgumentException if the session event Id is not valid
+     * @param code the session event type code.
+     * @return the corresponding session event type.
+     * @throws IllegalArgumentException if the session event code is not valid.
      */
-    public static SessionEvent valueOf(int sessionEventId) {
-        for (SessionEvent event : values()) {
-            if (event.sessionEventId == sessionEventId) {
+    public static SessionEventType fromCode(int code) {
+        for (SessionEventType event : values()) {
+            if (event.code == code) {
                 return event;
             }
         }
 
-        throw new IllegalArgumentException("Unknown session event Id " + sessionEventId);
+        throw new IllegalArgumentException("Unknown session event Id " + code);
     }
 
 }

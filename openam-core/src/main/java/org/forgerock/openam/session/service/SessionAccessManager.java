@@ -28,6 +28,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.caching.InternalSessionCache;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.utils.CrestQuery;
@@ -35,7 +36,6 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
@@ -190,14 +190,14 @@ public class SessionAccessManager implements SessionPersistenceManager {
             case DESTROY:
                 delete(session);
                 session.changeStateWithoutNotify(SessionState.DESTROYED);
-                sessionNotificationSender.sendEvent(session, SessionEvent.DESTROY);
+                sessionNotificationSender.sendEvent(session, SessionEventType.DESTROY);
                 return true;
             case MAX_TIMEOUT:
-                session.changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
+                session.changeStateAndNotify(SessionEventType.MAX_TIMEOUT);
                 sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
                 return false;
             case IDLE_TIMEOUT:
-                session.changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
+                session.changeStateAndNotify(SessionEventType.IDLE_TIMEOUT);
                 sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
                 return false;
             default:

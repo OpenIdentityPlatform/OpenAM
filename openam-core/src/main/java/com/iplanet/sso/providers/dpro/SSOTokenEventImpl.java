@@ -24,6 +24,7 @@
  *
  * $Id: SSOTokenEventImpl.java,v 1.2 2008/06/25 05:41:43 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.iplanet.sso.providers.dpro;
@@ -34,42 +35,35 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 
 /**
- * This class <code>SSOTokenEventImpl</code> implements the interface 
- * <code>SSOTokenEvent</code>. The <code> SSOTokenEvent</code>>represents a 
- * change in SSOToken.
- * </p>
- * The following are possible sso token event types: SSO_TOKEN_IDLE_TIMEOUT,
- * SSO_TOKEN_MAX_TIMEOUT and SSO_TOKEN_DESTORY
- * 
- * @see com.iplanet.sso.SSOTokenEvent
+ * This {@link SSOTokenEvent} represents a change in {@link SSOToken} state.
  */
-
 class SSOTokenEventImpl implements SSOTokenEvent {
-    private com.iplanet.dpro.session.SessionEvent sessionEvent;
+
+    private final SessionEvent sessionEvent;
 
   /**
-   * Creates a SSOTokenEventImpl object
+   * Creates a SSOTokenEventImpl object.
+   *
    * @param event The SessionEvent
-   * @see com.iplanet.dpro.session.SessionEvent
+   * @see SessionEvent
    */
-    SSOTokenEventImpl(com.iplanet.dpro.session.SessionEvent event) {
+    SSOTokenEventImpl(SessionEvent event) {
         sessionEvent = event;
     }
 
   /**
-   * Returns the SSOToken
-   * @return token , returns the changed token
+   * Returns the {@link SSOToken}.
+   *
+   * @return The SSO token affected by this event.
    */ 
-   
     public SSOToken getToken() {
-        SSOToken ssoToken = new SSOTokenImpl(sessionEvent.getSession());
-        return ssoToken;
+        return new SSOTokenImpl(sessionEvent.getSession());
     }
 
     /**
-     * Gets the time of this event
+     * Gets the time of this event.
      * 
-     * @return The event time as UTC milliseconds from the epoch
+     * @return The event time as UTC milliseconds from the epoch.
      */
     public long getTime() {
         return sessionEvent.getTime();
@@ -77,26 +71,23 @@ class SSOTokenEventImpl implements SSOTokenEvent {
 
     /**
      * Gets the type of this event.
-     * 
+     *
      * @return The type of this event. Possible types are :
-     *         SSO_TOKEN_IDLE_TIMEOUT, SSO_TOKEN_MAX_TIMEOUT and
-     *         SSO_TOKEN_DESTORY
-     * @exception A
-     *                SSOException is thrown if the SSOTokenEvent type is not
-     *                one of the above.
+     *         {@link SSOTokenEvent#SSO_TOKEN_IDLE_TIMEOUT}, {@link SSOTokenEvent#SSO_TOKEN_MAX_TIMEOUT},
+     *         {@link SSOTokenEvent#SSO_TOKEN_DESTROY} and {@link SSOTokenEvent#SSO_TOKEN_PROPERTY_CHANGED}.
+     * @exception SSOException is thrown if the SSOTokenEvent type is not one of the above.
      */
     public int getType() throws SSOException {
-        int state = sessionEvent.getType();
-        switch (state) {
-        case SessionEvent.IDLE_TIMEOUT:
+        switch (sessionEvent.getType()) {
+        case IDLE_TIMEOUT:
             return SSOTokenEvent.SSO_TOKEN_IDLE_TIMEOUT;
-        case SessionEvent.MAX_TIMEOUT:
+        case MAX_TIMEOUT:
             return SSOTokenEvent.SSO_TOKEN_MAX_TIMEOUT;
-        case SessionEvent.LOGOUT:
+        case LOGOUT:
             return SSOTokenEvent.SSO_TOKEN_DESTROY;
-        case SessionEvent.DESTROY:
+        case DESTROY:
             return SSOTokenEvent.SSO_TOKEN_DESTROY;
-        case SessionEvent.PROPERTY_CHANGED:
+        case PROPERTY_CHANGED:
             return SSOTokenEvent.SSO_TOKEN_PROPERTY_CHANGED;
         }
         throw new SSOException(SSOProviderBundle.rbName, "invalidevent", null);

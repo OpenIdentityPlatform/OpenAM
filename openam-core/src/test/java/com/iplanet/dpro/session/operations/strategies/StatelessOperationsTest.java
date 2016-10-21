@@ -17,23 +17,15 @@
 package com.iplanet.dpro.session.operations.strategies;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.TimeUnit;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.SessionTimedOutException;
-import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.share.SessionInfo;
 import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
@@ -42,6 +34,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.service.SessionLogging;
+import com.iplanet.dpro.session.share.SessionInfo;
 
 public class StatelessOperationsTest {
 
@@ -115,7 +114,7 @@ public class StatelessOperationsTest {
 
         // Then
         verify(mockSessionLogging).logEvent(
-                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEvent.LOGOUT);
+                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEventType.LOGOUT);
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 
@@ -141,7 +140,7 @@ public class StatelessOperationsTest {
 
         // Then
         verify(mockSessionLogging).logEvent(
-                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEvent.DESTROY);
+                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEventType.DESTROY);
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 

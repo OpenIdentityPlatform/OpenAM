@@ -60,6 +60,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.AMSession;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
 import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
 import org.forgerock.util.annotations.VisibleForTesting;
@@ -619,7 +620,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 		try {
         	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
 		} catch (SessionException se) {
-            sessionLogging.logEvent(toSessionInfo(), SessionEvent.PROTECTED_PROPERTY);
+            sessionLogging.logEvent(toSessionInfo(), SessionEventType.PROTECTED_PROPERTY);
 			throw se;
 		}
         internalPutProperty(key,value);
@@ -684,9 +685,9 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         }
 
         if (sessionState == SessionState.VALID && serviceConfig.isSendPropertyNotification(key)) {
-            sessionService.sendEvent(this, SessionEvent.PROPERTY_CHANGED);
+            sessionService.sendEvent(this, SessionEventType.PROPERTY_CHANGED);
             SessionInfo sessionInfo = toSessionInfo();
-            sessionLogging.logEvent(sessionInfo, SessionEvent.PROPERTY_CHANGED);
+            sessionLogging.logEvent(sessionInfo, SessionEventType.PROPERTY_CHANGED);
             sessionAuditor.auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED);
         }
         notifyPersistenceManager();
@@ -755,7 +756,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         }
         // Exceeded max active sessions, but allow if the user is super-admin
         if ((sessionService.hasExceededMaxSessions()) && !sessionService.isSuperUser(userDN)) {
-            sessionLogging.logSystemMessage(LOG_MSG_SESSION_MAX_LIMIT_REACHED, java.util.logging.Level.INFO);
+            sessionLogging.logSystemMessage(LOG_MSG_SESSION_MAX_LIMIT_REACHED);
             return false;
         }
 
@@ -766,15 +767,15 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
             if (SessionConstraint.checkQuotaAndPerformAction(this)) {
                 debug.message("Session Quota exhausted!");
-                sessionLogging.logEvent(sessionInfo, SessionEvent.QUOTA_EXHAUSTED);
+                sessionLogging.logEvent(sessionInfo, SessionEventType.QUOTA_EXHAUSTED);
                 return false;
             }
         }
         setLatestAccessTime();
         setState(SessionState.VALID);
-        sessionLogging.logEvent(sessionInfo, SessionEvent.SESSION_CREATION);
+        sessionLogging.logEvent(sessionInfo, SessionEventType.SESSION_CREATION);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_CREATED);
-        sessionService.sendEvent(this, SessionEvent.SESSION_CREATION);
+        sessionService.sendEvent(this, SessionEventType.SESSION_CREATION);
 
         if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
             sessionService.incrementActiveSessions();
@@ -860,7 +861,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Changes the state of the session and sends Session Notification when session times out.
      */
-    public void changeStateAndNotify(int eventType) {
+    public void changeStateAndNotify(SessionEventType eventType) {
         sessionLogging.logEvent(toSessionInfo(), eventType);
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
         putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds));
@@ -950,10 +951,10 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * restricted token ids.
      * @return Map of session event URLs and their associated SessionIDs.
      */
-    Map<String, Set<SessionID>> getSessionEventURLs(int eventType, SessionBroadcastMode logoutDestroyBroadcast) {
+    Map<String, Set<SessionID>> getSessionEventURLs(SessionEventType eventType, SessionBroadcastMode logoutDestroyBroadcast) {
         Map<String, Set<SessionID>> urls = new HashMap<>();
 
-        if ((eventType == SessionEvent.DESTROY || eventType == SessionEvent.LOGOUT) &&
+        if ((eventType == SessionEventType.DESTROY || eventType == SessionEventType.LOGOUT) &&
                 logoutDestroyBroadcast != SessionBroadcastMode.OFF) {
             try {
                 String localServer = WebtopNaming.getLocalServer();
@@ -1222,11 +1223,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     // TODO: Don't make this method public
     public void removeSession() {
         SessionInfo sessionInfo = toSessionInfo();
-        sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
+        sessionLogging.logEvent(sessionInfo, SessionEventType.DESTROY);
         sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
         setState(SessionState.DESTROYED);
         sessionService.removeCachedInternalSession(sessionID);
-        sessionService.sendEvent(this, SessionEvent.DESTROY);
+        sessionService.sendEvent(this, SessionEventType.DESTROY);
     }
 
     /**

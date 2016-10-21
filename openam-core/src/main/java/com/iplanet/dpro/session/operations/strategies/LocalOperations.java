@@ -32,6 +32,7 @@ import javax.inject.Named;
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.utils.CrestQuery;
@@ -170,7 +171,7 @@ public class LocalOperations implements SessionOperations {
     private void destroyInternalSession(SessionID sessionID) {
         InternalSession sess = sessionAccessManager.removeInternalSession(sessionID);
         if (sess != null && sess.getState() != INVALID) {
-            signalRemove(sess, SessionEvent.DESTROY);
+            signalRemove(sess, SessionEventType.DESTROY);
             sessionAuditor.auditActivity(sess.toSessionInfo(), AM_SESSION_DESTROYED);
         }
         sessionAccessManager.removeSessionId(sessionID);
@@ -494,7 +495,7 @@ public class LocalOperations implements SessionOperations {
     private void logoutInternalSession(final SessionID sessionId) {
         InternalSession session = sessionAccessManager.removeInternalSession(sessionId);
         if (session != null && session.getState() != INVALID) {
-            signalRemove(session, SessionEvent.LOGOUT);
+            signalRemove(session, SessionEventType.LOGOUT);
             sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);
         }
     }
@@ -504,7 +505,7 @@ public class LocalOperations implements SessionOperations {
      * @param session Non null InternalSession.
      * @param event An integrate from the SessionEvent class.
      */
-    private void signalRemove(InternalSession session, int event) {
+    private void signalRemove(InternalSession session, SessionEventType event) {
         sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(SessionState.DESTROYED);
         sessionNotificationSender.sendEvent(session, event);

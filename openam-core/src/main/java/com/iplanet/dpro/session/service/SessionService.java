@@ -49,6 +49,7 @@ import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
@@ -234,7 +235,7 @@ public class SessionService {
     void destroyInternalSession(SessionID sessionID) {
         InternalSession internalSession = removeCachedInternalSession(sessionID);
         if (internalSession != null && internalSession.getState() != SessionState.INVALID) {
-            signalRemove(internalSession, SessionEvent.DESTROY);
+            signalRemove(internalSession, SessionEventType.DESTROY);
             sessionAuditor.auditActivity(internalSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
         sessionAccessManager.removeSessionId(sessionID);
@@ -252,7 +253,7 @@ public class SessionService {
             authenticationSession = removeCachedInternalSession(sessionID);
         }
         if (authenticationSession != null && authenticationSession.getState() != SessionState.INVALID) {
-            signalRemove(authenticationSession, SessionEvent.DESTROY);
+            signalRemove(authenticationSession, SessionEventType.DESTROY);
             sessionAuditor.auditActivity(authenticationSession.toSessionInfo(), AM_SESSION_DESTROYED);
         }
         sessionAccessManager.removeSessionId(sessionID);
@@ -292,7 +293,7 @@ public class SessionService {
      * @param session Non null InternalSession.
      * @param event An integrate from the SessionEvent class.
      */
-    private void signalRemove(InternalSession session, int event) {
+    private void signalRemove(InternalSession session, SessionEventType event) {
         sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(SessionState.DESTROYED);
         sendEvent(session, event);
@@ -390,7 +391,7 @@ public class SessionService {
      * @param internalSession Internal Session.
      * @param eventType Event Type.
      */
-    public void sendEvent(InternalSession internalSession, int eventType) {
+    public void sendEvent(InternalSession internalSession, SessionEventType eventType) {
         sessionNotificationSender.sendEvent(internalSession, eventType);
     }
 
@@ -465,9 +466,9 @@ public class SessionService {
      * with the corresponding timeout event simultaneously.
      *
      * @param sessionId  The timed out sessions ID
-     * @param changeType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
+     * @param eventType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
      */
-    void execSessionTimeoutHandlers(final SessionID sessionId, final int changeType) {
+    void execSessionTimeoutHandlers(final SessionID sessionId, final SessionEventType eventType) {
         // Take snapshot of reference to ensure atomicity.
         final Set<String> handlers = serviceConfig.getTimeoutHandlers();
 
@@ -485,11 +486,11 @@ public class SessionService {
                                 SessionTimeoutHandler handler =
                                         Class.forName(clazz).asSubclass(
                                                 SessionTimeoutHandler.class).newInstance();
-                                switch (changeType) {
-                                    case SessionEvent.IDLE_TIMEOUT:
+                                switch (eventType) {
+                                    case IDLE_TIMEOUT:
                                         handler.onIdleTimeout(token);
                                         break;
-                                    case SessionEvent.MAX_TIMEOUT:
+                                    case MAX_TIMEOUT:
                                         handler.onMaxTimeout(token);
                                         break;
                                 }

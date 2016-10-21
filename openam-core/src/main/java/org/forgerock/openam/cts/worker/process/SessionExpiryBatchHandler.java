@@ -15,10 +15,10 @@
  */
 package org.forgerock.openam.cts.worker.process;
 
-import static com.iplanet.dpro.session.SessionEvent.IDLE_TIMEOUT;
-import static com.iplanet.dpro.session.SessionEvent.MAX_TIMEOUT;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_IDLE_TIMED_OUT;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
+import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
+import static org.forgerock.openam.session.SessionEventType.IDLE_TIMEOUT;
 
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -30,6 +30,7 @@ import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
@@ -52,19 +53,19 @@ class SessionExpiryBatchHandler {
     private final TaskDispatcher queue;
     private final Provider<SessionAccessManager> sessionAccessManager;
     private final SessionAuditor sessionAuditor;
-    private final int sessionEvent;
+    private final SessionEventType sessionEventType;
     private final EventName auditEvent;
 
     private SessionExpiryBatchHandler(
             final TaskDispatcher queue,
             final Provider<SessionAccessManager> sessionAccessManager,
             final SessionAuditor sessionAuditor,
-            final int sessionEvent,
+            final SessionEventType sessionEventType,
             final EventName auditEvent) {
         this.queue = queue;
         this.sessionAccessManager = sessionAccessManager;
         this.sessionAuditor = sessionAuditor;
-        this.sessionEvent = sessionEvent;
+        this.sessionEventType = sessionEventType;
         this.auditEvent = auditEvent;
     }
 
@@ -102,7 +103,7 @@ class SessionExpiryBatchHandler {
      */
     CountDownLatch timeoutBatch(Collection<PartialToken> tokenIds) throws CoreTokenException {
         CountDownLatch latch = new CountDownLatch(tokenIds.size());
-        StateChangeResultHandler stateChangeResultHandler = new StateChangeResultHandler(sessionEvent, auditEvent, latch);
+        StateChangeResultHandler stateChangeResultHandler = new StateChangeResultHandler(sessionEventType, auditEvent, latch);
 
         for (PartialToken partialToken : tokenIds) {
             // Attempt to timeout session; if setting the session state succeeds, then
@@ -124,22 +125,22 @@ class SessionExpiryBatchHandler {
      */
     private class StateChangeResultHandler implements ResultHandler<Token, CoreTokenException> {
 
-        private final int sessionEvent;
+        private final SessionEventType sessionEventType;
         private final EventName auditEvent;
         private final CountDownLatch latch;
 
         /**
          * Constructs a new {@link CountDownHandler}.
          *
-         * @param sessionEvent Identifies the timeout that has occurred.
+         * @param sessionEventType Identifies the timeout that has occurred.
          * @param auditEvent Identifies the timeout that has occurred.
          * @param latch The {@link CountDownLatch} to update as results and errors are received.
          */
         private StateChangeResultHandler(
-                final int sessionEvent,
+                final SessionEventType sessionEventType,
                 final EventName auditEvent,
                 final CountDownLatch latch) {
-            this.sessionEvent = sessionEvent;
+            this.sessionEventType = sessionEventType;
             this.auditEvent = auditEvent;
             this.latch = latch;
         }
@@ -154,7 +155,7 @@ class SessionExpiryBatchHandler {
             try {
                 String sessionId = result.getAttribute(SessionTokenField.SESSION_ID.getField());
                 InternalSession session = sessionAccessManager.get().getInternalSession(new SessionID(sessionId));
-                session.changeStateAndNotify(sessionEvent);
+                session.changeStateAndNotify(sessionEventType);
                 sessionAuditor.auditActivity(session.toSessionInfo(), auditEvent);
             } finally {
                 latch.countDown();

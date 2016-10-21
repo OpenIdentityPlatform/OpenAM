@@ -46,7 +46,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Topic;
 import org.forgerock.openam.notifications.NotificationsConfig;
-import org.forgerock.openam.session.SessionEvent;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -69,9 +69,6 @@ import com.sun.identity.shared.debug.Debug;
  *
  * Local listeners (i.e. this instance of AM) will be notified by calling SessionNotificationHandler directly.
  */
-/*
- * Further refactoring is warranted.
- */
 @Singleton
 public class SessionNotificationSender {
 
@@ -83,11 +80,6 @@ public class SessionNotificationSender {
     private final SessionInfoFactory sessionInfoFactory;
     private final ThreadPool threadPool;
     private final NotificationBroker broker;
-
-    /**
-     * The URL Vector for ALL session events : SESSION_CREATION, IDLE_TIMEOUT,
-     * MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY.
-     */
 
     @Inject
     public SessionNotificationSender(
@@ -129,15 +121,15 @@ public class SessionNotificationSender {
      * @param session    Internal Session.
      * @param eventType Event Type.
      */
-    public void sendEvent(InternalSession session, int eventType) {
-        sessionDebug.message("Running sendEvent, type = " + eventType);
+    public void sendEvent(InternalSession session, SessionEventType eventType) {
+        sessionDebug.message("Running sendEvent, type = " + eventType.getCode());
 
         if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
-            SessionEvent sessionEvent = SessionEvent.valueOf(eventType);
-            publishSessionNotification(session.getSessionID(), sessionEvent);
+            // TODO: Pull websocket notification logic into its own class (as SessionEventListener)
+            publishSessionNotification(session.getSessionID(), eventType);
 
             for (SessionID sessionId : session.getRestrictedTokens()) {
-                publishSessionNotification(sessionId, sessionEvent);
+                publishSessionNotification(sessionId, eventType);
             }
         }
 
@@ -155,10 +147,10 @@ public class SessionNotificationSender {
         }
     }
 
-    private void publishSessionNotification(SessionID sessionId, SessionEvent sessionEvent) {
+    private void publishSessionNotification(SessionID sessionId, SessionEventType sessionEventType) {
         JsonValue notification = json(object(
                 field("tokenId", sessionId.toString()),
-                field("eventType", sessionEvent)));
+                field("eventType", sessionEventType)));
         broker.publish(Topic.of("/agent/session"), notification);
     }
 
@@ -168,10 +160,10 @@ public class SessionNotificationSender {
     private class SessionNotificationSenderTask implements Runnable {
 
         private final InternalSession session;
-        private final int eventType;
+        private final SessionEventType eventType;
         private Map<String, Set<SessionID>> urls;
 
-        SessionNotificationSenderTask(InternalSession session, int eventType) {
+        SessionNotificationSenderTask(InternalSession session, SessionEventType eventType) {
             this.session = session;
             this.eventType = eventType;
         }
@@ -193,7 +185,7 @@ public class SessionNotificationSender {
                             for (SessionID sid : entry.getValue()) {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, currentTimeMillis());
+                                        new SessionNotification(info, eventType.getCode(), currentTimeMillis());
                                 SessionNotificationHandler.handler.processLocalNotification(notification);
                             }
                         } else {
@@ -230,7 +222,7 @@ public class SessionNotificationSender {
 
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, currentTimeMillis());
+                                        new SessionNotification(info, eventType.getCode(), currentTimeMillis());
                                 Notification notificationXml = new Notification(notification.toXMLString());
                                 NotificationSet notificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
                                 notificationSet.addNotification(notificationXml);

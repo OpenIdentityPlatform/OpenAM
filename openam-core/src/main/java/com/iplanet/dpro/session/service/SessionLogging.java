@@ -29,7 +29,18 @@
 
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.dpro.session.SessionEvent;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.utils.StringUtils;
+
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogConstants;
@@ -39,15 +50,6 @@ import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 /**
  * Responsible for logging Session events to the audit logs amSSO.access and amSSO.error.
@@ -56,9 +58,6 @@ import java.util.logging.Level;
  * as part of first-pass refactoring to improve SessionService adherence to SRP.
  *
  * @since 13.0.0
- */
-/*
- * Further refactoring is warranted.
  */
 @Singleton
 public class SessionLogging {
@@ -93,11 +92,7 @@ public class SessionLogging {
      * @param sessionInfo SessionInfo
      * @param eventType event type.
      */
-    public void logEvent(SessionInfo sessionInfo, int eventType) {
-        logIt(sessionInfo, getEventId(eventType));
-    }
-
-    private void logIt(SessionInfo sessionInfo, String eventId) {
+    public void logEvent(SessionInfo sessionInfo, SessionEventType eventType) {
         try {
             String clientID = sessionInfo.getClientID();
             String uidData;
@@ -107,8 +102,9 @@ public class SessionLogging {
                 StringTokenizer st = new StringTokenizer(clientID, ",");
                 uidData = (st.hasMoreTokens()) ? st.nextToken() : clientID;
             }
+            String logMessageId = getLogMessageId(eventType);
             String[] data = {uidData};
-            LogRecord lr = getLogMessageProvider().createLogRecord(eventId, data, null);
+            LogRecord lr = getLogMessageProvider().createLogRecord(logMessageId, data, null);
             lr.addLogInfo(LogConstants.LOGIN_ID_SID, sessionInfo.getSessionID());
             lr.addLogInfo(LogConstants.CONTEXT_ID, sessionInfo.getProperties().get(Constants.AM_CTX_ID));
             lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
@@ -122,7 +118,7 @@ public class SessionLogging {
         }
     }
 
-    public void logSystemMessage(String msgID, Level level) {
+    public void logSystemMessage(String msgID) {
         if (!serviceConfig.isLoggingEnabled()) {
             return;
         }
@@ -138,26 +134,24 @@ public class SessionLogging {
         }
     }
 
-    private String getEventId(int eventType) {
+    private String getLogMessageId(SessionEventType eventType) {
 
         switch (eventType) {
-            case SessionEvent.SESSION_CREATION:
+            case SESSION_CREATION:
                 return "SESSION_CREATED";
-            case SessionEvent.IDLE_TIMEOUT:
+            case IDLE_TIMEOUT:
                 return "SESSION_IDLE_TIMED_OUT";
-            case SessionEvent.MAX_TIMEOUT:
+            case MAX_TIMEOUT:
                 return "SESSION_MAX_TIMEOUT";
-            case SessionEvent.LOGOUT:
+            case LOGOUT:
                 return "SESSION_LOGOUT";
-            case SessionEvent.REACTIVATION:
-                return "SESSION_REACTIVATION";
-            case SessionEvent.DESTROY:
+            case DESTROY:
                 return "SESSION_DESTROYED";
-            case SessionEvent.PROPERTY_CHANGED:
+            case PROPERTY_CHANGED:
                 return "SESSION_PROPERTY_CHANGED";
-            case SessionEvent.QUOTA_EXHAUSTED:
+            case QUOTA_EXHAUSTED:
                 return "SESSION_QUOTA_EXHAUSTED";
-            case SessionEvent.PROTECTED_PROPERTY:
+            case PROTECTED_PROPERTY:
                 return "SESSION_PROTECTED_PROPERTY_ERROR";
             default:
                 return "SESSION_UNKNOWN_EVENT";

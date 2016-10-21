@@ -174,7 +174,7 @@ public class SessionCache {
             // ensure session has destroyed state and observers are notified (exactly once)
             if (session.getRemoved().compareAndSet(false, true)) {
                 session.setState(SessionState.DESTROYED);
-                SessionEvent event = new SessionEvent(session, SessionEvent.DESTROY, eventTime);
+                SessionEvent event = new SessionEvent(session, SessionEventType.DESTROY, eventTime);
                 SessionEvent.invokeListeners(event);
             }
         }

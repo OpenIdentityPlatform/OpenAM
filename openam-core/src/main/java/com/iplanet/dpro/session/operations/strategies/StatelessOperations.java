@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
@@ -88,7 +89,7 @@ public class StatelessOperations implements SessionOperations {
     public void logout(final Session session) throws SessionException {
         if (session instanceof StatelessSession) {
             SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEvent.LOGOUT);
+            sessionLogging.logEvent(sessionInfo, SessionEventType.LOGOUT);
             // Required since not possible to mock SessionAuditor in test case
             if (sessionAuditor != null) {
                 sessionAuditor.auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT);
@@ -131,7 +132,7 @@ public class StatelessOperations implements SessionOperations {
 
         if (session instanceof StatelessSession) {
             SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
+            sessionLogging.logEvent(sessionInfo, SessionEventType.DESTROY);
             // Required since not possible to mock SessionAuditor in test case
             if (sessionAuditor != null) {
                 sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);

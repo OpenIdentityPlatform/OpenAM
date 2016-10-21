@@ -36,6 +36,7 @@ import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import java.util.Vector;
@@ -126,7 +127,8 @@ public class SessionNotificationHandler implements NotificationHandler {
             sessionCache.removeSID(sid);
             return;
         }
-        SessionEvent evt = new SessionEvent(session, snot.getNotificationType(), snot.getNotificationTime());
+        SessionEventType sessionEventType = SessionEventType.fromCode(snot.getNotificationType());
+        SessionEvent evt = new SessionEvent(session, sessionEventType, snot.getNotificationTime());
         SessionEvent.invokeListeners(evt);
     }
 

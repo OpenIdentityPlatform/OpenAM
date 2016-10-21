@@ -24,12 +24,16 @@
  *
  * $Id: SSOSessionListener.java,v 1.2 2008/06/25 05:41:43 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.sso.providers.dpro;
 
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.util.Reject;
+
 import com.iplanet.dpro.session.SessionEvent;
+import com.iplanet.dpro.session.SessionListener;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenListener;
 
@@ -41,38 +45,27 @@ import com.iplanet.sso.SSOTokenListener;
  * triggered, which calls the ssoTokenChanged
  * 
  */
-
-public class SSOSessionListener implements com.iplanet.dpro.session.SessionListener {
+public class SSOSessionListener implements SessionListener {
     
-    private SSOTokenListener ssoListener;
+    private final SSOTokenListener ssoListener;
 
     public SSOSessionListener(SSOTokenListener listener) {
+        Reject.ifNull(listener);
         ssoListener = listener;
     }
 
-    /* implement the session changed method */
+    @Override
     public void sessionChanged(SessionEvent evt) {
 
         SSOTokenEvent ssoEvent = new SSOTokenEventImpl(evt);
 
-        /*
-         * we don't care for session creation and reactivation events. we will
-         * ignore them
-         */
-        int evtType = evt.getType();
-        if (evtType == SessionEvent.SESSION_CREATION
-                || evtType == SessionEvent.REACTIVATION) {
-            return;
-        } else {
-            /*
-             * let us catch any errors in ssoTokenChanged call since they are
-             * implemented by the token listeners.
-             */
+        if (evt.getType() != SessionEventType.SESSION_CREATION) {
             try {
                 ssoListener.ssoTokenChanged(ssoEvent);
             } catch (Throwable t) {
-                SSOProviderImpl.debug.error(
-                        "Unknown Error in calling ssoTokenChanged method", t);
+                // Log but otherwise ignore any errors coming from listeners;
+                // an error in one listener should not prevent other listeners receiving notifications.
+                SSOProviderImpl.debug.error("Unknown Error in calling ssoTokenChanged method", t);
             }
         }
     }
