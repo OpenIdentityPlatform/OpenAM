@@ -35,8 +35,6 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
 import org.forgerock.util.time.TimeService;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -138,8 +136,7 @@ public final class InMemoryNotificationBrokerTest {
         verify(consumer).accept(notificationCapture.capture());
 
         assertThat(notificationCapture.getValue().isDefined("timestamp")).isTrue();
-        String expectedDateTime = ISODateTimeFormat.dateTime().print(new DateTime(timeService.now()));
-        assertThat(notificationCapture.getValue().get("timestamp").asString()).isEqualTo(expectedDateTime);
+        assertThat(notificationCapture.getValue().get("timestamp").asString()).isEqualTo("2016-01-01T12:00:00.000Z");
     }
 
     @Test

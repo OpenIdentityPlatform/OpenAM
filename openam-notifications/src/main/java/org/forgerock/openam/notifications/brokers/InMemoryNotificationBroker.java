@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 public final class InMemoryNotificationBroker implements NotificationBroker {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryNotificationBroker.class);
-    private static final DateTimeFormatter TS_FORMATTER = ISODateTimeFormat.dateTime();
+    private static final DateTimeFormatter TS_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
 
     private final BlockingQueue<NotificationEntry> queue;
     private final List<InternalSubscription> subscriptions;

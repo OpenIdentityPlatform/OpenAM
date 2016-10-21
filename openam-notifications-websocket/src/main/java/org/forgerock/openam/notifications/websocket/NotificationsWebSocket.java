@@ -149,12 +149,14 @@ public final class NotificationsWebSocket {
         String topic = json.get("topic").asString();
 
         subscription.bindTo(Topic.of(topic));
-        sendMessage(session, id, "subscription registered");
+        sendMessage(session, id, topic, "subscription registered");
     }
 
-    private void sendMessage(Session session, String id, String message) {
+    private void sendMessage(Session session, String id, String topic, String message) {
         try {
-            JsonValue json = json(object(field("message", message)));
+            JsonValue json = json(object(
+                    field("topic", topic),
+                    field("message", message)));
 
             if (id != null) {
                 json.put("id", id);
