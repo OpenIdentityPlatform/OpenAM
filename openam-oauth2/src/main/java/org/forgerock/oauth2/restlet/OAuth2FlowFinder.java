@@ -83,7 +83,7 @@ public class OAuth2FlowFinder extends Finder {
         if (finder == null) {
             logger.error("Unsupported grant type: Type is not supported: " + grantType);
             return new ErrorResource(exceptionHandler,
-                    new UnsupportedGrantTypeException("Grant type is not supported: " + grantType));
+                    new UnsupportedGrantTypeException("Grant type is not supported"));
         }
 
         try {
