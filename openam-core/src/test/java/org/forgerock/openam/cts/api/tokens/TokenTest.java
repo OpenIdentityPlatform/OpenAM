@@ -151,4 +151,20 @@ public class TokenTest {
         // Then
         assertEquals(values, new HashSet<>(Arrays.asList("one", "two", "three")));
     }
+
+    @Test
+    public void shouldCopy() {
+        // Given
+        Token token = new Token("id", TokenType.SESSION);
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "one");
+
+        Token token2 = new Token(token);
+
+        // When
+        Set<String> set = token2.getAttribute(CoreTokenField.MULTI_STRING_ONE);
+
+        // Then
+
+        assert(set.contains("one"));
+    }
 }

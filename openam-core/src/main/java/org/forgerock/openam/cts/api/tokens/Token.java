@@ -19,7 +19,6 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -302,21 +301,26 @@ public class Token {
      * @param value May be null
      */
     private void put(CoreTokenField field, Object value) {
-        String s;
-        if (value == null) {
-            s = null;
-        } else if (CoreTokenField.TOKEN_TYPE.equals(field)) {
-            s = ((TokenType) value).name();
-        } else if (CoreTokenFieldTypes.isCalendar(field)) {
-            s = GeneralizedTime.valueOf((Calendar) value).toString();
-        } else if (CoreTokenFieldTypes.isByteArray(field)) {
-            s = Base64.encode((byte[]) value);
-        } else if (CoreTokenFieldTypes.isInteger(field)) {
-            s = Integer.toString((Integer) value);
+        if (CoreTokenFieldTypes.isMulti(field)) {
+            putMulti(field, (Set) value);
         } else {
-            s = value.toString();
+
+            String s;
+            if (value == null) {
+                s = null;
+            } else if (CoreTokenField.TOKEN_TYPE.equals(field)) {
+                s = ((TokenType) value).name();
+            } else if (CoreTokenFieldTypes.isCalendar(field)) {
+                s = GeneralizedTime.valueOf((Calendar) value).toString();
+            } else if (CoreTokenFieldTypes.isByteArray(field)) {
+                s = Base64.encode((byte[]) value);
+            } else if (CoreTokenFieldTypes.isInteger(field)) {
+                s = Integer.toString((Integer) value);
+            } else {
+                s = value.toString();
+            }
+            attributes.put(field.toString(), s);
         }
-        attributes.put(field.toString(), s);
     }
 
     /**
