@@ -16,10 +16,13 @@
 package org.forgerock.openam.dpro.session;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.util.Calendar;
 
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.session.SessionConstants;
@@ -34,14 +37,28 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * The JSON representation of partially described session objects.
  */
+@Title(SESSION_RESOURCE + "schema." + TITLE)
+@Description(SESSION_RESOURCE + "schema." + DESCRIPTION)
 public class PartialSession {
 
     private static final Debug DEBUG = Debug.getInstance(SessionConstants.SESSION_DEBUG);
+    @Title(SESSION_RESOURCE + "schema.property.username." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.username." + DESCRIPTION)
     private String username;
+    @Title(SESSION_RESOURCE + "schema.property.universalId." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.universalId." + DESCRIPTION)
     private String universalId;
+    @Title(SESSION_RESOURCE + "schema.property.realm." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.realm." + DESCRIPTION)
     private String realm;
+    @Title(SESSION_RESOURCE + "schema.property.sessionHandle." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.sessionHandle." + DESCRIPTION)
     private String sessionHandle;
+    @Title(SESSION_RESOURCE + "schema.property.maxIdleExpirationTime." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.maxIdleExpirationTime." + DESCRIPTION)
     private String maxIdleExpirationTime;
+    @Title(SESSION_RESOURCE + "schema.property.maxSessionExpirationTime." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.maxSessionExpirationTime." + DESCRIPTION)
     private String maxSessionExpirationTime;
 
     public PartialSession(PartialToken partialToken) {
@@ -57,6 +74,60 @@ public class PartialSession {
                 partialToken.<Calendar>getValue(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField()).getTime());
         maxSessionExpirationTime = DateUtils.toUTCDateFormat(
                 partialToken.<Calendar>getValue(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField()).getTime());
+    }
+
+    /**
+     * Returns the username associated with this partial session.
+     *
+     * @return The user friendly username.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Returns the universal ID associated with this partial session.
+     *
+     * @return The universal ID of the user this partial session belongs to.
+     */
+    public String getUniversalId() {
+        return universalId;
+    }
+
+    /**
+     * Returns the realm associated with this partial session.
+     *
+     * @return The realm where this session was created.
+     */
+    public String getRealm() {
+        return realm;
+    }
+
+    /**
+     * Returns the session handle associated with this partial session.
+     *
+     * @return The session's handle.
+     */
+    public String getSessionHandle() {
+        return sessionHandle;
+    }
+
+    /**
+     * The timestamp of when the max idle timeout will be reached.
+     *
+     * @return When this session will time out due to inactivity.
+     */
+    public String getMaxIdleExpirationTime() {
+        return maxIdleExpirationTime;
+    }
+
+    /**
+     * The timestamp of when the max session timeout will be reached.
+     *
+     * @return When the session will time out.
+     */
+    public String getMaxSessionExpirationTime() {
+        return maxSessionExpirationTime;
     }
 
     public JsonValue asJson() {

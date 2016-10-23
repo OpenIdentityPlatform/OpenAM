@@ -18,6 +18,8 @@ package org.forgerock.openam.core.rest.session;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_REALM;
+import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_USERNAME;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
@@ -39,10 +41,8 @@ import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
-import org.forgerock.api.annotations.Queries;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Schema;
-import org.forgerock.api.enums.ParameterSource;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.resource.ActionRequest;
@@ -98,7 +98,7 @@ import org.forgerock.util.promise.Promise;
                 title = SESSION_RESOURCE + TITLE,
                 description = SESSION_RESOURCE + DESCRIPTION,
                 mvccSupported = false,
-                resourceSchema = @Schema(schemaResource = "SessionResource.schema.json")
+                resourceSchema = @Schema(fromType = PartialSession.class)
         )
 )
 public class SessionResourceV2 implements CollectionResourceProvider {
@@ -116,11 +116,6 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     public static final String GET_SESSION_PROPERTIES_ACTION_ID = "getSessionProperties";
     public static final String UPDATE_SESSION_PROPERTIES_ACTION_ID = "updateSessionProperties";
 
-    public static final String KEYWORD_ALL = "all";
-    public static final String KEYWORD_SERVER_ID = "serverId";
-
-    private final String ALL_QUERY_ID = "all";
-    private final String SERVER_QUERY_ID = "server";
     private final SessionPropertyWhitelist sessionPropertyWhitelist;
 
     private final Map<String, ActionHandler> actionHandlers;
@@ -322,37 +317,19 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
-    @Queries({
-            @Query(
-                    operationDescription = @Operation(
-                            description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
-                            errors = {
-                                    @ApiError(
-                                            code = 401,
-                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                    )
-                            },
-                            parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE +
-                                    SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION,
-                                    source = ParameterSource.ADDITIONAL)
-                    ),
-                    type = QueryType.ID,
-                    id = SERVER_QUERY_ID
-            ),
-            @Query(
-                    operationDescription = @Operation(
-                            description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
-                            errors = {
-                                    @ApiError(
-                                            code = 401,
-                                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                                    )
-                            }
-                    ),
-                    type = QueryType.ID,
-                    id = ALL_QUERY_ID
-            )
-    })
+    @Query(
+            operationDescription = @Operation(
+                    description = SESSION_RESOURCE + QUERY_DESCRIPTION,
+                    errors = {
+                            @ApiError(
+                                    code = 400,
+                                    description = SESSION_RESOURCE + QUERY + ERROR_400_DESCRIPTION),
+                            @ApiError(
+                                    code = 500,
+                                    description = SESSION_RESOURCE + QUERY + ERROR_500_DESCRIPTION)}),
+            queryableFields = {JSON_SESSION_USERNAME, JSON_SESSION_REALM},
+            type = QueryType.FILTER
+    )
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
