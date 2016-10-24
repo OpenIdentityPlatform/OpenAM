@@ -20,12 +20,14 @@
  */
 define([
     "org/forgerock/openam/ui/admin/utils/form/bindSavePromiseToElement",
-    "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting",
+    "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction",
     "org/forgerock/openam/ui/admin/utils/form/setActiveTab",
     "org/forgerock/openam/ui/admin/utils/deprecatedWarning"
-], (bindSavePromiseToElement, showConfirmationBeforeDeleting, setActiveTab, deprecatedWarning) => {
+], (bindSavePromiseToElement, showConfirmationBeforeAction, setActiveTab, deprecatedWarning) => {
 
     const obj = {};
+
+    showConfirmationBeforeAction = showConfirmationBeforeAction.default;
 
     obj.bindSavePromiseToElement = function (promise, element) {
         deprecatedWarning(
@@ -38,9 +40,9 @@ define([
     obj.showConfirmationBeforeDeleting = function (msg, deleteCallback) {
         deprecatedWarning(
             "FormHelper.showConfirmationBeforeDeleting",
-            "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting"
+            "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction"
         );
-        return showConfirmationBeforeDeleting(msg, deleteCallback);
+        return showConfirmationBeforeAction(msg, deleteCallback);
     };
 
     obj.setActiveTab = function (msg, deleteCallback) {

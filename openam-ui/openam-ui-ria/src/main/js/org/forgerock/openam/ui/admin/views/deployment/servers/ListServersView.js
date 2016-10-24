@@ -18,13 +18,15 @@ define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeDeleting",
+    "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/services/global/ServersService",
     "org/forgerock/openam/ui/common/components/TemplateBasedView",
     "org/forgerock/openam/ui/admin/views/common/ToggleCardListView"
-], ($, _, AbstractView, showConfirmationBeforeDeleting, Messages, ServersService, TemplateBasedView,
+], ($, _, AbstractView, showConfirmationBeforeAction, Messages, ServersService, TemplateBasedView,
     ToggleCardListView) => {
+
+    showConfirmationBeforeAction = showConfirmationBeforeAction.default;
 
     const ListServersView = AbstractView.extend({
         template: "templates/admin/views/deployment/servers/ListServersTemplate.html",
@@ -38,7 +40,7 @@ define([
         onDelete (event) {
             event.preventDefault();
             const id = $(event.currentTarget).data().deleteItem;
-            showConfirmationBeforeDeleting({
+            showConfirmationBeforeAction({
                 message: $.t("console.common.confirmDeleteText", { type: $.t("console.servers.common.confirmType") })
             },
             () => {

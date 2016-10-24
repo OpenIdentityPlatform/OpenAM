@@ -339,6 +339,7 @@
             "propertyValue": "Property Value",
             "addName": "Add a name",
             "addValue": "Add a value",
+            "confirm": "Confirm",
             "validation" : {
                 "errorsNotSaved" : "Validation errors exist in form. Changes not saved.",
                 "VALID_PHONE_FORMAT": "Contains invalid characters",
@@ -744,6 +745,7 @@
             "type": "Type",
             "editFullScreen": "Edit Fullscreen",
             "exitFullScreen": "Exit Fullscreen",
+            "confirmAction": "Are you sure that you want to perform this action?",
             "confirmDelete": "Confirm delete",
             "confirmDeleteText": "Are you sure that you want to delete this __type__?",
             "confirmDeleteSelected": "Are you sure that you want to delete these items?",
