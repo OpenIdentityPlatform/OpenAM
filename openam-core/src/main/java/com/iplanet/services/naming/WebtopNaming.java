@@ -381,12 +381,12 @@ public class WebtopNaming {
      * @throws URLNotFoundException
      */
     public static String mapSiteToServer(SessionID sid) throws URLNotFoundException {
-        String mapSessionServiceUrl = mapSiteToServer(sid.getSessionServerProtocol(), sid.getSessionServer(),
-                sid.getSessionServerPort(), sid.getSessionServerURI()).toString();
+        URL mapSessionServiceUrl = mapSiteToServer(sid.getSessionServerProtocol(), sid.getSessionServer(),
+                sid.getSessionServerPort(), sid.getSessionServerURI());
         if (mapSessionServiceUrl == null) {
             return sid.getSessionServerURL();
         }
-        return mapSessionServiceUrl;
+        return mapSessionServiceUrl.toString();
     }
 
     /**
