@@ -24,11 +24,29 @@ import fetchUrl from "org/forgerock/openam/ui/common/services/fetchUrl";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
-export function getByUserId (id, realm) {
+export function getByUserIdAndRealm (id, realm) {
     const queryFilter = encodeURIComponent(`username eq "${id}" and realm eq "${realm}"`);
 
     return obj.serviceCall({
         url: fetchUrl(`/sessions?_queryFilter=${queryFilter}`, { realm: false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
+    }).then((response) => response.result);
+}
+
+export function getByRealm (realm) {
+    const queryFilter = encodeURIComponent(`realm eq "${realm}"`);
+
+    return obj.serviceCall({
+        url: fetchUrl(`/sessions?_queryFilter=${queryFilter}`, { realm: false }),
+        headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
+    }).then((response) => response.result);
+}
+
+export function invalidateByHandles (handles) {
+    return obj.serviceCall({
+        url: fetchUrl("/sessions?_action=logoutByHandle", { realm: false }),
+        type: "POST",
+        headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+        data: JSON.stringify({ sessionHandles: handles })
     }).then((response) => response.result);
 }

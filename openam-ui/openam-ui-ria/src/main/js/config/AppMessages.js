@@ -131,6 +131,11 @@ define([
         "resTypeErrorNoActions": {
             msg: "config.messages.AdminMessages.policies.error.noActions",
             type: "error"
+        },
+
+        "invalidationSuccessful": {
+            msg: "console.sessions.invalidationSuccessful",
+            type: "info"
         }
     };
 });
