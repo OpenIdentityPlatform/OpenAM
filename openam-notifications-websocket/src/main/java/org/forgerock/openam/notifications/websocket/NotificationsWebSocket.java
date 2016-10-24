@@ -24,7 +24,9 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.websocket.EncodeException;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -86,7 +88,7 @@ public final class NotificationsWebSocket {
     }
 
     /**
-     * When a new notification websocket is opened, creates a new subscription.
+     * See {@link OnOpen}.
      *
      * @param session the websocket session
      */
@@ -105,7 +107,7 @@ public final class NotificationsWebSocket {
     }
 
     /**
-     * Handles the processing of messages sent down the notification websocket.
+     * See {@link OnMessage}.
      *
      * @param session the websocket session
      * @param json the json message
@@ -150,6 +152,17 @@ public final class NotificationsWebSocket {
 
         subscription.bindTo(Topic.of(topic));
         sendMessage(session, id, topic, "subscription registered");
+    }
+
+    /**
+     * See {@link javax.websocket.Endpoint#onError(Session, Throwable)}.
+     *
+     * @param session The WebSocket session.
+     * @param error The error.
+     */
+    @OnError
+    public void error(Session session, Throwable error) {
+        sendError(session, null, error.getMessage());
     }
 
     private void sendMessage(Session session, String id, String topic, String message) {
