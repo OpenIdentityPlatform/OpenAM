@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2016 Agile Digital Engineering
  */
 
 package com.sun.identity.entitlement;
@@ -40,8 +41,8 @@ public class JwtPrincipal implements Principal {
         return jwt.get("sub").asString();
     }
 
-    public String getClaim(String key) {
-        return jwt.get(key).asString();
+    public JsonValue getClaim(String key) {
+        return jwt.get(key);
     }
 
     @Override

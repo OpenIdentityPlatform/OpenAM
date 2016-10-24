@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2016 Agile Digital Engineering
  */
 
 package com.sun.identity.entitlement;
@@ -22,7 +23,9 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
@@ -30,6 +33,7 @@ import static org.forgerock.json.JsonValue.*;
 public class JwtClaimSubjectTest {
     private static final String CLAIM = "testClaim";
     private static final String VALUE = "testValue";
+    private static final List<String> ARRAY_VALUE = CollectionUtils.asList("ignoreme", VALUE, "ignoremetoo");
 
     private JwtClaimSubject testSubject;
 
@@ -101,7 +105,44 @@ public class JwtClaimSubjectTest {
         assertThat(result.isSatisfied()).isTrue();
     }
 
-    private Subject getTestSubject(final String claimName, final String claimValue) {
+    @Test
+    public void shouldAllowIfArrayClaimDoesMatch() throws Exception {
+        // Given
+        final Subject subject = getTestSubject(CLAIM, ARRAY_VALUE);
+        
+        // When
+        final SubjectDecision result = testSubject.evaluate(null, null, subject, null, null);
+
+        // Then
+        assertThat(result.isSatisfied()).isTrue();
+    }
+
+    @Test
+    public void shouldDenyIfArrayClaimDoesNotMatch() throws Exception {
+        // Given
+        List<String> claimValueWrong = Arrays.asList(new String[] {"ignoreme", "ignoremetoo"});
+        final Subject subject = getTestSubject(CLAIM, claimValueWrong);
+
+        // When
+        final SubjectDecision result = testSubject.evaluate(null, null, subject, null, null);
+
+        // Then
+        assertThat(result.isSatisfied()).isFalse();
+    }
+
+    @Test
+    public void shouldDenyIfArrayClaimIsMissing() throws Exception {
+        // Given
+        final Subject subject = getTestSubject("wibble", ARRAY_VALUE);
+
+        // When
+        final SubjectDecision result = testSubject.evaluate(null, null, subject, null, null);
+
+        // Then
+        assertThat(result.isSatisfied()).isFalse();
+    }
+
+    private Subject getTestSubject(final String claimName, final Object claimValue) {
         final JwtPrincipal principal = new JwtPrincipal(json(object(
                 field("sub", "test"),
                 field(claimName, claimValue))));
