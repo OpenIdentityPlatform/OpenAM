@@ -175,7 +175,7 @@ public class SessionCache {
             if (session.getRemoved().compareAndSet(false, true)) {
                 session.setState(SessionState.DESTROYED);
                 SessionEvent event = new SessionEvent(session, SessionEventType.DESTROY, eventTime);
-                SessionEvent.invokeListeners(event);
+                Session.invokeListeners(event);
             }
         }
     }

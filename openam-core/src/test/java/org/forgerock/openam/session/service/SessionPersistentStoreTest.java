@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.session.service;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import org.fest.util.Collections;

@@ -56,9 +56,9 @@ import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
@@ -68,9 +68,9 @@ import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFact
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
 import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
-import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
-import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
 import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
+import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
+import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
@@ -130,8 +130,10 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
+import com.iplanet.dpro.session.service.InternalSessionListener;
 import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.SessionConstants;
+import com.iplanet.dpro.session.service.SessionEventBroker;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -250,9 +252,7 @@ public class CoreGuiceModule extends AbstractModule {
         // SAML2 token repository dependencies
         bind(new TypeLiteral<TokenAdapter<SAMLToken>>(){}).to(SAMLAdapter.class);
 
-        /**
-         * Session related dependencies.
-         */
+        // Session related dependencies
         bind(InternalSessionCache.class).to(InternalSessionStore.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
@@ -268,10 +268,9 @@ public class CoreGuiceModule extends AbstractModule {
                 return InjectorHolder.getInstance(SessionService.class);
             }
         });
-
-        bind(Debug.class)
-                .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
+        bind(Debug.class).annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
+        bind(InternalSessionListener.class).to(SessionEventBroker.class).in(Singleton.class);
 
 
         bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})

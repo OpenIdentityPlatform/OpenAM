@@ -38,13 +38,15 @@ import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionEvent;
+import com.iplanet.dpro.session.service.InternalSessionListener;
 import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.SessionEventBroker;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
@@ -75,9 +77,9 @@ public class LocalOperations implements SessionOperations {
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
+    private final InternalSessionListener sessionEventBroker;
     private final SessionChangeAuthorizer sessionChangeAuthorizer;
     private final SessionServiceConfig serviceConfig;
-
 
     /**
      * Guice initialised constructor.
@@ -88,6 +90,7 @@ public class LocalOperations implements SessionOperations {
      * @param sessionNotificationSender notification sender for session removal notification
      * @param sessionLogging special logging service for session removal logging
      * @param sessionAuditor audit logger
+     * @param sessionEventBroker observer of session events
      * @param sessionChangeAuthorizer class for verifying permissions and authorisation for the current user to
 *                                perform tasks on the session.  Used during deleting a session and getting access
      * @param serviceConfig contains configuration relating to the session service.
@@ -101,6 +104,7 @@ public class LocalOperations implements SessionOperations {
                     final SessionNotificationSender sessionNotificationSender,
                     final SessionLogging sessionLogging,
                     final SessionAuditor sessionAuditor,
+                    final SessionEventBroker sessionEventBroker,
                     final SessionChangeAuthorizer sessionChangeAuthorizer,
                     final SessionServiceConfig serviceConfig) {
         this.debug = debug;
@@ -110,6 +114,7 @@ public class LocalOperations implements SessionOperations {
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
+        this.sessionEventBroker = sessionEventBroker;
         this.sessionChangeAuthorizer = sessionChangeAuthorizer;
         this.serviceConfig = serviceConfig;
     }
@@ -506,6 +511,7 @@ public class LocalOperations implements SessionOperations {
      * @param event An integrate from the SessionEvent class.
      */
     private void signalRemove(InternalSession session, SessionEventType event) {
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, event));
         sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(SessionState.DESTROYED);
         sessionNotificationSender.sendEvent(session, event);

@@ -58,7 +58,6 @@ import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
@@ -97,6 +96,7 @@ public class SessionService {
     private final MonitoringOperations monitoringOperations;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
+    private final InternalSessionListener sessionEventBroker;
     private final InternalSessionFactory internalSessionFactory;
     private final SessionNotificationSender sessionNotificationSender;
     private final SessionMaxStats maxSessionStats; // TODO: Inject from Guice
@@ -123,6 +123,7 @@ public class SessionService {
             final MonitoringOperations monitoringOperations,
             final SessionLogging sessionLogging,
             final SessionAuditor sessionAuditor,
+            final SessionEventBroker sessionEventBroker,
             final InternalSessionFactory internalSessionFactory,
             final SessionNotificationSender sessionNotificationSender,
             final SessionAccessManager sessionAccessManager,
@@ -138,6 +139,7 @@ public class SessionService {
         this.monitoringOperations = monitoringOperations;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
+        this.sessionEventBroker = sessionEventBroker;
         this.internalSessionFactory = internalSessionFactory;
         this.sessionOperationStrategy = sessionOperationStrategy;
         this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
@@ -294,6 +296,7 @@ public class SessionService {
      * @param event An integrate from the SessionEvent class.
      */
     private void signalRemove(InternalSession session, SessionEventType event) {
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, event));
         sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(SessionState.DESTROYED);
         sendEvent(session, event);
@@ -468,6 +471,7 @@ public class SessionService {
      * @param sessionId  The timed out sessions ID
      * @param eventType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
      */
+    // TODO: Convert to session listener (AME-12528)
     void execSessionTimeoutHandlers(final SessionID sessionId, final SessionEventType eventType) {
         // Take snapshot of reference to ensure atomicity.
         final Set<String> handlers = serviceConfig.getTimeoutHandlers();

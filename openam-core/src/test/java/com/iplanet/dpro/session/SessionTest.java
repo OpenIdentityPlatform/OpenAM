@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session;
 
@@ -26,7 +26,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class SessionEventTest {
+public class SessionTest {
+
     @Test
     public void shouldInvokeAllListenersOnSession() {
         // Given
@@ -35,12 +36,12 @@ public class SessionEventTest {
                 mock(SessionListener.class),
                 mock(SessionListener.class),
                 mock(SessionListener.class));
-        given(mockSession.getLocalSessionEventListeners()).willReturn(new HashSet<SessionListener>(listeners));
+        given(mockSession.getLocalSessionEventListeners()).willReturn(new HashSet<>(listeners));
         SessionEvent mockEvent = mock(SessionEvent.class);
         given(mockEvent.getSession()).willReturn(mockSession);
 
         // When
-        SessionEvent.invokeListeners(mockEvent);
+        Session.invokeListeners(mockEvent);
 
         // Then
         for (SessionListener mockListener : listeners) {

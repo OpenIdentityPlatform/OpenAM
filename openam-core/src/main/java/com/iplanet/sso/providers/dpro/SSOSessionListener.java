@@ -29,12 +29,10 @@
 
 package com.iplanet.sso.providers.dpro;
 
-import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionListener;
-import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenListener;
 
 /**
@@ -55,18 +53,26 @@ public class SSOSessionListener implements SessionListener {
     }
 
     @Override
-    public void sessionChanged(SessionEvent evt) {
+    public void sessionChanged(SessionEvent sessionEvent) {
+        switch (sessionEvent.getType()) {
+        case IDLE_TIMEOUT:
+        case MAX_TIMEOUT:
+        case LOGOUT:
+        case DESTROY:
+        case PROPERTY_CHANGED:
+            tryToPropagateEventToTokenListeners(sessionEvent);
+            break;
+        default:
+            // ignore all other session event types
+        }
+    }
 
-        SSOTokenEvent ssoEvent = new SSOTokenEventImpl(evt);
-
-        if (evt.getType() != SessionEventType.SESSION_CREATION) {
-            try {
-                ssoListener.ssoTokenChanged(ssoEvent);
-            } catch (Throwable t) {
-                // Log but otherwise ignore any errors coming from listeners;
-                // an error in one listener should not prevent other listeners receiving notifications.
-                SSOProviderImpl.debug.error("Unknown Error in calling ssoTokenChanged method", t);
-            }
+    private void tryToPropagateEventToTokenListeners(SessionEvent sessionEvent) {
+        try {
+            ssoListener.ssoTokenChanged(new SSOTokenEventImpl(sessionEvent));
+        } catch (Throwable t) {
+            // SSOTokenListener should be responsible for handling its own errors
+            SSOProviderImpl.debug.error("Unknown Error in calling ssoTokenChanged method", t);
         }
     }
 }

@@ -48,6 +48,8 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.operations.ClientSdkSessionOperationStrategy;
@@ -663,8 +665,22 @@ public class Session implements Blacklistable, AMSession{
      *
      * @return SessionEventListener vector
      */
-    public Set<SessionListener> getLocalSessionEventListeners() {
+    @VisibleForTesting
+    Set<SessionListener> getLocalSessionEventListeners() {
         return localSessionEventListeners;
+    }
+
+    /**
+     * Invokes all listeners on the Session associated with the event.
+     *
+     * @param sessionEvent Non null Session Event.
+     */
+    public static void invokeListeners(SessionEvent sessionEvent) {
+        Reject.ifNull(sessionEvent, sessionEvent.getSession());
+        final Session session = sessionEvent.getSession();
+        for (SessionListener listener : session.getLocalSessionEventListeners()) {
+            listener.sessionChanged(sessionEvent);
+        }
     }
 
     /**

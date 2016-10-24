@@ -17,19 +17,27 @@
 package com.iplanet.dpro.session.service;
 
 import static java.util.concurrent.TimeUnit.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
-import org.forgerock.openam.session.SessionMeta;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.utils.TimeTravelUtil;
 import org.forgerock.openam.utils.TimeTravelUtil.FrozenTimeService;
 import org.forgerock.util.time.TimeService;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.debug.Debug;
 
 public class InternalSessionTest {
@@ -38,6 +46,9 @@ public class InternalSessionTest {
     @Mock private SessionServiceConfig mockSessionServiceConfig;
     @Mock private SessionLogging mockSessionLogging;
     @Mock private SessionAuditor mockSessionAuditor;
+    @Mock private SessionEventBroker mockSessionEventBroker;
+    @Mock private SessionUtilsWrapper mockSessionUtils;
+    @Mock private SessionConstraint sessionConstraint;
     @Mock private Debug mockDebug;
 
     @BeforeMethod
@@ -51,6 +62,104 @@ public class InternalSessionTest {
     public void tearDown() {
         TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
     }
+
+    // Session events
+
+    @Test
+    public void firesInternalSessionEventWhenAttemptToSetProtectedPropertyIsBlocked() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+        final SSOToken clientToken = mock(SSOToken.class);
+        doThrow(SessionException.class)
+                .when(mockSessionUtils).checkPermissionToSetProperty(eq(clientToken), eq("key"), eq("value"));
+
+        // When
+        try {
+            session.putExternalProperty(clientToken, "key", "value");
+        } catch (SessionException se) {
+            // expected
+        }
+
+        // Then
+        verifyEvent(session, SessionEventType.PROTECTED_PROPERTY);
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenProtectedPropertyIsSet() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+        final SSOToken clientToken = mock(SSOToken.class);
+        doNothing().when(mockSessionUtils).checkPermissionToSetProperty(eq(clientToken), eq("key"), eq("value"));
+        session.changeStateWithoutNotify(SessionState.VALID);
+        given(mockSessionServiceConfig.isSendPropertyNotification(eq("key"))).willReturn(true);
+
+        // When
+        session.putExternalProperty(clientToken, "key", "value");
+
+        // Then
+        verifyEvent(session, SessionEventType.PROPERTY_CHANGED);
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenActivatingNonAdminUserSessionAndMaxSessionLimitReached() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+        given(mockSessionService.hasExceededMaxSessions()).willReturn(true);
+        given(mockSessionService.isSuperUser(eq("userDN"))).willReturn(false);
+
+        // When
+        boolean activated = session.activate("userDN");
+
+        // Then
+        assertThat(activated).as("session should not be activated").isEqualTo(false);
+        verifyEvent(session, SessionEventType.SESSION_MAX_LIMIT_REACHED);
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenActivatingSessionAndUserSessionQuotaExhausted() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+        given(mockSessionService.hasExceededMaxSessions()).willReturn(false);
+        given(mockSessionServiceConfig.isSessionConstraintEnabled()).willReturn(true);
+        given(mockSessionService.isSuperUser(anyString())).willReturn(false);
+        given(sessionConstraint.checkQuotaAndPerformAction(eq(session))).willReturn(true);
+
+        // When
+        boolean activated = session.activate("userDN");
+
+        // Then
+        assertThat(activated).as("session should not be activated").isEqualTo(false);
+        verifyEvent(session, SessionEventType.QUOTA_EXHAUSTED);
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenActivatingSession() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+        given(mockSessionService.hasExceededMaxSessions()).willReturn(false);
+        given(mockSessionServiceConfig.isSessionConstraintEnabled()).willReturn(false);
+
+        // When
+        boolean activated = session.activate("userDN");
+
+        // Then
+        assertThat(activated).as("session should be activated").isEqualTo(true);
+        verifyEvent(session, SessionEventType.SESSION_CREATION);
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenTimingOutSession() throws Exception {
+        // Given
+        final InternalSession session = createSession();
+
+        // When
+        session.changeStateAndNotify(SessionEventType.IDLE_TIMEOUT);
+
+        // Then
+        verifyEvent(session, SessionEventType.IDLE_TIMEOUT);
+    }
+
+    // Timeout calculations
 
     @Test
     public void shouldSetDefaultTimeoutsWhenConstructed() {
@@ -157,14 +266,25 @@ public class InternalSessionTest {
         assertThat(session.getMaxIdleExpirationTime(MINUTES)).isEqualTo(21);
     }
 
+    private void verifyEvent(InternalSession session, SessionEventType eventType) {
+        ArgumentCaptor<InternalSessionEvent> eventCaptor = ArgumentCaptor.forClass(InternalSessionEvent.class);
+        verify(mockSessionEventBroker, times(1)).onEvent(eventCaptor.capture());
+        InternalSessionEvent event = eventCaptor.getValue();
+        assertThat(event.getInternalSession()).isSameAs(session);
+        assertThat(event.getType()).isEqualTo(eventType);
+    }
+
     private InternalSession createSession() {
         final SessionID sessionID = new SessionID("");
         return new InternalSession(
                 sessionID,
                 mockSessionService,
                 mockSessionServiceConfig,
+                mockSessionEventBroker,
                 mockSessionLogging,
                 mockSessionAuditor,
+                mockSessionUtils,
+                sessionConstraint,
                 mockDebug);
     }
 

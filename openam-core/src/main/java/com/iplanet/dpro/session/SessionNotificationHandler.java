@@ -129,7 +129,7 @@ public class SessionNotificationHandler implements NotificationHandler {
         }
         SessionEventType sessionEventType = SessionEventType.fromCode(snot.getNotificationType());
         SessionEvent evt = new SessionEvent(session, sessionEventType, snot.getNotificationTime());
-        SessionEvent.invokeListeners(evt);
+        Session.invokeListeners(evt);
     }
 
 }

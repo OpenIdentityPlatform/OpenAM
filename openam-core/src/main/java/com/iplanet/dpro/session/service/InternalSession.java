@@ -28,15 +28,10 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_CREATED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_PROPERTY_CHANGED;
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
-import static org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP;
-import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
+import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.Serializable;
@@ -71,7 +66,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
@@ -79,7 +73,7 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.session.util.SessionUtils;
+import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
@@ -119,6 +113,9 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private transient SessionServiceConfig serviceConfig;
     private transient SessionLogging sessionLogging;
     private transient SessionAuditor sessionAuditor;
+    private transient InternalSessionListener sessionEventBroker;
+    private transient SessionUtilsWrapper sessionUtilsWrapper;
+    private transient SessionConstraint sessionConstraint;
 
     /*
      * System properties
@@ -195,15 +192,13 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @param debug Debugging instance to use for all logging.
      */
     @VisibleForTesting
-    InternalSession(SessionID sid,
-                           SessionService service,
-                           SessionServiceConfig serviceConfig,
-                           SessionLogging sessionLogging,
-                           SessionAuditor sessionAuditor,
-                           Debug debug) {
+    InternalSession(
+            SessionID sid, SessionService service, SessionServiceConfig serviceConfig,
+            SessionEventBroker sessionEventBroker, SessionLogging sessionLogging, SessionAuditor sessionAuditor,
+            SessionUtilsWrapper sessionUtilsWrapper, SessionConstraint sessionConstraint, Debug debug) {
         sessionID = sid;
-        setSessionServiceDependencies(service, serviceConfig, sessionLogging, sessionAuditor, debug);
-
+        setSessionServiceDependencies(service, serviceConfig, sessionEventBroker, sessionLogging, sessionAuditor,
+                sessionUtilsWrapper, sessionConstraint, debug);
         maxIdleTimeInMinutes = maxDefaultIdleTimeInMinutes;
         maxSessionTimeInMinutes = maxDefaultIdleTimeInMinutes;
         sessionState = SessionState.INVALID;
@@ -223,8 +218,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         this(sid,
                 InjectorHolder.getInstance(SessionService.class),
                 InjectorHolder.getInstance(SessionServiceConfig.class),
+                InjectorHolder.getInstance(SessionEventBroker.class),
                 InjectorHolder.getInstance(SessionLogging.class),
                 InjectorHolder.getInstance(SessionAuditor.class),
+                InjectorHolder.getInstance(SessionUtilsWrapper.class),
+                InjectorHolder.getInstance(SessionConstraint.class),
                 InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG))));
     }
 
@@ -255,14 +253,18 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * The SessionService is not restored during deserialisation.
      * @param service Non null SessionService.
      */
-    public void setSessionServiceDependencies(SessionService service, SessionServiceConfig serviceConfig,
-                                              SessionLogging sessionLogging, SessionAuditor sessionAuditor,
-                                              Debug debug) {
+    public void setSessionServiceDependencies(
+            SessionService service, SessionServiceConfig serviceConfig, SessionEventBroker sessionEventBroker,
+            SessionLogging sessionLogging, SessionAuditor sessionAuditor, SessionUtilsWrapper sessionUtilsWrapper,
+            SessionConstraint sessionConstraint, Debug debug) {
 
         this.sessionService = service;
         this.serviceConfig = serviceConfig;
+        this.sessionEventBroker = sessionEventBroker;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
+        this.sessionUtilsWrapper = sessionUtilsWrapper;
+        this.sessionConstraint = sessionConstraint;
         this.debug = debug;
     }
 
@@ -618,8 +620,9 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     public void putExternalProperty(SSOToken clientToken, String key, String value) throws SessionException {
 		try {
-        	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
+        	sessionUtilsWrapper.checkPermissionToSetProperty(clientToken, key, value);
 		} catch (SessionException se) {
+            fireSessionEvent(SessionEventType.PROTECTED_PROPERTY);
             sessionLogging.logEvent(toSessionInfo(), SessionEventType.PROTECTED_PROPERTY);
 			throw se;
 		}
@@ -685,6 +688,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         }
 
         if (sessionState == SessionState.VALID && serviceConfig.isSendPropertyNotification(key)) {
+            fireSessionEvent(SessionEventType.PROPERTY_CHANGED);
             sessionService.sendEvent(this, SessionEventType.PROPERTY_CHANGED);
             SessionInfo sessionInfo = toSessionInfo();
             sessionLogging.logEvent(sessionInfo, SessionEventType.PROPERTY_CHANGED);
@@ -754,9 +758,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         if (userDN == null) {
             return false;
         }
+        // TODO: Drop per server max session limit: OPENAM-8445
         // Exceeded max active sessions, but allow if the user is super-admin
         if ((sessionService.hasExceededMaxSessions()) && !sessionService.isSuperUser(userDN)) {
-            sessionLogging.logSystemMessage(LOG_MSG_SESSION_MAX_LIMIT_REACHED);
+            fireSessionEvent(SessionEventType.SESSION_MAX_LIMIT_REACHED);
+            sessionLogging.logSystemMessage(LOG_MSG_SESSION_MAX_LIMIT_REACHED); // TODO: Convert to InternalSessionListener (AME-12528)
             return false;
         }
 
@@ -765,20 +771,22 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         // checking Session Quota Constraints
         if ((serviceConfig.isSessionConstraintEnabled()) && !shouldIgnoreSessionQuotaChecking()) {
 
-            if (SessionConstraint.checkQuotaAndPerformAction(this)) {
+            if (sessionConstraint.checkQuotaAndPerformAction(this)) {
                 debug.message("Session Quota exhausted!");
-                sessionLogging.logEvent(sessionInfo, SessionEventType.QUOTA_EXHAUSTED);
+                fireSessionEvent(SessionEventType.QUOTA_EXHAUSTED);
+                sessionLogging.logEvent(sessionInfo, SessionEventType.QUOTA_EXHAUSTED); // TODO: Convert to InternalSessionListener (AME-12528)
                 return false;
             }
         }
         setLatestAccessTime();
         setState(SessionState.VALID);
-        sessionLogging.logEvent(sessionInfo, SessionEventType.SESSION_CREATION);
-        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_CREATED);
-        sessionService.sendEvent(this, SessionEventType.SESSION_CREATION);
+        fireSessionEvent(SessionEventType.SESSION_CREATION);
+        sessionLogging.logEvent(sessionInfo, SessionEventType.SESSION_CREATION); // TODO: Convert to InternalSessionListener (AME-12528)
+        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_CREATED); // TODO: Convert to InternalSessionListener (AME-12528)
+        sessionService.sendEvent(this, SessionEventType.SESSION_CREATION); // TODO: Convert to InternalSessionListener (AME-12528)
 
         if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
-            sessionService.incrementActiveSessions();
+            sessionService.incrementActiveSessions(); // TODO: Convert to InternalSessionListener (AME-12528) ?
         }
         return true;
     }
@@ -862,10 +870,11 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * Changes the state of the session and sends Session Notification when session times out.
      */
     public void changeStateAndNotify(SessionEventType eventType) {
-        sessionLogging.logEvent(toSessionInfo(), eventType);
+        fireSessionEvent(eventType);
+        sessionLogging.logEvent(toSessionInfo(), eventType); // TODO: Convert to InternalSessionListener (AME-12528)
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds));
-        sessionService.execSessionTimeoutHandlers(sessionID, eventType);
+        putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
+        sessionService.execSessionTimeoutHandlers(sessionID, eventType); // TODO: Convert to InternalSessionListener (AME-12528)
         sessionService.destroyInternalSession(sessionID);
     }
 
@@ -1217,30 +1226,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         return sessionState == SessionState.INVALID;
     }
 
-    /**
-     * Signals the Session for removal.
-     */
-    // TODO: Don't make this method public
-    public void removeSession() {
-        SessionInfo sessionInfo = toSessionInfo();
-        sessionLogging.logEvent(sessionInfo, SessionEventType.DESTROY);
-        sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-        setState(SessionState.DESTROYED);
-        sessionService.removeCachedInternalSession(sessionID);
-        sessionService.sendEvent(this, SessionEventType.DESTROY);
-    }
-
-    /**
-     * Sets the time at which this session timed out due to idle/max timeout. The time is in seconds since the same
-     * epoch as {@link System#currentTimeMillis()}. A value of 0 indicates that the session has not timed out.
-     *
-     * @param timedOutAt the time in seconds at which the session timed out.
-     */
-    @VisibleForTesting
-    void setTimedOutAt(long timedOutAt) {
-        this.timedOutTimeInSeconds = timedOutAt;
-    }
-
     @Override
     public void setPersistenceManager(SessionPersistenceManager manager) {
         persistenceManager = manager;
@@ -1250,6 +1235,10 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         if (persistenceManager != null) {
             persistenceManager.notifyUpdate(getSessionID());
         }
+    }
+
+    private void fireSessionEvent(SessionEventType sessionEventType) {
+        sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType));
     }
 
     /**

@@ -15,12 +15,14 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -30,8 +32,10 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionEvent;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.SessionEventBroker;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
@@ -41,7 +45,6 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
 
 public class LocalOperationsTest {
-
 
     private LocalOperations local;
     @Mock
@@ -66,6 +69,8 @@ public class LocalOperationsTest {
     private SessionCookies sessionCookies;
     @Mock
     private SessionChangeAuthorizer sessionChangeAuthorizer;
+    @Mock
+    private SessionEventBroker sessionEventBroker;
 
     @BeforeMethod
     public void setup() {
@@ -78,8 +83,8 @@ public class LocalOperationsTest {
         given(mockSession.getID()).willReturn(mockSessionID);
 
         local = new LocalOperations(mock(Debug.class), sessionAccessManager, sessionInfoFactory, serverConfig,
-                mock(SessionNotificationSender.class),
-                mock(SessionLogging.class), mock(SessionAuditor.class), sessionChangeAuthorizer, serviceConfig);
+                mock(SessionNotificationSender.class), mock(SessionLogging.class), mock(SessionAuditor.class),
+                sessionEventBroker, sessionChangeAuthorizer, serviceConfig);
     }
 
     @Test
@@ -127,6 +132,17 @@ public class LocalOperationsTest {
     }
 
     @Test
+    public void firesInternalSessionEventWhenLoggingOutSession() throws Exception {
+        // Given
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(mockSession.getID()).willReturn(mockSessionID);
+        // When
+        local.logout(mockSession);
+        // Then
+        verifyEvent(SessionEventType.LOGOUT);
+    }
+
+    @Test
     public void shouldRemoveSessionFromSessionAccessManagerOnDestroy() throws SessionException {
         // Given
         given(mockSession.getSessionID()).willReturn(mockSessionID);
@@ -135,6 +151,24 @@ public class LocalOperationsTest {
         local.destroy(mockRequester, mockSession);
         // Then
         verify(sessionAccessManager).removeSessionId(eq(mockSessionID));
+    }
+
+    @Test
+    public void firesInternalSessionEventWhenDestroyingSession() throws Exception {
+        // Given
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
+        // When
+        local.destroy(mockRequester, mockSession);
+        // Then
+        verifyEvent(SessionEventType.DESTROY);
+    }
+
+    private void verifyEvent(SessionEventType eventType) {
+        ArgumentCaptor<InternalSessionEvent> eventCaptor = ArgumentCaptor.forClass(InternalSessionEvent.class);
+        verify(sessionEventBroker, times(1)).onEvent(eventCaptor.capture());
+        InternalSessionEvent event = eventCaptor.getValue();
+        assertThat(event.getType()).isEqualTo(eventType);
     }
 
 }

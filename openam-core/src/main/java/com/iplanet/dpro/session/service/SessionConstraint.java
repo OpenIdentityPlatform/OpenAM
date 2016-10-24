@@ -30,8 +30,6 @@
 
 package com.iplanet.dpro.session.service;
 
-import static com.iplanet.dpro.session.service.SessionConstants.*;
-
 import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,8 +38,6 @@ import java.util.Set;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.DestroyOldestAction;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -76,7 +72,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
  *
  *
  */
- 
 public class SessionConstraint {
 
     public static final String DESTROY_OLDEST_SESSION_CLASS =
@@ -86,16 +81,13 @@ public class SessionConstraint {
 
     private static final String AM_SESSION_SERVICE = "iPlanetAMSessionService";
 
-    private static final String SESSION_QUOTA_ATTR_NAME = 
-        "iplanet-am-session-quota-limit";
+    private static final String SESSION_QUOTA_ATTR_NAME = "iplanet-am-session-quota-limit";
 
-    private static final Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+    private static final Debug debug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     private static QuotaExhaustionAction quotaExhaustionAction = null;
 
-    private static SSOToken adminToken = null;
-
-    private static QuotaExhaustionAction getQuotaExhaustionAction() {
+    private QuotaExhaustionAction getQuotaExhaustionAction() {
         String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
         if (quotaExhaustionAction != null
                 && quotaExhaustionAction.getClass().getName().equals(clazzName)) {
@@ -117,67 +109,66 @@ public class SessionConstraint {
     /**
      * Check if the session quota for a given user has been exhausted and
      * perform necessary actions in such as case.
-     * 
-     * @param is
-     * @return true if the session activation request should be rejected, false
-     *         otherwise
+     *
+     * @param internalSession
+     * @return true if the session activation request should be rejected, false otherwise.
      */
-    protected static boolean checkQuotaAndPerformAction(InternalSession is) {
+    protected boolean checkQuotaAndPerformAction(InternalSession internalSession) {
         boolean reject = false;
         int sessionCount = -1;
 
-        // Check if it is upgrade scenario
-        if (is.getIsSessionUpgrade()) {
+        // Check if it internalSession upgrade scenario
+        if (internalSession.getIsSessionUpgrade()) {
             return false;
         }
 
         // Step 1: get constraints for the given user via IDRepo
-        int quota = getSessionQuota(is);
+        int quota = getSessionQuota(internalSession);
 
-	// Step 2: get the information (session id and expiration
-	// time) of all sessions for the given user from all
-	// AM servers and/or session repository
-	Map sessions = null;
-	try {
-	    sessions = InjectorHolder.getInstance(SessionCount.class).getAllSessionsByUUID(is.getUUID());
-	} catch (Exception e) {
-	    if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
-		if (debug.messageEnabled()) {
-		    debug.message("SessionConstraint." +
-                        "checkQuotaAndPerformAction: " +
-                        "denyLoginIfDBIsDown=true => "+
-			"The session repository is down and "+
-			"the login request will be rejected. ");
-		}
+        // Step 2: get the information (session id and expiration
+        // time) of all sessions for the given user from all
+        // AM servers and/or session repository
+        Map sessions = null;
+        try {
+            sessions = InjectorHolder.getInstance(SessionCount.class).getAllSessionsByUUID(internalSession.getUUID());
+        } catch (Exception e) {
+            if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
+                if (debug.messageEnabled()) {
+                    debug.message("SessionConstraint." +
+                            "checkQuotaAndPerformAction: " +
+                            "denyLoginIfDBIsDown=true => "+
+                            "The session repository internalSession down and "+
+                            "the login request will be rejected. ");
+                }
                 return true;
             } else {
-		if (debug.messageEnabled()) {
-	            debug.message("SessionConstraint." +
-                        "checkQuotaAndPerformAction: " +
-                        "denyLoginIfDBIsDown=false => "+
-	   		"The session repository is down and "+
-	                          "there will be no constraint checking.");
-	   	}
-	   	return false;
+                if (debug.messageEnabled()) {
+                    debug.message("SessionConstraint." +
+                            "checkQuotaAndPerformAction: " +
+                            "denyLoginIfDBIsDown=false => "+
+                            "The session repository internalSession down and "+
+                            "there will be no constraint checking.");
+                }
+                return false;
             }
-	 }
+        }
 
-	 if (sessions != null) {
-	    sessionCount = sessions.size();
-	}
+        if (sessions != null) {
+            sessionCount = sessions.size();
+        }
 
-	// Step 3: checking the constraints
-	if (sessionCount >= quota) {
-	    // If the session quota is exhausted, invoke the
-	    // pluggin to determine the desired behavior.
-	    reject = getQuotaExhaustionAction().action(is, sessions);
-	    if (debug.messageEnabled()) {
-			debug.message("SessionConstraint." +
+        // Step 3: checking the constraints
+        if (sessionCount >= quota) {
+            // If the session quota internalSession exhausted, invoke the
+            // pluggin to determine the desired behavior.
+            reject = getQuotaExhaustionAction().action(internalSession, sessions);
+            if (debug.messageEnabled()) {
+                debug.message("SessionConstraint." +
                         "checkQuotaAndPerformAction: " +
                         "Session quota exhausted.");
             }
-	}
-	return reject;
+        }
+        return reject;
     }
 
     /*
@@ -188,7 +179,7 @@ public class SessionConstraint {
      * @param InternalSession 
      * @return session quota
      */
-    private static int getSessionQuota(InternalSession is) {
+    private int getSessionQuota(InternalSession is) {
 
         int quota = getDefaultSessionQuota();
         String profile = is.getProperty(ISAuthConstants.USER_PROFILE);
@@ -243,13 +234,11 @@ public class SessionConstraint {
      * @return admin <code>SSOToken</code>
      */
     private static SSOToken getAdminToken() {
-        if (adminToken == null) {
-            try {
-                adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            } catch (Exception e) {
-                debug.error("Failed to get the admin token for Session constraint checking.", e);
-            }
+        try {
+            return AccessController.doPrivileged(AdminTokenAction.getInstance());
+        } catch (Exception e) {
+            debug.error("Failed to get the admin token for Session constraint checking.", e);
+            return null;
         }
-        return adminToken;
     }
 }

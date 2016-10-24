@@ -27,36 +27,44 @@
  * Portions Copyrighted 2016 ForgeRock AS.
  */
 
-package com.iplanet.dpro.session;
+package com.iplanet.dpro.session.service;
 
 import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 
 /**
  * This class represents a session event.
- * <p>
- * If this is a new session, the event object contains all session information of this new
- * session; otherwise, only the changed information of the session is contained in the event.
  *
- * @see com.iplanet.dpro.session.Session
+ * @see InternalSession
  * @see SessionEventType
  */
-public class SessionEvent {
+public class InternalSessionEvent {
 
-    private final Session session;
+    private final InternalSession internalSession;
     private final SessionEventType eventType;
     private final long eventTime;
 
     /**
-     * Creates a new session event.
+     * Creates a new event.
      *
-     * @param session The session object which emitted this event.
+     * @param internalSession The session object which emitted this event.
+     * @param eventType The event which has occurred.
+     */
+    public InternalSessionEvent(InternalSession internalSession, SessionEventType eventType) {
+        this(internalSession, eventType, Time.currentTimeMillis());
+    }
+
+    /**
+     * Creates a new event.
+     *
+     * @param internalSession The session object which emitted this event.
      * @param eventType The event which has occurred.
      * @param eventTime The event time as UTC milliseconds from the epoch.
      */
-    public SessionEvent(Session session, SessionEventType eventType, long eventTime) {
-        Reject.ifNull(session, eventType);
-        this.session = session;
+    public InternalSessionEvent(InternalSession internalSession, SessionEventType eventType, long eventTime) {
+        Reject.ifNull(internalSession, eventType, eventTime);
+        this.internalSession = internalSession;
         this.eventType = eventType;
         this.eventTime = eventTime;
     }
@@ -66,8 +74,8 @@ public class SessionEvent {
      * 
      * @return The session object which emitted this event.
      */
-    public Session getSession() {
-        return session;
+    public InternalSession getInternalSession() {
+        return internalSession;
     }
 
     /**
