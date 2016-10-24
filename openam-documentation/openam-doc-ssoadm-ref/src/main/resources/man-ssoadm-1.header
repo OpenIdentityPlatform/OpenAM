@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS.
+  !      Copyright 2011-2016 ForgeRock AS.
   !    
 -->
 <refentry xml:id='ssoadm-1'
@@ -210,13 +210,10 @@
     <listitem><para><link linkend="ssoadm-add-app-priv"><command>add-app-priv</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-create-appl"><command>create-appl</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-create-appl-type"><command>create-appl-type</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-create-xacml"><command>create-xacml</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-delete-appl-types"><command>delete-appl-types</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-delete-appls"><command>delete-appls</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-delete-xacml"><command>delete-xacml</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-list-appl-types"><command>list-appl-types</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-list-appls"><command>list-appls</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-list-xacml"><command>list-xacml</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-set-appl"><command>set-appl</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-set-entitlement-conf"><command>set-entitlement-conf</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-show-app-priv"><command>show-app-priv</command></link></para></listitem>
@@ -274,10 +271,9 @@
   <refsect2>
    <title>Policy Management</title>
    <itemizedlist>
-    <listitem><para><link linkend="ssoadm-create-policies"><command>create-policies</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-delete-policies"><command>delete-policies</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-list-policies"><command>list-policies</command></link></para></listitem>
-    <listitem><para><link linkend="ssoadm-update-policies"><command>update-policies</command></link></para></listitem>
+   <listitem><para><link linkend="ssoadm-create-xacml"><command>create-xacml</command></link></para></listitem>
+   <listitem><para><link linkend="ssoadm-delete-xacml"><command>delete-xacml</command></link></para></listitem>
+   <listitem><para><link linkend="ssoadm-list-xacml"><command>list-xacml</command></link></para></listitem>
    </itemizedlist>
   </refsect2>
   <refsect2>
