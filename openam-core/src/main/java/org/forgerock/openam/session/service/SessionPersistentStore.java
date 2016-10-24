@@ -73,6 +73,7 @@ public class SessionPersistentStore {
             .put(JSON_SESSION_UNIVERSAL_ID, CoreTokenField.USER_ID)
             .put(JSON_SESSION_REALM, SessionTokenField.REALM.getField())
             .put(JSON_SESSION_HANDLE, SessionTokenField.SESSION_HANDLE.getField())
+            .put(JSON_SESSION_LATEST_ACCESS_TIME, SessionTokenField.LATEST_ACCESS_TIME.getField())
             .put(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField())
             .put(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField())
             .build();

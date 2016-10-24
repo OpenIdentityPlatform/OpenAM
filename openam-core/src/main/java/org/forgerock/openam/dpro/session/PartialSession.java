@@ -28,6 +28,7 @@ import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.TimeUtils;
 
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -54,6 +55,9 @@ public class PartialSession {
     @Title(SESSION_RESOURCE + "schema.property.sessionHandle." + TITLE)
     @Description(SESSION_RESOURCE + "schema.property.sessionHandle." + DESCRIPTION)
     private String sessionHandle;
+    @Title(SESSION_RESOURCE + "schema.property.latestAccessTime." + TITLE)
+    @Description(SESSION_RESOURCE + "schema.property.latestAccessTime." + DESCRIPTION)
+    private String latestAccessTime;
     @Title(SESSION_RESOURCE + "schema.property.maxIdleExpirationTime." + TITLE)
     @Description(SESSION_RESOURCE + "schema.property.maxIdleExpirationTime." + DESCRIPTION)
     private String maxIdleExpirationTime;
@@ -74,6 +78,9 @@ public class PartialSession {
                 realm = partialToken.getValue(SessionTokenField.REALM.getField());
             } else if (field.equals(SessionTokenField.SESSION_HANDLE.getField())) {
                 sessionHandle = partialToken.getValue(SessionTokenField.SESSION_HANDLE.getField());
+            } else if (field.equals(SessionTokenField.LATEST_ACCESS_TIME.getField())) {
+                latestAccessTime = DateUtils.toUTCDateFormat(TimeUtils.fromUnixTime(Long.valueOf(
+                        partialToken.<String>getValue(SessionTokenField.LATEST_ACCESS_TIME.getField()))).getTime());
             } else if (field.equals(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField())) {
                 maxIdleExpirationTime = DateUtils.toUTCDateFormat(partialToken.<Calendar>getValue(
                         SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField()).getTime());
@@ -121,6 +128,15 @@ public class PartialSession {
     }
 
     /**
+     * The timestamp of when the session was last used.
+     *
+     * @return The timestamp of when the session was last used.
+     */
+    public String getLatestAccessTime() {
+        return latestAccessTime;
+    }
+
+    /**
      * The timestamp of when the max idle timeout will be reached.
      *
      * @return When this session will time out due to inactivity.
@@ -144,6 +160,7 @@ public class PartialSession {
                 fieldIfNotNull(JSON_SESSION_UNIVERSAL_ID, universalId),
                 fieldIfNotNull(JSON_SESSION_REALM, realm),
                 fieldIfNotNull(JSON_SESSION_HANDLE, sessionHandle),
+                fieldIfNotNull(JSON_SESSION_LATEST_ACCESS_TIME, latestAccessTime),
                 fieldIfNotNull(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, maxIdleExpirationTime),
                 fieldIfNotNull(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, maxSessionExpirationTime)
         ));

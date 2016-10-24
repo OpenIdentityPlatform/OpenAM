@@ -89,6 +89,11 @@ public class SessionConstants {
     public static final String JSON_SESSION_HANDLE = "sessionHandle";
 
     /**
+     * The name of the JSON Field which describes the session's latest access time.
+     */
+    public static final String JSON_SESSION_LATEST_ACCESS_TIME = "latestAccessTime";
+
+    /**
      * The name of the JSON field which describes the session's max idle expiration time.
      */
     public static final String JSON_SESSION_MAX_IDLE_EXPIRATION_TIME = "maxIdleExpirationTime";
