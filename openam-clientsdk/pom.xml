@@ -347,6 +347,7 @@
                                 <include>org/forgerock/openam/console/base/ConsoleViewBeanBase*</include>
                                 <include>org/forgerock/openam/core/realms/*</include>
                                 <include>org/forgerock/openam/core/DNWrapper*</include>
+                                <include>org/forgerock/openam/dpro/session/InvalidSessionIdException*</include>
                                 <include>org/forgerock/openam/entitlement/ConditionTypeRegistry*</include>
                                 <include>org/forgerock/openam/entitlement/EntitlementModule*</include>
                                 <include>org/forgerock/openam/entitlement/EntitlementRegistry*</include>
