@@ -40,6 +40,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
+import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.caf.authentication.framework.AuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
@@ -128,7 +129,8 @@ public class RestGuiceModule extends AbstractModule {
     @Named("AuthenticationFilter")
     @Singleton
     org.forgerock.http.Filter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
-            AuditApi auditApi, @Named("OptionalSsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule) {
+            AuditApi auditApi, @Named("OptionalSsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule)
+            throws AuthenticationException {
         return AuthenticationFilter.builder()
                 .logger(logger)
                 .auditApi(auditApi)

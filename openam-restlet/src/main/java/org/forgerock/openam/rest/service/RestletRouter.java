@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
@@ -34,6 +34,12 @@ final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet
     @Override
     protected RestletRouter getThis() {
         return this;
+    }
+
+    @Override
+    protected Pair<RouteMatcher<Request>, Restlet> getSelfApiHandler() {
+        // API Description not used for Restlet services
+        return null;
     }
 
     void handle(Context context, Request request, Response response) {
