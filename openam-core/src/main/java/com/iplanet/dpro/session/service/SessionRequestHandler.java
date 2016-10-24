@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
@@ -366,8 +367,7 @@ public class SessionRequestHandler implements RequestHandler {
                         SSOTokenManager tokenManager = SSOTokenManager.getInstance();
                         final SSOToken statelessToken = tokenManager.createSSOToken(req.getSessionID());
                         if (!tokenManager.isValidToken(statelessToken)) {
-                            throw new SessionException(SessionBundle.getString("invalidSessionID")
-                                    + req.getSessionID());
+                            throw new InvalidSessionIdException(req.getSessionID());
                         }
                     }
                     res.addSessionInfo(sessionService.getSessionInfo(requesterSession.getSessionID(), req.getResetFlag()));

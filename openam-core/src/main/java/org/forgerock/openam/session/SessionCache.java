@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -277,8 +279,8 @@ public class SessionCache {
     public Session getSession(SessionID sessionID, boolean allowInvalidSessions, boolean possiblyResetIdleTime)
             throws SessionException {
 
-        if (sessionID.toString() == null || sessionID.toString().length() == 0) {
-            throw new SessionException(SessionBundle.rbName, "invalidSessionID", null);
+        if (StringUtils.isEmpty(sessionID.toString())) {
+            throw new InvalidSessionIdException();
         }
 
         Session session = readSession(sessionID);

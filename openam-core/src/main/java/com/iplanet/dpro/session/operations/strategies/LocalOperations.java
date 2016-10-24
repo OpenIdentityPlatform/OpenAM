@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
@@ -231,7 +232,7 @@ public class LocalOperations implements SessionOperations {
             sess = resolveRestrictedToken(token, true);
         }
         if (sess == null) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + token.toString());
+            throw new InvalidSessionIdException(token);
         }
         return sess;
     }
@@ -271,7 +272,7 @@ public class LocalOperations implements SessionOperations {
         InternalSession session = sessionAccessManager.getInternalSession(masterSessionId);
 
         if (session == null) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSessionId);
+            throw new InvalidSessionIdException(masterSessionId);
         }
         sessionInfoFactory.validateSession(session, masterSessionId);
         // attempt to reuse the token if restriction is the same
@@ -305,7 +306,7 @@ public class LocalOperations implements SessionOperations {
             debug.message(MessageFormat.format("Local logout for {0}", sessionId.toString()));
         }
         if (sessionId == null || sessionId.isSessionHandle()) {
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + sessionId);
+            throw new InvalidSessionIdException(sessionId);
         }
         //if the provided session ID was a restricted token, resolveToken will always validate the restriction, so there is no
         //need to check restrictions here.

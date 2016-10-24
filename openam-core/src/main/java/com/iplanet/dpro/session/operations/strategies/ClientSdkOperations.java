@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionServiceURLService;
@@ -253,7 +254,7 @@ public class ClientSdkOperations implements SessionOperations {
                 sessionServiceURLService.getSessionServiceURL(servicesClusterMonitorHandler.getCurrentHostServer(masterSid)), masterSid, restriction);
         if (token == null) {
             // TODO consider one retry attempt
-            throw new SessionException(SessionBundle.getString("invalidSessionID") + masterSid);
+            throw new InvalidSessionIdException(masterSid);
         } else {
             return token;
         }

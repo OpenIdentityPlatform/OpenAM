@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
@@ -41,8 +42,6 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -138,7 +137,7 @@ public class SessionCookies {
         }
 
         if (sid == null || StringUtils.isBlank(sid.toString())) {
-            throw new SessionException(SessionBundle.rbName, "invalidSessionID", null);
+            throw new InvalidSessionIdException();
         }
 
         if (SystemProperties.isServerMode()) {

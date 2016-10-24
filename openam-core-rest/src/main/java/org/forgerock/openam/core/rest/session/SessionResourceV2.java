@@ -67,6 +67,7 @@ import org.forgerock.openam.core.rest.session.action.ActionHandler;
 import org.forgerock.openam.core.rest.session.action.GetSessionInfoActionHandler;
 import org.forgerock.openam.core.rest.session.action.GetSessionPropertiesActionHandler;
 import org.forgerock.openam.core.rest.session.action.LogoutActionHandler;
+import org.forgerock.openam.core.rest.session.action.LogoutByHandleActionHandler;
 import org.forgerock.openam.core.rest.session.action.RefreshActionHandler;
 import org.forgerock.openam.core.rest.session.action.UpdateSessionPropertiesActionHandler;
 import org.forgerock.openam.dpro.session.PartialSession;
@@ -115,6 +116,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     public static final String REFRESH_ACTION_ID = "refresh";
     public static final String GET_SESSION_PROPERTIES_ACTION_ID = "getSessionProperties";
     public static final String UPDATE_SESSION_PROPERTIES_ACTION_ID = "updateSessionProperties";
+    public static final String LOGOUT_BY_HANDLE_ACTION_ID = "logoutByHandle";
 
     private final SessionPropertyWhitelist sessionPropertyWhitelist;
 
@@ -146,6 +148,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
                 new GetSessionPropertiesActionHandler(sessionPropertyWhitelist, sessionResourceUtil));
         actionHandlers.put(UPDATE_SESSION_PROPERTIES_ACTION_ID,
                 new UpdateSessionPropertiesActionHandler(sessionPropertyWhitelist, sessionResourceUtil));
+        actionHandlers.put(LOGOUT_BY_HANDLE_ACTION_ID, new LogoutByHandleActionHandler());
     }
 
     /**
@@ -231,6 +234,20 @@ public class SessionResourceV2 implements CollectionResourceProvider {
             ),
             name = UPDATE_SESSION_PROPERTIES_ACTION_ID,
             response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+        ),
+        @Action(
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + LOGOUT_BY_HANDLE_ACTION_ID + "." + ACTION_DESCRIPTION,
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = LOGOUT_BY_HANDLE_ACTION_ID,
+            request = @Schema(schemaResource = "SessionResource.logoutByHandle.request.schema.json"),
+            response = @Schema(schemaResource = "SessionResource.logoutByHandle.response.schema.json")
         )
     })
     @Override
