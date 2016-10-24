@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.core.rest.docs.api;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.forgerock.json.resource.Requests.newApiRequest;
 
 import java.io.File;
@@ -30,6 +31,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,6 +64,7 @@ import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Get;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.services.descriptor.Describable;
 
 import com.sun.identity.shared.debug.Debug;
@@ -74,9 +84,9 @@ public class ApiDocsService implements Describable.Listener {
     private final Asciidoctor asciidoctor;
     private final Router realmRouter;
     private final Debug debug;
-    private volatile ApiDescription description;
-    private volatile File docs;
-    private volatile File asciidoc;
+    private volatile Future<ApiDescription> description;
+    private volatile Future<File> docs;
+    private volatile Future<File> asciidoc;
 
     /**
      * Create an instance of the {@link ApiDocsService}.
@@ -145,82 +155,116 @@ public class ApiDocsService implements Describable.Listener {
      * Handle the request for the OpenAM REST API docs. This will make an internal call to the CREST API endpoint to
      * retrieve the API description and use that to generate the docs in HTML.
      *
-     * @param context The request context.
      * @param request The HTTP request.
      *
      * @return The {@link Response} containing the OpenAM REST API docs as HTML.
      */
     @Get
-    public Response handle(@Contextual Context context, @Contextual Request request) {
+    public Response handle(@Contextual Request request) {
         if (!ApiDescriptorFilter.State.INSTANCE.isEnabled()) {
             return new Response(Status.NOT_IMPLEMENTED);
         }
         Response response = new Response(Status.OK);
-        File input;
-        try {
-            if ("asciidoc".equals(request.getForm().getFirst("format"))) {
-                response.getHeaders().add(TEXT_CONTENT_TYPE);
-                input = getAsciiDoc(context);
-            } else {
-                response.getHeaders().add(HTML_CONTENT_TYPE);
-                input = getDocs(context);
-            }
-        } catch (IOException | RuntimeException e) {
-            debug.warning("ApiDocsService#handle :: Could not generate API docs", e);
-            return new Response(Status.INTERNAL_SERVER_ERROR).setCause(e);
+        Future<File> input;
+        if ("asciidoc".equals(request.getForm().getFirst("format"))) {
+            response.getHeaders().add(TEXT_CONTENT_TYPE);
+            input = asciidoc;
+        } else {
+            response.getHeaders().add(HTML_CONTENT_TYPE);
+            input = docs;
         }
         try {
-            response.setEntity(new FileBranchingStream(input));
-        } catch (IOException e) {
+            response.setEntity(new FileBranchingStream(input.get()));
+        } catch (InterruptedException | ExecutionException | IOException e) {
             debug.error("ApiDocsService#handle :: Could not read API docs", e);
             return new Response(Status.INTERNAL_SERVER_ERROR).setCause(e);
         }
         return response;
     }
 
-    private synchronized File getDocs(Context context) throws IOException {
-        if (docs == null) {
-            docs = File.createTempFile("openam-api.", ".html");
-            docs.deleteOnExit();
-            try (Reader reader = new FileReader(getAsciiDoc(context)); Writer writer = new FileWriter(docs)) {
-                asciidoctor.render(
-                        reader,
-                        writer,
-                        OptionsBuilder.options()
-                                .attributes(AttributesBuilder.attributes()
-                                        .tableOfContents(Placement.LEFT)
-                                        .sectNumLevels(SECTION_NUMBERING_DEPTH)
-                                        .attribute("toclevels", TOC_LEVELS)
-                                        .get())
-                                .safe(SafeMode.SAFE)
-                                .headerFooter(true)
-                                .get());
-            }
+    private File getDocs(File asciidoc) throws IOException {
+        File docs = File.createTempFile("openam-api.", ".html");
+        docs.deleteOnExit();
+        try (Reader reader = new FileReader(asciidoc); Writer writer = new FileWriter(docs)) {
+            asciidoctor.render(
+                    reader,
+                    writer,
+                    OptionsBuilder.options()
+                            .attributes(AttributesBuilder.attributes()
+                                    .tableOfContents(Placement.LEFT)
+                                    .sectNumLevels(SECTION_NUMBERING_DEPTH)
+                                    .attribute("toclevels", TOC_LEVELS)
+                                    .get())
+                            .safe(SafeMode.SAFE)
+                            .headerFooter(true)
+                            .get());
         }
         return docs;
     }
 
-    private synchronized File getAsciiDoc(Context context) throws IOException {
-        if (asciidoc == null) {
-            String asciiDocMarkup = ApiDocGenerator.execute("OpenAM API", getDescription(context), null);
-            asciidoc = File.createTempFile("openam-api.", ".asciidoc");
-            asciidoc.deleteOnExit();
-            Files.write(asciiDocMarkup, asciidoc, StandardCharsets.UTF_8);
-        }
+    private File getAsciiDoc(ApiDescription description) throws IOException {
+        String asciiDocMarkup = ApiDocGenerator.execute("OpenAM API", description, null);
+        File asciidoc = File.createTempFile("openam-api.", ".asciidoc");
+        asciidoc.deleteOnExit();
+        Files.write(asciiDocMarkup, asciidoc, StandardCharsets.UTF_8);
         return asciidoc;
     }
 
-    private synchronized ApiDescription getDescription(Context context) {
-        if (description == null) {
-            description = realmRouter.handleApiRequest(context, newApiRequest(ResourcePath.empty()));
-        }
-        return description;
+    private ApiDescription getDescription() {
+        return realmRouter.handleApiRequest(new RootContext(), newApiRequest(ResourcePath.empty()));
     }
 
     @Override
     public synchronized void notifyDescriptorChange() {
-        docs = null;
-        asciidoc = null;
-        description = null;
+        debug.error("API Descriptor has changed - regenerating docs");
+        ExecutorService executorService = new ThreadPoolExecutor(1, 1, 0, SECONDS, new LinkedBlockingQueue<Runnable>());
+        final Future<ApiDescription> description = executorService.submit(new Callable<ApiDescription>() {
+            @Override
+            public ApiDescription call() throws Exception {
+                debug.message("Initialising API Description");
+                ApiDescription apiDescription = null;
+                try {
+                    apiDescription = getDescription();
+                    return apiDescription;
+                } catch (Exception e) {
+                    debug.message("API Description failed", e);
+                    throw e;
+                } finally {
+                    debug.message("API Description initialised: {}", apiDescription);
+                }
+            }
+        });
+        final Future<File> asciidoc = executorService.submit(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                debug.message("Initialising API Docs Asciidoc");
+                try {
+                    return getAsciiDoc(description.get());
+                } catch (Exception e) {
+                    debug.message("API Asciidoc failed", e);
+                    throw e;
+                } finally {
+                    debug.message("Asciidoc initialised");
+                }
+            }
+        });
+        final Future<File> docs = executorService.submit(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                debug.message("Initialising API Docs HTML");
+                try {
+                    return getDocs(asciidoc.get());
+                } catch (Exception e) {
+                    debug.message("API HTML failed", e);
+                    throw e;
+                } finally {
+                    debug.message("HTML initialised");
+                }
+            }
+        });
+        executorService.shutdown();
+        this.description = description;
+        this.asciidoc = asciidoc;
+        this.docs = docs;
     }
 }

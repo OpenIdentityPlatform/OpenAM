@@ -25,6 +25,8 @@ import static org.forgerock.api.models.Resource.resource;
 import static org.forgerock.api.models.VersionedPath.UNVERSIONED;
 import static org.forgerock.api.models.VersionedPath.versionedPath;
 import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
@@ -83,8 +85,8 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.SmsRouter;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.DescriptorUtils;
 import org.forgerock.openam.rest.RestConstants;
@@ -112,7 +114,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
     final Map<MatchingResourcePath, CrestAuthorizationModule> authzModules;
     private final Predicate<String> handlesFunction;
     final CrestAuthorizationModule defaultAuthzModule;
-    final Router router;
+    private final SmsRouter router;
     final ResourcePath path;
     private final boolean isRoot;
     private final Set<SmsRouteTree> subTrees;
@@ -152,7 +154,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
      *                              {@code getAllTypes} and {@code getCreateableTypes}.
      */
     SmsRouteTree(Map<MatchingResourcePath, CrestAuthorizationModule> authzModules,
-            CrestAuthorizationModule defaultAuthzModule, boolean isRoot, Router router, Filter filter,
+            CrestAuthorizationModule defaultAuthzModule, boolean isRoot, SmsRouter router, Filter filter,
             ResourcePath path, Predicate<String> handlesFunction, String uriTemplate, boolean supportGeneralActions) {
         this.authzModules = authzModules;
         this.defaultAuthzModule = defaultAuthzModule;
@@ -168,7 +170,7 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
 
     final void addSubTree(SmsRouteTree subTree) {
         this.subTrees.add(subTree);
-        router.addRoute(RoutingMode.STARTS_WITH, uriTemplate(subTree.uriTemplate), subTree);
+        router.addRoute(STARTS_WITH, uriTemplate(subTree.uriTemplate), subTree);
     }
 
     /**
@@ -230,14 +232,14 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
             SmsRouteTree subtree = new SmsRouteTreeBuilder(uriTemplate).supportGeneralActions(supportGeneralActions)
                     .build(this);
             handlers.put(uriTemplate, subtree);
-            if (mode.equals(RoutingMode.STARTS_WITH)) {
+            if (mode.equals(STARTS_WITH)) {
                 subtree.router.setDefaultRoute(handler);
             } else {
-                subtree.router.addRoute(RoutingMode.EQUALS, uriTemplate(""), handler);
+                subtree.router.addRoute(EQUALS, uriTemplate(""), handler);
             }
-            return new Route(router.addRoute(RoutingMode.STARTS_WITH, uriTemplate(uriTemplate), subtree), subtree);
+            return new Route(router.addRoute(STARTS_WITH, uriTemplate(uriTemplate), subtree), subtree, handler);
         } else {
-            return new Route(router.addRoute(mode, uriTemplate(uriTemplate), handler), this);
+            return new Route(router.addRoute(mode, uriTemplate(uriTemplate), handler), this, handler);
         }
     }
 
@@ -534,10 +536,13 @@ public class SmsRouteTree implements RequestHandler, Describable<ApiDescription,
         public final RouteMatcher<Request> matcher;
         /** The tree that contains this route. */
         public final SmsRouteTree tree;
+        /** The target handler for the route. */
+        public final RequestHandler target;
 
-        private Route(RouteMatcher<Request> matcher, SmsRouteTree tree) {
+        private Route(RouteMatcher<Request> matcher, SmsRouteTree tree, RequestHandler target) {
             this.matcher = matcher;
             this.tree = tree;
+            this.target = target;
         }
     }
 

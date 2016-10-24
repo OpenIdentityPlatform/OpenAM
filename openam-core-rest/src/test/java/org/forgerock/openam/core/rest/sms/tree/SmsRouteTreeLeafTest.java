@@ -35,7 +35,7 @@ public class SmsRouteTreeLeafTest {
 
     @BeforeClass
     public void setup() {
-        Router router = new Router();
+        SmsRouteTreeBuilder.SmsRouter router = new SmsRouteTreeBuilder.SmsRouter();
         Predicate<String> handlesFunction = new Predicate<String>() {
             public boolean apply(String serviceName) {
                 return "SERVICE_NAME".equals(serviceName);

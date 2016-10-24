@@ -36,12 +36,6 @@ final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet
         return this;
     }
 
-    @Override
-    protected Pair<RouteMatcher<Request>, Restlet> getSelfApiHandler() {
-        // API Description not used for Restlet services
-        return null;
-    }
-
     void handle(Context context, Request request, Response response) {
         try {
             Pair<Context, Restlet> bestMatch = getBestRoute(context, request);
@@ -54,6 +48,11 @@ final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet
             DEBUG.message(String.format("Route for '%s' not found", request.getResourceRef().getPath()));
             response.setStatus(org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND);
         }
+    }
+
+    @Override
+    protected Pair<RouteMatcher<Request>, Restlet> getSelfApiHandler() {
+        return null;
     }
 
     @Override

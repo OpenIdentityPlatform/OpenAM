@@ -31,10 +31,13 @@ import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guava.common.base.Predicates;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.routing.RouteMatcher;
 
 /**
  * A builder for creating {@link SmsRouteTree} trees.
@@ -66,7 +69,7 @@ public class SmsRouteTreeBuilder {
     public static SmsRouteTree tree(Map<MatchingResourcePath, CrestAuthorizationModule> authModules,
             CrestAuthorizationModule defaultAuthModule,
             SmsRouteTreeBuilder... subTreeBuilders) {
-        Router router = new Router();
+        SmsRouter router = new SmsRouter();
         SmsRouteTree tree = new SmsRouteTree(authModules, defaultAuthModule, true, router, null, empty(),
                 Predicates.<String>alwaysFalse(), null, false);
         for (SmsRouteTreeBuilder subTreeBuilder : subTreeBuilders) {
@@ -170,7 +173,7 @@ public class SmsRouteTreeBuilder {
      * @return The built sub-tree.
      */
     SmsRouteTree build(@Nonnull SmsRouteTree parent) {
-        Router router = new Router();
+        SmsRouter router = new SmsRouter();
 
         ResourcePath path = SmsRouteTree.concat(parent.path, uriTemplate);
         SmsRouteTree tree = new SmsRouteTree(parent.authzModules, parent.defaultAuthzModule, false, router, filter,
@@ -179,5 +182,18 @@ public class SmsRouteTreeBuilder {
             tree.addSubTree(subTreeBuilder.build(tree));
         }
         return tree;
+    }
+
+    /**
+     * A router for the SmsRouteTree that allows access to the internal routes.
+     */
+    static class SmsRouter extends Router {
+        /**
+         * Get the routes map.
+         * @return The map.
+         */
+        public Map<RouteMatcher<Request>, RequestHandler> getAllRoutes() {
+            return getRoutes();
+        }
     }
 }
