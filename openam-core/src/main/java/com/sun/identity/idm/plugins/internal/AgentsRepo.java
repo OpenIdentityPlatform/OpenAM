@@ -30,6 +30,10 @@
 
 package com.sun.identity.idm.plugins.internal;
 
+import static com.google.inject.name.Names.named;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import java.net.MalformedURLException;
@@ -42,10 +46,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Named;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
+import com.google.inject.Key;
 import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.server.SendNotificationException;
 import com.iplanet.services.comm.share.Notification;
@@ -81,7 +87,13 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.notifications.LocalOnly;
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.NotificationsConfig;
+import org.forgerock.openam.notifications.Topic;
 import org.forgerock.openam.utils.CrestQuery;
 
 public class AgentsRepo extends IdRepo implements ServiceListener {
@@ -131,6 +143,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     // Initialization exception
     IdRepoException initializationException;
 
+    private final NotificationBroker broker;
+
     public AgentsRepo() {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
@@ -166,6 +180,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         if (debug.messageEnabled()) {
             debug.message("AgentsRepo invoked");
         }
+        broker = InjectorHolder.getInstance(Key.get(NotificationBroker.class, LocalOnly.class));
     }
 
     /*
@@ -1719,6 +1734,13 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
 
                    if (!aNameSet.isEmpty()) {
                        for (String agentName : aNameSet) {
+                           if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
+                               broker.publish(Topic.of("/agent/config"), json(object(
+                                       field("realm", DNMapper.orgNameToRealmName(realmName)),
+                                       field("agentName", agentName)
+                               )));
+                           }
+
                            agentIdTypeforNotificationSet = IdType.AGENTONLY;
 
                            // To be consistent and for easy web agent

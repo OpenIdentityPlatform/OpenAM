@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.notifications.LocalOnly;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
 import org.forgerock.openam.notifications.integration.brokers.CTSNotificationBroker;
@@ -46,7 +47,7 @@ public class NotificationsGuiceModule extends PrivateModule {
     @Override
     protected void configure() {
         bind(NotificationBroker.class)
-                .annotatedWith(Names.named("localBroker"))
+                .annotatedWith(LocalOnly.class)
                 .to(InMemoryNotificationBroker.class)
                 .in(Singleton.class);
         bindConstant().annotatedWith(Names.named("queueTimeoutMilliseconds"))
@@ -56,6 +57,7 @@ public class NotificationsGuiceModule extends PrivateModule {
         bindConstant().annotatedWith(Names.named("tokenExpirySeconds"))
                 .to(SystemProperties.getAsLong("org.forgerock.openam.notifications.cts.tokenExpirySeconds", 600L));
 
+        expose(NotificationBroker.class).annotatedWith(LocalOnly.class);
         expose(NotificationBroker.class);
     }
 
@@ -70,7 +72,7 @@ public class NotificationsGuiceModule extends PrivateModule {
     @Inject
     @Singleton
     NotificationBroker notificationBroker(CTSPersistentStore store,
-            @Named("localBroker") NotificationBroker broker,
+            @LocalOnly NotificationBroker broker,
             @Named("tokenExpirySeconds") long tokenExpirySeconds) {
         return new CTSNotificationBroker(store, broker, tokenExpirySeconds);
     }
