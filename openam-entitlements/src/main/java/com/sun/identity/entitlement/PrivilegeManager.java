@@ -28,12 +28,19 @@
  */
 package com.sun.identity.entitlement;
 
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.Time.newDate;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -44,14 +51,8 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
@@ -370,27 +371,8 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         return adminSubject;
     }
 
-    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current)
-            throws EntitlementException {
-
-        Set<String> resourceNames = new HashSet<String>();
-        if (previous != null) {
-            Set<String> r = previous.getEntitlement().getResourceNames();
-            if (r != null) {
-                resourceNames.addAll(r);
-            }
-        }
-
-        Set<String> r = current.getEntitlement().getResourceNames();
-        if (r != null) {
-            resourceNames.addAll(r);
-        }
-
-        String applicationName = current.getEntitlement().getApplicationName();
-
-        PrivilegeChangeNotifier.getInstance().notify(adminSubject, realm,
-            applicationName, current.getName(), resourceNames);
-    }
+    protected abstract void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current,
+            PolicyEventType eventType) throws EntitlementException;
 
     public static boolean isNameValid(String target) {
         return PRIVILEGE_NAME_PATTERN.matcher(target).matches();

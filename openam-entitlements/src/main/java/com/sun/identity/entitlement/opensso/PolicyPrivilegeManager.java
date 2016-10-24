@@ -28,7 +28,10 @@
  */
 package com.sun.identity.entitlement.opensso;
 
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.Time.newDate;
 
 import java.security.AccessController;
 import java.security.Principal;
@@ -40,21 +43,26 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.NotificationsConfig;
+import org.forgerock.openam.notifications.Topic;
+import org.forgerock.util.Reject;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PolicyDataStore;
+import com.sun.identity.entitlement.PolicyEventType;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeChangeNotifier;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.util.Reject;
 
 /**
  * Implementation of <code>PrivilegeManager</code> that saves privileges as <code>com.sun.identity.policy</code> objects
@@ -63,6 +71,8 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
 
     private String realm = "/";
     private static Subject dsameUserSubject;
+
+    private final NotificationBroker broker;
 
     static {
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -82,13 +92,16 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
      */
     @Inject
     public PolicyPrivilegeManager(ApplicationServiceFactory applicationServiceFactory,
-                                  ResourceTypeService resourceTypeService,
-                                  ConstraintValidator constraintValidator) {
+            ResourceTypeService resourceTypeService,
+            ConstraintValidator constraintValidator,
+            NotificationBroker broker) {
         super(applicationServiceFactory, resourceTypeService, constraintValidator);
+        this.broker = broker;
     }
 
     /**
      * Initializes the object
+     *
      * @param subject subject that would be used for privilege management
      * operations
      */
@@ -107,7 +120,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
      */
     @Override
     public Privilege findByName(String name)
-        throws EntitlementException {
+            throws EntitlementException {
         return findByName(name, getAdminSubject());
     }
 
@@ -122,7 +135,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         privilege = (Privilege) pis.getPrivilege(privilegeName);
 
         if (privilege == null) {
-            throw new EntitlementException(EntitlementException.NO_SUCH_POLICY, new Object[] { privilegeName });
+            throw new EntitlementException(EntitlementException.NO_SUCH_POLICY, new Object[] {privilegeName});
         }
 
         if (adminSubject != PrivilegeManager.superAdminSubject) {
@@ -184,7 +197,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         String currentRealm = getRealm();
         pdb.addPolicy(getAdminSubject(), currentRealm, privilege);
-        notifyPrivilegeChanged(currentRealm, null, privilege);
+        notifyPrivilegeChanged(currentRealm, null, privilege, PolicyEventType.CREATE);
     }
 
     /**
@@ -205,7 +218,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             Subject adminSubject = getAdminSubject();
             PolicyDataStore pdb = PolicyDataStore.getInstance();
             pdb.removePrivilege(adminSubject, currentRealm, privilege);
-            notifyPrivilegeChanged(currentRealm, null, privilege);
+            notifyPrivilegeChanged(currentRealm, null, privilege, PolicyEventType.DELETE);
         }
     }
 
@@ -246,7 +259,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         pdb.removePrivilege(getAdminSubject(), currentRealm, oldP);
 
         pdb.addPolicy(getAdminSubject(), currentRealm, privilege);
-        notifyPrivilegeChanged(currentRealm, oldP, privilege);
+        notifyPrivilegeChanged(currentRealm, oldP, privilege, PolicyEventType.MODIFY);
     }
 
     /**
@@ -261,7 +274,8 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     }
 
     @Override
-    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current) throws EntitlementException {
+    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current,
+            PolicyEventType eventType) throws EntitlementException {
         Set<String> resourceNames = new HashSet<String>();
         if (previous != null) {
             Set<String> r = previous.getEntitlement().getResourceNames();
@@ -281,7 +295,18 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             PrivilegeManager.debug.message("PolicyPrivilegeManager.notifyPrivilegeChanged():"
                     + "applicationName=" + applicationName + ", resources=" + resourceNames);
         }
+
+        if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
+            JsonValue json = json(object(
+                    field("realm", realm),
+                    field("policy", current.getName()),
+                    field("policySet", applicationName),
+                    field("eventType", eventType)
+            ));
+            broker.publish(Topic.of("/agent/policy"), json);
+        }
+
         PrivilegeChangeNotifier.getInstance().notify(getAdminSubject(), realm,
-            applicationName, current.getName(), resourceNames);
+                applicationName, current.getName(), resourceNames);
     }
 }
