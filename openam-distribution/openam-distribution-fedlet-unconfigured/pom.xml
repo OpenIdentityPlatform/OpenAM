@@ -26,7 +26,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM Distribution Fedlet UnConfigured</name>
-    <description>OpenAM Distribution Fedlet UnConfigured.</description>
+    <description>OpenAM Distribution Fedlet UnConfigured</description>
     <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
     <packaging>pom</packaging>
 

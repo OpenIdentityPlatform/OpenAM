@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Component Definition -->
-    <name>OpenAM Auth SAML2</name>
+    <name>OpenAM SAML2 Authentication Module</name>
     <description>OpenAM Authentication SAML2</description>
     <artifactId>openam-auth-saml2</artifactId>
     <packaging>jar</packaging>
@@ -32,41 +32,6 @@
         <checkstyleFailOnError>true</checkstyleFailOnError>
     </properties>
 
-    <!-- Build -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM Auth SAML2</Specification-Title>
-                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Auth SAML2</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
-                            </Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Version>${project.version}</Version>
-                            <Create-On>${maven.build.timestamp}</Create-On>
-                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                            <!-- TODO Add License to Manifest -->
-                            <License />
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
@@ -86,5 +51,4 @@
             <artifactId>forgerock-guava-cache</artifactId>
         </dependency>
     </dependencies>
-
 </project>

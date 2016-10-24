@@ -23,7 +23,7 @@
     </parent>
     <artifactId>openam-soap-sts</artifactId>
     <packaging>pom</packaging>
-    <name>OpenAM Soap STS</name>
+    <name>OpenAM SOAP STS</name>
 
     <modules>
         <module>openam-soap-sts-server</module>

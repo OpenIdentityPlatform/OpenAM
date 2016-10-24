@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>openam-fedlet-unconfigured-war</artifactId>
-    <name>OpenAM Fedlet un-configured web application</name>
+    <name>OpenAM Fedlet WAR</name>
     <packaging>war</packaging>
 
     <build>

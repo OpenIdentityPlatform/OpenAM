@@ -26,6 +26,7 @@
 
     <artifactId>openam-time-travel</artifactId>
 
+    <name>OpenAM Time Travel</name>
     <dependencies>
         <dependency>
             <groupId>org.forgerock.commons</groupId>

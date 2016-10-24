@@ -24,6 +24,7 @@
 
     <artifactId>openam-tokens</artifactId>
 
+    <name>OpenAM Tokens</name>
     <properties>
         <checkstyleFailOnError>true</checkstyleFailOnError>
     </properties>

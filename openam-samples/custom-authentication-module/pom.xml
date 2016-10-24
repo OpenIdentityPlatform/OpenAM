@@ -24,6 +24,8 @@
     <version>14.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>OpenAM Custom Authentication Module</name>
+
     <properties>
         <openam.version>14.0.0-SNAPSHOT</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

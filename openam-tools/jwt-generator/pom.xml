@@ -27,6 +27,8 @@
 
     <artifactId>jwt-generator</artifactId>
 
+    <name>OpenAM JWT generator</name>
+
     <dependencies>
         <dependency>
             <groupId>org.forgerock.commons</groupId>

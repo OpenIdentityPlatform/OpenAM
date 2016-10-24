@@ -26,6 +26,8 @@
 
     <artifactId>openam-example-api-descriptor</artifactId>
 
+    <name>OpenAM Example API descriptor</name>
+
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
