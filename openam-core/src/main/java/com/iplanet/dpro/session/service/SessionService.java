@@ -334,10 +334,10 @@ public class SessionService {
             isSuperUser = adminUserId.equals(user);
 
         } catch (SSOException ssoe) {
-            sessionDebug.error("SessionService.isSuperUser: Cannot get the admin token for this operation.");
+            sessionDebug.error("SessionService.isSuperUser: Cannot get the admin token for this operation.", ssoe);
 
         } catch (IdRepoException idme) {
-            sessionDebug.error("SessionService.isSuperUser: Cannot get the user identity.");
+            sessionDebug.error("SessionService.isSuperUser: Cannot get the user identity '{}'.", uuid, idme);
         }
 
         if (sessionDebug.messageEnabled()) {
