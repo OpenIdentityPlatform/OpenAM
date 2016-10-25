@@ -15,17 +15,14 @@
  */
 package org.forgerock.openam.cts.worker.process;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_IDLE_TIMED_OUT;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
-import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
 import static org.forgerock.openam.session.SessionEventType.IDLE_TIMEOUT;
+import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
 
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Provider;
 
-import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -40,7 +37,6 @@ import org.forgerock.openam.tokens.TokenType;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionState;
 
 /**
@@ -52,41 +48,31 @@ class SessionExpiryBatchHandler {
 
     private final TaskDispatcher queue;
     private final Provider<SessionAccessManager> sessionAccessManager;
-    private final SessionAuditor sessionAuditor;
     private final SessionEventType sessionEventType;
-    private final EventName auditEvent;
 
     private SessionExpiryBatchHandler(
             final TaskDispatcher queue,
             final Provider<SessionAccessManager> sessionAccessManager,
-            final SessionAuditor sessionAuditor,
-            final SessionEventType sessionEventType,
-            final EventName auditEvent) {
+            final SessionEventType sessionEventType) {
         this.queue = queue;
         this.sessionAccessManager = sessionAccessManager;
-        this.sessionAuditor = sessionAuditor;
         this.sessionEventType = sessionEventType;
-        this.auditEvent = auditEvent;
     }
 
     /**
      * Creates delegate for {@link MaxSessionTimeExpiredProcess}.
      */
     static SessionExpiryBatchHandler forMaxSessionTimeExpired(
-            final TaskDispatcher queue,
-            final Provider<SessionAccessManager> accessManager,
-            final SessionAuditor auditor) {
-        return new SessionExpiryBatchHandler(queue, accessManager, auditor, MAX_TIMEOUT, AM_SESSION_MAX_TIMED_OUT);
+            final TaskDispatcher queue, final Provider<SessionAccessManager> accessManager) {
+        return new SessionExpiryBatchHandler(queue, accessManager, MAX_TIMEOUT);
     }
 
     /**
      * Creates delegate for {@link SessionIdleTimeExpiredProcess}.
      */
     static SessionExpiryBatchHandler forSessionIdleTimeExpired(
-            final TaskDispatcher queue,
-            final Provider<SessionAccessManager> accessManager,
-            final SessionAuditor auditor) {
-        return new SessionExpiryBatchHandler(queue, accessManager, auditor, IDLE_TIMEOUT, AM_SESSION_IDLE_TIMED_OUT);
+            final TaskDispatcher queue, final Provider<SessionAccessManager> accessManager) {
+        return new SessionExpiryBatchHandler(queue, accessManager, IDLE_TIMEOUT);
     }
 
     /**
@@ -103,7 +89,7 @@ class SessionExpiryBatchHandler {
      */
     CountDownLatch timeoutBatch(Collection<PartialToken> tokenIds) throws CoreTokenException {
         CountDownLatch latch = new CountDownLatch(tokenIds.size());
-        StateChangeResultHandler stateChangeResultHandler = new StateChangeResultHandler(sessionEventType, auditEvent, latch);
+        StateChangeResultHandler stateChangeResultHandler = new StateChangeResultHandler(sessionEventType, latch);
 
         for (PartialToken partialToken : tokenIds) {
             // Attempt to timeout session; if setting the session state succeeds, then
@@ -126,22 +112,18 @@ class SessionExpiryBatchHandler {
     private class StateChangeResultHandler implements ResultHandler<Token, CoreTokenException> {
 
         private final SessionEventType sessionEventType;
-        private final EventName auditEvent;
         private final CountDownLatch latch;
 
         /**
          * Constructs a new {@link CountDownHandler}.
          *
          * @param sessionEventType Identifies the timeout that has occurred.
-         * @param auditEvent Identifies the timeout that has occurred.
          * @param latch The {@link CountDownLatch} to update as results and errors are received.
          */
         private StateChangeResultHandler(
                 final SessionEventType sessionEventType,
-                final EventName auditEvent,
                 final CountDownLatch latch) {
             this.sessionEventType = sessionEventType;
-            this.auditEvent = auditEvent;
             this.latch = latch;
         }
 
@@ -155,8 +137,7 @@ class SessionExpiryBatchHandler {
             try {
                 String sessionId = result.getAttribute(SessionTokenField.SESSION_ID.getField());
                 InternalSession session = sessionAccessManager.get().getInternalSession(new SessionID(sessionId));
-                session.changeStateAndNotify(sessionEventType);
-                sessionAuditor.auditActivity(session.toSessionInfo(), auditEvent);
+                session.timeoutSession(sessionEventType);
             } finally {
                 latch.countDown();
             }

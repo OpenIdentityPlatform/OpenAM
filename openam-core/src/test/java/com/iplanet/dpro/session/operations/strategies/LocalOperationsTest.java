@@ -15,7 +15,7 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.session.SessionCookies;
@@ -34,11 +34,8 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionEvent;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.MonitoringOperations;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionEventBroker;
-import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -71,7 +68,7 @@ public class LocalOperationsTest {
     @Mock
     private SessionChangeAuthorizer sessionChangeAuthorizer;
     @Mock
-    private SessionEventBroker sessionEventBroker;
+    private InternalSessionEventBroker internalSessionEventBroker;
 
     @BeforeMethod
     public void setup() {
@@ -83,9 +80,7 @@ public class LocalOperationsTest {
         given(mockSession.getID()).willReturn(mockSessionID);
 
         local = new LocalOperations(mock(Debug.class), sessionAccessManager, mock(SessionQueryManager.class),
-                sessionInfoFactory, serverConfig, mock(SessionNotificationSender.class),
-                mock(SessionLogging.class), mock(SessionAuditor.class), sessionEventBroker,
-                sessionChangeAuthorizer);
+                sessionInfoFactory, serverConfig, internalSessionEventBroker, sessionChangeAuthorizer);
     }
 
     @Test
@@ -167,7 +162,7 @@ public class LocalOperationsTest {
 
     private void verifyEvent(SessionEventType eventType) {
         ArgumentCaptor<InternalSessionEvent> eventCaptor = ArgumentCaptor.forClass(InternalSessionEvent.class);
-        verify(sessionEventBroker, times(1)).onEvent(eventCaptor.capture());
+        verify(internalSessionEventBroker, times(1)).onEvent(eventCaptor.capture());
         InternalSessionEvent event = eventCaptor.getValue();
         assertThat(event.getType()).isEqualTo(eventType);
     }

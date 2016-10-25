@@ -15,8 +15,7 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import static com.iplanet.dpro.session.service.SessionState.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static com.iplanet.dpro.session.service.SessionState.INVALID;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -40,13 +39,9 @@ import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionEvent;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.InternalSessionListener;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionEventBroker;
-import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -57,21 +52,15 @@ import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * Responsible for applying Session operations on the local Server instance.
- *
- * This will be based on invoking the {@link SessionService} directly. This implementation
- * has been refactored out from {@link Session}.
+ * Handles sessions that are stored in CTS.
  */
 public class LocalOperations implements SessionOperations {
 
     private final Debug debug;
     private final SessionAccessManager sessionAccessManager;
-    private SessionQueryManager sessionQueryManager;
+    private final SessionQueryManager sessionQueryManager;
     private final SessionInfoFactory sessionInfoFactory;
     private final SessionServerConfig serverConfig;
-    private final SessionNotificationSender sessionNotificationSender;
-    private final SessionLogging sessionLogging;
-    private final SessionAuditor sessionAuditor;
     private final InternalSessionListener sessionEventBroker;
     private final SessionChangeAuthorizer sessionChangeAuthorizer;
 
@@ -81,10 +70,7 @@ public class LocalOperations implements SessionOperations {
      * @param sessionAccessManager access manager for returning the session information from the storage mechanism
      * @param sessionInfoFactory the factory for creating session information objects from a session
      * @param serverConfig session server config
-     * @param sessionNotificationSender notification sender for session removal notification
-     * @param sessionLogging special logging service for session removal logging
-     * @param sessionAuditor audit logger
-     * @param sessionEventBroker observer of session events
+     * @param internalSessionEventBroker observer of session events
      * @param sessionChangeAuthorizer class for verifying permissions and authorisation for the current user to
      *                                perform tasks on the session.  Used during deleting a session and getting access
      *
@@ -95,20 +81,14 @@ public class LocalOperations implements SessionOperations {
                     final SessionQueryManager sessionQueryManager,
                     final SessionInfoFactory sessionInfoFactory,
                     final SessionServerConfig serverConfig,
-                    final SessionNotificationSender sessionNotificationSender,
-                    final SessionLogging sessionLogging,
-                    final SessionAuditor sessionAuditor,
-                    final SessionEventBroker sessionEventBroker,
+                    final InternalSessionEventBroker internalSessionEventBroker,
                     final SessionChangeAuthorizer sessionChangeAuthorizer) {
         this.debug = debug;
         this.sessionAccessManager = sessionAccessManager;
         this.sessionQueryManager = sessionQueryManager;
         this.sessionInfoFactory = sessionInfoFactory;
         this.serverConfig = serverConfig;
-        this.sessionNotificationSender = sessionNotificationSender;
-        this.sessionLogging = sessionLogging;
-        this.sessionAuditor = sessionAuditor;
-        this.sessionEventBroker = sessionEventBroker;
+        this.sessionEventBroker = internalSessionEventBroker;
         this.sessionChangeAuthorizer = sessionChangeAuthorizer;
     }
 
@@ -122,11 +102,7 @@ public class LocalOperations implements SessionOperations {
     public SessionInfo refresh(Session session, boolean reset) throws SessionException {
         SessionID sessionID = session.getID();
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    "Local fetch SessionInfo for {0}\n" +
-                            "Reset: {1}",
-                    sessionID.toString(),
-                    reset));
+            debug.message("Local fetch SessionInfo for {}\nReset: {}", sessionID.toString(), reset);
         }
         return getSessionInfo(sessionID, reset);
     }
@@ -141,7 +117,7 @@ public class LocalOperations implements SessionOperations {
     @Override
     public void destroy(Session requester, Session session) throws SessionException {
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format("Local destroy for {0}", session.getID().toString()));
+            debug.message("Local destroy for {}", session.getID().toString());
         }
         if (session == null) {
             return;
@@ -170,7 +146,6 @@ public class LocalOperations implements SessionOperations {
         sessionAccessManager.removeInternalSession(session);
         if (session != null && session.getState() != INVALID) {
             signalRemove(session, SessionEventType.DESTROY);
-            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_DESTROYED);
         }
         sessionAccessManager.removeSessionId(session.getSessionID());
     }
@@ -181,11 +156,7 @@ public class LocalOperations implements SessionOperations {
      */
     public void setProperty(Session session, String name, String value) throws SessionException {
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    "Local setProperty for {0} {1}={2}",
-                    session.getID().toString(),
-                    name,
-                    value));
+            debug.message("Local setProperty for {} {}={}", session.getID().toString(), name, value);
         }
         resolveToken(session.getID()).putProperty(name, value);
     }
@@ -334,7 +305,6 @@ public class LocalOperations implements SessionOperations {
         sessionAccessManager.removeInternalSession(session);
         if (session != null && session.getState() != INVALID) {
             signalRemove(session, SessionEventType.LOGOUT);
-            sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_LOGGED_OUT);
         }
     }
 
@@ -344,9 +314,12 @@ public class LocalOperations implements SessionOperations {
      * @param event An integrate from the SessionEvent class.
      */
     private void signalRemove(InternalSession session, SessionEventType event) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(session, event));
-        sessionLogging.logEvent(session.toSessionInfo(), event);
         session.setState(SessionState.DESTROYED);
-        sessionNotificationSender.sendEvent(session, event);
+        fireSessionEvent(session, event);
     }
+
+    private void fireSessionEvent(InternalSession session, SessionEventType sessionEventType) {
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, sessionEventType));
+    }
+
 }

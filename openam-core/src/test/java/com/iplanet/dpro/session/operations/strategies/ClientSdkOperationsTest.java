@@ -15,8 +15,8 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -36,7 +36,6 @@ import com.iplanet.dpro.session.ClientSdkSessionRequests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.HttpConnectionFactory;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -65,8 +64,6 @@ public class ClientSdkOperationsTest {
     private SessionServiceURLService mockSessionServiceURLService;
     @Mock
     private SessionServerConfig mockServerConfig;
-    @Mock
-    private HttpConnectionFactory mockHttpConnectionFactor;
 
     @BeforeMethod
     public void setup() throws SessionException {

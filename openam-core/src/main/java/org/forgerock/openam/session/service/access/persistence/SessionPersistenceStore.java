@@ -60,10 +60,8 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionConstraint;
-import com.iplanet.dpro.session.service.SessionEventBroker;
-import com.iplanet.dpro.session.service.SessionLogging;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
@@ -232,9 +230,7 @@ public class SessionPersistenceStore {
         InternalSession session = tokenAdapter.fromToken(token);
         session.setSessionServiceDependencies(InjectorHolder.getInstance(SessionService.class),
                 InjectorHolder.getInstance(SessionServiceConfig.class),
-                InjectorHolder.getInstance(SessionEventBroker.class),
-                InjectorHolder.getInstance(SessionLogging.class),
-                InjectorHolder.getInstance(SessionAuditor.class),
+                InjectorHolder.getInstance(InternalSessionEventBroker.class),
                 InjectorHolder.getInstance(SessionUtilsWrapper.class),
                 InjectorHolder.getInstance(SessionConstraint.class),
                 debug);

@@ -32,7 +32,6 @@ import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
-import com.iplanet.dpro.session.service.SessionAuditor;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -51,10 +50,9 @@ public class MaxSessionTimeExpiredProcess extends CTSWorkerBaseProcess {
     public MaxSessionTimeExpiredProcess(
             final TaskDispatcher queue,
             final Provider<SessionAccessManager> accessManager,
-            final SessionAuditor auditor,
             @Named(CoreTokenConstants.CTS_DEBUG) final Debug debug) {
         this.debug = debug;
-        this.timeoutHandler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(queue, accessManager, auditor);
+        this.timeoutHandler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(queue, accessManager);
     }
 
     @Override

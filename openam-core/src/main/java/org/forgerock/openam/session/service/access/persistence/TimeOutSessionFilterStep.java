@@ -16,16 +16,14 @@
 
 package org.forgerock.openam.session.service.access.persistence;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-
 import javax.inject.Inject;
 
 import org.forgerock.openam.session.SessionEventType;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.service.SessionNotificationSender;
+import com.iplanet.dpro.session.service.InternalSessionEvent;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.SessionState;
 
 /**
@@ -34,13 +32,11 @@ import com.iplanet.dpro.session.service.SessionState;
  */
 public class TimeOutSessionFilterStep implements InternalSessionStoreStep {
 
-    private final SessionNotificationSender sessionNotificationSender;
-    private final SessionAuditor sessionAuditor;
+    private final InternalSessionEventBroker internalSessionEventBroker;
 
     @Inject
-    public TimeOutSessionFilterStep(SessionNotificationSender sessionNotificationSender, SessionAuditor sessionAuditor) {
-        this.sessionNotificationSender = sessionNotificationSender;
-        this.sessionAuditor = sessionAuditor;
+    public TimeOutSessionFilterStep(InternalSessionEventBroker internalSessionEventBroker) {
+        this.internalSessionEventBroker = internalSessionEventBroker;
     }
 
     @Override
@@ -75,15 +71,13 @@ public class TimeOutSessionFilterStep implements InternalSessionStoreStep {
             case DESTROY:
                 next.remove(session.getSessionID());
                 session.changeStateWithoutNotify(SessionState.DESTROYED);
-                sessionNotificationSender.sendEvent(session, SessionEventType.DESTROY);
+                internalSessionEventBroker.onEvent(new InternalSessionEvent(session, SessionEventType.DESTROY));
                 return true;
             case MAX_TIMEOUT:
-                session.changeStateAndNotify(SessionEventType.MAX_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_MAX_TIMED_OUT);
+                session.timeoutSession(SessionEventType.MAX_TIMEOUT);
                 return false;
             case IDLE_TIMEOUT:
-                session.changeStateAndNotify(SessionEventType.IDLE_TIMEOUT);
-                sessionAuditor.auditActivity(session.toSessionInfo(), AM_SESSION_IDLE_TIMED_OUT);
+                session.timeoutSession(SessionEventType.IDLE_TIMEOUT);
                 return false;
             default:
                 return false;

@@ -60,12 +60,12 @@ public enum SessionEventType {
     /**
      * Session quota exhausted
      */
-    QUOTA_EXHAUSTED(7), // TODO: As listener is introduced, ensure this event type only results in audit logging (AME-12528)
+    QUOTA_EXHAUSTED(7),
 
     /**
      * Session property protected against change
      */
-    PROTECTED_PROPERTY(8), // TODO: As listener is introduced, ensure this event type only results in audit logging (AME-12528)
+    PROTECTED_PROPERTY(8),
 
     /**
      * User has reached their max active sessions limit

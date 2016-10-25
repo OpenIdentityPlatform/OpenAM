@@ -129,13 +129,11 @@ public class LogRecord extends java.util.logging.LogRecord
                    ipAddress);
             }
         }
-        Date date = newDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         /*
          * these are the compulsory fields ... to be logged even if there are
          * exceptions while getting domain, loginid, ipaddr, hostname
          */
-        addLogInfo(LogConstants.TIME, sdf.format(date));
+        addTimeLogInfo(newDate());
         addLogInfo(LogConstants.DATA, getMessage());
         addLogInfo(LogConstants.LOG_LEVEL, getLevel().toString());
         addLogInfo(LogConstants.DOMAIN, clientDomain);
@@ -168,6 +166,19 @@ public class LogRecord extends java.util.logging.LogRecord
      */
     public void addLogInfo(String key,Object value) {
         logInfoMap.put(key,value);
+    }
+
+    /**
+     * Sets the {@link LogConstants#TIME} for this {@code LogRecord} to the provided date.
+     *
+     * @param date The timestamp to use for this log record.
+     */
+    public void addTimeLogInfo(Date date) {
+        addLogInfo(LogConstants.TIME, formatDate(date));
+    }
+
+    private String formatDate(Date date) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
     
     /**

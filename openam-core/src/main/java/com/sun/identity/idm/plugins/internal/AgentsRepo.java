@@ -144,6 +144,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     IdRepoException initializationException;
 
     private final NotificationBroker broker;
+    private final NotificationsConfig notificationConfig;
 
     public AgentsRepo() {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
@@ -181,6 +182,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             debug.message("AgentsRepo invoked");
         }
         broker = InjectorHolder.getInstance(Key.get(NotificationBroker.class, LocalOnly.class));
+        notificationConfig = InjectorHolder.getInstance(NotificationsConfig.class);
     }
 
     /*
@@ -1734,7 +1736,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
 
                    if (!aNameSet.isEmpty()) {
                        for (String agentName : aNameSet) {
-                           if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
+                           if (notificationConfig.isAgentsEnabled()) {
                                broker.publish(Topic.of("/agent/config"), json(object(
                                        field("realm", DNMapper.orgNameToRealmName(realmName)),
                                        field("agentName", agentName)

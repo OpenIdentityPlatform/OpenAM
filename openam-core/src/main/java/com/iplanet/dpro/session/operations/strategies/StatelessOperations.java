@@ -16,8 +16,7 @@
 
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +31,7 @@ import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.Time;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -86,19 +86,7 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public void logout(final Session session) throws SessionException {
-        if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEventType.LOGOUT);
-            // Required since not possible to mock SessionAuditor in test case
-            if (sessionAuditor != null) {
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT);
-            }
-        }
-        try {
-            sessionBlacklist.blacklist(session);
-        } catch (BlacklistException e) {
-            throw new SessionException(e);
-        }
+        blacklist(session, SessionEventType.LOGOUT);
     }
 
     @Override
@@ -128,21 +116,7 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
         sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
-
-        if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEventType.DESTROY);
-            // Required since not possible to mock SessionAuditor in test case
-            if (sessionAuditor != null) {
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-            }
-        }
-
-        try {
-            sessionBlacklist.blacklist(session);
-        } catch (BlacklistException e) {
-            throw new SessionException(e);
-        }
+        blacklist(session, SessionEventType.DESTROY);
     }
 
     @Override
@@ -178,6 +152,24 @@ public class StatelessOperations implements SessionOperations {
     @Override
     public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
         localOperations.setExternalProperty(clientToken, sessionId, name, value);
+    }
+
+    private void blacklist(final Session session, final SessionEventType destroy) throws SessionException {
+        if (session instanceof StatelessSession) {
+            logAuditEvent(session, destroy);
+        }
+        try {
+            sessionBlacklist.blacklist(session);
+        } catch (BlacklistException e) {
+            throw new SessionException(e);
+        }
+    }
+
+    private void logAuditEvent(final Session session, final SessionEventType sessionEventType) throws SessionException {
+        long timestamp = Time.currentTimeMillis();
+        SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
+        sessionLogging.logEvent(sessionInfo, sessionEventType, timestamp);
+        sessionAuditor.auditActivity(sessionInfo, sessionEventType, timestamp);
     }
 
 }

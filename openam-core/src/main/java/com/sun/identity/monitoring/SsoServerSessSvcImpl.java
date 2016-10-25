@@ -24,17 +24,19 @@
  *
  * $Id: SsoServerSessSvcImpl.java,v 1.3 2009/11/02 20:10:45 hvijay Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.monitoring;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.management.snmp.SnmpStatusException;
+
 import org.forgerock.guice.core.InjectorHolder;
+
+import com.iplanet.dpro.session.service.SessionNotificationSender;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.management.snmp.SnmpStatusException;
+import com.sun.management.snmp.agent.SnmpMib;
 
 /**
  * This class extends the "SsoServerSessSvc" class.
@@ -107,7 +109,7 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      * Getter for the "SessionNotifCount" variable.
      */
     public Long getSessionNotifCount() throws SnmpStatusException {
-        return Long.valueOf(InjectorHolder.getInstance(SessionService.class).getNotificationQueueSize());
+        return Long.valueOf(InjectorHolder.getInstance(SessionNotificationSender.class).getNotificationQueueSize());
     }
 
 }

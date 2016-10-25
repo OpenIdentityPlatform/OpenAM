@@ -137,11 +137,16 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.InternalSessionListener;
+import com.iplanet.dpro.session.service.SessionNotificationPublisher;
+import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionConstants;
-import com.iplanet.dpro.session.service.SessionEventBroker;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
+import com.iplanet.dpro.session.service.SessionLogging;
+import com.iplanet.dpro.session.service.SessionNotificationSender;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.SessionTimeoutHandlerExecutor;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.naming.WebtopNamingQuery;
@@ -275,8 +280,7 @@ public class CoreGuiceModule extends AbstractModule {
         });
         bind(Debug.class).annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
-        bind(InternalSessionListener.class).to(SessionEventBroker.class).in(Singleton.class);
-
+        bind(InternalSessionListener.class).to(InternalSessionEventBroker.class).in(Singleton.class);
 
         bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
                 .annotatedWith(Names.named("tagSwapFunc"))
@@ -358,6 +362,19 @@ public class CoreGuiceModule extends AbstractModule {
                                                  InternalSessionPersistenceStoreStep internalSessionPersistenceStoreStep) {
         return new InternalSessionStoreChain(Arrays.asList(timeOutSessionFilterStep, internalSessionCacheStep),
                 internalSessionPersistenceStoreStep);
+    }
+
+    @Provides @Inject @Singleton
+    InternalSessionEventBroker getSessionEventBroker(
+            final SessionLogging sessionLogging,
+            final SessionAuditor sessionAuditor,
+            final SessionNotificationSender sessionNotificationSender,
+            final SessionNotificationPublisher sessionNotificationPublisher,
+            final SessionTimeoutHandlerExecutor sessionTimeoutHandlerExecutor) {
+
+        return new InternalSessionEventBroker(
+                sessionLogging, sessionAuditor, sessionNotificationSender, sessionNotificationPublisher,
+                sessionTimeoutHandlerExecutor);
     }
 
     @Provides

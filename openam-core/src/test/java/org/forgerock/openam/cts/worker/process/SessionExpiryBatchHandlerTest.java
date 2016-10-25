@@ -16,7 +16,6 @@
 package org.forgerock.openam.cts.worker.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
@@ -43,15 +42,12 @@ import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionAuditor;
-import com.iplanet.dpro.session.share.SessionInfo;
 
 public class SessionExpiryBatchHandlerTest {
 
     private SessionExpiryBatchHandler handler;
     private TaskDispatcher mockQueue;
     private SessionAccessManager mockSessionAccessManager;
-    private SessionAuditor mockSessionAuditor;
 
     private ArgumentCaptor<Token> tokenArgumentCaptor;
     private ArgumentCaptor<ResultHandler> resultHandlerArgumentCaptor;
@@ -60,12 +56,10 @@ public class SessionExpiryBatchHandlerTest {
     public void setUp() throws Exception {
         mockQueue = mock(TaskDispatcher.class);
         mockSessionAccessManager = mock(SessionAccessManager.class);
-        mockSessionAuditor = mock(SessionAuditor.class);
         Provider<SessionAccessManager> sessionAccessManagerProvider = mock(Provider.class);
         given(sessionAccessManagerProvider.get()).willReturn(mockSessionAccessManager);
 
-        handler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(
-                mockQueue, sessionAccessManagerProvider, mockSessionAuditor);
+        handler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(mockQueue, sessionAccessManagerProvider);
 
         tokenArgumentCaptor = ArgumentCaptor.forClass(Token.class);
         resultHandlerArgumentCaptor = ArgumentCaptor.forClass(ResultHandler.class);
@@ -109,8 +103,7 @@ public class SessionExpiryBatchHandlerTest {
 
         // Then
         assertThat(countDownLatch.getCount()).isZero();
-        verify(mockSession, times(1)).changeStateAndNotify(SessionEventType.MAX_TIMEOUT);
-        verify(mockSessionAuditor, times(1)).auditActivity(any(SessionInfo.class), eq(AM_SESSION_MAX_TIMED_OUT));
+        verify(mockSession, times(1)).timeoutSession(SessionEventType.MAX_TIMEOUT);
     }
 
     private void assertAttemptsToUpdateSessionStateOfAllTokens(List<PartialToken> tokens, String newState) throws Exception {

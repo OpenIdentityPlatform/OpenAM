@@ -44,9 +44,7 @@ public class InternalSessionTest {
 
     @Mock private SessionService mockSessionService;
     @Mock private SessionServiceConfig mockSessionServiceConfig;
-    @Mock private SessionLogging mockSessionLogging;
-    @Mock private SessionAuditor mockSessionAuditor;
-    @Mock private SessionEventBroker mockSessionEventBroker;
+    @Mock private InternalSessionEventBroker mockInternalSessionEventBroker;
     @Mock private SessionUtilsWrapper mockSessionUtils;
     @Mock private SessionConstraint sessionConstraint;
     @Mock private Debug mockDebug;
@@ -153,7 +151,7 @@ public class InternalSessionTest {
         final InternalSession session = createSession();
 
         // When
-        session.changeStateAndNotify(SessionEventType.IDLE_TIMEOUT);
+        session.timeoutSession(SessionEventType.IDLE_TIMEOUT);
 
         // Then
         verifyEvent(session, SessionEventType.IDLE_TIMEOUT);
@@ -268,7 +266,7 @@ public class InternalSessionTest {
 
     private void verifyEvent(InternalSession session, SessionEventType eventType) {
         ArgumentCaptor<InternalSessionEvent> eventCaptor = ArgumentCaptor.forClass(InternalSessionEvent.class);
-        verify(mockSessionEventBroker, times(1)).onEvent(eventCaptor.capture());
+        verify(mockInternalSessionEventBroker, times(1)).onEvent(eventCaptor.capture());
         InternalSessionEvent event = eventCaptor.getValue();
         assertThat(event.getInternalSession()).isSameAs(session);
         assertThat(event.getType()).isEqualTo(eventType);
@@ -280,9 +278,7 @@ public class InternalSessionTest {
                 sessionID,
                 mockSessionService,
                 mockSessionServiceConfig,
-                mockSessionEventBroker,
-                mockSessionLogging,
-                mockSessionAuditor,
+                mockInternalSessionEventBroker,
                 mockSessionUtils,
                 sessionConstraint,
                 mockDebug);

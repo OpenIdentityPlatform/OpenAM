@@ -48,6 +48,7 @@ import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.NotificationsConfig;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -71,6 +72,7 @@ public class TestAttributeEvaluator {
     private ConstraintValidator constraintValidator;
     private ApplicationServiceFactory applicationServiceFactory;
     private NotificationBroker broker;
+    private NotificationsConfig notificationsConfig;
 
     @BeforeClass
     public void setup() throws Exception {
@@ -82,6 +84,7 @@ public class TestAttributeEvaluator {
         constraintValidator = Mockito.mock(ConstraintValidator.class);
         applicationServiceFactory = Mockito.mock(ApplicationServiceFactory.class);
         broker = Mockito.mock(NotificationBroker.class);
+        notificationsConfig = Mockito.mock(NotificationsConfig.class);
 
         Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
@@ -95,7 +98,7 @@ public class TestAttributeEvaluator {
         ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         PrivilegeManager pm = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator, broker);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pm.initialize("/", adminSubject);
         Map<String, Boolean> actions = new HashMap<String, Boolean>();
         actions.put("GET", Boolean.TRUE);
@@ -122,7 +125,7 @@ public class TestAttributeEvaluator {
             return;
         }
         PrivilegeManager pm = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator, broker);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pm.initialize("/", SubjectUtils.createSubject(adminToken));
         pm.remove(PRIVILEGE1_NAME);
 

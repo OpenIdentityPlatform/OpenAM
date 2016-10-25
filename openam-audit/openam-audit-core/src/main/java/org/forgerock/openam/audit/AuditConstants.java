@@ -42,8 +42,6 @@ public final class AuditConstants {
         AM_SESSION_MAX_TIMED_OUT("AM-SESSION-MAX_TIMED_OUT"),
         /** Session logged out audit event name. */
         AM_SESSION_LOGGED_OUT("AM-SESSION-LOGGED_OUT"),
-        /** Session reactivated audit event name. */
-        AM_SESSION_REACTIVATED("AM-SESSION-REACTIVATED"),
         /** Session destroyed audit event name. */
         AM_SESSION_DESTROYED("AM-SESSION-DESTROYED"),
         /** Session property changed audit event name. */

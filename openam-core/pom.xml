@@ -157,6 +157,10 @@
             <artifactId>openam-license-manager-cli</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-web-token</artifactId>
         </dependency>
@@ -181,8 +185,9 @@
             <artifactId>forgerock-bloomfilter-monitoring</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-notifications</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-test-utils</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- LDAP APIs -->

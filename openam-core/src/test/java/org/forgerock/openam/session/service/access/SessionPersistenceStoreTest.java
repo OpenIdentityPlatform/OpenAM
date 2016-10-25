@@ -37,6 +37,7 @@ import com.google.inject.AbstractModule;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionAuditor;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -115,6 +116,7 @@ public class SessionPersistenceStoreTest extends GuiceTestCase {
             bind(SessionServiceConfig.class).toInstance(mock(SessionServiceConfig.class));
             bind(SessionLogging.class).toInstance(mock(SessionLogging.class));
             bind(SessionAuditor.class).toInstance(mock(SessionAuditor.class));
+            bind(InternalSessionEventBroker.class).toInstance(mock(InternalSessionEventBroker.class));
         }
     }
 }

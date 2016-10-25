@@ -29,11 +29,6 @@
 
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
-
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
@@ -42,11 +37,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.notifications.NotificationBroker;
-import org.forgerock.openam.notifications.Topic;
-import org.forgerock.openam.notifications.NotificationsConfig;
-import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -70,7 +60,7 @@ import com.sun.identity.shared.debug.Debug;
  * Local listeners (i.e. this instance of AM) will be notified by calling SessionNotificationHandler directly.
  */
 @Singleton
-public class SessionNotificationSender {
+public class SessionNotificationSender implements InternalSessionListener {
 
     private static final String THREAD_POOL_NAME = "amSession";
 
@@ -78,7 +68,6 @@ public class SessionNotificationSender {
     private final SessionServerConfig serverConfig;
     private final SessionInfoFactory sessionInfoFactory;
     private final ThreadPool threadPool;
-    private final NotificationBroker broker;
 
     @Inject
     public SessionNotificationSender(
@@ -86,13 +75,11 @@ public class SessionNotificationSender {
             final SessionServiceConfig serviceConfig,
             final SessionServerConfig serverConfig,
             final SessionInfoFactory sessionInfoFactory,
-            final ShutdownManager shutdownManager,
-            final NotificationBroker broker) {
+            final ShutdownManager shutdownManager) {
 
         this.sessionDebug = sessionDebug;
         this.serverConfig = serverConfig;
         this.sessionInfoFactory = sessionInfoFactory;
-        this.broker = broker;
 
         threadPool = new ThreadPool(THREAD_POOL_NAME, serviceConfig.getNotificationThreadPoolSize(),
                 serviceConfig.getNotificationThreadPoolThreshold(), true, sessionDebug);
@@ -113,26 +100,27 @@ public class SessionNotificationSender {
         return threadPool.getCurrentSize();
     }
 
-    /**
-     * Sends the Internal Session event to the SessionNotificationSender.
-     *
-     * @param session    Internal Session.
-     * @param eventType Event Type.
-     */
-    public void sendEvent(InternalSession session, SessionEventType eventType) {
-        sessionDebug.message("Running sendEvent, type = " + eventType.getCode());
-
-        if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
-            // TODO: Pull websocket notification logic into its own class (as SessionEventListener)
-            publishSessionNotification(session.getSessionID(), eventType);
-
-            for (SessionID sessionId : session.getRestrictedTokens()) {
-                publishSessionNotification(sessionId, eventType);
-            }
+    @Override
+    public void onEvent(final InternalSessionEvent event) {
+        switch (event.getType()) {
+            case SESSION_CREATION:
+            case IDLE_TIMEOUT:
+            case MAX_TIMEOUT:
+            case LOGOUT:
+            case DESTROY:
+            case PROPERTY_CHANGED:
+                sendEvent(event);
+                break;
+            default:
+                // ignore all other types of event
         }
+    }
+
+    private void sendEvent(final InternalSessionEvent event) {
+        sessionDebug.message("Running sendEvent, type = " + event.getType().getCode());
 
         try {
-            SessionNotificationSenderTask sns = new SessionNotificationSenderTask(session, eventType);
+            SessionNotificationSenderTask sns = new SessionNotificationSenderTask(event);
             // First send local notification. sendToLocal will return
             // true if remote URL's exists than add the notification
             // to the thread pool to process remote notifications.
@@ -145,25 +133,16 @@ public class SessionNotificationSender {
         }
     }
 
-    private void publishSessionNotification(SessionID sessionId, SessionEventType sessionEventType) {
-        JsonValue notification = json(object(
-                field("tokenId", sessionId.toString()),
-                field("eventType", sessionEventType)));
-        broker.publish(Topic.of("/agent/session"), notification);
-    }
-
     /**
      * Inner Session Notification Publisher Class Thread.
      */
     private class SessionNotificationSenderTask implements Runnable {
 
-        private final InternalSession session;
-        private final SessionEventType eventType;
+        private final InternalSessionEvent event;
         private Map<String, Set<SessionID>> urls;
 
-        SessionNotificationSenderTask(InternalSession session, SessionEventType eventType) {
-            this.session = session;
-            this.eventType = eventType;
+        SessionNotificationSenderTask(final InternalSessionEvent event) {
+            this.event = event;
         }
 
         /**
@@ -171,7 +150,7 @@ public class SessionNotificationSender {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            this.urls = session.getSessionEventURLs();
+            this.urls = event.getInternalSession().getSessionEventURLs();
 
             // The check individual URLs
             if (!urls.isEmpty()) {
@@ -181,9 +160,9 @@ public class SessionNotificationSender {
                         URL parsedUrl = new URL(url);
                         if (serverConfig.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
-                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(event.getInternalSession(), sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType.getCode(), currentTimeMillis());
+                                        new SessionNotification(info, event.getType().getCode(), event.getTime());
                                 SessionNotificationHandler.handler.processNotification(notification);
                             }
                         } else {
@@ -218,9 +197,9 @@ public class SessionNotificationSender {
                         if (!serverConfig.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
 
-                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(event.getInternalSession(), sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType.getCode(), currentTimeMillis());
+                                        new SessionNotification(info, event.getType().getCode(), event.getTime());
                                 Notification notificationXml = new Notification(notification.toXMLString());
                                 NotificationSet notificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
                                 notificationSet.addNotification(notificationXml);

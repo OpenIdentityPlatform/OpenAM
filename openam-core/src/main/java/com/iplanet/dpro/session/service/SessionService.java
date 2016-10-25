@@ -28,18 +28,7 @@
  */
 package com.iplanet.dpro.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-
-import java.io.InterruptedIOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,7 +39,6 @@ import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
-import org.forgerock.openam.session.service.SessionTimeoutHandler;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.Reject;
 
@@ -64,7 +52,6 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -72,7 +59,6 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.stats.Stats;
 
 /**
  * This class represents a Session Service.
@@ -87,20 +73,11 @@ public class SessionService {
 
     private final Debug sessionDebug;
     private final SessionServiceConfig serviceConfig;
-    private final SessionServerConfig serverConfig;
-    private final SSOTokenManager ssoTokenManager;
     private final DsameAdminTokenProvider dsameAdminTokenProvider;
     private final MonitoringOperations monitoringOperations;
-    private final SessionLogging sessionLogging;
-    private final SessionAuditor sessionAuditor;
     private final InternalSessionListener sessionEventBroker;
     private final InternalSessionFactory internalSessionFactory;
-    private final SessionNotificationSender sessionNotificationSender;
-    private final SessionMaxStats maxSessionStats; // TODO: Inject from Guice
-    private final ExecutorService executorService = Executors.newCachedThreadPool(); // TODO: Inject from Guice
-
     private final SessionOperationStrategy sessionOperationStrategy;
-
     private final SessionAccessManager sessionAccessManager;
 
     /**
@@ -109,50 +86,22 @@ public class SessionService {
     @Inject
     private SessionService(
             final @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
-            final @Named(SessionConstants.STATS_MASTER_TABLE) Stats stats,
-            final SSOTokenManager ssoTokenManager,
             final DsameAdminTokenProvider dsameAdminTokenProvider,
-            final SessionServerConfig serverConfig,
             final SessionServiceConfig serviceConfig,
             final MonitoringOperations monitoringOperations,
-            final SessionLogging sessionLogging,
-            final SessionAuditor sessionAuditor,
-            final SessionEventBroker sessionEventBroker,
+            final InternalSessionEventBroker internalSessionEventBroker,
             final InternalSessionFactory internalSessionFactory,
-            final SessionNotificationSender sessionNotificationSender,
             final SessionAccessManager sessionAccessManager,
             final SessionOperationStrategy sessionOperationStrategy) {
 
         this.sessionDebug = sessionDebug;
-        this.ssoTokenManager = ssoTokenManager;
         this.dsameAdminTokenProvider = dsameAdminTokenProvider;
-        this.serverConfig = serverConfig;
         this.serviceConfig = serviceConfig;
         this.monitoringOperations = monitoringOperations;
-        this.sessionLogging = sessionLogging;
-        this.sessionAuditor = sessionAuditor;
-        this.sessionEventBroker = sessionEventBroker;
+        this.sessionEventBroker = internalSessionEventBroker;
         this.internalSessionFactory = internalSessionFactory;
         this.sessionOperationStrategy = sessionOperationStrategy;
-        this.sessionNotificationSender = sessionNotificationSender;
         this.sessionAccessManager = sessionAccessManager;
-
-        try {
-
-            if (stats.isEnabled()) {
-                maxSessionStats = new SessionMaxStats(
-                        sessionAccessManager, monitoringOperations, sessionNotificationSender, stats);
-                stats.addStatsListener(maxSessionStats);
-            } else {
-                maxSessionStats = null;
-            }
-
-        } catch (Exception ex) {
-
-            sessionDebug.error("SessionService initialization failed.", ex);
-            throw new IllegalStateException("SessionService initialization failed.", ex);
-
-        }
     }
 
     /**
@@ -201,7 +150,6 @@ public class SessionService {
         if (sessionToDestroy == null) {
             return;
         }
-
         sessionOperationStrategy.getOperation(sessionToDestroy).destroy(requester, resolveSession(sessionToDestroy));
     }
 
@@ -213,8 +161,8 @@ public class SessionService {
     void destroyInternalSession(InternalSession internalSession) {
         sessionAccessManager.removeInternalSession(internalSession);
         if (internalSession != null && internalSession.getState() != SessionState.INVALID) {
-            signalRemove(internalSession, SessionEventType.DESTROY);
-            sessionAuditor.auditActivity(internalSession.toSessionInfo(), AM_SESSION_DESTROYED);
+            fireSessionEvent(internalSession, SessionEventType.DESTROY);
+            internalSession.setState(SessionState.DESTROYED);
         }
         sessionAccessManager.removeSessionId(internalSession.getSessionID());
     }
@@ -225,26 +173,28 @@ public class SessionService {
      * @param sessionID
      */
     public void destroyAuthenticationSession(final SessionID sessionID) {
-
         InternalSession authenticationSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).removeSession(sessionID);
         if (authenticationSession == null) {
             authenticationSession = sessionAccessManager.getInternalSession(sessionID);
             sessionAccessManager.removeInternalSession(authenticationSession);
         }
         if (authenticationSession != null && authenticationSession.getState() != SessionState.INVALID) {
-            signalRemove(authenticationSession, SessionEventType.DESTROY);
-            sessionAuditor.auditActivity(authenticationSession.toSessionInfo(), AM_SESSION_DESTROYED);
+            fireSessionEvent(authenticationSession, SessionEventType.DESTROY);
+            authenticationSession.setState(SessionState.DESTROYED);
         }
         sessionAccessManager.removeSessionId(sessionID);
     }
 
+    private void fireSessionEvent(InternalSession session, SessionEventType sessionEventType) {
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, sessionEventType));
+    }
+
     /**
-     * Checks whether current session should be considered local (so that local
-     * invocations of SessionService methods are to be used) and if local and
-     * Session Failover is enabled will recover the Session if the Session is
-     * not found locally.
+     * Check whether a session identified by {code sessionId} can be retrieved.
      *
-     * @return a boolean
+     * @param sessionId the session ID to check.
+     * @return returns true if the session is local
+     * @throws SessionException if the session could not be accessed.
      */
     public boolean checkSessionExists(SessionID sessionId) throws SessionException {
         return sessionOperationStrategy.getOperation(sessionId).checkSessionExists(sessionId);
@@ -268,20 +218,9 @@ public class SessionService {
     }
 
     /**
-     * Simplifies the signalling that a Session has been removed.
-     * @param session Non null InternalSession.
-     * @param event An integrate from the SessionEvent class.
-     */
-    private void signalRemove(InternalSession session, SessionEventType event) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(session, event));
-        sessionLogging.logEvent(session.toSessionInfo(), event);
-        session.setState(SessionState.DESTROYED);
-        sendEvent(session, event);
-    }
-
-    /**
      * Decrements number of active sessions
      */
+    // TODO: Remove monitoringOperations counting code in 14.0.0, replace with numSubOrdinates in 14.5.0
     public void decrementActiveSessions() {
         monitoringOperations.decrementActiveSessions();
     }
@@ -289,6 +228,7 @@ public class SessionService {
     /**
      * Increments number of active sessions
      */
+    // TODO: Remove monitoringOperations counting code in 14.0.0, replace with numSubOrdinates in 14.5.0
     public void incrementActiveSessions() {
         monitoringOperations.incrementActiveSessions();
     }
@@ -359,37 +299,6 @@ public class SessionService {
     }
 
     /**
-     * Returns current Notification queue size.
-     */
-    public int getNotificationQueueSize() {
-        return sessionNotificationSender.getNotificationQueueSize();
-    }
-
-    /**
-     * Sends the Internal Session event to the SessionNotificationSender.
-     *
-     * @param internalSession Internal Session.
-     * @param eventType Event Type.
-     */
-    public void sendEvent(InternalSession internalSession, SessionEventType eventType) {
-        sessionNotificationSender.sendEvent(internalSession, eventType);
-    }
-
-    /**
-     * Given a restricted token, returns the SSOTokenID of the master token
-     * can only be used if the requester is an app token
-     *
-     * @param session Must be an app token
-     * @param restrictedID The SSOTokenID of the restricted token
-     * @return The SSOTokenID string of the master token
-     * @throws SSOException If the master token cannot be dereferenced
-     */
-    public String deferenceRestrictedID(Session session, String restrictedID) throws SessionException {
-        SessionID sessionId = new SessionID(restrictedID);
-        return sessionOperationStrategy.getOperation(session.getSessionID()).deferenceRestrictedID(session, sessionId);
-    }
-
-    /**
      * Sets external property in the Internal Session as long as it is not
      * protected
      *
@@ -403,76 +312,6 @@ public class SessionService {
                                     String name, String value)
             throws SessionException {
         sessionOperationStrategy.getOperation(sessionId).setExternalProperty(clientToken, sessionId, name, value);
-    }
-
-    /**
-     * This method will execute all the globally set session timeout handlers
-     * with the corresponding timeout event simultaneously.
-     *
-     * @param sessionId  The timed out sessions ID
-     * @param eventType Type of the timeout event: IDLE_TIMEOUT (1) or MAX_TIMEOUT (2)
-     */
-    // TODO: Convert to session listener (AME-12528)
-    void execSessionTimeoutHandlers(final SessionID sessionId, final SessionEventType eventType) {
-        // Take snapshot of reference to ensure atomicity.
-        final Set<String> handlers = serviceConfig.getTimeoutHandlers();
-
-        if (!handlers.isEmpty()) {
-            try {
-                final SSOToken token = ssoTokenManager.createSSOToken(sessionId.toString());
-                final List<Future<?>> futures = new ArrayList<>();
-                final CountDownLatch latch = new CountDownLatch(handlers.size());
-
-                for (final String clazz : handlers) {
-                    Runnable timeoutTask = new Runnable() {
-
-                        public void run() {
-                            try {
-                                SessionTimeoutHandler handler =
-                                        Class.forName(clazz).asSubclass(
-                                                SessionTimeoutHandler.class).newInstance();
-                                switch (eventType) {
-                                    case IDLE_TIMEOUT:
-                                        handler.onIdleTimeout(token);
-                                        break;
-                                    case MAX_TIMEOUT:
-                                        handler.onMaxTimeout(token);
-                                        break;
-                                }
-                            } catch (Exception ex) {
-                                if (Thread.interrupted()
-                                        || ex instanceof InterruptedException
-                                        || ex instanceof InterruptedIOException) {
-                                    sessionDebug.warning("Timeout Handler was interrupted");
-                                } else {
-                                    sessionDebug.error("Error while executing the following session timeout handler: " + clazz, ex);
-                                }
-                            } finally {
-                                latch.countDown();
-                            }
-                        }
-                    };
-                    futures.add(executorService.submit(timeoutTask)); // This should not throw any exceptions.
-                }
-
-                // Wait 1000ms for all handlers to complete.
-                try {
-                    latch.await(1000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ignored) {
-                    // This should never happen: we can't handle it here, so propagate it.
-                    Thread.currentThread().interrupt();
-                }
-
-                for (Future<?> future : futures) {
-                    if (!future.isDone()) {
-                        // It doesn't matter really if the future completes between isDone and cancel.
-                        future.cancel(true); // Interrupt.
-                    }
-                }
-            } catch (SSOException ssoe) {
-                sessionDebug.warning("Unable to construct SSOToken for executing timeout handlers", ssoe);
-            }
-        }
     }
 
     /**

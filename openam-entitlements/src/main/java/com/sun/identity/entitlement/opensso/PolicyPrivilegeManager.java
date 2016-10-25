@@ -73,6 +73,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     private static Subject dsameUserSubject;
 
     private final NotificationBroker broker;
+    private final NotificationsConfig notificationsConfig;
 
     static {
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -92,11 +93,13 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
      */
     @Inject
     public PolicyPrivilegeManager(ApplicationServiceFactory applicationServiceFactory,
-            ResourceTypeService resourceTypeService,
-            ConstraintValidator constraintValidator,
-            NotificationBroker broker) {
+                                  ResourceTypeService resourceTypeService,
+                                  ConstraintValidator constraintValidator,
+                                  NotificationBroker broker,
+                                  NotificationsConfig notificationsConfig) {
         super(applicationServiceFactory, resourceTypeService, constraintValidator);
         this.broker = broker;
+        this.notificationsConfig = notificationsConfig;
     }
 
     /**
@@ -296,7 +299,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
                     + "applicationName=" + applicationName + ", resources=" + resourceNames);
         }
 
-        if (NotificationsConfig.INSTANCE.isAgentsEnabled()) {
+        if (notificationsConfig.isAgentsEnabled()) {
             JsonValue json = json(object(
                     field("realm", realm),
                     field("policy", current.getName()),

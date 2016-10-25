@@ -43,9 +43,9 @@ import com.sun.identity.common.SearchResults;
 import com.sun.identity.shared.debug.Debug;
 
 /**
- * Responsible for providing ClientSDK implementations of the {@link SessionOperations}. These
- * are all moved from {@link Session}. Importantly they use the {@link SessionRequest} PLL
- * mechanism for performing these operations.
+ * Responsible for providing ClientSDK implementations of the {@link SessionOperations}.
+ * <p>
+ * Importantly they use the {@link SessionRequest} PLL mechanism for performing these operations.
  */
 public class ClientSdkOperations implements SessionOperations {
     protected static final String INVALID_SESSION_STATE = "invalidSessionState";

@@ -39,6 +39,7 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
 import com.iplanet.dpro.session.share.SessionInfo;
 
@@ -58,6 +59,8 @@ public class StatelessOperationsTest {
 
     @Mock
     private SessionLogging mockSessionLogging;
+    @Mock
+    private SessionAuditor mockSessionAuditor;
 
     private SessionID sid;
 
@@ -73,8 +76,7 @@ public class StatelessOperationsTest {
         given(mockSession.getID()).willReturn(sid);
         given(mockSession.getSessionID()).willReturn(sid);
         statelessOperations = new StatelessOperations(
-                null, mockSessionFactory,
-                mockSessionBlacklist, mockSessionLogging, null,
+                null, mockSessionFactory, mockSessionBlacklist, mockSessionLogging, mockSessionAuditor,
                 mockSessionChangeAuthorizer);
     }
 
@@ -114,7 +116,13 @@ public class StatelessOperationsTest {
 
         // Then
         verify(mockSessionLogging).logEvent(
-                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEventType.LOGOUT);
+                eq(mockSessionFactory.getSessionInfo(mockSession.getSessionID())),
+                eq(SessionEventType.LOGOUT),
+                anyLong());
+        verify(mockSessionAuditor).auditActivity(
+                eq(mockSessionFactory.getSessionInfo(mockSession.getSessionID())),
+                eq(SessionEventType.LOGOUT),
+                anyLong());
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 
@@ -140,7 +148,13 @@ public class StatelessOperationsTest {
 
         // Then
         verify(mockSessionLogging).logEvent(
-                mockSessionFactory.getSessionInfo(mockSession.getSessionID()), SessionEventType.DESTROY);
+                eq(mockSessionFactory.getSessionInfo(mockSession.getSessionID())),
+                eq(SessionEventType.DESTROY),
+                anyLong());
+        verify(mockSessionAuditor).auditActivity(
+                eq(mockSessionFactory.getSessionInfo(mockSession.getSessionID())),
+                eq(SessionEventType.DESTROY),
+                anyLong());
         verify(mockSessionBlacklist).blacklist(mockSession);
     }
 

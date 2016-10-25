@@ -16,15 +16,25 @@
 package com.iplanet.dpro.session.service;
 
 import javax.inject.Singleton;
+import javax.inject.Inject;
 
 /**
  * Propagates {@link InternalSessionEvent} to fixed set of observers.
  */
 @Singleton
-public class SessionEventBroker implements InternalSessionListener {
+public class InternalSessionEventBroker implements InternalSessionListener {
+
+    private final InternalSessionListener[] listeners;
+
+    @Inject
+    public InternalSessionEventBroker(final InternalSessionListener... listeners){
+        this.listeners = listeners;
+    }
 
     @Override
-    public void onEvent(final InternalSessionEvent evt) {
-        // TODO: Propagate to auditing and notification listeners (AME-12528)
+    public void onEvent(final InternalSessionEvent event) {
+        for (final InternalSessionListener listener : listeners) {
+            listener.onEvent(event);
+        }
     }
 }

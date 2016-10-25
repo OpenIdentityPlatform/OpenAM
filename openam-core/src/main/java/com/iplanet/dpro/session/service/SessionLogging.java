@@ -31,8 +31,8 @@ package com.iplanet.dpro.session.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Date;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,13 +54,10 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * Responsible for logging Session events to the audit logs amSSO.access and amSSO.error.
  *
- * amSSO access and error logging logic extracted from SessionService class
- * as part of first-pass refactoring to improve SessionService adherence to SRP.
- *
  * @since 13.0.0
  */
 @Singleton
-public class SessionLogging {
+public class SessionLogging implements InternalSessionListener {
 
     private static final String LOG_PROVIDER = "Session";
     private static final String AM_SSO_ACCESS_LOG_FILE = "amSSO.access";
@@ -86,13 +83,48 @@ public class SessionLogging {
         this.adminTokenAction = adminTokenAction;
     }
 
+    @Override
+    public void onEvent(final InternalSessionEvent event) {
+        switch (event.getType()) {
+            case SESSION_MAX_LIMIT_REACHED:
+                logSystemMessage("SESSION_MAX_LIMIT_REACHED");
+                break;
+            default:
+                logEvent(event.getInternalSession().toSessionInfo(), event.getType(), event.getTime());
+        }
+    }
+
     /**
      * Log the event based on the values contained in the SessionInfo
      *
      * @param sessionInfo SessionInfo
      * @param eventType event type.
      */
-    public void logEvent(SessionInfo sessionInfo, SessionEventType eventType) {
+    public void logEvent(SessionInfo sessionInfo, SessionEventType eventType, long timestamp) {
+        switch (eventType) {
+            case SESSION_CREATION:
+                logEvent(sessionInfo, "SESSION_CREATED", timestamp);
+            case IDLE_TIMEOUT:
+                logEvent(sessionInfo, "SESSION_IDLE_TIMED_OUT", timestamp);
+            case MAX_TIMEOUT:
+                logEvent(sessionInfo, "SESSION_MAX_TIMEOUT", timestamp);
+            case LOGOUT:
+                logEvent(sessionInfo, "SESSION_LOGOUT", timestamp);
+            case DESTROY:
+                logEvent(sessionInfo, "SESSION_DESTROYED", timestamp);
+            case PROPERTY_CHANGED:
+                logEvent(sessionInfo, "SESSION_PROPERTY_CHANGED", timestamp);
+            case QUOTA_EXHAUSTED:
+                logEvent(sessionInfo, "SESSION_QUOTA_EXHAUSTED", timestamp);
+            case PROTECTED_PROPERTY:
+                logEvent(sessionInfo, "SESSION_PROTECTED_PROPERTY_ERROR", timestamp);
+            default:
+                logEvent(sessionInfo, "SESSION_UNKNOWN_EVENT", timestamp);
+        }
+
+    }
+
+    private void logEvent(SessionInfo sessionInfo, String logMessageId, long timestamp) {
         try {
             String clientID = sessionInfo.getClientID();
             String uidData;
@@ -102,9 +134,9 @@ public class SessionLogging {
                 StringTokenizer st = new StringTokenizer(clientID, ",");
                 uidData = (st.hasMoreTokens()) ? st.nextToken() : clientID;
             }
-            String logMessageId = getLogMessageId(eventType);
             String[] data = {uidData};
             LogRecord lr = getLogMessageProvider().createLogRecord(logMessageId, data, null);
+            lr.addTimeLogInfo(new Date(timestamp));
             lr.addLogInfo(LogConstants.LOGIN_ID_SID, sessionInfo.getSessionID());
             lr.addLogInfo(LogConstants.CONTEXT_ID, sessionInfo.getProperties().get(Constants.AM_CTX_ID));
             lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
@@ -118,43 +150,19 @@ public class SessionLogging {
         }
     }
 
-    public void logSystemMessage(String msgID) {
+    private void logSystemMessage(String logMessageId) {
         if (!serviceConfig.isLoggingEnabled()) {
             return;
         }
         try {
-            String[] data = {msgID};
-            LogRecord lr = getLogMessageProvider().createLogRecord(msgID, data, null);
+            String[] data = {logMessageId};
+            LogRecord lr = getLogMessageProvider().createLogRecord(logMessageId, data, null);
             SSOToken serviceToken = AccessController.doPrivileged(adminTokenAction);
             lr.addLogInfo(LogConstants.LOGIN_ID_SID, serviceToken.getTokenID().toString());
             lr.addLogInfo(LogConstants.LOGIN_ID, serviceToken.getPrincipal().getName());
             getErrorLogger().log(lr, serviceToken);
         } catch (Exception ex) {
             sessionDebug.error("SessionService.logSystemMessage(): Cannot write to the session error log file: ", ex);
-        }
-    }
-
-    private String getLogMessageId(SessionEventType eventType) {
-
-        switch (eventType) {
-            case SESSION_CREATION:
-                return "SESSION_CREATED";
-            case IDLE_TIMEOUT:
-                return "SESSION_IDLE_TIMED_OUT";
-            case MAX_TIMEOUT:
-                return "SESSION_MAX_TIMEOUT";
-            case LOGOUT:
-                return "SESSION_LOGOUT";
-            case DESTROY:
-                return "SESSION_DESTROYED";
-            case PROPERTY_CHANGED:
-                return "SESSION_PROPERTY_CHANGED";
-            case QUOTA_EXHAUSTED:
-                return "SESSION_QUOTA_EXHAUSTED";
-            case PROTECTED_PROPERTY:
-                return "SESSION_PROTECTED_PROPERTY_ERROR";
-            default:
-                return "SESSION_UNKNOWN_EVENT";
         }
     }
 

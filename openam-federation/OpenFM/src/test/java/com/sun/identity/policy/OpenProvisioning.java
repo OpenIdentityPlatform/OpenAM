@@ -61,6 +61,7 @@ import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.NotificationsConfig;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -83,6 +84,7 @@ public class OpenProvisioning {
     private ConstraintValidator constraintValidator;
     private ApplicationServiceFactory applicationServiceFactory;
     private NotificationBroker broker;
+    private NotificationsConfig notificationsConfig;
 
     @BeforeClass
     public void setup()
@@ -91,6 +93,7 @@ public class OpenProvisioning {
         constraintValidator = Mockito.mock(ConstraintValidator.class);
         applicationServiceFactory = Mockito.mock(ApplicationServiceFactory.class);
         broker = Mockito.mock(NotificationBroker.class);
+        notificationsConfig = Mockito.mock(NotificationsConfig.class);
         SSOToken adminToken = (SSOToken)AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
         AMIdentityRepository amir = new AMIdentityRepository(
@@ -107,7 +110,7 @@ public class OpenProvisioning {
     private void createPolicy(SSOToken adminToken)
         throws EntitlementException {
         PrivilegeManager pMgr = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator, broker);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pMgr.initialize("/", SubjectUtils.createSubject(adminToken));
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("CREATE", Boolean.TRUE);
@@ -145,7 +148,7 @@ public class OpenProvisioning {
         amir.deleteIdentities(identities);
 
         PrivilegeManager pMgr = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator, broker);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pMgr.initialize("/", SubjectUtils.createSubject(adminToken));
         pMgr.remove(PRIVILEGE_NAME);
     }
