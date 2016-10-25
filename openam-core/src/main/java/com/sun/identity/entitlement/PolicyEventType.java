@@ -34,8 +34,8 @@ public enum PolicyEventType {
     DELETE,
 
     /**
-     * When a policy is modified.
+     * When a policy is updated.
      */
-    MODIFY
+    UPDATE
 
 }

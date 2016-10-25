@@ -259,7 +259,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         pdb.removePrivilege(getAdminSubject(), currentRealm, oldP);
 
         pdb.addPolicy(getAdminSubject(), currentRealm, privilege);
-        notifyPrivilegeChanged(currentRealm, oldP, privilege, PolicyEventType.MODIFY);
+        notifyPrivilegeChanged(currentRealm, oldP, privilege, PolicyEventType.UPDATE);
     }
 
     /**
