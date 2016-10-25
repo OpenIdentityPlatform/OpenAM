@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.forgerock.openam.keystore.KeyStoreConfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,8 +40,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class BootstrapConfig {
     @JsonIgnore
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    // pattern we use to match for ${env.ENV_VAR} or ${ENV} to run expansions
-    private final static Pattern ENV_VAR_PATTERN = Pattern.compile("\\$\\{(\\w*\\.?\\w+)\\}|\\$(\\w+)");
+
     private String instance;
     private String dsameUser;
     private Map<String, KeyStoreConfig> keystores = new HashMap<String, KeyStoreConfig>();
@@ -68,8 +66,11 @@ public class BootstrapConfig {
     }
 
     /**
-     * Return the string value, expanding any environment variables
-     * found in the expression.
+     * Return the string value, expanding any environment variables and java system properties
+     * found in the expression. The supported syntax for environment variables is ${env.NAME}.
+     * Java properties are of the form ${property.name}
+     * <p>
+     * If the environment variable or system property is not present, the ${} expression will be left as is.
      * <p>
      * For example    "Home dir is ${env.HOME}"  will expand using the env var "HOME"
      * to something like "Home dir is /home/justin_bieber"
@@ -78,26 +79,11 @@ public class BootstrapConfig {
      * @return The expanded string value
      */
 
-    static String expandEnvironmentVariables(String value) {
-        if (null == value) {
-            return null;
-        }
-        Matcher m = ENV_VAR_PATTERN.matcher(value);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String envVarValue = null;
-            String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
-            if( envVarName.startsWith(("env."))) {
-                envVarValue = System.getenv(envVarName.substring(3));
-            }
-            else {
-                envVarValue = System.getProperty(envVarName);
-            }
-            m.appendReplacement(sb,
-                    null == envVarValue ? "" : Matcher.quoteReplacement(envVarValue));
-        }
-        m.appendTail(sb);
-        return sb.toString();
+    public static String expandEnvironmentVariables(String value) {
+        // First replace any java system props using the syntax ${prop.name}
+        String s = StrSubstitutor.replaceSystemProperties(value);
+        // now any env vars
+        return StrSubstitutor.replace(s, System.getenv(), "${env.", "}");
     }
 
     public String getDsameUserPassword() {
